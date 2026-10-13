@@ -28,6 +28,8 @@ The [prior-session synthesis](../../research_notes/Global%20X%20Camera%20decisio
 | D-12 | **USB powers the camera and firmware emulates a drive presenting stored photos as files. Shutter does nothing in USB mode.** | Message 044. Select the easiest practical filesystem during prototype firmware work. Keep the battery converter disabled and prevent backfeed; exact detection/isolation/RUN-inhibit circuit remains open. USB mode is download/explicit erase, not capture. |
 | D-13 | **Ignore shutter presses during capture or saving; no queued exposure; require a fresh press after ready.** | Recommendation in 049 accepted by “ignore” in 050. Finish the current capture/save normally. Debounce, busy/completion LED patterns and rearming implementation remain open. Do not turn a press begun while busy into a later shot merely because it is still held. |
 | D-14 | **Record decisions and discoveries in this repository and commit/push the consolidated project.** | Message 050. The Page is a convenience view. Preserve historical evidence while distinguishing it from current requirements. |
+| D-15 | **Low battery detected at any point in the cycle: one red LED flash, abort the cycle and enter shutdown.** | Subsequent explicit user approval, quoted in [F-01](failure-response-review.md#f-01-low-battery-detected-at-any-point-in-the-cycle--approved). No automatic retry or resumption in the same powered session. Indication requires enough remaining power; sudden loss before firmware can act is a separate case. Thresholds and timing remain unqualified. |
+| D-16 | **Shutdown is the lowest attainable power state; another image requires a power cycle.** | Same user clarification, recorded in the [failure response review](failure-response-review.md#shutdown-definition--approved). A firmware wake/software reset is insufficient. Main capture electronics must power-cycle; RTC backup may remain. Held-button Standby and actual rail-discharge/rearm requirements still apply. |
 
 ## Future directions explicitly retained
 
@@ -76,6 +78,8 @@ FD-03 is different from the optional **RUN-to-ground capacitor** in D-11: the se
 ## Remaining decisions and implementation work
 
 Discuss unresolved choices one at a time. Do not reopen settled choices merely because their implementation still needs engineering.
+
+The user requested that failure reasons be considered individually. The [failure response review](failure-response-review.md) tracks that discussion, separating proposed responses from approved decisions. Low-battery handling at any cycle phase and the shutdown/power-cycle definition are now approved (D-15/D-16). Abrupt power loss before firmware can act is the next case.
 
 | Order | Open item | What closes it |
 |---|---|---|

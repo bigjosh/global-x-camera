@@ -16,9 +16,11 @@ Current decisions and their remaining implementation boundaries are indexed in t
 | Photo capacity | **At least 200 full-native-resolution, uncompressed packed RAW10 photos between downloads** from CAM-6G3-073CLR / VD56G3. This is a capacity requirement; the exact NAND part and implemented storage format remain to be qualified. |
 | Full image readback | **Approved October 13:** full payload readback plus checksum comparison is configurable, enabled by default during bring-up/initial testing, and may be disabled later. Required save checks and final commit-record readback verification remain mandatory; see §6.1. Firmware implementation remains pending. |
 | Storage full | **Approved October 13:** preserve existing committed photos, reject new captures when no usable slot remains, and indicate storage full with the status LED. Reclaim saved-photo space through an explicit USB erase action after download; connection or download alone must not erase photos. Firmware implementation remains pending. |
-| Presses while busy | **Approved October 13:** ignore additional shutter presses during capture/save, finish the current operation, and do not queue another exposure. A new capture requires a fresh press after the camera is ready. |
+| Presses while busy | **Approved October 13:** ignore additional shutter presses during capture/save, finish the current operation unless a fault requires abort, and do not queue another exposure. A new capture requires a fresh press after ready and an actual power cycle of the main capture electronics after shutdown. |
 | USB mode | **Approved October 13:** USB powers the camera for download and explicit erase only; the shutter has no operation while connected. Firmware will emulate a host-visible USB mass-storage drive presenting stored photos as files. Choose the easiest practical emulated filesystem and photo-file representation during prototype firmware work. Firmware and USB power isolation remain unimplemented. |
 | Post-save shutdown | **Clarified October 13:** prepare peripherals and the required shutdown sequence, then enter genuine STM32N6 Standby so an ordinary HOLD GPIO becomes high impedance and releases the diode hold path. A held shutter keeps the buck enabled until release. External rail sequencing and any RUN-delay capacitor remain unimplemented. |
+| Shutdown state | **Approved October 13:** the lowest attainable power state; the main capture electronics must undergo an actual power cycle before another image. RTC backup may remain powered. A held button waits for release; no automatic wake or retake. A fresh press alone does not substitute for the power cycle. |
+| F-01: low battery at any phase | **Approved October 13:** one red LED flash, then abort the cycle to the shutdown state. Indication requires sufficient remaining power; successful commit is not a prerequisite to this abnormal abort. Preserve existing committed photos; detection, thresholds and interrupted-write recovery remain implementation work. |
 | Battery and main converter | **Four CR2032 cells in series through LTC3621.** These are the prototype power choices. |
 | Room-temperature OFF current | **0.1 µA (100 nA) target for the main power path**, including regulator, input-capacitor, switch, PCB and other pack-connected leakage. The retained RTC cell-tap drain is additional and excluded from this target; it must be measured and budgeted separately. Compliance is not yet demonstrated. |
 | Cold-start shutter timing | **≤50 ms from shutter-button press to start of exposure, starting fully powered off.** Exposure duration, frame readout, save and shutdown may follow and are measured separately. This is the acceptance requirement, not demonstrated hardware performance. |
@@ -38,14 +40,15 @@ The PCB is intended to be both the electronic assembly and a structural rear sur
 
 ### 1.1 Required user-visible behavior
 
-1. With no USB cable attached and the camera idle, the main electronic system is physically power-gated.
+1. With no USB cable attached, the shutter released and shutdown complete, the main electronic system is physically power-gated. A held shutter can keep the buck enabled in the lowest attainable state until release.
 2. With USB disconnected, pressing the right-angle shutter switch starts the battery power latch.
 3. The processor asserts its power-hold signal before the user releases the switch.
 4. The processor boots from external Quad-SPI NOR, establishes clocks and rails, and checks for a usable storage slot. If none remains, it preserves existing committed photos, rejects the capture and indicates storage full with the status LED. Otherwise, it initializes the camera, reads orientation and time, and captures one image.
 5. The image is written to raw SLC NAND with firmware-managed bad blocks/pages.
-6. The status LED communicates capture/save state. Ignore additional shutter presses while capture/save is busy, finish the current operation and queue no exposure; a new capture requires a fresh press after the camera is ready.
+6. The status LED communicates capture/save state. Ignore additional shutter presses while capture/save is busy, finish the current operation unless a fault requires abort, and queue no exposure. Another image requires a power cycle of the main capture electronics after shutdown and a fresh press after ready.
 7. After all required save checks and verification of the durable NAND commit record, firmware prepares peripherals and the required shutdown sequence, then enters Standby. The ordinary HOLD GPIO becomes high impedance, releasing the diode hold path. With the shutter released, the main supply turns off after any qualified shutdown delay; a held shutter keeps the buck enabled while the MCU remains in Standby until release. Full image readback follows the configurable policy in §6.1.
 8. When USB-C is attached, USB powers the camera's download/explicit-erase mode independently of the batteries. Firmware emulates a host-visible drive with stored photos presented as files, and the shutter has no operation. Erasing saved photos after download requires an explicit USB erase action; attaching USB or downloading images does not itself erase them.
+9. At any phase of a cycle, detected low battery causes one red LED flash while sufficient power remains, followed by abort to the shutdown state. Abort is not proof of a successful save; retain an already valid, committed current image and never claim an incomplete or unverified image was saved. See §6.4 for the power-cycle and data-preservation requirements.
 
 ### 1.2 Performance priorities
 
@@ -268,7 +271,7 @@ The recovered design used a CAM-6G3 reference STEP while electrically specifying
 
 ## 6. Firmware architecture requirements
 
-The staged workflow remains the starting point, but the inherited rail actions and sensor initialization below must be reconciled with CAM-6G3-073CLR and the LTC3621 implementation. No existing firmware or timing model is thereby qualified for the new module.
+The staged workflow remains the starting point, but the inherited rail actions and sensor initialization below must be reconciled with CAM-6G3-073CLR and the LTC3621 implementation. No existing firmware or timing model is thereby qualified for the new module. The sequence below describes successful capture/save; F-01 low battery at any phase instead follows the abnormal abort in §6.4.
 
 For battery-powered capture with USB disconnected, the firmware implementation should use a staged, latency-measured startup:
 
@@ -296,9 +299,9 @@ USB detection, source selection and isolation—including preventing unintended 
 
 **Full image verification is configurable:** read back the full stored image payload and compare its checksum with the generated image checksum when enabled. Enable this by default during bring-up and initial testing. It may be disabled later; the measured behavior that would justify disabling it and any quantitative criteria have not yet been settled.
 
-**Required in both modes:** generate and store image checksums and integrity metadata; wait for NAND program/busy completion; check completion status and program-failure indicators; perform the required ECC, bad-block and recovery handling; and establish a valid durable commit. ECC status applies to data actually read and cannot verify an unread image payload.
+**Required for a successful save in both modes:** generate and store image checksums and integrity metadata; wait for NAND program/busy completion; check completion status and program-failure indicators; perform the required ECC, bad-block and recovery handling; and establish a valid durable commit. ECC status applies to data actually read and cannot verify an unread image payload.
 
-Read back and verify the **final commit record** in both modes, separately from the optional full image readback. Complete all required data and metadata operations, status/failure checks and commit-record verification before reporting a successful save or performing the normal post-save shutdown. Disabling full image readback does not make these steps optional. This is an approved firmware requirement; its implementation and measured behavior remain unverified.
+Read back and verify the **final commit record** in both modes, separately from the optional full image readback. Complete all required data and metadata operations, status/failure checks and commit-record verification before reporting a successful save or performing the normal post-save shutdown. Disabling full image readback does not make these steps optional. An abnormal low-battery abort under §6.4 must not wait for a successful commit or report an incomplete photo as saved. This is an approved firmware requirement; its implementation and measured behavior remain unverified.
 
 ### 6.2 Storage-full policy — approved October 13, 2026
 
@@ -308,7 +311,15 @@ The exact LED pattern and erase-interface details remain implementation work. Th
 
 ### 6.3 Presses while busy — approved October 13, 2026
 
-Ignore additional shutter presses during capture and save. Finish the current operation without queuing another exposure. A new capture requires a fresh press after the camera is ready; a press made while busy, even if still held at completion, must not become a deferred shot. The existing held-button Standby behavior still applies. Exact busy/ready indication and input handling remain implementation work, and USB mode keeps the shutter inactive.
+Ignore additional shutter presses during capture and save. Finish the current operation unless a fault requires abort, without queuing another exposure. A new capture requires an actual power cycle of the main capture electronics after shutdown and a fresh press after ready; a press made while busy, even if still held at completion, must not become a deferred shot. The existing held-button Standby behavior still applies. Exact busy/ready indication and input handling remain implementation work, and USB mode keeps the shutter inactive.
+
+### 6.4 F-01: low-battery abort and shutdown state — approved October 13, 2026
+
+**Low battery at any point in the cycle:** indicate it with **one red LED flash**, then abort the cycle to the shutdown state. This applies before exposure, during capture/save and through post-save shutdown. A flash can only occur while enough power remains; the requirement does not establish detection or indication after rail collapse. Do not continue or retry the exposure automatically, and do not require successful image commit before this abnormal abort. Preserve existing committed photos, including the current image if already valid and durably committed; never present an incomplete or unverified write as successfully saved. Exact interruption, cleanup and recovery handling remain open.
+
+**Shutdown means the lowest attainable power state, with an actual power cycle of the main capture electronics required before another image.** RTC backup may remain powered. Prepare peripherals and the shutdown sequence as remaining power permits, then use the Standby/HOLD handoff. With the prototype divider and a held button, remain in the lowest attainable state until release permits main power-off; prevent automatic wake or retake. A fresh press or software wake without the intervening main-power cycle is insufficient.
+
+Battery measurement circuitry, thresholds, load qualification and available warning/shutdown energy are unimplemented or unqualified; no hold-up guarantee is implied. The recovered [BOM](bom.txt) identifies LED1 as **ROHM SML-P11MTT86R, green/yellow-green**. It does not meet the new red indication requirement; select and qualify a red-capable indication implementation without treating the unchanged BOM/CAD as compliant. Flash duration and drive details remain implementation work.
 
 ## 7. Validation and bring-up
 
@@ -337,7 +348,8 @@ Adapt the recovered circuit checklist below to the implemented CAM-6G3-073CLR/LT
 - Validate QSPI boot and redundant FSBL selection.
 - Run destructive NAND bad-block, program, readback, interrupted-write, and recovery tests.
 - Confirm full image readback/checksum comparison is enabled by default for bring-up. Validate that disabling it retains required completion/status checks, integrity metadata, ECC/recovery handling and final commit-record readback verification before normal shutdown.
-- Verify busy presses do not interrupt the current capture/save or queue a shot, and a fresh press is required after ready. Verify the shutter is inactive in USB mode and downloads do not erase photos.
+- Verify busy presses do not interrupt the current capture/save or queue a shot, and another image requires an actual main-power cycle after shutdown plus a fresh press after ready. Verify the shutter is inactive in USB mode and downloads do not erase photos.
+- Exercise F-01 before exposure, during capture/save and through post-save shutdown: one red flash where power permits, abnormal abort without falsely reporting incomplete/unverified data as saved, preservation of committed photos, and no automatic wake/retake before a main-power cycle. Qualify battery detection and interrupted-write recovery separately.
 - Validate RTC backup operation with main power absent and confirm no digital-pin backfeed.
 - Validate accelerometer switched-power behavior and orientation mapping.
 - Verify camera rail sequence, MCLK, I2C identity, CSI lock and repeated cold starts; measure shutter-button press to exposure start separately from exposure duration, first complete frame, save and shutdown.
