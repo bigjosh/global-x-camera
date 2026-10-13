@@ -1,0 +1,62 @@
+                                                                                                                W25Q128JV
+
+
+
+
+
+                                                                                                                  SPEC
+ DESCRIPTION                                                             SYMBOL           ALT                                               UNIT
+                                                                                                    MIN        TYP           MAX
+ Write Protect Setup Time Before /CS Low                                  tWHSL(3)                   20                                      ns
+
+ Write Protect Hold Time After /CS High                                   tSHWL(3)                  100                                      ns
+
+ /CS High to Power-down Mode                                                tDP(2)                                              3            µs
+
+ /CS High to Standby Mode without ID Read                                 tRES1(2)                                              3            µs
+ /CS High to Standby Mode with ID Read                                    tRES2(2)                                            1.8            µs
+
+ /CS High to next Instruction after Suspend                                tSUS(2)                                             20            µs
+
+ /CS High to next Instruction after Reset                                  tRST(2)                                             30            µs
+
+ /RESET pin Low period to reset the device                                tRESET(2)                  1(4)                                    µs
+
+ Write Status Register Time                                                   tW                                10             15            ms
+
+ Page Program Time                                                           tPP                                0.4             3            ms
+
+ Sector Erase Time (4KB)                                                     tSE                                45            400            ms
+
+ Block Erase Time (32KB)                                                     tBE1                              120           1,600           ms
+
+ Block Erase Time (64KB)                                                     tBE2                              150           2,000           ms
+
+ Chip Erase Time                                                             tCE                                40            200             s
+
+Notes:
+     1.    Clock high or Clock low must be more than or equal to 45%Pc. Pc = 1/fc(max).
+     2.    Value guaranteed by design and/or characterization, not 100% tested in production.
+     3.    Only applicable as a constraint for a Write Status Register instruction when SRP=1.
+     4.    It’s possible to reset the device with shorter tRESET (as short as a few hundred ns), a 1us minimum is recommended to
+           ensure reliable operation.
+     5.    Tested on sample basis and specified through design and characterization data. TA = 25° C, VCC = 3.0V, 25% driver
+           strength.
+     6.    4-bytes address alignment for Quad Read
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                 Publication Release Date: December 24, 2024
+                                                                   - 66 -                                                   Revision M

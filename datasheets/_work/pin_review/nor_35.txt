@@ -1,0 +1,60 @@
+                                                                                                      W25Q128JV
+
+
+
+
+
+
+
+
+
+Fast Read Quad I/O with “8/16/32/64-Byte Wrap Around” in Standard SPI mode
+
+The Fast Read Quad I/O instruction can also be used to access a specific portion within a page by issuing
+a “Set Burst with Wrap” (77h) command prior to EBh. The “Set Burst with Wrap” (77h) command can
+either enable or  disable the “Wrap Around” feature for the following EBh commands. When “Wrap
+Around” is enabled, the data being accessed can be limited to either an 8, 16, 32 or 64-byte section of a
+256-byte page. The output data starts at the initial address specified in the instruction, once it reaches the
+ending boundary of the 8/16/32/64-byte section, the output will wrap around to the beginning boundary
+automatically until /CS is pulled high to terminate the command.
+
+The Burst with Wrap feature allows applications that use cache to quickly fetch a critical address and then
+fill the cache afterwards within a fixed length (8/16/32/64-byte) of data without issuing multiple read
+commands.
+
+The “Set Burst with Wrap” instruction allows three “Wrap Bits”, W6-4 to be set. The W4 bit is used to
+enable or disable the “Wrap Around” operation while W6-5 are used to specify the length of the wrap
+around section within a page. Refer to section 8.2.37 for detail descriptions.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                         Publication Release Date: December 24, 2024
+                                                            - 34 -                                              Revision M

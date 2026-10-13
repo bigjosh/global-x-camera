@@ -1,0 +1,74 @@
+STM32N6x5xx                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            STM32N6x7xx
+
+
+                                                         The analog supply voltage input is available on a separate VDDA18ADC pin, and an
+                                                         isolated supply grou nd connection is provided on VSSA pin.
+
+3.4.7 System supply startup
+
+                                                         The system startup sequence from power-on   has different supply configurations (see
+                                                         Figure 3 and Figure 4), according to the usage of the SMPS.
+
+                                                                              Figure 3. Device startup with V CORE supplied directly from an external SMPS
+
+                                                                                                                            VDD
+
+                                                                                                                                                                                                                POR threshold
+
+
+                                                                                                       VDDA18AON
+
+                                                                                                                                                                                                                POR threshold
+
+
+
+
+                                                                                          pwr_por_rstn
+
+
+                                                                                                     PWR_ON
+
+
+
+                                                                                                                                                                                                                                                            Vddcore_ok threshold
+                                                                                                             VDDCORE
+
+
+                                                                                                                                                                                                                                                           tempo
+                                                                                                      Vcore_ok
+
+
+                                                                               Operating mode                                                       Power                                                  Reset                                                         Wait                                Hardware system                                                                                      Run
+                                                                                                                                                     down                                                                                                         oscillator                                                     init
+
+
+                                                                                                                ck_sys
+
+
+                                                               Supply configuration                                                                                                                                                                             Default configuration                                                                                                               Bypass mode
+
+
+                                                                                                                  SDEN                                                                                                                                                              X
+                                                                                                                                                                                     (1)                                                                                                         (2)                                                                                                                                  (3)                                                                                                                                                                                                                                                                              (4)
+                                                                                                                                                                                                                                                                                                                                                                                                                                    MSv70451V2
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                      DS14791 Rev 10                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          27/263
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         80

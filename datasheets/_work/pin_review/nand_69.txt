@@ -1,0 +1,63 @@
+8-1.    R/B#: Termination for The Ready/Busy# Pin  (R/B#)
+
+The R/B# is an open-drain output pin and a pull-up resistor is necessary to add on the R/B# pin. The R/B#
+outputs the ready/busy status of read/program/ erase operation of the device. When the R/B# is at low, the
+device is busy for read or program or erase operation. When the R/B# is at high, the read/program/erase
+operation is finished.
+
+
+Rp Value Guidence
+The rise time of the R/B# signal depends on the combination of Rp and capacitive loading of the R/B# circuit.
+It is approximately two times constants (Tc) between the 10% and 90% points on the R/B# waveform.
+                 TC = R × C
+Where R = Rp (Resistance of pull-up resistor), and C = CL (Total capacitive load)
+The fall time of the R/B# signal majorly depends on the output impedance of the R/B# signal and the total
+load capacitance.
+
+Rp (Min.) =                                                           Vcc (Max.) - VOL (Max.)
+                          IOL+ΣIL
+
+  Notes:
+      1. Considering of the variation of device-by-device, the above data is for reference to decide the
+          resistor value.
+      2. Rp maximum value depends on the maximum permissible limit of tr.
+      3. IL is the total sum of the input currents of all devices tied to the R/B pin.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                     69

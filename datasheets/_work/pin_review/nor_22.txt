@@ -1,0 +1,56 @@
+                                                                                                  W25Q128JV
+
+
+  8.    INSTRUCTIONS
+The Standard/Dual/Quad SPI instruction set of the W25Q128JV consists of 47 basic instructions that are
+fully controlled through the SPI bus (see Instruction Set Table1-2). Instructions are initiated with the falling
+edge of Chip Select (/CS). The first byte of data clocked into the DI input provides the instruction code.
+Data on the DI input is sampled on the rising edge of clock with most significant bit (MSB) first.
+
+Instructions vary in length from a single byte to several bytes and may be followed by address bytes, data
+bytes, dummy bytes (don’t care), and in some cases, a combination. Instructions are completed with the
+rising edge of edge      /CS. Clock relative timing diagrams for each instruction are included in Figures                     5
+through 57. All read instructions can be completed after any clocked bit. However, all instructions that
+Write, Program or Erase must complete on a byte boundary (/CS driven high after a full 8-bits have been
+clocked) otherwise the instruction will be ignored. This feature further protects the device from inadvertent
+writes. Additionally, while the memory is being programmed or erased, or when the Status Register is
+being written, all instructions except for Read Status Register will be ignored until the program or erase
+cycle has completed.
+
+8.1    Device ID and Instruction Set Tables
+
+8.1.1    Manufacturer and Device Identification
+
+   MANUFACTURER ID                           (MF7 - MF0)
+
+
+   Winbond Serial Flash                      EFh
+
+   Device ID                                 (ID7 - ID0)                      (ID15 - ID0)
+   Instruction                               ABh, 90h, 92h, 94h               9Fh
+
+   W25Q128JV-IN/IQ/JQ                        17h                              4018h
+   W25Q128JV-IM*/JM*                         17h                              7018h
+                                         Note: For DTR, QPI supporting, please refer to W25Q128JV-M DTR datasheet.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                             - 21 -

@@ -1,0 +1,55 @@
+                                                                                                   W25Q128JV
+
+
+7.     STATUS AND CONFIGURATION REGISTERS
+Three Status and Configuration Registers are provided for W25Q128JV. The Read Status Register-1/2/3
+instructions can be used to provide status on the availability of the flash memory array, whether the device
+is write enabled or disabled, the state of write protection, Quad SPI setting, Security Register lock status,
+Erase/Program Suspend status, output driver strength, power-up. The Write Status Register instruction
+can be used to configure the device write protection features, Quad SPI setting, Security Register OTP locks,
+and output driver strength. Write access to the Status Register is controlled by the state of the non-volatile
+Status Register Protect bits (SRL), the Write Enable instruction, and during Standard/Dual SPI operations
+
+7.1    Status Registers
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                  Figure 4a. Status Register-1
+7.1.1    Erase/Write In Progress (BUSY) – Status Only
+BUSY is a read only bit in the status register (S0) that is set to a 1 state when the device is executing a
+Page Program, Quad Page Program, Sector Erase,                    Block Erase, Chip Erase,         Write Status Register       or
+Erase/Program Security Register           instruction. During this time the device will ignore further instructions
+except for the Read Status Register           and Erase/Program Suspend instruction (see tW, tPP, tSE, tBE, and
+tCE  in AC Characteristics). When the program, erase or write status/security                       register instruction has
+completed, the BUSY bit will be cleared to a 0 state indicating the device is ready for further instructions.
+7.1.2    Write Enable Latch (WEL) – Status Only
+Write Enable Latch (WEL) is a read only bit in the status register (S1) that is set to 1 after executing a
+Write Enable Instruction. The WEL status bit is cleared to 0 when the device is write disabled. A write
+disable  state  occurs  upon  power-up  or  after  any  of  the  following  instructions:  Write  Disable,  Page
+Program,    Quad Page Program,           Sector Erase,     Block Erase,      Chip Erase,     Write Status Register, Erase
+Security Register and Program Security Register.
+7.1.3    Block Protect Bits (BP2, BP1, BP0) – Volatile/Non-Volatile Writable
+The Block Protect Bits (BP2, BP1, BP0) are non-volatile read/write bits in the status register (S4, S3, and
+S2) that provide Write Protection control and status. Block Protect bits can be set using the Write Status
+Register Instruction (see tW        in AC characteristics). All, none or a portion of the memory array can be
+protected from Program and Erase instructions (see Status Register Memory Protection table). The
+factory default setting for the Block Protection Bits is 0, none of the array protected.
+
+
+                                                             - 13 -

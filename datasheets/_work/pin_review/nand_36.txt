@@ -1,0 +1,62 @@
+6-9.                   Status Read
+
+The MX30LFxG18AC provides a status register that outputs the device status by writing a command code
+70h, and then the IO pins output the status at the falling edge of CE# or RE# which occurs last.  Even though
+when multiple flash devices are connecting in system and the R/B#pins are common-wired, the two lines of
+CE# and RE# may be checked for individual devices status separately.
+The status read command 70h will keep the device at the status read mode unless next valid command is
+issued. The resulting information is outlined in Table 4 as below.
+
+
+Table 4. Status Output
+
+                                Pin                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 Status                                                                                                                                       Related Mode                                                                                                                                                                                                                                                                                                                                                      Value
+
+                                                                                                                                                              Page Program, Cache
+        SR[0]                                                                                                                                                                                                                        Chip StatusProgram (Page N),              0: Passed                                                        1: Failed
+                                                                                                                                                              Block Erase
+        SR[1]                                                                                                                                                                                                                        Cache Program  Cache Program
+                                                                               Result                                                                         (Page N-1)                                                                                                                                                                                                                                                                                                                                0: Passed                                                                                                                                 1: Failed
+        SR[2-4]                                                                                                                                                                                        Not Used
+                                                                                                                                                              Cache Program/Cache
+        SR[5]                                                                                                                                                                                                                        Ready / Busy Read operation, other Page   0: Busy                                                                                                                                                                         1: Ready
+                                                                               (For P/E/R Controller)                                                         Program/Block Erase/Read
+                                                                                                                                                              are same as IO6 (Note 1)
+                                                                                                                                                              Page Program, Block Erase,
+        SR[6]                                                                                                                                                                                                                                                                           Ready / BusyCache Program, Read, 0: Busy                                                                                                                                                                         1: Ready
+                                                                                                                                                              Cache Read (Note 2)
+        SR[7]                                                                                                                                                                                                                                                                           Write Protect                                                                                          Page Program, Block Erase, Cache Program, Read                                                                                                                                          0: Protected                                                                                               1: Unprotected
+
+    Notes:
+                 1. During the actual programming operation, the SR[5] is "0" value; however, when the internal
+                     operation is completed during the cache mode, the SR[5] returns to "1".
+                 2. The SR[6] returns to "1" when the internal cache is available to receive new data. The SR[6] value is
+                     consistent with the R/B#.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                             36

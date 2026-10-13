@@ -1,0 +1,52 @@
+Functional overview                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    STM32N6x5xx STM32N6x7xx
+
+
+                                   The DCMIPP path offers the following summarized maximum features:
+                                   •                                                                   Target sensors: 5 Mpixel at 30 fps max
+                                   •                                                                  Parallel input: 120 MHz on  16-bit input capability
+                                   •                                                                   Serial input: CSI-2 at 2.5 Gbps/lane on two data lanes
+                                   •                                                                   ISP (image signal processor): demosaicing, exposure, white-balance, contrast,
+                                                bad-pixel
+                                   •                                                                   Application pipes: two pipes with crop, downsize, gamma, YUV conversion, YUV420
+                                   Some over-target use cases are poss  ible, but with specific constraints:
+                                   •                                                                  sensors with resolution above 5 Mpixels
+                                   •                                                                   sensors with pixel rate above 150 Mpixel/s
+                                   •                                                                   double sensors in parallel
+
+3.25.1                                                                        Digital camera interface (DCMI)
+
+                                   The digital camera is a synchronous parallel inte    rface able to receive a high speed data flow
+                                   from an external 8-, 10-, 12- or 14-bit CMOS camera module. It supports different data
+                                   formats: YCbCr4:2:2/RGB565 progressive video and compressed data (JPEG).
+                                   DCMI main features are:
+                                   •                                                                   8-, 10-, 12- or 14-bit parallel interface at 80 MHz (no I/O ReTime)
+                                   •                                                                   Embedded/external line and frame synchronization
+                                   •                                                                   Continuous or snapshot mode
+                                   •                                                                   Crop feature
+                                   •                                                                   Supports the following data formats:
+                                                –                                                        8/10/12/14-bit progressive video:  either monochrome or raw Bayer
+                                                –                                                       YCbCr 4:2:2 progressive video
+                                                –                                                        RGB 565 progressive video
+                                                –                                                        Compressed data: JPEG (any default/byte data)
+
+3.25.2 Digital camera interface pixel pipeline (DCMIPP)
+
+                                   The DCMIPP path groups the DCMIPP pixel pipeline block, its included parallel interface,
+                                   and the abutted CSI-2-Host and PHY.
+                                   The parallel interface has the following features:
+                                   •                                                                   Input rate: 120 MHz up to 16-bit  capability (with I/O ReTime)
+                                   •                                                                   Pixel format: RGB565, 888, YUV422, RawBayer/Mono 8/10/12/14
+                                   •                                                                   Synchronization: embedded versus external line and frame synchronization
+                                   The CSI-2 serial interface has the following features:
+                                   •                                                                  Standard: MIPI CSI2 v1.3
+                                   •                                                                   Input rate: two data lanes at 2.5 Gbps/lane
+                                   •                                                                   Pixel rate: up to 200 Mpixel/s for RGB888, up to 333 Mpixel/s for rawBayer 10
+                                   •                                                                   Pixel format: any MIPI CSI2 v1.3 (RGB565, 888, YUV422, rawBayer)
+                                   •                                                                   Miscellaneous: interlaced video, interleaved packets, virtual channels
+
+
+
+
+
+
+50/263                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          DS14791 Rev 10

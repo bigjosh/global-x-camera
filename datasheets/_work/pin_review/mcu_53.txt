@@ -1,0 +1,52 @@
+STM32N6x5xx                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            STM32N6x7xx
+
+
+                                                            –                                                             Multi-threaded fragment (pixel) processing   core with a VLIW (very-long instruction
+                                                                            word) instruction set.
+                                                            –                                                       Fixed point functional units
+                                                            –                                                        Command list based DMAs to minimize CPU overhead
+                                                            –                                                        Two 64-bit AXI controller interfaces for texture and framebuffer access
+                                                            –                                                       Dedicated 64-bit AXI contro ller interface for command list
+                                                            –                                                        32-bit AHB target interface for register bank access
+                                                            –                                                        Up to four general-purpose flags for system-level synchronization
+                                                            –                                                       Texture decompression unit with TSC™4 and TSC™6/TSC™6a support
+                                           •                                                                   2D drawing features
+                                                            –                                                        Pixel/line drawing
+                                                            –                                                       Filled rectangles
+                                                            –                                                        Triangles, quadrilateral drawing
+                                                            –                                                        Anti-aliasing 8xMSAA (multi-sample anti-aliasing)
+                                           •                                                                   Image transformations
+                                                            –                                                       3D perspective correct projections
+                                                            –                                                        Texture mapping with bilinear  filtering or point sampling
+                                           •                                                                  Blit support
+                                                            –                                                        Rotation, mirroring, stretching (independently on x and y axis)
+                                                            –                                                        Source and/or destination color keying
+                                                            –                                                       Pixel format conversions
+                                           •                                                                   Text rendering support
+                                                            –                                                        A1, A2, A4, and A8 bitmap anti-aliased
+                                                            –                                                       Subsampled anti-aliased
+                                           •                                                                   Color formats
+                                                            –                                                                      ABGR8888, ARGB8888,   BGRA8888,   RGBA8888
+                                                            –                                                        xBGR8888, xRGB8888, BGRx8888,   RGBx8888, RGB888, BGR888
+                                                            –                                                        BGR565, RGB565
+                                                            –                                                        RGB322, BGR322
+                                                            –                                                            TSC4, TSC6, TSC6A
+                                                            –                                                        L1, L2, L4, L8 (gray scale)
+                                                            –                                                                      A1, A2, A4, A8
+                                           •                                                                  Full alpha blending with hardware blender
+                                                            –                                                        Programmable blending modes
+                                                            –                                                        Source/destination color keying
+
+3.30                                                                                              Video encoder (VENC)
+
+                                           The video encoder (VENC) provides a hardware acceleration to encode a 1080p15 video
+                                           stream in H264 (= MPEG4_Part10/AVC). The VEN   C also provides hardware acceleration to
+                                           encode still images (JPEG) of  up to 300 Mpixel/s. The VEN C implementation embeds a
+                                           large 128-Kbyte video RAM (VENCRAM). When  the VENC is disabled, the VENCRAM is
+
+
+
+
+                                                                                                                                                       DS14791 Rev 10                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          53/263
+
+                                                                                                                                                                                                                                                                                                                                                                                    80

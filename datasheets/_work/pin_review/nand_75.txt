@@ -1,0 +1,65 @@
+9-4.    Program
+
+It is feasible to reprogram the data into another page (Page B) when an error occurred in Page A by loading
+from an external buffer. Then create a bad block table or by using another appropriate scheme to prevent
+further system accesses to Page A.
+
+Figure 48. Failure Modes
+
+
+                                   Program error occurs in Page A
+
+
+                                       Buffer
+                                      Memory
+                                                                                   Block
+
+
+
+
+
+                                                                                   Another good block
+                                                 Page B
+
+
+Figure 49. Program Flow Chart
+
+                                                                  Start
+
+
+                                                              Command 80h
+
+                                     Program
+                                     Command                   Set Address
+                                     Flow
+
+                                                              Write Data
+
+
+                                                              Write 10h
+
+
+                                                        Read Status Register
+
+
+
+                                                   No         SR[6] = 1 ?
+                                                             (or R/B# = 1 ?)
+
+
+                                                                     Yes
+                                   Program Error    No        SR[0] = 0 ?
+                                  *
+
+
+                                                                    Yes
+
+                                                           Program Completed
+
+9-5.    Erase
+
+To prevent future accesses to this bad block, it is feasible to create a table within the system or by using
+another appropriate scheme when an error occurs in an Erase operation.
+
+
+                                                                  75

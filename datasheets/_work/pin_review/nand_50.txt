@@ -1,0 +1,64 @@
+6-15-3. Secure OTP (One-Time-Programmable) Feature
+
+There is an OTP area which has thirty full pages (30 x 2,112-byte) guarantee to be good for system
+device serial number storage or other fixed code storage. The OTP area is a non-erasable and one-time-
+programmable area, which is default to “1” and allows whole page or partial page program to be “0”, once the
+OTP protection mode is set, the OTP area becomes read-only and cannot be programmed again.
+The OTP operation is operated by the Set Feature/ Get Feature operation to access the OTP operation mode
+and OTP protection mode.
+To check the NAND device is ready or busy in the OTP operation mode, either checking the R/B# or writing
+the Status Read command (70h) may collect the status.
+To exit the OTP operation or protect mode, it can be done by writing 00h to P1 at feature address 90h.
+
+OTP Read/Program Operation
+To enter the OTP operation mode, it is by using the Set Feature command (EFh) and followed by the feature
+address (90h) and then input the 01h to P1 and 00h to P2-P4 of sub-Feature Parameter data( please refer to
+the sub-Feature Parameter table). After enter the OTP operation mode, the normal Read command (00h-30h)
+or Page program( 80h-10h) command can be used to read the OTP area or program it. The address of OTP
+is located on the 02h-1Fh of page address.
+Besides the normal Read command, the Random Data Output command (05h-E0h) can be used for read
+OTP data.  However, the Cache Read command is not supported in the OTP area.
+Besides the normal page program command, the Random Data Input command (85h) allows multi-data load
+in non-sequential address. After data load is completed, a program confirm command (10h) is issued to start
+the page program operation. The number of partial-page OTP program is 8 per each OTP page.
+
+Figure 29. AC Waveforms for OTP Data Read
+
+
+
+                                                                                         tCLR
+              CLE
+
+
+
+              CE#
+
+
+
+             WE#
+
+
+
+                                                                                         tAR
+
+              ALE
+
+
+
+                                                                                               tRC
+              RE#                                                                       tRR
+
+                                                                                      tR
+                                                                              tWB
+
+                            00h    1st Address2nd AddressOTP  00h             30h              Dout 0                                                Dout 1                                                                                                                                                Dout n
+           IO[7:0]                   Cycle   Cycle   Page                                                                                                                                                        00h
+
+
+
+
+             R/B#
+                                                                                      Busy
+
+
+                                                                         50

@@ -1,0 +1,64 @@
+Electrical characteristics                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      STM32N6x5xx STM32N6x7xx
+
+
+             Table 49. HSE clock characteristics generated from crystal/ceramic resonator     (1) (continued)
+      Symbol                                                                                                                                                                                                                              Parameter                                                                                                                                                                                                                                                                                                                                                                     Conditions                                                                                                                                                                                        Min                                                    Typ                                                Max                                                   Unit
+
+                                                                                                                                                                                                      Startup                                                                                                                                                                                                                                                                                                                                                                                                                                    -                                                                                                 -                                                                                    10
+      IDD(HSE)                                  Current consumption on VDDA18AON                                                                                                                      VDD =1.8 V, Rm= 400 Ω,                                                                                                                                .8-                                                                          mA
+                                                                                                                                                                                                      CL = 6 pF, 48 MHz                          -4
+      tSU(HSE)                                   Startup time                                                                                                                                                                                                                                                                                                                                                                                                       VDD stabilized                                                                                                                                                                                                                                                                                                                                       -                                                                                               2                                                                                               -                                                                                         ms
+                RF                                                                        Internal feedback equivalent resistor                                                                                                                                                                                                                                                                          -                                                                                                                                                                                                                                                                                            -                                                                           250                                                                           -                                                                                        kΩ
+
+1.                          Specified by design, not tested in production.
+
+                                                       For CL1 and CL2, it is recommended to use high-qua  lity external ceramic capacitors,
+                                                       designed for high-frequency applications, and    selected to match the requirements of the
+                                                       crystal or resonator (see Figure 21). CL1 and CL2 are usually the same size. The crystal
+                                                       manufacturer typically specifie  s a load capacitance, which is   the series combination of CL1
+                                                       and CL2. The PCB and pin capacitance must be in   cluded (4 pF can be used as a rough
+                                                       estimate of the combined pin and board capacitance).
+
+                                                                                                                                     Figure 21. Typical application with a 40 MHz crystal
+
+                                                                                                                 CL1
+                                                                                                                                                                                                                   OSC_IN                                                                                                                                                          fHSE
+
+                                                                                                                                                            40 MHz                                                                                                                               Bias
+                                                                                                                                                            crystal                                                                                             RF                     controlled
+                                                                                                                                                                                                                                                                                                  gain
+
+                                                                                                                                                                                                                   OSC_OUT                                                                                                                                                                              STM32
+                                                                                                                 CL2
+
+Note:                                                                                                                      For information on select ing the crystal, refer to AN286 7 “Oscillator design guide for
+                                                       STM8AF/AL/S, STM32 MCUs and MPUs”, available from    www.st.com.
+
+                                                       LSE user clock generated from an external source
+                                                       In bypass mode the LSE oscillator is switched  off and the input pin  is a standard I/O. The
+                                                       external clock signal must respect the values indicated in Table 65. The recommended
+                                                       clock input waveforms are shown in Figure 22 for digital bypass and   Figure 23 for analog
+                                                       bypass.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+162/263                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        DS14791 Rev 10

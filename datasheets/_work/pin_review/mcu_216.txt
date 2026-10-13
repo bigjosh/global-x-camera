@@ -1,0 +1,60 @@
+Electrical characteristics                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      STM32N6x5xx STM32N6x7xx
+
+5.3.32 Camera interface pixel pipeline (DCMIPP) characteristics
+
+                                                                            Unless otherwise specified,  the parameters given in   Table 108 are derived from tests
+                                                                            performed under the ambient temperature, f   HCLK frequency, and VDD supply voltage
+                                                                            summarized in Table 24, with the following configuration:
+                                                                            •                                                                   DCMIPP_PIXCLK polarity: falling
+                                                                            •                                                                  DCMIPP_VSYNC and DCMIPP_ HSYNC polarity: high
+                                                                            •                                                                   Data format: 16 bits
+                                                                            •                                                                   Capacitive load C = 30 pF
+                                                                            •                                                                   HSLV deactivated
+                                                                            •                                                                  Measurement points are done at CMOS levels: 0.5 V  DD
+
+                                                                                                                                                                                                                                      Table 108. DCMIPP characteristics  (1)
+                                                                                                                        Symbol                                                                                                                                                                                                                                                                                                                                                                                                                          Parameter                                                                                                                                                                                                                                                                                                                                  Min                                                             Max                                                         Unit
+
+                                                                                              DCMIPP_PIXCLK                                                          Pixel clock input                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                -                                                                                       120                                                           MHz
+                                                                                                                                Dpixel                                                                                                                                                     Pixel clock input duty cycle                                                                                                                                                                                                                                                                                                                                                                                            30                                                                                   70                                                                                       %
+                                                                                                                        tsu(DATA)                                                                                                                                   Data input setup time                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              2                                                                                                           -
+                                                                                                                          th(DATA)                                                                                                                                       Data hold time                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    3                                                                                                        -ns
+                                                                                     tsu(HSYNC), tsu(VSYNC)                                DCMI_HSYNC/ DCMI_VSYNC input setup time                                                                                                 2                                                                                                           -
+                                                                                          th(HSYNC), th(VSYNC)                                                  DCMI_HSYNC/ DCMI_VSYNC input hold time                                                                                                                   3                                                                                                           -
+
+                                                                            1.                          Evaluated by characterization. Not tested in production.
+
+                                                                                                                                                                                                                                             Figure 50. DCMIPP timing diagram
+
+                                                                                                                                                                                                                                         1/DCMIPP_PIXCLK
+
+                                                                                                                                                DCMIPP_PIXCLK
+
+                                                                                                                                                                                                                                                                                                              tsu(HSYNC)                                                                                                                                        th(HSYNC)
+
+                                                                                                                                                 DCMIPP_HSYNC
+
+                                                                                                                                                                                                                                                                                                          tsu(VSYNC)                                                                                                                                                 th(HSYNC)
+
+                                                                                                                                                 DCMIPP_VSYNC
+                                                                                                                                                                                                                                                                                               tsu(DATA)                        th ( D ATA )
+
+                                                                                                                                                                               DATA[15:0]
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      MSv73149V1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+216/263                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        DS14791 Rev 10

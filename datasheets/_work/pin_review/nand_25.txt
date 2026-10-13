@@ -1,0 +1,97 @@
+     Figure 11-2. AC Waveforms for Cache Read Random
+
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                        tCLR                                                      A
+       CLE
+
+
+
+       CE#
+
+
+
+      WE#
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                         tAR
+
+        ALE
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                           tRC
+        RE#                                                                                                                                                                                                                                                                                                                                                                                                                           tRR
+
+                                                                                                                                                                                                                  tR                                                                                                                                                                                                       tRCBSY
+                                                                                                                                                                                            tWB                                                                                                                                                                                                           tWB
+
+
+                                                                    1st Address           2nd Address           3rd Address              4th Address           5th Address                                                                                                        1st Address            2nd Address            3rd Address            4th Address           5th Address                   31h                                            Page n                   Page n                                           Page n
+IO[7:0]                                       00h                        Cycle                  Cycle                Cycle                   Cycle                  Cycle                    30h                                                             00h                       Cycle                  Cycle                 Cycle                   Cycle                 Cycle                                                                   Dout 0                   Dout 1                                         Dout 2111
+
+                                                                                               Page n address                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               Page m address
+
+
+      R/B#
+                                                                                                                                                                                                                 Busy                                                                                                                                                                                                          Busy
+
+                                                                                A                                                                                                                                                                                                                                                    tCLR
+      CLE
+
+
+
+      CE#
+
+
+
+     WE#
+
+
+
+                                                                                                                                                                                                                                                                                                                                      tAR
+
+       ALE
+
+
+
+                                                                                                                                                                                                                                                                                                                                                        tRC
+       RE#                                                                                                                                                                                                                                                                                                                         tRR
+
+
+                                                                                                                                                                                                                                                                                                                        tRCBSY
+                                                                                                                                                                                                                                                                                                        tWB
+                                       Page n                    Page n                                           Page n                                  00h                  1st Address            2nd Address            3rd Address            4th Address           5th Address                   31h                                            Page m                   Page m                                           Page m
+IO[7:0]                                Dout 0                    Dout 1                                         Dout 2111                                                           Cycle                  Cycle                  Cycle                  Cycle                 Cycle                                                                   Dout 0                   Dout 1                                         Dout 2111
+
+
+                                                                                                                                                                                                                              Page x address
+
+
+    R/B#
+                                                                                                                                                                                                                                                                                                                            Busy
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                                                                                        25

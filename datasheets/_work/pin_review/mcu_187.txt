@@ -1,0 +1,73 @@
+STM32N6x5xx                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            STM32N6x7xx
+
+
+                                                                                  Figure 30. Synchronous non multiplexed NOR/PSRAM read timings
+
+                                                                                                  tw(CLK)                                                                                                                tw(CLK)                                                                                                                                                                                                                                         BUSTURN = 0
+
+                                     FMC_CLK
+                                                                                                                                                                                                          Data latency = 0 (2 cycles)
+                                                               td(CLKL-NADVL)                                                                                                                  td(CLKL-NADVH)
+
+                             FMC_NADV
+                                                                                                                                                  td(CLKL-AV)                                                                                                                                                                                                                                                            td(CLKH-AIV)
+
+                           FMC_A[25:0]
+
+                                                                                                                                                                                                                 td(CLKL-NOEL)                                                                                                                                                                                       td(CLKH-NOEH)
+
+                                 FMC_NOE
+
+                                                                                                                                                                                                                                                                                                                                                                                                        tsu(ADV-CLKH)                                                                             th(CLKH-ADV)
+
+                          FMC_D[15:0]                                                                                                                                                                                                                                                                                                                                      D1                                                                                                                                                                                                                                                 D2
+
+                                                                                                                                                  td(CLKL-NExL)                                                                                                                                                                                                                                                      td(CLKH-NExH)
+                                     FMC_NEx
+
+                                                                                                                                     td(NExL-NWAITV)                                                                                                                                             tsu(NWAITV-CLKH)                                                                                              th(CLKH-NWAITV)
+                          FMC_NWAIT
+            (WAITCFG = 1b,
+               WAITPOL = 0b)                                                                                                                                                                                                                                                                                                                                                         tsu(NWAITV-CLKH)                                                        th(CLKH-NWAITV)
+                          FMC_NWAIT                                                                                                                                                                                                                    tsu(NWAITV-CLKH)                                                                                       th(CLKH-NWAITV)
+            (WAITCFG = 0b,
+               WAITPOL = 0b)                                                                                                                                                                                                                                                                       tsu(NWAITV-CLKH)                                                                                             th(CLKH-NWAITV)
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               MS32759V3
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                                                    DS14791 Rev 10                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        187/263
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   238

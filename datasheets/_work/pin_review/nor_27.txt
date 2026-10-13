@@ -1,0 +1,62 @@
+                                                                                                        W25Q128JV
+
+
+
+8.2.5       Write Status Register-1 (01h), Status Register-2 (31h) & Status Register-3 (11h)
+
+The Write Status Register instruction allows the Status Registers to be written. The writable Status
+Register bits include: SEC, TB, BP[2:0] in Status Register-1; CMP, LB[3:1], QE, SRL in Status Register-2;
+DRV1, DRV0, WPS in Status Register-3. All other Status Register bit locations are read-only and will not
+be affected by the Write Status Register instruction. LB[3:1] are non-volatile OTP bits, once it is set to 1, it
+cannot be cleared to 0.
+
+To write non-volatile Status Register bits, a standard Write Enable (06h) instruction must previously have
+been executed for the device to accept the Write Status Register instruction (Status Register bit WEL
+must equal 1). Once write enabled, the instruction is entered by driving /CS low, sending the instruction
+code “01h/31h/11h”, and then writing the status register data byte as illustrated in Figure 9a.
+
+To write volatile Status Register bits, a Write Enable for Volatile Status Register (50h) instruction must
+have been executed prior to the Write Status Register instruction (Status Register bit WEL remains 0).
+However, SRL and LB[3:1] cannot be changed from “1” to “0” because of the OTP protection for these
+bits. Upon power off or the execution of a Software/Hardware Reset, the volatile Status Register bit values
+will be lost, and the non-volatile Status Register bit values will be restored.
+
+During non-volatile Status Register write operation (06h combined with 01h/31h/11h), after /CS is driven
+high,  the  self-timed  Write  Status  Register  cycle  will commence for  a time duration of tW                         (See AC
+Characteristics). While the Write Status Register cycle is in progress, the Read Status Register instruction
+may still be accessed to check the status of the BUSY bit. The BUSY bit is a 1 during the Write Status
+Register cycle and a 0 when the cycle is finished and ready to accept other instructions again. After the
+Write Status Register cycle has finished, the Write Enable Latch (WEL) bit in the Status Register will be
+cleared to 0.
+
+During volatile Status Register write operation (50h combined with 01h/31h/11h), after /CS is driven high,
+the Status Register bits will be refreshed to the new values within the time period of tSHSL2 (See AC
+Characteristics). BUSY bit will remain 0 during the Status Register bit refresh period.
+
+
+Refer to section 7.1 for Status Register descriptions.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                         Figure 9a. Write Status Register-1/2/3 Instruction
+
+
+
+
+
+                                                                           Publication Release Date: December 24, 2024
+                                                              - 26 -                                               Revision M

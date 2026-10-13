@@ -1,0 +1,78 @@
+STM32N6x5xx                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            STM32N6x7xx
+
+
+                                                                                                                   Figure 58. I2S target timing diagram (Philips protocol)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1.                          LSB transmit/receive of the previously transmitted byte. No LSB transmit/receive is sent before the first byte.
+
+                                                                                                        Figure 59. I2S controller timing diagram (Philips protocol)
+
+
+
+
+
+                                                                                                                                                                                                                                                                                                                      tf(CK)                                                    tr(CK)
+
+
+
+
+
+                                                                                                                                                                                                                    tc(CK)
+
+                        CP OL = 0
+                                                                                                                                          tw(CKH)
+
+                        CP OL = 1
+                                                                                             tv(WS)                                                                                                                                                                                    tw(CKL)                                                                                                                                                 th(WS)
+
+                      WS output
+
+                                                                                                                                                                                                                                                                                                                                                      tv(SD_MT)                                                                                    th(SD_MT)
+
+                  SDtransmit                                                                                                                                                  LSB transmit(2)                                                                        MSB transmit                                                                                                            Bitn transmit                                                                                                LSB transmit
+
+                                                                                                                                                                                    tsu(SD_MR)                                                                                                                                                th(SD_MR)
+
+                  SDreceive                                                                                                                                         LSB receive(2)                                                                           MSB receive                                                                                                                             Bitn receive                                                                                             LSB receive
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 ai14884b
+
+1.                          LSB transmit/receive of the previously transmitted byte. No LSB transmit/receive is sent before the first byte.
+
+
+
+
+                                                                                                                                                                                                                           DS14791 Rev 10                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        227/263
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            238

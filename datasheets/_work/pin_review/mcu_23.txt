@@ -1,0 +1,51 @@
+STM32N6x5xx                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            STM32N6x7xx
+
+3 Functional overview
+
+3.1                                                                                                                        Arm Cortex-M55 core with TrustZone, FPU, NVIC
+
+                                  The device architecture relies on an Arm   Cortex-M55 core optimized for execution:
+                                  •                                                                   Main controllers:
+                                               –                                                        Cortex-M55 with Arm TrustZone mainline, with two controller ports
+                                                            - M-AXI: provides access to the memory and to the peripherals
+                                                            - P-AHB: provides access to the peripherals
+                                               –                                                        NPU (neural processor unit), including two controller AXI ports
+                                  •                                                                  Memories:
+                                               –                                                        AHB and APB peripherals
+                                               –                                                       4.2 Mbytes of SRAM
+                                               –                                                       128-Kbyte data TCM RAM with ECC for crit ical real-time data, and 64-Kbyte of
+                                                            instruction TCM RAM with ECC for critic al real-time routines (TCMs case not
+                                                            extended)
+                                               –                                                        8 Kbytes of backup SRAM (BKPSRAM) active in V   BAT mode
+                                               –                                                        2 x 16-Kbyte AHB RAMs
+                                               –                                                                 Flexible external memory controller (FLEXMEM) with cypher engine supporting up
+                                                            to 32-bit data bus: SRAM, PSRAM, SDRAM,  LPSDR SDRAM, NOR/NAND
+                                                            memories
+                                               –                                                        XSPI 8-bit configuration with cypher engine
+                                               –                                                        XSPI 16-bit configuration with cypher engine (only on STM32N657X0H3Q,
+                                                            STM32N657L0H3Q, and STM32N657B0H3Q)
+
+3.2 SRAM configuration
+
+                                  AHBSRAM1/2, AXISRAM1 to 6, BKPSRAM,  FLEXRAM, and VENCRAM,  with the following
+                                  features:
+                                  •                                                                  Error code correction (ECC):
+                                               –                                                        Single-error detection and correction with interrupt generation
+                                               –                                                        Double-error detection with interrupt generation
+                                               –                                                        Status with failing address
+                                  •                                                                        Hardware erase: on reset or dedicated even  t, the RAM content is automatically erased
+                                               (written as 0)
+                                  •                                                                  Software erase: the software can trigger an SRAM erase through RAMCFG registers
+
+3.3                                                                                                                          AXI cache configuration
+
+                                  The AXI cache (CACHEAXI) is  introduced (only on STM32N 6x7xx devices) on the AXI
+                                  interconnect driven by the NPU (neural network)    peripheral, to improve the performance of
+                                  data traffic, by caching the NPU data  accessed in the external memories.
+                                  When configured as an SRAM, the CACHEAXI   can be accessed by the NPU, and also by
+                                  the Cortex-M55 processor or by any AXI controller peripheral.
+
+
+                                                                                                                       DS14791 Rev 10                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          23/263
+
+                                                                                                                                                                                                                                                                                                      80

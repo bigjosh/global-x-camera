@@ -1,0 +1,51 @@
+Functional overview                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    STM32N6x5xx STM32N6x7xx
+
+
+                                           –                                                        Support for SHA-2 truncated outputs (SHA2-512/224, SHA2-512/256)
+                                           –                                                        Support for HMAC mode with all supported algorithm
+                               •                                                                     Corresponding 32-bit words of the digest from consecutive message blocks are added
+                                           to each other to form the digest of the whole message
+                                           –                                                        Automatic 32-bit words swapping to comply with the internal little-endian
+                                                      representation of the input bit-string
+                                           –                                                       Supported word swapping format: bits, bytes, half-words and 32-bit words
+                               •                                                                   Single 32-bit, write-only, input register associated to an internal input FIFO,
+                                           corresponding to a 64-byte block size (16 x 32 bits)
+                               •                                                                   Automatic padding to complete the input bi t string to fit digest minimum block size
+                               •                                                                   AHB target peripheral, accessible by 32  -bit words only (else an AHB error is
+                                           generated)
+                               •                                                                   8 × 32-bit words (H0 to H15) for output message digest
+                               •                                                                   Automatic data flow control supporting direct memory access (DMA) using one
+                                           channel.
+                               •                                                                   Support for both single and fixed DMA burst transfers of four words.
+                               •                                                                   Interruptible message digest computation, on a per-block basis
+                                           –                                                       Re-loadable digest registers
+                                           –                                                        Hashing computation suspend/resume mechanism, including DMA
+
+3.36                                                                                             Memory cipher engine (MCE)
+
+                               The memory cipher engine (MCE) defines, in    a given address space, multiple regions with
+                               specific security setup (encryption). All system   bus traffic going through an encrypted region
+                               is managed on-the-fly by the MC  E, automatically decrypting reads and encrypting writes if
+                               authorized. This function is  available only on STM32N655xx and STM32N657xx devices.
+                               Multiple ciphering option (stream, block, fast   block) are available to offer the best security
+                               versus performance trade-off.
+                               MCE main features are:
+                               •                                                                   System bus in-line encryption (for writes) and decryption (for reads), based on
+                                           embedded firewall programming
+                                           –                                                        Four encryption modes per region (maximum 4 regions available): no encryption
+                                                      (bypass mode), stream cipher, block cipher and fast block cipher modes
+                                           –                                                        Start and end of regions defined with 4-Kbytes granularity
+                                           –                                                        Default filtering (region 0): any access granted
+                                           –                                                       Regions 1 to 4 access filtering criteria: none
+                               •                                                                   Supported block ciphers: A ES-128, AES-256 or Noekeon ( 12 round versio n), selected
+                                           at boot
+                               •                                                                   Supported chaining modes: block and stream
+                                           –                                                           Block mode with AES cipher  is compatible with ECB mode  specified in NIST FIPS
+                                                      publication 197 Advanced  encryption standard ( AES) (normal or fast).
+                                           –                                                       Stream mode with AES cipher is compliant with CT R mode specified in NIST
+                                                      SP800-38A Recommendation for Block Cipher Modes of Operation.
+                                           –                                                        Includes a leakage resilient mode of oper ation as defense ag ainst side channel
+                                                      attacks (SCA).
+
+
+58/263                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          DS14791 Rev 10

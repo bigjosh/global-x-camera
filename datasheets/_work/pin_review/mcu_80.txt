@@ -1,0 +1,53 @@
+Functional overview                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    STM32N6x5xx STM32N6x7xx
+
+
+                               •                                                                  RGMII specification version 2.6 from HP/Marvell
+                               •                                                                   RMII specification version  1.2 from RMII consortium
+Caution:                                                          The gigabit media independent interface (GMII)    is only available internally to supply the
+                               RGMII adapter. No GMII signals are available off-chip
+
+3.55 Development support
+
+3.55.1 Serial-wire/JTAG debug port (SWJ-DP)
+
+                               This is a CoreSight component that implement  s an external access port for connecting
+                               debugging equipment. Two types of interface   can be configured, namely a 5-pin standard
+                               JTAG interface (JTAG-DP), and a 2-pin (clock + data) serial-wire debug port (SW-DP).
+                               The two modes are mutually exclusive, as they share the same I/O pins.
+                               By default, the JTAG-DP is selected after a syst em or POR. The five I/O pins are configured
+                               by hardware in debug alternative function mode.    The SWJ-DP incorporates pull-up resistors
+                               on JTDI, JTMS/SWDIO, and NJTRST, as well as a pull-down resistor on JTCK/SWCLK.
+                               A debugger can select the SW-DP by transmitting the following serial data sequence on
+                               JTMS/SWDIO: ...(50 or more one s)...,0,1,1,1,1,0,0,1,1,1,1,0,0,1,1,1,...(50 or more ones)...
+                               JTCK/SWCLK must be cycled for each data bit.
+                               In SW-DP mode, the unused JTAG pins (JTDI, JTDO, and NJTRST) can be used for other
+                               functions.
+Note:                                                                                                                      All SWJ port I/Os can be reconfigured to ot   her functions by software, but debugging is no
+                               longer possible.
+
+3.55.2                                                                         Embedded Trace Macrocell
+
+                               The Cortex-M55 ETM is a CoreSight component closely coupled to the CPU. The ETM
+                               generates trace packets that allow to trace the execution of the Cortex-M55 core.
+Note:                                                                                                                      Data accesses are  not included in the trace information.
+                               The ETM receives information from the CPU over the processor trace interface, including:
+                               •                                                                   the number of instructions  executed in the same cycle
+                               •                                                                   changes in program flow
+                               •                                                                   the current processor instruction state
+                               •                                                                   addresses of memory locations accessed by load and store instructions
+                               •                                                                   type, direction and size of a transfer
+                               •                                                                   condition code information
+                               •                                                                   exception information
+                               •                                                                  wait for interrupt state information
+
+
+
+
+
+
+
+
+
+
+
+80/263                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          DS14791 Rev 10

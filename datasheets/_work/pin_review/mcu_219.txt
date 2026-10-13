@@ -1,0 +1,72 @@
+STM32N6x5xx                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            STM32N6x7xx
+
+
+                                                                                                                                                          Figure 52. PSSI recei ve timing diagram
+
+                                                                                                                                                                                tc(PDCK)
+
+                                                                                                                                                 tw(PDCKH)                                                 tw(PDCKL)                                                        tf(PDCK)                                                                                              tr(PDCK)
+                                            CKPOL=0
+
+
+                                            CKPOL=1
+
+                                                                                                                                                                                                          ts ( D ATA )                                                                th ( D ATA )
+                           PSSI D[15:0]                                                                                                       Invalid data IN                                                                                                     Valid data IN                                                                                                  Invalid data IN
+                                                     (input)
+                                                                                                                                                                                                              ts(DE)                                                                     th(DE)
+
+                                            DEPOL=0
+
+
+                                            DEPOL=1
+
+
+                                                                                                          tv(RDY)                                                                                                                                                                                                                                                                       tho(RDY)
+                                      RDYPOL=0
+
+
+                                      RDYPOL=1
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      MSv63436V1
+
+5.3.34 LCD-TFT controller (LTDC) characteristics
+
+                                                               Unless otherwise specified, the parameters given in    Ta   b   l   e    111 for TFT-LCD are derived from
+                                                               tests performed under the ambient temperature, f   HCLK frequency, and VDD supply voltage
+                                                               summarized in Table 24, with the following configuration:
+                                                               •                                                                   LCD_CLK polarity: low
+                                                               •                                                                  LCD_DE polarity: low
+                                                               •                                                                   LCD_VSYNC and LCD_HSYNC polarity: high
+                                                               •                                                                   Pixel format: 24 bits
+                                                               •                                                                   Capacitive load C = 30 pF
+                                                               •                                                                  Measurement points are done at CMOS levels: 0.5 V  DD
+                                                               •                                                                   I/O compensation cell activated
+                                                               •                                                                   HSLV activated when V DD ≤ 2.5 V
+                                                               •                                                                   Output speed is set to OSPEEDRy[1:0] = 11
+
+
+
+
+
+
+
+
+                                                                                                                                                             Table 111. LCD-TFT characteristics(1)
+                       Symbol                                                                                                                                                                                                                                                                                                                                                                                                                           Parameter                                                                                                                                                                                                                                                                                                                                                                                                                                         Min                                                                                                                                                                                  Max                                                                                                      Unit
+
+                                fCLK                                                                                                                     LTDC clock output                                            1.65 V ≤ VDD ≤ 3.6 V,                                                                                                                                                   8MHz
+                                                                                      frequency                                                                                                                       30 pF                 -8
+                              DCLK                                                                                                              LTDC clock output duty cycle                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       45                                                                                                                                                                                                           55                                                                                                                                     %
+
+
+
+
+
+
+
+                                                                                                                                                                                                                          DS14791 Rev 10                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        219/263
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          238

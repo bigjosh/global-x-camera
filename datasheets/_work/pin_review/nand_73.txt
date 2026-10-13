@@ -1,0 +1,62 @@
+9.            SOFTWARE ALGORITHM
+
+       9-1.           Invalid Blocks (Bad Blocks)
+
+       The bad blocks are included in the device while it gets shipped. During the time of using the device, the
+       additional bad blocks might be increasing; therefore, it is recommended to check the bad block marks
+       and avoid using the bad blocks. Furthermore, please read out the bad block information before any erase
+       operation since it may be cleared by any erase operation.
+
+       Figure 46. Bad Blocks
+
+
+
+
+                                                                                                                                                    Bad Block
+
+
+
+
+
+
+                                                                                                                                                    Bad Block
+
+
+
+
+       While the device is shipped, the value of all data bytes of the good blocks are FFh. The 1st byte of the
+       1st and 2nd page in the spare area for bad block will be 00h. The erase operation at the bad blocks is not
+       recommended.
+       After the device is installed in the system, the bad block checking is recommended. The figure shows the brief
+       test flow by the system software managing the bad blocks while the bad blocks were found. When a block
+       gets damaged, it should not be used any more.
+       Due to the blocks are isolated from bit-line by the selected gate, the performance of good blocks will not be
+       impacted by bad ones.
+
+
+       Table 18. Valid Blocks
+                                                        Density                                           Min.                                                                                 Typ.                                                                   Max.                                                                              Unit                                                                                                                                                                                                                                                                                    Remark
+                Valid (Good)                                  2Gb                                                                                  2008                                                                                                                                                                                                                                   2048                                                                   Block                                                                                            Block 0 is guaranteed to be good
+              Block Number                                    4Gb                                                                                      4016                                                                                                                                                                                                                                        4096                                                                            Blockupto 1K P/E cycle (with ECC).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                   73

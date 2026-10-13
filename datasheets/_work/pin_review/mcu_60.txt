@@ -1,0 +1,52 @@
+Functional overview                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    STM32N6x5xx STM32N6x7xx
+
+3.38 Timers (TIMx)
+
+                              The devices contain 15 timers and 5 low-power timers.
+
+3.38.1 Basic timers (TIM6/TIM7/TIM18)
+
+                              These timers consist in a 16-bit autoreload counter driven by a programmable prescaler.
+                              They can be used as generic timers for time  -base generation. The timers are completely
+                              independent, and do not share any resources.
+                              Main features:
+                              •                                                                   16-bit autoreload upcounter
+                              •                                                                   16-bit programmable prescaler used to divide (also “on the fly”) the counter clock
+                                         frequency by any factor between 1 and 65535
+                              •                                                                   Interrupt/DMA generation on the update event: counter overflow
+                              •                                                                   ADC synchronization for jitter-free sampling points
+
+3.38.2 Advanced control timers (TIM1/TIM8)
+
+                              The devices embed two advanced control timers th   at consist in a 16-bit auto-reload counter
+                              driven by a programmable prescaler. These timers can be used for a variety of purposes,
+                              such as measuring the pulse length of input    signals (input capture) or generating output
+                              waveforms (output compare, PWM, complementary PWM with dead-time insertion). Pulse
+                              lengths and waveform periods can be modula   ted from a few microseconds to several
+                              milliseconds using the timer prescaler   and the RCC clock controller prescalers.
+                              The advanced control timers are completely independent from the general purpose ones,
+                              and do not share any resources. They can be synchronized together.
+                              Advanced control timers main features are:
+                              •                                                                  16-bit up, down, up/down auto-reload counter.
+                              •                                                                   16-bit programmable prescaler allowing dividing (also “on the fly”) the counter clock
+                                         frequency either by any factor between 1 and 65536.
+                              •                                                                  Up to six independent channels for:
+                                         –                                                       Input capture (except channels 5 and 6)
+                                         –                                                        Output compares
+                                         –                                                        PWM generation (edge- and center-aligned mode)
+                                         –                                                        One pulse mode output
+                              •                                                                   Complementary outputs with programmable dead-time
+                              •                                                                   Synchronization circuit to control the time  r with external signals and to interconnect
+                                         several timers together.
+                              •                                                                   Repetition counter to update the timer regi  sters only after a given number of cycles of
+                                         the counter.
+                              •                                                                   Two break inputs to put the timer’s output signals in a safe user selectable
+                                         configuration.
+                              •                                                                   Interrupt/DMA generation on the following events:
+                                         –                                                        Update: counter overflow /underflow, counter initia lization (by software or
+                                                    internal/external trigger)
+                                         –                                                         Trigger event (counter start, stop, initialization or count by internal/external trigger)
+
+
+
+60/263                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          DS14791 Rev 10

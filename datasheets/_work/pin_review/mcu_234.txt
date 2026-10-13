@@ -1,0 +1,69 @@
+Electrical characteristics                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      STM32N6x5xx STM32N6x7xx
+
+
+                                                                                                                                                        Figure 66. USART timing diagram in SPI target mode
+
+                                NSS input
+
+                                                                                                                                                                                                    1/fCK                                                                                                                                                                                                                              th(NSS)
+
+                                                                                                              tsu(NSS)                                              tw(CKH)
+                                     CPHA=0
+                                      CPOL=0
+
+                                     CPHA=0
+                                      CPOL=1
+                                                                                                                                                                     tw(CKL)                                            tv(TX)                                                                                                          th(TX)
+
+
+                               TX output                                                                                                                     First bit OUT                                                                                                 Next bits OUT                                                                                                                             Last bit OUT
+
+
+                                                                                                               tsu(RX)                                                                        th(RX)
+
+                               RX input                                                                                                                                    First bit IN                                                                                                   Next bits IN                                                                                              Last bit IN
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               MSv65387V6
+
+                                                                FDCAN (controller area network) interface
+                                                                Refer to Section 5.3.17 for more details on the input/output   alternate   function  characteristics
+                                                                (FDCANx_TX and FDCANx_RX).
+
+5.3.37                                                                         Embedded PHY characteristics
+                                                                No timing data are provided on PHY interfaces,   refer to the specification in the norm. CSI-2
+                                                                silicon is compliant with  MIPI 1.2 alliance norm.
+
+                                                                CSI PHY characteristics
+
+
+
+
+
+
+
+
+                                                                                                                                                                  Table 125. CSI PHY characteristics  (1)
+
+                         Symbol                                                                                                                                                                                                Parameter                                                                                                                                                                                                                                                                                                                                       Conditions                                                                                                                                                                                                                                        Min                                  Max                                                        Ty   p                                     Unit
+
+                                REXT                                                                                                                          External resistor on REXT                    Connected to ground                                                                                                                                                                                                                                                                                                                 198                                           200                                                    202                                Ω
+                                                                                                                                                                                                                                                                                           2 lanes at 1 Gbps                                                                                                                                                        -                                                            2.21                                  12.36
+                                                                                                                                                                                                                    High-speed                                                             2 lanes at 1.5 Gbps                                                                                                                             -                                                            3.14                                  13.91
+                                                                                                                                                                                                                    receive(2)                                                             2 lanes at 2 Gbps                                                                                                                                                        -                                                            4.07                                  14.94
+    IVDDCORE(CSIPHY)                        Supply current on VDDCORE                                                                                                                                                                                                                                                                                                                                                                                                                                                 mA
+                                                                                                                                                                                                                                                                                           2 lanes at 2.5 Gbps                                                                                                                             -                                                            5.00                                  16.48
+                                                                                                                                                                                                                    LP receive                                                                       Lane 0 at 10 Mbps                                                                                                                                          -                                                            0.42                                           8.29
+                                                                                                                                                                                                                    ULPS receive                          ck_ker_csi2phy stopped                                                           -                                                            0.06                                           8.70
+
+
+
+
+
+
+
+
+
+
+
+
+234/263                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        DS14791 Rev 10

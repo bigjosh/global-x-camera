@@ -1,0 +1,73 @@
+Figure 30. AC Waveforms for OTP Data Read with Random Data Output
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                        tCLR                                                                                                      A
+             CLE
+
+
+
+             CE#
+
+
+
+          WE#
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                           tAR
+
+              ALE
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                           tRC                                                  tRHW
+              RE#                                                                                                                                                                                                                                                                                                                                                                                      tRR
+
+
+                                                                                                                                                                                                                                                                                                                                                                                         tR
+                                                                                                                                                                                                                                                                                                                                                    tWB
+IO[7:0]                                                                            00h                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           30h1st Address2nd AddressOTP00hDout M                                                                   Dout M+105h
+                                                                                                                                    Cycle                                   Cycle                                     Page                                                                                       00h
+
+
+
+         R/B#
+                                                                                                                                                                                                                                                                                                                                                                                         Busy
+
+
+
+
+
+
+
+                                               A
+            CLE
+
+
+            CE#
+
+
+
+         WE#
+                                                                                                                                                                                                                                                 tWHR
+
+
+             ALE
+
+
+
+             RE#
+
+
+                                                                                                                                                                                                                                                                                                   tREA
+
+IO[7:0]                                                                              05h                                   1st Address                            2nd Address                                          E0h                                                                               Dout N                                                                                       Dout N+1
+                                                                                                                                   Cycle                                   Cycle
+
+
+        R/B#
+                                                                                                                                                                                        Repeat if needed
+
+
+
+                                                                                                                                                                                                                                                                  51

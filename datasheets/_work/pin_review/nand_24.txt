@@ -1,0 +1,67 @@
+6-4.   Cache Read Random
+
+The main difference from the Cache Read Sequential operation is the Cache Read Random operation may
+allow the random page to be read-out with cache operation not just for the consecutive page only.
+After writing the 00h command, the column and row address should be given for the start page selection,
+and followed by the 30h command for address confirmation. The column address is ignored in the cache
+read random operation. And then, the CACHE READ RANDOM operation starts after a latency time tR and
+following a 00h command with the selected page address and following a 31h command, the data can be
+read-out after the latency time of tRCBSY. After the previous selected page data out, a new selected page
+address can be given by writing the 00h-31h command set again. The CACHE READ RANDOM command is
+also valid for the consecutive page cross block.
+The random data out (05h-E0h) command set is available to change the column address of the current page
+data in the cache register.
+The user can check the chip status by the following method:
+- R/B# pin ("0" means the data is not ready, "1" means the user can read the data)
+- Status Register can be checked after the Read Status command (70h) is issued. (SR[6] behaves the same
+as R/B# pin, SR[5] indicates the internal chip operation, "0" means the chip is in internal operation and "1"
+means the chip is idle.) Command 00h should be given to return to the cache read operation.
+To confirm the last page to be read-out during the cache read operation, a 3Fh command is needed to replace
+the 31h command prior to the last data-out.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                               24

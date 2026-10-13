@@ -1,0 +1,101 @@
+                                                                                                                              CAM-5G0-079CLR
+
+                                                                                                                                       Schematic diagrams
+
+
+Note:       These schematic diagrams refer to the latest version.
+
+Note 2:     There is a need to add external capacitors at the host side for VDDIO, VCORE, VANA pins. Please refer to
+            "Application Schematic" section of the data sheet for more details.
+
+
+                                                                             Figure 1. Circuit schematic
+
+
+                                            VCORE 1V15            VANA 2V8                                                VDDIO 1V8
+                                                                                               
+
+
+
+
+
+
+
+
+
+
+
+
+
+                              VCPPOS_OUT              69  VCPPOSOUT
+                              VCPPOS_IN               68  VCPPOSIN                                   PORTST 18
+                                                      67  VCORE                                            NC 19
+                                                      66  VANA                                        VCORE 20
+                                                      65  AGND                                            SCL 21                  SCL
+                                                      64  DGND                                           SDA 22                   SDA
+                              VCPNEG_OUT              63  VCPNEGOUT                                     DGND 23
+                              VCPNEG_IN               62  VCPNEGIN                               XSHUTDOWN 24                     XSHUTDOWN
+                                                      61  AGND                     U1                   VANA 25
+                                                      60  AGND                   VD55G0CCA1            GPIO3 26                   GPIO3
+                                                          NC59                                          DGND 27                   GPIO2
+                                                          NC58                                         GPIO2 28                   GPIO1
+                                                      56  NC57                                         GPIO1 29
+                                                          VCORE                                       VCORE 30
+                                                      54  NC55                                         VDDIO 31
+                                                      53  VANA                                          DGND 32
+                                                      52  VANA                                        VCORE 33                    GPIO0
+                                                          AGND                                         GPIO0 34
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                J1
+
+                                                                                                             31   GND                    GND 32
+                                                                                          VANA 2V8            1   VANA 2V8               GND 2
+                                                                                                                  GND3            VCORE 1V15 4              VCORE 1V15
+                                                                                          VDDIO 1V8           5   VDDIO 1V8      XSHUTDOWN 6                XSHUTDOWN
+                                                                                          GPIO0               7   GPIO0                  GND 8
+                                                                                          GPIO1               9   GPIO1               DATA1P 10             DATA1P
+                                                                                          GPIO2              11   GPIO2               DATA1N 12             DATA1N
+                                                                                          GPIO3              13   GPIO3                  GND 14
+              C1         C2               C3               C4         C5                                     15   GPIO4                  CLKP 16            CLKP
+                                                                                                             17   GPIO5                 CLKN 18             CLKN
+              0.1uF      1uF              0.47uF           1uF        1uF                                         N/C19                  GND 20
+                                                                                                             23   N/C21               DATA2P 22
+                                                                                          SCL                     GND                 DATA2N 2426
+                                                                                          SDA                27   SCL25                   GND               CLKIN
+                                                                                                             29   SDA                   CLKIN 28
+                                                                                                             33   GND                    GND 3034
+                                                                                                                  GND                    GND
+
+
+                                                                                                                     BM28B0.6-30DP/2-0.35V
+
+
+
+
+
+
+ CAM-5G0-079CLR - Rev 1 - Jun 2024                                                                                                                             www.st.com
+ For further information contact your local STMicroelectronics sales office.

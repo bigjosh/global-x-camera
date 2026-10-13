@@ -1,0 +1,54 @@
+                                                                                                   W25Q128JV
+
+
+
+6.  FUNCTIONAL DESCRIPTIONS
+
+6.1      Standard SPI Instructions
+The W25Q128JV          is accessed through an SPI compatible bus consisting of four signals: Serial Clock
+(CLK), Chip Select (/CS), Serial Data Input (DI) and Serial Data Output (DO). Standard SPI instructions
+use the DI input pin to serially write instructions, addresses or data to the device on the rising edge of
+CLK. The DO output pin is used to read data or status from the device on the falling edge of CLK.
+SPI bus operation Mode 0 (0,0) and 3 (1,1) are supported. The primary difference between Mode 0 and
+Mode 3 concerns the normal state of the CLK signal when the SPI bus master is in standby and data is
+not being transferred to the Serial Flash. For Mode 0, the CLK signal is normally low on the falling and
+rising edges of /CS. For Mode 3, the CLK signal is normally high on the falling and rising edges of /CS.
+
+
+ 6.2     Dual SPI Instructions
+The W25Q128JV supports Dual SPI operation when using instructions such as “Fast Read Dual Output
+(3Bh)” and “Fast Read Dual I/O (BBh)”. These instructions allow data to be transferred to or from the
+device at two to three times the rate of ordinary Serial Flash devices. The Dual SPI Read instructions are
+ideal for quickly downloading code to RAM upon power-up (code-shadowing) or for executing non-speed-
+critical code directly from the        SPI bus (XIP). When using Dual SPI instructions, the DI and DO pins
+become bidirectional I/O pins: IO0 and IO1.
+
+
+ 6.3     Quad SPI Instructions
+The W25Q128JV supports Quad SPI operation when using instructions such as “Fast Read Quad Output
+(6Bh)”,  and “Fast Read       Quad I/O (EBh). These instructions allow data to be transferred to or from the
+device four to six times the rate of ordinary Serial Flash. When using Quad SPI instructions, the DI and
+DO pins become bidirectional IO0 and IO1, with the additional I/O pins: IO2, IO3.
+
+
+ 6.4     Software Reset & Hardware /RESET pin
+The W25Q128JV can be reset to the initial power-on state by a software Reset sequence. This sequence
+must include two consecutive instructions: Enable Reset (66h) & Reset (99h). If the instruction sequence
+is successfully accepted, the device will take approximately 30µS (tRST) to reset. No                      instruction   will be
+accepted during the reset period.           For the SOIC-16         and TFBGA       packages,      W25Q128JV        provides a
+dedicated hardware /RESET pin. Drive the /RESET pin low for a minimum period of ~1µS (tRESET*) will
+interrupt  any  on-going  external/internal  operations          and   reset the device to its initial power-on state.
+Hardware /RESET pin has higher priority than other SPI input signals (/CS, CLK, IOs).
+
+Note:
+1. Hardware /RESET pin is available on SOIC-16 or TFBGA; please contact Winbond for his package.
+2. While a faster /RESET pulse (as short as a few hundred nanoseconds) will often reset the device, a 1us minimum is
+   recommended to ensure reliable operation.
+3. There is an internal pull-up resistor for the dedicated /RESET pin on the SOIC-16 and TFBGA-24 package. If the reset function
+   is not needed, this pin can be left floating in the system.
+
+
+
+
+
+                                                             - 11 -

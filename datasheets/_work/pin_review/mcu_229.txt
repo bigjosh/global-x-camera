@@ -1,0 +1,69 @@
+STM32N6x5xx                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            STM32N6x7xx
+
+
+                                                                                                                                                       Figure 60. SAI controller timing waveforms
+
+                                                                                                                        1/fSCK
+
+                        SAI_SCK_X
+                        (CKSTR = 0)
+
+                        SAI_SCK_X
+                        (CKSTR = 1)
+                                                                                                                                                                                                                                                                                                                                                                                            th(FS)
+
+                         SAI_FS_X
+                         (output)
+                                                                                                      tv(FS)                                                                                                                                              tv(SD_MT)                                                                                                                                     th(SD_MT)
+
+                        SAI_SD_X                                                                                                                                                                                                          Slot n                                                                                                 Slot n+2
+                        (transmit)
+                                                                                                                                                                                 tsu(SD_MR)                                                                                               th(SD_MR)
+
+                        SAI_SD_X                                                                                                                                                                                                                   Slot n
+                        (receive)
+
+                                                                                                                                                                                                                                                                                                                                                                                                                          MS32771V2
+
+                                                                                                                                                                Figure 61. SAI targ et timing waveforms
+
+                                                                                                                           1/fSCK
+
+
+                           SAI_SCK_X
+                           (CKSTR = 0)
+                           SAI_SCK_X
+                           (CKSTR = 1)
+
+                                                 tw(CKH_X)                                                                                                                            tw(CKL_X)                                                                                                                                                                                                   th(FS)
+
+                           SAI_FS_X
+                           (input)
+                                                                                                                          tsu(FS)                                                                                                                              tv(SD_ST)                                                                                                                                                                                                                                                                                                                                                                                                             th(SD_ST)
+
+                           SAI_SD_X                                                                                                                                                                                                            Slot n                                                                                                  Slot n+2
+                           (transmit)
+                                                                                                                                                                                tsu(SD_SR)                                                                                                     th(SD_SR)
+
+                           SAI_SD_X                                                                                                                                                                                                                     Slot n
+                           (receive)
+                                                                                                                                                                                                                                                                                                                                                                                                                          MS32772V2
+
+                                                      Ethernet (ETH) interface
+
+                                                      Unless otherwise specified,   the parameters given in   Table 120 to Table 123 for MDIO/SMA,
+                                                      RMII, MII, RGMII, and RGMII ID are derived from tests performed under the ambient
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                             DS14791 Rev 10                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        229/263
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  238

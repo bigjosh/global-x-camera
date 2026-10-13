@@ -1,0 +1,68 @@
+8-2.   Power On/Off Sequence
+
+After the Chip reaches the power on level (Vth = Vcc min.), the internal power on reset sequence will be
+triggered. During the internal power on reset period, no any external command is accepted. There are two
+ways to identify the termination of the internal power on reset sequence. Please refer to Figure 44. Power
+On/Off Sequence.
+       •    R/B# pin
+       •    Wait 1 ms
+During the power on and power off sequence, it is recommended to keep the WP# = Low for internal data
+protection.
+
+Figure 44. Power On/Off Sequence
+
+
+
+
+                             VCC (Min.)
+
+
+
+
+             Vcc
+
+
+
+
+
+             WP#
+
+
+
+
+
+
+
+
+
+
+            CE#
+
+
+
+
+
+
+
+
+
+            WE#                                1 ms (Max.)
+
+
+
+
+
+                                10us (Max.)
+
+
+
+
+
+
+            R/B#
+
+
+
+
+
+                                                              71

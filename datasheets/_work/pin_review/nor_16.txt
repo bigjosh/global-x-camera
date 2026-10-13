@@ -1,0 +1,59 @@
+                                                                                                    W25Q128JV
+
+
+7.1.1       Status Register Protect (SRP, SRL) – Volatile/Non-Volatile Writable
+Three Status and Configuration Registers are provided for W25Q128JV. The Read Status Register-1/2/3
+instructions can be used to provide status on the availability of the flash memory array, whether the device
+is write enabled or disabled, the state of write protection, Quad SPI setting, Security Register lock status,
+Erase/Program Suspend status,and output driver strength, The Write Status Register instruction can be
+used to configure the device write protection features, Quad SPI setting,  Security Register OTP locks,
+output driver. Write access to the Status Register is controlled by the state of the                       non-volatile Status
+Register Protect bits (SRP, SRL), the Write Enable instruction, and during Standard/Dual SPI operations,
+the /WP pin.
+
+                              Status
+SRL       SRP        /WP      Register              Description
+
+
+0         0          X        Software              /WP pin has no control. The Status register can be written to
+                              Protection            after a Write Enable instruction, WEL=1. [Factory Default]
+
+0         1          0        Hardware              When /WP pin is low the Status Register locked and cannot be
+                              Protected             written to.
+
+0         1          1        Hardware              When /WP pin is high the Status register is unlocked and can
+                              Unprotected           be written to after a Write Enable instruction, WEL=1.
+
+1         X          X        Power Supply          Status Register is protected and cannot be written to again until
+                              Lock-Down             the next power-down, power-up cycle.(1)
+
+
+1         X          X        One Time              Status Register is permanently protected and cannot be written
+                              Program(2)            to. (enabled by adding prefix command AAh, 55h)
+
+
+        1.  When SRL =1 , a power-down, power-up cycle will change SRL =0 state.
+        2.  Please contact Winbond for details regarding the special instruction sequence.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                              - 15 -

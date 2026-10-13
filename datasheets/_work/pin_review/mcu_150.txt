@@ -1,0 +1,76 @@
+Electrical characteristics                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      STM32N6x5xx STM32N6x7xx
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                           Table 35. Current consumption (1V8) in Run mode
+                                                                                                                                                                                                                                                                                                                                                                                                                           SMPS external
+
+    Symbol                                                                                                                                                                                                                                                                                 Conditions                                                                                                                                                                                                                                                                              frcc_c_ck Max(1)Unit
+                                                                                                                                                                                                                                                                                                                (MHz)                                                  Ty  p
+                                                                                                                                                                                                                                                                                                                                                                                                           TJ =                                   TJ =                                     TJ =                                       TJ =
+                                                                                                                                                                                                                                                                                                                                                                                                         25°C                                   85°C                                  105°C                                      125°C
+
+                                                                                                                                                             All peripherals                                                                 VOS high                                                       800(3)                                                                 2.03                                            2.24                                               2.24                                                      2.26                                                             2.27
+                                                      Code with data                                                                                         disabled                                                                        VOS low                                                                   600(4)                                                                 4.30                                            4.73                                               4.83                                                      4.86                                                             4.91
+                                                      processing running
+                                                      from ITCM(2)                                                                                           All peripherals                                                                 VOS high                                                       800(3)                                                                 2.04                                            2.24                                               2.24                                                      2.26                                                             2.27
+                                                      HSI, VDD = 1.8 V                                                                                       enabled
+                                                                                                                                                                                                                                             VOS low                                                                   600(4)                                                                 4.30                                            4.74                                               4.84                                                      4.87                                                             4.92
+                                                                                                                                                             All peripherals                                                                 VOS high                                                       800(3)                                                                 2.03                                            2.21                                               2.22                                                      2.23                                                             2.26
+                                                      Code with data                                                                                         disabled                                                                        VOS low                                                                   600(4)                                                                 1.41                                            1.54                                               1.53                                                      1.53                                                             1.55
+                                                      processing running
+                                                      from ITCM (2)                                                                                          All peripherals                                                                 VOS high                                                       800(3)                                                                 2.03                                            2.21                                               2.22                                                      2.23                                                             2.26
+                                                      HSE, VDD = 1.8 V                                                                                       enabled
+   IDDA1V8                                                                                                                                                                                                                                   VOS low                                                                   600(4)                                                                 1.41                                            1.54                                               1.53                                                      1.53                                                             1.55mA
+                                                      Code with data                                                                                         All peripherals                                                                 VOS high                                                       800(3)                                                                 2.04                                            2.24                                               2.24                                                      2.26                                                             2.27
+                                                      processing running                                                                                     disabled                                                                        VOS low                                                                   600(4)                                                                 4.30                                            4.73                                               4.83                                                      4.86                                                             4.90
+                                                      from AXI-SRAM2,
+                                                      Cache ON (2)                                                                                           All peripherals                                                                 VOS high                                                       800(3)                                                                 2.04                                            2.24                                               2.24                                                      2.26                                                             2.27
+                                                      HSI, VDD = 1.8 V                                                                                       enabled                                                                         VOS low                                                                   600(4)                                                                 4.31                                            4.75                                               4.83                                                      4.87                                                             4.92
+
+                                                      Code with data                                                                                         All peripherals                                                                 VOS high                                                       800(3)                                                                 2.03                                            2.21                                               2.22                                                      2.23                                                             2.26
+                                                      processing running                                                                                     disabled                                                                        VOS low                                                                   600(4)                                                                 1.41                                            1.54                                               1.53                                                      1.53                                                             1.55
+                                                      from AXI-SRAM2,
+                                                      Cache OFF (2)                                                                                          All peripherals                                                                 VOS high                                                       800(3)                                                                 2.04                                            2.21                                               2.22                                                      2.23                                                             2.26
+                                                      HSE, VDD = 1.8 V                                                                                       enabled                                                                         VOS low                                                                   600(4)                                                                 1.41                                            1.54                                               1.53                                                      1.53                                                             1.55
+
+1.                          Guaranteed by characterization results unless otherwise specified.
+2.                          Data are in DTCM for best computation performance, cache has no influence on consumption in this case.
+3.                          cpu_overdrive range frequency.
+4.                          cpu_nominal range frequency.
+
+Note:                                                                                                                      Power consumption is higher d ue to VCO frequency (800 MHz for FCPU at 800 MHz HSI,
+                                                                        1200 MHz for FCPU at 600 MHz HSI) on IDDA1V8.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+150/263                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        DS14791 Rev 10

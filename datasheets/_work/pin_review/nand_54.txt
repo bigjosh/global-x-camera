@@ -1,0 +1,68 @@
+OTP Protection Operation
+To prevent the further OTP data to be changed, the OTP protection mode operation is necessary. To enter the
+OTP protection mode, it can be done by using the Set Feature command (EFh) and followed by the feature
+address (90h) and then input the 03h to P1 and 00h to P2-P4 of sub-Feature Parameter data (please refer to
+the sub-Feature Parameter table). And then the normal page program command (80h-10h) with the address
+00h before the 10h command is required.
+The OTP Protection mode is operated by the whole OTP area instead of individual OTP page. Once the OTP
+protection mode is set, the OTP area cannot be programmed or unprotected again.
+
+Figure 33. AC Waveforms for OTP Protection Operation
+
+
+    CLE          tCLS
+
+
+                     tCLH
+    CE#         tCS
+
+
+
+
+                               tWC
+  WE#
+
+                       tALS
+
+
+                      tALH                                          tALH                      tWB
+    ALE
+
+
+
+    RE#
+
+
+                tDS                                 tDH
+
+
+
+
+                   80h          -              Note-  00h     00h        00h               10h                    70h      Status
+ IO[7:0]                                                                                                                   Output
+
+                      1st Address   2nd Address                       Dummy data
+                         Cycle         Cycle                              input
+                                                                                                    tPROG
+
+   R/B#
+
+    Note:      This address cycle can be any value since the OTP protection protects the entire OTP area
+               instead of individual OTP page.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                  54

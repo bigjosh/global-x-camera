@@ -1,0 +1,65 @@
+Electrical characteristics                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      STM32N6x5xx STM32N6x7xx
+
+5.1.6                                                                                                  Power supply scheme
+
+                                                                                                                                     Figure 16. Power supply scheme
+
+
+
+
+
+
+
+
+                                                                                                                PC[1]                                PC[0]                             Port 1                      Port 2                         USB HS                                UCPD                            CSI
+                                                                                                            PC[12:6]                               PC[5:2]                           PO[5:0]                   PN[12:0]                               PHYs                                 I/Os                        PHY
+                                                                                                             PH[2,9]                                 PE[4]                          PP[15:0]
+                                                                                                                  I/Os                                 I/Os                                  XSPIM I/Os                                         VSS                                           VSS                        VSS
+
+                                                                                                                   VSS                                  VSS                                                        VSS
+                                                            VDDCORE                                                                                           Core domain (VCORE)
+
+                                                                            VSS
+
+                                                                                                    I/Os                                                                        I/O                       (CPU, system logic,
+                                                                                                                                                                              logic                 EXTI, peripherals, RAM)
+
+
+                                                                                                    VDD
+                                                    VDDA18PMU                                                                                         Retention domain
+                                                           VDDSMPS                                                                                                                                   ITCM
+                                                            VLXSMPS                                              Step-down
+                                                            VFBSMPS                                                converter                                                                        DTCM
+
+                                                            VSSSMPS                                                                                                                          ITCM FLEX
+                                                                                                    VDD
+                                                                                                    RET                                                      I/O                LSI, WKUP,                               VRET
+                                                                                                    I/Os                                                   logic              IWDG, BSEC,
+                                                                                                                                                                                       RIFSC
+                                                                                                    VSS                                                                                                                            VSS
+                                                   VDDA18AON                                                               OTP, HSE, HSI, MSI
+
+                                                      VDDA18PLL                                                                PLLs                               Backup domain                                                                                                                       Power
+                                                                V08CAP                                                                                                                                                                                                                                 switch
+
+                                                                          VDD                                                              VSW                              Backup                               VBKP
+                                                                        VBAT                                                                                               regulator
+                                                                                                             Power switch
+
+                                                                                                                                                                                                                                                                                                             Backup
+                                                                                                  BKUP                                                                                                                     I/O                     LSE, RTC,                                                     RAM
+                                                                                                    I/Os                                                                                                                 logic                TAMP, backup
+                                                                                                                                                                                                                                             registers, reset
+
+                                                                                                     VSS                                                                                                                                                                                                      VSS
+                                                     VDDA18ADC                                                                                                                                   Analog domain
+
+                                                                                                                           VREFBUF                                    VREF+ADCs
+                                                                     VREF+
+                                                                      VREF-                                                                                           VREF-
+                                                                        VSSA
+
+                                                                                                                                                                                                                                                                                                                 MSv70448V3
+
+
+136/263                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        DS14791 Rev 10

@@ -1,0 +1,215 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2400" height="2240" viewBox="0 0 2400 2240">
+<title>Global X Camera: recovered power supply tree</title>
+<desc>Battery and USB-C input paths, the shared 3.3 V supply, external 1.8 V buck, internal MCU core supply, camera rails, memory, RTC and accelerometer. The proposed LTC3621 and AON/AUX split are explicitly not implemented in this recovered tree.</desc>
+<rect width="100%" height="100%" fill="white"/>
+<text x="45" y="66.9" font-family="Segoe UI,Arial,sans-serif" font-size="45" font-weight="700" text-anchor="start" fill="#172c43">Global X Camera  |  Power supply tree</text>
+<text x="45" y="113.96" font-family="Segoe UI,Arial,sans-serif" font-size="28" font-weight="400" text-anchor="start" fill="#5d6e80">Recovered wiring • September 7, 2026 • Nominal voltages • Repeated rail labels connect the panels</text>
+<rect x="40" y="145" width="2320" height="610" rx="8" fill="#f8fbfd" stroke="#d4e0e9" stroke-width="2"/>
+<text x="65" y="187.78" font-family="Segoe UI,Arial,sans-serif" font-size="29" font-weight="700" text-anchor="start" fill="#17648d">1  BATTERIES AND USB-C</text>
+<rect x="80" y="220" width="360" height="130" rx="8" fill="#ffffff" stroke="#17648d" stroke-width="2"/>
+<text x="98" y="259.6" font-family="Segoe UI,Arial,sans-serif" font-size="30" font-weight="700" text-anchor="start" fill="#17648d">Four CR2032 cells</text>
+<text x="98" y="294.5" font-family="Segoe UI,Arial,sans-serif" font-size="25" font-weight="400" text-anchor="start" fill="#172c43">Series stack: 8–13.2 V</text>
+<text x="98" y="325.5" font-family="Segoe UI,Arial,sans-serif" font-size="25" font-weight="400" text-anchor="start" fill="#172c43">External battery assembly</text>
+<rect x="520" y="220" width="380" height="130" rx="8" fill="#ffffff" stroke="#17648d" stroke-width="2"/>
+<text x="538" y="259.6" font-family="Segoe UI,Arial,sans-serif" font-size="30" font-weight="700" text-anchor="start" fill="#17648d">Battery latch</text>
+<text x="538" y="294.5" font-family="Segoe UI,Arial,sans-serif" font-size="25" font-weight="400" text-anchor="start" fill="#172c43">Q1 + Q3: AO3401A</text>
+<text x="538" y="325.5" font-family="Segoe UI,Arial,sans-serif" font-size="25" font-weight="400" text-anchor="start" fill="#172c43">Q2 controls the gate latch</text>
+<polyline points="440,285 520,285" stroke="#17648d" stroke-width="4" fill="none" stroke-linejoin="round"/>
+<polygon points="520,285 507,278 507,292" fill="#17648d"/>
+<text x="480" y="265.86" font-family="Segoe UI,Arial,sans-serif" font-size="23" font-weight="400" text-anchor="middle" fill="#17648d">BAT+</text>
+<polyline points="900,285 935,285 935,410 970,410" stroke="#17648d" stroke-width="4" fill="none" stroke-linejoin="round"/>
+<polygon points="970,410 957,403 957,417" fill="#17648d"/>
+<rect x="520" y="370" width="380" height="90" rx="8" fill="#ffffff" stroke="#714c9e" stroke-width="2"/>
+<text x="538" y="406.32" font-family="Segoe UI,Arial,sans-serif" font-size="26" font-weight="700" text-anchor="start" fill="#714c9e">U8 RTC backup input</text>
+<text x="538" y="442.86" font-family="Segoe UI,Arial,sans-serif" font-size="23" font-weight="400" text-anchor="start" fill="#172c43">VBACKUP ← BAT_CELL1_TAP</text>
+<polyline points="250,350 250,415 520,415" stroke="#714c9e" stroke-width="4" fill="none" stroke-linejoin="round"/>
+<polygon points="520,415 507,408 507,422" fill="#714c9e"/>
+<text x="275" y="397.86" font-family="Segoe UI,Arial,sans-serif" font-size="23" font-weight="400" text-anchor="start" fill="#714c9e">Lowest-cell tap ≈3 V</text>
+<rect x="80" y="495" width="360" height="140" rx="8" fill="#ffffff" stroke="#17648d" stroke-width="2"/>
+<text x="98" y="534.6" font-family="Segoe UI,Arial,sans-serif" font-size="30" font-weight="700" text-anchor="start" fill="#17648d">USB-C • J1</text>
+<text x="98" y="569.5" font-family="Segoe UI,Arial,sans-serif" font-size="25" font-weight="400" text-anchor="start" fill="#172c43">USB_VBUS: nominal 5 V</text>
+<text x="98" y="600.5" font-family="Segoe UI,Arial,sans-serif" font-size="25" font-weight="400" text-anchor="start" fill="#172c43">Also feeds D1 ESD pin 5</text>
+<rect x="520" y="495" width="380" height="125" rx="8" fill="#ffffff" stroke="#17648d" stroke-width="2"/>
+<text x="538" y="533.78" font-family="Segoe UI,Arial,sans-serif" font-size="29" font-weight="700" text-anchor="start" fill="#17648d">D2 • SS34 diode</text>
+<text x="538" y="569.5" font-family="Segoe UI,Arial,sans-serif" font-size="25" font-weight="400" text-anchor="start" fill="#172c43">5 V minus diode drop</text>
+<text x="538" y="600.5" font-family="Segoe UI,Arial,sans-serif" font-size="25" font-weight="400" text-anchor="start" fill="#172c43">USB → SYS_IN</text>
+<polyline points="440,557 520,557" stroke="#17648d" stroke-width="4" fill="none" stroke-linejoin="round"/>
+<polygon points="520,557 507,550 507,564" fill="#17648d"/>
+<polyline points="900,557 935,557 935,410" stroke="#17648d" stroke-width="4" fill="none" stroke-linejoin="round"/>
+<circle cx="935" cy="410" r="6" fill="#17648d"/>
+<rect x="970" y="335" width="300" height="150" rx="8" fill="#ffffff" stroke="#17648d" stroke-width="2"/>
+<text x="988" y="374.6" font-family="Segoe UI,Arial,sans-serif" font-size="30" font-weight="700" text-anchor="start" fill="#17648d">SYS_IN</text>
+<text x="988" y="408.68" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="400" text-anchor="start" fill="#172c43">Battery through latch</text>
+<text x="988" y="439.68" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="400" text-anchor="start" fill="#172c43">or USB through D2</text>
+<text x="988" y="470.68" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="400" text-anchor="start" fill="#172c43">No priority controller</text>
+<polyline points="1270,410 1390,410" stroke="#17648d" stroke-width="4" fill="none" stroke-linejoin="round"/>
+<polygon points="1390,410 1377,403 1377,417" fill="#17648d"/>
+<rect x="1390" y="335" width="430" height="150" rx="8" fill="#ffffff" stroke="#17648d" stroke-width="2"/>
+<text x="1408" y="374.6" font-family="Segoe UI,Arial,sans-serif" font-size="30" font-weight="700" text-anchor="start" fill="#17648d">U2 • Main buck</text>
+<text x="1408" y="409.5" font-family="Segoe UI,Arial,sans-serif" font-size="25" font-weight="400" text-anchor="start" fill="#172c43">TPS62132RGTR + L1 2.2 µH</text>
+<text x="1408" y="440.5" font-family="Segoe UI,Arial,sans-serif" font-size="25" font-weight="400" text-anchor="start" fill="#172c43">SYS_IN → regulated 3.3 V</text>
+<text x="1408" y="471.5" font-family="Segoe UI,Arial,sans-serif" font-size="25" font-weight="400" text-anchor="start" fill="#172c43">EN tied to SYS_IN</text>
+<polyline points="1820,410 1920,410" stroke="#17648d" stroke-width="4" fill="none" stroke-linejoin="round"/>
+<polygon points="1920,410 1907,403 1907,417" fill="#17648d"/>
+<rect x="1920" y="335" width="370" height="150" rx="8" fill="#ffffff" stroke="#17648d" stroke-width="2"/>
+<text x="1938" y="373.78" font-family="Segoe UI,Arial,sans-serif" font-size="29" font-weight="700" text-anchor="start" fill="#17648d">3V3 • Main 3.3 V</text>
+<text x="1938" y="409.5" font-family="Segoe UI,Arial,sans-serif" font-size="25" font-weight="400" text-anchor="start" fill="#172c43">Feeds panel 2 below</text>
+<text x="1938" y="440.5" font-family="Segoe UI,Arial,sans-serif" font-size="25" font-weight="400" text-anchor="start" fill="#172c43">Available from battery</text>
+<text x="1938" y="471.5" font-family="Segoe UI,Arial,sans-serif" font-size="25" font-weight="400" text-anchor="start" fill="#172c43">or USB input</text>
+<circle cx="470" cy="557" r="6" fill="#17648d"/>
+<polyline points="470,557 470,695 1040,695" stroke="#17648d" stroke-width="4" fill="none" stroke-linejoin="round"/>
+<polygon points="1040,695 1027,688 1027,702" fill="#17648d"/>
+<rect x="1040" y="645" width="490" height="100" rx="8" fill="#ffffff" stroke="#17648d" stroke-width="2"/>
+<text x="1058" y="682.96" font-family="Segoe UI,Arial,sans-serif" font-size="28" font-weight="700" text-anchor="start" fill="#17648d">U4 • TLV70033DDCT LDO</text>
+<text x="1058" y="718.68" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="400" text-anchor="start" fill="#172c43">USB_VBUS → 3V3_USB, fixed 3.3 V</text>
+<polyline points="1530,695 1630,695" stroke="#17648d" stroke-width="4" fill="none" stroke-linejoin="round"/>
+<polygon points="1630,695 1617,688 1617,702" fill="#17648d"/>
+<rect x="1630" y="645" width="660" height="100" rx="8" fill="#ffffff" stroke="#17648d" stroke-width="2"/>
+<text x="1648" y="682.96" font-family="Segoe UI,Arial,sans-serif" font-size="28" font-weight="700" text-anchor="start" fill="#17648d">STM32 USB PHY supply</text>
+<text x="1648" y="720.32" font-family="Segoe UI,Arial,sans-serif" font-size="26" font-weight="400" text-anchor="start" fill="#172c43">3V3_USB → U1 VDD33USB (pin A4)</text>
+<rect x="40" y="785" width="1120" height="1150" rx="8" fill="#f8fbfd" stroke="#d4e0e9" stroke-width="2"/>
+<text x="65" y="828.78" font-family="Segoe UI,Arial,sans-serif" font-size="29" font-weight="700" text-anchor="start" fill="#17648d">2  MAIN 3.3 V DISTRIBUTION</text>
+<text x="85" y="869.5" font-family="Segoe UI,Arial,sans-serif" font-size="25" font-weight="700" text-anchor="start" fill="#17648d">3V3 from U2</text>
+<polyline points="150,887 150,1820" stroke="#17648d" stroke-width="4" fill="none" stroke-linejoin="round"/>
+<rect x="260" y="895" width="840" height="150" rx="8" fill="#ffffff" stroke="#17648d" stroke-width="2"/>
+<text x="278" y="933.78" font-family="Segoe UI,Arial,sans-serif" font-size="29" font-weight="700" text-anchor="start" fill="#17648d">STM32N657 • main 3.3 V pins</text>
+<text x="278" y="968.68" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="400" text-anchor="start" fill="#172c43">U1 VDD + VDDIO2/3 + MCU VBAT</text>
+<text x="278" y="999.68" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="400" text-anchor="start" fill="#172c43">Internal backup regulator → V08CAP / C19 bypass</text>
+<text x="278" y="1030.68" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="400" text-anchor="start" fill="#172c43">V08CAP is a separate internal node; not the core SMPS rail.</text>
+<circle cx="150" cy="970" r="6" fill="#17648d"/>
+<polyline points="150,970 260,970" stroke="#17648d" stroke-width="4" fill="none" stroke-linejoin="round"/>
+<polygon points="260,970 247,963 247,977" fill="#17648d"/>
+<rect x="260" y="1065" width="840" height="125" rx="8" fill="#ffffff" stroke="#17648d" stroke-width="2"/>
+<text x="278" y="1103.78" font-family="Segoe UI,Arial,sans-serif" font-size="29" font-weight="700" text-anchor="start" fill="#17648d">Boot and image storage</text>
+<text x="278" y="1139.5" font-family="Segoe UI,Arial,sans-serif" font-size="25" font-weight="400" text-anchor="start" fill="#172c43">U5 W25Q128JVPIQ • boot NOR • VCC = 3.3 V</text>
+<text x="278" y="1170.5" font-family="Segoe UI,Arial,sans-serif" font-size="25" font-weight="400" text-anchor="start" fill="#172c43">U6 MX30LF2G18AC-TI • NAND • VCC/VCC1 = 3.3 V</text>
+<circle cx="150" cy="1127" r="6" fill="#17648d"/>
+<polyline points="150,1127 260,1127" stroke="#17648d" stroke-width="4" fill="none" stroke-linejoin="round"/>
+<polygon points="260,1127 247,1120 247,1134" fill="#17648d"/>
+<rect x="260" y="1210" width="840" height="105" rx="8" fill="#ffffff" stroke="#17648d" stroke-width="2"/>
+<text x="278" y="1248.78" font-family="Segoe UI,Arial,sans-serif" font-size="29" font-weight="700" text-anchor="start" fill="#17648d">U8 • RV-3028 real-time clock</text>
+<text x="278" y="1283.68" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="400" text-anchor="start" fill="#172c43">VDD = 3.3 V; separate single-cell VBACKUP shown in panel 1</text>
+<circle cx="150" cy="1262" r="6" fill="#17648d"/>
+<polyline points="150,1262 260,1262" stroke="#17648d" stroke-width="4" fill="none" stroke-linejoin="round"/>
+<polygon points="260,1262 247,1255 247,1269" fill="#17648d"/>
+<rect x="260" y="1335" width="840" height="120" rx="8" fill="#ffffff" stroke="#17648d" stroke-width="2"/>
+<text x="278" y="1373.78" font-family="Segoe UI,Arial,sans-serif" font-size="29" font-weight="700" text-anchor="start" fill="#17648d">Indicator and debug reference</text>
+<text x="278" y="1408.68" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="400" text-anchor="start" fill="#172c43">3V3 → R12 1.5 kΩ → LED1 → MCU PC0 current sink</text>
+<text x="278" y="1439.68" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="400" text-anchor="start" fill="#172c43">J2 pin 1 = 3V3 / VTref • debug voltage sense, not a source</text>
+<circle cx="150" cy="1395" r="6" fill="#17648d"/>
+<polyline points="150,1395 260,1395" stroke="#17648d" stroke-width="4" fill="none" stroke-linejoin="round"/>
+<polygon points="260,1395 247,1388 247,1402" fill="#17648d"/>
+<rect x="260" y="1490" width="395" height="150" rx="8" fill="#ffffff" stroke="#17648d" stroke-width="2"/>
+<text x="278" y="1526.32" font-family="Segoe UI,Arial,sans-serif" font-size="26" font-weight="700" text-anchor="start" fill="#17648d">U9 • Camera analog LDO</text>
+<text x="278" y="1563.68" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="400" text-anchor="start" fill="#172c43">TLV70028DDCR</text>
+<text x="278" y="1594.68" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="400" text-anchor="start" fill="#172c43">3.3 V → 2.8 V</text>
+<text x="278" y="1625.68" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="400" text-anchor="start" fill="#172c43">EN: CAM_AVDD_EN</text>
+<circle cx="150" cy="1560" r="6" fill="#17648d"/>
+<polyline points="150,1560 260,1560" stroke="#17648d" stroke-width="4" fill="none" stroke-linejoin="round"/>
+<polygon points="260,1560 247,1553 247,1567" fill="#17648d"/>
+<polyline points="655,1560 770,1560" stroke="#a36214" stroke-width="4" fill="none" stroke-linejoin="round"/>
+<polygon points="770,1560 757,1553 757,1567" fill="#a36214"/>
+<text x="712" y="1540.5" font-family="Segoe UI,Arial,sans-serif" font-size="25" font-weight="700" text-anchor="middle" fill="#a36214">2.8 V</text>
+<rect x="770" y="1490" width="330" height="150" rx="8" fill="#ffffff" stroke="#a36214" stroke-width="2"/>
+<text x="788" y="1527.14" font-family="Segoe UI,Arial,sans-serif" font-size="27" font-weight="700" text-anchor="start" fill="#a36214">CAM1 • Analog</text>
+<text x="788" y="1562.86" font-family="Segoe UI,Arial,sans-serif" font-size="23" font-weight="400" text-anchor="start" fill="#172c43">CAM_VANA_2V8</text>
+<text x="788" y="1593.86" font-family="Segoe UI,Arial,sans-serif" font-size="23" font-weight="400" text-anchor="start" fill="#172c43">Via J3 pin 1</text>
+<text x="788" y="1624.86" font-family="Segoe UI,Arial,sans-serif" font-size="23" font-weight="400" text-anchor="start" fill="#172c43">External camera module</text>
+<rect x="260" y="1660" width="395" height="155" rx="8" fill="#ffffff" stroke="#17648d" stroke-width="2"/>
+<text x="278" y="1696.32" font-family="Segoe UI,Arial,sans-serif" font-size="26" font-weight="700" text-anchor="start" fill="#17648d">U7 • External 1.8 V buck</text>
+<text x="278" y="1733.68" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="400" text-anchor="start" fill="#172c43">TPS62825DMQR</text>
+<text x="278" y="1764.68" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="400" text-anchor="start" fill="#172c43">L2 0.47 µH; EN tied 3V3</text>
+<text x="278" y="1795.68" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="400" text-anchor="start" fill="#172c43">3.3 V → 1.8 V</text>
+<circle cx="150" cy="1737" r="6" fill="#17648d"/>
+<polyline points="150,1737 260,1737" stroke="#17648d" stroke-width="4" fill="none" stroke-linejoin="round"/>
+<polygon points="260,1737 247,1730 247,1744" fill="#17648d"/>
+<polyline points="655,1737 770,1737" stroke="#12796e" stroke-width="4" fill="none" stroke-linejoin="round"/>
+<polygon points="770,1737 757,1730 757,1744" fill="#12796e"/>
+<text x="712" y="1717.5" font-family="Segoe UI,Arial,sans-serif" font-size="25" font-weight="700" text-anchor="middle" fill="#12796e">1.8 V</text>
+<rect x="770" y="1660" width="330" height="155" rx="8" fill="#ffffff" stroke="#12796e" stroke-width="2"/>
+<text x="788" y="1696.32" font-family="Segoe UI,Arial,sans-serif" font-size="26" font-weight="700" text-anchor="start" fill="#12796e">1V8 • External 1.8 V</text>
+<text x="788" y="1733.68" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="400" text-anchor="start" fill="#172c43">Feeds panel 3</text>
+<text x="788" y="1764.68" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="400" text-anchor="start" fill="#172c43">Shared AON + AUX</text>
+<text x="788" y="1795.68" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="400" text-anchor="start" fill="#172c43">in recovered wiring</text>
+<text x="65" y="1880.86" font-family="Segoe UI,Arial,sans-serif" font-size="23" font-weight="400" text-anchor="start" fill="#5d6e80">Local bypass capacitors and pull-up networks are grouped with their rails.</text>
+<rect x="1200" y="785" width="1160" height="1150" rx="8" fill="#f6fbf9" stroke="#d4e0e9" stroke-width="2"/>
+<text x="1225" y="828.78" font-family="Segoe UI,Arial,sans-serif" font-size="29" font-weight="700" text-anchor="start" fill="#12796e">3  EXTERNAL 1.8 V DISTRIBUTION</text>
+<text x="1245" y="869.5" font-family="Segoe UI,Arial,sans-serif" font-size="25" font-weight="700" text-anchor="start" fill="#12796e">1V8 from U7</text>
+<polyline points="1310,887 1310,1820" stroke="#12796e" stroke-width="4" fill="none" stroke-linejoin="round"/>
+<rect x="1420" y="895" width="890" height="115" rx="8" fill="#fffaf0" stroke="#a36214" stroke-width="2"/>
+<text x="1438" y="933.78" font-family="Segoe UI,Arial,sans-serif" font-size="29" font-weight="700" text-anchor="start" fill="#a36214">STM32 main 1.8 V • VDDA18AON</text>
+<text x="1438" y="968.68" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="400" text-anchor="start" fill="#172c43">VDDA18PLL is also connected to this same 1V8 net.</text>
+<text x="1438" y="999.68" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="400" text-anchor="start" fill="#172c43">No separate AON supply branch exists in the recovered wiring.</text>
+<circle cx="1310" cy="952" r="6" fill="#12796e"/>
+<polyline points="1310,952 1420,952" stroke="#12796e" stroke-width="4" fill="none" stroke-linejoin="round"/>
+<polygon points="1420,952 1407,945 1407,959" fill="#12796e"/>
+<rect x="1420" y="1030" width="890" height="140" rx="8" fill="#ffffff" stroke="#12796e" stroke-width="2"/>
+<text x="1438" y="1068.78" font-family="Segoe UI,Arial,sans-serif" font-size="29" font-weight="700" text-anchor="start" fill="#12796e">STM32 1.8 V analog and I/O supplies</text>
+<text x="1438" y="1103.68" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="400" text-anchor="start" fill="#172c43">VDDA18ADC / VREF+ • VDDA18CSI • VDDA18USB</text>
+<text x="1438" y="1134.68" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="400" text-anchor="start" fill="#172c43">VDDIO4 + VDDIO5</text>
+<text x="1438" y="1165.68" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="400" text-anchor="start" fill="#172c43">These are external supply inputs to blocks inside U1.</text>
+<circle cx="1310" cy="1100" r="6" fill="#12796e"/>
+<polyline points="1310,1100 1420,1100" stroke="#12796e" stroke-width="4" fill="none" stroke-linejoin="round"/>
+<polygon points="1420,1100 1407,1093 1407,1107" fill="#12796e"/>
+<rect x="1420" y="1190" width="400" height="170" rx="8" fill="#ffffff" stroke="#12796e" stroke-width="2"/>
+<text x="1438" y="1227.14" font-family="Segoe UI,Arial,sans-serif" font-size="27" font-weight="700" text-anchor="start" fill="#12796e">U1 internal SMPS + L3</text>
+<text x="1438" y="1262.86" font-family="Segoe UI,Arial,sans-serif" font-size="23" font-weight="400" text-anchor="start" fill="#172c43">IN: VDDSMPS / VDDA18PMU</text>
+<text x="1438" y="1293.86" font-family="Segoe UI,Arial,sans-serif" font-size="23" font-weight="400" text-anchor="start" fill="#172c43">1.8 V input; external L3 = 1 µH</text>
+<text x="1438" y="1324.86" font-family="Segoe UI,Arial,sans-serif" font-size="23" font-weight="400" text-anchor="start" fill="#172c43">Converter is inside STM32</text>
+<circle cx="1310" cy="1275" r="6" fill="#12796e"/>
+<polyline points="1310,1275 1420,1275" stroke="#12796e" stroke-width="4" fill="none" stroke-linejoin="round"/>
+<polygon points="1420,1275 1407,1268 1407,1282" fill="#12796e"/>
+<polyline points="1820,1275 1970,1275" stroke="#714c9e" stroke-width="4" fill="none" stroke-linejoin="round"/>
+<polygon points="1970,1275 1957,1268 1957,1282" fill="#714c9e"/>
+<text x="1895" y="1256.5" font-family="Segoe UI,Arial,sans-serif" font-size="25" font-weight="700" text-anchor="middle" fill="#714c9e">~0.81 V</text>
+<rect x="1970" y="1190" width="340" height="170" rx="8" fill="#ffffff" stroke="#714c9e" stroke-width="2"/>
+<text x="1988" y="1226.32" font-family="Segoe UI,Arial,sans-serif" font-size="26" font-weight="700" text-anchor="start" fill="#714c9e">STM32 core supply</text>
+<text x="1988" y="1262.86" font-family="Segoe UI,Arial,sans-serif" font-size="23" font-weight="400" text-anchor="start" fill="#172c43">VCORE_0V81</text>
+<text x="1988" y="1293.86" font-family="Segoe UI,Arial,sans-serif" font-size="23" font-weight="400" text-anchor="start" fill="#172c43">VDDCORE + VDDCSI</text>
+<text x="1988" y="1324.86" font-family="Segoe UI,Arial,sans-serif" font-size="23" font-weight="400" text-anchor="start" fill="#172c43">~0.81 / ~0.9 V by VOS</text>
+<rect x="1420" y="1380" width="890" height="105" rx="8" fill="#ffffff" stroke="#12796e" stroke-width="2"/>
+<text x="1438" y="1418.78" font-family="Segoe UI,Arial,sans-serif" font-size="29" font-weight="700" text-anchor="start" fill="#12796e">CAM1 • Camera I/O supply</text>
+<text x="1438" y="1454.5" font-family="Segoe UI,Arial,sans-serif" font-size="25" font-weight="400" text-anchor="start" fill="#172c43">1V8 → J3 pin 5 → camera module VDDIO = 1.8 V</text>
+<circle cx="1310" cy="1432" r="6" fill="#12796e"/>
+<polyline points="1310,1432 1420,1432" stroke="#12796e" stroke-width="4" fill="none" stroke-linejoin="round"/>
+<polygon points="1420,1432 1407,1425 1407,1439" fill="#12796e"/>
+<rect x="1420" y="1510" width="400" height="150" rx="8" fill="#ffffff" stroke="#12796e" stroke-width="2"/>
+<text x="1438" y="1547.14" font-family="Segoe UI,Arial,sans-serif" font-size="27" font-weight="700" text-anchor="start" fill="#12796e">U10 • Camera core LDO</text>
+<text x="1438" y="1583.68" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="400" text-anchor="start" fill="#172c43">NCP115AMX120TCG</text>
+<text x="1438" y="1614.68" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="400" text-anchor="start" fill="#172c43">1.8 V → 1.2 V</text>
+<text x="1438" y="1645.68" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="400" text-anchor="start" fill="#172c43">EN tied to 1V8</text>
+<circle cx="1310" cy="1580" r="6" fill="#12796e"/>
+<polyline points="1310,1580 1420,1580" stroke="#12796e" stroke-width="4" fill="none" stroke-linejoin="round"/>
+<polygon points="1420,1580 1407,1573 1407,1587" fill="#12796e"/>
+<polyline points="1820,1580 1970,1580" stroke="#714c9e" stroke-width="4" fill="none" stroke-linejoin="round"/>
+<polygon points="1970,1580 1957,1573 1957,1587" fill="#714c9e"/>
+<text x="1895" y="1560.5" font-family="Segoe UI,Arial,sans-serif" font-size="25" font-weight="700" text-anchor="middle" fill="#714c9e">1.2 V</text>
+<rect x="1970" y="1510" width="340" height="150" rx="8" fill="#ffffff" stroke="#714c9e" stroke-width="2"/>
+<text x="1988" y="1546.32" font-family="Segoe UI,Arial,sans-serif" font-size="26" font-weight="700" text-anchor="start" fill="#714c9e">CAM1 • Camera core</text>
+<text x="1988" y="1582.86" font-family="Segoe UI,Arial,sans-serif" font-size="23" font-weight="400" text-anchor="start" fill="#172c43">CAM_VCORE_1V2</text>
+<text x="1988" y="1613.86" font-family="Segoe UI,Arial,sans-serif" font-size="23" font-weight="400" text-anchor="start" fill="#172c43">Via J3 pin 4</text>
+<text x="1988" y="1644.86" font-family="Segoe UI,Arial,sans-serif" font-size="23" font-weight="400" text-anchor="start" fill="#172c43">External camera module</text>
+<rect x="1420" y="1680" width="400" height="155" rx="8" fill="#ffffff" stroke="#12796e" stroke-width="2"/>
+<text x="1438" y="1717.96" font-family="Segoe UI,Arial,sans-serif" font-size="28" font-weight="700" text-anchor="start" fill="#12796e">U12 • Load switch</text>
+<text x="1438" y="1753.68" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="400" text-anchor="start" fill="#172c43">TPS22918DBVT</text>
+<text x="1438" y="1784.68" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="400" text-anchor="start" fill="#172c43">1.8 V in → switched 1.8 V</text>
+<text x="1438" y="1815.68" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="400" text-anchor="start" fill="#172c43">ON: ACCEL_PWR_EN</text>
+<circle cx="1310" cy="1750" r="6" fill="#12796e"/>
+<polyline points="1310,1750 1420,1750" stroke="#12796e" stroke-width="4" fill="none" stroke-linejoin="round"/>
+<polygon points="1420,1750 1407,1743 1407,1757" fill="#12796e"/>
+<polyline points="1820,1750 1970,1750" stroke="#12796e" stroke-width="4" fill="none" stroke-linejoin="round"/>
+<polygon points="1970,1750 1957,1743 1957,1757" fill="#12796e"/>
+<text x="1895" y="1730.5" font-family="Segoe UI,Arial,sans-serif" font-size="25" font-weight="700" text-anchor="middle" fill="#12796e">1.8 V</text>
+<rect x="1970" y="1680" width="340" height="155" rx="8" fill="#ffffff" stroke="#12796e" stroke-width="2"/>
+<text x="1988" y="1716.32" font-family="Segoe UI,Arial,sans-serif" font-size="26" font-weight="700" text-anchor="start" fill="#12796e">U11 • Accelerometer</text>
+<text x="1988" y="1753.68" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="400" text-anchor="start" fill="#172c43">LIS2DW12TR</text>
+<text x="1988" y="1784.68" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="400" text-anchor="start" fill="#172c43">ACCEL_1V8_SW</text>
+<text x="1988" y="1815.68" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="400" text-anchor="start" fill="#172c43">VDD + VDDIO + CS</text>
+<text x="1225" y="1880.86" font-family="Segoe UI,Arial,sans-serif" font-size="23" font-weight="400" text-anchor="start" fill="#5d6e80">The internal SMPS powers the STM32 core / CSI receiver, not CAM1.</text>
+<rect x="40" y="1960" width="2320" height="175" rx="8" fill="#fff9eb" stroke="#c5a561" stroke-width="2"/>
+<text x="65" y="2001.78" font-family="Segoe UI,Arial,sans-serif" font-size="29" font-weight="700" text-anchor="start" fill="#a36214">PLANNED CHANGES • NOT APPLIED TO THIS TREE</text>
+<text x="65" y="2046.96" font-family="Segoe UI,Arial,sans-serif" font-size="28" font-weight="400" text-anchor="start" fill="#172c43">The LTC3621 proposal changes the battery / main-converter path. USB source selection still needs a complete circuit.</text>
+<text x="65" y="2092.96" font-family="Segoe UI,Arial,sans-serif" font-size="28" font-weight="400" text-anchor="start" fill="#172c43">Split shared 1V8 into main AON and switched AUX; keep main rails valid through auxiliary shutdown.</text>
+<text x="45" y="2179.68" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="400" text-anchor="start" fill="#5d6e80">All grounds are common. Arrows show intended power flow; they do not guarantee reverse-current blocking or source priority.</text>
+<text x="45" y="2216.68" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="400" text-anchor="start" fill="#5d6e80">Battery assembly comes from spec.md. Remaining paths follow the recovered connectivity. Full pin and source details: power-tree.md.</text>
+</svg>

@@ -1,0 +1,1983 @@
+
+===== PDF PAGE 1 =====
+TPS6282x 2.4V to 5.5V Input, 1, 2, 3, 4A Step-Down Converter With 1% Output 
+Accuracy
+1 Features
+• Available as an integrated-inductor power module: 
+TPSM82821, TPSM82822, and TPSM82823
+• DCS-Control topology
+• 1% feedback or output voltage accuracy (full 
+temperature range)
+• Up to 97% efficiency
+• 26mΩ and 25mΩ internal power MOSFETs
+• 2.4V to 5.5V input voltage range
+• 4μA operating quiescent current
+• 2.2MHz switching frequency
+• 0.6V to 4V adjustable output voltage
+• Power save mode for light load efficiency
+• 100% duty cycle for lowest dropout
+• Active output discharge
+• Power-good output
+• Thermal shutdown protection
+• Hiccup short-circuit protection
+• A forced-PWM version for CCM operation
+• Create a custom design using the TPS6282x with 
+the WEBENCH® Power Designer
+2 Applications
+• Solid state drive
+• Portable electronics
+• Analog security and IP network cameras
+• Industrial PC
+• Multifunction printers
+• Generic point of load
+3 Description
+The TPS6282x is an easy-to-use, synchronous step-
+down DC/DC converters family with a very low 
+quiescent current of only 4 μA. Based on the DCS-
+Control topology, the device provides a fast transient 
+response. The internal reference allows to regulate 
+the output voltage down to 0.6V with a high feedback 
+voltage accuracy of 1% over the junction temperature 
+range of –40°C to 125°C. The family devices are 
+pin-to-pin and BOM-to-BOM compatible. The entire 
+design requires a small 470nH inductor, a single 
+4.7µF input capacitor, and two 10µF or single 22µF 
+output capacitor.
+The TPS6282x is available in two flavors. The 
+first includes an automatically entered power save 
+mode to maintain high efficiency down to very light 
+loads for extending the system battery run-time. The 
+second runs in forced-PWM maintaining a continuous 
+conduction mode to make sure of the least ripple 
+in the output voltage and a quasi-fixed switching 
+frequency. The device features a Power-Good signal 
+and an internal soft-start circuit. The device is able 
+to operate in 100% mode. For fault protection, the 
+device incorporates a HICCUP short-circuit protection 
+as well as a thermal shutdown. The device is 
+available in a 6-pin 1.5mm × 1.5mm QFN package, 
+offering the highest power density design.
+Device Information
+PART NUMBER PACKAGE(1) PACKAGE SIZE(2)
+TPS6282xx DMQ (VSON-HR, 6) 1.5mm × 1.5mm
+(1) For more information, see Section 11.
+(2) The package size (length × width) is a nominal value and 
+includes pins, where applicable.
+Typical Application Schematic
+Load (A)
+Efficiency (%)
+50
+55
+60
+65
+70
+75
+80
+85
+90
+95
+100
+100P 1m 10m 100m 1 4
+Vout=3.3V
+Vout=2.5V
+Vout=1.8V
+Vout=1.2V
+Vout=0.6V
+Efficiency at VIN = 5V
+TPS62824, TPS62825, TPS62826, TPS62827, TPS62824A, TPS62825A, TPS62826A, TPS62827A
+SLVSEF9I – MARCH 2018 – REVISED MARCH 2024
+An IMPORTANT NOTICE at the end of this data sheet addresses availability, warranty, changes, use in safety-critical applications, 
+intellectual property matters and other important disclaimers. PRODUCTION DATA.
+
+===== PDF PAGE 2 =====
+Table of Contents
+1 Features............................................................................1
+2 Applications.....................................................................1
+3 Description.......................................................................1
+4 Device Options................................................................ 3
+5 Pin Configuration and Functions...................................3
+6 Specifications.................................................................. 4
+6.1 Absolute Maximum Ratings........................................ 4
+6.2 ESD Ratings............................................................... 4
+6.3 Recommended Operating Conditions.........................4
+6.4 Thermal Information....................................................4
+6.5 Electrical Characteristics.............................................5
+6.6 Typical Characteristics................................................7
+7 Detailed Description........................................................8
+7.1 Overview.....................................................................8
+7.2 Functional Block Diagram...........................................8
+7.3 Feature Description.....................................................9
+7.4 Device Functional Modes..........................................10
+8 Application and Implementation.................................. 11
+8.1 Application Information..............................................11
+8.2 Typical Application.................................................... 11
+8.3 Power Supply Recommendations.............................22
+8.4 Layout....................................................................... 22
+9 Device and Documentation Support............................24
+9.1 Device Support......................................................... 24
+9.2 Documentation Support............................................ 24
+9.3 Support Resources................................................... 24
+9.4 Trademarks...............................................................24
+9.5 Electrostatic Discharge Caution................................24
+9.6 Glossary....................................................................24
+10 Revision History.......................................................... 25
+11 Mechanical, Packaging, and Orderable 
+Information.................................................................... 25
+TPS62824, TPS62825, TPS62826, TPS62827, TPS62824A, TPS62825A, TPS62826A, TPS62827A
+SLVSEF9I – MARCH 2018 – REVISED MARCH 2024
+ www.ti.com
+2 Submit Document Feedback Copyright © 2024 Texas Instruments Incorporated
+Product Folder Links: TPS62824 TPS62825 TPS62826 TPS62827 TPS62824A TPS62825A TPS62826A TPS62827A
+
+===== PDF PAGE 3 =====
+4 Device Options
+PART NUMBER OUTPUT VOLTAGE OPERATION 
+MODE OUTPUT CURRENT
+TPS62824DMQ Adjustable
+PSM/PWM
+1A
+TPS62825DMQ Adjustable
+2ATPS6282518DMQ 1.8V
+TPS6282533DMQ 3.3V
+TPS62826DMQ Adjustable
+3A
+TPS6282618DMQ 1.8V
+TPS62827DMQ Adjustable 4A
+TPS62824ADMQ Adjustable
+Forced-PWM
+1A
+TPS62825ADMQ Adjustable 2A
+TPS62826ADMQ Adjustable 3A
+TPS62827ADMQ Adjustable 4A
+5 Pin Configuration and Functions
+SW
+VIN
+GND
+PG
+EN
+FB
+1
+2
+3
+6
+5
+4
+Figure 5-1. DMQ Package, 6-Pin VSON-HR (Bottom View)
+Table 5-1. Pin Functions
+PIN
+TYPE(1) DESCRIPTION
+NAME NO.
+EN 1 I Device enable pin. To enable the device, this pin must be pulled high. Pulling this pin low 
+disables the device. Do not leave floating.
+PG 2 O Power-good open-drain output pin. The pullup resistor can be connected to voltages up to 
+5.5V. If unused, leave the pin floating.
+FB 3 I Feedback pin. For the fixed output voltage versions, this pin must be connected to the 
+output.
+GND 4 Ground pin
+SW 5 PWR Switch pin of the power stage
+VIN 6 PWR Input voltage pin
+(1) I = input, O = output, PWR = power
+www.ti.com
+TPS62824, TPS62825, TPS62826, TPS62827, TPS62824A, TPS62825A, TPS62826A, TPS62827A
+SLVSEF9I – MARCH 2018 – REVISED MARCH 2024
+Copyright © 2024 Texas Instruments Incorporated Submit Document Feedback 3
+Product Folder Links: TPS62824 TPS62825 TPS62826 TPS62827 TPS62824A TPS62825A TPS62826A TPS62827A
+
+===== PDF PAGE 4 =====
+6 Specifications
+6.1 Absolute Maximum Ratings
+Over operating junction temperature range (unless otherwise noted) (1)
+MIN MAX UNIT
+Voltage at Pins (2)
+VIN, FB, EN, PG –0.3 6
+V
+SW (DC) (4) –0.3 VIN + 0.3
+SW (DC, in current limit) –1.0 VIN + 0.3
+SW (AC, less than 10ns) (3) –2.5 10
+SW (AC, PFM Mode, less than 100ns) (3) –1.0 VIN + 1.0
+Temperature
+Operating junction temperature, TJ –40 150
+°C
+Storage temperature, Tstg –65 150
+(1) Operation outside the Absolute Maximum Ratings may cause permanent device damage. Absolute Maximum Ratings do not imply 
+functional operation of the device at these or any other conditions beyond those listed under Recommended Operating Conditions. 
+If used outside the Recommended Operating Conditions but within the Absolute Maximum Ratings, the device may not be fully 
+functional, and this may affect device reliability, functionality, performance, and shorten the device lifetime.
+(2) All voltage values are with respect to network ground terminal.
+(3) While switching.
+(4) After disabling the device, the SW voltage may exceed the MIN specification until the inductor and output capacitor are fully 
+discharged.
+6.2 ESD Ratings
+VALUE UNIT
+V(ESD) Electrostatic discharge
+Human-body model (HBM), per ANSI/ESDA/JEDEC JS-001 (1) ±2000 V
+Charged-device model (CDM), per JEDEC specification JESD22-C101 (2) ±500 V
+(1) JEDEC document JEP155 states that 500-V HBM allows safe manufacturing with a standard ESD control process.
+(2) JEDEC document JEP157 states that 250-V CDM allows safe manufacturing with a standard ESD control process.
+6.3 Recommended Operating Conditions
+Over operating junction temperature range (unless otherwise noted)
+MIN NOM MAX UNIT
+VIN Input voltage range, TPS62824x, TPS62825x and TPS62826x 2.4 5.5 V
+VIN Input voltage range, TPS62827x 2.5 5.5 V
+VOUT Output voltage range 0.6 4.0 V
+IOUT Output current range, TPS62824x 0 1 A
+IOUT Output current range, TPS62825x 0 2 A
+IOUT Output current range, TPS62826x 0 3 A
+IOUT Output current range, TPS62827x 0 4 A
+ISINK_PG Sink current at PG pin 1 mA
+VPG Pull-up resistor voltage 5.5 V
+TJ Operating junction temperature -40 125 °C
+6.4 Thermal Information
+THERMAL METRIC(1)
+DEVICE
+UNITTPS6282x, JEDEC TPS62826EVM-794
+6 pins 6 pins
+RθJA Junction-to-ambient thermal resistance 129.5 71.4 °C/W
+RθJC(top) Junction-to-case (top) thermal resistance 103.9 n/a (2) °C/W
+RθJB Junction-to-board thermal resistance 33.1 n/a (2) °C/W
+ψJT Junction-to-top characterization parameter 3.8 3.9 °C/W
+TPS62824, TPS62825, TPS62826, TPS62827, TPS62824A, TPS62825A, TPS62826A, TPS62827A
+SLVSEF9I – MARCH 2018 – REVISED MARCH 2024
+ www.ti.com
+4 Submit Document Feedback Copyright © 2024 Texas Instruments Incorporated
+Product Folder Links: TPS62824 TPS62825 TPS62826 TPS62827 TPS62824A TPS62825A TPS62826A TPS62827A
+
+===== PDF PAGE 5 =====
+6.4 Thermal Information (continued)
+THERMAL METRIC(1)
+DEVICE
+UNITTPS6282x, JEDEC TPS62826EVM-794
+6 pins 6 pins
+ψJB Junction-to-board characterization parameter 33.1 38.6 °C/W
+(1) For more information about traditional and new thermal metrics, see the Semiconductor and IC Package Thermal Metrics application 
+report.
+(2) Not applicable to an EVM.
+6.5 Electrical Characteristics
+TJ = -40 °C to 125 °C, and VIN = 2.4 V to 5.5 V. Typical values are at TJ = 25 °C and VIN = 5 V , unless otherwise noted.
+PARAMETER TEST CONDITIONS MIN TYP MAX UNIT
+SUPPLY
+IQ Quiescent current EN = High, no load, device not switching 4 10 µA
+IQ Quiescent current EN = High, no load, FPWM devices 8 mA
+ISD Shutdown current EN = Low, TJ = -40 ℃ to 85 ℃ 0.05 0.5 µA
+VUVLO
+Under voltage lock out threshold VIN falling 2.1 2.2 2.3 V
+Under voltage lock out hysteresis VIN rising 160 mV
+TJSD
+Thermal shutdown threshold TJ rising 150 °C
+Thermal shutdown hysteresis TJ falling 20 °C
+LOGIC INTERFACE EN
+VIH High-level threshold voltage 1.0 V
+VIL Low-level threshold voltage 0.4 V
+IEN,LKG Input leakage current into EN pin EN = High 0.01 0.1 µA
+SOFT START, POWER GOOD
+tSS Soft start time
+Time from EN high to 95% of VOUT nominal, TPS62827 1.75 ms
+Time from EN high to 95% of VOUT nominal, 
+TPS62824x/5x/6x/7A 1.25 ms
+VPG
+Power good lower threshold
+VPG rising, VFB referenced to VFB nominal 94 96 98 %
+VPG falling, VFB referenced to VFB nominal 90 92 94 %
+Power good upper threshold
+VPG rising, VFB referenced to VFB nominal 108 110 112 %
+VPG falling, VFB referenced to VFB nominal 103 105 107 %
+VPG,OL Low-level output voltage Isink = 1 mA 0.4 V
+IPG,LKG Input leakage current into PG pin VPG = 5.0 V 0.01 0.1 µA
+tPG,DLY Power good deglitch delay
+PG rising edge 100
+µs
+PG falling edge 20
+OUTPUT
+VOUT Output voltage accuracy TPS6282533, PWM mode 3.267 3.3 3.333 V
+VOUT Output voltage accuracy TPS6282x18, PWM mode 1.78 1.8 1.82 V
+VFB Feedback regulation voltage PWM mode 594 600 606 mV
+IFB,LKG
+Feedback input leakage current for adjustable 
+output voltage VFB = 0.6 V 0.01 0.05 µA
+RFB
+Internal resistor divider connected to FB pin, for 
+fixed output votlage TPS6282518, TPS6282618, TPS6282533 7.5 MΩ
+IDIS Output discharge current VSW = 0.4V; EN = LOW 75 400 mA
+Load regulation IOUT = 0.5 A to 3 A, VOUT = 1.8 V 0.1 %/A
+POWER SWITCH
+RDS(on)
+High-side FET on-resistance 26 mΩ
+Low-side FET on-resistance 25 mΩ
+www.ti.com
+TPS62824, TPS62825, TPS62826, TPS62827, TPS62824A, TPS62825A, TPS62826A, TPS62827A
+SLVSEF9I – MARCH 2018 – REVISED MARCH 2024
+Copyright © 2024 Texas Instruments Incorporated Submit Document Feedback 5
+Product Folder Links: TPS62824 TPS62825 TPS62826 TPS62827 TPS62824A TPS62825A TPS62826A TPS62827A
+
+===== PDF PAGE 6 =====
+6.5 Electrical Characteristics (continued)
+TJ = -40 °C to 125 °C, and VIN = 2.4 V to 5.5 V. Typical values are at TJ = 25 °C and VIN = 5 V , unless otherwise noted.
+PARAMETER TEST CONDITIONS MIN TYP MAX UNIT
+ILIM High-side FET switch current limit, DC
+TPS62824A 1.7 2.1 2.4 A
+TPS62825x 2.74 3.3 3.9 A
+TPS62826x 3.7 4.3 5.0 A
+TPS62827x 4.8 5.6 6.4 A
+ILIM Low-side FET negative current limit, DC TPS62824A/5A/6A/7A –1.6 A
+fSW PWM switching frequency IOUT = 1 A, VOUT = 1.8 V 2.2 MHz
+TPS62824, TPS62825, TPS62826, TPS62827, TPS62824A, TPS62825A, TPS62826A, TPS62827A
+SLVSEF9I – MARCH 2018 – REVISED MARCH 2024
+ www.ti.com
+6 Submit Document Feedback Copyright © 2024 Texas Instruments Incorporated
+Product Folder Links: TPS62824 TPS62825 TPS62826 TPS62827 TPS62824A TPS62825A TPS62826A TPS62827A
+
+===== PDF PAGE 7 =====
+6.6 Typical Characteristics
+Input Voltage (V)
+RDS(on) (mOhm)
+2.5 3.0 3.5 4.0 4.5 5.0 5.5
+0.0
+10.0
+20.0
+30.0
+40.0
+50.0
+60.0
+70.0
+D010
+TJ = 0 °C
+TJ = 25 °C
+TJ = 85 °C
+TJ = 125 °C
+Figure 6-1. High-Side FET On-Resistance
+Input Voltage (V)
+RDS(on) (mOhm)
+2.5 3.0 3.5 4.0 4.5 5.0 5.5
+0.0
+10.0
+20.0
+30.0
+40.0
+50.0
+60.0
+70.0
+D011
+TJ = 0 °C
+TJ = 25 °C
+TJ = 85 °C
+TJ = 125 °C Figure 6-2. Low-Side FET On-Resistance
+Input Voltage (V)
+6KXWGRZQ&XUUHQW$
+2.5 3.0 3.5 4.0 4.5 5.0 5.5
+0.0
+0.1
+0.2
+0.3
+0.4
+0.5
+D000
+TJ = -40 °C
+TJ = 25 °C
+TJ = 85 °C
+TJ = 125 °C
+Figure 6-3. Shutdown Current
+Input Voltage (V)
+4XLHVFHQW&XUUHQW$
+2.5 3.0 3.5 4.0 4.5 5.0 5.5
+0.0
+2.0
+4.0
+6.0
+8.0
+D001
+TJ = -40 °C
+TJ = 25 °C
+TJ = 85 °C
+TJ = 125 °C Figure 6-4. Quiescent Current
+Input Voltage (V)
+Output Discharge Current (mA)
+2.5 3.0 3.5 4.0 4.5 5.0 5.5
+0
+50
+100
+150
+200
+250
+300
+350
+400
+450
+500
+D012
+TJ = 0 °C
+TJ = 25 °C
+TJ = 85 °C
+TJ = 125 °C
+Figure 6-5. Output Discharge Current
+www.ti.com
+TPS62824, TPS62825, TPS62826, TPS62827, TPS62824A, TPS62825A, TPS62826A, TPS62827A
+SLVSEF9I – MARCH 2018 – REVISED MARCH 2024
+Copyright © 2024 Texas Instruments Incorporated Submit Document Feedback 7
+Product Folder Links: TPS62824 TPS62825 TPS62826 TPS62827 TPS62824A TPS62825A TPS62826A TPS62827A
+
+===== PDF PAGE 8 =====
+7 Detailed Description
+7.1 Overview
+The TPS6282x are synchronous step-down converters based on the DCS-Control topology with an adaptive 
+constant on-time control and a stabilized switching frequency. The devices operate in PWM (pulse width 
+modulation) mode for medium to heavy loads and in PSM (power save mode) at light load conditions, keeping 
+the output voltage ripple small. The nominal switching frequency is about 2.2MHz with a small and controlled 
+variation over the input voltage range. As the load current decreases, the converter enters PSM, reducing the 
+switching frequency to keep efficiency high over the entire load current range. Because combining both PWM 
+and PSM within a single building block, the transition between modes is seamless and without effect on the 
+output voltage. In forced-PWM devices, the converter maintains a continuous conduction mode operation and 
+keeps the output voltage ripple very low across the whole load range and at a nominal switching frequency of 
+2.2MHz. The devices offer both excellent dc voltage and fast load transient regulation, combined with a very low 
+output voltage ripple.
+7.2 Functional Block Diagram
+UVLO
+Control Logic
+Soft-Start Thermal 
+Shutdown
+Gate Drive
+Peak Current Detect
+Zero Current Detect
+HICCUP
+Modulator
+Ton
+Ramp
+EA
+VSW
+VSW
+VREF
+VFB
+VREF
+VIN VSW
+VFB
+VREF
+Comp
+VIN
+FB
+EN
+0.6 V
+Or 
+Fixed Output Voltages
+PG
+VIN
+SW
+GND
+Output
+Discharge
+TPS62824, TPS62825, TPS62826, TPS62827, TPS62824A, TPS62825A, TPS62826A, TPS62827A
+SLVSEF9I – MARCH 2018 – REVISED MARCH 2024
+ www.ti.com
+8 Submit Document Feedback Copyright © 2024 Texas Instruments Incorporated
+Product Folder Links: TPS62824 TPS62825 TPS62826 TPS62827 TPS62824A TPS62825A TPS62826A TPS62827A
+
+===== PDF PAGE 9 =====
+7.3 Feature Description
+7.3.1 Pulse Width Modulation (PWM) Operation
+At load currents larger than half the inductor ripple current, the device operates in pulse width modulation in 
+continuous conduction mode (CCM). The PWM operation is based on an adaptive constant on-time control with 
+stabilized switching frequency. To achieve a stable switching frequency in a steady state condition, the on-time is 
+calculated as:
+TON =
+VOUT
+VIN × 450ns (1)
+In forced-PWM devices, the device always operates in pulse width modulation in continuous conduction mode 
+(CCM).
+7.3.2 Power Save Mode (PSM) Operation
+To maintain high efficiency at light loads, the device enters power save mode (PSM) at the boundary to 
+discontinuous conduction mode (DCM). This event happens when the output current becomes smaller than half 
+of the ripple current of the inductor. The device operates now with a fixed on-time and the switching frequency 
+further decreases proportional to the load current. Use the following equation to calculate:
+fPSM =
+2 × IOUT
+TON2 × VIN
+VOUT
+VIN − VOUT
+L
+(2)
+In PSM, the output voltage rises slightly above the nominal target, which can be minimized using larger output 
+capacitance. At duty cycles larger than 90%, the device can not enter PSM. The device maintains output 
+regulation in PWM mode.
+7.3.3 Minimum Duty Cycle and 100% Mode Operation
+There is no limitation for small duty cycles, because even at very low duty cycles, the switching frequency is 
+reduced as needed to always make sure of a proper regulation.
+If the output voltage level comes close to the input voltage, the device enters 100% mode. While the high-side 
+switch is constantly turned on, the low-side switch is switched off. The difference between VIN and VOUT is 
+determined by the voltage drop across the high-side FET and the DC resistance of the inductor. The minimum 
+VIN that is needed to maintain a specific VOUT value is estimated as:
+VIN, min = VOUT + IOUT, MAX × RDS on + RL (3)
+where
+• VIN,MIN = Minimum input voltage to maintain an output voltage
+• IOUT,MAX = Maximum output current
+• RDS(on) = High-side FET ON-resistance
+• RL = Inductor ohmic resistance (DCR)
+7.3.4 Soft Start
+About 250μs after EN goes High, the internal soft-start circuitry controls the output voltage during start-up. This 
+action avoids excessive inrush current and makes sure of a controlled output voltage ramp. This action also 
+prevents unwanted voltage drops from high-impedance power sources or batteries. The TPS6282x can start into 
+a prebiased output.
+7.3.5 Switch Current Limit and HICCUP Short-Circuit Protection
+The switch current limit prevents the device from drawing excessive current in case of externally-caused 
+overcurrent or short-circuit condition. Due to an internal propagation delay (typically 60ns), the actual AC peak 
+current can exceed the static current limit during that time.
+www.ti.com
+TPS62824, TPS62825, TPS62826, TPS62827, TPS62824A, TPS62825A, TPS62826A, TPS62827A
+SLVSEF9I – MARCH 2018 – REVISED MARCH 2024
+Copyright © 2024 Texas Instruments Incorporated Submit Document Feedback 9
+Product Folder Links: TPS62824 TPS62825 TPS62826 TPS62827 TPS62824A TPS62825A TPS62826A TPS62827A
+
+===== PDF PAGE 10 =====
+If the current limit threshold is reached, the device delivers maximum output current. Detecting this condition for 
+32 switching cycles (about 13 μs), the device turns off the high-side MOSFET for about 100 μs which allows the 
+inductor current to decrease through the low-side MOSFET body diode and then restarts again with a soft start 
+cycle. As long as the overload condition is present, the device hiccups that way, limiting the output power.
+In forced PWM devices, a negative current limit (I LIMN) is enabled to prevent excessive current flowing 
+backwards to the input. When the inductor current reaches I LIMN, the low-side MOSFET turns off and the 
+high-side MOSFET turns on and kept on until TON time expires.
+7.3.6 Undervoltage Lockout
+The undervoltage lockout (UVLO) function prevents misoperation of the device if the input voltage drops below 
+the UVLO threshold. The undervoltage lockout is set to about 2.2V with a hysteresis of typically 160mV.
+7.3.7 Thermal Shutdown
+The junction temperature (TJ) of the device is monitored by an internal temperature sensor. If T J exceeds 150°C 
+(typ.), the device goes in thermal shutdown with a hysteresis of typically 20°C. After T J has decreased enough, 
+the device resumes normal operation.
+7.4 Device Functional Modes
+7.4.1 Enable, Disable, and Output Discharge
+The device starts operation when Enable (EN) is set High. The input threshold levels are typically 0.9V for rising 
+and 0.7V for falling signals. Do not leave EN floating. Shutdown is forced if EN is pulled Low with a shutdown 
+current of typically 50nA. During shutdown, the internal power MOSFETs as well as the entire control circuitry 
+are turned off and the output voltage is actively discharged through the SW pin by a current sink. Therefore VIN 
+must remain present for the discharge to function.
+7.4.2 Power Good
+The TPS6282x has a built-in power-good (PG) function. The PG pin goes high impedance when the output 
+voltage has reached the nominal value. Otherwise, including when disabled, in UVLO or in thermal shutdown, 
+PG is Low (see Table 7-1). The PG function is formed with a window comparator, which has an upper and lower 
+voltage threshold. The PG pin is an open-drain output and is specified to sink up to 1mA. The power-good output 
+requires a pullup resistor connecting to any voltage rail less than 5.5V.
+The PG signal can be used for sequencing of multiple rails by connecting it to the EN pin of other converters. 
+Leave the PG pin unconnected when not used. The PG rising edge has a 100µs blanking time and the PG falling 
+edge has a deglitch delay of 20µs.
+Table 7-1. PG Pin Logic
+DEVICE CONDITIONS
+LOGIC STATUS
+HIGH Z LOW
+Enable
+EN = High, VFB ≥ 0.576V √
+EN = High, VFB ≤ 0.552V √
+EN = High, VFB ≤ 0.63V √
+EN = High, VFB ≥ 0.66V √
+Shutdown EN = Low √
+Thermal Shutdown TJ > TJSD √
+UVLO 0.7V < VIN < VUVLO √
+Power Supply Removal VIN < 0.7V √
+TPS62824, TPS62825, TPS62826, TPS62827, TPS62824A, TPS62825A, TPS62826A, TPS62827A
+SLVSEF9I – MARCH 2018 – REVISED MARCH 2024
+ www.ti.com
+10 Submit Document Feedback Copyright © 2024 Texas Instruments Incorporated
+Product Folder Links: TPS62824 TPS62825 TPS62826 TPS62827 TPS62824A TPS62825A TPS62826A TPS62827A
+
+===== PDF PAGE 11 =====
+8 Application and Implementation
+Note
+Information in the following applications sections is not part of the TI component specification, 
+and TI does not warrant its accuracy or completeness. TI’s customers are responsible for 
+determining suitability of components for their purposes, as well as validating and testing their design 
+implementation to confirm system functionality.
+8.1 Application Information
+The following section discusses the design of the external components to complete the power supply design for 
+several input and output voltage options by using typical applications as a reference.
+8.2 Typical Application
+R1
+200 k
+
+R2
+100 k
+ 
+SW
+GND FB
+EN
+PG
+VIN
+C2
+2x10 µF
+R3
+100 k
+
+C1
+4.7 µF
+VIN
+2.4 V to 5.5 V
+VPG
+VOUT
+1.8 V
+L1
+0.47 µH
+TPS62826
+C3
+120 pF
+Figure 8-1. Typical Application of TPS62826x
+R1
+200 k
+
+R2
+100 k
+ 
+SW
+GND FB
+EN
+PG
+VIN
+C2
+3x10 µF
+R3
+100 k
+
+C1
+4.7 µF
+VIN
+2.5 V to 5.5 V
+VPG
+VOUT
+1.8 V
+L1
+0.47 µH
+TPS62827
+C3
+120 pF
+Figure 8-2. Typical Application of TPS62827
+8.2.1 Design Requirements
+For this design example, use the parameters listed in Table 8-1 as the input parameters.
+Table 8-1. Design Parameters
+DESIGN PARAMETER EXAMPLE VALUE
+Input voltage, TPS62826x 2.4V to 5.5V
+Input voltage, TPS62827x 2.5V to 5.5V
+Output voltage 1.8V
+Output ripple voltage < 20mV
+Maximum output current, TPS62826x 3A
+Maximum output current, TPS62827x 4A
+www.ti.com
+TPS62824, TPS62825, TPS62826, TPS62827, TPS62824A, TPS62825A, TPS62826A, TPS62827A
+SLVSEF9I – MARCH 2018 – REVISED MARCH 2024
+Copyright © 2024 Texas Instruments Incorporated Submit Document Feedback 11
+Product Folder Links: TPS62824 TPS62825 TPS62826 TPS62827 TPS62824A TPS62825A TPS62826A TPS62827A
+
+===== PDF PAGE 12 =====
+Table 8-2 lists the components used for the example.
+Table 8-2. List of Components
+REFERENCE DESCRIPTION MANUFACTURER
+C1 4.7µF, Ceramic capacitor, 6.3V, X7R, size 0603, JMK107BB7475MA Taiyo Yuden
+C2, 
+TPS62824x/5x/6x/7A 2 × 10µF, Ceramic capacitor, 10V, X7R, size 0603, GRM188Z71A106MA73D Murata
+C2, TPS62827 3 × 10µF, Ceramic capacitor, 10V, X7R, size 0603, GRM188Z71A106MA73D Murata
+C3 120pF, Ceramic capacitor, 50V, size 0402 Std
+L1 0.47µH, Power Inductor, XFL4015-471MEB Coilcraft
+R1 Depending on the output voltage, 1%, size 0402 Std
+R2 100kΩ, Chip resistor, 1/16W, 1%, size 0402 Std
+R3 100kΩ, Chip resistor, 1/16W, 1%, size 0402 Std
+8.2.2 Detailed Design Procedure
+8.2.2.1 Custom Design With WEBENCH® Tools
+Click here to create a custom design using the TPS6282x device with the WEBENCH® Power Designer.
+1. Start by entering the input voltage (VIN), output voltage (VOUT), and output current (IOUT) requirements.
+2. Optimize the design for key parameters such as efficiency, footprint, and cost using the optimizer dial.
+3. Compare the generated design with other possible solutions from Texas Instruments.
+The WEBENCH Power Designer provides a customized schematic along with a list of materials with real-time 
+pricing and component availability.
+In most cases, these actions are available:
+• Run electrical simulations to see important waveforms and circuit performance
+• Run thermal simulations to understand board thermal performance
+• Export customized schematic and layout into popular CAD formats
+• Print PDF reports for the design, and share the design with colleagues
+Get more information about WEBENCH tools at www.ti.com/WEBENCH.
+8.2.2.2 Setting The Output Voltage
+The output voltage is set by an external resistor divider according to Equation 4:
+R1 = R2 ×
+VOUT
+VFB − 1 = R2 ×
+VOUT
+0.6 V − 1 (4)
+R2 must not be higher than 100k Ω to achieve high efficiency at light load while providing acceptable noise 
+sensitivity. Equation 5 shows how to compute the value of the feedforward capacitor for a given R2 value. For 
+the recommended 100k value for R2, a 120pF feedforward capacitor is used.
+C3 = 12μ
+R2 (5)
+For the fixed output voltage versions, connect the FB pin to the output. R1, R2, and C3 are not needed. The 
+fixed output voltage devices have an internal feedforward capacitor.
+8.2.2.3 Output Filter Design
+The inductor and the output capacitor together provide a low-pass filter. To simplify this process, Table 8-3 
+outlines possible inductor and capacitor value combinations for most applications. Checked cells represent 
+combinations that are proven for stability by simulation and lab test. check further combinations for each 
+individual application.
+TPS62824, TPS62825, TPS62826, TPS62827, TPS62824A, TPS62825A, TPS62826A, TPS62827A
+SLVSEF9I – MARCH 2018 – REVISED MARCH 2024
+ www.ti.com
+12 Submit Document Feedback Copyright © 2024 Texas Instruments Incorporated
+Product Folder Links: TPS62824 TPS62825 TPS62826 TPS62827 TPS62824A TPS62825A TPS62826A TPS62827A
+
+===== PDF PAGE 13 =====
+Table 8-3. Matrix of Output Capacitor and Inductor Combinations, TPS62824x, TPS62825x, TPS62826x, 
+and TPS62827A
+NOMINAL L [µH](2) NOMINAL COUT [µF](3)
+10 2 × 10 or 22 47 100
+0.33
+0.47 + +(1) +
+1.0
+(1) This LC combination is the standard value and recommended for most applications.
+(2) Inductor tolerance and current derating is anticipated. The effective inductance can vary by 20% and –30%.
+(3) Capacitance tolerance and bias voltage derating is anticipated. The effective capacitance can vary by 20% and –35%.
+Table 8-4. Matrix of Output Capacitor and Inductor Combinations, TPS62827
+NOMINAL L [µH](2) NOMINAL COUT [µF](3)
+22 3 × 10 47 100
+0.33
+0.47 +(1) + +
+1.0
+8.2.2.4 Inductor Selection
+The main parameter for the inductor selection is the inductor value and then the saturation current of the 
+inductor. To calculate the maximum inductor current under static load conditions, Equation 6 is given.
+IL, MAX = IOUT, MAX +
+∆ IL
+2
+∆ IL = VOUT ×
+1 − VOUT
+VIN
+L × fSW
+(6)
+where
+• IOUT,MAX = Maximum output current
+• ΔIL = Inductor current ripple
+• fSW = Switching frequency
+• L = Inductor value
+TI recommends to choose a saturation current for the inductor that is approximately 20% to 30% higher than 
+IL,MAX. In addition, DC resistance and size must also be taken into account when selecting an appropriate 
+inductor. Table 8-5 lists recommended inductors.
+Table 8-5. List of Recommended Inductors
+INDUCTANCE [µH] CURRENT RATING 
+[A]
+DIMENSIONS [L × W 
+× H mm]
+MAX. DC 
+RESISTANCE [mΩ] MFR PART NUMBER(1)
+0.47
+4.8 2.0 × 1.6 × 1.0 32 HTEN20161T-R47MDR, Cyntec
+4.6 2.0 × 1.2 × 1.0 25 HTEH20121T-R47MSR, Cyntec
+4.8 2.0 × 1.6 × 1.0 32 DFE201610E - R47M, MuRata
+4.8 2.0 × 1.6 × 1.0 32 DFE201210S - R47M, MuRata
+5.1 2.0 × 1.6 × 1.0 34 TFM201610ALM-R47MTAA, TDK
+5.2 2.0 × 1.6 × 1.0 25 TFM201610ALC-R47MTAA, TDK
+6.6 4.0 × 4.0 × 1.6 8.36 XFL4015-471ME, Coilcraft
+8.0 3.5 × 3.2 × 2.0 10.85 XEL3520-471ME, Coilcraft
+6.8 4.5 × 4 × 1.8 11.2 WE-LHMI-744373240047, Würth
+(1) See the Third-party Products Disclaimer.
+www.ti.com
+TPS62824, TPS62825, TPS62826, TPS62827, TPS62824A, TPS62825A, TPS62826A, TPS62827A
+SLVSEF9I – MARCH 2018 – REVISED MARCH 2024
+Copyright © 2024 Texas Instruments Incorporated Submit Document Feedback 13
+Product Folder Links: TPS62824 TPS62825 TPS62826 TPS62827 TPS62824A TPS62825A TPS62826A TPS62827A
+
+===== PDF PAGE 14 =====
+8.2.2.5 Capacitor Selection
+The input capacitor is the low-impedance energy source for the converters which helps provide stable operation. 
+TI recommends a low-ESR multilayer ceramic capacitor for best filtering and must be placed between VIN and 
+GND as close as possible to those pins. For most applications, a minimum effective input capacitance of 3µF 
+must be present, though a larger value reduces input current ripple.
+The architecture of the device allows the use of tiny ceramic output capacitors with low equivalent series 
+resistance (ESR). These capacitors provide low output voltage ripple and are recommended. To keep the low 
+resistance up to high frequencies and to get narrow capacitance variation with temperature, TI recommends 
+using X7R or X5R dielectrics. Considering the DC-bias derating the capacitance, the minimum effective output 
+capacitance is 10µF for TPS62824x, TPS62825x, TPS62826x. and TPS62827A and 20µF for TPS62827.
+A feed forward capacitor is required for the adjustable version, as described in Setting the Output Voltage. This 
+capacitor is not required for the fixed output voltage versions.
+TPS62824, TPS62825, TPS62826, TPS62827, TPS62824A, TPS62825A, TPS62826A, TPS62827A
+SLVSEF9I – MARCH 2018 – REVISED MARCH 2024
+ www.ti.com
+14 Submit Document Feedback Copyright © 2024 Texas Instruments Incorporated
+Product Folder Links: TPS62824 TPS62825 TPS62826 TPS62827 TPS62824A TPS62825A TPS62826A TPS62827A
+
+===== PDF PAGE 15 =====
+8.2.3 Application Curves
+VIN = 5.0V, VOUT = 1.8V, TA = 25°C, BOM = Table 8-2, unless otherwise noted.
+Load (A)
+Efficiency (%)
+45
+50
+55
+60
+65
+70
+75
+80
+85
+90
+95
+100P 1m 10m 100m 1 4
+D002
+VIN = 2.5V
+VIN = 3.3V
+VIN = 4.2V
+VIN = 5.0V
+VOUT = 0.6V
+Figure 8-3. Efficiency
+Load (A)
+Vout (V)
+0.588
+0.591
+0.594
+0.597
+0.6
+0.603
+0.606
+0.609
+0.612
+100P 1m 10m 100m 1 4
+D021
+VIN = 2.5 V
+VIN = 3.3 V
+VIN = 4.2 V
+VIN = 5.0 V
+VOUT = 0.6V
+Figure 8-4. Load Regulation
+Load (A)
+Efficiency (%)
+0 0.5 1 1.5 2 2.5 3 3.5 4
+40
+45
+50
+55
+60
+65
+70
+75
+80
+85
+90
+95
+100
+VIN=2.5V
+VIN=3.3V
+VIN=4.2V
+VIN=5.0V
+VOUT = 0.6V F-PWM devices
+Figure 8-5. PWM Efficiency
+Load (A)
+Vout (V)
+0 0.5 1 1.5 2 2.5 3 3.5 4
+0.591
+0.594
+0.597
+0.6
+0.603
+0.606
+0.609
+VIN=2.5V
+VIN=3.3V
+VIN=4.2V
+VIN=5.0V
+VOUT = 0.6V F-PWM devices
+Figure 8-6. Load Regulation
+Load (A)
+Efficiency (%)
+55
+60
+65
+70
+75
+80
+85
+90
+95
+100
+100P 1m 10m 100m 1 4
+D003
+VIN = 2.5V
+VIN = 3.3V
+VIN = 4.2V
+VIN = 5.0V
+VOUT = 1.2V
+Figure 8-7. Efficiency
+Load (A)
+Vout (V)
+1.188
+1.191
+1.194
+1.197
+1.2
+1.203
+1.206
+1.209
+1.212
+100P 1m 10m 100m 1 4
+D031
+VIN = 2.4 V
+VIN = 3.3 V
+VIN = 4.5 V
+VIN = 5.0 V
+VOUT = 1.2V
+Figure 8-8. Load Regulation
+www.ti.com
+TPS62824, TPS62825, TPS62826, TPS62827, TPS62824A, TPS62825A, TPS62826A, TPS62827A
+SLVSEF9I – MARCH 2018 – REVISED MARCH 2024
+Copyright © 2024 Texas Instruments Incorporated Submit Document Feedback 15
+Product Folder Links: TPS62824 TPS62825 TPS62826 TPS62827 TPS62824A TPS62825A TPS62826A TPS62827A
+
+===== PDF PAGE 16 =====
+Load (A)
+Efficiency (%)
+0 0.5 1 1.5 2 2.5 3 3.5 4
+40
+45
+50
+55
+60
+65
+70
+75
+80
+85
+90
+95
+100
+VIN=2.5V
+VIN=3.3V
+VIN=4.2V
+VIN=5.0V
+VOUT = 1.2V F-PWM devices
+Figure 8-9. PWM Efficiency
+Load (A)
+Vout (V)
+0 0.5 1 1.5 2 2.5 3 3.5 4
+1.182
+1.188
+1.194
+1.2
+1.206
+1.212
+1.218
+VIN=2.5V
+VIN=3.3V
+VIN=4.2V
+VIN=5.0V
+VOUT = 1.2V F-PWM devices
+Figure 8-10. Load Regulation
+Load (A)
+Efficiency (%)
+60
+65
+70
+75
+80
+85
+90
+95
+100
+100P 1m 10m 100m 1 4
+D004
+VIN = 2.5V
+VIN = 3.3V
+VIN = 4.2V
+VIN = 5.0V
+VOUT = 1.8V
+Figure 8-11. Efficiency
+Load (A)
+Vout (V)
+1.782
+1.788
+1.794
+1.8
+1.806
+1.812
+1.818
+100P 1m 10m 100m 1 4
+D041
+VIN = 2.5 V
+VIN = 3.3 V
+VIN = 4.2 V
+VIN = 5.0 V
+VOUT = 1.8V
+Figure 8-12. Load Regulation
+Load (A)
+Efficiency (%)
+0 0.5 1 1.5 2 2.5 3 3.5 4
+40
+45
+50
+55
+60
+65
+70
+75
+80
+85
+90
+95
+100
+VIN=2.5V
+VIN=3.3V
+VIN=4.2V
+VIN=5.0V
+VOUT = 1.8V F-PWM devices
+Figure 8-13. PWM Efficiency
+Load (A)
+Vout (V)
+0 0.5 1 1.5 2 2.5 3 3.5 4
+1.773
+1.779
+1.785
+1.791
+1.797
+1.803
+1.809
+1.815
+1.821
+1.827
+VIN=2.5V
+VIN=3.3V
+VIN=4.2V
+VIN=5.0V
+VOUT = 1.8V F-PWM devices
+Figure 8-14. Load Regulation
+TPS62824, TPS62825, TPS62826, TPS62827, TPS62824A, TPS62825A, TPS62826A, TPS62827A
+SLVSEF9I – MARCH 2018 – REVISED MARCH 2024
+ www.ti.com
+16 Submit Document Feedback Copyright © 2024 Texas Instruments Incorporated
+Product Folder Links: TPS62824 TPS62825 TPS62826 TPS62827 TPS62824A TPS62825A TPS62826A TPS62827A
+
+===== PDF PAGE 17 =====
+Load (A)
+Efficiency (%)
+60
+65
+70
+75
+80
+85
+90
+95
+100
+100P 1m 10m 100m 1 4
+D006
+VIN = 3.3V
+VIN = 4.2V
+VIN = 5.0V
+VOUT = 2.5V
+Figure 8-15. Efficiency
+Load (A)
+Vout (V)
+2.475
+2.485
+2.495
+2.505
+2.515
+2.525
+100P 1m 10m 100m 1 4
+D061
+VIN = 3.3 V
+VIN = 4.2 V
+VIN = 5.0 V
+VOUT = 2.5V
+Figure 8-16. Load Regulation
+Load (A)
+Efficiency (%)
+0 0.5 1 1.5 2 2.5 3 3.5 4
+40
+45
+50
+55
+60
+65
+70
+75
+80
+85
+90
+95
+100
+VIN=3.3V
+VIN=4.2V
+VIN=5.0V
+VOUT = 2.5V F-PWM devices
+Figure 8-17. PWM Efficiency
+Load (A)
+Vout (V)
+0 0.5 1 1.5 2 2.5 3 3.5 4
+2.4625
+2.47
+2.4775
+2.485
+2.4925
+2.5
+2.5075
+2.515
+2.5225
+2.53
+2.5375
+VIN=3.3V
+VIN=4.2V
+VIN=5.0V
+VOUT = 2.5V F-PWM devices
+Figure 8-18. Load Regulation
+Load (A)
+Efficiency (%)
+70
+75
+80
+85
+90
+95
+100
+100P 1m 10m 100m 1 4
+D005
+VIN = 4.2V
+VIN = 5.0V
+VOUT = 3.3V
+Figure 8-19. Efficiency
+Load (A)
+Vout (V)
+3.260
+3.280
+3.300
+3.320
+3.340
+100P 1m 10m 100m 1 4
+D051
+VIN = 4.2V
+VIN = 5.0V
+VOUT = 3.3V
+Figure 8-20. Load Regulation
+www.ti.com
+TPS62824, TPS62825, TPS62826, TPS62827, TPS62824A, TPS62825A, TPS62826A, TPS62827A
+SLVSEF9I – MARCH 2018 – REVISED MARCH 2024
+Copyright © 2024 Texas Instruments Incorporated Submit Document Feedback 17
+Product Folder Links: TPS62824 TPS62825 TPS62826 TPS62827 TPS62824A TPS62825A TPS62826A TPS62827A
+
+===== PDF PAGE 18 =====
+Load (A)
+Efficiency (%)
+0 0.5 1 1.5 2 2.5 3 3.5 4
+40
+45
+50
+55
+60
+65
+70
+75
+80
+85
+90
+95
+100
+VIN=4.2V
+VIN=5.0V
+VOUT = 3.3V F-PWM devices
+Figure 8-21. PWM Efficiency
+Load (A)
+Vout (V)
+0 0.5 1 1.5 2 2.5 3 3.5 4
+3.2505
+3.2604
+3.2703
+3.2802
+3.2901
+3.3
+3.3099
+3.3198
+3.3297
+3.3396
+3.3495
+VIN=4.2V
+VIN=5.0V
+VOUT = 3.3V F-PWM devices
+Figure 8-22. Load Regulation
+Load (A)
+Switching Frequency (kHz)
+0.0 0.5 1.0 1.5 2.0 2.5 3.0
+0
+250
+500
+750
+1000
+1250
+1500
+1750
+2000
+2250
+2500
+2750
+3000
+D008
+VOUT = 0.6V
+VOUT = 1.2V
+VOUT = 1.8V
+VOUT = 2.5V
+VIN = 3.3V TPS62824, TPS62825, 
+TPS62826
+Figure 8-23. Switching Frequency
+Input Voltage (V)
+Switching Frequency (kHz)
+2.5 3.0 3.5 4.0 4.5 5.0 5.5
+0
+250
+500
+750
+1000
+1250
+1500
+1750
+2000
+2250
+2500
+2750
+3000
+D009
+VOUT = 0.6V
+VOUT = 1.2V
+VOUT = 1.8V
+VOUT = 2.5V
+VOUT = 3.3V
+IOUT = 1.0A TPS62824, TPS62825, 
+TPS62826
+Figure 8-24. Switching Frequency
+Load (A)
+Switching Frequency (Hz)
+0 0.5 1 1.5 2 2.5 3 3.5 4
+0.00x100
+250.00x103
+500.00x103
+750.00x103
+1.00x106
+1.25x106
+1.50x106
+1.75x106
+2.00x106
+2.25x106
+2.50x106
+2.75x106
+3.00x106
+VOUT=0.6V
+VOUT=1.2V
+VOUT=1.8V
+VOUT=2.5V
+VIN = 3.3V TPS62824A/5A/6A/7A
+Figure 8-25. Switching Frequency
+Input Voltgae (V)
+Switching Frequency (Hz)
+2.4 2.8 3.2 3.6 4 4.4 4.8 5.2 5.5
+0.00x100
+300.00x103
+600.00x103
+900.00x103
+1.20x106
+1.50x106
+1.80x106
+2.10x106
+2.40x106
+2.70x106
+VOUT=0.6V
+VOUT=1.2V
+VOUT=1.8V
+VOUT=2.5V
+VOUT=3.3V
+IOUT = 1.0A TPS62824A/5A/6A/7A
+Figure 8-26. Switching Frequency
+TPS62824, TPS62825, TPS62826, TPS62827, TPS62824A, TPS62825A, TPS62826A, TPS62827A
+SLVSEF9I – MARCH 2018 – REVISED MARCH 2024
+ www.ti.com
+18 Submit Document Feedback Copyright © 2024 Texas Instruments Incorporated
+Product Folder Links: TPS62824 TPS62825 TPS62826 TPS62827 TPS62824A TPS62825A TPS62826A TPS62827A
+
+===== PDF PAGE 19 =====
+Load (A)
+Switching Frequency (kHz)
+0.0 0.5 1.0 1.5 2.0 2.5 3.0 3.5 4.0
+0
+250
+500
+750
+1000
+1250
+1500
+1750
+2000
+2250
+2500
+2750
+3000
+D013
+VOUT = 0.6V
+VOUT = 1.2V
+VOUT = 1.8V
+VOUT = 2.5V
+VIN = 3.3V TPS62827
+Figure 8-27. Switching Frequency
+Input Voltage (V)
+Switching Frequency (kHz)
+2.5 3.0 3.5 4.0 4.5 5.0 5.5
+0
+250
+500
+750
+1000
+1250
+1500
+1750
+2000
+2250
+2500
+2750
+3000
+D014
+VOUT = 0.6V
+VOUT = 1.2V
+VOUT = 1.8V
+VOUT = 2.5V
+VOUT = 3.3V
+IOUT = 1.0A TPS62827
+Figure 8-28. Switching Frequency
+Ambient Temperature (°C)
+Output Current (A)
+45 55 65 75 85 95 105 115 125
+0
+1
+2
+3
+4
+5
+D020
+VIN = 2.5 V
+VIN = 3.3 V
+VIN = 5.0 V
+VOUT = 1.2V θJA= 71.4°C/W
+Figure 8-29. Thermal Derating
+Ambient Temperature (°C)
+Output Current (A)
+45 55 65 75 85 95 105 115 125
+0
+1
+2
+3
+4
+5
+D015
+VIN = 2.5 V
+VIN = 3.3 V
+VIN = 5.0 V
+VOUT = 1.8V θJA= 71.4°C/W
+Figure 8-30. Thermal Derating
+Ambient Temperature (°C)
+Output Current (A)
+45 55 65 75 85 95 105 115 125
+0
+1
+2
+3
+4
+5
+D017
+VIN = 3.3 V
+VIN = 5.0 V
+VOUT = 2.5V θJA= 71.4°C/W
+Figure 8-31. Thermal Derating
+Ambient Temperature (°C)
+Output Current (A)
+45 55 65 75 85 95 105 115 125
+0
+1
+2
+3
+4
+5
+D016
+VIN = 5.0 V
+VOUT = 3.3V θJA= 71.4°C/W
+Figure 8-32. Thermal Derating
+www.ti.com
+TPS62824, TPS62825, TPS62826, TPS62827, TPS62824A, TPS62825A, TPS62826A, TPS62827A
+SLVSEF9I – MARCH 2018 – REVISED MARCH 2024
+Copyright © 2024 Texas Instruments Incorporated Submit Document Feedback 19
+Product Folder Links: TPS62824 TPS62825 TPS62826 TPS62827 TPS62824A TPS62825A TPS62826A TPS62827A
+
+===== PDF PAGE 20 =====
+IOUT = 1.0A TPS62824/5/6/7
+Figure 8-33. PWM Operation
+IOUT = 0.1A TPS62824/5/6/7
+Figure 8-34. PSM Operation
+IOUT = 1.0A TPS62824A/5A/6A/7A
+Figure 8-35. PWM Operation at F-PWM
+No load TPS62824A/5A/6A/7A
+Figure 8-36. PWM Operation at F-PWM
+Load = 0.6Ω TPS62826
+Figure 8-37. Start-Up With Load
+TPS62824/5/6
+Figure 8-38. Start-Up With No Load
+TPS62824, TPS62825, TPS62826, TPS62827, TPS62824A, TPS62825A, TPS62826A, TPS62827A
+SLVSEF9I – MARCH 2018 – REVISED MARCH 2024
+ www.ti.com
+20 Submit Document Feedback Copyright © 2024 Texas Instruments Incorporated
+Product Folder Links: TPS62824 TPS62825 TPS62826 TPS62827 TPS62824A TPS62825A TPS62826A TPS62827A
+
+===== PDF PAGE 21 =====
+Load = 0.6Ω TPS62826A/7A
+Figure 8-39. Start-Up With Load
+TPS62824A/5A/6A/7A
+Figure 8-40. Start-Up With No Load
+Load = 1.8Ω TPS6282x
+Figure 8-41. Disable, Active Output Discharge
+TPS6282x
+Figure 8-42. Disable, Active Output Discharge at 
+No Load
+IOUT = 0.05A to 1A TPS62824/5/6/7
+Figure 8-43. Load Transient
+IOUT = 1A to 2A TPS62825/6/7
+Figure 8-44. Load Transient
+www.ti.com
+TPS62824, TPS62825, TPS62826, TPS62827, TPS62824A, TPS62825A, TPS62826A, TPS62827A
+SLVSEF9I – MARCH 2018 – REVISED MARCH 2024
+Copyright © 2024 Texas Instruments Incorporated Submit Document Feedback 21
+Product Folder Links: TPS62824 TPS62825 TPS62826 TPS62827 TPS62824A TPS62825A TPS62826A TPS62827A
+
+===== PDF PAGE 22 =====
+IOUT = 0.05A to 1A TPS62824A/5A/6A/7A
+Figure 8-45. Load Transient
+IOUT = 1A to 2A TPS62825A/6A/7A
+Figure 8-46. Load Transient
+7LPHV',9
+D018
+VOUT
+1V/DIV
+ICOIL
+2A/DIV
+VPG
+5V/DIV
+IOUT = 1A TPS6282x
+Figure 8-47. HICCUP Short-Circuit Protection
+7LPHV',9
+D019
+VOUT
+1V/DIV
+ICOIL
+2A/DIV
+VPG
+5V/DIV
+IOUT = 1A TPS6282x
+Figure 8-48. HICCUP Short-Circuit Protection 
+(Zoom In)
+8.3 Power Supply Recommendations
+The device is designed to operate from an input voltage supply range from 2.4V to 5.5V. Make sure that the 
+input power supply has a sufficient current rating for the application.
+8.4 Layout
+8.4.1 Layout Guidelines
+The printed-circuit-board (PCB) layout is an important step to maintain the high performance of the device. See 
+Layout Example for the recommended PCB layout.
+• Place the input, output capacitors and the inductor as close as possible to the IC. This placement keeps 
+the power traces short. Routing these power traces direct and wide results in low trace resistance and low 
+parasitic inductance.
+• Connect the low side of the input and output capacitors properly to the GND pin to avoid a ground potential 
+shift.
+• Note that the sense traces connected to FB is a signal trace. Take special care to avoid noise being induced. 
+Keep these traces away from SW nodes. The connection of the output voltage trace for the FB resistors must 
+be made at the output capacitor.
+• Refer to Layout Example for an example of component placement, routing, and thermal design.
+TPS62824, TPS62825, TPS62826, TPS62827, TPS62824A, TPS62825A, TPS62826A, TPS62827A
+SLVSEF9I – MARCH 2018 – REVISED MARCH 2024
+ www.ti.com
+22 Submit Document Feedback Copyright © 2024 Texas Instruments Incorporated
+Product Folder Links: TPS62824 TPS62825 TPS62826 TPS62827 TPS62824A TPS62825A TPS62826A TPS62827A
+
+===== PDF PAGE 23 =====
+8.4.2 Layout Example
+L1VIN
+GND
+VOUT
+C2C1
+C3
+R1
+R2
+L1
+C1
+GND
+EN PG FB
+SWVIN
+Solution size = 31mm2
+Figure 8-49. PCB Layout Recommendation
+8.4.2.1 Thermal Considerations
+Implementation of integrated circuits in low-profile and fine-pitch surface-mount packages typically requires 
+special attention to power dissipation. Many system-dependent issues such as thermal coupling, airflow, added 
+heat sinks and convection surfaces, and the presence of other heat-generating components affect the power 
+dissipation limits of a given component.
+Two basic approaches for enhancing thermal performance are:
+• Improving the power dissipation capability of the PCB design
+• Introducing airflow in the system
+The Thermal Data section in Thermal Information provides the thermal metric of the device on the EVM after 
+considering the PCB design of real applications. The big copper planes connecting to the pads of the IC on the 
+PCB improve the thermal performance of the device. For more details on how to use the thermal parameters, 
+see Thermal Characteristics of Linear and Logic Packages Using JEDEC PCB Designs  application note and 
+Semiconductor and IC Package Thermal Metrics application note.
+www.ti.com
+TPS62824, TPS62825, TPS62826, TPS62827, TPS62824A, TPS62825A, TPS62826A, TPS62827A
+SLVSEF9I – MARCH 2018 – REVISED MARCH 2024
+Copyright © 2024 Texas Instruments Incorporated Submit Document Feedback 23
+Product Folder Links: TPS62824 TPS62825 TPS62826 TPS62827 TPS62824A TPS62825A TPS62826A TPS62827A
+
+===== PDF PAGE 24 =====
+9 Device and Documentation Support
+9.1 Device Support
+9.1.1 Third-Party Products Disclaimer
+TI'S PUBLICATION OF INFORMATION REGARDING THIRD-PARTY PRODUCTS OR SERVICES DOES NOT 
+CONSTITUTE AN ENDORSEMENT REGARDING THE SUITABILITY OF SUCH PRODUCTS OR SERVICES 
+OR A WARRANTY, REPRESENTATION OR ENDORSEMENT OF SUCH PRODUCTS OR SERVICES, EITHER 
+ALONE OR IN COMBINATION WITH ANY TI PRODUCT OR SERVICE.
+9.1.2 Development Support
+9.1.2.1 Custom Design With WEBENCH® Tools
+Click here to create a custom design using the TPS6282x device with the WEBENCH® Power Designer.
+1. Start by entering the input voltage (VIN), output voltage (VOUT), and output current (IOUT) requirements.
+2. Optimize the design for key parameters such as efficiency, footprint, and cost using the optimizer dial.
+3. Compare the generated design with other possible solutions from Texas Instruments.
+The WEBENCH Power Designer provides a customized schematic along with a list of materials with real-time 
+pricing and component availability.
+In most cases, these actions are available:
+• Run electrical simulations to see important waveforms and circuit performance
+• Run thermal simulations to understand board thermal performance
+• Export customized schematic and layout into popular CAD formats
+• Print PDF reports for the design, and share the design with colleagues
+Get more information about WEBENCH tools at www.ti.com/WEBENCH.
+9.2 Documentation Support
+9.2.1 Related Documentation
+For related documentation, see the following:
+• Texas Instruments, Thermal Characteristics of Linear and Logic Packages Using JEDEC PCB Designs 
+application note
+• Texas Instruments, Semiconductor and IC Package Thermal Metrics application note
+9.3 Support Resources
+TI E2E ™ support forums  are an engineer's go-to source for fast, verified answers and design help — straight 
+from the experts. Search existing answers or ask your own question to get the quick design help you need.
+Linked content is provided "AS IS" by the respective contributors. They do not constitute TI specifications and do 
+not necessarily reflect TI's views; see TI's Terms of Use.
+9.4 Trademarks
+TI E2E™ is a trademark of Texas Instruments.
+WEBENCH® is a registered trademark of Texas Instruments.
+All trademarks are the property of their respective owners.
+9.5 Electrostatic Discharge Caution
+This integrated circuit can be damaged by ESD. Texas Instruments recommends that all integrated circuits be handled 
+with appropriate precautions. Failure to observe proper handling and installation procedures can cause damage.
+ESD damage can range from subtle performance degradation to complete device failure. Precision integrated circuits may 
+be more susceptible to damage because very small parametric changes could cause the device not to meet its published 
+specifications.
+9.6 Glossary
+TI Glossary This glossary lists and explains terms, acronyms, and definitions.
+TPS62824, TPS62825, TPS62826, TPS62827, TPS62824A, TPS62825A, TPS62826A, TPS62827A
+SLVSEF9I – MARCH 2018 – REVISED MARCH 2024
+ www.ti.com
+24 Submit Document Feedback Copyright © 2024 Texas Instruments Incorporated
+Product Folder Links: TPS62824 TPS62825 TPS62826 TPS62827 TPS62824A TPS62825A TPS62826A TPS62827A
+
+===== PDF PAGE 25 =====
+10 Revision History
+Changes from Revision H (August 2023) to Revision I (March 2024) Page
+• Added foot note to include turnoff behavior........................................................................................................4
+• Updated incorrect Power good upper threshold (swapped rising/falling)........................................................... 5
+• Updated description of start-up figures to show correct device versions ........................................................ 15
+Changes from Revision G (March 2022) to Revision H (August 2023) Page
+• Added TPSM82823 to the modules proposals...................................................................................................1
+• Changed equation formatting............................................................................................................................. 1
+• Deleted four-way connections from images throughout the document.............................................................. 1
+• Removed trademark from DCS-Control............................................................................................................. 1
+• Updated the first page table............................................................................................................................... 1
+• Added an SW pin voltage specification at PFM mode in the Absolute Maximum Ratings table ....................... 4
+• Added the Absolute Maximum Ratings standard table note ..............................................................................4
+Changes from Revision F (September 2021) to Revision G (March 2022) Page
+• Removed "in 1.5-mm × 1.5-mm QFN package" from data sheet title................................................................ 1
+Changes from Revision E (December 2020) to Revision F (September 2021) Page
+• Changed the status of the TPS62824DMQ to Production Data......................................................................... 3
+• Added the TPS6282533..................................................................................................................................... 3
+11 Mechanical, Packaging, and Orderable Information
+The following pages include mechanical, packaging, and orderable information. This information is the most 
+current data available for the designated devices. This data is subject to change without notice and revision of 
+this document. For browser-based versions of this data sheet, refer to the left-hand navigation.
+www.ti.com
+TPS62824, TPS62825, TPS62826, TPS62827, TPS62824A, TPS62825A, TPS62826A, TPS62827A
+SLVSEF9I – MARCH 2018 – REVISED MARCH 2024
+Copyright © 2024 Texas Instruments Incorporated Submit Document Feedback 25
+Product Folder Links: TPS62824 TPS62825 TPS62826 TPS62827 TPS62824A TPS62825A TPS62826A TPS62827A
+
+===== PDF PAGE 26 =====
+PACKAGE OPTION ADDENDUM
+www.ti.com 31-Oct-2025
+PACKAGING INFORMATION
+Orderable part number Status
+(1)
+Material type
+(2)
+Package | Pins Package qty | Carrier RoHS
+(3)
+Lead finish/
+Ball material
+(4)
+MSL rating/
+Peak reflow
+(5)
+Op temp (°C) Part marking
+(6)
+TPS62824ADMQR Active Production VSON-HR (DMQ) | 6 3000 | LARGE T&R Yes Call TI | Sn Level-1-260C-UNLIM -40 to 125 JM
+TPS62824ADMQR.A Active Production VSON-HR (DMQ) | 6 3000 | LARGE T&R Yes SN Level-1-260C-UNLIM -40 to 125 JM
+TPS62824DMQR Active Production VSON-HR (DMQ) | 6 3000 | LARGE T&R Yes Call TI | Sn Level-1-260C-UNLIM -40 to 125 JL
+TPS62824DMQR.A Active Production VSON-HR (DMQ) | 6 3000 | LARGE T&R Yes SN Level-1-260C-UNLIM -40 to 125 JL
+TPS62824DMQR.B Active Production VSON-HR (DMQ) | 6 3000 | LARGE T&R Yes SN Level-1-260C-UNLIM -40 to 125 JL
+TPS6282518DMQR Active Production VSON-HR (DMQ) | 6 3000 | LARGE T&R Yes Call TI | Sn Level-1-260C-UNLIM -40 to 125 CJ
+TPS6282518DMQR.A Active Production VSON-HR (DMQ) | 6 3000 | LARGE T&R Yes SN Level-1-260C-UNLIM -40 to 125 CJ
+TPS6282518DMQR.B Active Production VSON-HR (DMQ) | 6 3000 | LARGE T&R Yes SN Level-1-260C-UNLIM -40 to 125 CJ
+TPS6282518DMQT Active Production VSON-HR (DMQ) | 6 250 | SMALL T&R Yes Call TI | Sn Level-1-260C-UNLIM -40 to 125 CJ
+TPS6282518DMQT.A Active Production VSON-HR (DMQ) | 6 250 | SMALL T&R Yes SN Level-1-260C-UNLIM -40 to 125 CJ
+TPS6282518DMQT.B Active Production VSON-HR (DMQ) | 6 250 | SMALL T&R Yes SN Level-1-260C-UNLIM -40 to 125 CJ
+TPS6282533DMQR Active Production VSON-HR (DMQ) | 6 3000 | LARGE T&R Yes Call TI | Sn Level-1-260C-UNLIM -40 to 125 L1
+TPS6282533DMQR.A Active Production VSON-HR (DMQ) | 6 3000 | LARGE T&R Yes SN Level-1-260C-UNLIM -40 to 125 L1
+TPS6282533DMQR.B Active Production VSON-HR (DMQ) | 6 3000 | LARGE T&R Yes SN Level-1-260C-UNLIM -40 to 125 L1
+TPS62825ADMQR Active Production VSON-HR (DMQ) | 6 3000 | LARGE T&R Yes Call TI | Sn Level-1-260C-UNLIM -40 to 125 JN
+TPS62825ADMQR.A Active Production VSON-HR (DMQ) | 6 3000 | LARGE T&R Yes SN Level-1-260C-UNLIM -40 to 125 JN
+TPS62825DMQR Active Production VSON-HR (DMQ) | 6 3000 | LARGE T&R Yes Call TI | Sn Level-1-260C-UNLIM -40 to 125 CI
+TPS62825DMQR.A Active Production VSON-HR (DMQ) | 6 3000 | LARGE T&R Yes SN Level-1-260C-UNLIM -40 to 125 CI
+TPS62825DMQR.B Active Production VSON-HR (DMQ) | 6 3000 | LARGE T&R Yes SN Level-1-260C-UNLIM -40 to 125 CI
+TPS62825DMQT Active Production VSON-HR (DMQ) | 6 250 | SMALL T&R Yes Call TI | Sn Level-1-260C-UNLIM -40 to 125 CI
+TPS62825DMQT.A Active Production VSON-HR (DMQ) | 6 250 | SMALL T&R Yes SN Level-1-260C-UNLIM -40 to 125 CI
+TPS62825DMQT.B Active Production VSON-HR (DMQ) | 6 250 | SMALL T&R Yes SN Level-1-260C-UNLIM -40 to 125 CI
+TPS6282618DMQR Active Production VSON-HR (DMQ) | 6 3000 | LARGE T&R Yes Call TI | Sn Level-1-260C-UNLIM -40 to 125 CK
+TPS6282618DMQR.A Active Production VSON-HR (DMQ) | 6 3000 | LARGE T&R Yes SN Level-1-260C-UNLIM -40 to 125 CK
+TPS6282618DMQR.B Active Production VSON-HR (DMQ) | 6 3000 | LARGE T&R Yes SN Level-1-260C-UNLIM -40 to 125 CK
+TPS6282618DMQT Active Production VSON-HR (DMQ) | 6 250 | SMALL T&R Yes Call TI | Sn Level-1-260C-UNLIM -40 to 125 CK
+TPS6282618DMQT.A Active Production VSON-HR (DMQ) | 6 250 | SMALL T&R Yes Call TI Level-1-260C-UNLIM -40 to 125 CK
+TPS6282618DMQT.B Active Production VSON-HR (DMQ) | 6 250 | SMALL T&R Yes Call TI Level-1-260C-UNLIM -40 to 125 CK
+TPS62826ADMQR Active Production VSON-HR (DMQ) | 6 3000 | LARGE T&R Yes Call TI | Sn Level-1-260C-UNLIM -40 to 125 JO
+Addendum-Page 1
+
+===== PDF PAGE 27 =====
+PACKAGE OPTION ADDENDUM
+www.ti.com 31-Oct-2025
+Orderable part number Status
+(1)
+Material type
+(2)
+Package | Pins Package qty | Carrier RoHS
+(3)
+Lead finish/
+Ball material
+(4)
+MSL rating/
+Peak reflow
+(5)
+Op temp (°C) Part marking
+(6)
+TPS62826ADMQR.A Active Production VSON-HR (DMQ) | 6 3000 | LARGE T&R Yes SN Level-1-260C-UNLIM -40 to 125 JO
+TPS62826DMQR Active Production VSON-HR (DMQ) | 6 3000 | LARGE T&R Yes Call TI | Sn Level-1-260C-UNLIM -40 to 125 CL
+TPS62826DMQR.A Active Production VSON-HR (DMQ) | 6 3000 | LARGE T&R Yes SN Level-1-260C-UNLIM -40 to 125 CL
+TPS62826DMQR.B Active Production VSON-HR (DMQ) | 6 3000 | LARGE T&R Yes SN Level-1-260C-UNLIM -40 to 125 CL
+TPS62826DMQT Active Production VSON-HR (DMQ) | 6 250 | SMALL T&R Yes Call TI | Sn Level-1-260C-UNLIM -40 to 125 CL
+TPS62826DMQT.A Active Production VSON-HR (DMQ) | 6 250 | SMALL T&R Yes SN Level-1-260C-UNLIM -40 to 125 CL
+TPS62826DMQT.B Active Production VSON-HR (DMQ) | 6 250 | SMALL T&R Yes SN Level-1-260C-UNLIM -40 to 125 CL
+TPS62827ADMQR Active Production VSON-HR (DMQ) | 6 3000 | LARGE T&R Yes Call TI | Sn Level-1-260C-UNLIM -40 to 125 JP
+TPS62827ADMQR.A Active Production VSON-HR (DMQ) | 6 3000 | LARGE T&R Yes SN Level-1-260C-UNLIM -40 to 125 JP
+TPS62827DMQR Active Production VSON-HR (DMQ) | 6 3000 | LARGE T&R Yes Call TI | Sn Level-1-260C-UNLIM -40 to 125 EH
+TPS62827DMQR.A Active Production VSON-HR (DMQ) | 6 3000 | LARGE T&R Yes SN Level-1-260C-UNLIM -40 to 125 EH
+TPS62827DMQT Active Production VSON-HR (DMQ) | 6 250 | SMALL T&R Yes Call TI | Sn Level-1-260C-UNLIM -40 to 125 EH
+TPS62827DMQT.A Active Production VSON-HR (DMQ) | 6 250 | SMALL T&R Yes SN Level-1-260C-UNLIM -40 to 125 EH
+ 
+(1) Status:  For more details on status, see our product life cycle.
+ 
+(2) Material type:  When designated, preproduction parts are prototypes/experimental devices, and are not yet approved or released for full production. Testing and final process, including without limitation quality assurance,
+reliability performance testing, and/or process qualification, may not yet be complete, and this item is subject to further changes or possible discontinuation. If available for ordering, purchases will be subject to an additional
+waiver at checkout, and are intended for early internal evaluation purposes only. These items are sold without warranties of any kind.
+ 
+(3) RoHS values:  Yes, No, RoHS Exempt. See the TI RoHS Statement for additional information and value definition.
+ 
+(4) Lead finish/Ball material:  Parts may have multiple material finish options. Finish options are separated by a vertical ruled line. Lead finish/Ball material values may wrap to two lines if the finish value exceeds the maximum
+column width.
+ 
+(5) MSL rating/Peak reflow:  The moisture sensitivity level ratings and peak solder (reflow) temperatures. In the event that a part has multiple moisture sensitivity ratings, only the lowest level per JEDEC standards is shown.
+Refer to the shipping label for the actual reflow temperature that will be used to mount the part to the printed circuit board.
+ 
+(6) Part marking:  There may be an additional marking, which relates to the logo, the lot trace code information, or the environmental category of the part.
+ 
+Multiple part markings will be inside parentheses. Only one part marking contained in parentheses and separated by a "~" will appear on a part. If a line is indented then it is a continuation of the previous line and the two
+combined represent the entire part marking for that device.
+ 
+Addendum-Page 2
+
+===== PDF PAGE 28 =====
+PACKAGE OPTION ADDENDUM
+www.ti.com 31-Oct-2025
+Important Information and Disclaimer:The information provided on this page represents TI's knowledge and belief as of the date that it is provided. TI bases its knowledge and belief on information provided by third parties, and
+makes no representation or warranty as to the accuracy of such information. Efforts are underway to better integrate information from third parties. TI has taken and continues to take reasonable steps to provide representative
+and accurate information but may not have conducted destructive testing or chemical analysis on incoming materials and chemicals. TI and TI suppliers consider certain information to be proprietary, and thus CAS numbers
+and other limited information may not be available for release.
+ 
+In no event shall TI's liability arising out of such information exceed the total purchase price of the TI part(s) at issue in this document sold by TI to Customer on an annual basis.
+ 
+Addendum-Page 3
+
+===== PDF PAGE 29 =====
+PACKAGE MATERIALS INFORMATION
+  
+www.ti.com 3-Sep-2026
+TAPE AND REEL INFORMATION
+Reel Width (W1)
+REEL DIMENSIONS
+A0B0K0WDimension designed to accommodate the component lengthDimension designed to accommodate the component thicknessOverall width of the carrier tapePitch between successive cavity centersDimension designed to accommodate the component width
+TAPE DIMENSIONSK0 P1B0WA0Cavity
+QUADRANT ASSIGNMENTS FOR PIN 1 ORIENTATION IN TAPE
+Pocket QuadrantsSprocket HolesQ1Q1Q2Q2Q3Q3Q4Q4User Direction of Feed
+P1ReelDiameter
+ 
+*All dimensions are nominal
+Device Package
+Type
+Package
+Drawing
+Pins SPQ Reel
+Diameter
+(mm)
+Reel
+Width
+W1 (mm)
+A0
+(mm)
+B0
+(mm)
+K0
+(mm)
+P1
+(mm)
+W
+(mm)
+Pin1
+Quadrant
+TPS62824ADMQR VSON-
+HR
+DMQ 6 3000 180.0 8.4 1.7 1.7 1.14 4.0 8.0 Q2
+TPS62824DMQR VSON-
+HR
+DMQ 6 3000 180.0 8.4 1.7 1.7 1.14 4.0 8.0 Q2
+TPS6282518DMQR VSON-
+HR
+DMQ 6 3000 180.0 8.4 1.7 1.7 1.14 4.0 8.0 Q2
+TPS6282518DMQT VSON-
+HR
+DMQ 6 250 180.0 8.4 1.7 1.7 1.14 4.0 8.0 Q2
+TPS6282533DMQR VSON-
+HR
+DMQ 6 3000 180.0 8.4 1.7 1.7 1.14 4.0 8.0 Q2
+TPS6282533DMQR VSON-
+HR
+DMQ 6 3000 180.0 8.4 1.7 1.7 1.14 4.0 8.0 Q2
+TPS62825ADMQR VSON-
+HR
+DMQ 6 3000 180.0 8.4 1.7 1.7 1.14 4.0 8.0 Q2
+TPS62825DMQR VSON-
+HR
+DMQ 6 3000 180.0 8.4 1.7 1.7 1.14 4.0 8.0 Q2
+TPS6282618DMQR VSON-
+HR
+DMQ 6 3000 180.0 8.4 1.7 1.7 1.14 4.0 8.0 Q2
+Pack Materials-Page 1
+
+===== PDF PAGE 30 =====
+PACKAGE MATERIALS INFORMATION
+  
+www.ti.com 3-Sep-2026
+Device Package
+Type
+Package
+Drawing
+Pins SPQ Reel
+Diameter
+(mm)
+Reel
+Width
+W1 (mm)
+A0
+(mm)
+B0
+(mm)
+K0
+(mm)
+P1
+(mm)
+W
+(mm)
+Pin1
+Quadrant
+TPS6282618DMQT VSON-
+HR
+DMQ 6 250 180.0 8.4 1.7 1.7 1.14 4.0 8.0 Q2
+TPS62826ADMQR VSON-
+HR
+DMQ 6 3000 180.0 8.4 1.7 1.7 1.14 4.0 8.0 Q2
+TPS62826DMQR VSON-
+HR
+DMQ 6 3000 180.0 8.4 1.7 1.7 1.14 4.0 8.0 Q2
+TPS62827ADMQR VSON-
+HR
+DMQ 6 3000 180.0 8.4 1.7 1.7 1.14 4.0 8.0 Q2
+TPS62827DMQT VSON-
+HR
+DMQ 6 250 180.0 8.4 1.7 1.7 1.14 4.0 8.0 Q2
+Pack Materials-Page 2
+
+===== PDF PAGE 31 =====
+PACKAGE MATERIALS INFORMATION
+  
+www.ti.com 3-Sep-2026
+TAPE AND REEL BOX DIMENSIONS
+Width (mm)
+W LH
+ 
+*All dimensions are nominal
+Device Package Type Package Drawing Pins SPQ Length (mm) Width (mm) Height (mm)
+TPS62824ADMQR VSON-HR DMQ 6 3000 210.0 185.0 35.0
+TPS62824DMQR VSON-HR DMQ 6 3000 210.0 185.0 35.0
+TPS6282518DMQR VSON-HR DMQ 6 3000 210.0 185.0 35.0
+TPS6282518DMQT VSON-HR DMQ 6 250 210.0 185.0 35.0
+TPS6282533DMQR VSON-HR DMQ 6 3000 210.0 185.0 35.0
+TPS6282533DMQR VSON-HR DMQ 6 3000 182.0 182.0 20.0
+TPS62825ADMQR VSON-HR DMQ 6 3000 210.0 185.0 35.0
+TPS62825DMQR VSON-HR DMQ 6 3000 210.0 185.0 35.0
+TPS6282618DMQR VSON-HR DMQ 6 3000 210.0 185.0 35.0
+TPS6282618DMQT VSON-HR DMQ 6 250 341.0 182.0 80.0
+TPS62826ADMQR VSON-HR DMQ 6 3000 210.0 185.0 35.0
+TPS62826DMQR VSON-HR DMQ 6 3000 210.0 185.0 35.0
+TPS62827ADMQR VSON-HR DMQ 6 3000 210.0 185.0 35.0
+TPS62827DMQT VSON-HR DMQ 6 250 341.0 182.0 80.0
+Pack Materials-Page 3
+
+===== PDF PAGE 32 =====
+www.ti.com
+PACKAGE OUTLINE
+C
+3X 0.3
+0.2
+3X 0.5
+0.3 2X
+1
+4X 0.5
+1.0
+0.8
+0.05
+0.00
+3X 0.9
+0.7
+3X 0.25
+0.15
+B 1.55
+1.45
+A
+1.55
+1.45
+(0.2) TYP(0.2) MIN
+VSON - 1 mm max heightDMQ0006A
+PLASTIC SMALL OUTLINE - NO LEAD
+4222645/E   09/2023
+PIN 1 INDEX AREA
+SEATING PLANE
+0.08 C
+1
+3 4
+6
+0.1 C A B
+0.05 C
+0.1 C A B
+0.05 C
+NOTES:
+ 
+1. All linear dimensions are in millimeters. Any dimensions in parenthesis are for reference only. Dimensioning and tolerancing
+    per ASME Y14.5M. 
+2. This drawing is subject to change without notice.
+SCALE  6.000
+
+===== PDF PAGE 33 =====
+www.ti.com
+EXAMPLE BOARD LAYOUT
+0.05 MIN
+ALL AROUND
+0.05 MAX
+ALL AROUND
+4X (0.5)
+(0.65)
+3X (0.25)
+3X (0.6)
+(R0.05) TYP (0.45)
+3X (1)
+3X (0.2)
+VSON - 1 mm max heightDMQ0006A
+PLASTIC SMALL OUTLINE - NO LEAD
+4222645/E   09/2023
+PKG
+1
+3
+4
+6
+SYMM
+LAND PATTERN EXAMPLE
+SCALE:30X
+NOTES: (continued)
+ 
+3. For more information, see Texas Instruments literature number SLUA271 (www.ti.com/lit/slua271).
+ 
+ 
+SOLDER MASK
+OPENING
+SOLDER MASK
+METAL UNDER
+SOLDER MASK
+DEFINED
+(PREFERRED)
+METALSOLDER MASK
+OPENING SOLDER MASK DETAILS
+NON SOLDER MASK
+DEFINED
+
+===== PDF PAGE 34 =====
+www.ti.com
+EXAMPLE STENCIL DESIGN
+3X (0.25)
+3X (0.6)
+4X (0.5)
+(0.65)
+(R0.05) TYP
+3X (1)
+3X (0.2)
+(0.45)
+VSON - 1 mm max heightDMQ0006A
+PLASTIC SMALL OUTLINE - NO LEAD
+4222645/E   09/2023
+NOTES: (continued)
+ 
+4. Laser cutting apertures with trapezoidal walls and rounded corners may offer better paste release. IPC-7525 may have alternate
+    design recommendations. 
+ 
+SOLDER PASTE EXAMPLE
+BASED ON 0.125 mm THICK STENCIL
+SCALE:30X
+PKG
+1
+3 4
+6
+SYMM
+METAL UNDER
+SOLDER MASK
+TYP
+
+===== PDF PAGE 35 =====
+IMPORTANT NOTICE AND DISCLAIMER
+TI PROVIDES TECHNICAL AND RELIABILITY DATA (INCLUDING DATASHEETS), DESIGN RESOURCES (INCLUDING REFERENCE 
+DESIGNS), APPLICATION OR OTHER DESIGN ADVICE, WEB TOOLS, SAFETY INFORMATION, AND OTHER RESOURCES “AS IS” 
+AND WITH ALL FAULTS, AND DISCLAIMS ALL WARRANTIES, EXPRESS AND IMPLIED, INCLUDING WITHOUT LIMITATION ANY 
+IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE OR NON-INFRINGEMENT OF THIRD 
+PARTY INTELLECTUAL PROPERTY RIGHTS.
+These resources are intended for skilled developers designing with TI products. You are solely responsible for (1) selecting the appropriate 
+TI products for your application, (2) designing, validating and testing your application, and (3) ensuring your application meets applicable 
+standards, and any other safety, security, regulatory or other requirements.
+These resources are subject to change without notice. TI grants you permission to use these resources only for development of an 
+application that uses the TI products described in the resource. Other reproduction and display of these resources is prohibited. No license 
+is granted to any other TI intellectual property right or to any third party intellectual property right. TI disclaims responsibility for, and you fully 
+indemnify TI and its representatives against any claims, damages, costs, losses, and liabilities arising out of your use of these resources.
+TI’s products are provided subject to TI’s Terms of Sale, TI’s General Quality Guidelines, or other applicable terms available either on 
+ti.com or provided in conjunction with such TI products. TI’s provision of these resources does not expand or otherwise alter TI’s applicable 
+warranties or warranty disclaimers for TI products. Unless TI explicitly designates a product as custom or customer-specified, TI products 
+are standard, catalog, general purpose devices.
+TI objects to and rejects any additional or different terms you may propose.
+IMPORTANT NOTICE
+Copyright © 2026, Texas Instruments Incorporated
+Last updated 10/2025

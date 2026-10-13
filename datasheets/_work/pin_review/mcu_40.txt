@@ -1,0 +1,52 @@
+Functional overview                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    STM32N6x5xx STM32N6x7xx
+
+
+                                •                                                                   Up to four virtual buffers
+                                •                                                                   Each virtual buffer has 3072 or 4096 bytes per line and 1024 lines
+                                •                                                                   Each virtual buffer can be physically mapped to any system memory
+                                •                                                                   Packing and unpacking operation to store 32-bit pixel data into 24-bit packed
+                                •                                                                  Interrupt in case of buffer overflow (one per buffer)
+                                •                                                                  Interrupt in case of memory transfer error
+
+3.13 Graphic timer (GFXTIM)
+
+                                The graphic timer (GFXTIM) is a graphic orie  nted timer for smart management of graphical
+                                events for frame or line counting. Its main features are:
+                                •                                                                  Integrated frame and line clock generation
+                                •                                                                   One absolute frame counter with one compare channel
+                                •                                                                   Two auto-reload relative frame counters
+                                •                                                                   One line timer with two compare channels
+                                •                                                                   External tearing-effect line management and synchronization
+                                •                                                                   Four programmable event generators with external trigger generation
+                                •                                                                   One watchdog counter
+
+3.14 Interrupts and events
+
+3.14.1                                                                        Nested vectored interrupt controller (NVIC)
+
+                                The NVIC includes the following features:
+                                •                                                                   Up to 196 maskable interrupt channels (not including the Cortex-M55 interrupt lines)
+                                •                                                                   16 programmable priority levels (using four bits of interrupt priority)
+                                •                                                                   Low latency exception and interrupt handling
+                                •                                                                  Power management control
+                                •                                                                   Implementation of system control registers
+                                The NVIC and the processor core interface are closely coupled, which enables low latency
+                                interrupt processing and efficient   processing of late arriving interrupts. All interrupts,
+                                including the core exceptions, are managed by the NVIC.
+
+3.14.2                                                                         Extended interrupt/event controller (EXTI)
+
+                                The EXTI manages the individual CPU and system wake-up through configurable event
+                                inputs. It provides wake-up requests to the power control, and generates interrupt requests
+                                to the CPU NVIC and events to the CPU ev   ent input. For the CPU an additional event
+                                generation block (EVG) is needed to generate the CPU event signal.
+                                The EXTI wake-up requests allow the system to be woken up from Stop modes, and the
+                                CPU to be woken up from CStop and CStandby modes.
+                                The interrupt request and event request generation can also be used in Run modes.
+
+
+
+
+
+
+40/263                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          DS14791 Rev 10

@@ -1,0 +1,55 @@
+STM32N6x5xx                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            STM32N6x7xx
+
+
+                                  •                                                                  16 concurrent HPDMA channels:
+                                               –                                                        Per channel FIFO for queuing s ource and destination transfers
+                                               –                                                        Intra-channel HPDMA transfers chaining via programmable linked-list into
+                                                            memory, supporting two execution modes: run-to-completion and link step mode.
+                                               –                                                        Intra-channel and inter-channel HPDMA transfers chaining via programmable
+                                                            HPDMA input triggers connection   to HPDMA task completion events
+                                  •                                                                   Per linked-list item within a channel:
+                                               –                                                        Separately programmed source and destination transfers
+                                               –                                                        Programmable data handling between source and destination: byte-based
+                                                            reordering, packing, or unpacking, paddi  ng or truncation, sign extension and
+                                                            left/right realignment
+                                               –                                                        Programmable number of data bytes to be transferred from the source, defining
+                                                            the block level
+                                               –                                                                 Linear source and destination addressing ei   ther fixed or contiguously incremented
+                                                            addressing, programmed at block level, between successive burst transfers
+                                               –                                                        2D source and destination addressing programmable signed address offsets
+                                                            between successive burst transfers (non-  contiguous addressing within a block,
+                                                            combined with programmable signed address offsets between successive blocks,
+                                                            at a second 2D/repeated block level, for a reduced set of channels
+                                               –                                                        Support for scatter-gather (multi-buffer transfers), data interleaving and
+                                                            de-interleaving via 2D addressing
+                                               –                                                        Selection of programmable HPDMA request and trigger
+                                               –                                                        Generation of programmable HPDMA ha  lf-transfer and transfer-complete event
+                                               –                                                            Pointer to the next linked-list item and it  s data structure in memory, with automatic
+                                                            update of the HPDMA linked-list control registers
+                                               –                                                        Channel abort and restart
+                                  •                                                                  Debug:
+                                               –                                                        Channel suspend and resume support
+                                               –                                                        Channel status reporting, including FIFO level, and event flags
+                                  •                                                                   TrustZone support:
+                                               –                                                        Support for secure and non-secure HPDMA transfers, independently at a first
+                                                            channel level, and independently at a    source/destination and link sublevels
+                                               –                                                        Secure and non-secure interrupts reporting, resulting from any of the respectively
+                                                            secure and non-secure channels
+                                               –                                                        TrustZone-aware AHB target port, protecting any HPDMA secure resource
+                                                            (register, bitfield) from a non-secure access
+                                  •                                                                   Privileged/unprivileged support:
+                                               –                                                        Support for privileged and unprivileged HPDMA transfers, independently at
+                                                            channel level
+                                               –                                                                      Privileged-aware AHB   target   port
+                                  •                                                                  Channel isolation support:
+                                               –                                                        Support for compartmented DMA transfers  , independently at channel level, via
+                                                            compartment IDs (named CIDs)
+                                               –                                                       CID-aware interrupts reporting
+
+
+
+
+
+                                                                                                                       DS14791 Rev 10                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          37/263
+
+                                                                                                                                                                                                                                                                                                     80

@@ -1,0 +1,48 @@
+                                                                                                     W25Q128JV
+
+
+
+7.1.4    Top/Bottom Block Protect (TB) – Volatile/Non-Volatile Writable
+The non-volatile Top/Bottom bit (TB) controls if the Block Protect Bits (BP2, BP1, BP0) protect from the
+Top (TB=0) or the Bottom (TB=1) of the array as shown in the Status Register Memory Protection table.
+The factory default setting is TB=0. The TB bit can be set with the Write Status Register Instruction
+depending on the state of the SRP, SRL and WEL bits.
+7.1.5   Sector/Block Protect Bit (SEC) – Volatile/Non-Volatile Writable
+The non-volatile Sector/Block Protect bit (SEC) controls if the Block Protect Bits (BP2, BP1, BP0) protect
+either 4KB Sectors (SEC=1) or 64KB Blocks (SEC=0) in the Top (TB=0) or the Bottom (TB=1) of the array
+as shown in the Status Register Memory Protection table. The default setting is SEC=0.
+7.1.6    Complement Protect (CMP) – Volatile/Non-Volatile Writable
+The Complement Protect bit (CMP) is a non-volatile read/write bit in the status register (S14). It is used in
+conjunction with SEC, TB, BP2, BP1 and BP0 bits to provide more flexibility for the array protection. Once
+CMP is set to 1, previous array protection set by              SEC,    TB, BP2, BP1 and BP0 will be reversed.               For
+instance, when CMP=0, a top            64KB    block   can be protected while the rest of the array is not;               when
+CMP=1, the top 64KB block will become unprotected while the rest of the array become read-only. Please
+refer to the Status Register Memory Protection table for details. The default setting is CMP=0.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                         Publication Release Date: December 24, 2024
+                                                            - 14 -                                              Revision M

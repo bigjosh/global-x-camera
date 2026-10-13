@@ -1,0 +1,63 @@
+STM32N6x5xx                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            STM32N6x7xx
+
+
+Caution:                                                         Each power supply pair (VDD / VSS, VDDCORE / VSS, VDDA / VSSA) must be decoupled with
+                                  filtering ceramic capacitors. Thes  e capacitors must be placed as close as possible to (or
+                                  below) the appropriate pins to ensure correct device functionality. It  is not recommended to
+                                  remove them to reduce PCB size or cost, as this can cause incorrect operation of the
+                                  device. The number of needed capacitors a  nd their values are detailed in AN5967.
+
+5.1.7 Current consumption measurement
+
+                                  The IDD parameters in the tables in the next sect   ions represent the to tal MCU consumption,
+                                  including the current supplying V  DD, VDDA, and VDDCORE.
+
+                                                            Figure 17. Current consumption measurement scheme
+
+
+                                     IDDCORE                                     VDDCORE                                                                        VDDA18PLL                                           IDDA18
+
+         VDDCORE                                                                      VDDCSI                                                                    VDDA18CSI                                                                   VDDA18
+
+
+                                         IDD                                             VDD                                                                    VDDA18USB
+                  VDD                                                                                                                                           VDDA18AON                                        IDDA18AON
+
+                                                                                                                                                                                                                                            VDDA18AON
+
+                                                                                                                                                                VDD33USB                                          IDD33USB
+                                       IDDiox                                      VDDIO2
+                                                                                                                                                                                                                                            VDD33USB
+              VDDIOx                                                               VDDIO3
+
+                                                                                   VDDIO4                                                                                                                        IDDA18ADC
+                                                                                                                                                                VDDA18ADC
+                                                                                   VDDIO5                                                                       VREF+
+                                                                                                                                                                                                                                            VDDA18ADC
+                                                                                                                                                                VBAT                                                  IBAT
+
+                                                                                                               VSS                                                                                                                   VSSA   VBAT
+
+
+
+5.2                                                                                                                        Absolute maximum ratings
+
+                                  Stresses above the absolute maximum ratings listed in     Table 21, Table 22, and Table 23
+                                  may cause permanent damage to the device. These are stress ratings only and the
+                                  functional operation of the device at these co  nditions is not implied. Exposure to maximum
+                                  rating conditions for extended periods may affect device reliability. Device mission profile
+                                  (application conditions) is compliant with JEDEC JESD 47 qualification standard, extended
+                                  mission profiles are available on demand.
+
+
+
+
+
+
+
+
+
+
+                                                                                                                      DS14791 Rev 10                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        137/263
+
+                                                                                                                                                                                                                                                                                                   238

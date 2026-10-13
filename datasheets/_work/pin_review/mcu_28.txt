@@ -1,0 +1,73 @@
+Functional overview                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    STM32N6x5xx STM32N6x7xx
+
+
+                                                              Figure 4. Device startup with VCORE supplied directly from the internal SMPS
+
+
+                                                                                                               VDD                                                             POR threshold
+
+
+
+
+
+                                                                                               VDDA18AON                                                                        POR threshold
+
+
+
+
+
+                                                                                    pwr_por_rstn
+
+                                                                                             PWR_ON
+
+                                                                                            VDDA18PMU /                                                                                                                     vdda18pmu_ok threshold
+                                                                                                   VDDSMPS
+
+
+
+
+                                                                            Vdda18pmu_ok
+                                                                                                                                                                                                                                                                 VOS low
+                                                                                                    VFBSMPS
+
+
+
+
+                                                                                                                       VOS low                                                                                                                                    vddcore_ok threshold
+                                                                                                         VCORE
+
+                                                                                                                                                                                                                                                   tempo
+
+                                                                                              Vcore_ok
+
+                                                                           Operating mode                                        Power                                                         Reset                                                             Wait                  Hardware system init                                        Run
+                                                                                                                                  down                                                                                                                      oscillator
+
+
+                                                                                                      ck_sys
+
+
+                                                                                                                                                                                                                                                                                                                                                 Direct
+                                                               Supply configuration                                                                                                                            Default configuration                                                                                                                 SD
+                                                                                                                                                                                                                                                                                                                                                supply
+
+                                                                                                        SDEN                                                                               X
+                                                                                                                                                            (1)                                                                                         (2)                                                                                                                               (3)(4)(5)
+                                                                                                                                                                                                                                                                                                                                                   MSv70450V3
+
+3.4.8 Operation modes
+
+                                              Several system operating modes are available to tune the system according to the required
+                                              performance. The user can select the oper  ating mode that gives the best compromise
+                                              between power consumption, start-up time, and available wake-up sources.
+
+
+
+
+
+
+
+
+
+
+28/263                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          DS14791 Rev 10

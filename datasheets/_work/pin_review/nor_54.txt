@@ -1,0 +1,61 @@
+                                                                                                       W25Q128JV
+
+
+8.2.30     Program Security Registers (42h)
+The Program Security Register instruction is similar to the Page Program instruction. It allows from one
+byte to 256 bytes of security register data to be programmed at previously erased (FFh) memory locations.
+A Write Enable instruction must be executed before the device will accept the Program Security Register
+Instruction (Status Register bit WEL= 1). The instruction is initiated by driving the /CS pin low then shifting
+the instruction code “42h” followed by a 24-bit address (A23-A0) and at least one data byte, into the DI pin.
+The /CS pin must be held low for the entire length of the instruction while data is being sent to the device.
+
+
+                    ADDRESS                        A23-16               A15-12              A11-8                A7-0
+              Security Register #1                   00h                0 0 0 1             0 0 0 0         Byte Address
+              Security Register #2                   00h                0 0 1 0             0 0 0 0         Byte Address
+              Security Register #3                   00h                0 0 1 1             0 0 0 0         Byte Address
+
+
+
+The Program Security Register instruction sequence is shown in Figure 46. The Security Register Lock
+Bits (LB3-1) in the Status Register-2 can be used to OTP protect the security registers. Once a lock bit is
+set  to  1, the corresponding security register             will be permanently locked, Program Security Register
+instruction to that register will be ignored (See 7.1.9 for detail descriptions).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                         Figure 46. Program Security Registers Instruction
+
+
+
+
+
+
+
+
+
+
+
+                                                               - 53 -

@@ -1,0 +1,94 @@
+# Project decisions and discoveries through October 13, 2026
+
+This is the durable decision register for Global X Camera. It consolidates the October 12–13 review and points to the repository's engineering evidence. The repository, rather than a chat or Page, is the project record. Current requirements are implemented in documentation, not yet in a revised circuit or integrated firmware.
+
+Read this with [spec.md](../../spec.md), [power.md](../../power.md), the [consolidated review](../../reports/Global%20X%20Camera%20decision%20review.md), and the [prototype research record](../prototype/prototype-parts-and-camera-research.md). Historical studies retain their original assumptions; a later explicit decision below takes precedence.
+
+## Decision evidence
+
+The [local review conversation export](../../research_notes/Global%20X%20Camera%20decision%20review/chat_sources/2026-10-12-13-current-review.md) preserves user requests and final answers in sequence, including the proposals that short replies such as “yes” accepted. Message numbers below refer to that export; timestamps there are UTC. It contains proposals as well as approvals, so use the status in this register when implementing.
+
+The [prior-session synthesis](../../research_notes/Global%20X%20Camera%20decision%20review/project_chats.md), [coverage inventory](../../research_notes/Global%20X%20Camera%20decision%20review/project_chat_coverage.csv), and local `chat_sources/` copies preserve earlier decisions. Claude imports were not found, and the user explicitly authorized continuing without them (message 002). This is a disclosed coverage gap, not an open task blocking the prototype.
+
+## Accepted prototype decisions
+
+| ID | Decision | Scope and evidence |
+|---|---|---|
+| D-01 | STM32N6 remains the processor direction; Himax is abandoned. | Direct user clarification in the prior-session synthesis and its local source copy. Exact downstream rail implementation remains open. |
+| D-02 | Use **CAM-6G3-073CLR / VD56G3, 73° diagonal FOV**, for the prototype. | Message 020 replaces the earlier VD55G0 recommendation. Monochrome global shutter, 1124 × 1364 native active pixels; no custom optics are required for this prototype. |
+| D-03 | Use **four CR2032 cells in series through LTC3621**. | Message 020. Exact converter suffix, output voltage/current, passives, cells and contacts still require qualification. Earlier 3.3 V/250 mA values are study assumptions. |
+| D-04 | **Exposure starts within 50 ms of button press from fully powered off.** | Messages 023–024. The deadline includes startup and initialization up to exposure start; it is not the complete exposure/readout/save/shutdown deadline. |
+| D-05 | **≤5 mm finished-product thickness target; a thicker functional prototype is allowed.** | Messages 025–026. Full mechanical stackup remains unqualified. |
+| D-06 | **0.1 µA (100 nA) room-temperature main-path OFF target, RTC backup additional and separate.** | Messages 028–030. Includes regulator, input capacitor, switch, PCB and other pack-connected leakage. It is not a demonstrated result or a full-temperature guarantee. Regulator screening is a proposed method, not a qualified test/yield limit. |
+| D-07 | Store **at least 200 full-native-resolution, uncompressed packed-RAW10 photos between downloads**. | Messages 031–032. Final NAND part, geometry, allocation and usable capacity are not frozen by this requirement. |
+| D-08 | **Full-image readback is configurable:** enabled for bring-up and initial testing, and disableable later. | Messages 033–034. Required program-completion/status checks, integrity metadata, and final commit-record verification remain; only full payload readback/comparison is optional. Interpret ECC status for data actually read. |
+| D-09 | **Preserve photos and stop accepting captures when storage is full.** | Messages 035–036. Indicate full; reclaim space via explicit USB erase after download. Connecting or downloading alone does not erase photos. Exact erase UI and host-write/delete semantics remain open. |
+| D-10 | Start with the **button-fed battery divider to RUN plus diode-isolated GPIO HOLD**. | Message 038. User accepts a minimum press until firmware takes over. In the prototype baseline a held button keeps the regulator enabled after the shot, with the MCU in its lowest suitable power state until release. |
+| D-11 | After safe completion, **prepare peripherals and shutdown sequencing, then enter STM32N6 Standby**, releasing ordinary GPIO HOLD as part of entering that state. | Message 040 and technical clarification in 041, then continuation in 042. Pin choice, auxiliary-rail discharge and timing remain to implement. An optional RUN-to-ground capacitor may delay disable; no value selected. |
+| D-12 | **USB powers the camera and firmware emulates a drive presenting stored photos as files. Shutter does nothing in USB mode.** | Message 044. Select the easiest practical filesystem during prototype firmware work. Keep the battery converter disabled and prevent backfeed; exact detection/isolation/RUN-inhibit circuit remains open. USB mode is download/explicit erase, not capture. |
+| D-13 | **Ignore shutter presses during capture or saving; no queued exposure; require a fresh press after ready.** | Recommendation in 049 accepted by “ignore” in 050. Finish the current capture/save normally. Debounce, busy/completion LED patterns and rearming implementation remain open. Do not turn a press begun while busy into a later shot merely because it is still held. |
+| D-14 | **Record decisions and discoveries in this repository and commit/push the consolidated project.** | Message 050. The Page is a convenience view. Preserve historical evidence while distinguishing it from current requirements. |
+
+## Future directions explicitly retained
+
+| ID | Direction | Qualification before adoption |
+|---|---|---|
+| FD-01 | VD5943 with potentially custom compact optics, around 73° diagonal. | Message 020. Higher-resolution full-sensor or cropped-sensor approaches remain research. Confirm lens/sensor match, focus, total assembly thickness and supply. No suitable complete <5 mm VD5943 assembly is qualified. |
+| FD-02 | Mechanical frame advance winding/driving a spring. | Message 020. Mechanism, energy conversion, effort, thickness, losses and endurance remain open. The [existing harvesting model](../power/shutter-energy-harvesting.md) is background, not an adopted battery replacement. |
+| FD-03 | A **series capacitor in the shutter start path** to limit held-button drain and permit eventual shutdown while held. | Messages 046–048. Deferred by the user; retain the existing divider/HOLD baseline. Qualify start-pulse duration through reliable HOLD takeover, reset/rearm time, leakage, bounce, repeated presses and pin transients. SPST with a reset bleed versus SPDT reset is unselected. |
+
+FD-03 is different from the optional **RUN-to-ground capacitor** in D-11: the series capacitor limits a held start assertion, while the shunt capacitor delays shutdown after HOLD releases. Neither capacitor independently powers the MCU; the battery and regulator supply energy while RUN remains enabled. If both are eventually used, analyze their interaction.
+
+## Engineering discoveries and boundaries
+
+### Sensor, optics and prototype hardware
+
+- **VD56G3 frame payload:** 1124 × 1364 × 10 / 8 = **1,916,420 bytes** before metadata, alignment and spare capacity. Two hundred payloads need **383,284,000 bytes (about 365.5 MiB)**. A nominal 4 Gbit / 512 MiB device holds 280 bare payloads; an illustrative 2 MiB slot allocation with 20% reserve leaves 204 slots. That narrow planning margin is not qualified usable capacity. Bad blocks, reserved metadata, erase geometry and recovery must be included.
+- The former VD55G0 workload is 644 × 604 RAW10 = **486,220 bytes**. The earlier approximately 800-image capacity and NAND timing/energy tables do not qualify the larger selected camera. See the [NAND comparison](../power/quad-nand-comparison.md) and [system-energy model](../power/nand-energy-impact.md).
+- Complete camera-module stock in quantity 500 was **not confirmed** for any reviewed candidate. Dated distributor counts are snapshots, not allocation or supplier commitments. Module optical height does not include all PCB/enclosure structure. The selected 4.68 mm module makes a complete ≤5 mm product mechanically demanding.
+- VD5943's tall supplied module does not define the bare sensor's minimum optical-package height. Kantatsu F6639/D0501 and other compact-lens leads, crop calculations, chief-ray-angle concerns, and the distinction between optical TTL and complete module thickness are preserved in the [prototype research record](../prototype/prototype-parts-and-camera-research.md). No compatibility or supply claim is inferred from an old lens catalog.
+- **NUCLEO-N657X0-Q** is the selected MCU development board for the order discussion. It has no microSD socket; onboard NOR is not a substitute for qualification of the eventual photo-storage device. Its target USB port is **CN8**; **CN10** is ST-LINK. Verify board jumper/power configuration before external-rail injection. [ST UM3417](https://www.st.com/resource/en/user_manual/um3417-stm32n6-nucleo144-board-mb1940-stmicroelectronics.pdf).
+- The user confirmed placing a DigiKey order (message 014). Its exact purchased quantities and substitutions were not supplied. The shopping recommendations, including camera adapter, RTC/accelerometer boards, LTC3621 demo board, NAND board and candidate chips, are preserved locally; they are not an inferred purchase receipt or frozen production BOM.
+
+### RUN control, leakage and shutdown
+
+- LTC3621 shutdown is **0.1 µA typical, 1 µA maximum** at the cited 12 V/25°C test condition. Its typical value alone uses the entire project main-path target before external leakage; screen and measure the assembled stage rather than assume compliance. The enabled converter's quiescent current also counts while the button is held. [Local ADI datasheet](../../datasheets/candidates/power-latch/ADI_LTC3621.pdf).
+- The study's 330 kΩ/100 kΩ button divider draws about **18.6–30.7 µA over the assumed 8–13.2 V pack range**. A diode-fed 3.3 V HOLD GPIO has different margin from a 1.8 V GPIO. Neither the pack endpoint nor the final resistor/diode choice has been qualified. See [power.md](../../power.md).
+- **Standby makes ordinary STM32N6 GPIOs high impedance without pull-ups/pull-downs; Stop retains I/O configuration.** Select a non-exception HOLD pin and retain external pulldowns. `PWR_ON` and internal SMPS behavior do not remove the obligation to discharge external AUX rails while required main/AON rails remain valid. A dedicated external sequencer is not inherently mandatory. [Local RM0486](../../datasheets/processor/STM32N6_RM0486_reference_manual.pdf), §13.7.7, and [AN5967](../../datasheets/processor/STM32N6_AN5967_hardware_design.pdf).
+- RTC backup bypasses the main regulator through one cell. In the retained RV-3028-C8 Level Switching Mode, the cited manufacturer table gives **140 nA typical / 210 nA maximum** at 3 V/25°C with VDD below 2 V. This additional cell load differs from lower VDD-only timekeeping figures. Preserve primary-cell charging disable and unpowered-bus isolation. [Local RTC application manual](../../datasheets/sensors_timing/RV-3028-C8_application_manual.pdf), p97.
+- Firmware ignoring a USB-mode press cannot stop the physical divider from raising RUN. USB source detection, reverse-current isolation and hardware RUN suppression need a combined circuit; the HOLD diode alone does not provide them. Avoid battery-level or USB 5 V exposure to GPIOs, and avoid shorting a driven HOLD path through a RUN clamp.
+- For FD-03, a bare series capacitor without reset can fail to rearm. A resistor across it gives reset after release but residual held current: **10 MΩ is an illustrative value yielding about 1.25 µA at 13 V**, not a selection. Larger resistance reduces current and slows reset. SPDT reset can avoid that intentional held-current path but needs transient protection. A negative pulse is topology-dependent; the floating-plate SPST arrangement does not inherently force one. RUN's absolute negative limit is −0.3 V. See the local ADI datasheet and messages 046–047.
+
+### Storage integrity and firmware
+
+- Native SLC NAND needs explicit bad-block, ECC, metadata, commit and interrupted-write recovery design. Disabling full-image readback does not remove those obligations. A program-status check is not a readback ECC result. Loss of power before a valid commit must not expose an incomplete photo as successfully saved; exact recovery implementation remains open.
+- Micron's modeled write-only advantage over Winbond nearly disappears when full readback is included. MCU-on time and complete-save energy matter alongside NAND-only figures. Exact device/interface selection remains open; parallel NAND, 1.8 V quad NAND, 3.3 V quad NAND and microSD studies are candidates rather than adopted new pin maps.
+- Long-term unpowered retention, acceptable loss, corrected-error response and refresh opportunities during USB operation are unresolved. USB filesystem, photo-file representation and host write/delete behavior are deferred. Internal raw storage need not be identical to the emulated host filesystem.
+- Rust was explored, not selected. No recovered integrated camera firmware was found. The firmware framework should be chosen against boot, capture, storage, USB and power behavior, not assumed from a prior language discussion.
+
+### Recovered design and manufacturing
+
+- Flux recovery accounts for **148 components, 737 terminals and 81 nets** in the checked reconstructed design. Clean ERC and recovered footprint coverage establish model consistency, not electrical correctness or a production release. [Recovery](../../hardware/reconstruction/README.md), [current CAD evidence](../../research_notes/Global%20X%20Camera%20decision%20review/current-cad-evidence.json).
+- The September review contains **47 findings: 5 blockers, 22 high, 17 medium, 3 low**. Preserve concrete corrections such as latch/shutter-sense voltage, boot flash chip select, parallel NAND ready/busy, RTC interrupt level, reset capacitance, camera connector geometry and external rail sequencing until fixed or superseded with evidence. [Finding register](../review/findings.md).
+- Current KiCad files still contain VD55G0, 3.3 V memories, parallel NAND and TPS62132/TPS62825/AO3401A power circuitry. The accepted new camera/converter choices are not applied CAD changes. No finished routed PCB, manufacturing release or measured complete capture/save/shutdown cycle was found.
+- JLCPCB Standard is a study recommendation, with PCBWay fallback; neither is selected. Conventional four-layer construction is a working target, with six layers a proposed option if routing requires it. Stackup, BGA escape, panel/rails, assembler scope, quantity and final mechanical fit need qualification. [Manufacturing study](../manufacturing/china-pcba-feasibility.md).
+
+## Remaining decisions and implementation work
+
+Discuss unresolved choices one at a time. Do not reopen settled choices merely because their implementation still needs engineering.
+
+| Order | Open item | What closes it |
+|---|---|---|
+| 1 | Fault behavior and power transitions | Define failed capture/program, brownout, firmware hang, USB insertion/removal during saving, indication and retry policy; review a safe complete state sequence. Busy presses are already settled by D-13. |
+| 2 | Storage qualification and retention | Exact NAND/interface/carrier, actual usable 200-photo capacity, ECC/commit/recovery policy, unpowered retention and error/refresh behavior. |
+| 3 | Power and physical implementation | Exact regulator/rails/passives and load margin, AUX discharge, USB priority/isolation, HOLD timing and safe pins; measured cold start, leakage, weak-cell and source-transition tests. |
+| 4 | Manufacturing and prototype package | Actual purchased-parts reconciliation, PCB stackup/escape, mechanical section, assembly service/quantity and current supply evidence. |
+| 5 | Optional features and firmware choices | Flash requirement, directional photopic metering role/optics, firmware language/framework. Emulated filesystem selection is intentionally deferred to firmware work. |
+
+A flash-specific discussion using AA cells did not replace the camera's CR2032 decision. Directional metering's suggested <10° interpretation and optics remain unresolved. Keep both separate from the locked prototype until explicitly decided.
+
+## Consolidation and source preservation
+
+The initial audit inventoried 1,314 existing files and 78 PDFs totaling 7,012 pages, including duplicates, and reviewed 19 native session records plus six substantive cloud conversations. These are **initial audit counts**, excluding later review artifacts; PDF parsing/indexing was not a page-by-page fresh qualification. The [coverage record](../../research_notes/Global%20X%20Camera%20decision%20review/README.md) preserves scope and gaps.
+
+The folder had no root Git repository when consolidation began. Its separate KiCad save history is preserved as [a portable Git bundle](../../hardware/reconstruction/kicad-save-history.bundle); a project-level repository is being established to save source files, studies, decisions and evidence together. Scratch outputs and live editor history are excluded, without deleting them locally. The project commit and remote location are recorded by Git itself.

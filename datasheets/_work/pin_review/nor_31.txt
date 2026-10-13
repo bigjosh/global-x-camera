@@ -1,0 +1,65 @@
+                                                                                                         W25Q128JV
+
+
+
+8.2.8     Fast Read Dual Output (3Bh)
+The Fast Read Dual Output (3Bh) instruction is similar to the standard Fast Read (0Bh) instruction except
+that data is output on two pins; IO0 and IO1. This allows data to be transferred at twice the rate of standard
+SPI devices. The Fast Read Dual Output instruction is ideal for quickly downloading code from Flash to
+RAM upon power-up or for applications that cache code-segments to RAM for execution.
+
+Similar to the Fast Read instruction, the Fast Read Dual Output instruction can operate at the highest
+possible  frequency  of  FR        (see  AC  Electrical  Characteristics).  This  is  accomplished  by  adding  eight
+“dummy” clocks after the 24-bit address as shown in Figure 18. The dummy clocks allow the device's
+internal circuits additional time for setting up the initial address. The input data during the dummy clocks is
+“don’t care”. However, the IO0 pin should be high-impedance prior to the falling edge of the first data out
+clock.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                           Figure 18. Fast Read Dual Output Instruction
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                           Publication Release Date: December 24, 2024
+                                                              - 30 -                                                Revision M

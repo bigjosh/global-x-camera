@@ -1,0 +1,51 @@
+Functional overview                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    STM32N6x5xx STM32N6x7xx
+
+
+                                             –                                                        On a hot-join request
+                                             –                                                        On a controller-role request
+                                 •                                                                   • Wake-up from Stop mode(s), as target:
+                                             –                                                        On a reset pattern
+                                             –                                                        On a missed start
+                                 •                                                                  Multiclock domain management:
+                                             –                                                        Separate APB clock and kernel clock,   driven from independently programmed
+                                                          clock sources via the RCC, in addition to SCL clock
+                                             –                                                        Minimum operating frequency for the   kernel clock and th e APB clock vs. the
+                                                          application-driven SCL clock
+
+3.45 Universal synchronous/asynchronous receiver transmitter
+                                 (USART/UART/LPUART)
+
+                                 USART offers a flexible way to perform Full-du  plex data exchange with external equipments
+                                 requiring an industry standard NRZ asynchrono  us serial data format. A very wide range of
+                                 baud rates can be achieved through a fractional baud rate generator.
+
+3.45.1 USART/UART
+
+                                 The USART supports both synchronous one-way and Half-duplex Single-wire
+                                 communications, as well as LIN (local interc  onnection network), Smartcard protocol, IrDA
+                                 (infrared data association) SIR ENDEC spec  ifications, and Modem operations (CTS/RTS).
+                                 Multiprocessor communicati ons are also supported.
+                                 High-speed data communications are possible by using the DMA (direct memory access)
+                                 for multibuffer configuration.
+                                 USART main features are:
+                                 •                                                                   Full-duplex asynchronous communication
+                                 •                                                                  NRZ standard format (mark/space)
+                                 •                                                                  Configurable oversampling method by 16 or 8 to achieve the best compromise
+                                             between speed and clock tolerance
+                                 •                                                                   Baud rate generator systems
+                                 •                                                                   Two internal FIFOs for transmit and receive data. Each FIFO can be enabled/disabled
+                                             by software and come with a status flag.
+                                 •                                                                   A common programmable transmit and receive baud rate
+                                 •                                                                   Dual clock domain with dedicated kernel clock for peripherals independent from PCLK
+                                 •                                                                   Auto baud rate detection
+                                 •                                                                   Programmable data word length (7, 8 or 9 bits)
+                                 •                                                                   Programmable data order with M SB-first or LSB-first shifting
+                                 •                                                                   Configurable stop bits (1 or 2 stop bits)
+                                 •                                                                   Synchronous target/controller mode and clock output/input for synchronous
+                                             communications
+                                 •                                                                   SPI target transmission underrun error flag
+                                 •                                                                   Single-wire Half-duplex communications
+                                 •                                                                   Continuous communications using DMA
+
+
+70/263                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          DS14791 Rev 10

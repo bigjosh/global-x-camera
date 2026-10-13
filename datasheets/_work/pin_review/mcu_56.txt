@@ -1,0 +1,51 @@
+Functional overview                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    STM32N6x5xx STM32N6x7xx
+
+
+                              •                                                                   Protection against side-channel attacks (SCA  ), incl. differential power analysis (DPA),
+                                          certified SESIP and PSA secu rity assurance level 3
+                              •                                                                   128-bit data block processing, supporting   cipher key lengths of 128-bit and 256-bit
+                              •                                                                   480 or 680 clock cycle latency in ECB mode   for processing one 128-bit block with,
+                                          respectively, 128-bit or 256-bit key
+                              •                                                                   Hardware secret key encryption/ decryption (Wrapped-key mode)
+                              •                                                                          Using dedicated key bus, optional key shar   ing with faster CRYP peripheral (Sharedkey
+                                          mode), controlled by SAES
+                              •                                                                   Integrated key scheduler to compute the last round key for ECB/CBC decryption
+                              •                                                                   256-bit of write-only registers for storing   cryptographic keys (eight 32-bit registers)
+                              •                                                                   Optional 128-bit or 256-bit hardware loadi  ng of two hardware secret keys (BHK,
+                                          DHUK) that can be XOR-ed together
+                              •                                                                   Security context enforcement for keys
+                              •                                                                   128-bit of registers for storing initia  lization vectors (four 32-bit registers)
+                              •                                                                   32-bit buffer for data input and output
+                              •                                                                              Automatic data flow control supporting two   direct memory access (DMA) channels, one
+                                          for incoming data, one for processed data. Only single transfers are supported.
+                              •                                                                   Data-swapping logic to support 1-, 8-, 16-, or 32-bit data
+                              •                                                                   AMBA AHB target peripheral, accessible through 32-bit word single accesses only.
+                                          Other access types generate an AHB error, and other than 32-bit writes may corrupt
+                                          the register content.
+                              •                                                                  Possibility for software to suspend a me ssage if SAES needs to process another
+                                          message with a higher priority, then resume the original message
+
+3.34 Cryptographic processor (CRYP)
+
+                              The cryptographic processor (C  RYP) encrypts or decrypts  data in compliance with the
+                              advanced encryption standard ( AES) defined by NIST. This fu nction is available only on
+                              STM32N655xx and STM32N657xx devices.
+                              CRYP supports ECB, CBC, CTR, GCM, GMAC , and CCM chaining modes for key sizes of
+                              128, 192, or 256 bits. CRYP has the possibility  to load by hardware the key stored in SAES
+                              peripheral, under SAES control.
+                              The peripheral supports both single and    fixed DMA burst transfers for incoming and
+                              outgoing data (two DMA channels are requir  ed). CRYP also includes input and output
+                              FIFOs for better performance.
+                              CRYP main features are:
+                              •                                                                   Compliant with NIST FIPS publication 1 97 “Advanced encryptio n standard (AES)”
+                                          (November 2001)
+                              •                                                                   Encryption and decr yption with multiple chaining modes:
+                                          –                                                        Electronic codebook (ECB) mode
+                                          –                                                        Cipher block chaining (CBC) mode
+                                          –                                                        Counter (CTR) mode
+                                          –                                                       Galois counter mode (GCM)
+                                          –                                                        Galois message authentication code (GMAC) mode
+
+
+
+56/263                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          DS14791 Rev 10

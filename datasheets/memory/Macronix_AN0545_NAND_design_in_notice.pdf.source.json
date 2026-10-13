@@ -1,0 +1,14 @@
+{
+  "path": "memory/Macronix_AN0545_NAND_design_in_notice.pdf",
+  "title": "Macronix AN0545 NAND Design-In Notice Ver 2",
+  "parts": "MX30LF2G18AC-TI",
+  "source_url": "https://www.macronix.com/Lists/ApplicationNote/Attachments/2005/AN0545V2%20-%20NAND%20Design-In%20Notice.pdf",
+  "resolved_url": "https://www.macronix.com/Lists/ApplicationNote/Attachments/2005/AN0545V2%20-%20NAND%20Design-In%20Notice.pdf",
+  "source_page": "https://www.macronix.com/en-us/support/technical-documentation/Pages/SLC-NAND-Flash.aspx",
+  "retrieved_utc": "2026-09-05T06:49:05.288283+00:00",
+  "bytes": 697265,
+  "pages": 14,
+  "sha256": "b2e15b1ce12f6a9a2973fff9c31f53ef0ca4f69ebb4a71c4cd27974e5bd24fdd",
+  "note": "Family-level software design guidance: ECC, bad blocks, partition table, UBI and erased-page behavior; exact device datasheet controls.",
+  "first_page_excerpt": "APPLICATION NOTE NAND Design-In Notice P/N: AN0545 Ver.2, Sep. 25, 2017 1 1. Introduction NAND flash process migration is fast. On average, i t only takes 1 ~ 2 years before the next process migration is ready to provide cost reductions for g eneral embedded system applications, such as STB, TV, router, printer, etc. As NAND structures shrink in physical size, certain software efforts are req uired to maintain NAND flash data integrity and design re liability. In general, these software efforts incl ude, but are not limited to, the use of ECC, Bad Black M anagement, and Partition Tables. This application note will focus on this topic and provide guidelines for NAND usage with software management. 2. Bad Block Management 2-1. Bad Block In NOR flash, memory cells are independent, but NAN D memory cells are joined together to form strings of 32 or 64 cells. See Figure 2-1: Comparis on of NAND and NOR Cell Structure. With this structure, a NAND memory cell may become dependent on other member cells of its string. Weak cells in a string may prevent data from being programmed into a cell, prevent cell erasure, cause cell read bit errors that exceed specifications, and so on. Every flash vendor has its own screening method to identify defective cells in a block and mark that b lock as BB (Bad Block) if the defective cells canno t be corrected with ECC. In general, NAND flash will no t ship if the BB count exceeds 2% of the total number of blocks. Bad blocks (BB) are common in NAND flash, and they must be handled correctly by software. When a user accesses a fresh NAND device for t"
+}

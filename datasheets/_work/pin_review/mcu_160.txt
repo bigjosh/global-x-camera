@@ -1,0 +1,66 @@
+Electrical characteristics                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      STM32N6x5xx STM32N6x7xx
+
+
+
+1.                          Evaluated by characterization, not tested in production, unless otherwise specified.
+2.                          Measured from the wake-up event to the point in which the application code reads the first instruction.
+
+5.3.8 External clock sources characteristics
+
+                                     HSE clock generated from an external source
+                                     In bypass mode the HSE oscilla tor is switched off and the in put pin is a standard I/O.
+                                     Digital and analog bypass modes are available.
+                                     The external clock signal must resp  ect the requirements specified in   Section 5.3.17 . The
+                                     recommended clock input  waveform is shown in Figure 19 for digital bypass mode and in
+                                     Figure 20 for analog bypass mode. In the latter, the clock can be a sinusoidal waveform.
+
+                                                    Figure 19. HSE clock source AC timing diagram (digital bypass)
+
+
+
+
+               VHSEH          90        %
+
+               VHSEL         10         %
+
+                                               tr(HSE)                                                                  tf(HSE)                                                                                                                                                                                                                                                       tW(HSE)tW(HSE)t
+
+                                                                                                      THSE
+
+
+
+
+                                    External                                           fHSE_ext                                                                                                IL
+                                     clock source                                                                        OSC_IN
+                                                                                                                                                                                                                        STM32
+
+
+                                                   Figure 20. HSE clock source AC timing diagram (analog bypass)
+
+                                                                           VHSE
+
+
+
+                                                                                                                                                                                                                             90%
+
+                                                                   VPP
+
+                                                                                                                                                                                                                             10%
+
+                                                                                                    THSE                                           tr(HSE)                                                                 t
+
+
+
+
+                                                                    External                                                 fHSE_ext                  OSC_IN
+                                                                    clock source                                                                                                                      IL
+
+                                                                                                                                                                                                                   STM32
+
+
+
+
+
+
+
+160/263                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        DS14791 Rev 10

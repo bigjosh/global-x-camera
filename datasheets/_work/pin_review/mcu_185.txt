@@ -1,0 +1,69 @@
+STM32N6x5xx                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            STM32N6x7xx
+
+
+                                                                                  Figure 29. Asynchronous multiple xed PSRAM/NOR write waveforms
+
+                                                                                                                                                                                                                          tw(NE)
+
+                                                                                     FMC_                     NEx
+
+
+
+                                                                                   FMC_NOE
+                                                                                                                                                                   tv(NWE_NE)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          t   h(NE_NWE)tw(NWE)
+
+                                                                                  FMC_NWE
+
+                                                                                                                                                                  tv(A_NE)                                                                       th(A_NWE)
+                                                                         FMC_                     A[25:16]                                                                                                              Address
+
+                                                                                                                                                                     tv(BL_NE)                                                              th(BL_NWE)
+
+                                                                        FMC_                     NBL[1:0]                                                                                                                              NBL
+
+                                                                                                                                                                 t   v(A_NE)                                             t  v(Data_NADV)                                                                               th(Data_NWE)
+
+                                                                        FMC_                     AD[15:0]                                                                  Address                                                                                 Data
+                                                                                            t   v(NADV_NE)                                                                                                                 th(AD_NADV)
+                                                                                                                                                                 tw(NADV)
+
+
+                                                                               FMC_NADV
+
+
+
+                                                                              FMC_NWAIT
+
+                                                                                                                                                                                                                                                                           th(NE_NWAIT)
+
+                                                                                                                                                                                                                                                           tsu(NWAIT_NE)
+                                                                                                                                                                                                                                                                                                                                                                           MS32756V1
+
+                                                Synchronous waveforms and timings
+                                                Figure 30 to Figure 33 represent synchronous waveforms and Table 80 to Table 83 provide
+                                                the corresponding timings. The results shown in    these tables are obtained with the following
+                                                FMC configuration:
+                                                •                                                                   BurstAccessMode = FMC_BurstAccessMode_Enable
+                                                •                                                                  MemoryType = FMC_MemoryType_CRAM
+                                                •                                                                   WriteBurst = FMC_WriteBurst_Enable
+                                                •                                                                   CLKDivision = 1
+                                                •                                                                   DataLatency = 1 for NOR flash memory; DataLatency = 0 for PSRAM
+                                                In all timing tables, T fmc_ker_ck is the fmc_ker_ck clock period with the following FMC_CLK
+                                                maximum values:
+                                                •                                                                   For 1.65 V < VDD< 3.6 V, FMC_CLK = 65 MHz at 20 pF (55 MHz when using NWAIT)
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                       DS14791 Rev 10                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        185/263
+
+                                                                                                                                                                                                                                                                                                                                                                                                                            238

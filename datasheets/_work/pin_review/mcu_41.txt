@@ -1,0 +1,57 @@
+STM32N6x5xx                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            STM32N6x7xx
+
+
+                                  The EXTI main features are the following:
+                                  •                                                                   73 input events supported
+                                  •                                                                   Most event inputs allow to wa ke up the system, some can be used only to generate a
+                                               CPU wake-up
+                                  •                                                                  Events without an associated wake-up flag in   the peripheral have a flag in the EXTI,
+                                               and generate a combined secure/non-secure interrupt to the CPUs from the EXTI
+                                  •                                                                   Events can be used to generate a CPU wake-up event
+                                  •                                                                   The asynchronous event inputs   are classified in two groups:
+                                               –                                                        Configurable events (signals from I/Os or   peripherals able to generate a pulse),
+                                                           with the following features:
+                                                           >                                                       Selectable active trigger edge
+                                                           >                                                       Interrupt pending status register bits   independent for the rising and falling
+                                                                        edge
+                                                           >                                                       Individual interrupt and event generation mask, used to condition the CPU
+                                                                        wake-up, interrupt, and event generation
+                                                           >                                                      Individual interrupt lines per CPU
+                                                           >                                                       Software trigger possibility
+                                               –                                                        Direct events (interrupt and wake-up sources from peripherals with an associated
+                                                           flag, which must be cleared in the peripheral), with the following features:
+                                                           >                                                       Fixed rising edge active trigger
+                                                           >                                                       No interrupt pending status register   bit in the EXTI (the interrupt pending
+                                                                        status flag is provided by th e peripheral generating the event)
+                                                           >                                                       No interrupt pending status register   bit in the EXTI (the interrupt pending
+                                                                        status flag is provided by th e peripheral generating the event)
+                                                           >                                                       No software trigger possibility
+                                  •                                                                   Secure events
+                                               –                                                        The access to control and configuration bits of secure input events can be made
+                                                           secure and or privileged
+                                  •                                                                  EXTI I/O port selection
+
+3.15 Cyclic redundancy check calculation unit (CRC)
+
+                                  The CRC (cyclic redundancy check) calculation un   it is used to get a CRC code from 8-, 16-
+                                  or 32-bit data word and a generator polynomial.
+                                  Among other applications, CRC-based techniques are used to verify data transmission or
+                                  storage integrity. In the scope of the function   al safety standards, they offer a means of
+                                  verifying the flash memory integrity. The CRC   calculation unit helps compute a signature of
+                                  the software during runtime, to be compared with a reference signature generated at link
+                                  time and stored at a given memory location.
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                      DS14791 Rev 10                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          41/263
+
+                                                                                                                                                                                                                                                                                                   80

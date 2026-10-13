@@ -1,0 +1,60 @@
+STM32N6x5xx                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            STM32N6x7xx
+
+
+                                           For the output pins, any internal or external    pull-up or pull-down and external load must also
+                                           be considered to estimate the current consumption.
+                                           An additional current consumption is due to I/O  s configured as inputs when an intermediate
+                                           voltage level is applied externally.  This is caused by the input Schmitt trigger circuits used to
+                                           discriminate the input value. Un  less this specific configuration  is required by the application,
+                                           this supply current consumption can be avoided by configuring these I/Os in analog mode.
+                                           This is the case of ADC  input pins, which must be co  nfigured as analog inputs.
+Caution:                                                                Any floating input pin can settle to an intermediate voltage level or switch inadvertently, as a
+                                           result of external electromagnetic noise. To   avoid current consumption related to floating
+                                           pins, they must be configured in analog mode, or    forced internally to a definite digital value.
+                                           This can be done by using pull-up/down resistors, or by configuring the pins in output mode.
+                                           I/O dynamic current consumption
+                                           The I/Os used in application contribute to th  e consumption. When an I/O pin switches, it
+                                           uses the current from the I/O supply voltage to supply the pin circuitry, and to
+                                           charge/discharge the capacitive load (internal and external) connected to it:
+                                                                                                                                                         I SW                                                                   V DD                                                    f SW                                                    C=××
+
+                                           where:
+                                           •                                                                   ISW is the current sunk by a switching I/ O to charge/discharge the capacitive load
+                                           •                                                                   VDD is the I/O supply voltage
+                                           •                                                                   fSW is the I/O switching frequency
+                                           •                                                                   C is the total capacitance seen by the I/O pin: C = C   INT + CEXT
+                                                           –CINT is the I/O pin capacitance
+                                                           –CEXT is any connected external device pin capacitance
+
+5.3.7 Wake-up time from low-power modes
+
+                                           The times given in  Table 46 are measured starting from the  wake-up event trigger up to the
+                                           first instruction executed by the CPU.
+                                           All timings are derived from tests performed under ambient temperature, V    DD and
+                                           VDDA18AON = 1.8 V, VDDCORE at nominal voltage.
+                                           General conditions unless otherwise noted:
+                                           •                                                                  CM55 CPU software in SRAMx
+                                           •                                                                   CPU goes to low power mo de after WFI instruction.
+
+
+
+
+
+
+
+
+                                                                                        Table 46. Low-power mode wake-up timings  (1)(2)
+     Symbol                                                                                                                                                                                                              Parameter                                                                                                                                                                                                                                                                                                                                                                                                                   Conditions                                                                                                                                                                                                                                            Typ                                                                                                                         Unit
+
+   tWU(Sleep)                             Wake-up time from Sleep                                                                                                                                                                                                                                                                                                                                                                                                                                                               -                                                                                                                                                                                                                                                                                                                                        38                                    CPU clock cycles
+                                                                                                                                                   SVOS HIGH, HSI 64 MHz, clock disabled                                10
+   tWUDSTOP                          Wake-up time from Stop                                                                                        SVOS HIGH, HSI 64 MHz, clock enabled                                              5
+                                                                                                                                                   SVOS HIGH, MSI 4 MHz, clock disabled                                               65                                                                                       µs
+                                                                                                                                                   SVOS HIGH, MSI 4 MHz, clock enabled                                                     55
+     tWUSTBY                                     Wake-up time from Standby mode                                                                                                                                                                                                                                                                                                                               -                                                                                                                                                                                                                                                                                                                               400
+
+
+
+                                                                                                                                                      DS14791 Rev 10                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        159/263
+
+                                                                                                                                                                                                                                                                                                                                                                                 238

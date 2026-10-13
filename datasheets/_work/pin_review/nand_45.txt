@@ -1,0 +1,62 @@
+6-14.      Unique ID Read (ONFI)
+
+The unique ID is 32-byte and with 16 copies for back-up purpose. After writing the Unique ID read command
+(EDh) and following the one address byte (00h), the host may read out the unique ID data. The host need to
+XOR the 1st 16-byte unique data and the 2nd 16-byte complement data to get the result, if the result is FFh,
+the unique ID data is correct; otherwise, host need to repeat the XOR with the next copy of Unique ID data.
+Once sending the EDh command, the NAND device will remain in the Unique ID read mode until next valid
+command is sent.
+To change the data output location, it is recommended to use the Random Data Out command set (05h-E0h).
+The Status Read command (70h) can be used to check the completion. To continue the read operation, a
+following read command (00h) to re-enable the data out is necessary.
+
+
+Figure 25. AC waveforms for Unique ID Read Operation
+
+
+                                                                tCLR
+                    CLE
+
+
+
+                    CE#
+
+
+
+                    WE#
+
+
+
+                                                                 tAR
+
+                     ALE
+
+
+
+
+                                                                         tRC
+                     RE#                                       tRR
+                                                  tWB
+
+                                                           tR
+
+                 IO[7:0]              EDh                                                                                                                00hUnique ID 0Unique ID 0Unique ID 0Unique ID 1
+                                                                        Dout 0      Dout 1                 Dout 31     Dout 0
+
+
+
+
+                    R/B#
+                                                            Busy
+
+
+
+
+
+
+
+
+
+
+
+                                                                       45

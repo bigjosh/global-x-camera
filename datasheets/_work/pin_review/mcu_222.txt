@@ -1,0 +1,62 @@
+Electrical characteristics                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      STM32N6x5xx STM32N6x7xx
+
+
+                                                                                                                   Table 113. LPTIMx characteristics(1)(2) (continued)
+                   Symbol Parameter Min  Max   Unit
+
+                ResLPTIM Timer resolution                                                                        -                    16                         bit
+           tMAX_COUNT                                                  Maximum possible count                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          -                                                                                                                                  65536                                                                                                                fLPTIMxCLK
+
+1.                          Specified by design. Not tested in production.
+2.                          LPTIMx is used as a general term to refer to the LPTIM1 to LPTIM5 timers.
+
+5.3.36 Communications interfaces
+
+                                                          SPI interface
+                                                          Unless otherwise specified, the parameters given in  Ta   b   l   e    11   4 for SPI are derived from tests
+                                                          performed under the ambient temperature, f   PCLKx frequency, and V DD supply voltage
+                                                          conditions summarized in Table 24, with the following configuration:
+                                                          •                                                                   Output speed is set to OSPEEDRy[1:0] = 11
+                                                          •                                                                   Capacitive load: C = 3 0pF
+                                                          •                                                                  Measurement points are done at CMOS levels: 0.5 V  DD
+                                                          •                                                                   I/O compensation cell activated
+                                                          •                                                                   HSLV activated when V DD ≤ 2.5 V
+                                                          Refer to Section 5.3.17 for more details on the input/outpu  t alternate function characteristics
+                                                          (NSS, SCK, MOSI, and MISO for SPI).
+
+                                                                                                                                                              Table 114. SPI characteristics (1)
+       Symbol                                                                                                                                            Parameter                                                                                                                                                                                                                                                                                                                             Conditions                                                                                                                                                                                                                                                        Min                                                                         Typ                                                                     Max                                                                Unit
+
+                                                                                                                                                                 Controller mode, 1.65 < VDD < 1.98 V                                                                                                                                                                                                                        11   5
+                                                                                                                                                                 Controller mode, 3.00 < VDD < 3.6 V                                                                                                                                                                                                                                                                                                                                                                          105
+               fSCK                                                                SPI clock frequency                                                           Target receiver mode                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              100--MHz
+
+                                                                                                                                                                 Target mode transmitter/full duplex                                                                                                                                                                                                                                                                                                                                                                                        50(2)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+222/263                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        DS14791 Rev 10

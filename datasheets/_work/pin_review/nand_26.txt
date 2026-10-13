@@ -1,0 +1,73 @@
+6-5.    Page Program
+
+The memory is programmed by page, which is 2,112 bytes. After Program load command (80h) is issued
+and the row and column address is given,  the data will be loaded into the chip sequentially. Random Data
+Input command (85h) allows multi-data load in non-sequential address. After data load is complete, program
+confirm command (10h) is issued to start the page program operation. The page program operation in a
+block should start from the low address to high address. Partial program in a page is allowed up to 4 times.
+However, the random data input mode for programming a page is allowed and number of times is not limited.
+The status of the program completion can be detected by R/B# pin or Status register bit SR[6].
+The program result is shown in the chip status bit (SR[0]). SR[0] = 1 indicates the Page Program is not
+successful and SR[0] = 0 means the program operation is successful.
+During the Page Program progressing, only the read status register command and reset command are
+accepted, others are ignored.
+
+
+Figure 12. AC Waveforms for Program Operation after Command 80H
+
+      CLE        tCLS
+
+
+                     tCLH
+      CE#       tCS
+
+
+
+
+
+                             tWC
+    WE#
+
+                      tALS
+
+
+                     tALH                                    tALH                               tWB
+
+      ALE
+
+
+
+     RE#
+
+
+                tDS                 tDHtDS/tDH
+
+
+
+
+                  80h          -                                      Din      Din           10h                  70h     Status
+   IO[7:0]                                                             0       n                                          Output
+
+
+
+                         1st Address2nd Address3rd Address4th Address5th Address
+                           Cycle    Cycle    Cycle   Cycle  Cycle                                      tPROG
+
+     R/B#
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                   26

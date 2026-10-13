@@ -1,0 +1,65 @@
+                                                                                                                                     W25Q128JV
+
+
+
+8.1.2         Instruction Set Table 1 (Standard SPI Instructions)(1)
+
+Data Input Output                       Byte 1           Byte 2              Byte 3              Byte 4              Byte 5              Byte 6              Byte 7
+
+Number of Clock(1-1-1)                     8                8                   8                   8                   8                   8                   8
+Write Enable                              06h
+Volatile SR Write Enable                  50h
+Write Disable                             04h
+Release Power-down / ID                   ABh            Dummy               Dummy               Dummy             (ID7-ID0)(2)
+
+Manufacturer/Device ID                    90h            Dummy               Dummy                 00h             (MF7-MF0)            (ID7-ID0)
+JEDEC ID                                  9Fh          (MF7-MF0)           (ID15-ID8)           (ID7-ID0)
+Read Unique ID                            4Bh            Dummy               Dummy               Dummy               Dummy              (UID63-0)
+
+Read Data                                 03h           A23-A16              A15-A8               A7-A0              (D7-D0)
+Fast Read                                 0Bh           A23-A16              A15-A8               A7-A0              Dummy               (D7-D0)
+Page Program                              02h           A23-A16              A15-A8               A7-A0              D7-D0              D7-D0(3)
+
+Sector Erase (4KB)                        20h           A23-A16              A15-A8               A7-A0
+Block Erase (32KB)                        52h           A23-A16              A15-A8               A7-A0
+Block Erase (64KB)                        D8h           A23-A16              A15-A8               A7-A0
+Chip Erase                             C7h/60h
+Read Status Register-1                    05h           (S7-S0)(2)
+Write Status Register-1(4)                01h           (S7-S0)(4)
+Read Status Register-2                    35h          (S15-S8)(2)
+
+Write Status Register-2                   31h           (S15-S8)
+Read Status Register-3                    15h         (S23-S16)(2)
+
+Write Status Register-3                   11h          (S23-S16)
+
+Read SFDP Register                        5Ah               00                  00                A7-A0              Dummy               (D7-D0)
+Erase Security Register(5)                44h           A23-A16              A15-A8               A7-A0
+Program Security Register(5)              42h           A23-A16              A15-A8               A7-A0              D7-D0              D7-D0(3)
+Read Security Register(5)                 48h           A23-A16              A15-A8               A7-A0              Dummy               (D7-D0)
+
+Global Block Lock                         7Eh
+Global Block Unlock                       98h
+Read Block Lock                           3Dh           A23-A16              A15-A8               A7-A0              (L7-L0)
+Individual Block Lock                     36h           A23-A16              A15-A8               A7-A0
+Individual Block Unlock                   39h           A23-A16              A15-A8               A7-A0
+Erase / Program Suspend                   75h
+Erase / Program Resume                    7Ah
+Power-down                                B9h
+
+Enable Reset                              66h
+Reset Device                              99h
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                Publication Release Date: December 24, 2024
+                                                                               - 22 -                                                              Revision M

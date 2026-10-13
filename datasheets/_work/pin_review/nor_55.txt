@@ -1,0 +1,61 @@
+                                                                                                          W25Q128JV
+
+
+
+8.2.31     Read Security Registers (48h)
+
+The Read Security Register instruction is similar to the Fast Read instruction and allows one or more data
+bytes to be sequentially read from one of the four security registers. The instruction is initiated by driving
+the /CS pin low and then shifting the instruction code “48h” followed                     by a 24-bit address (A23-A0) and
+eight “dummy” clocks into the DI pin. The code and address bits are latched on the rising edge of the CLK
+pin. After the address is received, the data byte of the addressed memory location will be shifted out on
+the  DO  pin     at  the  falling  edge  of  CLK  with  most  significant  bit  (MSB)  first.  The  byte  address  is
+automatically incremented to the next byte address after each byte of data is shifted out. Once the byte
+address reaches the last byte of the register (byte address FFh), it will reset to address 00h, the first byte
+of the register, and continue to increment. The instruction is completed by driving /CS high. The Read
+Security Register instruction sequence is shown in Figure 47. If a Read Security Register instruction is
+issued while an Erase, Program or Write cycle is in process (BUSY=1) the instruction is ignored and will
+not have any effects on the current cycle. The Read Security Register instruction allows clock rates from
+D.C. to a maximum of FR (see AC Electrical Characteristics).
+
+
+
+                    ADDRESS                        A23-16               A15-12               A11-8               A7-0
+              Security Register #1                   00h                0 0 0 1             0 0 0 0         Byte Address
+              Security Register #2                   00h                0 0 1 0             0 0 0 0         Byte Address
+              Security Register #3                   00h                0 0 1 1             0 0 0 0         Byte Address
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                           Figure 47. Read Security Registers Instruction
+
+
+
+
+
+                                                                            Publication Release Date: December 24, 2024
+                                                               - 54 -                                                Revision M

@@ -1,0 +1,61 @@
+Functional overview                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    STM32N6x5xx STM32N6x7xx
+
+3.17.2                                                                        XSPI I/O manager (XSPIM)
+
+                                The XSPI I/O manager is  a low level interface, enabling ef ficient XSPI pin assignment with a
+                                full I/O matrix (before alternate  function map), and multiplex of single/dual/quad/octal/16-bit
+                                SPI interfaces over the same bus.
+                                Main features:
+                                •                                                                   Supports up to two single/dual/quad/octal/16-bit SPI interfaces
+                                •                                                                   Supports up to two ports for pin assignment
+                                •                                                                   Supports high-speed interfaces
+                                •                                                                   Manages up to three XSPIs
+
+                                                                                                           Figure 5. XSPIM block diagram
+
+                                                                                                                              XSPI I/O manager
+
+
+                                                                          AHB                                   AHB interface                             Control register                                   High
+                                                                                                                                                                                                            speed
+                                                                                                                                                                                                          interface
+                                                                                                                                                 Static
+                                                                                                                                              muxing                                                                             XSPIM_P1_CLK
+                                                                       bus signals                                                                                                                                               XSPIM_P1_NCLK
+                                                XSPI1                      ACK1                                                                                                                               PHY                XSPIM_P1_DQS0,1
+                                                                                                                                                                                                                                 XSPIM_P1_NCS1,2
+                                                                                                                                                                                                                                 XSPIM_P1_IO[15:0]
+                                                                          REQ1                                                                                        I/O  matrix
+                                                                                                         Arbiter              Dynamic
+                                                                                                                                muxing                                                                                           XSPIM_P2_CLK
+                                                                           REQ2                                                                                                                                                  XSPIM_P2_NCLK
+                                                                                                                                                                                                              PHY                XSPIM_P2_DQS0
+                                                XSPI2                      ACK2                                                                                                                                                  XSPIM_P2_NCS1,2
+
+                                                                                                                                                                                                                                 XSPIM_P2_IO[7:0]
+                                                                      bus signals
+
+
+                                                                           REQ3
+                                                XSPI3                      ACK3
+
+
+                                                                      bus signals
+                                                                                                                                                                                                                                                   MS55949V2
+
+3.18 Secure digital input/output MultiMediaCard interface
+                                (SDMMC)
+
+                                The SD/SDIO, embedded MultiMediaCard (eMM  C™) host interface (SDMMC) provides an
+                                interface between the AHB bus and SD memo   ry cards, SDIO cards and eMMC devices.
+                                The MultiMediaCard system specifications are available through the MultiMediaCard
+                                Association website at www.jedec.org, published by the MMCA technical committee. The
+                                SD memory card and SD I/O card system s  pecifications are ava ilable through the SD
+                                Association website at www.sdcard.org.
+
+
+
+
+
+
+44/263                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          DS14791 Rev 10

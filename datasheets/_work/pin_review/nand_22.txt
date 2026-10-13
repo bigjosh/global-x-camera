@@ -1,0 +1,66 @@
+6-3.   Cache Read Sequential
+
+The cache read sequential operation is for throughput enhancement by using the internal cache buffer. It
+allows the consecutive pages to be read-out without giving next page address, which reduces the latency
+time from tR to tRCBSY between pages or blocks. While the data is read out on one page, the data of next
+page can be read into the cache buffer.
+After writing the 00h command, the column and row address should be given for the start page selection,
+and followed by the 30h command for address confirmation. After that, the CACHE READ operation starts
+after a latency time tR and following a 31h command with the latency time of tRCBSY, the data can be read-
+out sequentially from 1st column address (A[11:0]=00h) without giving next page address input. The 31h
+command is necessary to confirm the next cache read sequential operation and followed by a tRCBSY
+latency time before next page data is necessary.  The CACHE READ SEQUENTIAL command is also valid
+for the consecutive page cross block.
+The random data out (05h-E0h) command set is available to change the column address of the current page
+data in the cache register.
+The user can check the chip status by the following method:
+- R/B# pin ("0" means the data is not ready, "1" means the user can read the data)
+- Status Register (SR[6] functions the same as R/B# pin, SR[5] indicates the internal chip operation, "0"
+means the chip is in internal operation and "1" means the chip is idle.) Status Register can be checked
+after the Read Status command (70h) is issued. Command 00h should be given to return to the cache read
+sequential operation.
+To confirm the last page to be read-out during the cache read sequential operation, a 3Fh command is
+needed to replace the 31h command prior to the last data-out.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                22

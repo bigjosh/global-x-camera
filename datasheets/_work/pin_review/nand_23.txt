@@ -1,0 +1,94 @@
+Figure 11-1. AC Waveforms for Cache Read Sequential
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                        tCLR                                                                                                     A
+                   CLE
+
+
+
+                  CE#
+
+
+
+                 WE#
+
+
+
+                                                                                                                                                                                                                                                                                                                                                          tAR
+
+                   ALE
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                tRC
+                    RE#                                                                                                                                                                                                                                                                                                                              tRR
+
+                                                                                                                                                                                                                                                                              tR                                           tRCBSY
+                                                                                                                                                                                                                                                       tWB                                                               tWB
+
+
+                                                                                                1st Address                 2nd Address                  3rd Address                  4th Address                 5th Address                          30h                                                                                                                     Page 1                         Page 1                                                        Page 1
+          IO[7:0]                                                   00h                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   31hCycleCycleCycleCycleCycleDout 0Dout 1Dout 2111
+
+
+
+
+                R/B#
+                                                                                                                                                                                                                                                                                 Busy                                                        Busy
+
+                                                                A                                                                                 tCLR                                                                                                                                                                                      tCLR
+              CLE
+
+
+
+              CE#
+
+
+
+            WE#
+
+
+
+                                                                                                                                                   tAR                                                                                                                                                                                        tAR
+              ALE
+
+
+
+
+                                                                                                                                                                          tRC                                                                                                                                                                                       tRC
+               RE#                                                                                                                             tRR                                                                                                                                                                                     tRR
+
+                                                                                                                       tRCBSY                                                                                                                                                                                     tRCBSY
+                                                                                                                  tWB                                                                                                                                                                                        tWB
+     IO[7:0]                                                              Page 1                             31h                                                        Page 2                         Page 2                                                        Page 2                            3Fh                                                        Page 3                         Page 3                                                        Page 3
+                                                                        Dout 2111                                                                                       Dout 0                         Dout 1                                                     Dout 2111                                                                                        Dout 0                         Dout 1                                                     Dout 2111
+
+
+
+
+            R/B#
+                                                                                                                                       Busy                                                                                                                                                                                      Busy
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                                                            23

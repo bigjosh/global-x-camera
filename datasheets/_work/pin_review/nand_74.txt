@@ -1,0 +1,63 @@
+9-2.               Bad Block Test Flow
+
+Although the initial bad blocks are marked by the flash vendor, they could be inadvertently erased and
+destroyed by a user that does not pay attention to them. To prevent this from occurring, it is necessary to
+always know where any bad blocks are located. Continually checking for bad block markers during normal
+use would be very time consuming, so it is highly recommended to initially locate all bad blocks and build a
+bad block table and reference it during normal NAND flash use. This will prevent having the initial bad block
+markers erased by an unexpected program or erase operation. Failure to keep track of bad blocks can be
+fatal for the application.  For example, if boot code is programmed into a bad block, a boot up failure may
+occur. The following section shows the recommended flow for creating a bad block table.
+
+Figure 47. Bad Block Test Flow
+
+
+
+                                                                                                                                                            Start
+
+
+
+
+                                                                                                                                                  Block No. = 0
+
+
+
+                                                                                                Yes                                                     Read 00h(Note1)
+
+                                                                                                                                                            Check
+
+                                                    Create (or Update)                                                                                              No                                       Block No. = Block No. + 1
+                                                    Bad Block Table
+
+
+
+
+
+
+                                                                                                                                                                                     (Note2)                                No
+                                                                                                                                             Block No. = 2047
+
+                                                                                                                                                                     Yes
+
+
+                                                                                                                                                            End
+
+
+                       Note 1:  Read 00h check is at the 1st byte of the 1st and 2nd pages of the block spare area.
+                       Note 2: The block No. = 2047 for 2Gb, 4095 for 4Gb.
+
+9-3.               Failure Phenomena for Read/Program/Erase Operations
+
+The device may fail during a Read, Program or Erase operation. The following possible failure modes should
+be considered when implementing a highly reliable system:
+
+Table 19. Failure Modes
+                                     Failure Mode                                                                                                                                                                                                                                                  Detection and Countermeasure                                                                                                                                                    Sequence
+      Erase Failure                                                                                                                                                                                                                                                                                                                                                                                                                                        Status Read after Erase                                                                                                                                                                                                                                                                                                                                 Block Replacement
+      Programming Failure                                                                                                                                                                                                                                                                                       Status Read after Program                                                                                                                                                                                                                                                                                     Block Replacement
+      Read Failure                                                                                                                                                                                                                                                                                                                                                                                                                                                  Read Failure                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ECC
+
+
+
+
+                                                                                                                                                          74

@@ -1,0 +1,53 @@
+     Functional overview                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    STM32N6x5xx STM32N6x7xx
+
+
+                                               •                                                                   Up to 32 dedicated transmit buffers
+                                               •                                                                   Configurable transmit FIFO / queue
+                                               •                                                                   Configurable transmit event FIFO
+                                               •                                                                   FDCAN modules share th e same message RAM
+                                               •                                                                   Programmable loop-back test mode
+                                               •                                                                   Maskable module interrupts
+                                               •                                                                   Two clock domains: APB bus interf ace and CAN core kernel clock
+                                               •                                                                   Power-down support
+
+     3.51                                                                                            USB on-the-go high speed (OTG)
+
+                                               Reference is made to the following documents:
+                                               •                                                                   USB On-The-Go Supplement, Revision 2.0
+                                               •                                                                  Universal Serial Bus Revision 2.0 Specification
+                                               •                                                                   USB 2.0 Link Power Management Addendum Engineering Change Notice to the USB
+                                                               2.0 specification, July 16, 2007
+                                               •                                                                   Errata for USB 2.0 ECN: Link Power Management (LPM) - 7/2007
+                                               •                                                                   Battery Charging Specif ication, Revision 1.2
+                                               The USB OTG is a dual-role device (DRD) cont   roller that supports both device and host
+                                               functions and is fully compliant with th e On-The-Go Supplement to the USB 2.0
+                                               Specification. It can also be configured as a   host-only or device-only controller, fully
+                                               compliant with the USB 2.0 Specification.   OTG supports the speeds defined in   Table 16.
+
+                                                                                                                                          Table 16. Supported OTG speeds
+                                                                            Mode                                                                                                                                                                                                           HS (480 Mbit/s)                                                                                                                                             FS (12 Mbit/s)                                                                                                                                                   LS (1.5 Mbit/s)
+
+ode                         XXXHost m
+                                                 Device mode                                                                                                                                                                                                                                                                                                                                                   X                                                                                                                                                                                                                                                                                                                                                          X                                                                                                                                                                                                                                                                                                                                                                -
+
+     3.52                                                                                            USB HS PHY controller (USBPHYC)
+
+                                               There are two near-identical instances,  namely USBPHYC1 (associ ated with OTG1), and
+                                               USBPHYC2 (associated with OTG2)   including one additional cont rol bit for hardware debug
+                                               (HDP).
+                                               For a more complete system view of the USB controllers and PHYs, refer to the block
+                                               diagram of the main OTG controller. This controller handles general and miscellaneous
+                                               control of the OTG PHYs.
+                                               The main features are:
+                                               •                                                                  PLL configuration
+                                               •                                                                   Trimming of the electrical parameters (if required)
+
+
+
+
+
+
+
+
+
+     78/263                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          DS14791 Rev 10

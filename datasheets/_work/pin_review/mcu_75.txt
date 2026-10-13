@@ -1,0 +1,52 @@
+STM32N6x5xx                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            STM32N6x7xx
+
+
+                                                                                                                                               Table 14. SPI features (continued)
+                                                                                      Feature                                                                                                                                                                                                                                                            SPI1, SPI2, SPI3, SPI6                                                                                                                                                                                                                                             SPI4, SPI5
+
+                                               Autonomous in Stop modes with
+                                               wake-up capability                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  No
+                                               Autonomous in Standby mode                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   No
+
+3.47                                                                                            Serial audio interface (SAI)
+
+                                             The SAI offers a wide set of audio protocol  s due to its flexibility and wide range of
+                                             configurations. Many stereo or mono audio applications can be ta rgeted. I2S standards,
+                                             LSB or MSB-justified, PCM/DSP, TDM, and AC’97 protocols can be addressed. SPDIF
+                                             output is offered when the audio block is configured as a transmitter.
+                                             The SAI contains two independent audio sub-bl   ocks, each has its own clock generator and
+                                             I/O line controller.
+                                             The SAI works in controller or target configurat  ion. The audio sub-blocks act as receiver or
+                                             transmitter, and work synchronously or   not (with respect to the other one).
+                                             The SAI can be connected with ot  her SAIs, to work synchronously.
+                                             SAI main features are:
+                                             •                                                                   Two independent audio sub-blocks which can    be transmitters or receivers with their
+                                                              respective FIFO
+                                             •                                                                   8-word integrated FIFOs for each audio sub-block
+                                             •                                                                   Synchronous or asynchronous mode between the audio sub-blocks
+                                             •                                                                   Possible synchronization between multiple SAIs
+                                             •                                                                   Target or controller configuration independent for both audio sub-blocks
+                                             •                                                                   Clock generator for each audio block to target independent audio frequency sampling
+                                                              when both audio sub-blocks are configured in controller mode
+                                             •                                                                   Data size configurable: 8-, 10-, 16-, 20-, 24-, 32-bit
+                                             •                                                                   Audio protocol: I2S, LSB or MSB-justified, PCM/DSP, TDM, AC’97
+                                             •                                                                   PDM interface, supporting three microphone pairs
+                                             •                                                                   SPDIF output available if required
+                                             •                                                                   Up to 16 slots available with configurable size
+                                             •                                                                  Number of bits by frame can be configurable
+                                             •                                                                  Frame synchronization active level co nfigurable (offset, bit length, level)
+                                             •                                                                   First active bit position in  the slot is configurable
+                                             •                                                                   LSB first or MSB first for data transfer
+                                             •                                                                  Mute mode
+                                             •                                                                   Stereo/Mono audio frame capability
+                                             •                                                                   Communication clock strobing edge configurable (SCK)
+                                             •                                                                   Error flags with associated interrupts if enabled respectively
+                                                              –                                                       Overrun and underrun detection
+                                                              –                                                        Anticipated frame synchronization   signal detection in target mode
+                                                              –                                                        Late frame synchronization signal detection in target mode
+
+
+
+                                                                                                                                                             DS14791 Rev 10                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          75/263
+
+                                                                                                                                                                                                                                                                                                                                                                                                   80

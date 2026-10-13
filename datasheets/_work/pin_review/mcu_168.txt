@@ -1,0 +1,56 @@
+Electrical characteristics                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      STM32N6x5xx STM32N6x7xx
+
+
+                                                                                                                       Table 61. EMS characteristics  (1)
+    Symbol                                                                                                                                                                                                                                                               Parameter                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      Conditions                                                                                                                                                                                                                                                                          Level/Class
+
+       VFESD                                            Voltage limits to apply on any I/O pin to induce a functional disturbance                                                                                                                                                                              VDD = 3.3 V, TA = +25°C,  2B
+                                                                                                                                                                          f PLL1 = 1200 MHz, fck_icn_hs_mcu = 600 MHz,
+                                    Fast transient voltage burst limits to apply                                                                                          VFBGA264 package,
+         VFTB                       through 100 pF on VDD and VSS pins to                                                                                                 conforming to IEC 61000-4-2                                                                                                                                    5A
+                                    induce a functional disturbance
+
+1.                          Evaluated by characterization, not tested in production, unless otherwise specified.
+
+                                           Designing hardened software to avoid noise problems
+                                           EMC characterization and optimization are per   formed at component level with a typical
+                                           application environment and simplified MCU software.
+                                           Good EMC performance is highly dependent on    the user application, and the software in
+                                           particular. Therefore, it is recommended that the user applies EMC software optimization
+                                           and prequalification tests in rela tion with the requested EMC level.
+                                           Software recommendations
+                                           The software flow must include the management of runaway conditions, such as:
+                                           •                                                                   Corrupted program counter
+                                           •                                                                   Unexpected reset
+                                           •                                                                  Critical data corruption (control registers)
+                                           Prequalification trials
+                                           Most of the common failures (unexpected reset and program counter corruption) can be
+                                           reproduced by manually forcing a low state on the NRST pin or  on the oscillator pins for
+                                           1 second.
+                                           To complete these trials, ESD stress can be applie  d directly on the device, over the range of
+                                           specified values. When an unexpected behavior    is detected, the software can be hardened
+                                           to prevent the occurrence of unrecoverable errors. See AN1015 “    Software techniques for
+                                           improving microcontrollers EMC performance  ” for more details.
+
+                                           Electromagnetic interference (EMI)
+                                           The electromagnetic field emitted by the device   is monitored while a simple application is
+                                           executed (toggling two LEDs through the I/O ports). This emission test is compliant with the
+                                           IEC 61967-2 standard, which specifies   the test board and the pin loading.
+
+                                                                       Table 62. EMI characteristics for f HSE = 32 MHz and f HCLK = 100 MHz (1)
+
+                                               Symbol                                     Parameter                                                                                                                                                     Conditions                                                                                                                                                   Monitored frequency band                                Value                                          Unit
+
+                                                                                                                                                                                                                     0.1 MHz to 30 MHz                                                                                                                                                                                                            9
+                                                                                         Peak                            VDD = 3.6 V, TA = 25°C,                                                                     30 MHz to 130 MHz                                                                                                                                                                                      13
+                                                                                       level(2)                          VFBGA264 package,                                                                                                                                                                                                     dBµV
+                                                     SEMI                                                                SMPS on,                                                                                    130 MHz to 1 GHz                                                                                                                                                                                                         13
+                                                                                                                         fck_icn_hs_mcu = 800 MHz,                                                                   1 GHz to 2 GHz                                                                                                                                                                                                                                                             7
+                                                                                                                         compliant with IEC 61967-2
+                                                                                      Level(3)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  EMI level                                                                                                                                                                                                                                                                                                                                                      3                                                                                                     -
+
+                                           1.                          Evaluated by characterization, not tested in production.
+
+
+
+168/263                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        DS14791 Rev 10

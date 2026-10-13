@@ -1,0 +1,53 @@
+STM32N6x5xx                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            STM32N6x7xx
+
+3.32                                                                                            True random number generator (RNG)
+
+                             The RNG is a true random number generator that provides full entropy outputs to the
+                             application as 32-bit samples.  It is composed of a live entropy source (analog) and an
+                             internal conditioning component.
+                             The RNG is a NIST SP 800-90B compliant entropy    source that can be used to construct a
+                             nondeterministic random  bit generator (NDRBG).
+                             The RNG true random number generator has been precertified NIST SP800-90B. It has
+                             also been tested using the German BSI   statistical tests of AIS-31 (T0 to T8).
+                             RNG main features:
+                             •                                                                   Delivers 32-bit true random numbers, produced by an analog entropy source
+                                        conditioned by a NIST SP800-90B approved conditioning stage.
+                             •                                                                   Entropy source to construct a nondeter  ministic random bit generator (NDRBG).
+                             •                                                                   Embeds startup and NIST SP800-90B appr  oved continuous health tests (repetition
+                                        count and adaptive proportion tests), a   ssociated with specific error management
+                             •                                                                   Can be disabled to reduce power consum   ption, or enabled with an automatic
+                                        low-power mode (default configuration).
+                             •                                                                   AMBA® AHB target peripheral, accessible through 32-bit word single accesses only
+                                        (else an AHB bus error is generated, and the write accesses are ignored).
+
+3.33                                                                                            Secure AES coprocessor (SAES)
+
+                             The SAES (available only on STM32N655xx   and STM32N657xx devic es) encrypts or
+                             decrypts data in compliance with the advanced  encryption standard ( AES) defined by NIST.
+                             It incorporates a protection against side-chann  el attacks (SCA), including differential power
+                             analysis (DPA), certified SESIP and PSA securi ty assurance level 3.
+                             SAES supports ECB, CBC, CTR, GCM, GMAC, an  d CCM chaining modes for key sizes of
+                             128 or 256 bits, and special modes such as hardware secret key encryption/decryption
+                             (Wrapped-key mode) and key sharing with faster CRYP peripheral (Shared-key mode).
+                             SAES has the possibility to load  STM32 hardware secret  controller keys (boot hardware key
+                             BHK and derived hardware unique key DHUK), usable but not readable by application.
+                             The peripheral supports DMA single transfer   s for incoming and outgoing data (two DMA
+                             channels are required). It is hardware-linked with the true random number generator
+                             (TRNG) and with the CRYP peripheral.
+                             SAES main features:
+                             •                                                                   Compliant with NIST FIPS publication 1 97 “Advanced encryptio n standard (AES)”
+                                        (November 2001)
+                             •                                                                   Encryption and decr yption with multiple chaining modes:
+                                        –                                                        Electronic codebook (ECB) mode
+                                        –                                                        Cipher block chaining (CBC) mode
+                                        –                                                        Counter (CTR) mode
+                                        –                                                       Galois counter mode (GCM)
+                                        –                                                        Galois message authentication code (GMAC) mode
+                                        –                                                        Counter with CBC-MAC (CCM) mode
+
+
+
+
+                                                                                                     DS14791 Rev 10                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          55/263
+
+                                                                                                                                                                                                                                                          80

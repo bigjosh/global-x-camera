@@ -1,0 +1,71 @@
+Figure 13. AC Waveforms for Random Data In (For Page Program)
+
+                                                                                                                                                                                                                                              A
+                       CLE
+
+
+
+                      CE#
+
+
+
+                                                                                         tWC                                                                               tADL
+
+                     WE#
+
+
+
+                       ALE
+
+
+
+                       RE#
+
+
+
+                 IO[7:0]                                    80h                                                             1st Address2nd Address3rd Address4th Address5th Address  Din A                                                                                                                                                             Din A+N
+                                                                               Cycle               Cycle              Cycle               Cycle               Cycle
+
+
+
+
+                     R/B#
+
+                                        A
+                      CLE
+
+
+
+                      CE#
+
+
+
+                                                                                       tWC                     tADL
+
+                     WE#
+                                                                                                                                                                                                       tWB
+
+
+                      ALE
+
+
+
+                       RE#
+
+
+
+                IO[7:0]                                    85h            1st Address         2nd Address                  Din B                               Din B+M                      10h                                                      70h                                                                                                                                                                                Status
+                                                                               Cycle               Cycle
+
+
+                                                                                                                                                                                                                             tPROG
+
+                    R/B#
+                                                                                                        Repeat if needed
+
+                                                                                                                                                                                                                                                                                          IO0 = 0; Pass
+                                                                                                                                                                                                                                                                                          IO0 = 1; Fail
+            Note:                   Random Data In is also supported in cache program.
+
+
+                                                                                                                                                       27

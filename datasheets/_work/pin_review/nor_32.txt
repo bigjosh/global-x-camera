@@ -1,0 +1,72 @@
+                                                                                                   W25Q128JV
+
+
+8.2.9    Fast Read Quad Output (6Bh)
+The Fast Read Quad Output (6Bh) instruction is similar to the Fast Read Dual Output (3Bh) instruction
+except that data is output on four pins, IO0, IO1, IO2, and IO3.                  The Quad Enable (QE) bit in Status
+Register-2 must be set to 1 before the device will accept the Fast Read Quad Output Instruction. The Fast
+Read Quad Output Instruction allows data to be transferred at four times the rate of standard SPI devices.
+
+The Fast Read Quad Output instruction can operate at the highest possible frequency of FR                              (see AC
+Electrical Characteristics). This is accomplished by adding eight “dummy” clocks after the 24-bit address
+as shown in Figure 20. The dummy clocks allow the device's internal circuits additional time for setting up
+the initial address. The input data during the dummy clocks is “don’t care”. However, the IO pins should be
+high-impedance prior to the falling edge of the first data out clock.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                          Figure 20. Fast Read Quad Output Instruction
+
+
+
+
+
+
+
+
+
+
+                                                             - 31 -

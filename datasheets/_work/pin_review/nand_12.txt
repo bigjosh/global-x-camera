@@ -1,0 +1,57 @@
+PIN FUNCTIONS
+The MX30LFxG18AC device is a sequential                              COMMAND LATCH ENABLE: CLE
+access memory that utilizes multiplexing input of                    The CLE controls the command input. When the
+Command/Address/Data.                                                CLE goes high, the command data is latched at the
+                                                                     rising edge of the WE#.
+
+I/O PORT: IO7 - IO0
+The IO7 to IO0 pins are for address/command                          ADDRESS LATCH ENABLE: ALE
+input and data output to/from the device.                            The ALE controls the address input.  When the ALE
+                                                                     goes high, the address is latched at the rising edge
+CHIP ENABLE: CE#                                                     of WE#.
+
+The device goes into low-power Standby Mode
+when CE# goes high during a read operation and                       WRITE PROTECT: WP#
+not at busy stage.                                                   The WP# signal keeps low and then the memory will
+The CE# goes low to enable the device to be                          not accept the program/erase operation. It is recom-
+ready for standard operation.  When the CE# goes                     mended to keep WP# pin low during power on/off
+high, the device is deselected. However, when the                    sequence. Please refer to the waveform of "Power
+device is at busy stage, the device will not go to                   On/Off Sequence".
+standby mode when CE# pin goes high.
+
+                                                                     READY/Busy: R/B#
+READ ENABLE: RE#                                                     The R/B# is an open-drain output pin. The R/B#
+The RE# (Read Enable) allows the data to be                          outputs the ready/busy status of read/program/
+output by a tREA time after the falling edge of                      erase operation of the device. When the R/B# is at
+RE#. The internal address counter is automatically                   low, the device is busy for read or program or erase
+increased by one at the falling edge of RE#.                         operation.  When the R/B# is at high, the read/
+                                                                     program/erase operation is finished.
+WRITE ENABLE: WE#                                                    Please refer to Section 8-1 for details.
+
+When the WE# goes low, the address/data/
+command are latched at the rising edge of WE#.                       PT: Protection
+                                                                     When the PT pin is high at power on, the whole
+                                                                     chip is protected even the WP# is at high; the un-
+                                                                     protection procedure (through BP bits setting) is
+                                                                     necessary before any program/erase operation.
+                                                                     When the PT pin is connected to low or floating, the
+                                                                     function of block protection is disabled.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                              12

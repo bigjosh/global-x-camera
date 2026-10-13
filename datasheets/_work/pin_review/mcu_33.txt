@@ -1,0 +1,57 @@
+STM32N6x5xx                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            STM32N6x7xx
+
+
+                              fabric. The specific instantiation can va ry from a low-end version for low-cost
+                              microcontrollers designed with two convolution accelerators (CA).
+                              The NPU subsystem connects to the host  system and the shared system memory.
+                              The host configures the NPU subsystem through an AHB/AXI lite target port, connected to
+                              one of the ports of the system bus matrix/inter  connect. The two controller ports of NPU are
+                              64-bit wide controller AXI-4 interfaces that c onnect to the system bus matrix/Interconnect.
+                              The system memory is shared between th   e host subsystem and the NPU subsystem.
+                              The used memory is configurable by software, it depends upon the complexity and target
+                              performance of the selected neural network workload.
+
+3.6 Boot modes
+
+                              The BootROM is the first code executed af  ter any system reset. The boot mode is
+                              determined by BOOT0 and BOOT1 pins, one OTP word (flash source selection), and one
+                              TAMP backup register.
+                              •                                                                   BOOT0 is a dedicated pin latched upon reset release
+                              •                                                                   BOOT1 is a non-dedicated boot pin. The BOOT1 value comes from BOOT1 pin
+                                          (default pin), or any other pin defined by system
+                              Depending the configuration of these signals, there are two boot modes, namely serial boot,
+                              and external flash boot.
+
+3.6.1                                                                                                  External flash boot
+
+                              The firmware is loaded from an external fl  ash memory. The BootROM code supports
+                              following types of boot memory devices:
+                              •                                                                   XSPI serial NOR (in SPI mode, single)
+                              •                                                                   XSPI HyperFlash™ (8-bit)
+                              •                                                                   e.MMC™ SDMMC1 or e.MMC™ SDMMC2 (up to JEDEC v5.1)
+                              •                                                                   SD-Card SDMMC1 (up to SD standard v6.0)
+
+3.6.2 Serial boot
+
+                              The image is loaded from a serial interface. The BootROM code supports following types of
+                              serial boot interfaces:
+                              •                                                                   USB boot: USB 2.0 OTG HS
+                              •                                                                   UART boot
+
+3.6.3 Development boot
+
+                              If BOOT1 is selected, the BootROM code finishes    in an endless loop after having reopened
+                              debug in a secure way.
+                              This boot mode is available only when the device is in development.
+
+                              Secure installation
+
+                              The ROM code is the root-of-trust   of secure firmware installation.
+
+
+
+
+
+                                                                                                          DS14791 Rev 10                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          33/263
+
+                                                                                                                                                                                                                                                                      80

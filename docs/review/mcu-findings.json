@@ -1,0 +1,850 @@
+{
+  "scope": "STM32N657X0H3Q MCU physical pin/AF/bank, boot, sequencing, clocks, reset and hardware-critical firmware review; no schematic edits",
+  "source_hashes": {
+    "hardware/reconstruction/schematic-connectivity.json": "51e7cc050d23652d4eaf891e7384f519d6f3fd94c0c72f2dd945cbf626a62e98",
+    "imports/flux/2026-09-05/bigjosh-global-x-camera.flx": "6da7be0451f25cee64d67e8072e4fb0b201687bf9c56cfb6292dd439a3d16aac"
+  },
+  "findings": [
+    {
+      "id": "MCU-001",
+      "severity": "blocker",
+      "confidence": "confirmed",
+      "title": "Boot NOR chip select is on the wrong ROM pin",
+      "references": [
+        "U1.P14",
+        "U1.R17",
+        "U5",
+        "R13"
+      ],
+      "observed": "BOOT_XSPI_NCS connects U1 P14/PN12 to NOR /CS. PN12 AF9 is XSPIM_P2_NCS2. U1 R17/PN1 is unused. Other boot pins are PN6 CLK and PN2/PN3 IO0/IO1.",
+      "consequence": "STM32N6 ROM uses a fixed PN1 AF9 chip select for serial NOR; the selected flash is not addressed by the ROM. Firmware in that flash cannot repair the pin selection before it has booted.",
+      "recommended_fix": "Move BOOT_XSPI_NCS and its pull-up to U1 R17/PN1, AF9 XSPIM_P2_NCS1. Keep PN6/PN2/PN3; PN4/PN5 may serve quad data after the FSBL. Recheck pin-map and cold boot with a minimal signed/headered FSBL.",
+      "evidence": [
+        {
+          "type": "manufacturer_pdf",
+          "path": "datasheets/processor/STM32N6_UM3234_boot_ROM.pdf",
+          "pdf_pages": [
+            13,
+            14,
+            28
+          ],
+          "url": "https://www.st.com/resource/en/user_manual/um3234-how-to-proceed-with-boot-rom-on-stm32n6-mcus-stmicroelectronics.pdf",
+          "sha256": "88688e713d3222d47a6bfbf0d9e5f4b41d980b074c34b2e98f334f62fd2af08d",
+          "detail": "Sections 3.4.5-3.4.6, Table 27: fixed legacy SPI boot on PN6/PN1/PN2/PN3."
+        },
+        {
+          "type": "manufacturer_pdf",
+          "path": "datasheets/processor/STM32N657X0_DS14791_datasheet.pdf",
+          "pdf_pages": [
+            87,
+            106,
+            132
+          ],
+          "url": "https://www.st.com/resource/en/datasheet/stm32n657x0.pdf",
+          "sha256": "293fd40113f5b5ba6c1b33fd32481d5045b6cf13b7c4d9905ee046fc41072023",
+          "detail": "VFBGA264 ball map and Table 20: PN1=NCS1; PN12=NCS2 at AF9."
+        }
+      ]
+    },
+    {
+      "id": "MCU-002",
+      "severity": "blocker",
+      "confidence": "confirmed",
+      "title": "Main and auxiliary MCU supplies cannot perform the mandatory sequence",
+      "references": [
+        "U1",
+        "U2",
+        "U7",
+        "U4"
+      ],
+      "observed": "The single 1V8 net joins F6/VDDA18AON to VDDSMPS, VDDA18PMU, VDDA18ADC, VDDA18CSI, VDDA18USB and other domains. U7 EN is tied directly to 3V3. USB-derived 3V3_USB is generated independently from VBUS. PWR_ON only drives the battery latch.",
+      "consequence": "AN5967 requires main VDD and VDDA18AON first, then auxiliary domains after PWR_ON rises. On shutdown auxiliary rails must discharge below 0.6 V while main supplies remain in their operating ranges. Tying AON to the auxiliary 1.8 V consumers prevents that independent sequence. USB-derived auxiliary power can also precede the main group. A successful bench startup would not establish compliance across corners.",
+      "recommended_fix": "Separate the main 1.8 V AON domain from auxiliary domains and implement PWR_ON-controlled auxiliary enables with defined discharge and ordering on both battery and USB. Observe permitted exceptions for IO supplies tied to VDD and PLL tied to AON. Capture every rail and PWR_ON during cold start, shutdown, hot plug, brownout and rapid retry before release. Coordinate the latch fixes in power-review.md.",
+      "evidence": [
+        {
+          "type": "manufacturer_pdf",
+          "path": "datasheets/processor/STM32N6_AN5967_hardware_design.pdf",
+          "pdf_pages": [
+            8,
+            9,
+            10
+          ],
+          "url": "https://www.st.com/resource/en/application_note/an5967-getting-started-with-hardware-development-for-stm32n6-mcus-stmicroelectronics.pdf",
+          "sha256": "e42e6d530e17d112dff8611c9071b94417205988bba2a9e8eb129369b910aa48",
+          "detail": "Section 3.5 and Figures2/3: mandatory main/AUX startup and shutdown sequence; AUX below 0.6 V before main shutdown."
+        },
+        {
+          "type": "manufacturer_pdf",
+          "path": "datasheets/processor/STM32N6_RM0486_reference_manual.pdf",
+          "pdf_pages": [
+            353,
+            356,
+            357,
+            385,
+            386
+          ],
+          "url": "https://www.st.com/resource/en/reference_manual/rm0486-stm32n647657xx-armbased-32bit-mcus-stmicroelectronics.pdf",
+          "sha256": "83cb7e9c7f784a4c5dbbedec428adf58d2cbac8cd802d11e2cdc4d504cceaa86",
+          "detail": "Power-on control and PWR_CR1 POPL/MODE_PDN/SDEN behavior."
+        }
+      ]
+    },
+    {
+      "id": "MCU-003",
+      "severity": "high",
+      "confidence": "confirmed",
+      "title": "NAND ready/busy is routed to FMC_NWAIT instead of FMC_RNB",
+      "references": [
+        "U1.N4",
+        "U1.R12",
+        "U6"
+      ],
+      "observed": "NAND_RNB is on PF2/N4, whose AF12 is FMC_NWAIT. The actual dedicated FMC_RNB is available on unused PA7/R12 AF12 (also PE4/D10, but that pin uses the 1.8 V bank).",
+      "consequence": "The N6 NAND controller uses its dedicated RNB input for automatic busy waits, sequencer tWB handling and ready/busy interrupts. FMC_NWAIT is not the same input. Software GPIO/status polling can be a separately validated fallback, but the intended hardware wait/sequencer path is unavailable as wired.",
+      "recommended_fix": "Move NAND_RNB to PA7/R12 AF12 FMC_RNB on the 3.3 V VDD bank. Retain a suitable 3.3 V pull-up and configure NAND wait timing. Do not substitute PE4 without revisiting voltage compatibility.",
+      "evidence": [
+        {
+          "type": "manufacturer_pdf",
+          "path": "datasheets/processor/STM32N657X0_DS14791_datasheet.pdf",
+          "pdf_pages": [
+            91,
+            124,
+            128
+          ],
+          "url": "https://www.st.com/resource/en/datasheet/stm32n657x0.pdf",
+          "sha256": "293fd40113f5b5ba6c1b33fd32481d5045b6cf13b7c4d9905ee046fc41072023",
+          "detail": "PA7 supports FMC_RNB AF12; PF2 supports FMC_NWAIT AF12."
+        },
+        {
+          "type": "manufacturer_pdf",
+          "path": "datasheets/processor/STM32N6_RM0486_reference_manual.pdf",
+          "pdf_pages": [
+            1227,
+            1230,
+            1241
+          ],
+          "url": "https://www.st.com/resource/en/reference_manual/rm0486-stm32n647657xx-armbased-32bit-mcus-stmicroelectronics.pdf",
+          "sha256": "83cb7e9c7f784a4c5dbbedec428adf58d2cbac8cd802d11e2cdc4d504cceaa86",
+          "detail": "Table 185 and NAND control description distinguish RNB and its wait/interrupt uses."
+        }
+      ]
+    },
+    {
+      "id": "MCU-004",
+      "severity": "high",
+      "confidence": "confirmed",
+      "title": "RTC interrupt pull-up exceeds the receiving bank operating limit",
+      "references": [
+        "U1.E7",
+        "R24",
+        "U8.2"
+      ],
+      "observed": "RTC_INT_N at U1 E7/PH2 is pulled to 3V3 by R24. PH2 belongs to VDDIO4, which is supplied by1V8.",
+      "consequence": "DS14791 Table 24 recommends input voltage at most the receiving supply+0.3 V in the 1.8 V range (about 2.1 V here).3.3 V violates that operating limit. In default VRSEL=0 the TT absolute maximum is 3.6 V, so immediate damage is not proven; after selecting 1.8 V VRSEL=1 its absolute maximum is 1.98 V, making this also an overstress path.",
+      "recommended_fix": "Pull RTC_INT_N up to 1V8, using the RTC open-drain output, or relocate it to a 3.3 V bank. Verify backup-only isolation and the revised supply order. Do not enable IO4 high-speed 1.8 V mode while this 3.3 V pull-up remains.",
+      "evidence": [
+        {
+          "type": "manufacturer_pdf",
+          "path": "datasheets/processor/STM32N657X0_DS14791_datasheet.pdf",
+          "pdf_pages": [
+            105,
+            112,
+            138,
+            140
+          ],
+          "url": "https://www.st.com/resource/en/datasheet/stm32n657x0.pdf",
+          "sha256": "293fd40113f5b5ba6c1b33fd32481d5045b6cf13b7c4d9905ee046fc41072023",
+          "detail": "PH2 bank note 6; Table 21 TT absolute limits; Table 24 VIN operating limit."
+        },
+        {
+          "type": "manufacturer_pdf",
+          "path": "datasheets/processor/STM32N6_RM0486_reference_manual.pdf",
+          "pdf_pages": [
+            393
+          ],
+          "url": "https://www.st.com/resource/en/reference_manual/rm0486-stm32n647657xx-armbased-32bit-mcus-stmicroelectronics.pdf",
+          "sha256": "83cb7e9c7f784a4c5dbbedec428adf58d2cbac8cd802d11e2cdc4d504cceaa86",
+          "detail": "PWR_SVMCR1 VDDIO4VRSEL and supply-valid controls."
+        }
+      ]
+    },
+    {
+      "id": "MCU-005",
+      "severity": "high",
+      "confidence": "confirmed",
+      "title": "NRST capacitor is ten times the specified maximum",
+      "references": [
+        "C38",
+        "U1.G3",
+        "J2.5",
+        "SW3"
+      ],
+      "observed": "C38 is recorded as 100 nF in the native per-instance Capacitance field and connected from NRST to GND.",
+      "consequence": "DS14791 Table 71 specifies CEXT maximum 10 nF. The existing load is outside the reset-pin characterization and can compromise internally generated or external reset pulses.",
+      "recommended_fix": "Use C38 no greater than 10 nF, including its positive tolerance, and verify NRST low level and pulse timing with the selected debugger and switch. Apply the silicon-revision reset workaround where needed.",
+      "evidence": [
+        {
+          "type": "manufacturer_pdf",
+          "path": "datasheets/processor/STM32N657X0_DS14791_datasheet.pdf",
+          "pdf_pages": [
+            177
+          ],
+          "url": "https://www.st.com/resource/en/datasheet/stm32n657x0.pdf",
+          "sha256": "293fd40113f5b5ba6c1b33fd32481d5045b6cf13b7c4d9905ee046fc41072023",
+          "detail": "Section 5.3.18, Table 71 and Figure 25: CEXT maximum 10 nF; VIL maximum 0.65 V."
+        },
+        {
+          "type": "manufacturer_pdf",
+          "path": "datasheets/processor/STM32N6_ES0620_errata.pdf",
+          "pdf_pages": [
+            10
+          ],
+          "url": "https://www.st.com/resource/en/errata_sheet/es0620-stm32n6xxxx-device-errata-stmicroelectronics.pdf",
+          "sha256": "dcabef6a6f7554b8ae83b9718b3924d1f76003448de3ba94b5f0a195da70d3fd",
+          "detail": "Section2.2.18: incorrect NRST reset behavior on affected revisions."
+        }
+      ]
+    },
+    {
+      "id": "MCU-006",
+      "severity": "high",
+      "confidence": "measurement",
+      "title": "The 50 ms capture target needs a bounded cold-boot payload and measured startup budget",
+      "references": [
+        "U1",
+        "U5",
+        "Y1",
+        "CAM1"
+      ],
+      "observed": "The design physically cold-starts and loads firmware from serial NOR before capture; the spec targets image acquisition within 50 ms. ROM uses 32 MHz single-bit data transfer, not a quad data boot.",
+      "consequence": "The ideal ROM data ceiling is4MB/s:100 KiB already needs 25.6 ms and 200 KiB needs 51.2 ms, before command/software/authentication overhead, rail startup, clock settling or sensor initialization. Large FSBL payloads alone can consume the complete budget. This is a quantitative risk, not a claim that every possible small FSBL fails.",
+      "recommended_fix": "Create a small capture-first FSBL, keep noncritical code and NAND commit after acquisition, and measure shutter-to-rails, ROM completion, first MCLK, first I2C operation and first complete frame. Coordinate sensor-revision/patch bounds in the memory/sensor review. Define whether the deadline is exposure completion or frame arrival and reserve real margin; do not infer cold-boot latency from Standby wake figures.",
+      "evidence": [
+        {
+          "type": "manufacturer_pdf",
+          "path": "datasheets/processor/STM32N6_UM3234_boot_ROM.pdf",
+          "pdf_pages": [
+            13,
+            14,
+            26,
+            28
+          ],
+          "url": "https://www.st.com/resource/en/user_manual/um3234-how-to-proceed-with-boot-rom-on-stm32n6-mcus-stmicroelectronics.pdf",
+          "sha256": "88688e713d3222d47a6bfbf0d9e5f4b41d980b074c34b2e98f334f62fd2af08d",
+          "detail": "Table14 single-line0Bh read with prescaler2; Table26 XSPI kernel from 64 MHz per_ck; no DMA for ROM SPI transfer."
+        },
+        {
+          "type": "manufacturer_pdf",
+          "path": "datasheets/processor/STM32N657X0_DS14791_datasheet.pdf",
+          "pdf_pages": [
+            159,
+            161,
+            162
+          ],
+          "url": "https://www.st.com/resource/en/datasheet/stm32n657x0.pdf",
+          "sha256": "293fd40113f5b5ba6c1b33fd32481d5045b6cf13b7c4d9905ee046fc41072023",
+          "detail": "Low-power wake times are not cold boot; HSE crystal startup is 2 ms typical with no guaranteed maximum."
+        }
+      ]
+    },
+    {
+      "id": "MCU-007",
+      "severity": "medium",
+      "confidence": "conditional",
+      "title": "The 0.81 V core label must not be treated as an 800 MHz operating point",
+      "references": [
+        "U1",
+        "L3",
+        "VCORE_0V81"
+      ],
+      "observed": "The core/CSI rail is named VCORE_0V81 and the spec describes an 800 MHz MCU. The core rail is produced by the programmable internal SMPS, not a fixed external 0.81 V regulator.",
+      "consequence": "VOS low uses nominal 0.81 V and permits at most 600 MHz CPU;800 MHz requires VOS high, nominal 0.89 V. There is no supplied firmware proving which operating point will actually be used. A fixed 0.81 V/800 MHz configuration would be out of specification.",
+      "recommended_fix": "Choose the lowest operating point that meets capture timing; if using 800 MHz, program VOS high and wait for readiness before raising CPU frequency. Validate0.858-0.921 V at the core at high VOS and account for its increased transient load. Rename the rail to VDDCORE during an approved schematic revision if it will change voltage.",
+      "evidence": [
+        {
+          "type": "manufacturer_pdf",
+          "path": "datasheets/processor/STM32N657X0_DS14791_datasheet.pdf",
+          "pdf_pages": [
+            139,
+            140
+          ],
+          "url": "https://www.st.com/resource/en/datasheet/stm32n657x0.pdf",
+          "sha256": "293fd40113f5b5ba6c1b33fd32481d5045b6cf13b7c4d9905ee046fc41072023",
+          "detail": "Table 24: CPU600MHz low VOS/800 MHz high VOS; VDDCORE ranges0.782-0.842 V and0.858-0.921 V."
+        }
+      ]
+    },
+    {
+      "id": "MCU-008",
+      "severity": "high",
+      "confidence": "conditional",
+      "title": "Shutdown and bank setup need an N6-specific early firmware contract",
+      "references": [
+        "U1",
+        "PWR_HOLD",
+        "CAM_MCLK",
+        "I2C4_SCL",
+        "I2C4_SDA"
+      ],
+      "observed": "PWR_HOLD uses dedicated PWR_ON, while the camera/control interfaces use independent 1.8 V banks and the boot flash uses VDDIO3. Firmware is not yet in the repository.",
+      "consequence": "PWR_ON is a hardware-controlled VDD output, not a writable GPIO: it asserts after main POR and drops in Standby. Firmware that attempts to clear an ordinary GPIO will not release this latch. IO supply-valid controls, voltage-range settings and current errata also affect whether MCLK/control pins work and whether output duty cycles meet specification.",
+      "recommended_fix": "Implement shutdown by saving/isolating external devices then entering the appropriate Standby sequence; program a sufficient POPL minimum low interval and required discharge, retaining BSECEN. Validate VDDIO3/4/5 supplies before enabling them; select correct voltage modes and OTP HSLV settings only for the corresponding physical voltage. Apply ES0620 fixed I/O-compensation workaround and coupled supply-valid access requirements. Do not fuse OTP until the final supply plan is reconciled.",
+      "evidence": [
+        {
+          "type": "manufacturer_pdf",
+          "path": "datasheets/processor/STM32N657X0_DS14791_datasheet.pdf",
+          "pdf_pages": [
+            89,
+            112
+          ],
+          "url": "https://www.st.com/resource/en/datasheet/stm32n657x0.pdf",
+          "sha256": "293fd40113f5b5ba6c1b33fd32481d5045b6cf13b7c4d9905ee046fc41072023",
+          "detail": "PWR_ON powered by VDD; independent-bank voltage selection follows actual bank supplies."
+        },
+        {
+          "type": "manufacturer_pdf",
+          "path": "datasheets/processor/STM32N6_RM0486_reference_manual.pdf",
+          "pdf_pages": [
+            356,
+            357,
+            385,
+            386,
+            393,
+            394,
+            396
+          ],
+          "url": "https://www.st.com/resource/en/reference_manual/rm0486-stm32n647657xx-armbased-32bit-mcus-stmicroelectronics.pdf",
+          "sha256": "83cb7e9c7f784a4c5dbbedec428adf58d2cbac8cd802d11e2cdc4d504cceaa86",
+          "detail": "PWR_ON in Standby; POPL default no guaranteed low time; MODE_PDN defaults off; supply-valid and VRSEL controls."
+        },
+        {
+          "type": "manufacturer_pdf",
+          "path": "datasheets/processor/STM32N6_ES0620_errata.pdf",
+          "pdf_pages": [
+            7,
+            11
+          ],
+          "url": "https://www.st.com/resource/en/errata_sheet/es0620-stm32n6xxxx-device-errata-stmicroelectronics.pdf",
+          "sha256": "dcabef6a6f7554b8ae83b9718b3924d1f76003448de3ba94b5f0a195da70d3fd",
+          "detail": "Sections2.2.2,2.2.19,2.2.20: BSECEN requirement and fixed compensation0x287 workaround."
+        }
+      ]
+    },
+    {
+      "id": "MCU-009",
+      "severity": "medium",
+      "confidence": "measurement",
+      "title": "The 40 MHz crystal network needs startup and load qualification",
+      "references": [
+        "Y1",
+        "C36",
+        "C37",
+        "U1.A7",
+        "U1.B7"
+      ],
+      "observed": "Y1 is CX3225SA40000D0PTWCC,40 MHz,CL 8pF,ESR 50ohm maximum; C36/C37 are 8.2 pF each. ST allows16-48 MHz crystals.",
+      "consequence": "The first-order load estimate8.2/2+4=8.1 pF matches the requested 8 pF using ST's rough 4 pF stray estimate, so the capacitor values are not demonstrably wrong. Actual parasitics, crystal shunt capacitance, drive and startup margin remain unverified. HSERDY detects initial cycles and does not guarantee stable frequency.",
+      "recommended_fix": "Use C0G load capacitors and a short oscillator layout. Obtain the crystal shunt-capacitance/startup data, check critical-gm margin against the MCU 1.95 mA/V capability, and measure drive level, frequency and worst-case stable-start time across voltage/temperature. Budget that measured time before enabling USB/camera timing-critical paths.",
+      "evidence": [
+        {
+          "type": "manufacturer_pdf",
+          "path": "datasheets/processor/STM32N657X0_DS14791_datasheet.pdf",
+          "pdf_pages": [
+            161,
+            162
+          ],
+          "url": "https://www.st.com/resource/en/datasheet/stm32n657x0.pdf",
+          "sha256": "293fd40113f5b5ba6c1b33fd32481d5045b6cf13b7c4d9905ee046fc41072023",
+          "detail": "Table 49:16-48 MHz, maximum critical crystal gm 1.95 mA/V;4 pF rough combined parasitics;2 ms typical startup."
+        },
+        {
+          "type": "manufacturer_pdf",
+          "path": "datasheets/processor/STM32N6_AN5967_hardware_design.pdf",
+          "pdf_pages": [
+            21
+          ],
+          "url": "https://www.st.com/resource/en/application_note/an5967-getting-started-with-hardware-development-for-stm32n6-mcus-stmicroelectronics.pdf",
+          "sha256": "e42e6d530e17d112dff8611c9071b94417205988bba2a9e8eb129369b910aa48",
+          "detail": "Section7.2: crystal selection and C0G load capacitors with PCB/pin capacitance."
+        },
+        {
+          "type": "manufacturer_pdf",
+          "path": "datasheets/processor/STM32N6_ES0620_errata.pdf",
+          "pdf_pages": [
+            12
+          ],
+          "url": "https://www.st.com/resource/en/errata_sheet/es0620-stm32n6xxxx-device-errata-stmicroelectronics.pdf",
+          "sha256": "dcabef6a6f7554b8ae83b9718b3924d1f76003448de3ba94b5f0a195da70d3fd",
+          "detail": "Section2.2.24: HSERDY is not frequency-stability assurance."
+        },
+        {
+          "type": "manufacturer_pdf_historical_copy",
+          "path": "datasheets/sensors_timing/CX3225SA40000D0PTWCC_specification_TI_forum_copy.pdf",
+          "pdf_pages": [
+            3
+          ],
+          "url": "https://e2e.ti.com/cfs-file/__key/communityserver-discussions-components-files/1023/CX3225SA40000D0PTWCC_5F00_DS.pdf",
+          "sha256": "d12cc4465a45581516366389c52e877efabfa1bd9c24dd91077f9911afa370e0",
+          "detail": "Kyocera exact-MPN specification, historical TI-hosted copy:40 MHz, CL 8pF, ESR maximum 50ohm, drive maximum 200uW. Confirm current procurement specification."
+        }
+      ]
+    },
+    {
+      "id": "MCU-010",
+      "severity": "medium",
+      "confidence": "conditional",
+      "title": "Silicon revision and cold-reset recovery must be recorded before bring-up",
+      "references": [
+        "U1",
+        "J2",
+        "SW2",
+        "SW3"
+      ],
+      "observed": "The part number specifies STM32N657X0H3Q but no purchased silicon revision or ROM version is recorded. SWD pins are connected; BOOT0 and NRST pads exist, while PA6/BOOT1 only has a pull-down.",
+      "consequence": "ES0620 describes revision-dependent reset/boot fallbacks and all-revision clock/SMPS limitations. A stuck reset path or invalid flash state may require a real power cycle. REV_ID alone does not distinguish Z/B/X in this errata; assuming generic STM32 reset behavior would weaken recovery.",
+      "recommended_fix": "Record package revision marking and ROM version, apply applicable NRST and software-reset clock-mux workarounds, and avoid the internal-SMPS backup-domain reset limitation. Keep accessible SWD/NRST, BOOT0, a way to force PA6/BOOT1 development boot, and a true power-cycle path during prototype bring-up. Keep flash in a ROM-readable state before warm reset and verify production boot/recovery before locking debug or fusing boot options.",
+      "evidence": [
+        {
+          "type": "manufacturer_pdf",
+          "path": "datasheets/processor/STM32N6_ES0620_errata.pdf",
+          "pdf_pages": [
+            1,
+            2,
+            7,
+            9,
+            10,
+            12
+          ],
+          "url": "https://www.st.com/resource/en/errata_sheet/es0620-stm32n6xxxx-device-errata-stmicroelectronics.pdf",
+          "sha256": "dcabef6a6f7554b8ae83b9718b3924d1f76003448de3ba94b5f0a195da70d3fd",
+          "detail": "Revision matrix;2.2.1 APB prescaling;2.2.5 REV_ID;2.2.12/13 FSBL fallback;2.2.15 VSWRST/SMPS;2.2.18 NRST;2.2.22 reset clocks."
+        },
+        {
+          "type": "manufacturer_pdf",
+          "path": "datasheets/processor/STM32N6_UM3234_boot_ROM.pdf",
+          "pdf_pages": [
+            8,
+            9,
+            14,
+            20,
+            22
+          ],
+          "url": "https://www.st.com/resource/en/user_manual/um3234-how-to-proceed-with-boot-rom-on-stm32n6-mcus-stmicroelectronics.pdf",
+          "sha256": "88688e713d3222d47a6bfbf0d9e5f4b41d980b074c34b2e98f334f62fd2af08d",
+          "detail": "Boot1 priority/development flow, no special serial-NOR setup, ROM version and diagnostics."
+        },
+        {
+          "type": "manufacturer_pdf",
+          "path": "datasheets/processor/STM32N6_AN5967_hardware_design.pdf",
+          "pdf_pages": [
+            24,
+            25
+          ],
+          "url": "https://www.st.com/resource/en/application_note/an5967-getting-started-with-hardware-development-for-stm32n6-mcus-stmicroelectronics.pdf",
+          "sha256": "e42e6d530e17d112dff8611c9071b94417205988bba2a9e8eb129369b910aa48",
+          "detail": "Boot configuration and debug management."
+        }
+      ]
+    }
+  ],
+  "functional_gpio_matrix": [
+    {
+      "pin": "U10",
+      "signal": "PA0",
+      "net": "NAND_D7",
+      "function": "AF12 FMC_D7",
+      "bank_voltage": "VDD /3.3 V",
+      "ds_pdf_page": 124,
+      "validation": "Pass at nominal connected voltage; configure timing and supply state."
+    },
+    {
+      "pin": "P9",
+      "signal": "PA1",
+      "net": "NAND_D6",
+      "function": "AF12 FMC_D6",
+      "bank_voltage": "VDD /3.3 V",
+      "ds_pdf_page": 124,
+      "validation": "Pass at nominal connected voltage; configure timing and supply state."
+    },
+    {
+      "pin": "T8",
+      "signal": "PA2",
+      "net": "NAND_D5",
+      "function": "AF12 FMC_D5",
+      "bank_voltage": "VDD /3.3 V",
+      "ds_pdf_page": 124,
+      "validation": "Pass at nominal connected voltage; configure timing and supply state."
+    },
+    {
+      "pin": "R14",
+      "signal": "PA3",
+      "net": "NAND_ALE",
+      "function": "AF12 FMC_A17/ALE",
+      "bank_voltage": "VDD /3.3 V",
+      "ds_pdf_page": 124,
+      "validation": "Pass at nominal connected voltage; configure timing and supply state."
+    },
+    {
+      "pin": "U14",
+      "signal": "PA4",
+      "net": "NAND_NWP",
+      "function": "GPIO output (NAND /WP)",
+      "bank_voltage": "VDD /3.3 V",
+      "ds_pdf_page": 113,
+      "validation": "Pass; keep /WP asserted until NAND setup is complete."
+    },
+    {
+      "pin": "R8",
+      "signal": "PA5",
+      "net": "NAND_NOE",
+      "function": "AF12 FMC_NOE",
+      "bank_voltage": "VDD /3.3 V",
+      "ds_pdf_page": 124,
+      "validation": "Pass at nominal connected voltage; configure timing and supply state."
+    },
+    {
+      "pin": "P8",
+      "signal": "PA6",
+      "net": "BOOT1",
+      "function": "BOOT1 input sampled by ROM",
+      "bank_voltage": "VDD /3.3 V",
+      "ds_pdf_page": 91,
+      "validation": "Pass pull-down; add practical development-boot access."
+    },
+    {
+      "pin": "U8",
+      "signal": "PA8",
+      "net": "NAND_D4",
+      "function": "AF12 FMC_D4",
+      "bank_voltage": "VDD /3.3 V",
+      "ds_pdf_page": 124,
+      "validation": "Pass at nominal connected voltage; configure timing and supply state."
+    },
+    {
+      "pin": "P7",
+      "signal": "PA9",
+      "net": "NAND_D3",
+      "function": "AF12 FMC_D3",
+      "bank_voltage": "VDD /3.3 V",
+      "ds_pdf_page": 124,
+      "validation": "Pass at nominal connected voltage; configure timing and supply state."
+    },
+    {
+      "pin": "R7",
+      "signal": "PA10",
+      "net": "NAND_D2",
+      "function": "AF12 FMC_D2",
+      "bank_voltage": "VDD /3.3 V",
+      "ds_pdf_page": 124,
+      "validation": "Pass at nominal connected voltage; configure timing and supply state."
+    },
+    {
+      "pin": "T7",
+      "signal": "PA11",
+      "net": "NAND_D1",
+      "function": "AF12 FMC_D1",
+      "bank_voltage": "VDD /3.3 V",
+      "ds_pdf_page": 124,
+      "validation": "Pass at nominal connected voltage; configure timing and supply state."
+    },
+    {
+      "pin": "U7",
+      "signal": "PA12",
+      "net": "NAND_D0",
+      "function": "AF12 FMC_D0",
+      "bank_voltage": "VDD /3.3 V",
+      "ds_pdf_page": 124,
+      "validation": "Pass at nominal connected voltage; configure timing and supply state."
+    },
+    {
+      "pin": "U6",
+      "signal": "PA13",
+      "net": "SWDIO",
+      "function": "AF0 JTMS/SWDIO",
+      "bank_voltage": "VDD /3.3 V",
+      "ds_pdf_page": 113,
+      "validation": "Pass at nominal connected voltage; configure timing and supply state."
+    },
+    {
+      "pin": "T6",
+      "signal": "PA14",
+      "net": "SWCLK",
+      "function": "AF0 JTCK/SWCLK",
+      "bank_voltage": "VDD /3.3 V",
+      "ds_pdf_page": 113,
+      "validation": "Pass at nominal connected voltage; configure timing and supply state."
+    },
+    {
+      "pin": "U12",
+      "signal": "PB5",
+      "net": "SWO",
+      "function": "AF0 JTDO/TRACESWO",
+      "bank_voltage": "VDD /3.3 V",
+      "ds_pdf_page": 114,
+      "validation": "Pass at nominal connected voltage; configure timing and supply state."
+    },
+    {
+      "pin": "C10",
+      "signal": "PC0",
+      "net": "STATUS_LED_K",
+      "function": "GPIO output LED sink",
+      "bank_voltage": "VDDIO5 /1.8 V",
+      "ds_pdf_page": 115,
+      "validation": "Conditional: LED fed from 3.3 V; qualify off leakage/ghosting and powered-off state. Physical LED polarity is correct."
+    },
+    {
+      "pin": "A9",
+      "signal": "PC1",
+      "net": "ACCEL_PWR_EN",
+      "function": "GPIO output load-switch enable",
+      "bank_voltage": "VDDIO4 /1.8 V",
+      "ds_pdf_page": 115,
+      "validation": "Pass 1.8 V control of TPS22918; sensor bus pull-ups follow switched rail."
+    },
+    {
+      "pin": "D9",
+      "signal": "PC2",
+      "net": "ACCEL_I2C_SCL",
+      "function": "GPIO open-drain software I2C",
+      "bank_voltage": "VDDIO5 /1.8 V",
+      "ds_pdf_page": 115,
+      "validation": "Pass 1.8 V switched pull-ups; remain high impedance until ACCEL_VDD is present."
+    },
+    {
+      "pin": "E10",
+      "signal": "PC3",
+      "net": "ACCEL_I2C_SDA",
+      "function": "GPIO open-drain software I2C",
+      "bank_voltage": "VDDIO5 /1.8 V",
+      "ds_pdf_page": 115,
+      "validation": "Pass 1.8 V switched pull-ups; remain high impedance until ACCEL_VDD is present."
+    },
+    {
+      "pin": "A10",
+      "signal": "PC4",
+      "net": "ACCEL_INT1",
+      "function": "GPIO input/EXTI",
+      "bank_voltage": "VDDIO5 /1.8 V",
+      "ds_pdf_page": 115,
+      "validation": "Pass 1.8 V accelerometer interrupt; keep safe when sensor unpowered."
+    },
+    {
+      "pin": "D7",
+      "signal": "PC8",
+      "net": "CAM_XSHUTDOWN",
+      "function": "GPIO output sensor shutdown",
+      "bank_voltage": "VDDIO4 /1.8 V",
+      "ds_pdf_page": 115,
+      "validation": "Pass 1.8 V camera control; firmware sequence pending sensor review."
+    },
+    {
+      "pin": "C7",
+      "signal": "PC9",
+      "net": "CAM_MCLK",
+      "function": "AF0 MCO2",
+      "bank_voltage": "VDDIO4 /1.8 V",
+      "ds_pdf_page": 115,
+      "validation": "Pass clock-capable 1.8 V pin; HSE/2 gives 20 MHz; verify required sensor mode and duty cycle."
+    },
+    {
+      "pin": "A8",
+      "signal": "PC10",
+      "net": "I2C4_SCL",
+      "function": "AF4 I2C4_SCL",
+      "bank_voltage": "VDDIO4 /1.8 V",
+      "ds_pdf_page": 115,
+      "validation": "Pass 1.8 V pull-ups; configure open-drain and external-bus timing."
+    },
+    {
+      "pin": "B8",
+      "signal": "PC11",
+      "net": "I2C4_SDA",
+      "function": "AF4 I2C4_SDA",
+      "bank_voltage": "VDDIO4 /1.8 V",
+      "ds_pdf_page": 115,
+      "validation": "Pass 1.8 V pull-ups; configure open-drain and external-bus timing."
+    },
+    {
+      "pin": "C8",
+      "signal": "PC12",
+      "net": "CAM_AVDD_EN",
+      "function": "GPIO output camera LDO enable",
+      "bank_voltage": "VDDIO4 /1.8 V",
+      "ds_pdf_page": 115,
+      "validation": "Pass 1.8 V enable capability; camera sequencing pending sensor review."
+    },
+    {
+      "pin": "F3",
+      "signal": "PC13",
+      "net": "SHUTTER_SENSE",
+      "function": "GPIO input shutter",
+      "bank_voltage": "VDD_VSW /3.3 V",
+      "ds_pdf_page": 115,
+      "validation": "Fail external battery-derived input topology; see PWR-001."
+    },
+    {
+      "pin": "C11",
+      "signal": "PE5",
+      "net": "RTC_I2C1_SCL",
+      "function": "AF4 I2C1_SCL",
+      "bank_voltage": "VDD /3.3 V",
+      "ds_pdf_page": 117,
+      "validation": "Pass 3.3 V RTC pull-up; verify RTC backup isolation."
+    },
+    {
+      "pin": "D11",
+      "signal": "PE6",
+      "net": "RTC_I2C1_SDA",
+      "function": "AF4 I2C1_SDA",
+      "bank_voltage": "VDD /3.3 V",
+      "ds_pdf_page": 117,
+      "validation": "Pass 3.3 V RTC pull-up; verify RTC backup isolation."
+    },
+    {
+      "pin": "N4",
+      "signal": "PF2",
+      "net": "NAND_RNB",
+      "function": "AF12 FMC_NWAIT (wrong for RNB)",
+      "bank_voltage": "VDD /3.3 V",
+      "ds_pdf_page": 128,
+      "validation": "Fail MCU-003; move to PA7/R12 AF12 FMC_RNB."
+    },
+    {
+      "pin": "N3",
+      "signal": "PF8",
+      "net": "NAND_NWE",
+      "function": "AF12 FMC_NWE",
+      "bank_voltage": "VDD /3.3 V",
+      "ds_pdf_page": 129,
+      "validation": "Pass at nominal connected voltage; configure timing and supply state."
+    },
+    {
+      "pin": "T10",
+      "signal": "PG10",
+      "net": "NAND_CLE",
+      "function": "AF12 FMC_A16/CLE",
+      "bank_voltage": "VDD /3.3 V",
+      "ds_pdf_page": 130,
+      "validation": "Pass; ROM can use PG10 for boot-failure UART5_TX diagnostics, so retain NAND deselect/write-protect defaults."
+    },
+    {
+      "pin": "P6",
+      "signal": "PG14",
+      "net": "NAND_NCE",
+      "function": "AF10 FMC_NCE",
+      "bank_voltage": "VDD /3.3 V",
+      "ds_pdf_page": 130,
+      "validation": "Pass at AF10; AF12 is FMC_NE2 and must not be selected for NAND CE."
+    },
+    {
+      "pin": "A7",
+      "signal": "PH0",
+      "net": "HSE_IN",
+      "function": "Dedicated HSE OSC_IN",
+      "bank_voltage": "VDDA18AON /1.8 V (oscillator)",
+      "ds_pdf_page": 161,
+      "validation": "Pass 40 MHz crystal range; oscillator runs from VDDA18AON, see MCU-009."
+    },
+    {
+      "pin": "B7",
+      "signal": "PH1",
+      "net": "HSE_OUT",
+      "function": "Dedicated HSE OSC_OUT",
+      "bank_voltage": "VDDA18AON /1.8 V (oscillator)",
+      "ds_pdf_page": 161,
+      "validation": "Pass 40 MHz crystal range; oscillator runs from VDDA18AON, see MCU-009."
+    },
+    {
+      "pin": "E7",
+      "signal": "PH2",
+      "net": "RTC_INT_N",
+      "function": "GPIO input/EXTI",
+      "bank_voltage": "VDDIO4 /1.8 V",
+      "ds_pdf_page": 120,
+      "validation": "Fail MCU-004:3.3 V pull-up on 1.8 V bank."
+    },
+    {
+      "pin": "T17",
+      "signal": "PN2",
+      "net": "BOOT_XSPI_IO0",
+      "function": "AF9 XSPIM_P2_IO0",
+      "bank_voltage": "VDDIO3 /3.3 V",
+      "ds_pdf_page": 132,
+      "validation": "Pass 3.3 V flash; ROM uses IO0/1 only, quad IO2/3 are application use."
+    },
+    {
+      "pin": "R15",
+      "signal": "PN3",
+      "net": "BOOT_XSPI_IO1",
+      "function": "AF9 XSPIM_P2_IO1",
+      "bank_voltage": "VDDIO3 /3.3 V",
+      "ds_pdf_page": 132,
+      "validation": "Pass 3.3 V flash; ROM uses IO0/1 only, quad IO2/3 are application use."
+    },
+    {
+      "pin": "N17",
+      "signal": "PN4",
+      "net": "BOOT_XSPI_IO2",
+      "function": "AF9 XSPIM_P2_IO2",
+      "bank_voltage": "VDDIO3 /3.3 V",
+      "ds_pdf_page": 132,
+      "validation": "Pass 3.3 V flash; ROM uses IO0/1 only, quad IO2/3 are application use."
+    },
+    {
+      "pin": "R16",
+      "signal": "PN5",
+      "net": "BOOT_XSPI_IO3",
+      "function": "AF9 XSPIM_P2_IO3",
+      "bank_voltage": "VDDIO3 /3.3 V",
+      "ds_pdf_page": 132,
+      "validation": "Pass 3.3 V flash; ROM uses IO0/1 only, quad IO2/3 are application use."
+    },
+    {
+      "pin": "P15",
+      "signal": "PN6",
+      "net": "BOOT_XSPI_CLK",
+      "function": "AF9 XSPIM_P2_CLK",
+      "bank_voltage": "VDDIO3 /3.3 V",
+      "ds_pdf_page": 132,
+      "validation": "Pass 3.3 V flash clock, including fixed ROM boot assignment."
+    },
+    {
+      "pin": "P14",
+      "signal": "PN12",
+      "net": "BOOT_XSPI_NCS",
+      "function": "AF9 XSPIM_P2_NCS2",
+      "bank_voltage": "VDDIO3 /3.3 V",
+      "ds_pdf_page": 132,
+      "validation": "Fail MCU-001: ROM requires PN1/R17 AF9 NCS1."
+    }
+  ],
+  "validated_support_components": [
+    {
+      "reference": "R17",
+      "resistance_ohm": 200,
+      "tolerance_percent": 1,
+      "connection": "U1.P5 CSI_REXT to GND",
+      "result": "pass",
+      "evidence": "AN5967 Rev5 §13.5 p35; DS14791 Rev10 Table125 p234:198-202ohm"
+    },
+    {
+      "reference": "R18",
+      "resistance_ohm": 200,
+      "tolerance_percent": 1,
+      "connection": "U1.C6 USB_TX_RTUNE to GND",
+      "result": "pass",
+      "evidence": "AN5967 Rev5 §13.3.1 p29; RM0486 Rev4 p3748; DS14791 Rev10 Table126 p235:198-202ohm"
+    }
+  ],
+  "unused_usb2_review": {
+    "pins": {
+      "A3": "OTG2_HSDM NC",
+      "B3": "OTG2_HSDP NC",
+      "D6": "OTG2_TXRTUNE NC",
+      "E6": "OTG2_ID NC"
+    },
+    "confidence": "conditional",
+    "evidence": "AN5967 Rev5 Table5 footnote2 p8 specifies DP/DM to VSS and TXRTUNE open when USB/UCPD features unused.",
+    "conclusion": "Keep PHY2 disabled; open TXRTUNE follows unused-feature guidance. Review grounding unused DP/DM; group-level wording does not explicitly settle one unused port while USB1 active, so NC is not labeled a confirmed fault. Shared USB supplies must remain for active USB1."
+  }
+}

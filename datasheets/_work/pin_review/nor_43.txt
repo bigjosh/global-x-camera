@@ -1,0 +1,65 @@
+                                                                                                     W25Q128JV
+
+
+
+8.2.19     Erase / Program Suspend (75h)
+The Erase/Program Suspend instruction “75h”, allows the system to interrupt a Sector or Block Erase
+operation or a Page Program operation and then read from or program/erase data to, any other sectors or
+blocks. The Erase/Program Suspend instruction sequence is shown in Figure 35a.
+
+The Write Status Register instruction (01h) and Erase instructions (20h, 52h, D8h, C7h, 60h, 44h) are not
+allowed during Erase Suspend. Erase Suspend is valid only during the Sector or Block erase operation. If
+written during the Chip Erase operation, the Erase                Suspend instruction is ignored. The Write Status
+Register instruction (01h) and Program instructions (02h, 32h, 42h) are                      not allowed during Program
+Suspend. Program Suspend is valid only during the Page Program or Quad Page Program operation.
+
+The Erase/Program Suspend instruction “75h” will be accepted by the device only if the SUS bit in the
+Status Register equals to 0 and           the BUSY bit equals to 1 while a Sector or Block Erase or a Page
+Program operation is on-going. If the SUS bit equals to 1 or the BUSY                       bit equals to 0, the Suspend
+instruction will be ignored by the device. A maximum of time of “tSUS” (See AC Characteristics) is required
+to suspend the erase or program operation. The BUSY bit in the Status Register will be cleared from 1 to
+0  within  “tSUS”  and  the  SUS  bit  in  the  Status  Register  will  be  set  from  0  to  1  immediately  after
+Erase/Program Suspend. For a previously resumed Erase/Program operation, it is also required that the
+Suspend instruction “75h” is not issued earlier than a minimum of time                   of “tSUS” following the preceding
+Resume instruction “7Ah”.
+
+Unexpected power off during the Erase/Program suspend state                       will reset the device and release the
+suspend state. SUS bit in the Status Register will also reset to 0. The data within the page, sector or block
+that was being suspended may become corrupted. It is recommended for the user to implement system
+design  techniques  against  the  accidental  power  interruption  and  preserve  data  integrity  during
+erase/program suspend state.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                         Figure 35a. Erase/Program Suspend Instruction
+
+
+
+
+
+
+                                                                         Publication Release Date: December 24, 2024
+                                                            - 42 -                                              Revision M

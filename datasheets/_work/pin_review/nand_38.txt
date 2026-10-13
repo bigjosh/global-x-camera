@@ -1,0 +1,68 @@
+6-10.           Status Enhance Read
+
+The MX30LFxG18AC supports the two-plane operation, the Status Enhanced Read command (78h) offers
+the alternative method besides the Status Read command to get the status of specific plane in the same
+NAND Flash device.  The result information is outlined in Table 4.
+The [SR]6 and SR[5] bits are shared with all planes. However, the SR[0], SR[1], SR[3], SR[4] are for the
+status of specific plane in the row address. The Status Enhanced Read command is not allowed at power-on
+Reset (FFh) command, OTP enabled operation.
+
+Figure 20. AC Waveforms for Status Enhance Operation
+
+
+            CLE
+                                 tCLS
+
+
+                                 tCS
+            CE#
+
+
+                                                                                                                                                                             tCHZ
+
+           WE#
+
+
+
+                                                  tALH                                                   tALS                                      tAR
+
+            ALE
+
+
+                                                                                                                                                                               tOH
+
+            RE#
+                                                                                                                                          tWHR
+
+                                                                   tDS     tDH                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            tREA
+
+                                                                   3rd Address                 4th Address                  5th Address                                  Status
+       IO[7:0]                       78h                               Cycle                       Cycle                        Cycle                                    Output
+
+
+
+
+
+
+
+6-11.           Block Protection Status Read
+
+The Block Protection Status Read command (7Ah) may check the protect/un-protect status of blocks. The
+status output is shown in Table 5. Block Protection Status Output and the address cycle is referred to Table 6.
+Address Cycle Definition of Block.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                      38

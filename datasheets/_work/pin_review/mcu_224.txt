@@ -1,0 +1,67 @@
+Electrical characteristics                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      STM32N6x5xx STM32N6x7xx
+
+
+                                                                               Figure 56. SPI timing diagram - Target mode and CPHA = 0
+
+
+                         NSS input
+
+                                                                                                                                                   tc(SCK)                                                                                                                                                                          th(NSS)
+
+                                                                                     tsu(NSS)                               tw(SCKH)
+                             CPHA=0
+                             CPOL=0
+
+
+                             CPHA=0
+                             CPOL=1
+                                                          ta(SO)                                                             tw(SCKL)                                tv(SO)                                                                              th(SO)                                                                                                   tdis(SO)
+
+
+                 MISO output                                                                                            First bit OUT                                                                       Next bits OUT                                                                                             Last bit OUT
+
+
+                                                                                   tsu(SI)                                                        th(SI)
+
+                 MOSI input                                                                                                        First bit IN                                                                        Next bits IN                                                                     Last bit IN
+
+
+                                                                                                                                                                                                                                                                                                                                                                              MSv41658V2
+
+                                                                               Figure 57. SPI timing diagram - Target mode and CPHA = 1
+
+
+                        NSS input
+
+
+                                                                                                                                               tc(SCK)                                                                                                                                                                                             th(NSS)
+                            CPHA=1                                                tsu(NSS)                             tw(SCKH)
+
+                            CPOL=0
+
+
+                            CPHA=1
+                            CPOL=1
+                                                          ta(SO)                                                        tw(SCKL)                                                                        tv(SO)                                                       th(SO)                                                                                   tdis(SO)
+
+                      MISO output                                                                                                                        First bit OUT                                                                                                                                                                                         Next bits OUT                                                                                                                                                                                            Last bit OUT
+
+                                                                                                                                    tsu(SI)                               th(SI)
+
+                      MOSI input                                                                                                                       First bit IN                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           Last bit INNext bits IN
+
+
+                                                                                                                                                                                                                                                                                                                                                                              MSv41659V2
+
+                                                 I2C interface
+                                                 The I2C interface meets the timings requirements of the I   2C-bus specification and user
+                                                 manual rev. 03 for:
+                                                 •                                                                    Standard-mode (Sm): bit rate up to 100 kbit/s
+                                                 •           Fast-mode (Fm): bit rate up to 400 kbit/s
+                                                 •           Fast-mode Plus (Fm+): bit rate up to 1 Mbit/s.
+                                                 The timing requirements are specified by   design, not tested in production, when the
+                                                 peripheral is properly configured (refer to product reference manual).
+
+
+
+224/263                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        DS14791 Rev 10

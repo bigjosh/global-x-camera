@@ -1,0 +1,68 @@
+6-6.   Cache Program
+
+The cache program feature enhances the program performance by using the cache buffer of 2,112-byte.
+The serial data can be input to the cache buffer while the previous data stored in the buffer are programming
+into the memory cell. Cache Program command sequence is almost the same as page program command
+sequence. Only the Program Confirm command (10h) is replaced by cache Program command (15h).
+After the Cache Program command (15h) is issued. The user can check the status by the following methods.
+- R/B# pin
+- Cache Status Bit (SR[6] = 0 indicates the cache is busy; SR[6] = 1 means the cache is ready).
+The user can issue another Cache Program Command Sequence after the Cache is ready. The user can
+always monitor the chip state by Ready/Busy Status Bit (SR[5]). The user can issues either program confirm
+command (10h) or cache program command (15h) for the last page if the user monitor the chip status by
+issuing Read Status Command (70h).
+However, if the user only monitors the R/B# pin, the user needs to issue the program confirm command (10h)
+for the last page.
+The user can check the Pass/Fail Status through P/F Status Bit (SR[0]) and Cache P/F Status Bit (SR[1]).
+SR[1] represents Pass/Fail Status of the previous page. SR[1] is updated when SR[6] change from 0 to 1 or
+Chip is ready. SR[0] shows the Pass/Fail status of the current page. It is updated when SR[5] change from "0"
+to "1" or the end of the internal programming.  For more details, please refer to the related waveforms.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                               29

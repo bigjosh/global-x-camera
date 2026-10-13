@@ -1,0 +1,61 @@
+                                                                                                    W25Q128JV
+
+
+8.2.12     Set Burst with Wrap (77h)
+
+In Standard SPI mode, the Set Burst with Wrap (77h) instruction is used in conjunction with “Fast Read
+Quad I/O” instruction to access a fixed length of 8/16/32/64-byte section within a 256-byte page. Certain
+applications can benefit from this feature and improve the overall system code execution performance.
+
+Similar to a Quad I/O instruction, the Set Burst with Wrap instruction is initiated by driving the /CS pin low
+and then shifting the instruction code “77h” followed by 24 dummy bits and 8 “Wrap Bits”, W7-0. The
+instruction sequence is shown in Figure 28. Wrap bit W7 and the lower nibble W3-0 are not used.
+
+                 W6, W5                         W4 = 0                               W4 =1 (DEFAULT)
+                                 Wrap Around            Wrap Length           Wrap Around          Wrap Length
+                   0  0                Yes                  8-byte                  No                  N/A
+                   0  1                Yes                 16-byte                  No                  N/A
+                   1  0                Yes                 32-byte                  No                  N/A
+                   1  1                Yes                 64-byte                  No                  N/A
+Once W6-4 is set by a Set Burst with Wrap instruction, all the following “Fast Read Quad I/O” instruction
+will use the W6-4 setting to access the 8/16/32/64-byte section within any page. To exit the “Wrap Around”
+function and return to normal read operation, another Set Burst with Wrap instruction should be issued to
+set W4 = 1. The default value of W4 upon power on or after a software/hardware reset is 1.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                            Figure 28. Set Burst with Wrap Instruction
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                              - 35 -

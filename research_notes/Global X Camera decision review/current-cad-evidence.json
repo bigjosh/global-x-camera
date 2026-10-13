@@ -1,0 +1,747 @@
+{
+  "baseline_sha256": "51e7cc050d23652d4eaf891e7384f519d6f3fd94c0c72f2dd945cbf626a62e98",
+  "review_baseline_matches": true,
+  "current_export_connected_mismatches": [],
+  "components": {
+    "U1": {
+      "value": "STM32N657X0H3Q",
+      "footprint": "GX:U1_Recovered"
+    },
+    "U2": {
+      "value": "TPS62132RGTR",
+      "footprint": "GX:U2_Recovered"
+    },
+    "U5": {
+      "value": "W25Q128JVPIQ",
+      "footprint": "GX:U5_Recovered"
+    },
+    "U6": {
+      "value": "MX30LF2G18AC-TI",
+      "footprint": "GX:U6_Recovered"
+    },
+    "U7": {
+      "value": "TPS62825DMQR",
+      "footprint": "GX:U7_Recovered"
+    },
+    "Q1": {
+      "value": "AO3401A",
+      "footprint": "GX:Q1_Recovered"
+    },
+    "Q2": {
+      "value": "BSS138",
+      "footprint": "GX:Q2_Recovered"
+    },
+    "Q3": {
+      "value": "AO3401A",
+      "footprint": "GX:Q3_Recovered"
+    },
+    "R1": {
+      "value": "1Mohm",
+      "footprint": "GX:R1_Recovered"
+    },
+    "R2": {
+      "value": "100kohm",
+      "footprint": "GX:R2_Recovered"
+    },
+    "C38": {
+      "value": "100nF",
+      "footprint": "GX:C38_Recovered"
+    },
+    "L3": {
+      "value": "1uH",
+      "footprint": "GX:L3_Recovered"
+    }
+  },
+  "nets": {
+    "BOOT_XSPI_NCS": [
+      {
+        "ref": "R13",
+        "pin": "2",
+        "pintype": "passive"
+      },
+      {
+        "ref": "U1",
+        "pin": "P14",
+        "pinfunction": "PN12_P14",
+        "pintype": "bidirectional"
+      },
+      {
+        "ref": "U5",
+        "pin": "1",
+        "pinfunction": "~{CS}_1",
+        "pintype": "input"
+      }
+    ],
+    "NAND_RNB": [
+      {
+        "ref": "R14",
+        "pin": "2",
+        "pintype": "passive"
+      },
+      {
+        "ref": "U1",
+        "pin": "N4",
+        "pinfunction": "PF2_N4",
+        "pintype": "bidirectional"
+      },
+      {
+        "ref": "U6",
+        "pin": "7",
+        "pinfunction": "R/~{B}_7",
+        "pintype": "open_collector"
+      }
+    ],
+    "RTC_INT_N": [
+      {
+        "ref": "R24",
+        "pin": "1",
+        "pintype": "passive"
+      },
+      {
+        "ref": "U1",
+        "pin": "E7",
+        "pinfunction": "PH2_E7",
+        "pintype": "bidirectional"
+      },
+      {
+        "ref": "U8",
+        "pin": "2",
+        "pinfunction": "INT_2",
+        "pintype": "open_collector"
+      }
+    ],
+    "SHUTTER_SENSE": [
+      {
+        "ref": "D3",
+        "pin": "1",
+        "pinfunction": "K_1",
+        "pintype": "passive"
+      },
+      {
+        "ref": "SW1",
+        "pin": "1",
+        "pinfunction": "A_1",
+        "pintype": "passive"
+      },
+      {
+        "ref": "U1",
+        "pin": "F3",
+        "pinfunction": "PC13_F3",
+        "pintype": "bidirectional"
+      }
+    ],
+    "LATCH_PULLDOWN": [
+      {
+        "ref": "D3",
+        "pin": "2",
+        "pinfunction": "A_2",
+        "pintype": "passive"
+      },
+      {
+        "ref": "Q2",
+        "pin": "3",
+        "pinfunction": "D_3",
+        "pintype": "passive"
+      },
+      {
+        "ref": "R2",
+        "pin": "2",
+        "pintype": "passive"
+      }
+    ],
+    "PWR_HOLD": [
+      {
+        "ref": "Q2",
+        "pin": "1",
+        "pinfunction": "G_1",
+        "pintype": "input"
+      },
+      {
+        "ref": "R3",
+        "pin": "1",
+        "pintype": "passive"
+      },
+      {
+        "ref": "U1",
+        "pin": "E2",
+        "pinfunction": "PWR_ON_E2",
+        "pintype": "output"
+      }
+    ],
+    "PMOS_GATE": [
+      {
+        "ref": "Q1",
+        "pin": "1",
+        "pinfunction": "G_1",
+        "pintype": "input"
+      },
+      {
+        "ref": "Q3",
+        "pin": "1",
+        "pinfunction": "G_1",
+        "pintype": "input"
+      },
+      {
+        "ref": "R1",
+        "pin": "2",
+        "pintype": "passive"
+      },
+      {
+        "ref": "R2",
+        "pin": "1",
+        "pintype": "passive"
+      }
+    ],
+    "BAT_FET_COMMON_SOURCE": [
+      {
+        "ref": "Q1",
+        "pin": "2",
+        "pinfunction": "S_2",
+        "pintype": "passive"
+      },
+      {
+        "ref": "Q3",
+        "pin": "2",
+        "pinfunction": "S_2",
+        "pintype": "passive"
+      },
+      {
+        "ref": "R1",
+        "pin": "1",
+        "pintype": "passive"
+      }
+    ],
+    "3V3_USB": [
+      {
+        "ref": "C14",
+        "pin": "1",
+        "pintype": "passive"
+      },
+      {
+        "ref": "U1",
+        "pin": "A4",
+        "pinfunction": "VDD33USB_A4",
+        "pintype": "power_in"
+      },
+      {
+        "ref": "U4",
+        "pin": "5",
+        "pinfunction": "OUT_5",
+        "pintype": "power_out"
+      }
+    ],
+    "1V8": [
+      {
+        "ref": "C10",
+        "pin": "1",
+        "pintype": "passive"
+      },
+      {
+        "ref": "C11",
+        "pin": "1",
+        "pintype": "passive"
+      },
+      {
+        "ref": "C12",
+        "pin": "1",
+        "pintype": "passive"
+      },
+      {
+        "ref": "C26",
+        "pin": "1",
+        "pintype": "passive"
+      },
+      {
+        "ref": "C27",
+        "pin": "1",
+        "pintype": "passive"
+      },
+      {
+        "ref": "C28",
+        "pin": "1",
+        "pintype": "passive"
+      },
+      {
+        "ref": "C29",
+        "pin": "1",
+        "pintype": "passive"
+      },
+      {
+        "ref": "C30",
+        "pin": "1",
+        "pintype": "passive"
+      },
+      {
+        "ref": "C31",
+        "pin": "1",
+        "pintype": "passive"
+      },
+      {
+        "ref": "C32",
+        "pin": "1",
+        "pintype": "passive"
+      },
+      {
+        "ref": "C33",
+        "pin": "1",
+        "pintype": "passive"
+      },
+      {
+        "ref": "C34",
+        "pin": "1",
+        "pintype": "passive"
+      },
+      {
+        "ref": "C35",
+        "pin": "1",
+        "pintype": "passive"
+      },
+      {
+        "ref": "C60",
+        "pin": "1",
+        "pintype": "passive"
+      },
+      {
+        "ref": "C61",
+        "pin": "1",
+        "pintype": "passive"
+      },
+      {
+        "ref": "C64",
+        "pin": "1",
+        "pintype": "passive"
+      },
+      {
+        "ref": "C66",
+        "pin": "1",
+        "pintype": "passive"
+      },
+      {
+        "ref": "C70",
+        "pin": "1",
+        "pintype": "passive"
+      },
+      {
+        "ref": "C74",
+        "pin": "1",
+        "pintype": "passive"
+      },
+      {
+        "ref": "CAM1",
+        "pin": "5",
+        "pinfunction": "VDDIO_1V8_5",
+        "pintype": "power_in"
+      },
+      {
+        "ref": "J3",
+        "pin": "5",
+        "pinfunction": "5_5",
+        "pintype": "passive"
+      },
+      {
+        "ref": "L2",
+        "pin": "2",
+        "pinfunction": "2_2",
+        "pintype": "passive"
+      },
+      {
+        "ref": "R22",
+        "pin": "2",
+        "pintype": "passive"
+      },
+      {
+        "ref": "R23",
+        "pin": "2",
+        "pintype": "passive"
+      },
+      {
+        "ref": "R5",
+        "pin": "1",
+        "pintype": "passive"
+      },
+      {
+        "ref": "R7",
+        "pin": "1",
+        "pintype": "passive"
+      },
+      {
+        "ref": "SW2",
+        "pin": "2",
+        "pinfunction": "B_2",
+        "pintype": "passive"
+      },
+      {
+        "ref": "TP4",
+        "pin": "1",
+        "pinfunction": "1_1",
+        "pintype": "passive"
+      },
+      {
+        "ref": "U1",
+        "pin": "A1",
+        "pinfunction": "PDR_ON_A1",
+        "pintype": "input"
+      },
+      {
+        "ref": "U1",
+        "pin": "C5",
+        "pinfunction": "VDDA18USB_C5",
+        "pintype": "power_in"
+      },
+      {
+        "ref": "U1",
+        "pin": "E8",
+        "pinfunction": "VDDIO4_1_E8",
+        "pintype": "power_in"
+      },
+      {
+        "ref": "U1",
+        "pin": "E9",
+        "pinfunction": "VDDIO5_1_E9",
+        "pintype": "power_in"
+      },
+      {
+        "ref": "U1",
+        "pin": "F6",
+        "pinfunction": "VDDA18AON_F6",
+        "pintype": "power_in"
+      },
+      {
+        "ref": "U1",
+        "pin": "F8",
+        "pinfunction": "VDDIO4_2_F8",
+        "pintype": "power_in"
+      },
+      {
+        "ref": "U1",
+        "pin": "F9",
+        "pinfunction": "VDDIO5_2_F9",
+        "pintype": "power_in"
+      },
+      {
+        "ref": "U1",
+        "pin": "G1",
+        "pinfunction": "VDDA18PMU_G1",
+        "pintype": "power_in"
+      },
+      {
+        "ref": "U1",
+        "pin": "K1",
+        "pinfunction": "VDDSMPS_1_K1",
+        "pintype": "power_in"
+      },
+      {
+        "ref": "U1",
+        "pin": "K2",
+        "pinfunction": "VDDSMPS_2_K2",
+        "pintype": "power_in"
+      },
+      {
+        "ref": "U1",
+        "pin": "K3",
+        "pinfunction": "VDDSMPS_3_K3",
+        "pintype": "power_in"
+      },
+      {
+        "ref": "U1",
+        "pin": "K4",
+        "pinfunction": "VDDSMPS_4_K4",
+        "pintype": "power_in"
+      },
+      {
+        "ref": "U1",
+        "pin": "K5",
+        "pinfunction": "VDDSMPS_5_K5",
+        "pintype": "power_in"
+      },
+      {
+        "ref": "U1",
+        "pin": "K6",
+        "pinfunction": "VDDSMPS_6_K6",
+        "pintype": "power_in"
+      },
+      {
+        "ref": "U1",
+        "pin": "M5",
+        "pinfunction": "VDDA18PLL_M5",
+        "pintype": "power_in"
+      },
+      {
+        "ref": "U1",
+        "pin": "N6",
+        "pinfunction": "VDDA18ADC_N6",
+        "pintype": "power_in"
+      },
+      {
+        "ref": "U1",
+        "pin": "R5",
+        "pinfunction": "VDDA18CSI_R5",
+        "pintype": "power_in"
+      },
+      {
+        "ref": "U1",
+        "pin": "U2",
+        "pinfunction": "VREF+_U2",
+        "pintype": "power_in"
+      },
+      {
+        "ref": "U10",
+        "pin": "3",
+        "pinfunction": "EN_3",
+        "pintype": "input"
+      },
+      {
+        "ref": "U10",
+        "pin": "4",
+        "pinfunction": "IN_4",
+        "pintype": "power_in"
+      },
+      {
+        "ref": "U12",
+        "pin": "1",
+        "pinfunction": "VIN_1",
+        "pintype": "power_in"
+      }
+    ]
+  },
+  "J3_pad_sizes": [
+    {
+      "pin": "1",
+      "size": [
+        "0.127",
+        "1.1176"
+      ]
+    },
+    {
+      "pin": "2",
+      "size": [
+        "0.127",
+        "1.1176"
+      ]
+    },
+    {
+      "pin": "3",
+      "size": [
+        "0.127",
+        "1.1176"
+      ]
+    },
+    {
+      "pin": "4",
+      "size": [
+        "0.127",
+        "1.1176"
+      ]
+    },
+    {
+      "pin": "5",
+      "size": [
+        "0.127",
+        "1.1176"
+      ]
+    },
+    {
+      "pin": "6",
+      "size": [
+        "0.127",
+        "1.1176"
+      ]
+    },
+    {
+      "pin": "7",
+      "size": [
+        "0.127",
+        "1.1176"
+      ]
+    },
+    {
+      "pin": "8",
+      "size": [
+        "0.127",
+        "1.1176"
+      ]
+    },
+    {
+      "pin": "9",
+      "size": [
+        "0.127",
+        "1.1176"
+      ]
+    },
+    {
+      "pin": "10",
+      "size": [
+        "0.127",
+        "1.1176"
+      ]
+    },
+    {
+      "pin": "11",
+      "size": [
+        "0.127",
+        "1.1176"
+      ]
+    },
+    {
+      "pin": "12",
+      "size": [
+        "0.127",
+        "1.1176"
+      ]
+    },
+    {
+      "pin": "13",
+      "size": [
+        "0.127",
+        "1.1176"
+      ]
+    },
+    {
+      "pin": "14",
+      "size": [
+        "0.127",
+        "1.1176"
+      ]
+    },
+    {
+      "pin": "15",
+      "size": [
+        "0.127",
+        "1.1176"
+      ]
+    },
+    {
+      "pin": "16",
+      "size": [
+        "0.127",
+        "1.1176"
+      ]
+    },
+    {
+      "pin": "17",
+      "size": [
+        "0.127",
+        "1.1176"
+      ]
+    },
+    {
+      "pin": "18",
+      "size": [
+        "0.127",
+        "1.1176"
+      ]
+    },
+    {
+      "pin": "19",
+      "size": [
+        "0.127",
+        "1.1176"
+      ]
+    },
+    {
+      "pin": "20",
+      "size": [
+        "0.127",
+        "1.1176"
+      ]
+    },
+    {
+      "pin": "21",
+      "size": [
+        "0.127",
+        "1.1176"
+      ]
+    },
+    {
+      "pin": "22",
+      "size": [
+        "0.127",
+        "1.1176"
+      ]
+    },
+    {
+      "pin": "23",
+      "size": [
+        "0.127",
+        "1.1176"
+      ]
+    },
+    {
+      "pin": "24",
+      "size": [
+        "0.127",
+        "1.1176"
+      ]
+    },
+    {
+      "pin": "25",
+      "size": [
+        "0.127",
+        "1.1176"
+      ]
+    },
+    {
+      "pin": "26",
+      "size": [
+        "0.127",
+        "1.1176"
+      ]
+    },
+    {
+      "pin": "27",
+      "size": [
+        "0.127",
+        "1.1176"
+      ]
+    },
+    {
+      "pin": "28",
+      "size": [
+        "0.127",
+        "1.1176"
+      ]
+    },
+    {
+      "pin": "29",
+      "size": [
+        "0.127",
+        "1.1176"
+      ]
+    },
+    {
+      "pin": "30",
+      "size": [
+        "0.127",
+        "1.1176"
+      ]
+    },
+    {
+      "pin": "31",
+      "size": [
+        "0.5334",
+        "0.3048"
+      ]
+    },
+    {
+      "pin": "32",
+      "size": [
+        "0.5334",
+        "0.3048"
+      ]
+    },
+    {
+      "pin": "33",
+      "size": [
+        "0.5334",
+        "0.3048"
+      ]
+    },
+    {
+      "pin": "34",
+      "size": [
+        "0.5334",
+        "0.3048"
+      ]
+    }
+  ]
+}

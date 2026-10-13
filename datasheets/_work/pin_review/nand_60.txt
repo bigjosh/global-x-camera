@@ -1,0 +1,93 @@
+      Figure 36. AC Waveforms for Two-plane Cache Program (ONFI)
+
+
+                                                                                                                                                                                                                                                                                                                                                                         A
+    CLE
+
+
+    CE#
+
+
+
+                                 tWC                                                                                     tADL                                                                                tWC                                                                                     tADL
+
+   WE#
+
+
+                                                                                                                                                             tWB                                                                                                                                                                          tWB
+
+    ALE
+
+
+
+     RE#
+
+IO[7:0]                      80h              1st Address    2nd Address    3rd Address    4th Address     5th Address           Din                                                            Din11h   80h              1st Address    2nd Address    3rd Address    4th Address     5th Address           Din                                                            Din15h
+                                                 Cycle          Cycle          Cycle          Cycle           Cycle                                                                                                         Cycle           Cycle          Cycle          Cycle           Cycle
+                                                                                                                       Plane 0                                                tDBSY                                                                                                           Plane 1                                                     tCBSY
+
+
+   R/B#
+                                                                                                                                                                             Busy          Repeat if needed                                                                                                                                              Busy
+
+
+                              A
+   CLE
+
+
+   CE#
+
+
+
+                                               tWC                                                                                     tADL                                                                                                                                                                                tADL
+  WE#
+
+
+
+                                                                                                                                                                            tWB                                                                                                                                                                                tWB
+
+   ALE
+
+
+
+   RE#
+
+IO[7:0]                                    80h              1st Address    2nd Address     3rd Address    4th Address    5th Address           Din                                                            Din11h              80h          1st Address    2nd Address     3rd Address    4th Address    5th Address           Din                                                           Din10h70h       Status
+                                                               Cycle           Cycle          Cycle          Cycle          Cycle                                                                                                                 Cycle           Cycle          Cycle          Cycle          Cycle                                                                                            Output
+                                                                                                                                 Plane 0                                                    tDBSY                                                                                                           Plane 1                                                           tPROG
+
+  R/B#
+
+                                                                                                                                                                                           Busy                                                                                                                                                                               Busy
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                         60

@@ -1,0 +1,230 @@
+
+===== PDF PAGE 1 =====
+1SLVUBE4 – March 2018
+Submit Documentation Feedback
+Copyright © 2018, Texas Instruments Incorporated
+TPS6282xEVM-794 Evaluation Module
+User's Guide
+SLVUBE4 – March 2018
+TPS6282xEVM-794 Evaluation Module
+The TPS6282xEVM-794 facilitates the evaluation of the TPS62825 and TPS62826 2-A and 3-A pin-to-pin
+compatible step-down converters with DCS-Control™ in a 1.5-mm × 1.5-mm QFN package. The PWR794-
+001 uses the 2-A TPS62825, and the PWR794-002 uses the 3-A TPS62826. The EVMs output a 1.8-V
+output voltage with 1% accuracy from input voltages from 2.4 V to 5.5 V with a maximum solution height
+of 1 mm. The TPS62825 and TPS62826 are highly efficient and small solutions for point-of-load (POL)
+converters in all types of equipment, such as solid-state drives (SSDs), optical modules, and portable
+devices.
+Contents
+1 Introduction ................................................................................................................... 2
+2 Setup .......................................................................................................................... 3
+3 TPS6282xEVM-794 Test Results.......................................................................................... 4
+4 Board Layout ................................................................................................................. 5
+5 Schematic and Bill of Materials ............................................................................................ 7
+List of Figures
+1 Thermal Performance (VIN = 5 V, IOUT = 3 A) ............................................................................. 4
+2 Loop Response Measurement (VIN = 5 V, Load = 3 A)................................................................. 4
+3 Top Assembly ................................................................................................................ 5
+4 Top Layer ..................................................................................................................... 5
+5 Signal Layer 1................................................................................................................ 5
+6 Signal Layer 2................................................................................................................ 5
+7 Bottom Layer ................................................................................................................. 6
+8 TPS6282xEVM-794 Schematic ............................................................................................ 7
+List of Tables
+1 Performance Specification Summary ..................................................................................... 2
+2 TPS6282xEVM-794 Bill of Materials ...................................................................................... 8
+
+===== PDF PAGE 2 =====
+Introduction www.ti.com
+2 SLVUBE4 – March 2018
+Submit Documentation Feedback
+Copyright © 2018, Texas Instruments Incorporated
+TPS6282xEVM-794 Evaluation Module
+1 Introduction
+The TPS62825 and TPS62826 are synchronous, step-down converters in a small 1.5- × 1.5- × 1-mm QFN
+package. Two different devices in this family support 2 A or 3 A of output current.
+1.1 Performance Specification
+Table 1 provides a summary of the TPS6282xEVM-794 performance specifications.
+Table 1. Performance Specification Summary
+Specification Test Conditions Min Typ Max Unit
+Input voltage 2.4 5 5.5 V
+Output voltage setpoint 1.8 V
+Output current TPS62825EVM-794 0 2 A
+TPS62826EVM-794 0 3 A
+1.2 Modifications
+The printed-circuit board (PCB) for this EVM is designed to accommodate both the fixed and adjustable
+output voltage versions of this integrated circuit (IC). Additional input and output capacitors can also be
+added. Finally, the loop response of the IC can be measured.
+1.2.1 Fixed Output Voltage Operation
+U1 can be replaced with the fixed output voltage version of the IC for evaluation. For fixed output voltage
+version operation, replace R1 with a 0-Ω resistor and remove R2 and C3.
+1.2.2 Input and Output Capacitors
+C7 is provided for an additional input capacitor. This capacitor is not required for proper operation but can
+be used to reduce the input voltage ripple.
+C5 and C8 are provided for additional output capacitors. These capacitors are not required for proper
+operation but can be used to reduce the output voltage ripple and to improve the load transient response.
+The total output capacitance must remain within the recommended range in the data sheet for proper
+operation.
+1.2.3 Loop Response Measurement
+The loop response of the TPS6282xEVM-794 can be measured by lifting both R1 and C3 and inserting a
+50-Ω resistor in series with these two components to inject the measurement signal across. The results of
+this test are shown in Figure 2.
+
+===== PDF PAGE 3 =====
+www.ti.com Setup
+3SLVUBE4 – March 2018
+Submit Documentation Feedback
+Copyright © 2018, Texas Instruments Incorporated
+TPS6282xEVM-794 Evaluation Module
+2 Setup
+This section describes how to properly use the TPS6282xEVM-794.
+2.1 Input/Output Connector Descriptions
+J1, Pin 1 and 2 – VIN Positive input connection from the input supply for the EVM.
+J1, Pin 3 and 4 – S+/S– Input voltage sense connections. Measure the input voltage at this point.
+J1, Pin 5 and 6 – GND Input return connection from the input supply for the EVM.
+J2, Pin 1 and 2 – VOUT Output voltage connection
+J2, Pin 3 and 4 – S+/S– Output voltage sense connections. Measure the output voltage at this point.
+J2, Pin 5 and 6 – GND Output return connection
+J3 – PG/GND The PG output appears on pin 1 of this header with ground on pin 2.
+JP1 – EN EN pin input jumper. Place the supplied jumper across ON and EN to turn on
+the IC. Place the jumper across OFF and EN to turn off the IC.
+JP2 – PG Pullup
+Voltage
+PG pin pullup voltage jumper. Place the supplied jumper on JP3 to connect
+the PG pin pullup resistor to VIN. Alternatively, the jumper can be removed and
+a different voltage can be supplied on pin 2 to pull up the PG pin to a different
+level. This externally applied voltage must remain below 6 V.
+2.2 Setup
+To operate the EVM, set jumpers JP1 through JP2 to the desired position per Section 2.1. Connect the
+input supply to J1 and connect the load to J2.
+
+===== PDF PAGE 4 =====
+Frequency (Hz)
+Gain (dB)
+Phase (q)
+100 1000 10000 100000 1000000
+-60 -180
+-50 -150
+-40 -120
+-30 -90
+-20 -60
+-10 -30
+0 0
+10 30
+20 60
+30 90
+40 120
+50 150
+60 180
+D001
+TPS6282xEVM-794 Test Results www.ti.com
+4 SLVUBE4 – March 2018
+Submit Documentation Feedback
+Copyright © 2018, Texas Instruments Incorporated
+TPS6282xEVM-794 Evaluation Module
+3 TPS6282xEVM-794 Test Results
+The TPS6282xEVM-794 was used to take all the data in TPS6282x, 2-, 3-A Step-Down Converter with 1%
+Output Accuracy in 1.5-mm × 1.5-mm QFN Package. See the device data sheet for the performance of
+this EVM.
+Figure 1 shows the thermal performance of the EVM.
+Figure 1. Thermal Performance (VIN = 5 V, IOUT = 3 A)
+Figure 2. Loop Response Measurement (VIN = 5 V, Load = 3 A)
+
+===== PDF PAGE 5 =====
+www.ti.com Board Layout
+5SLVUBE4 – March 2018
+Submit Documentation Feedback
+Copyright © 2018, Texas Instruments Incorporated
+TPS6282xEVM-794 Evaluation Module
+4 Board Layout
+This section provides the TPS6282xEVM-794 board layout and illustrations in Figure 3 through Figure 7.
+The Gerbers are available on the EVM product page: TPS62825EVM-794.
+Figure 3. Top Assembly Figure 4. Top Layer
+Figure 5. Signal Layer 1 Figure 6. Signal Layer 2
+
+===== PDF PAGE 6 =====
+Board Layout www.ti.com
+6 SLVUBE4 – March 2018
+Submit Documentation Feedback
+Copyright © 2018, Texas Instruments Incorporated
+TPS6282xEVM-794 Evaluation Module
+Figure 7. Bottom Layer
+
+===== PDF PAGE 7 =====
+www.ti.com Schematic and Bill of Materials
+7SLVUBE4 – March 2018
+Submit Documentation Feedback
+Copyright © 2018, Texas Instruments Incorporated
+TPS6282xEVM-794 Evaluation Module
+5 Schematic and Bill of Materials
+This section provides the TPS6282xEVM-794 schematic and bill of materials (BOM).
+5.1 Schematic
+Figure 8 illustrates the EVM schematic.
+Figure 8. TPS6282xEVM-794 Schematic
+
+===== PDF PAGE 8 =====
+Schematic and Bill of Materials www.ti.com
+8 SLVUBE4 – March 2018
+Submit Documentation Feedback
+Copyright © 2018, Texas Instruments Incorporated
+TPS6282xEVM-794 Evaluation Module
+5.2 Bill of Materials
+Table 2 lists the BOM for this EVM.
+Table 2. TPS6282xEVM-794 Bill of Materials
+Count
+Designator Value Description Package
+Reference Part Number Manufacturer
+-001 -002
+1 1 C1 4.7µF CAP, CERM, 4.7 µF, 6.3 V, ±10%, X7R, 0603 0603 JMK107BB7475MA-T Taiyo Yuden
+2 2 C2, C4 10µF CAP, CERM, 10 µF, 10 V, ±20%, X7R, 0603 0603 GRM188Z71A106MA73D Murata
+1 1 C3 120pF CAP, CERM, 120 pF, 50 V, ±5%, C0G/NP0, 0603 0603 Std Std
+1 1 C6 47µF CAP, CERM, 47 µF, 10 V, ±20%, X7R, 1210 1210 GRM32ER71A476ME15L Murata
+1 1 L1 470nH Inductor, Shielded, 470 nH, 3.6 A, 0.032 ohm, SMD 2016 DFE201610E-R47M=P2 Murata
+1 1 R1 200k RES, 200 k, 1%, 0.1 W, 0603 0603 Std Std
+3 3 R2, R3, R4 100k RES, 100 k, 1%, 0.1 W, 0603 0603 Std Std
+1 0 U1 2-A Step-Down Converter with 1% Output Accuracy in 1.5-mm × 1.5-mm QFN 1.5x1.5mm TPS62825DMQ Texas Instruments
+0 1 U1 3-A Step-Down Converter with 1% Output Accuracy in 1.5-mm × 1.5-mm QFN 1.5x1.5mm TPS62826DMQ Texas Instruments
+
+===== PDF PAGE 9 =====
+IMPORTANT NOTICE FOR TI DESIGN INFORMATION AND RESOURCES
+Texas Instruments Incorporated (‘TI”) technical, application or other design advice, services or information, including, but not limited to,
+reference designs and materials relating to evaluation modules, (collectively, “TI Resources”) are intended to assist designers who are
+developing applications that incorporate TI products; by downloading, accessing or using any particular TI Resource in any way, you
+(individually or, if you are acting on behalf of a company, your company) agree to use it solely for this purpose and subject to the terms of
+this Notice.
+TI’s provision of TI Resources does not expand or otherwise alter TI’s applicable published warranties or warranty disclaimers for TI
+products, and no additional obligations or liabilities arise from TI providing such TI Resources. TI reserves the right to make corrections,
+enhancements, improvements and other changes to its TI Resources.
+You understand and agree that you remain responsible for using your independent analysis, evaluation and judgment in designing your
+applications and that you have full and exclusive responsibility to assure the safety of your applications and compliance of your applications
+(and of all TI products used in or for your applications) with all applicable regulations, laws and other applicable requirements. You
+represent that, with respect to your applications, you have all the necessary expertise to create and implement safeguards that (1)
+anticipate dangerous consequences of failures, (2) monitor failures and their consequences, and (3) lessen the likelihood of failures that
+might cause harm and take appropriate actions. You agree that prior to using or distributing any applications that include TI products, you
+will thoroughly test such applications and the functionality of such TI products as used in such applications. TI has not conducted any
+testing other than that specifically described in the published documentation for a particular TI Resource.
+You are authorized to use, copy and modify any individual TI Resource only in connection with the development of applications that include
+the TI product(s) identified in such TI Resource. NO OTHER LICENSE, EXPRESS OR IMPLIED, BY ESTOPPEL OR OTHERWISE TO
+ANY OTHER TI INTELLECTUAL PROPERTY RIGHT, AND NO LICENSE TO ANY TECHNOLOGY OR INTELLECTUAL PROPERTY
+RIGHT OF TI OR ANY THIRD PARTY IS GRANTED HEREIN, including but not limited to any patent right, copyright, mask work right, or
+other intellectual property right relating to any combination, machine, or process in which TI products or services are used. Information
+regarding or referencing third-party products or services does not constitute a license to use such products or services, or a warranty or
+endorsement thereof. Use of TI Resources may require a license from a third party under the patents or other intellectual property of the
+third party, or a license from TI under the patents or other intellectual property of TI.
+TI RESOURCES ARE PROVIDED “AS IS” AND WITH ALL FAULTS. TI DISCLAIMS ALL OTHER WARRANTIES OR
+REPRESENTATIONS, EXPRESS OR IMPLIED, REGARDING TI RESOURCES OR USE THEREOF, INCLUDING BUT NOT LIMITED TO
+ACCURACY OR COMPLETENESS, TITLE, ANY EPIDEMIC FAILURE WARRANTY AND ANY IMPLIED WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT OF ANY THIRD PARTY INTELLECTUAL
+PROPERTY RIGHTS.
+TI SHALL NOT BE LIABLE FOR AND SHALL NOT DEFEND OR INDEMNIFY YOU AGAINST ANY CLAIM, INCLUDING BUT NOT
+LIMITED TO ANY INFRINGEMENT CLAIM THAT RELATES TO OR IS BASED ON ANY COMBINATION OF PRODUCTS EVEN IF
+DESCRIBED IN TI RESOURCES OR OTHERWISE. IN NO EVENT SHALL TI BE LIABLE FOR ANY ACTUAL, DIRECT, SPECIAL,
+COLLATERAL, INDIRECT, PUNITIVE, INCIDENTAL, CONSEQUENTIAL OR EXEMPLARY DAMAGES IN CONNECTION WITH OR
+ARISING OUT OF TI RESOURCES OR USE THEREOF, AND REGARDLESS OF WHETHER TI HAS BEEN ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGES.
+You agree to fully indemnify TI and its representatives against any damages, costs, losses, and/or liabilities arising out of your non-
+compliance with the terms and provisions of this Notice.
+This Notice applies to TI Resources. Additional terms apply to the use and purchase of certain types of materials, TI products and services.
+These include; without limitation, TI’s standard terms for semiconductor products http://www.ti.com/sc/docs/stdterms.htm), evaluation
+modules, and samples (http://www.ti.com/sc/docs/sampterms.htm).
+Mailing Address: Texas Instruments, Post Office Box 655303, Dallas, Texas 75265
+Copyright © 2018, Texas Instruments Incorporated

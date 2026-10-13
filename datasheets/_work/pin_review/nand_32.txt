@@ -1,0 +1,72 @@
+6-7.          Block Erase
+
+The MX30LFxG18AC supports a block erase command. This command will erase a block of 64 pages asso-
+ciated with the most significant address bits.
+The completion of the erase operation can be detected by R/B# pin or Status register bit (IO6). Recommend
+to check the status register bit IO0 after the erase operation completes.
+During the erasing process, only the read status register command and reset command can be accepted,
+others are ignored.
+
+
+Figure 16. AC Waveforms for Erase Operation
+
+
+                       CLE                         tCLS
+
+
+                                                              tCLH
+                       CE#                        tCS
+
+
+
+
+
+                                                                                              tWC
+                      WE#
+
+
+
+
+                                                                tALH                                                      tALS
+
+                        ALE
+
+
+
+                                                                                                                                                                     tWB
+                       RE#
+
+
+
+
+
+                                                     tDS                                   tDH                                                                                                                                                                       tDHtDS                                                                                                                                                                                                                                                                                                                                                                                             tDHtDStDHtDS
+
+                IO[7:0]                                   60h                                                                                                     D0h                             70h             Stauts
+                                                                                                                                                                                                                  Output
+
+                                                                         3rd Address  Cycle               4th Address  Cycle              5th Address  Cycle                  tERASE
+                    R/B#
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                        32

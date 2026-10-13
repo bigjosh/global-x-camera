@@ -1,0 +1,71 @@
+STM32N6x5xx                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            STM32N6x7xx
+
+
+                                                                                                               Figure 32. Synchronous multiplexed NOR/PSRAM read timings
+                                                                                                                    tw(CLK)                                                                                                                                      tw(CLK)                                                                                                                                                                                                                                                                                    BUSTURN = 0
+
+                                            FMC_CLK
+                                                                                    td(CLKL-NADVL)                                                                                                                                             Data latency = 0 (2 cycles)
+                                                                                                                                                                                                                                  td(CLKL-NADVH)
+                                    FMC_NADV
+
+                                                                                                                                                                             td(CLKL-AV)                                                                                                                                                                                                                                                                                                           td(CLKH-AIV)
+
+                          FMC_A[25:16]
+
+                                                                                                                                                                                                                                                         td(CLKL-NOEL)                                                                                                                                                                                                                         td(CLKH-NOEH)
+                                        FMC_NOE
+
+                                                                                                                                                                 td(CLKL-ADIV)
+                                                                                     td(CLKL-ADV)                                                                                                                                                                                                                                                                                                                                                                              tsu(ADV-CLKH)                                                                                            th(CLKH-ADV)
+
+                        FMC_AD[15:0]                                                                                                                                                                                                   AD[15:0]                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                D1                                                                                                                                                                                                                                                  D2
+
+                                                                                                                                                                             td(CLKL-NExL)                                                                                                                                                                                                                                                                                                     td(CLKH-NExH)
+                                             FMC_NEx
+
+                                                                                                                                                              td(NExL-NWAITV)                                                                                                                                                                         tsu(NWAITV-CLKH)                                                                                                                  th(CLKH-NWAITV)
+                                FMC_NWAIT
+               (WAITCFG = 1b,
+                   WAITPOL = 0b)                                                                                                                                                                                                                                                                                                                                                                                                                         tsu(NWAITV-CLKH)                                                                     th(CLKH-NWAITV)
+                                FMC_NWAIT                                                                                                                                                                                                                                                            tsu(NWAITV-CLKH)                                                                                                        th(CLKH-NWAITV)
+               (WAITCFG = 0b,
+                   WAITPOL = 0b)                                                                                                                                                                                                                                                                                                                        tsu(NWAITV-CLKH)                                                                                                                 th(CLKH-NWAITV)
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        MS32757V3
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                                                                                             DS14791 Rev 10                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        191/263
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        238

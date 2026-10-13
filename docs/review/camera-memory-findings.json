@@ -1,0 +1,518 @@
+{
+  "date": "2026-09-05",
+  "scope": "Camera/module/CSI/rails/startup and external NOR/NAND review; source reconstruction only, no circuit edits",
+  "connectivity_file": "hardware/reconstruction/schematic-connectivity.json",
+  "connectivity_sha256": "51e7cc050d23652d4eaf891e7384f519d6f3fd94c0c72f2dd945cbf626a62e98",
+  "findings": [
+    {
+      "id": "CAM-001",
+      "severity": "blocker",
+      "confidence": "confirmed",
+      "title": "Rebuild J3 signal lands before PCB release",
+      "observed": "The current GX.pretty/J3_Recovered.kicad_mod retains 30 signal lands of 0.127 by 1.1176 mm centered at Y=+/-0.7468 mm. Hirose recommends 0.18+/-0.02 mm width, with 1.80/1.18 mm outer/inner row extents, implying 0.31 mm pad length. The recovered lands extend into the central area marked no conductive trace.",
+      "consequence": "This is a manufacturing geometry defect, not an ERC error. Fine-pitch soldering and connector fit cannot be released with these lands.",
+      "recommendation": "Rebuild copper, mask, and paste from the exact Hirose drawing; independently verify pin-1/mating orientation. Keep the four end power contacts 31-34 on GND. Obtain a controlled drawing or vendor acceptance for production because the archived sheet is marked reference.",
+      "evidence": [
+        {
+          "file": "datasheets/connectors/BM28B0.6-30DS_51_drawing.pdf",
+          "pdf_pages": [
+            1
+          ],
+          "section": "Recommended PCB layout and metal mask",
+          "url": "https://www.hirose.com/en/product/document?clcode=CL0673-5021-0-51&productname=BM28B0.6-30DS%2f2-0.35V(51)&series=BM28&lang=en&documenttype=2DDrawing&documentid=0001121806"
+        },
+        {
+          "file": "hardware/kicad/GX.pretty/J3_Recovered.kicad_mod",
+          "line": 1
+        },
+        {
+          "file": "datasheets/camera/CAM-5G0-079CLR_schematic.pdf",
+          "pdf_pages": [
+            1
+          ],
+          "url": "https://www.st.com/resource/en/schematic_pack/cam-5g0-079clr-schematic.pdf"
+        }
+      ],
+      "closure": "Compare every land and mask aperture numerically, then inspect a 1:1 plot and actual mating part before routing/fabrication."
+    },
+    {
+      "id": "CAM-002",
+      "severity": "high",
+      "confidence": "conditional",
+      "title": "Sensor revision can make a 50 ms cold capture impossible",
+      "observed": "The module BOM does not identify the sensor silicon cut. Official ST driver revision 0x1111 uses cut1_patch=6868 bytes; revision 0x1120 uses cut2_patch=260 bytes, loaded at each power-on. UM2829 describes the patch load/activation before BOOT and STREAMING.",
+      "consequence": "At the sensor maximum 1 MHz I2C rate, patch data plus ACK alone takes at least 61.812 ms for cut1 or 2.340 ms for cut2. At 400 kHz those bounds are 154.530 and 5.850 ms. The cut1 path already exceeds 50 ms before power ramp, MCU boot, configuration, exposure, or readout. These are transfer lower bounds, not measured startup times.",
+      "recommendation": "Read and record the module revision on samples and qualify the production supply to a supported cut/patch combination. Use the approved patch for that cut and measure it; do not omit a required patch merely to meet latency. If only cut1 is available, revise latency or power-retention architecture.",
+      "evidence": [
+        {
+          "file": "datasheets/camera/VD55G0_UM2829_integration_registers.pdf",
+          "pdf_pages": [
+            7,
+            12
+          ],
+          "section": "READY_TO_BOOT and firmware patch",
+          "url": "https://www.st.com/resource/en/user_manual/um2829-how-to-integrate-and-configure-the-vd55g0-device-from-a-hardware-and-software-perspective-stmicroelectronics.pdf"
+        },
+        {
+          "file": "datasheets/camera/VD55G0_DS13170_datasheet.pdf",
+          "pdf_pages": [
+            21
+          ],
+          "section": "I2C maximum clock",
+          "url": "https://www.st.com/resource/en/datasheet/vd55g0.pdf"
+        },
+        {
+          "file": "docs/review/evidence/vd55g0.c",
+          "url": "https://github.com/STMicroelectronics/vd55g0-linux-driver/blob/a05627b0f6d8775aa54b6fa306e91f425f2cbf9e/vd55g0.c",
+          "lines": [
+            1133,
+            1751
+          ]
+        },
+        {
+          "file": "docs/review/evidence/vd55g0_patches.h",
+          "url": "https://github.com/STMicroelectronics/vd55g0-linux-driver/blob/a05627b0f6d8775aa54b6fa306e91f425f2cbf9e/vd55g0_patches.h",
+          "array_sizes": {
+            "cut1_patch": 6868,
+            "cut2_patch": 260
+          }
+        }
+      ],
+      "closure": "A procurement-controlled sensor revision and measured cold boot-to-valid-frame trace within the allocated budget."
+    },
+    {
+      "id": "CAM-003",
+      "severity": "high",
+      "confidence": "measurement",
+      "title": "Define exposure completion and first valid frame for the 50 ms requirement",
+      "observed": "The specification requires full native resolution and bit depth within 50 ms. VD55G0 full depth is 10-bit, with RAW10 output, not 9-bit fast mode or RAW8. Autoexposure updates from preceding frame statistics; a cold first frame is not guaranteed to have converged exposure. The host must provide CLKIN before XSHUTDOWN release and wait for READY_TO_BOOT before I2C access.",
+      "consequence": "A steady-state 185 fps rating (~5.41 ms frame period) does not establish cold-shutter latency or image exposure quality. Long exposures and several AEC convergence frames can consume the deadline even with cut2.",
+      "recommendation": "Define whether the deadline means end of exposure or a complete valid frame in SRAM. Use full 644x604, normal 10-bit ADC and RAW10. Budget rail/ROM/FSBL/patch/configuration/exposure/readout separately; choose a bounded manual or seeded AEC cold-start exposure policy and record actual applied gain/exposure with the image. GPIO0 is currently unconnected, so use supported I2C follower trigger or streaming control unless precise external-trigger wiring is added.",
+      "evidence": [
+        {
+          "file": "datasheets/camera/VD55G0_DS13170_datasheet.pdf",
+          "pdf_pages": [
+            8,
+            16,
+            20
+          ],
+          "url": "https://www.st.com/resource/en/datasheet/vd55g0.pdf"
+        },
+        {
+          "file": "datasheets/camera/VD55G0_UM2829_integration_registers.pdf",
+          "pdf_pages": [
+            7,
+            20,
+            21,
+            35,
+            36,
+            37,
+            39,
+            40
+          ],
+          "url": "https://www.st.com/resource/en/user_manual/um2829-how-to-integrate-and-configure-the-vd55g0-device-from-a-hardware-and-software-perspective-stmicroelectronics.pdf"
+        },
+        {
+          "file": "spec.md",
+          "section": "1.2 and 6"
+        },
+        {
+          "file": "docs/review/mcu-review.md",
+          "cross_reference": "MCU-006 boot-load budget"
+        }
+      ],
+      "closure": "Instrument power, XSHUTDOWN, MCLK, first CSI frame start/end and exposure status across light levels and supply/temperature corners."
+    },
+    {
+      "id": "CAM-004",
+      "severity": "high",
+      "confidence": "conditional",
+      "title": "Power-down must remove analog power before camera core and I/O",
+      "observed": "U9 analog enable is controllable, but U10 core enable follows 1V8 and camera I/O is directly on 1V8. The recorded flow ends by releasing the main latch. DS13170 requires XSHUTDOWN low before analog power-down, analog below 20% of its minimum (0.54 V), then at least 1000 us before core/I/O fall. TLV700 has no specified active output-discharge function or guaranteed discharge interval.",
+      "consequence": "Simultaneously dropping the main latch does not guarantee the required sequence. Disabling U9 and waiting a nominal 1 ms also does not establish that its output capacitor has already discharged below 0.54 V.",
+      "recommendation": "Stop streaming, enter standby, assert shutdown, disable U9, and keep the upstream/core/I/O rails alive until measured or guaranteed analog decay plus 1 ms has elapsed. Add a defined discharge path or choose a regulator with specified output discharge if software timing cannot bound it. Preserve the existing startup delay of >=1 ms after both lower rails are actually valid before enabling analog.",
+      "evidence": [
+        {
+          "file": "datasheets/camera/VD55G0_DS13170_datasheet.pdf",
+          "pdf_pages": [
+            17,
+            18
+          ],
+          "url": "https://www.st.com/resource/en/datasheet/vd55g0.pdf"
+        },
+        {
+          "file": "datasheets/camera/VD55G0_UM2829_integration_registers.pdf",
+          "pdf_pages": [
+            7,
+            8
+          ],
+          "url": "https://www.st.com/resource/en/user_manual/um2829-how-to-integrate-and-configure-the-vd55g0-device-from-a-hardware-and-software-perspective-stmicroelectronics.pdf"
+        },
+        {
+          "file": "datasheets/power/TI_TLV700_datasheet.pdf",
+          "pdf_pages": [
+            6,
+            11,
+            12
+          ],
+          "url": "https://www.ti.com/lit/ds/symlink/tlv700.pdf"
+        },
+        {
+          "file": "hardware/reconstruction/schematic-connectivity.json",
+          "components": [
+            "U9",
+            "U10",
+            "CAM1"
+          ]
+        }
+      ],
+      "closure": "Scope simultaneous VANA/VCORE/VDDIO/XSHUTDOWN at cold start, normal shutdown, rapid re-press and USB transitions; determine behavior on uncontrolled brownout separately."
+    },
+    {
+      "id": "CAM-005",
+      "severity": "medium",
+      "confidence": "conditional",
+      "title": "The 1.2 V camera core choice has limited tolerance margin",
+      "observed": "U10 NCP115AMX120TCG nominal 1.200 V supplies a sensor specified at 1.10-1.26 V, nominal 1.15 V. NCP115 specifies +/-40 mV output accuracy at its stated 1 mA test point and separately up to 30 mV load regulation for XDFN. Static 1.16-1.24 V fits, leaving only 20 mV to the sensor upper limit before accounting for other effects.",
+      "consequence": "The nominal value is not itself an overvoltage fault, but typical graphs or the +/-1% room-temperature headline do not establish a guaranteed rail budget across input, load, temperature and transients. Sensor core ripple allowance is 20 mV up to 10 MHz.",
+      "recommendation": "Close the signed worst-case regulation and transient budget using exact test conditions and actual loading. Retain U10 only if the full 1.10-1.26 V window is met at the module; otherwise select a tighter regulator nearer 1.15 V. Do not simply add all maxima as a claim of actual overvoltage.",
+      "evidence": [
+        {
+          "file": "datasheets/power/onsemi_NCP115_datasheet.pdf",
+          "pdf_pages": [
+            3,
+            4
+          ],
+          "url": "https://www.onsemi.cn/download/data-sheet/pdf/ncp115-d.pdf"
+        },
+        {
+          "file": "datasheets/camera/VD55G0_DS13170_datasheet.pdf",
+          "pdf_pages": [
+            16,
+            19,
+            20
+          ],
+          "url": "https://www.st.com/resource/en/datasheet/vd55g0.pdf"
+        },
+        {
+          "file": "hardware/reconstruction/schematic-connectivity.json",
+          "components": [
+            "U10",
+            "C65",
+            "CAM1"
+          ]
+        }
+      ],
+      "closure": "Worst-case design calculation plus VCORE measurements at sensor startup/streaming, including the specified 38 mA streaming-start transient."
+    },
+    {
+      "id": "CAM-006",
+      "severity": "medium",
+      "confidence": "conditional",
+      "title": "XSHUTDOWN pulldown is not proven against maximum input leakage",
+      "observed": "R20 is 100 kohm. Sensor digital-input leakage permits 10 uA, while VIL max is 0.3*VDDIO. An adverse 10 uA leakage through 100 kohm permits 1 V, above the ~0.54 V low threshold at nominal I/O power. Actual leakage direction and MCU reset-state contributions are not characterized here.",
+      "consequence": "The stated default-low shutdown guarantee has no demonstrated worst-case margin during reset and rail sequencing.",
+      "recommendation": "Use a stronger pulldown such as 10 kohm, or document a guaranteed combined leakage bound including the MCU pin. A lower resistance adds small current only while shutdown is released. R21 U9 enable does not have this same issue: its 100 kohm with TLV700 0.5 uA maximum enable leakage yields 50 mV.",
+      "evidence": [
+        {
+          "file": "datasheets/camera/VD55G0_DS13170_datasheet.pdf",
+          "pdf_pages": [
+            20
+          ],
+          "section": "Digital inputs",
+          "url": "https://www.st.com/resource/en/datasheet/vd55g0.pdf"
+        },
+        {
+          "file": "datasheets/power/TI_TLV700_datasheet.pdf",
+          "pdf_pages": [
+            6
+          ],
+          "section": "Enable current",
+          "url": "https://www.ti.com/lit/ds/symlink/tlv700.pdf"
+        },
+        {
+          "file": "hardware/reconstruction/schematic-connectivity.json",
+          "components": [
+            "R20",
+            "R21",
+            "CAM1"
+          ]
+        }
+      ],
+      "closure": "Guaranteed leakage calculation over corners, plus a captured reset/startup waveform below VIL until the intended release."
+    },
+    {
+      "id": "CAM-007",
+      "severity": "medium",
+      "confidence": "measurement",
+      "title": "1 MHz camera I2C needs a capacitance and pull-up budget",
+      "observed": "R22/R23 are 4.7 kohm to 1V8. Sensor Fm+ allows 120 ns rise time, while Fast mode allows 300 ns. A lumped RC estimate tr(30-70%)=0.8473*R*C gives maximum bus capacitance about 30 pF at 1 MHz or 75 pF at 400 kHz with these pulls.",
+      "consequence": "The speed used to reduce patch/configuration time is not guaranteed by choosing a 1 MHz peripheral setting; module flex, connector, MCU/sensor pads and probe capacitance all count.",
+      "recommendation": "Keep the bus short and measure rise/fall times at the module. Select pull-ups from actual capacitance and both devices' sink limits if Fm+ is needed. Use MCO2 on PC9 at a legal 6-27 MHz clock with the documented duty/jitter limits; MCU AF/domain checks passed separately.",
+      "evidence": [
+        {
+          "file": "datasheets/camera/VD55G0_DS13170_datasheet.pdf",
+          "pdf_pages": [
+            20,
+            21
+          ],
+          "url": "https://www.st.com/resource/en/datasheet/vd55g0.pdf"
+        },
+        {
+          "file": "docs/review/mcu-review.md",
+          "section": "PC9 MCO2 and PC10/PC11 I2C4 at VDDIO4=1V8"
+        }
+      ],
+      "closure": "Scope I2C timing and MCLK at final loading; no transfer errors across supply/temperature corners."
+    },
+    {
+      "id": "CAM-008",
+      "severity": "medium",
+      "confidence": "conditional",
+      "title": "Use the exact 079CLR module envelope for mechanical release",
+      "observed": "The existing spec used a related CAM-6G3 STEP. Exact DB5266 Rev2 specifies 079CLR head 5x5x2.8 mm, total 11.65x8x2.8 mm, and connector-to-optical-center distance 7.45 mm. ST now lists an exact CAM-5G0-079CLR STEP ZIP; direct TLS retrieval failed in this review, so no replacement model was claimed imported.",
+      "consequence": "Related-module geometry cannot certify flex sweep, connector orientation, optical aperture, or the complete <=5 mm product stack.",
+      "recommendation": "Retrieve/import the exact STEP via the listed official link or use a physical module. Combine it with the corrected J3 footprint, actual mating height, PCB/enclosure datums, clearances and optical field of view before locking placement. Evaluation-module procurement and production-unit supply should also be confirmed with the module supplier.",
+      "evidence": [
+        {
+          "file": "datasheets/camera/CAM-55G0_DB5266_module_brief.pdf",
+          "pdf_pages": [
+            3
+          ],
+          "url": "https://www.st.com/resource/en/data_brief/cam-55g0.pdf"
+        },
+        {
+          "url": "https://www.st.com/en/evaluation-tools/cam-55g0.html",
+          "section": "CAD Design Files: exact 079CLR STEP"
+        },
+        {
+          "url": "https://www.st.com/resource/en/cad_design_files/cam-5g0-079clr-step.zip",
+          "status": "URL discovered; HTTPS client transfer reset; not locally archived"
+        }
+      ],
+      "closure": "Exact CAD/physical fit with the intended flex orientation and a complete thickness/clearance drawing."
+    },
+    {
+      "id": "CAM-009",
+      "severity": "low",
+      "confidence": "conditional",
+      "title": "Qualify the clear-filter optics for intended lighting",
+      "observed": "The selected 079CLR has a clear filter and 13.5 cm-to-infinity depth of field. ST AN5836 documents persistent visible-domain artifacts after intense focused illumination, including when the sensor is unpowered.",
+      "consequence": "A powered-off outdoor camera can still acquire image artifacts; close-up behavior and spectral appearance are also properties of the selected optical module, not MCU processing.",
+      "recommendation": "Include intended outdoor/indoor lighting and near-distance scenes in optical qualification. If necessary, add an optical cover/shutter or revise the filter/module specification with the supplier; avoid treating power gating as optical protection.",
+      "evidence": [
+        {
+          "file": "datasheets/camera/CAM-55G0_DB5266_module_brief.pdf",
+          "pdf_pages": [
+            3
+          ],
+          "url": "https://www.st.com/resource/en/data_brief/cam-55g0.pdf"
+        },
+        {
+          "file": "datasheets/camera/VD55G0_AN5836_visible_domain_limitations.pdf",
+          "pdf_pages": [
+            1,
+            5
+          ],
+          "url": "https://www.st.com/resource/en/application_note/an5836-vd55g0-visible-domain-limitation-stmicroelectronics.pdf"
+        }
+      ],
+      "closure": "Acceptable images after intended storage/illumination exposure and at required scene distances."
+    },
+    {
+      "id": "MEM-001",
+      "severity": "high",
+      "confidence": "conditional",
+      "title": "Use BCH4 or stronger and protect metadata outside the FMC BCH data path",
+      "observed": "MX30LF2G18AC requires 4-bit correction per (512+16) bytes. STM32N6 FMC supports BCH4/BCH8 per 512-byte data sector; BCH4 produces 7 parity bytes, or 28 bytes per 2 KiB page. Hamming is the reset/default algorithm and is insufficient. RM0486 explicitly says its BCH encoder does not process spare-area metadata.",
+      "consequence": "There is no inherent controller ECC-strength incompatibility, but selecting Hamming or putting unprotected commit/allocation data into OOB would leave the required integrity contract incomplete. CRC detects errors but does not replace correction.",
+      "recommendation": "Configure BCH explicitly, specify an OOB layout retaining factory bad-block markers, and place critical metadata in BCH-protected data sectors or provide its own adequate error protection/redundancy. Flip corrected bits using FMC error locations and handle uncorrectable sectors, erased pages and ECC-field errors.",
+      "evidence": [
+        {
+          "file": "datasheets/memory/MX30LF2G18AC_datasheet_PM2129_v1.4.pdf",
+          "pdf_pages": [
+            6,
+            7,
+            73,
+            74
+          ],
+          "url": "https://www.macronix.com/Lists/Datasheet/Attachments/8461/MX30LF2G18AC%2C%203V%2C%202Gb%2C%20v1.4.pdf"
+        },
+        {
+          "file": "datasheets/processor/STM32N6_RM0486_reference_manual.pdf",
+          "pdf_pages": [
+            1231,
+            1232,
+            1233,
+            1234
+          ],
+          "section": "NAND ECC controller and sequencer",
+          "url": "https://www.st.com/resource/en/reference_manual/rm0486-stm32n647657xx-armbased-32bit-mcus-stmicroelectronics.pdf"
+        }
+      ],
+      "closure": "Documented format plus injected 1-4 bit errors in each data sector, parity and metadata; correctable recovery and deterministic rejection of uncorrectable records."
+    },
+    {
+      "id": "MEM-002",
+      "severity": "high",
+      "confidence": "conditional",
+      "title": "Power-fail recovery must respect partial-program and erase rules",
+      "observed": "The spec calls for a verified commit and redundant metadata but implementation is not present here. AC permits at most four partial programs per page and requires ascending page order within a block. Macronix warns an interrupted program/erase can appear readable yet have inadequate retention margin. Pulling WP# low or issuing reset during program/erase aborts it.",
+      "consequence": "A last-minute WP# assertion, a same-page commit-bit rewrite, or an immediate successful readback cannot by itself prove a durable transaction. Reusing an uncertain erased page/block can damage later recovery.",
+      "recommendation": "Use append-only, BCH-protected commit records and an interrupted-operation ledger; keep old committed records until new ones pass status/ECC/CRC checks. Quarantine/re-erase uncertain blocks. Preserve factory bad-block marks before erase and budget partial-program count including ECC/OOB writes. Keep WP# high until the final operation completes; only then protect and remove power.",
+      "evidence": [
+        {
+          "file": "datasheets/memory/MX30LF2G18AC_datasheet_PM2129_v1.4.pdf",
+          "pdf_pages": [
+            27,
+            40,
+            65,
+            71,
+            72,
+            73,
+            74
+          ],
+          "url": "https://www.macronix.com/Lists/Datasheet/Attachments/8461/MX30LF2G18AC%2C%203V%2C%202Gb%2C%20v1.4.pdf"
+        },
+        {
+          "file": "datasheets/memory/Macronix_AN0340_NAND_interrupted_program_erase.pdf",
+          "pdf_pages": [
+            3,
+            4
+          ],
+          "url": "https://www.macronix.com/Lists/ApplicationNote/Attachments/1921/AN0340V1-Preparing%20NAND%20Flash%20for%20an%20Unexpected%20Power%20Loss.pdf"
+        },
+        {
+          "file": "datasheets/memory/Macronix_AN0363_NAND_unexpected_power_loss.pdf",
+          "pdf_pages": [
+            5,
+            6
+          ],
+          "url": "https://www.macronix.com/Lists/ApplicationNote/Attachments/1924/AN0363V1%20-%20Managing%20Unexpected%20NAND%20Flash%20Power%20Loss%20In%20Embedded%20Systems.pdf"
+        }
+      ],
+      "closure": "Randomly interrupt power throughout data, ECC, commit and erase stages; every reboot must recover prior valid images and reject uncertain new records without erasing valid factory markers."
+    },
+    {
+      "id": "MEM-003",
+      "severity": "medium",
+      "confidence": "conditional",
+      "title": "Keep NAND scanning and erase work outside acquisition latency",
+      "observed": "The device has 2048 blocks; factory markers occupy the first spare byte of pages0 and1 in each block. At the specified 25 us maximum array-to-buffer time, a two-marker full scan can budget 4096*25 us=102.4 ms before command/transfer overhead. This is a worst-case timing budget, not a minimum or a measured scan time.",
+      "consequence": "An unconditional startup scan before camera capture is incompatible with a guaranteed 50 ms acquisition budget at the device timing corner, even though save completion is allowed later.",
+      "recommendation": "Persist redundant protected allocation/BBT checkpoints, perform first-use formatting and full recovery scans in a separate mode or after capture into SRAM, and maintain a reserve of erased good blocks. Plan recovery paths without making NAND ready a prerequisite for exposure when SRAM can hold the frame.",
+      "evidence": [
+        {
+          "file": "datasheets/memory/MX30LF2G18AC_datasheet_PM2129_v1.4.pdf",
+          "pdf_pages": [
+            66,
+            73,
+            74
+          ],
+          "url": "https://www.macronix.com/Lists/Datasheet/Attachments/8461/MX30LF2G18AC%2C%203V%2C%202Gb%2C%20v1.4.pdf"
+        },
+        {
+          "file": "datasheets/memory/Macronix_AN0545_NAND_design_in_notice.pdf",
+          "pdf_pages": [
+            1,
+            2,
+            3
+          ],
+          "url": "https://www.macronix.com/Lists/ApplicationNote/Attachments/2005/AN0545V2%20-%20NAND%20Design-In%20Notice.pdf"
+        }
+      ],
+      "closure": "Measured normal and damaged-metadata startup paths with explicit acquisition behavior; documented minimum erased reserve."
+    },
+    {
+      "id": "MEM-004",
+      "severity": "medium",
+      "confidence": "conditional",
+      "title": "NOR warm-reset state needs a recovery contract",
+      "observed": "IQ fixes QE=1 but still accepts standard single-line SPI. WSON8 has no dedicated reset input. Guaranteed power initialization requires VCC below0.8 V for at least100 us; a processor reset or quick power re-press does not necessarily do that. UM3234 documents a fixed legacy0Bh boot read, not a documented universal flash reset/release sequence.",
+      "consequence": "If firmware leaves NOR in deep power-down, continuous-read/wrap state, or an unfinished write, watchdog/BOR/debug reset can re-enter ROM with an unsuitable flash state. This is conditional on firmware behavior, not a proven failure of the current absent firmware.",
+      "recommendation": "Keep boot NOR in a ROM-compatible state before reset and avoid deep power-down/volatile read modes unless reset recovery is demonstrated. Use the66h/99h sequence only when safe; it takes about30 us and may corrupt an active write. Respect20 us read-ready and5 ms write-inhibit after power-up. Restrict133 MHz reads to VCC>=3.0 V; at2.7 V the datasheet fast-clock limit is104 MHz.",
+      "evidence": [
+        {
+          "file": "datasheets/memory/W25Q128JV_datasheet_RevM.pdf",
+          "pdf_pages": [
+            10,
+            17,
+            60,
+            61,
+            62
+          ],
+          "url": "https://www.winbond.com/resource-files/W25Q128JV%20RevM%2012242024%20Plus.pdf"
+        },
+        {
+          "file": "docs/review/mcu-review.md",
+          "cross_reference": "MCU-001 actual boot CS error; MCU-006 ROM protocol/timing"
+        }
+      ],
+      "closure": "Test cold, warm, watchdog, BOR, USB-powered reset and rapid re-press from every NOR state allowed by firmware."
+    },
+    {
+      "id": "MEM-005",
+      "severity": "low",
+      "confidence": "confirmed",
+      "title": "AC remains supported; AD substitution changes the storage format",
+      "observed": "Macronix March2026 MPLP lists MX30LF2G18AC-TI as recommended for new design with longevity support throughDec2029; AD-TI is listed throughJul2030. This is not an EOL notice. The migration note changes AC4-bit/528B and64-byte spare to AD8-bit/544B and128-byte spare, with different endurance and program/erase performance.",
+      "consequence": "There is no evidence here requiring an immediate AC replacement. A purchasing substitution to AD without firmware/format qualification would be unsafe, and longevity horizon should be checked against the intended production period.",
+      "recommendation": "Keep exact MPN control, confirm supply/support horizon directly with Macronix, and qualify AD as a separate device/format if desired. Do not label AC obsolete from distributor stock or the existence of a migration note.",
+      "evidence": [
+        {
+          "file": "datasheets/memory/Macronix_MPLP_part_list_March_2026.pdf",
+          "pdf_pages": [
+            20
+          ],
+          "url": "https://www.macronix.com/en-us/support/Documents/Macronix-Product-Longevity-Program(MPLP)-part-list.pdf"
+        },
+        {
+          "file": "datasheets/memory/Macronix_AN0719_MX30LF2G18AC_to_MX30LF2G28AD_migration.pdf",
+          "pdf_pages": [
+            1,
+            2
+          ],
+          "url": "https://www.macronix.com/Lists/ApplicationNote/Attachments/2069/AN0719V2-MGRT-MX30LF2G18AC%20to%20MX30LF2G28AD.pdf"
+        }
+      ],
+      "closure": "Supplier lifecycle confirmation and a controlled alternate-device qualification before substitutions."
+    }
+  ],
+  "checks_passed_or_bounded": [
+    "Exact module supports one CSI-2 data lane; DATA1P/N positions10/12 mate to MCU lane0. Positions15/17/19/21/22/24 are module NC; added connector power contacts31-34 are GND in both symbols.",
+    "Camera PC9=MCO2 and PC10/PC11=I2C4 on1.8V VDDIO4 pass MCU AF/domain review. A legal MCLK rate such as20MHz can be generated from40MHz HSE divided2, subject configuration and duty/jitter validation.",
+    "C63/C65/C70 provide nominal1uF host capacitors on analog/core/IO respectively; module embedded capacitors do not replace these. Production MLCC effective value/placement remains a layout/BOM check.",
+    "NOR IQ fixedQE does not block ROM legacySPI; its CS pullup and EP ground are valid. Actual ROM CS pin error is MCU-001, not a Winbond protocol fault.",
+    "NAND2.7-3.6V x8, TSOP48 map, supply pins and protection defaults are structurally suitable. FMC BCH exists; actual RNB connection toPF2/NWAIT is a separate MCU-003 issue: relocate toPA7/R12 AF12 on3.3V for dedicatedNANDRNB; do not substitutePE4 on1.8V.",
+    "No schematic or footprint edits were made. Electrical correctness is not inferred from zeroERC.",
+    "NAND PT has a specified internal pulldown; its datasheet explicitly permits low or floating to disable block protection (PDF p12). R27=100 kohm to GND reinforces that default. WP# 10 kohm pulldown, CE# 10 kohm pullup and R/B# 10 kohm pullup have adequate static margin; maintain WP# low during ramp and wait for POR readiness (R/B# or 1 ms, p71)."
+  ],
+  "storage_calculations": [
+    {
+      "storage_bits_per_pixel": 10,
+      "payload_bytes": 486220,
+      "nand_pages": 238,
+      "min_whole_blocks_if_image_block_aligned": 4,
+      "program_busy_typ_ms": 71.4,
+      "program_busy_max_ms": 142.8,
+      "nand_only_busy_energy_at_3V3_typ_mJ": 3.5343,
+      "nand_only_busy_energy_at_3V3_max_current_max_time_mJ": 14.1372,
+      "page_allocation_capacity_at_2008_good_blocks_images": 539,
+      "page_allocation_capacity_at_2048_good_blocks_images": 550
+    },
+    {
+      "storage_bits_per_pixel": 16,
+      "payload_bytes": 777952,
+      "nand_pages": 380,
+      "min_whole_blocks_if_image_block_aligned": 6,
+      "program_busy_typ_ms": 114.0,
+      "program_busy_max_ms": 228.0,
+      "nand_only_busy_energy_at_3V3_typ_mJ": 5.643,
+      "nand_only_busy_energy_at_3V3_max_current_max_time_mJ": 22.572,
+      "page_allocation_capacity_at_2008_good_blocks_images": 338,
+      "page_allocation_capacity_at_2048_good_blocks_images": 344
+    }
+  ],
+  "calculation_limits": "Busy time and energy use datasheet program timing/current only, at3.3V; exclude bus transfer, ECC CPU, readback, erase, metadata and other system loads. Capacity excludes metadata/redundancy/reserve and assumes page-granular allocation across blocks; whole-block allocation yields less. These are estimates, not measurements.",
+  "driver_evidence_commit": "a05627b0f6d8775aa54b6fa306e91f425f2cbf9e"
+}

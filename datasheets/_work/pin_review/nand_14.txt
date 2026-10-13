@@ -1,0 +1,68 @@
+5.                                SCHEMATIC   CELL   LAYOUT AND ADDRESS ASSIGNMENT
+
+                 MX30LFxG18AC NAND device is divided into two planes, which is composed by 64 pages of (2,048+64)-byte
+                 in two NAND strings structure with 32 serial connected cells in each string. Each page has an additional 64
+                 bytes for ECC and other purposes. The device has an on-chip buffer of 2,112 bytes for data load and access.
+                 Each 2K-Byte page has the two area, one is the main area which is 2048-bytes and the other is spare area
+                 which is 64-byte.
+                 There are five address cycles for the address allocation, please refer to the table below.
+
+
+                Table  1. Address Allocation
+
+                                                                Addresses                                                                                                                                                                                                                             IO7                                                                         IO6                                                                         IO5                                                                                             IO4                                                                                             IO3                                                                         IO2                                                                         IO1                                                                         IO0
+
+              Column address - 1st cycle                                                                                               A7                                                                                                                            A6                                                                                           A5                                                                                                                  A4                                                                                                                  A3                                                                                                      A2                                                                                             A1                                                                                             A0
+              Column address - 2nd cycle                                                                                                                 L                                                                                                                              L                                                                                                                  L                                                                                                                                           L                                                                                                                     A11                                                                           A10                                                                                   A9                                                                                             A8
+              Row address - 3rd cycle                                                                                                                                                                                            A19                                                                    A181                                                                             A17                                                                                              A16                                                                                              A15                                                                         A14                                                                         A13                                                                         A12
+              Row address - 4th cycle                                                                                                                                                                             A27                                                                    A26                                                                A25                                                                                                                                                 A24                                                            A23                                                                                  A22                                                                                                   A21                                                                              A20
+              Row address - 5th cycle                                                                                                                                                                                     L                                                                                                                              L                                                                                                                  L                                                                                                                                           L                                                                                                                                              L                                                                                                                          L                                                                                                                A292                                                                         A28
+
+                                  Notes:
+                                                                                1.  A18 is the plane selection.
+                                                                                2. A29 is for 4Gb, "L" (Low) is for 2Gb.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                                                                                                                            14

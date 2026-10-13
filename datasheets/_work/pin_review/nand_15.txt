@@ -1,0 +1,60 @@
+6.                   DEVICE OPERATIONS
+
+           6-1.                  Address Input/Command Input/Data Input
+
+           Address input bus operation is for address input to select the memory address. The command input bus
+           operation is for giving command to the memory. The data input bus is for data input to the memory device.
+
+           Figure 2. AC Waveforms for Command / Address / Data Latch Timing
+
+                        CLE
+                        ALE
+                        CE#
+
+                                                                                                                                                                                       tCS      tCLS      tALS/ /                                                                                                                                                                                           /tCH  tCLH
+
+                                                                                                                                                                                                                    tWP
+                        WE#
+
+
+
+                                                                                                                                                                                                                                  tDS                                                                    tDH
+
+                 IO[7:0]
+
+
+
+           Figure 3. AC Waveforms for Address Input Cycle
+
+
+                                                                                                                       tCLS
+                              CLE
+
+
+
+
+                                                                                                                                                  tWC                                                                                                                                                                         tWC                                                                                                                                                                                  tWCtWC
+                                 CE#
+
+
+
+                                                                                                                                  tWP                                                                      tWH                                                                  tWP                                                                tWH                                                                  tWP                                                             tWHtWPtWH                                                               tWP
+                             WE#
+
+
+
+                                                                                                                         tALS                                                                                                                                                                                                                                tALH
+                               ALE
+
+
+
+                                                                                                                                     tDS                                    tDH                                                                                                            tDS                                    tDH                                                                                                               tDS                                 tDH                                                                                                         tDS                                tDHtDS                            tDH
+                    IO[7:0]                                                                                                       1st Address                                     2nd Address                                      3rd Address                                       4th Address                                     5th Address
+                                                                                                                                         Cycle                                           Cycle                                            Cycle                                             Cycle                                           Cycle
+
+
+
+
+
+
+                                                                                                                                                                                               15

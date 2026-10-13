@@ -1,0 +1,72 @@
+Electrical characteristics                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      STM32N6x5xx STM32N6x7xx
+
+
+                                                                      Figure 18. Average (VDDA18 from 1.62 to 1.89 V) SMPS power efficiency vs. I  LOAD (A)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+5.3.5 Embedded voltage reference
+
+                                                                 The parameters in  Table 29 are derived under ambient temperature and supply voltage
+                                                                 conditions summarized in Table 24.
+
+                                                                                                                                          Table 29. Embedded internal voltage reference
+              Symbol                                                                                                                                                                                                                                     Parameter                                                                                                                                                                                                                                                                                                                               Conditions                                                                                                                                                                      Min                                                               Typ                                                           Max                                                                 Unit
+
+         VREFINT(1)                                          Internal reference voltage                                                                                                                                                             -40°C ≤ TJ ≤ +130°C                                                                                                                                                  0.792                                                      0.8                                                      0.808                                                                           V
+
+          tS_vrefint(2)                                  ADC sampling time when reading the internal reference voltage          -34--ns
+
+
+           ∆VREFINT                                               Internal reference voltage spread over the temperature range                                                                                                                                   -40°C ≤ TJ ≤ +130°C              --11mV
+
+                    TCoeff                                                                         Temperature coefficient                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    -                                                                                                          -                                                                                              43                                                       ppm/°C
+              VDDCoeff                                                      Voltage coefficient                                                                                                                                                                                                                                                                  1.71 V ≤ VDDA18AON ≤ 3.6 V                                                                               -                                                                                                             -                                                                              1250                                             ppm/V
+
+1.                          Guaranteed by test in production.
+2.                          Specified by design, not tested in production.
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                  Table 30. Embedded reference voltage calibration value
+
+                 Symbol                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           Parameter                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             Memory address
+
+      VREFINT_CAL                               Raw data acquired on ADC1 at 30°C, VDDA18ADC = VREF+ = 1.8 V                                                                                                                                                     0x4400 01B8[11:0](1)
+
+1.                             BSEC_FVR110 register, not automatically shadowed with OTP  content, so a fuse read sequence must be issued to get the
+                register updated once (clear after reading). Refer to RM0486, BSEC section “Operations on fuses”.
+
+
+
+144/263                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        DS14791 Rev 10

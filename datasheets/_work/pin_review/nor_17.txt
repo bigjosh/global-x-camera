@@ -1,0 +1,58 @@
+                                                                                                      W25Q128JV
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                  Figure 4b. Status Register-2
+7.1.2    Erase/Program Suspend Status (SUS) – Status Only
+The Suspend Status bit is a read only bit in the status register (S15) that is set to 1 after executing a
+Erase/Program Suspend (75h) instruction. The SUS status bit is cleared to 0 by Erase/Program Resume
+(7Ah) instruction as well as a power-down, power-up cycle.
+7.1.3    Security Register Lock Bits (LB3, LB2, LB1) – Non-Volatile OTP Writable
+The Security Register Lock Bits (LB3, LB2, LB1) are non-volatile One Time Program (OTP) bits in Status
+Register (S13, S12, S11) that provide the write protect control and status to the Security Registers. The
+default state of LB3-1 is 0, Security Registers are unlocked. LB3-1 can be set to 1 individually using the
+Write Status Register instruction.         LB3-1    are One Time Programmable (OTP), once it’s set to 1, the
+corresponding 256-Byte Security Register will become read-only permanently.
+7.1.4      Quad Enable (QE) – Volatile/Non-Volatile Writable
+The Quad Enable (QE) bit is a non-volatile read/write bit in the status register (S9) that enables Quad SPI
+operation. When the QE bit is set to a 0 state (factory default for part numbers with ordering options “IM” &
+“JM”), the /HOLD is enabled, the device operates in Standard/Dual SPI modes. When the QE bit is set to
+a 1 (factory fixed default for part numbers with ordering options “IQ/IN” & “JQ”), the Quad IO2 and IO3
+pins are enabled, and /HOLD function is disabled, the device operates in Standard/Dual/Quad SPI modes.
+
+Note: QE bit is set to a 0 state, factory default for part numbers with ordering options “IM” or ”JM”; please
+see W25Q128JV-M DTR data sheet.
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                         Publication Release Date: December 24, 2024
+                                                            - 16 -                                              Revision M

@@ -1,0 +1,25 @@
+{
+  "status": "Memory and RV-3028-C8 archive coverage verified. LIS2DW12 documentation is tracked separately in the catalog.",
+  "verified_documents": [
+    "datasheets/memory/Macronix_AN0271_NAND_ECC_introduction.pdf",
+    "datasheets/memory/Macronix_AN0278_bad_block_information.pdf",
+    "datasheets/memory/Macronix_AN0289_NAND_wear_leveling.pdf",
+    "datasheets/memory/Macronix_AN0339_NAND_endurance_retention.pdf",
+    "datasheets/memory/Macronix_AN0340_NAND_interrupted_program_erase.pdf",
+    "datasheets/memory/Macronix_AN0363_NAND_unexpected_power_loss.pdf",
+    "datasheets/memory/Macronix_AN0545_NAND_design_in_notice.pdf",
+    "datasheets/memory/Macronix_AN0719_MX30LF2G18AC_to_MX30LF2G28AD_migration.pdf",
+    "datasheets/memory/MX30LF2G18AC_datasheet_PM2129_v1.4.pdf",
+    "datasheets/memory/W25Q128JV_datasheet_RevM.pdf",
+    "datasheets/sensors_timing/RV-3028-C8_datasheet.pdf",
+    "datasheets/sensors_timing/RV-3028-C8_application_manual.pdf"
+  ],
+  "coverage_notes": [
+    "Winbond W25Q128JVPIQ exact part in Rev M PDF p77. Q option means QE=1 fixed (PDF p76), not writable configuration default. For IM/M-DTR reference a different document.",
+    "Winbond repeated power-cycle requirements: section 9.3.1 PDF p63; CS must track VCC during ramp.",
+    "MX30LF2G18AC-TI: -T is 48-TSOP, -I industrial -40 to +85 C, exact table PDF p8. Needs 4-bit ECC per (512+16)B (PDF p7). PM2386 v1.5 belongs J-grade; PM2129 v1.4 is archived exact industrial reference.",
+    "Macronix manufacturer recommends MX30LF2G28AD as successor; 8-bit ECC and spare-area geometry differ. AN0719 is reference only; no substitution made.",
+    "RTC uses exact C8 package docs, not C7. Backup switching disabled on delivery (manual PDF p46); CLKOUT initially enabled; EEPROM configuration procedure matters for permanent behavior (manual sections 4.6,7). Non-rechargeable source must not have trickle charger enabled.",
+    "AN0340 and AN0363 explain interrupted NAND program/erase and recovery. AN0271/0278/0289/0339/0545 cover ECC, bad blocks, wear, retention and design-in."
+  ]
+}

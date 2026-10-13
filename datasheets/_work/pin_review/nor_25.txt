@@ -1,0 +1,59 @@
+                                                                                                          W25Q128JV
+
+
+
+8.2     Instruction Descriptions
+
+8.2.1     Write Enable (06h)
+The Write Enable instruction (Figure 5) sets the Write Enable Latch (WEL) bit in the Status Register to a
+1. The WEL bit must be set prior to every Page Program, Quad Page Program, Sector Erase, Block
+Erase, Chip Erase, Write Status Register and Erase/Program Security Registers instruction. The Write
+Enable instruction is entered by driving /CS low, shifting the instruction code “06h” into the Data Input (DI)
+pin on the rising edge of CLK, and then driving /CS high.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                          Figure 5. Write Enable Instruction for SPI Mode
+
+8.2.2     Write Enable for Volatile Status Register (50h)
+The non-volatile Status Register bits described in section 7.1 can also be written to as volatile bits. This
+gives more flexibility to change the system configuration and memory protection schemes quickly without
+waiting for the typical non-volatile bit write cycles or affecting the endurance of the Status Register                         non-
+volatile bits. To write the volatile values into the Status Register bits, the Write Enable for Volatile Status
+Register (50h) instruction must be issued prior to a Write Status Register (01h) instruction. Write Enable
+for Volatile Status Register instruction (Figure 6) will not set the Write Enable Latch (WEL) bit, it is only
+valid for the Write Status Register instruction to change the volatile Status Register bit values.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                            Figure 6. Write Enable for Volatile Status Register Instruction for SPI Mode
+
+
+                                                                            Publication Release Date: December 24, 2024
+                                                               - 24 -                                                Revision M

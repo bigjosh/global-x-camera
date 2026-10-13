@@ -1,0 +1,53 @@
+STM32N6x5xx                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            STM32N6x7xx
+
+3.26                                                                                            CSI-2 Host (CSI)
+
+                                 The camera serial interface 2 (CSI-2) is a    part of a group of communication protocols
+                                 defined by the MIPI® Alliance. The MIPI CSI-2 Host co  ntroller is a digital core that
+                                 implements all protocol functions defined in the MIPI CSI-2 specification. It provides an
+                                 interface between the system and the MIPI D-PHY, allowing communication with a CSI-2
+                                 compliant camera.
+                                 Standard and references:
+                                 •                                                                   MIPI Alliance Specification for Camera Seri  al Interface 2 (CSI-2) v1.3 - 29 May 2014
+                                 •                                                                   MIPI Alliance Specification for  D-PHY v1.2 - 01 August 2014
+                                 Main features:
+                                 •                                                                   Compliant with MIPI Alliance standard
+                                 •                                                                   Interface with MIPI D-PHY
+                                 •                                                                   Up to two D-PHY data lanes supported
+                                              –                                                        Up to 2.5 Gbit/s per lane in high-speed (HS) mode
+                                              –                                                       10 Mbit/s in low-power (LP) mode
+                                 •                                                                   Data transmission in HS and LP modes supported by the D-PHY
+                                 •                                                                   Escape mode (ESC) and ultra-low-power state mode (ULPS) supported
+                                 •                                                                      CSI-2 lane management layer connected to    the D-PHY_RX to merge 1 or 2 data lanes
+                                              in a single 32-bit ISB-Byte bus
+                                 •                                                                   ECC and error correc tion capabilities
+                                 •                                                                   CRC check capability
+                                 •                                                                   CSI-2 virtual channel and data type filtering supporting interleaved data
+                                              –                                                        Up to four virtual channels
+                                              –                                                        Support the data formats s pecified into the MIPI Allia nce standard for CSI-2 v1.3
+                                                           (18 data formats, plus the user defined ones)
+                                 •                                                                   Up to seven independent data types
+                                 •                                                                  Programmable interrupts:
+                                              –                                                             Four timer interrupts mapped on a selected   virtual channel with starting point from
+                                                           SOF (start of frame) or EOF (end of frame)
+                                              –                                                        Four line/byte counter interrupts mapped on a selected virtual channel to trigger
+                                                           an event
+                                 •                                                                  ISB-Byte header generation for internal connection with the DCMIPP peripheral
+
+3.27 Parallel synchronous target interface (PSSI)
+
+                                 The PSSI and the DCMI use the same circuitry.    As a result, these tw o peripherals cannot be
+                                 used at the same time: when  using the PSSI, the DCMI regi  sters cannot be  accessed, and
+                                 vice versa. In addition, the PSSI and the DCMI    share the same altern ate functions and the
+                                 same interrupt vector.
+                                 The PSSI is a generic synchronou s 8-/16-bit parallel data input/o utput target interface. It
+                                 enables the transmitter to send a data valid signal that indicates when the data is valid, and
+                                 the receiver to output a flow control signal that   indicates when it is ready to sample the data.
+
+
+
+
+
+                                                                                                                     DS14791 Rev 10                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          51/263
+
+                                                                                                                                                                                                                                                                                                 80

@@ -1,0 +1,2995 @@
+
+===== PDF PAGE 1 =====
+Introduction
+This document demonstrates how to use the STM32N6 MCUs and details the minimum hardware resources required to develop 
+an application. It provides an overview of the development board hardware implementation, focusing on features such as power 
+supply, package selection, clock management, reset control, boot mode settings, and debug management.
+This document also includes reference design schematics, describing the main peripherals, interfaces, and power modes. It 
+may refer to STM32N6 microcontrollers as STM32N6x5 and STM32N6x7 product lines.
+Getting started with hardware development for STM32N6 MCUs
+AN5967
+Application note
+AN5967 - Rev 5 - August 2026
+For further information, contact your local STMicroelectronics sales office.
+www.st.com
+
+===== PDF PAGE 2 =====
+1 General information
+This document applies to the STM32N6 Arm®Cortex®‑M55‑based microcontrollers.
+Note: Arm and Cortex are registered trademarks of Arm Limited (or its subsidiaries or affiliates) in the US and/or 
+elsewhere.
+The Arm word and logo are trademarks of Arm Limited (or its subsidiaries) in the US and/or elsewhere. All rights 
+reserved.
+Reference documents
+The table below contains the main reference documents.
+Table 1. Reference documents
+Document type Document 
+reference Document title
+Datasheet DS14791 Arm® Cortex®‑M55, ST Neural-ART Accelerator, H264 encoder, Neo-Chrom 2.5D GPU, 
+4.2 Mbyte-contiguous SRAM (STM32N6 datasheet)
+Errata sheet ES0620 STM32N6 errata sheet
+Reference 
+manual RM0486 STM32N6 advanced Arm®-based 32-bit MCUs
+Programming 
+manual PM0273 STM32 Cortex®-M55 MCUs programming manual
+User manual UM3234 How to proceed with boot ROM on STM32N6 MCUs
+Application note AN5946 How to optimize low-power modes on STM32N6 MCUs
+Application note AN2867 Guidelines for oscillator design on STM8AF/AL/S and STM32 MCUs/MPUs
+Application note AN1709 EMC design guide for STM8, STM32, and legacy MCUs
+Application note AN6000 How to build the discrete power supply for STM32N6 MCUs
+AN5967
+General information
+AN5967 - Rev 5 page 2/51
+
+===== PDF PAGE 3 =====
+2 Terminology
+The table below defines the acronyms and other terms mentioned in this application note.
+Table 2. Acronyms
+Acronym Definition
+ADC Analog-to-digital converter
+AHB Advanced high-performance bus
+AXI Advanced extensible interface bus; by extension, the interconnect matrix based on AXI
+BKPSRAM Backup SRAM
+BSEC Boot and security controller (OTP interface)
+CM55 Cortex®-M55 processor
+CSI Camera serial interface
+CSS Clock security system
+DCMI Digital camera interface (parallel interface)
+DLYBSD Delay block for SDMMC; compensates external signal timings to reach the highest data rates
+DMA Direct memory access; bus master that autonomously transfers data between peripheral and 
+memory or between memories
+EMC Electromagnetic compatibility
+ETH Ethernet controller
+ESD Electrostatic discharge
+EMI Electromagnetic interference
+EXTI Extended interrupt and event controller
+FDCAN Controller area network with flexible data-rate; can also support time-triggered CAN
+FMC Flexible memory controller
+GPIO General-purpose input/output
+GPU Graphic processing unit
+HDMI High-definition multimedia interface
+HDP Hardware debug port
+HSE High-speed external crystal oscillator
+HSI High-speed internal oscillator
+I2C Inter-IC bus
+I3C Improved I2C
+I2S Inter-IC sound
+IWDG Independent watchdog
+JTAG Joint test action group (debug interface)
+LCD Liquid crystal display
+LPTIM Low-power timer
+LSE Low-speed external crystal oscillator
+LSI Low-speed internal oscillator
+MLCC Multi-layer ceramic capacitor
+MSI Multispeed internal oscillator
+XSPI Hexadata serial peripheral interface
+AN5967
+Terminology
+AN5967 - Rev 5 page 3/51
+
+===== PDF PAGE 4 =====
+Acronym Definition
+XSPIM XSPI IO manager
+LTDC LDC TFT display controller
+NVIC Nested vector interrupt controller
+OTP One-time programmable memory
+PCB Printed circuit board
+PCI PCI interface
+PHY Mixed-signal physical interface; adapts the internal logical level to a specific interface standard
+PWR Power control
+RCC Reset and clock control
+RETRAM Retention SRAM
+RNG Random number generator
+ROM Read-only memory
+RTC Real-time clock
+SAI Serial audio interface
+SDMMC Secure digital and multimedia card interface; supports SD, MMC, eMMC™, and SDIO protocols
+SMPS Switched-mode power supply
+SPDIF Sony/Philips digital interface format
+SPI Serial peripheral interface
+SRAM Static random access memory
+SW Software
+SWD Serial wire debug
+SWO Single wire output; trace port
+SYSCFG System configuration
+TAMP Tamper detection IP
+TIM Timer
+UART Universal asynchronous receiver transmitter
+UCPD USB Type-C® power delivery controller
+USART Universal synchronous/asynchronous receiver/transmitter
+USB Universal serial bus
+USB HS USB Hi-Speed USB 2.0 at 480 Mbit/s half-duplex
+USBPHYC USB physical interface control
+VREFBUF ADC voltage reference buffer
+WWDG Window watchdog
+AN5967
+Terminology
+AN5967 - Rev 5 page 4/51
+
+===== PDF PAGE 5 =====
+3 Power supplies
+The device is powered by multiple power supplies that must be connected to external decoupling capacitors. The 
+system always requires a power supply on VDD and VDDA18AON.
+Depending on the SMPS configuration mode, VDDA18PMU and VDDSMPS must be provided to start VDDCORE and 
+to allow all other independent supplies to power up (VDDA18ADC, VDDA18CSI, VDDA18PLL, VDDA18USB, VBAT, 
+VDD33USB, VDDIO2, VDDIO3, VDDIO4, and VDDIO5).
+Figure 1. Power supply overview
+DT70448V4
+BKUP  
+I/Os
+Retention domain
+Analog domain
+Core domain (VDDCORE)
+Backup domain
+(CPU, system logic,
+EXTI, peripherals, RAM)
+ADCs
+Power switch
+Step-down
+converter
+VDDCORE
+VSS
+VDDSMPS
+VLXSMPS
+VSSSMPS
+VFBSMPS
+VBAT
+VDDA18ADC
+VREF+
+VREF-
+VSSA
+Backup
+regulator
+VDD
+Power   
+switch
+I/Os
+VDD33USB
+VSS
+VREFBUF
+VSS
+I/O
+logic
+VREF+
+VSW
+LSE, RTC, 
+TAMP, backup 
+registers, reset
+I/O
+logic
+VBKP
+VREF-
+CSI
+PHY VDDCSI
+VDDA18CSI
+VSS
+UCPD
+ I/Os
+USB HS 
+PHYs
+I/O
+logic
+LSI, WKUP, 
+IWDG, BSEC, 
+RIFSC
+ITCM
+DTCM
+ITCM FLEX
+VRET
+PLLs
+OTP, HSE, HSI, MSI    VDDA18AON
+VDDA18PLL
+V08CAP
+VSS
+VDDA18USB
+VSS VSSXSPIM I/Os
+PC[1] 
+PC[12:6] 
+PH[2,9]
+ I/Os
+Port 1
+PO[5:0]
+PP[15:0]
+Port 2
+PN[12:0]
+VDDIO2
+VDDIO3
+PC[0] 
+PC[5:2] 
+PE[4]
+I/Os
+VDDIO4
+VDDIO5
+VSS VSS VSS
+VSS
+VDD
+VDD
+RET
+ I/Os
+VDDA18PMU
+Backup 
+RAM
+3.1 Mandatory power supplies
+The main power supplies are the following:
+• VBAT: external power supply for backup domain when VDD is not present (VBAT mode). When no battery is 
+used, this power supply must be connected to VDD.
+• VDD: external power supply for I/Os (can be 1.8 V or 3.3 V typical)
+• VDDA18AON: external power supply for analog blocks, such as reset, power management, and oscillators, 
+and OTP memory (always needed ON) – 1.8 V typical
+AN5967
+Power supplies
+AN5967 - Rev 5 page 5/51
+
+===== PDF PAGE 6 =====
+Table 3. Main power supplies
+Symbol Parameter Operating conditions Min. Typ. Max. Unit
+VDDA18AON Internal analog supply voltage 1.71 1.8 1.935 V
+VDD I/Os supply voltage
+1.8 V range 1.62 1.8 1.98 V
+3.3 V range 3 3.3 3.6 V
+The VDDCORE is the third power supply to run functional hardware on STM32N6 devices.
+VDDCORE is generated by SMPS, internally or externally. The power supplies are:
+• VDDSMPS: external power supply for the SMPS step-down converter.
+• VDDA18PMU: external analog power supply for the SMPS step-down converter - 1.8 V typical. This power 
+supply can be connected to VDDSMPS through an inductor-based filter.
+• VDDCORE: digital core domain supply - 0.8 V typical
+3.2 Optional power supplies
+STM32N6 devices have the following optional power supplies:
+• VDDIO2: external power supply for 22 I/Os (PO[5:0] and PP[15:0]); independent from any other power 
+supply; dedicated to powering the XSPIM1 16-bit interface(1).
+• VDDIO3: external power supply for 13 I/Os (PN[12:0]); independent from any other supply; dedicated to the 
+XSPIM2 8-bit interface(1).
+• VDDIO4: external power supply for 10 I/Os (PC[1], PC[12:6], and PH[9,2]); independent from any other 
+supply; dedicated to the SDMMC1(eMMC) interface(1).
+• VDDIO5: external power supply for six I/Os (PC[0], PC[5:2], and PE[4]); independent from any other supply; 
+dedicated to the SDMMC2 (SD-Card) interface(1).
+• USB power supply:
+– VDD33USB: external power supply for USB2 HS PHYs and USB Type-C® (CC1 and CC2 pins); 
+independent from any other supply - 3.3 V typical.
+– VDDA18USB: external analog power supply for USB HS PHYs - 1.8 V typical.
+• VDDA18CSI: external analog power supply for CSI D-PHY - 1.8 V typical.
+• VDDCSI: CSI PHY digital supply input - 0.8 V typical.
+• VDDA18PLL: external analog power supplies for PLLs - 1.8 V typical.
+• VDDA18ADC: external analog power supply for ADCs and voltage reference buffers; independent from any 
+other supplies (1.8 V only).
+Note: The ADC interface is 1.8 V only.
+• VREF+: external reference voltage for ADCs, independent from any other supplies.
+– When the voltage reference buffer is enabled, the internal voltage reference buffer delivers VREF+ 
+and VREF-.
+– When the voltage reference buffer is disabled, VREF+ is delivered by an independent external 
+reference supply.
+ 
+1. VDDIO2, VDDIO3, VDDIO4, and VDDIO5 are independent. This means that each supply voltage can take any of the following 
+voltage values at any time : 0 V (off), 1.8 V, or 3.3 V.
+ 
+3.3 Ground references
+STM32N6 devices have the following ground references:
+• VSS: common ground for all supplies except the step-down converter and analog peripherals.
+• VSSA: separate analog and reference voltage ground; must be connected externally to the same supply 
+ground as VSS.
+• VSSSMPS: separate step-down converter ground.
+AN5967
+Power supplies
+AN5967 - Rev 5 page 6/51
+
+===== PDF PAGE 7 =====
+Note: All ground pins (VSS, VSSA) must be connected to power planes. The following table must be used only as a 
+guideline: the count and values of capacitors can be adapted, depending upon parameters such as capacitor 
+size and dielectric, PCB technology, and product power integrity simulations.
+3.4 Main and auxiliary supplies groups usage :
+STM32N6 devices separate their power architecture into main supplies and auxiliary supplies groups to address 
+performance, robustness, power sequencing, and safety requirements of a high‑end, secure MCU. This 
+separation is intentional and fundamental to the STM32N6 design.
+Table 4. Main supplies group
+Presence Supply Voltage range Supply description Comment
+Mandatory VBAT > 3.0 V Backup domain
+Must be connected to 
+VDD when no battery is 
+used
+Mandatory VDD 1.8 V or 3.3 V I/Os and internal 
+circuitry -
+Mandatory VDDA18AON 1.8 V Core analog and 
+internal oscillators -
+Optional VDDIOx VDD I/Os Must be connected to 
+VDD
+Optional VDDA18PLL VDDA18ON PLLs Must be connected 
+VDDA18AON
+Table 5. Auxiliary supplies group 
+Presence Supply Voltage range Supply description Comment
+Mandatory VDDCORE 0.81 V – 0.89 V Core Connected to internal 
+or external SMPS
+Mandatory VDDA18PLL 1.8 V PLLs if not configured in 
+main group
+Optional VDDSMPS 1.8 V Internal SMPS main
+Connected to VSS if 
+external SMPS 
+configuration
+Optional VDDA18PMU 1.8 V Internal SMPS analog
+Connected to VSS if 
+external SMPS 
+configuration
+Optional VDDIOx 1.8 V or 3.3 V I/Os
+if not configured in 
+main group or 
+connected to VSS if not 
+used
+Optional VDDA18ADC & VREF+ 1.8 V Analog peripherals Connected to VSS if not 
+used
+Optional VDDCSI VDDCORE CSI core peripheral
+Must be connected to 
+VDDCORE or VSS if 
+not used
+Optional VDDA18CSI 1.8 V CSI analog peripheral Connected to VSS if not 
+used(1)
+Optional VDDA18USB 1.8 V USB analog peripheral Connected to VSS if not 
+used(2)
+Optional VDD33USB 3.3 V USB PHY Connected to VSS if not 
+used(2)
+ 
+1. If CSI feature is not used : All CSI signals connection must be left floating/open or all VSS.
+AN5967
+Power supplies
+AN5967 - Rev 5 page 7/51
+
+===== PDF PAGE 8 =====
+2. If USB/UCPD features are not used : DP/DM pins must be connected to VSS. TXRTUNE pins must be left floating/open. 
+UCPD_CC1/CC2 pins must be left floating/open.
+ 
+3.4.1 Independent ADC supply and reference voltage
+To improve the conversion accuracy and dynamic range, the ADC and reference have an independent power 
+supply that can be filtered separately, and shielded from noise on the PCB.
+The analog operating voltage supply (VDDA18ADC) is 1.8 V typical.
+• The ADC/VREFBUF voltage supply input is available on a separate VDDA18ADC pin.
+• External VREF: the user can connect a separate external reference voltage ADC input on VREF+. The 
+voltage on VREF+ may range from 1.10 V to VDDA18ADC.
+• Internal VREF: the user can enable an internal reference voltage on VREF+ in the VREFBUF block. The 
+voltage on VREF+ can be selected from either 1.21 V or 1.5 V. With internal VREF available on the VREF+ 
+pin, it can be used externally (for example, for analog comparator references), if loading is kept within 
+datasheet values.
+3.5 Main and auxiliary supplies sequencing
+3.5.1 Power-on sequence
+The STM32N6 power-on sequence is executed in two mandatory steps:
+1. Main group supplies are required firsttogether for the power-on operation and system integrity of the MCU and 
+may contains optionally certain I/O interfaces and PLLs supplies.
+2. Auxiliary group supplies are power-on in the second step together after PWR_ON signal is rising: mandatory 
+for the core and PLLs supplies, optional for the internal SMPS, I/O interfaces, analog, CSI or USB peripherals.
+AN5967
+Power supplies
+AN5967 - Rev 5 page 8/51
+
+===== PDF PAGE 9 =====
+Figure 2. STM32N6 power-on sequence (two steps execution)
+DT82228V1
+3.5.2 Power-off sequence
+The STM32N6 power-off sequence is executed in two mandatory steps:
+1. Auxiliary group supplies are first power-off together with active discharge while main group power supplies 
+voltage are under operating conditions (1.8 V and/or 3.3 V).
+2. Main group supplies are continuing there power-off discharge and can be below minimal operating conditions 
+when all auxiliary group voltage supplies are below 0.6 V. Optionally VBAT supply can remain power-on.
+AN5967
+Power supplies
+AN5967 - Rev 5 page 9/51
+
+===== PDF PAGE 10 =====
+Figure 3. Power off sequence with VDD = 3.3 V
+DT82229V1
+AN5967
+Power supplies
+AN5967 - Rev 5 page 10/51
+
+===== PDF PAGE 11 =====
+Figure 4. Power-off sequence with VDD = 1.8 V
+DT82230V1
+3.6 STM32N6 application power schematic
+The figure below illustrates the recommended application schematic for an STM32N6 device operating with a 3.3 
+V VDD supply, using the internal SMPS (Switch-Mode Power Supply) to generate the core voltage and enabling 
+the integrated USB interface. This configuration is optimized for reduced power consumption while maintaining 
+the performance benefits of the internal power management architecture.
+The schematic shows the required power connections, external passive components associated with the internal 
+SMPS, USB supply and decoupling requirements, as well as the recommended routing of the USB differential 
+signals. Following this implementation ensures reliable device operation, proper startup and power-down 
+behavior, and compliance with STM32N6 power-supply and USB interface requirements.
+AN5967
+Power supplies
+AN5967 - Rev 5 page 11/51
+
+===== PDF PAGE 12 =====
+Figure 5. STM32N6 - VDD = 3.3 V - Internal SMPS - USB application example
+DT82231V1
+STM 32 N 6
+VDD
+VFBSMPS
+VLXSMPS
+VDDSMPS
+VSSSMPS
+VDDCORE
+VDDA 18 CSI
+VDDCSI
+VSS
+VDD 33 USB
+PDR _ ON
+VSSA
+VSS
+VREF -
+VREF +
+VSS
+VDDA 18 _ USB
+only if internal VREFBUF disabled
+VDDA 18 ADC
+2  x  100 nF  +  1 µF
+VSS
+VSS
+CSI
+SMPS
+BACKUP
+DOMAIN
+I/Os
+&
+PWR
+I/Os
+XSPI  16 bits
+XSPI  8 bits
+SDMMC 1
+SDMMC 2
+(+ I/Os )
+ADC
+PLL
+3 V VBATor
+4 .7 µF
+USB
+VDDIO 2
+VDDIO 5
+VDDIO 3
+VDDIO 4
+V 08 CAP
+VDDA 18 PLL
+VSS
+1 µF
+VIN
+1 µF
+SMPS
+1 .8 V
+3 A
+100 nF
+(4 .0  - 5 .5 V )
+EN
+10  nF
+RESET
+470 k
+Additional VIN protections  
+if needed  (ESD ,  surges ,  
+noise ,  etc ..)
+VDDA 18 PMU
+PWR _ ON
+VSSAPMU
+VSSAON
+NRST
+LDO
+1 .8 V or  3 .3 V
+200 mA
+LDO
+1 .8 V
+200 mA
+EN
+VDD 3 V 3 _ EXT
+LDO or SMPS
+1 .8 V
+200 mA
+EN
+100 nF
+VDD 1 V 8 _ EXT
+VDD 1 V 8 _ EXT
+100 nF
+VDD 1 V 8 _ EXT
+100 nF
+n ×  100 nF
+n ×  1 µF
+n x  100 nF
+VDD 1 V 8 _ EXT or VDD 3 V 3 _ EXT
+n x  100 nF
+n x  100 nF
+n x  100 nF
+VDDCORE
+1 µF
+100 nF
+VDD 1 V 8VDD 1 V 8 _ EXT
+100 nF
+VDDA 18 ONVDDA 1 V 8 _ AON
+VDD
+VDD
+VDDA 1 V 8 _ AON
+VDD 1 V 8 _ SMPS
+VDD 1 V 8 _ SMPS
+VDD 3 V 3 _ EXT
+VDD 1 V 8 _ EXT
+2 x 10 µF  +  2 x 1 µF  +  2 x 100 nF  
+4 x 15 µF 2 R
+2 .2 nF
+EN
+PWR _ ONPWR _ ON
+PWR _ ON
+LDO or SMPS
+3 .3 V
+200 mA
+EN PWR _ ON
+PWR _ ON
+VDD 1 V 8 _ EXT or VDD 3 V 3 _ EXT
+VDD 1 V 8 _ EXT or VDD 3 V 3 _ EXT
+VDD 1 V 8 _ EXT or VDD 3 V 3 _ EXT
+Figure 6. STM32N6 - VDD = 1.8 V - Internal SMPS – no USB application example
+DT82232V1
+STM 32 N 6
+VDD
+VFBSMPS
+VLXSMPS
+VDDSMPS
+VSSSMPS
+VDDCORE
+VDDA 18 CSI
+VDDCSI
+VSS
+VDD 33 USB
+PDR _ ON
+VSSA
+VSS
+VREF -
+VREF +
+VSS
+VDDA 18 _ USB
+only if internal VREFBUF disabled
+VDDA 18 ADC
+2  x  100 nF  +  1 µF
+VSS
+VSS
+CSI
+SMPS
+BACKUP
+DOMAIN
+I/Os
+&
+PWR
+I/Os
+XSPI  16 bits
+XSPI  8 bits
+(+ I/Os )
+ADC
+PLL
+3 V VBATor
+4 .7 µF
+USB
+VDDIO 2
+VDDIO 5
+VDDIO 3
+VDDIO 4
+V 08 CAP
+VDDA 18 PLL
+VSS
+1 µF
+VIN
+SMPS
+1 .8 V
+3 A
+100 nF
+(4 .0  - 5 .5 V )
+EN
+10  nF
+RESET
+470 k
+Additional VIN protections  
+if needed  (ESD ,  surges ,  
+noise ,  etc ..)
+VDDA 18 PMU
+PWR _ ON
+VSSAPMU
+VSSAON
+NRST
+LDO
+1 .8 V  
+500 mA
+EN
+100 nF
+VDD 1 V 8 _ EXT
+VDD 1 V 8 _ EXT
+100 nF
+n ×  100 nF
+n ×  1 µF
+n x  100 nF
+VDD 1 V 8 _ EXT
+n x  100 nF
+n x  100 nF
+n x  100 nF
+VDDCORE
+1 µF
+100 nF
+VDD 1 V 8VDD 1 V 8 _ EXT
+100 nF
+VDDA 18 ONVDDA 1 V 8 _ AON
+VDD
+VDD
+VDDA 1 V 8 _ AON
+VDD 1 V 8 _ SMPS
+VDD 1 V 8 _ SMPS
+VDD 1 V 8 _ EXT
+2 x 10 µF  +  2 x 1 µF  +  2 x 100 nF  
+4 x 15 µF 2 R
+2 .2 nF
+PWR _ ONPWR _ ON
+PWR _ ON
+VDD 1 V 8 _ EXT
+VDD 1 V 8 _ EXT
+VDD 1 V 8 _ EXT
+3.6.1 STM32N6 power components
+The following table does not include capacitors on supply sources (such as LDO or SMPS) or external devices 
+(such as SD-Card, eMMC, or flash memories).
+Table 6. Power supply pins
+Supply pin Ground 
+reference pin Decoupling and filtering Comments
+VDD VSS n x 100 nF (MLCC, 10V, X5R, ±10%) -
+VBAT VSS 100 nF (MLCC, 10V, X5R, ±10%) No decoupling cap if VBAT 
+connected to VDD
+AN5967
+Power supplies
+AN5967 - Rev 5 page 12/51
+
+===== PDF PAGE 13 =====
+Supply pin Ground 
+reference pin Decoupling and filtering Comments
+VDD33USB VSS 1 µF (MLCC, 6.3 V, X5R, ±20%) -
+VDDA18PMU VSSAPMU 100 nF (MLCC, 10V, X5R, ±10%) VSSAPMU must be 
+connected to VSS
+VDDSMPS VSSSMPS
+2 x 10 µF (MLCC, 4V, X5R, ±20%)
++ 2 x 1 µF (MLCC, 6.3V, X5R, ±20%)
++ 2 x 100 nF (MLCC, 10V, X5R, ±10%)
+VSSSMPS must be 
+connected to VSS
+VLXSMPS VSSSMPS
+1 µH ±20%, 1 MHz, ISat > 3000 mA DC, resistance < 0.06 Ω 
+(DFE201612P-1R0M or TFM322512ALVA1R0MTAA)
++ 2.2 nF (MLCC, 50V, X7R, ±10%) + a 2 Ω resistance
++ 4 x 15 µF (MLCC, 6V3, X5R, ±20%)
+VSSSMPS must be 
+connected to VSS
+V08CAP VSS 4.7 µF (MLCC, 6V3, X5R, ±20%) Internal backup regulator 
+output pin
+VDDIO2 VSS n x 100 nF (MLCC, 10V, X5R, ±10%)(1) -
+VDDIO3 VSS n x 100 nF (MLCC, 10V, X5R, ±10%)(1) -
+VDDIO4 VSS n x 100 nF (MLCC, 10V, X5R, ±10%)(1) -
+VDDIO5 VSS n x 100 nF (MLCC, 10V, X5R, ±10%)(1) -
+VDDA18CSI VSS 100 nF (MLCC, 10V, X5R, +/‑10%) -
+VDDA18USB VSS 100 nF (MLCC, 10V, X5R, ±10%) -
+VDDA18ADC VSSA 100 nF ( MLCC, 10V, X5R, ±10%) VSSA must be connected 
+to VSS
+VDDA18AON VSSAON 100 nF ( MLCC, 10V, X5R, ±10%) VSSAON must be 
+connected to VSS
+VDDA18PLL VSS 100 nF (MLCC, 10V, X5R, ±10%) -
+VREFP VSSA
+1 µF (MLCC, 6.3V, X5R, ±20%)
++ 100 nF (MLCC, 10V, X5R, ±10%)
+VSSA must be connected 
+to VSS
+VDDCORE VSS n x 1 µF (MLCC, 6.3 V, X5R, ±20%)(2) -
+VDDCSI VSS 1 µF (MLCC, 6.3V, X5R, ±20%) Usually connected to 
+VDDCORE
+ 
+1. n is the number of VDDIOx pins.
+2. n is the number of VDDCORE pins.
+ 
+For further details on package features, select Section 4: Package selection.
+3.7 System pins
+The table below describes all the system pins.
+Table 7. System pins
+System pin Description Comments
+PA13 JTMS/SWDIO
+JTAG/SWD SIGNALS
+PA14 JTCK/SWCLK
+PA15 JTDI
+PB4 NJTRST
+PB5 JTDO/TRACESWO
+PWR_ON Output This is the core supply enable output. This pin can be used to enable 
+some secondary supplies.
+AN5967
+Power supplies
+AN5967 - Rev 5 page 13/51
+
+===== PDF PAGE 14 =====
+System pin Description Comments
+PDR_ON Input This pin is used during ST production tests. It must always be 
+connected to VDDA18AON in the final application.
+PA5 PWR_CSTOP This pin can be used to monitor the entry/exit to/from Stop mode.
+PA10 PWR_CSLEEP This pin can be used to monitor the entry/exit to/from Sleep mode.
+BOOT0 BOOT0
+This pin can be used to choose the boot scheme.
+PA6 BOOT1
+PG10 BOOTFAIL
+This pin is switched on or toggled by the boot ROM during a serial 
+boot, dev boot, or blocking failure. It is used by the boot ROM to send 
+a minimal UART text trace in case of blocking failure (multiplexed 
+with UART5_TX).
+PC13 TamperIN1/TamperOUT2 This is the only active tamper in VBAT mode. This pin is supplied by 
+VSW.
+NRST Input/Output This is the application pad reset input/output.
+3.8 Specific IO constraints related to voltage settings
+VDD, VDDIO2, VDDIO3, VDDIO4, and VDDIO5 must respect specific register settings and control sequences when 
+used at 3/3.3 V or 1.8 V typical.
+For further information, refer to the PWR section in the reference manual RM0486.
+3.9 System startup
+The startup system is different from other STM32 MCU architectures that need only VDD/VDDA18AON to start up. 
+Multiple voltage supplies must be applied with a specific sequence to start the device.
+Figure 7 and Figure 8 demonstrate the system startup sequence from power-on in different supply and SMPS 
+configurations.
+AN5967
+Power supplies
+AN5967 - Rev 5 page 14/51
+
+===== PDF PAGE 15 =====
+VDDCORE supply from SMPS step-down converter (internal SMPS configuration)
+Figure 7. Device startup with VDDCORE supplied directly from SMPS step-down converter
+DT70450V3
+VOS low
+ck_sys
+Default configuration
+Reset          
+SDEN
+V DDCORE
+V FBSMPS
+V DDA18AON
+pwr_por_rstn
+POR threshold
+Wait
+oscillator Hardware system initOperating mode
+Supply configuration
+Direct 
+SD 
+supply
+VOS low
+Run
+(1) (2) (3)
+Power 
+down
+(4)
+V DDA18PMU /
+V DDSMPS
+PWR_ON
+vddcore_ok threshold
+V DD
+POR threshold
+vdda18pmu_ok threshold
+(5)
+Vddcore_ok
+tempo
+Vdda18pmu_ok
+AN5967
+Power supplies
+AN5967 - Rev 5 page 15/51
+
+===== PDF PAGE 16 =====
+1. When the system is powered on, the POR monitors VDD and VDDA18AON supplies. Once the supplies are 
+above the POR threshold level, the external voltage regulator providing VDDA18PMU and VDDSMPS supplies is 
+enabled via the PWR_ON signal.
+2. The SMPS step-down converter is kept in reset as long as VDDA18PMU and VDDSMPS are not stable.
+3. Once VDDA18PMU and VDDSMPS supplies are above the vdda18pmu_ok threshold level, the SMPS step-down 
+converter is taken out of reset, and the output level is set by default at 0.8 V (VOS low). The system is kept in 
+reset mode as long as VDDCORE is stable.
+4. Once VDDCORE supply surpasses the vddcore_ok threshold level, the system is taken out of reset, and the 
+HSI oscillator is enabled.
+5. Once the oscillator is stable, the system is initialized: option bytes are loaded, and the CPU starts in Run 
+mode.
+VDDCORE supply in bypass mode (external SMPS configuration - SMPS off)
+Figure 8. Device startup with VDDCORE supplied from an external regulator
+DT70451V2
+ck_sys
+Default configuration
+Reset
+SDEN
+V DD
+pwr_por_rstn
+POR threshold
+Wait
+oscillator
+Hardware system 
+initOperating mode
+Supply configuration Bypass mode
+Run
+Power 
+down
+V DDCORE  
+PWR_ON
+Vddcore_ok threshold
+V DDA18AON
+POR threshold
+Vddcore_ok
+tempo
+(1) (2) (3) (4)
+The devices featuring the SMPS can also be used in bypass mode.
+1. When the system is powered on, the POR monitors VDD and VDDA18AON supplies. Once the supplies are 
+above the POR threshold level, the external voltage regulator providing the VDDCORE supply is enabled via the 
+PWR_ON signal.
+2. The system is kept in reset mode as long as VDDCORE is not stable.
+AN5967
+Power supplies
+AN5967 - Rev 5 page 16/51
+
+===== PDF PAGE 17 =====
+3. Once VDDCORE supply surpasses the vddcore_ok threshold level, the system is taken out of reset, and the 
+HSI oscillator is enabled.
+4. Once the oscillator is stable, the system is initialized: option bytes are loaded and the CPU starts in run mode. 
+The software must disable SMPS bit clearing SDEN in PWR_CR1 as soon as possible.
+AN5967
+Power supplies
+AN5967 - Rev 5 page 17/51
+
+===== PDF PAGE 18 =====
+4 Package selection
+The package must be selected by considering the application requirements.
+The list below summarizes the most frequent constraints:
+• Number of interfaces required. Some interfaces are unavailable on some packages. Some interface 
+combinations are unavailable on some packages. Refer to the product datasheet for details.
+• PCB technology constraints: small pitch and high ball density may require more PCB layers and higher 
+PCB classes, requiring stack-up with microvia (laser via) technology.
+• Package height.
+• PCB available area.
+• Thermal constraints (larger packages have better thermal dissipation capabilities).
+Table 8. Package summary
+Characteristic
+Size (mm)(1)
+14x14 10x10 10x10 12x12 8x8 6x6
+Pitch (mm) 0.8 0.5 0.65 0.8 0.5 0.4
+Thickness N/A N/A N/A N/A N/A N/A
+Number of IOs 165 144 126 106 90 75
+Sales number VFBGA264 VFBGA223 VFBGA198 VFBGA178 VFBGA142 VFBGA169
+STM32N6x5 X0 L0 B0 I0 Z0 A0
+STM32N6x7 X0 L0 B0 I0 Z0 A0
+ 
+1. Typical body size
+ 
+Table 9. Package thermal characteristics
+Package θJA θJB θJC (top) ΨJB ΨJC (top)
+VFBGA264 30.4 20.4 9.8 20.2 0.2
+VFBGA223 31.9 19.5 10.1 19.3 0.2
+VFBGA198 32.0 19.7 10.2 19.5 0.2
+VFBGA178 27.8 16.5 9.0 16.4 0.1
+VFBGA169 40.3 24.5 12.9 24.0 0.2
+VFBGA142 36.6 22.3 10.9 22.7 0.2
+Note: To obtain up-to-date reference availability, refer to the product datasheet.
+AN5967
+Package selection
+AN5967 - Rev 5 page 18/51
+
+===== PDF PAGE 19 =====
+5 Alternate function mapping to pins
+To explore peripheral alternate function mapping to pins easily when using the STM32N6 MCUs, use the 
+STM32CubeN6 tool, available on www.st.com.
+Note: The screenshot below is an example only, not specific to STM32N6 MCUs. The look and feel may differ from 
+future CubeMX versions.
+Figure 9. STM32CubeMX example screenshot
+DT71878V3
+AN5967
+Alternate function mapping to pins
+AN5967 - Rev 5 page 19/51
+
+===== PDF PAGE 20 =====
+6 Clocks
+Different clock sources can be used to drive the subsystem clocks:
+• Internal clock signal:
+– HSI oscillator clock (high-speed internal clock signal): 64 MHz typical
+– MSI oscillator clock (multispeed internal clock signal): 4 MHz typical
+• External clock signal:
+– HSE oscillator clock: high-speed external clock signal
+The devices have two secondary clock sources:
+• LSI: 32 kHz low-speed internal RC, driving the independent watchdog and, optionally, the RTC used for 
+autowake-up from the Stop and Standby modes.
+• LSE (LSE crystal): 32.768 kHz (typical) low-speed external crystal, optionally driving the real-time clock 
+(RTCCLK).
+The RCC authorizes the access of four PLL clocks with the same features. A typical allocation is:
+• PLL1: clock to the CPU, buses, and AXI storage areas
+• PLL2: clock to NPU and NPU storage areas
+• PLL3: clock to CACHEAXI RAM and Ethernet
+• PLL4: clock to display, camera module, FDCAN, and other peripherals
+Each clock source can be switched on or off independently when it is not used, to optimize power consumption.
+For the description of the clock tree and the details about the possible clock frequencies, refer to the product 
+reference manual and datasheet.
+AN5967
+Clocks
+AN5967 - Rev 5 page 20/51
+
+===== PDF PAGE 21 =====
+7 HSE oscillator
+The high-speed external clock signal (HSE) can be generated from two possible clock sources:
+• HSE user external clock
+• HSE external crystal
+Figure 10. HSE source clock
+DT70470V2
+OSC_IN OSC_OUT
+External analog clock 
+source
+OSC_IN OSC_OUT
+Load
+capacitors
+C L1 C L2
+Analog external clock Crystal/ceramic resonator configuration
+V DD
+R 1
+OSC_IN OSC_OUT
+External digital clock 
+source
+R 1
+Digital external clock
+The possible configurations are:
+• OSC_OUT is tied to GND (max 1 kΩ): HSE digital bypass.
+• OSC_OUT is tied to VDDA18AON (max 1 kΩ): HSE analog bypass.
+• OSC_OUT high-Z or connected to a crystal: HSE crystal mode.
+When the bypass is used, PWR_ON can enable the external clock generator to save power (that is, disabled in 
+Standby). In that case, the OSC_IN clock input must be stable within 10 ms after the PWR_ON rising edge 
+occurs.
+7.1 External source - HSE bypass mode
+In this mode, an external clock source must be provided. Refer to the product datasheet for information on the 
+frequency range.
+The external digital (VIL/VIH) or analog clock signal, with a duty cycle of about 50%, must drive the OSC_IN pin.
+7.2 External crystal - HSE crystal mode
+The external oscillator frequency has the advantage of producing a very accurate rate on the main clock.
+An external accurate clock source is required to get accurate USB and PCIe® high‑speed clocks. The oscillator 
+mode is enabled by clearing the HSEBYP bit and setting the HSEON bit.
+The crystal and the load capacitors must be connected as close as possible to the oscillator pins to minimize 
+output distortion and startup stabilization time. The load capacitance values must be adjusted according to the 
+selected crystal.
+For CL1 and CL2 it is recommended to use NP0/C0G capacitors, selected to meet the load requirements of the 
+crystal. CL1 and CL2 usually have the same value. The crystal manufacturer typically specifies a load 
+capacitance, which is the series combination of CL1 and CL2. The PCB and pin capacitances must be included 
+when sizing CL1 and CL2.
+For further information, refer to the electrical characteristics and to the application note AN2867.
+AN5967
+HSE oscillator
+AN5967 - Rev 5 page 21/51
+
+===== PDF PAGE 22 =====
+8 LSE oscillator
+The low-speed external clock signal (LSE) can be generated from two possible clock sources:
+• The LSE user external clock:
+Figure 11. LSE external clock
+DT75958V1
+LSE
+External clock 
+source
+OSC32_IN OSC32_OUT
+OSC32_OUT: 
+- High-Z (open) for LSE (digital or analog) bypass
+External clock configuration
+V SW
+V SS
+• The LSE external crystal/ceramic resonator:
+Figure 12. LSE crystal resonators
+DT75959V1
+LSE
+Load
+capacitors
+OSC32_IN OSC32_OUT
+C L1 C L2
+Crystal configuration
+8.1 External source - LSE bypass mode
+In this mode, an external clock source must be provided. It can have a frequency of up to 40 kHz.
+The external digital (VIL/VIH) or analog clock signal, with a duty cycle of approximately 50%, must drive the 
+OSC32_IN pin, while the OSC32_OUT pin must be left high-Z.
+The configuration of the bypass mode and the selection between digital and analog is done using the RCC 
+registers (RCC_CR register).
+For further details, refer to the reference manual RM0486.
+8.2 External crystal - LSE crystal mode
+The LSE crystal is a 32.768 kHz low-speed external crystal. It has the advantage of providing a low-power, but 
+highly accurate, clock source to the real-time clock peripheral (RTC) for clock, calendar, or other timing functions.
+The resonator and the load capacitors must be connected as close as possible to the oscillator pins to minimize 
+output distortion and startup stabilization time. The load capacitance values CL1 and CL2 must be adjusted 
+according to the selected oscillator.
+It is recommended to use a medium-high or high drive on the LSE oscillator.
+For further details, refer to the electrical characteristics in the product datasheet and to the application note 
+AN2867.
+AN5967
+LSE oscillator
+AN5967 - Rev 5 page 22/51
+
+===== PDF PAGE 23 =====
+9 Clock security system
+The clock security system (CSS) detects failures of the LSE and HSE oscillators.
+For further details, refer to the reference manual RM0486.
+9.1 CSS on HSE
+The clock security system can be activated by software. In this case, the clock detector is enabled after the HSE 
+oscillator startup delay, and disabled when this oscillator is stopped.
+If the CSS detects a failure on the HSE oscillator clock, it can generate an application reset.
+9.2 CSS on LSE
+The clock security system can be activated by software. In this case, the clock detector is enabled after the LSE 
+oscillator startup delay, and disabled when this oscillator is stopped.
+If the CSS detects a failure on the LSE oscillator clock, it stops the RTC/TAMP clock source and signals the 
+failure to the TAMP block for security protection and system wake-up.
+AN5967
+Clock security system 
+AN5967 - Rev 5 page 23/51
+
+===== PDF PAGE 24 =====
+10 Boot configuration
+The BOOT0 and BOOT1 pins and one OTP word determine the boot mode on STM32N6 devices.
+The BOOT1 is a nondedicated boot pin. If flash memory boot is selected, the flash memory device selection is 
+done using OTP fuses. If serial boot is selected, interfaces can be disabled by fuse.
+Note: • The BOOT1 pin check has priority on the BOOT0 pin check.
+• If the BOOT1 pin is not set, BOOT0 is checked.
+• If the BOOT1 pin is selected but not allowed in the current life cycle, the BOOT0 pin is checked.
+Table 10. Boot source description
+BOOT0 pin BOOT1 pin Boot source Interface OTP11 word value
+- 1 Development boot - -
+0 0 Flash memory boot
+XSPI serial NOR (in default, SPI, and 
+single) OTP11 [8:5] = 0x0011
+XSPI HyperFlash™ (8-bit) OTP11 [8:5] = 0x0101
+eMMC SDMMC1 OTP11 [8:5] = 0x0010
+eMMC SDMMC2 OTP11 [8:5] = 0x1000
+SD-Card SDMMC1 (up to SD 
+standard v6.0) OTP11 [8:5] = 0x0001
+SD-Card SDMMC2 (up to SD 
+standard v6.0) OTP11 [8:5] = 0x0111
+1 0 Serial boot
+USB boot: USB 2.0 OTG_HS OTP11 [16:9] = 0x1111111x x= 0 USB 
+enable, x=1 USB disable
+UART boot (default mode) OTP11 [16:9] = 0x111111x1 x= 0 
+UART enable, x=1 UART disable
+Note: Default modes correspond to no fused configuration on the OTP11 word.
+BOOT0 = 0: OTP11 [8:5] = 0x0000
+BOOT0 = 1: OTP11 [16:9] = 0x0000
+For further details, refer to the user manual UM3234.
+AN5967
+Boot configuration
+AN5967 - Rev 5 page 24/51
+
+===== PDF PAGE 25 =====
+11 Debug management
+The host/target interface is the hardware equipment that connects the host to the application board. It consists of 
+three components:
+• A hardware debug tool
+• A JTAG or SWD connector
+• A cable connecting the host to the debug tool
+11.1 SWJ debug port (serial wire and JTAG)
+The core of the STM32N6 MCUs integrates the serial wire/JTAG debug port (SWJ-DP). It is an Arm® standard 
+CoreSight™ debug port, combining a JTAG-DP (5-pin) interface and an SW-DP (2-pin) interface.
+• The JTAG debug port (JTAG-DP) provides a 5-pin standard JTAG interface to the AHP-AP port.
+• The serial wire debug port (SW-DP) provides a 2-pin (clock + data) interface to the AHB-AP port.
+The two pins of the SW-DP are multiplexed with two of the five JTAG pins of the JTAG-DP.
+11.2 Debug LED
+The PG10 (AF11) pin has specific BOOTFAILED behavior:
+• During the boot phase, in the case of boot failure, the BOOTFAILED (PG10) pin is set to low open-drain, 
+meaning the debug LED lights up brightly. In most cases, if secure boot is disabled, this fail is invisible as it 
+immediately falls back to a UART/USB boot.
+• During the UART/USB boot, the PG10 pin toggles open-drain at a rate of a few hertz until a connection 
+starts; the debug LED blinks fast.
+• In development boot mode, the PG10 pin is set to low open-drain, meaning the debug LED lights up 
+brightly.
+• In all other cases, the PG10 pin is kept in its reset value (high-Z until further software configuration).
+The recommendation is to use this debug pin. The LED connection quickly shows the system activity, making 
+PG10 perfect for quick low-level boot error signaling. In most cases, the LED circuitry does not conflict with usage 
+for other purposes.
+For further details, refer to the user manual UM3234.
+AN5967
+Debug management
+AN5967 - Rev 5 page 25/51
+
+===== PDF PAGE 26 =====
+12 Recommendations
+12.1 PCB
+For technical reasons, it is mandatory to use a multilayer PCB:
+• A separate layer is dedicated to the ground (VSS).
+• Another layer is dedicated to power supplies like VDD, VDDCPU, and VDDCORE.
+This provides good decoupling and a good shielding effect.
+12.2 Component position
+A preliminary layout of the PCB must separate the different circuits according to their EMI contribution. This 
+reduces the cross‑coupling on the PCB (noisy, high-current circuits, low-voltage circuits, and digital components).
+12.3 Ground and power supplies (VSSx, VDDx)
+Due to the large power and high frequencies involved in STM32N6 devices, it is mandatory to use the PCB with at 
+least four layers, and with dedicated power planes for VSSx and VDDx.
+12.4 I/O speed settings
+STM32N6 devices are made using a 16 nm technology, which requires MOSFETs transistor gate voltages lower 
+than 1.0 V. As these products are primarily intended to use high frequency external memories (in HEXA/
+OCTOSPI or SDMMC) and therefore, to be compatible with a wide range of 1.8/3.3V memories, the GPIOs have 
+been designed to tolerate voltages up to 3.3 V (TT structure). This means that each GPIO includes protections, 
+allowing it to operate in TT mode by default after a reset, and with the default factory OTP124 HCONF bit 
+configuration (refer to the Operating conditions section of DS14791) .
+The role of bits in OTP124 is to bypass the TT protection (3.3 V tolerant) and to make the I/O levels compatible 
+with voltages below 2.5 V (namely 1.8 V):
+• Bit 13: HSLV_VDDIO5
+• Bit 14: HSLV_VDDIO4
+• Bit 15: HSLV_VDDIO3
+• Bit 16: HSLV_VDDIO2
+• Bit 17: HSLV_VDD
+It is important that, in addition to OTP124, the corresponding VDDIOxVRSEL bits in the PWR_SVMCRx registers 
+are set by firmware:
+• PWR_SVMCR1 bit 24 VDDIO4VRSEL: controls PC[1], PC[12:6], and PH[9:2] I/Os in VDDIO4 domain
+• PWR_SVMCR2 bit 24 VDDIO5VRSEL: controls PC[0], PC[5:2] and PE[4] I/Os in VDDIO5 domain
+• PWR_SVMCR3 bit 26 VDDIO3VRSEL: controls PN[12:0] I/Os in VDDIO3 domain
+• PWR_SVMCR3 bit 25 VDDIO2VRSEL: controls PO[5:0] and PP[15:0] I/Os in VDDIO2 domain
+• PWR_SVMCR3 bit 24 VDDIOVRSEL: controls PA[15:0], PB[15:0], PC[15:14], PD[15:0], PE[3:0], PE[15:5], 
+PF[15:0], PG[15:0], PH[1:0], and PH[8:3] in VDD I/Os domain
+Thanks to these settings the I/Os of the XSPI and SDMMC/eMMC interfaces can reach the frequencies specified 
+in the datasheet.
+The GPIOs can be also configured according to the signal frequency and capacitive load. It is important to enable 
+the right output drive on the I/O structure, to have sufficient rise and fall times, and noise effect immunity.
+If the I/O is independent from the GPIO voltage domain, and when there are no specific requirements for its 
+speed, the GPIO can be left configured in GPIOx_OSPEEDR Low speed.
+Five I/O compensation cells (one for I/Os supplied by VDD, four for I/Os supplied by VDDIO2, VDDIO3, VDDIO4, 
+and VDDIO5) are used to control the current slew-rate in the I/O buffer structure. Their behavior depends upon 
+PVT conditions (such as process, voltage and temperature). The recommended values for the compensation cells 
+are RAPSRC = 0x8 and RANSRC = 0x7.
+AN5967
+Recommendations
+AN5967 - Rev 5 page 26/51
+
+===== PDF PAGE 27 =====
+12.5 ESD/EMI protections
+Electrostatic discharge (ESD) and electromagnetic interference (EMI) protections must be considered from the 
+start of product development, as it can be very complex and expensive to add them later.
+ESD and EMI are driven by global standards (such as IEC 61000 and JESD 22), which require certification in 
+most countries, to allow mandatory marking to be applied on a product (such as CE and FCC). They are also 
+driven by standardized interface certification or requirements (for example, USB).
+Although the STM32N6 MCUs embed device-level ESD protection, external components must manage the final 
+product protection, especially on interfaces with external user access in the final product (such as Ethernet, USB, 
+and SD-Card). Some components provide ESD protection, as well as EMI common-mode filtering. For example, 
+ECMF02-2AMX6 used on USB.
+Section 13: Reference design examples provides examples of ESD/EMI protections. For further details, refer to 
+the application note AN1709.
+12.6 Sensitive signals
+When designing an application, the EMC (electromagnetic compatibility) performance can be improved by closely 
+observing the following:
+• Signals for which a temporary disturbance affects the running process permanently (such as interrupts and 
+handshaking strobe signals, not the case for LED commands). For these signals, a surrounding ground 
+trace, shorter lengths, and the absence of noisy or sensitive traces nearby (the crosstalk effect) improve 
+the EMC performance. For digital signals, the best possible electrical margin must be reached for the two 
+logical states and slow Schmitt triggers are recommended to eliminate parasitic states.
+• Noisy signals (such as clocks).
+• Sensitive signals (such as high-Z ones).
+For more information, refer to the application note AN1709.
+12.7 Unused I/Os and features
+The STM32N6 MCUs are designed for a wide range of applications. Often a particular application does not use 
+100% of the resources.
+To increase the EMC performance, unused clocks, counters, or I/Os must not be left free. For example, I/Os must 
+be set to "0" or "1" (external or internal pull-up or pull-down to the unused I/O pins) and unused features must be 
+"frozen" or disabled.
+AN5967
+Recommendations
+AN5967 - Rev 5 page 27/51
+
+===== PDF PAGE 28 =====
+13 Reference design examples
+This section provides examples to help the user connect major and critical interfaces to the STM32N6 MCUs.
+13.1 Clock
+STM32N6 MCUs use two clock sources:
+• LSE: 32.768 kHz (typical) crystal for the embedded RTC
+• HSE: high speed external crystal or oscillator as the main clock (refer to product datasheet for the 
+frequency range)
+Refer to Section 6: Clocks for more details.
+13.2 SD card
+Note: As boot is always done in "Standard" mode (3-V IOs), if the card is used by the application in UHS-I, a power 
+cycle on the card supply is required after a Reset or Standby mode. NRSTC1MS can be used for this.
+Good signal integrity is dependent on the board, GPIO strength settings (GPIO_OSPEEDR registers), and VDD 
+voltage.
+When using VDDIO4 = 1.8 V, a setting of VDDIOxVRSEL can be required to ensure the adequate speed on pins 
+used on SDMMC1 outputs. If needed, the impedance matching resistor must be placed as close as possible to 
+the output driver pin. Values in the example below work in most cases, but can be tailored to IO drive strengths 
+and PCB impedance.
+Before the VCC_SDCARD shutdown (for example, before entering Standby mode), the SDMMC1 driver must set all 
+signals going to the card to 0 or high-Z. The example is independent of MPU I/O voltage VDD and relies on 
+variable VDDIO4 that can be set either to 3.0/3.3 V, or 1.8 V typical using one of the following:
+• SDVSEL1 (0 or high-Z = 3/3.3 V (default), 1 = 1.8 V) connected to an external regulator or other 
+component managing the VDDIO4 voltage
+• A regular GPIO output connected to an external regulator or other component managing the VDDIO4 
+voltage
+• An I²C bus when used with PMIC
+If no programmable VDDIO_SDCARD is available on the platform, VDDIO4 can be connected to VCC_SDCARD. In this 
+case, UHS-I is not supported.
+Figure 13. SD-Card with embedded level shifter connection
+DT71888V2
+STM32N6x
+PC12 SDMMC1_CK
+PH2 SDMMC1_CMD
+PC8 SDMMC1_D0
+PC9 SDMMC1_D1
+SDMMC1_D2
+PC10 SDMMC1_D3
+VDDIO4
+R PU
+SDMMC1
+R PU
+µ SD Card 
+Socket
+CMD
+DAT0
+DAT1
+DAT2
+DAT3
+CLK
+VDD
+EMIF06-
+MSD02N16
+(CLK <52MHz) 
+or 
+2 x USBLC6-
+4SC6
+VDDIO4
+3V/3.3V typ. during initialization
+1.8V typ. for UHS-I mode
+10k
+VDDIO_SDCARD
+22
+SDVSEL1
+Push-pull
+GPIOx / SYSCFG optional
+Bold and plain lines: default pins and minimum set of signals required by low level Boot ROM during SD Card Boot.
+PC10
+VCC_SDCARD
+3V/3.3V typ.
+VDDIO_SDCARD
+External memory supply (VDD_MEM1) must be cut for more than 1 ms to allow reboot on reset.
+AN5967
+Reference design examples
+AN5967 - Rev 5 page 28/51
+
+===== PDF PAGE 29 =====
+Note: When switching to UHS-I mode (VDDIO4 = 1.8 V), VDDIOxVRSEL must be set only when VDDIO4 is within the 
+1.8 V allowed range. In case of a reset of the SD-Card to the legacy 3/3.3V range and to avoid damage to the 
+I/Os, VDDIOxVRSEL must be cleared before the voltage is outside the 1.8 V allowed range.
+13.3 USB
+Multiple USB options are possible. Examples are listed below:
+• 1 × Hi-Speed USB device
+• 1 × Hi-Speed USB device + 1 × USB Hi-Speed host (Figure 14. USB hi-speed host example)
+The case of multiple Hi-Speed USB hosts using an external USB hub component is not described here.
+Note: In the case of on-board flash memory programming using the STM32CubeProgrammer, at least one USB with 
+device capabilities is required.
+Table 11. USB high-speed PCB routing recommendations
+Recommendation Min Typ Max Unit
+Differential impedance 76.5 90 103.5 Ω
+Single-ended impedance 38.25 45 51.75 Ω
+Length matching within a pair (including package)
+-50 - +50 mils
+-1.27 - +1.27 mm
+Max trace length (up to connector or first active component)
+- - 8 inches
+- - 203 mm
+Max number of vias (recommended value) - - 2 -
+Distance between any differential trace and other signals S-2S S-3S or more (1)
+Do not route over a power plane split. No stubs (point to point only). No right angles
+ 
+1. Definition can be found in the DDR memory routing guidelines.
+ 
+13.3.1 USB hi-speed host with Type-A connector (USBH)
+A 200 Ω 1% resistor should be connected between USBH_HS_TXRTUNE and VSS.
+Figure 14. USB hi-speed host example
+DT71899V1
+STM32N6x
+OTG_HSx
+x_HSDP
+x_HSDM
+ECMF2-40A100N6
+USB Type-A 
+receptacle
+D+
+VBUS
+D-
+GND
+x_TXRTUNE
+Hi-Speed PHY1
+High-Speed USB
+90Ω differential trace
+5.1V 0.5A Supply
+STMPS2151
+EN
+VIN
+VOUT
+FAULT
+OVRCUR
+VBUSEN
+10k
+R PU
+VDD
+ESDA7P60-1U1M    
+200  1%
+GPI
+OS
+Note: VBUS 1A is also possible using STMPS2171 instead of STMPS2151.
+AN5967
+Reference design examples
+AN5967 - Rev 5 page 29/51
+
+===== PDF PAGE 30 =====
+13.4 Ethernet
+13.4.1 10/100M Ethernet
+Note: Good signal integrity is dependent on the board, GPIO strength settings (GPIO_OSPEEDR registers), and VDD 
+voltage.
+When using VDD = 1.8 V, setting VDDIOxVRSEL may be required to ensure the adequate speed on the pins 
+used on the ETHx outputs. If needed, the impedance matching resistors must be placed as close as possible to 
+the output driver pin. The values in the example below work in most cases, but can be tailored to the I/O drive 
+strengths and PCB impedance of each side.
+Figure 15. 10/100M Ethernet PHY connection example
+10/100RJ45 connector with Magnetics and LEDs
+STM32N6x
+ETH1)
+ETHx_RMII_CRS_DV
+ETHx_RMII_RXD0
+ETHx_RMII_RXD1
+ETHx_RMII_TXD0
+ETHx_RMII_TXD1
+ETHx_MDC
+ETHx_MDIO
+ETHx_PHY_INTN
+ETHx_RMII_TX_EN
+RCC
+PxxGPIOxxGPIO
+PxxWKUPxPWR
+VDD1k5
+VDD1k5
+22
+22
+22
+22
+PHYAD[2:0] = 0b000
+VDDVDD
+VDD
+LAN8742A10/100M Ethernet Transceiver
+RXER/PHYAD0open
+nRST
+TXEN
+MDIO
+TXD0
+TXD1
+CRS_DV/MODE2
+RXD0/MODE0
+RXD1/MODE1
+MDC
+12k1 1%
+TXP
+TXN
+RXP
+RXN
+LED1/nINT/nPME/REGOFF
+RBIAS
+exposed thermal pad 100Ω differential traces
+USBLC6-4SC6
+3.3V
+270
+10k Green
+10k
+3.3VVDD1A
+VDD2A
+VDDCR
+VDDIO9
+5
+4
+11
+8
+7
+10
+16
+17
+18
+13
+12
+15
+23
+20
+21
+24
+22
+3
+6
+1
+19
+3.3V49.9
+49.9
+49.9
+49.9
+optional
+DT71890V1
+ETH1_RMII_REF_CLK
+ETHx_CLK (25 MHz Reference)
+optional if RCC provides a 25 MHz clock
+25MHz
+XTAL2
+XTAL1/CLKIN
+nINT/REFCLKO
+LED2/nINT/nPME/nINTSEL
+10k
+14
+2
+(50 MHz)
+Optional schematic
+Note: 1. ETH1 is either ETH1 direct or ETHSW port2 (ETHSW is not available on some part numbers).
+2. ETH2 is not available on some part numbers.
+3. ETH3 is ETHSW port1. ETHSW is not available on some part numbers.
+4. Decoupling capacitors are not shown.
+As RCC cannot provide the 25 MHz reference clock to the PHY in low-power modes, the dedicated 25 MHz 
+crystal is required on the PHY in case a "wake-up on LAN" (WOL) is needed for the platform.
+Setting RCC PLLs to get 25 MHz output for PHY clocking can constrain other RCC frequencies. In this case, it is 
+more flexible to put a dedicated 25 MHz crystal on the PHY.
+AN5967
+Reference design examples
+AN5967 - Rev 5 page 30/51
+
+===== PDF PAGE 31 =====
+Alternatively, if PHY allows it and if the RCC can provide a precise 50 MHz clock (to be checked with respect to 
+HSE quartz frequency and RCC, other peripheral, or core clock frequency settings), the STM32N6 devices can 
+provide a 50 MHz ETH_CLK to the PHY, and REF_CLK is left unconnected on both sides. This saves BOM and 
+area, as well as power on some PHYs.
+Figure 16. 10/100M Ethernet PHY connection (with REFCLK from RCC)
+10/100RJ45 connector with Magnetics and LEDs
+STM32N6x
+ETH1
+ETHx_RMII_CRS_DV
+ETHx_RMII_RXD0
+ETHx_RMII_RXD1
+ETHx_RMII_TXD0
+ETHx_RMII_TXD1
+ETHx_MDC
+ETHx_MDIO
+ETHx_PHY_INTN
+ETHx_RMII_TX_EN
+RCC
+PxxGPIOxxGPIO
+PxxWKUPxPWR
+VDD1k5
+VDD1k5
+22
+22
+22
+22
+PHYAD[2:0] = 0b000
+VDDVDD
+VDD
+LAN8742A10/100M Ethernet Transceiver
+RXER/PHYAD0open
+nRST
+TXEN
+MDIO
+TXD0
+TXD1
+CRS_DV/MODE2
+RXD0/MODE0
+RXD1/MODE1
+MDC
+12k1 1%
+TXP
+TXN
+RXP
+RXN
+LED1/nINT/nPME/REGOFF
+RBIAS
+exposed thermal pad 100Ω differential traces
+USBLC6-4SC6
+3.3V
+270
+10k Green
+10k
+3.3VVDD1A
+VDD2A
+VDDCR
+VDDIO9
+5
+4
+11
+8
+7
+10
+16
+17
+18
+13
+12
+15
+23
+20
+21
+24
+22
+3
+6
+1
+19
+3.3V49.9
+49.9
+49.9
+49.9
+optional
+DT71891V1
+ETHx_CLK (50 MHz Reference)
+22
+openclock path enabled in SYSCFG
+Yellow
+XTAL2
+XTAL1/CLKIN
+nINT/REFCLKO14
+LED2/nINT/nPME/nINTSEL
+2 270
+3.3V
+VDD
+Pull-up should be set by SW
+optional
+Note: 1. ETH1 is either ETH1 direct or ETHSW port2 (ETHSW is not available on some part numbers).
+2. ETH2 is not available on some part numbers.
+3. ETH3 is ETHSW port1. ETHSW is not available on some part numbers.
+4. Decoupling capacitors are not shown.
+As the RCC cannot provide the 50 MHz reference clock to the PHY in low-power modes, this option is not 
+possible in case a a "wake-up on LAN" (WOL) is needed for the platform.
+Setting RCC PLLs to get 50 MHz output for PHY clocking can constrain other RCC frequencies. In that case, 
+this option is not possible.
+AN5967
+Reference design examples
+AN5967 - Rev 5 page 31/51
+
+===== PDF PAGE 32 =====
+Table 12. ETH RMII pins
+Pin name Signal direction(1) ETH1(2) ETH2(3) ETH3(3)(4) Comments
+ETHx_CLK → PF3, PF5, PF8 PF4, PG3 -(5) Optional 25 MHz or 50 MHz 
+reference(6)
+ETHx_RMII_REF_CLK ← PA14 PC0, PF6 PA5 Optional if 50 MHz provided by 
+ETHx_CLK
+ETHx_RMII_CRS_DV ← PA11 PC3, PF8 PA2 -
+ETHx_RMII_RXD0 ← PF1 PG0 PA9 -
+ETHx_RMII_RXD1 ← PC2 PC12 PA10 -
+ETHx_RMII_TX_EN → PA13 PC4 PA3 -
+ETHx_RMII_TXD0 → PA15 PC7 PA6 -
+ETHx_RMII_TXD1 → PC1 PC8 PA7 -
+ETHx_MDC → PA9, PF0, PF4 PC6, PG4, PH10 -(7) -
+ETHx_MDIO
+→
+←
+PA10, PF2, PF5 PC5, PF9, PH11 - -
+ETHx_PHY_INTN ← PA12, PC6, PF5 PF5, PG3 PA1 Optional
+ 
+1. → MPU to PHY, ← PHY to MPU.
+2. Can also be used as ETHSW port2. ETHSW is not available on some part numbers.
+3. Not available on some part numbers.
+4. Equivalent to ETHSW port1.
+5. If needed, ETH1_CLK must be used.
+6. As RCC cannot provide the reference clock to the PHY in low-power modes, a dedicated 25 MHz crystal is required on the 
+PHY if "wake-up on LAN" (WOL) is needed for the platform.
+7. ETH3 PHY share THE same MDC/MDIO pins as ETH1 PHY (need to use different address for the PHY).
+ 
+13.4.2 Gigabit Ethernet
+Note: Good signal integrity is dependent on the board, GPIO strength settings (GPIO_OSPEEDR registers), and VDD 
+voltage.
+When using VDD = 1.8 V, setting VDDIOxRSEL can be required to ensure the adequate speed on pins used on 
+ETHx outputs. If needed, the impedance matching resistors must be placed as close as possible to the output 
+driver pin. The values in the example below work in most cases, but can be tailored to the I/O drive strengths and 
+PCB impedance of each side.
+AN5967
+Reference design examples
+AN5967 - Rev 5 page 32/51
+
+===== PDF PAGE 33 =====
+Figure 17. Gigabit Ethernet PHY connection with VDD = 3.3 V (RTL8211F)
+DT71892V1
+PHY_AD2=0
+10/100/1000
+RJ45 connector 
+with Magnetics 
+and LEDs
+STM32N6x
+ETH1
+ETHx_RGMII_CLK125
+ETHx_RGMII_RX_CL
+K
+ETHx_RGMII_RX_CT
+L
+ETHx_RGMII_RXD0
+ETHx_RGMII_RXD3
+ETHx_RGMII_RXD1
+ETHx_RGMII_RXD2
+ETHx_RGMII_GTX_CLK
+ETHx_RGMII_TXD0
+ETHx_RGMII_TXD1
+ETHx_RGMII_TXD2
+ETHx_RGMII_TXD3
+ETHx_MDC
+ETHx_MDIO
+ETHx_PHY_INTN
+ETHx_RGMII_TX_CTL
+ETHx_CLK (25 MHz Reference)
+RCC
+optional if 
+RCC 
+provides a 
+25 MHz 
+clock
+510
+4k7
+YellowCFG_LDO0=0
+4k7
+4k7
+RXDLY=1
+4k7
+TXDLY=1
+4k7
+TXDLY=0
+or
+4k7
+PLLOFF=1
+4k7
+PHY_AD0=1
+25MHz
+10k
+Pxx GPIOxx
+GPIO
+VDD
+Pxx WKUPx
+PWR 2k49 1%
+3.3V
+AVDD10 (1.0V)
+28
+29
+30
+3
+8, 38
+21
+3.3V
+11, 40
+37
+36
+35
+27
+26
+25
+24
+23
+22
+20
+19
+18
+17
+16
+15
+13
+14
+31
+12
+32
+33
+10
+9
+7
+6
+5
+4
+2
+1
+39
+RTL8211F(I)-CG
+10/100/1000M 
+Ethernet Transceiver
+CLKOUT
+RXC
+RXCTL
+RXD0
+RXD3
+RXD1
+RXD2
+TXC
+TXD0
+TXD1
+TXD2
+TXD3
+MDC
+MDIO
+INTB / PMEB
+TXCTL
+XTAL_IN
+XTAL_OUT
+MDIP0
+MDIN0
+MDIP1
+MDIN1
+MDIP2
+MDIN2
+MDIP3
+MDIN3
+LED0
+LED1
+PHYRSTB RSET
+DVDD_RG
+DVDD3V3
+REG_OUT
+AVDD10
+AVDD10
+DVDD10
+exposed thermal pad
+AVDD3V3
+RXDLY=0
+4k7
+or
+DVDD
+1k5
+DVDD
+1k5
+Pull-up should 
+be set by SW
+41
+22
+22
+22
+22
+22
+22
+22
+22
+22
+22
+22
+22
+22
+22
+PHY_AD[2:0] = 0b001
+22
+100Ω differential traces
+PHY_AD1=0
+4k7
+4k7
+PLLOFF=0
+or
+2 x 
+HSP051-
+4M10
+(PHY_AD1)
+(PHY_AD2)
+(RXDLY)
+(PHY_AD0)
+(TXDLY)
+(PLLOFF)
+(EXT_CLK)
+(CFG_EXT)
+(CFG_LDO0)
+VDD
+VDD
+125 MHz
+clock path enabled in SYSCFG
+or
+or optional if RCC 125 MHz is available
+Green
+34
+LED2(CFG_LDO1)
+optional
+50Ω traces unless otherwise noted. Traces should be short with balanced length.
+DVDD
+3.3V
+510
+4k7
+GreenCFG_LDO1 = 0
+VDD = 3.3V ± 5% 
+(PHY 3.3V can be shut down during STANDBY)
+VDD
+VDD
+VDD
+VDD
+510
+4k7
+3.3V
+CFG_EXT = 1
+Figure 18. Gigabit Ethernet PHY connection (ADIN1300xCPZ)
+DT73900V1
+10/100/1000
+RJ45 connector 
+with Magnetics 
+and LEDs
+STM32N6x
+ETH1 (1)
+ETH2 (2)
+ETH3 (3)
+ETHx_RGMII_CLK125
+ETHx_RGMII_RX_CLK
+ETHx_RGMII_RX_CTL
+ETHx_RGMII_RXD0
+ETHx_RGMII_RXD3
+ETHx_RGMII_RXD1
+ETHx_RGMII_RXD2
+ETHx_RGMII_GTX_CLK
+ETHx_RGMII_TXD0
+ETHx_RGMII_TXD1
+ETHx_RGMII_TXD2
+ETHx_RGMII_TXD3
+ETHx_MDC
+ETHx_MDIO
+ETHx_PHY_INTN
+ETHx_RGMII_TX_CTL
+ETHx_CLK (25 MHz Reference)
+RCC
+optional if RCC 
+provides a 
+25 MHz clock
+VDD
+4k7
+PHYAD_2=0
+Pxx GPIOxx
+GPIO
+VDD
+Pxx WKUPx
+PWR
+3k01 1%
+3.3V
+25, 31, 40
+11, 20
+9
+8
+27
+34
+35
+33
+32
+30
+29
+38
+37
+39
+1
+2
+3
+23
+24
+22
+7
+26
+21
+19
+18
+17
+16
+15
+14
+13
+12
+10
+ADIN1300xCPZ
+10/100/1000M 
+Ethernet Transceiver
+GP_CLK
+RXC
+RX_CTL
+RXD0
+RXD3
+RXD1
+RXD2
+TXC
+TXD0
+TXD1
+TXD2
+TXD3
+MDC
+MDIO
+INT_N
+TX_CTL
+XTAL_O
+XTAL_I
+MDI_0_P
+MDI_0_N
+MDI_1_P
+MDI_1_N
+MDI_2_P
+MDI_2_N
+MDI_3_P
+MDI_3_N
+RESET_N REXT
+VDDIO
+AVDD_3P3
+exposed thermal pad
+VDD
+1k5
+VDD
+1k5
+Pull-up should 
+be set by SW
+41
+22
+22
+22
+22
+22
+22
+22
+22
+22
+22
+22
+22
+22
+22
+PHY_AD[2:0] = 0b001
+68
+100Ω differential traces
+2 x 
+HSP051-
+4M10
+(MACIF_SEL0)
+(MACIF_SEL1)
+(PHYAD_0)
+(PHYAD_3)
+(PHYAD_1)
+(PHYAD_2)
+(CLK_IN)
+VDD
+VDD
+50Ω traces unless otherwise noted. Traces should be short with balanced length
+125 MHz
+clock path enabled in SYSCFG
+or
+or optional if RCC 125 MHz is available
+510
+10K
+Green
+PHY_CFG1=0
+optional
+VDD = 1.8V ± 5% or 3.3V ± 5%
+(PHY 3.3V and 0.9V can be shutdown during STANDBY)
+(MDIX_MODE1)
+LINK_ST(PHY_CFG1)
+LED_0(PHY_CFG0)
+VDD
+0.9V
+4, 28, 36DVDD_0P9
+510
+Yellow
+3.3V
+PHY_CFG0=1
+3.3V
+10kNote: IO on AVDD_3P3
+open
+3V3
+10k
+CLK25_REF open
+6
+Note: IO on AVDD_3P3
+Note: max input 2.5V
+240
+GND
+5
+Active High output
+Active Low output
+Only for
+VDD = 3.3V  
+22
+Active High reset output
+10 nF
+100k
+Active Low reset input
+VDD
+4k7
+PHYAD_3=0
+VDD
+4k7
+PHYAD_1=0
+VDD
+4k7
+PHYAD_0=1
+VDD
+4k7
+MACIF_SEL0=0
+VDD
+4k7
+MACIF_SEL0=0
+25MHz
+3.3V
+AN5967
+Reference design examples
+AN5967 - Rev 5 page 33/51
+
+===== PDF PAGE 34 =====
+Note: 1. ETH1 is either ETH1 direct or ETHSW port2 (ETHSW is not available on some part numbers).
+2. ETH2 is not available on some part numbers.
+3. ETH3 is ETHSW port1. ETHSW is not available on some part numbers.
+4. Decoupling capacitors are not shown.
+As RCC cannot provide the 25 MHz reference clock to the PHY in low-power modes, the dedicated 25 MHz 
+crystal is required on the PHY in case "wake-up on LAN" (WOL) is needed for the platform.
+Setting RCC PLLs to get 25 MHz output for PHY can constrain other RCC frequencies. In that case, it is more 
+flexible to put a dedicated 25 MHz crystal on the PHY.
+Figure 19. Gigabit Ethernet PHY connection with VDD = 1.8 V (RTL8211F)
+DT73901V1
+PHY_AD2=0
+10/100/1000
+RJ45 connector 
+with Magnetics 
+and LEDs
+STM32N6x
+ETH1
+ETHx_RGMII_CLK125
+ETHx_RGMII_RX_CL
+K
+ETHx_RGMII_RX_CT
+L
+ETHx_RGMII_RXD0
+ETHx_RGMII_RXD3
+ETHx_RGMII_RXD1
+ETHx_RGMII_RXD2
+ETHx_RGMII_GTX_CLK
+ETHx_RGMII_TXD0
+ETHx_RGMII_TXD1
+ETHx_RGMII_TXD2
+ETHx_RGMII_TXD3
+ETHx_MDC
+ETHx_MDIO
+ETHx_PHY_INTN
+ETHx_RGMII_TX_CTL
+ETHx_CLK (25 MHz Reference)
+RCC
+optional if 
+RCC 
+provides a 
+25 MHz 
+clock
+510
+4k7
+YellowCFG_LDO0=0
+4k7
+4k7
+RXDLY=1
+4k7
+TXDLY=1
+4k7
+TXDLY=0
+or
+4k7
+PLLOFF=1
+4k7
+PHY_AD0=1
+25MHz
+10k
+Pxx GPIOxx
+GPIO
+VDD
+Pxx WKUPx
+PWR 2k49 1%
+3.3V
+AVDD10 (1.0V)
+28
+29
+30
+3
+8, 38
+21
+3.3V
+11, 40
+37
+36
+35
+27
+26
+25
+24
+23
+22
+20
+19
+18
+17
+16
+15
+13
+14
+31
+12
+32
+33
+10
+9
+7
+6
+5
+4
+2
+1
+39
+RTL8211F(I)-CG
+10/100/1000M 
+Ethernet Transceiver
+CLKOUT
+RXC
+RXCTL
+RXD0
+RXD3
+RXD1
+RXD2
+TXC
+TXD0
+TXD1
+TXD2
+TXD3
+MDC
+MDIO
+INTB / PMEB
+TXCTL
+XTAL_IN
+XTAL_OUT
+MDIP0
+MDIN0
+MDIP1
+MDIN1
+MDIP2
+MDIN2
+MDIP3
+MDIN3
+LED0
+LED1
+PHYRSTB RSET
+DVDD_RG
+DVDD3V3
+REG_OUT
+AVDD10
+AVDD10
+DVDD10
+exposed thermal pad
+AVDD3V3
+RXDLY=0
+4k7
+or
+DVDD
+1k5
+DVDD
+1k5
+Pull-up should 
+be set by SW
+41
+22
+22
+22
+22
+22
+22
+22
+22
+22
+22
+22
+22
+22
+22
+PHY_AD[2:0] = 0b001
+22
+100Ω differential traces
+PHY_AD1=0
+4k7
+4k7
+PLLOFF=0
+or
+2 x 
+HSP051-
+4M10
+(PHY_AD1)
+(PHY_AD2)
+(RXDLY)
+(PHY_AD0)
+(TXDLY)
+(PLLOFF)
+(EXT_CLK)
+(CFG_EXT)
+(CFG_LDO0)
+VDD
+VDD
+125 MHz
+clock path enabled in SYSCFG
+or
+or optional if RCC 125 MHz is available
+Green
+34
+LED2(CFG_LDO1)
+optional
+50Ω traces unless otherwise noted. Traces should be short with balanced length.
+DVDD
+3.3V
+510
+4k7
+GreenCFG_LDO1 = 0
+VDD = 3.3V ± 5% 
+(PHY 3.3V can be shut down during STANDBY)
+VDD
+VDD
+VDD
+VDD
+510
+4k7
+3.3V
+CFG_EXT = 1
+Note: 1. ETH1 is either ETH1 direct or ETHSW port2 (ETHSW is not available on some part numbers).
+2. ETH2 is not available on some part numbers.
+3. ETH3 is ETHSW port1. ETHSW is not available on some part numbers.
+4. Decoupling capacitors are not shown.
+As RCC cannot provide the 25MHz reference clock to the PHY in low-power modes, the dedicated 25 MHz 
+crystal is required on the PHY in case "wake-up on LAN" (WOL) is needed for the platform.
+Setting RCC PLLs to get 25 MHz output for PHY can constrain other RCC frequencies. In that case, it is more 
+flexible to put a dedicated 25 MHz crystal on the PHY.
+AN5967
+Reference design examples
+AN5967 - Rev 5 page 34/51
+
+===== PDF PAGE 35 =====
+Table 13. ETH RGMII pins
+Pin name Signal direction(1) ETH1 (2) ETH2 (3) ETH3 (3)(4) comments
+ETHx_CLK → PF3, PF5, PF8 PF4, PG3 -(5) Optional 25 MHz reference (6)
+ETHx_RGMII_CLK125 ← PC4, PH9 PF8, PG2 -(7)
+Optional if 125 MHz is fed 
+internally from RCC to ETH 
+IP
+ETHx_RGMII_RX_CLK ← PA14 PC0, PF6 PA5 -
+ETHx_RGMII_RX_CTL ← PA11 PC3, PF8 PA2 -
+ETHx_RGMII_RXD0 ← PF1 PG0 PA9 -
+ETHx_RGMII_RXD1 ← PC2 PC12 PA10 -
+ETHx_RGMII_RXD2 ← PG0, PH12 PA0, PF9 PH7 -
+ETHx_RGMII_RXD3 ← PC12, PH13 PC11, PG1 PH8 -
+ETHx_RGMII_GTX_CLK → PC0 PF7 PH2 -
+ETHx_RGMII_TX_CTL → PA13 PC4 PA3 -
+ETHx_RGMII_TXD0 → PA15 PC7 PA6 -
+ETHx_RGMII_TXD1 → PC1 PC8 PA7 -
+ETHx_RGMII_TXD2 → PC7, PH10 PC9, PF10 PH6 -
+ETHx_RGMII_TXD3 → PC8, PH11 PC10, PF11 PH3 -
+ETHx_MDC → PA9, PF0, PF4 PC6, PG4, PH10 -(8) -
+ETHx_MDIO
+→
+←
+PA10, PF2, PF5 PC5, PF9, PH11 -(8) -
+ETHx_PHY_INTN ← PA12, PC6, PF5 PF5, PG3 PA1 Optional
+ 
+1. → MPU to PHY, ← PHY to MPU.
+2. Can also be used as ETHSW port2. ETHSW is not available on some part numbers.
+3. Not available on some part numbers.
+4. Equivalent to ETHSW port1.
+5. If needed, ETH1_CLK must be used.
+6. As RCC cannot provide the reference clock to the PHY in low-power modes, a dedicated 25 MHz crystal is required on the 
+PHY if "wake-up on LAN" (WOL) is needed for the platform.
+7. If needed, ETH1_RGMII_CLK125 must be used.
+8. ETH3 PHY share the same MDC/MDIO pins than ETH1 PHY (need to use a different address for the PHY).
+ 
+13.5 Camera serial interface
+As pixel data received by the camera serial interface (CSI) are processed by DCMIPP, the parallel high-resolution 
+sensor interface is not available when using CSI. In that case, a second parallel low-performance sensor is still 
+possible using DCMI. Refer to the reference manual for details.
+A 200 Ω 1% resistor must connect CSI_REXT and VSS.
+AN5967
+Reference design examples
+AN5967 - Rev 5 page 35/51
+
+===== PDF PAGE 36 =====
+Figure 20. CSI example
+DT46624V1
+External clock
+Power supply
+Serial interface
+(configuration
+signals)
+PIXCLK
+VSYNC
+HSYNC
+Control signals
+Image data 
+signals
+MCU
+Camera module
+Pixel array
+Digital signal 
+processing
+Control register
+Parallel output interface
+Timing control
+Note: 1. Supplies and decoupling capacitors are not shown.
+2. Image sensor controls are not shown (I2C for control, autofocus, and so on).
+Table 14. CSI PCB routing recommendations
+Recommendation Min Typ Max Unit
+Differential impedance 90 100 110 Ω
+Single-ended impedance 45 50 55 Ω
+Length matching within a pair (including package
+-5 - +5 mils
+-0.127 - +0.127 mm
+Length matching between clock and data pairs
+-100 - +100 mils
+-2.54 - +2.54 mm
+Max link length (including camera module cables)
+- - 8 inches
+- - 203 mm
+Max number of vias (recommended value) - - 2 -
+Distance between any differential trace and other signals S-2S S-3S or more -
+Do no route over a power plane split. No stubs (point to point only). No right angles
+AN5967
+Reference design examples
+AN5967 - Rev 5 page 36/51
+
+===== PDF PAGE 37 =====
+14 Recommended PCB routing guidelines for STM32N6x5 and 
+STM32N6x7
+14.1 PCB stack-up
+To reduce the reflections on high-speed signals, the impedance between the source, sink, and transmission lines 
+have to be matched. The impedance of a signal trace depends on its geometry and its position with respect to any 
+reference plane.
+The trace width and spacing between differential pairs for a specific impedance requirement is dependent on the 
+chosen PCB stack-up. As there are limitations in the minimum trace width and spacing, which depend on the type 
+of the PCB technology and cost requirements, a PCB stack-up needs to be chosen which addresses all the 
+impedance requirements.
+The minimum configuration that can be used is four or six layers stack-up. An eight-layer board may be required 
+for very dense PCBs that have multiple SDRAM/SRAM/NOR/LCD components. The following stack-ups (See the 
+two figures below) are intended as examples, which can be used as guide lines for a stack-up evaluation and 
+selection.
+These stack-up configurations place the GND plane next to the power plane to increase the capacitance and 
+reduce the physical gap between GND and the power plane. So, high-speed signals on the top layer have a solid 
+GND reference plane, which helps reduce the EMC emissions. Therefore, moving up in the layers and having a 
+GND reference for each PCB signal layer improves the radiated EMC performance.
+Figure 21. Layer PCB stack-up
+Solder Mask
+High Speed Signals+GND
+GND Plane
+Power Plane
+High Speed Signals+GND
+Prepeg
+Core
+Prepeg
+Solder Mask
+Layer_1 (Top)
+Layer_2 (Inner1)
+Layer_3 (Inner2)
+Layer_4 (Bottom)
+Figure 22. Six layer PCB stack-up example 
+Solder Mask
+High Speed Signals+GND
+GND Plane
+Power Plane
+High Speed Signals+GND
+Prepeg
+Core
+Prepeg
+Solder Mask
+Layer_1 (Top)
+Layer_2 (Inner1)
+Layer_3 (Inner2)
+Layer_6 (Bottom)
+Prepeg
+Low Speed Signals
+Core
+GND Plane
+Layer_4 (Inner3)
+Layer_5 (Inner4)
+AN5967
+Recommended PCB routing guidelines for STM32N6x5 and STM32N6x7
+AN5967 - Rev 5 page 37/51
+
+===== PDF PAGE 38 =====
+14.2 Crystal oscillator
+For further guidance on how to layout and route crystal oscillator circuits, refer to the application note AN2867.
+14.3 Power supply decoupling
+An adequate power decoupling for STM32N6 MCUs is necessary to prevent excessive power and ground bounce 
+noise. Refer to Section 3.2: Optional power supplies.
+The following recommendations must be followed:
+• Place the decoupling capacitors as close as possible to the power and ground pins of the MCU. For BGA 
+packages, it is recommended to place the decoupling capacitors on the opposing side of the PCB (see 
+Figure 23. Decoupling capacitor placement depending on package type. Decoupling capacitor placement 
+depending on package type).
+• Add the recommended decoupling capacitors to as many VDD/VSS pairs as possible.
+• Connect the decoupling capacitor pad to the power and ground plane with a wide and short trace/via. This 
+reduces the series inductance, maximizes the current flow, and minimizes the transient voltage drops from 
+the power plane and in turn reduces the ground bounce occurrence.
+Figure 23. Decoupling capacitor placement depending on package type
+DT43766V1
+PCB PCB
+Decoupling 
+capacitor                
+Decoupling capacitor and STM32 MCU on the 
+same side of the package (all packages except 
+BGA)                                
+Distance to be 
+minimized
+STM32
+Decoupling capacitor and STM32 MCU on the 
+opposite sides of the package (BGA package )
+STM32
+Decoupling 
+capacitor                
+The figure below shows an example of decoupling capacitor placement underneath the STM32N6 MCU, closer to 
+the pins and with fewer vias.
+Figure 24. Example of decoupling capacitor placed underneath
+Via Decoupling 
+capacitor
+BGA 
+ball
+AN5967
+Recommended PCB routing guidelines for STM32N6x5 and STM32N6x7
+AN5967 - Rev 5 page 38/51
+
+===== PDF PAGE 39 =====
+14.4 High-speed signal layout
+14.4.1 SDMMC bus interface
+Interface connectivity
+The SD/SDIO MMC card host interface (SDMMC) provides an interface between the AHB peripheral bus and 
+multimedia cards (MMCs), SD memory cards, and SDIO cards.
+The SDMMC interface is a serial data bus interface that consists of a clock (CK), command signal (CMD), and 
+eight data lines (D[0:7]).
+Interface signal layout guidelines
+• Reference the plane using GND or PWR (if PWR, add a 10 nf switching cap between PWR and GND).
+• Trace impedance: 50 Ω ± 10%.
+• All clock and data lines must have equal lengths to minimize any skew.
+• The maximum skew between data and clock must be less than 250 ps @ 10 mm.
+• The maximum trace length must be less than 120 mm. If the signal trace exceeds this trace-length/speed 
+criteria, then a termination must be used.
+• The trace capacitance must not exceed 20 pF at 3.3 V and 15 pF at 1.8 V.
+• The maximum signal trace inductance must be less than 16 nH.
+• Use the recommended pull-up resistance for CMD and data signals to prevent the bus from floating.
+• The mismatch within data bus, data, and CK or CK and CMD must be below 10 mm.
+• All data signals must have the same number of vias.
+AN5967
+Recommended PCB routing guidelines for STM32N6x5 and STM32N6x7
+AN5967 - Rev 5 page 39/51
+
+===== PDF PAGE 40 =====
+Note: The total capacitance of the SD memory card bus is the sum of the bus controller capacitance CHOST, the bus 
+capacitance CBUS itself and the capacitance CCARD of each card connected to this line. The total bus 
+capacitance is CL= CHost + CBus + N*CCard where the host is an STM32N6, the bus is all the signals, and the 
+Card is an SD card.
+The figures below show different typical use cases.
+Figure 25. microSD™ card interconnection example
+DT76765V1
+VDDSTM32N6
+PC12 SDMMC1_CK
+PH2 SDMMC1_CMD
+PC8 SDMMC1_D0
+PC1 SDMMC1_CDIR
+PC6 SDMMC1_D0DIR
+PH9 SDMMC1_CKIN
+PC9 SDMMC1_D1
+PC7 SDMMC1_D123DIR
+PC10 SDMMC1_D2
+PC11 SDMMC1_D3
+VDD
+R PU
+SDMMC1
+R PU
+10k
+VDD
+10k
+10k
+10k
+SD Card 
+Level Translator
+(e.g. IP4856CX25)
+GPIOx Pxx GPIOxx
+0 = 3.3V Card signalling
+1 = 1.8V Card signalling
+VDD_ SD
+SEL
+V CCA
+V SUPPLY
+V SD_REF
+microSD card 
+socket
+CMD
+DAT0
+DAT1
+DAT2
+DAT3
+CLK
+VDD
+CLK_IN
+CLK_FB
+CMD_H
+DIR_CMD
+DATA0_H
+DIR_0
+DATA1_H
+DATA2_H
+DATA3_H
+DIR_1_3
+CLK_SD
+CMD_SD
+DATA0_SD
+DATA1_SD
+DATA2_SD
+DATA3_SD
+22
+VDD
+VDD
+VDD is not 
+switched 
+between 1.8V 
+and 3.3V
+Stays always 
+at 3.3V even 
+in fast mode 
+(only the 
+interfaces are 
+switched)
+Figure 26. SD card interconnection example
+DT76766V1
+STM32N6
+PC12 SDMMC1_CK
+PH2 SDMMC1_CMD
+PC8 SDMMC1_D0
+PB9 SDMMC1_CDIR
+PC9 SDMMC1_D1
+PC10 SDMMC1_D2
+PC11 SDMMC1_D3
+VDD
+R PU
+SDMMC1
+R PU
+VDD_SD
+SD Card 
+Socket
+CMD
+DAT0
+DAT1
+DAT2
+DAT3
+CLK
+VDD
+Open (toggles during 
+SD-card boot)
+Only default 3.3 V Card signaling 
+supported without level Translator
+EMIF06-
+USD05F3
+VDD
+VDD > 2.9 V
+AN5967
+Recommended PCB routing guidelines for STM32N6x5 and STM32N6x7
+AN5967 - Rev 5 page 40/51
+
+===== PDF PAGE 41 =====
+14.4.2 Flexible memory controller (FMC) interface
+Interface connectivity
+The flexible memory controller (FMC) includes three memory controllers:
+• The NOR/PSRAM memory controller
+• The NAND memory controller
+• The synchronous DRAM (SDRAM/Mobile LPSDR SDRAM) controller
+The main purposes of the FMC are:
+• To translate AXI transactions into the appropriate external device protocol
+• To meet the access time requirements of the external memory devices
+All external memories share the addresses, data, and control signals with the controller. Each external device is 
+accessed by means of a unique chip select. The FMC performs only one access at a time to an external device. 
+The main features of the FMC are the following:
+• Interface with static-memory mapped devices including:
+– Static random-access memory (SRAM)
+– NOR flash memory/OneNAND flash memory
+– PSRAM (four memory banks)
+– NAND flash memory with ECC hardware to check up to 8 Kbytes of data
+• Interface with synchronous DRAM (SDRAM/Mobile LPSDR SDRAM) memories
+• 8-,16-,32-bit data bus width
+• Independent chip select control for each memory bank
+• Independent configuration for each memory bank
+• Write FIFO
+• Read FIFO for SDRAM controller
+• The maximum FMC_CLK/FMC_SDCLK frequency for synchronous accesses is the FMC kernel clock 
+divided by two.
+Interface signal layout guidelines
+• For reference the plane using GND or PWR (if PWR), add 10 nf stitching cap between PWR and GND.
+• Trace impedance: 50 Ω ± 10%.
+• The maximum trace length must not exceed 120 mm. If the signal trace exceeds this trace-length / speed 
+criteria, then a termination must be used.
+• To reduce the crosstalk, it is strongly recommended to place data tracks on the different layers to the 
+address and control lanes. However, when the data and address / control tracks coexist on the same layer 
+they must be separated from each other by at least 5 mm.
+• Match the trace lengths for the data group within ± 10 mm of each other to reduce any excessive skew.
+• Serpentine traces (this is an “S” pattern to increase trace length) can be used to match the lengths.
+• Placing the clock (SDCLK) signal on an internal layer, minimizes the noise (EMI). Route the clock signal at 
+least three times the width of the trace away from other signals. To avoid unnecessary impedance changes 
+and reflection, avoid the use of vias as much as possible. Serpentine routing is to be avoided also.
+• Match the clock traces to the data/address group traces length to within ±10 mm.
+• Match the clock trace length to each signal trace in the address and command groups to within ±10 mm 
+(with maximum of ≤ 20 mm).
+• Trace capacitances:
+– At 3.3 V, keep the trace capacitance within 20 pF with overall capacitive loading (including data 
+address, SDCLK, and control) to no more than 30 pF.
+– At 1.8 V, keep the trace capacitance within 15 pF with overall capacitive loading (including data, 
+address, SDCLK, and control) to no more than 20 pF.
+14.4.3 Extended-SPI interface (XSPI)
+The XSPI interface provides communication with external high-speed volatile and nonvolatile memories. Thanks 
+to its flexibility, it supports single-SPI, dual-SPI, quad-SPI, octo-SPI, and 16-bit protocol memories providing high 
+performance, low pin count, and PCB design cost.
+A dedicated external power supply for octo-SPI and hexa-SPI interfaces is available.
+AN5967
+Recommended PCB routing guidelines for STM32N6x5 and STM32N6x7
+AN5967 - Rev 5 page 41/51
+
+===== PDF PAGE 42 =====
+XSPI I/O manager (XSPIM)
+The user can set a fully programmable premapping of the XSPI1 and XSPI2 ports signals with the XSPI I/O 
+manager (XSPIM). It connects up to 16-bit external memories on port 1, and up to 8-bit external memories on port 
+2.
+In direct mode, each XSPI directly drives the corresponding port (XSPI1 mapped to port 1, XSPI2 mapped to port 
+2). In Figure 27, a 16-bit SPI memory is connected to port 1 while an octo-SPI memory is connected to port2.
+In swapped mode, the XSPI2 can be configured in 16-bit mode, and the XSPI1 can be configured in octal mode, 
+to connect an external 16-bit memory on port 1, and to connect in a concurrent way an octal external memory 
+connected to port 2 of the I/O manager.
+In multiplexed mode, only one output port is used to access two memories. Each memory requests a dedicated 
+chip select. The arbiter in the IO manager manages the access of XSPI1 and XSPI2 to the targeted memory. The 
+external memories can be two separate chips or embedded in a single multichip package.
+The multiplexed mode can be very useful for some packages where the port2 (or port1) is not mapped. In 
+Figure 28, the same bus of port 1 is shared between two external 16-bit SPI memories.
+For additional descriptions of use cases, refer to the XSPI I/O manager (XSPIM) section in the reference manual.
+AN5967
+Recommended PCB routing guidelines for STM32N6x5 and STM32N6x7
+AN5967 - Rev 5 page 42/51
+
+===== PDF PAGE 43 =====
+Interface signal layout guidelines
+• Reference the plane using GND or PWR (if PWR, add 10 F stitching capacitor between PWR and GND).
+• Trace impedance: 50 Ω for single-ended and 100 Ω for differential pairs (CLK/NCLK).
+• The maximum trace length must be less than120 mm. If the signal trace exceeds this trace-length/speed 
+criterion, then a termination must be used.
+• Avoid using multiple signal layers for the data signal routing.
+• Route the clock signal at least three times the width of the trace away from other signals. To avoid 
+unnecessary impedance changes and reflection, avoid the use of vias as much as possible. Serpentine 
+routing is to be avoided also.
+• Match the trace lengths for the data group within ± 10 mm of each other to reduce any excessive skew.
+• Serpentine traces (such as an “S” shape pattern to increase trace length) can be used to match the 
+lengths.
+• Avoid using a serpentine routing for the clock signal and use via(s) as little as possible for the whole path. 
+A via alters the impedance and adds a reflection to the signal.
+• Avoid discontinuities on high speed traces, such as vias and SMD components. If SMD components are 
+needed, place these components symmetrically to ensure good signal quality
+• It is recommended to connect the STM32 NRST pin with a reverse diode to each of all external RESET 
+pins of external memories, to generate a proper hardware reset simultaneously.
+Figure 27. XSPI direct mode example
+DT76767V2
+XSPI1
+XSPI2
+XSPI  I/O  Manager  (XSPIM)
+STM32N6
+ 16-bit SPI memory
+Octo- SPI memory
+PP0...PP15
+PO5
+PO4
+PO3
+PO2
+PO0
+Port  2 Port  1
+XSPIM_P1_IO0...IO15
+XSPIM_P1_CLK
+XSPIM_P1_NCLK
+XSPIM_P1_DQS0
+XSPIM_P1_NCS0
+XSPIM_P1_DQS1
+CS
+(RW) DS0
+(RW) DS1
+CK
+CK#
+DQ[0:15]
+16 bits
+VDDXSPI1
+VDDXSPI2
+VDD_MEM
+VDD_MEM
+VDD_MEM1
+VDD_MEM1
+10k
+VCC
+XSPIM_P2_NCS0
+VDD_MEM2
+VDD_MEM2
+10k
+VCC
+XSPIM_P2_DQS0
+XSPIM_P2_CLK
+XSPIM_P2_IO0...IO7 8 bits
+CS
+RWDS (=DQSM)
+CK
+XSPIM_P2_NCLK
+CK#
+DQ[0:7]
+VDD_MEM2
+RESET#
+10k
+VDD
+NRST
+PN1
+PN0
+PN6
+PN7
+PN2/PN3/PN4/PN5/
+PN8/PN9/PN10/PN11
+If RESET# is not connected, external memory supplies (VDD_MEM1 and VDD_MEM2) must be cut for more than 
+1 ms to allow reboot on reset.
+Note: Two octo-SPI memories accessed in XSPI dual octal mode can replace the 16-bit SPI memory.
+AN5967
+Recommended PCB routing guidelines for STM32N6x5 and STM32N6x7
+AN5967 - Rev 5 page 43/51
+
+===== PDF PAGE 44 =====
+Figure 28. XSPI multiplexed interconnection example
+DT76768V2
+XSPI1
+XSPI2
+XSPI  I/O  Manager  (XSPIM)
+STM32N6
+ Octo-SPI memory
+PP0...PP7
+PO4
+PO2
+PO1
+PO0
+Port  1
+XSPIM_P1_IO0...IO7
+XSPIM_P1_CLK
+XSPIM_P1_NCS1
+XSPIM_P1_NCS0
+XSPIM_P1_DQS0
+CS
+RWDS (=DQSM)
+CK
+CK#
+DQ[0:7]
+8 bits
+VDDXSPI1
+VDDXSPI2
+VDD_MEM2
+VDD_MEM1
+VDD_MEM1
+VDD_MEM1
+10k
+VCC
+VDD_MEM1
+VDD_MEM1
+VCC
+CS
+RWDS(=DQSM)
+CK#
+DQ[0:7]
+NRST
+Octo-SPI memory
+XSPIM_P1_NCLKPO5
+CK
+8  bits
+10k
+VDD_MEM1
+10k
+RESET
+RESET
+VDD_MEM1
+10k
+Note: VDD, VDD_MEM1, VDD_MEM2 supply voltage names are completely independent.
+If RESET# is not connected, external memory supplies (VDD_MEM1 and VDD_MEM2) must be cut for more than 
+1 ms to allow reboot on reset.
+14.4.4 ADF interface
+The audio digital filter (ADF) is a high-performance module dedicated to the connection of external sigma-delta 
+(ΣΔ) modulators, and specially the digital microphones. It is mainly targeted for the following applications: audio 
+capture signals, metering. The ADF features one digital serial interface (SITF0) and one digital filter (DFLT0) with 
+flexible digital processing options in order to offer up to 24-bit final resolution.
+The ADF serial interface supports several standards allowing the connection of various ΣΔ modulator sensors: 
+SPI interface, Manchester coded 1-wire interface, PDM interface. For further information, refer to the reference 
+manual RM0486.
+14.4.5 Embedded trace macrocell (ETM)
+Interface connectivity
+The ETM enables the reconstruction of the program execution. The data is traced using the data watchpoint and 
+trace (DWT) component or the instruction trace macrocell (ITM) whereas instructions are traced using the 
+embedded trace macrocell (ETM). The ETM interface is synchronous with the four data bus lines D[0:3] and the 
+clock signal CLK.
+Interface signals layout guidelines:
+AN5967
+Recommended PCB routing guidelines for STM32N6x5 and STM32N6x7
+AN5967 - Rev 5 page 44/51
+
+===== PDF PAGE 45 =====
+• Reference the plane using GND or PWR (if PWR, add 10 F stitching capacitor between PWR and 
+GNDTrace impedance: 50 Ω ± 10%.
+• All the data traces must be as short as possible (≤25 mm).
+• Trace the lines, which must run on the same layer with a solid ground plane underneath it without vias.
+• Trace the clock, which must have only a point-to-point connection. Any stubs must be avoided.
+It is strongly recommended also for other (data) lines to be point-to-point only. If any stubs are needed, they must 
+be as short as possible. If long stubs are required, there must be a possibility to optionally disconnect them (for 
+example, by jumpers).
+AN5967
+Recommended PCB routing guidelines for STM32N6x5 and STM32N6x7
+AN5967 - Rev 5 page 45/51
+
+===== PDF PAGE 46 =====
+Revision history
+Table 15. Document revision history
+Date Version Changes
+28-Nov-2024 1 Initial release
+12-May-2025 2
+Updated document title.
+Changed all VCORE occurrences into VDDCORE.
+Moved the note concerning ground pins and section Decoupling power figures to Section 3.2: 
+Secondary power supplies. Updated list of external devices and Table 4. Power supply pins in 
+Decoupling power figures.
+Added Section 3.4: System pins.
+Added STM32N6 power-up sequence and STM32N6 power-down sequence in Section 3.7: 
+System startup.
+Added Table 7. Package thermal characteristics.
+Updated Figure 5. STM32CubeMX example screenshot.
+Replaced VDDIO1 by VDDIO5 in Section 12.4: I/O speed settings and by VDDIO4 in Section 
+13.2: SD card.
+Updated list of USB options in Section 13.3: USB. Removed note 1 from Table 13. CSI PCB 
+routing recommendations.
+Added Section 14: Recommended PCB routing guidelines for STM32N6x5 and STM32N6x7.
+28-Aug-2025 3 Updated Section 12.4: I/O speed settings and note in Section 13.3: USB.
+17-Dec-2025 4
+Updated Section 6: Clocks, Section 7.1: External source - HSE bypass mode, Section 7.2: 
+External crystal - HSE crystal mode, Section 12.4: I/O speed settings, Section 13.1: Clock, 
+Section 13.2: SD card, and Section 14.4.3: Extended-SPI interface (XSPI).
+Updated Table 4. Power supply pins.
+Updated Figure 4. System supply configurations, Figure 23. XSPI direct mode example, and 
+Figure 24. XSPI multiplexed interconnection example.
+Removed former Table 9. HSE BOM for oscillator or crystal example for NX2016SA - 40 MHz.
+Minor text edits across the whole document.
+03-Aug-2026 5
+Added:
+• Section 3.3: Ground references
+• Section 3.4: Main and auxiliary supplies groups usage :
+• Section 3.4.1: Independent ADC supply and reference voltage
+• Section 3.5: Main and auxiliary supplies sequencing 
+• Section 3.5.1: Power-on sequence
+• Section 3.5.2: Power-off sequence
+• Section 3.6: STM32N6 application power schematic
+• Section 3.6.1: STM32N6 power components
+Updated:
+• Section 3.1: Mandatory power supplies
+• Section 3.2: Optional power supplies
+• Moved Table 6. Power supply pins to Section 3.6.1: STM32N6 power components
+• Section 3.9: System startup
+Removed:
+• Section 3.3 Independent ADC supply and reference voltage
+• Section 3.5 USB supplies
+AN5967
+Revision history
+AN5967 - Rev 5 page 46/51
+
+===== PDF PAGE 47 =====
+Contents
+1 General information ............................................................... 2
+2 Terminology ....................................................................... 3
+3 Power supplies .................................................................... 5
+3.1 Mandatory power supplies ....................................................... 5
+3.2 Optional power supplies ......................................................... 6
+3.3 Ground references ............................................................. 6
+3.4 Main and auxiliary supplies groups usage : ......................................... 7
+3.4.1 Independent ADC supply and reference voltage ................................. 8
+3.5 Main and auxiliary supplies sequencing ........................................... 8
+3.5.1 Power-on sequence ...................................................... 8
+3.5.2 Power-off sequence ...................................................... 9
+3.6 STM32N6 application power schematic ........................................... 11
+3.6.1 STM32N6 power components.............................................. 12
+3.7 System pins .................................................................. 13
+3.8 Specific IO constraints related to voltage settings................................... 14
+3.9 System startup................................................................ 14
+4 Package selection ................................................................ 18
+5 Alternate function mapping to pins ............................................... 19
+6 Clocks............................................................................ 20
+7 HSE oscillator .................................................................... 21
+7.1 External source - HSE bypass mode ............................................. 21
+7.2 External crystal - HSE crystal mode .............................................. 21
+8 LSE oscillator .................................................................... 22
+8.1 External source - LSE bypass mode.............................................. 22
+8.2 External crystal - LSE crystal mode .............................................. 22
+9 Clock security system ............................................................ 23
+9.1 CSS on HSE ................................................................. 23
+9.2 CSS on LSE.................................................................. 23
+10 Boot configuration................................................................ 24
+11 Debug management .............................................................. 25
+11.1 SWJ debug port (serial wire and JTAG)........................................... 25
+11.2 Debug LED .................................................................. 25
+12 Recommendations................................................................ 26
+12.1 PCB......................................................................... 26
+AN5967
+Contents
+AN5967 - Rev 5 page 47/51
+
+===== PDF PAGE 48 =====
+12.2 Component position ........................................................... 26
+12.3 Ground and power supplies (VSSx, VDDx) ......................................... 26
+12.4 I/O speed settings ............................................................. 26
+12.5 ESD/EMI protections .......................................................... 27
+12.6 Sensitive signals .............................................................. 27
+12.7 Unused I/Os and features ...................................................... 27
+13 Reference design examples....................................................... 28
+13.1 Clock........................................................................ 28
+13.2 SD card ..................................................................... 28
+13.3 USB......................................................................... 29
+13.3.1 USB hi-speed host with Type-A connector (USBH).............................. 29
+13.4 Ethernet ..................................................................... 30
+13.4.1 10/100M Ethernet ....................................................... 30
+13.4.2 Gigabit Ethernet ........................................................ 32
+13.5 Camera serial interface ........................................................ 35
+14 Recommended PCB routing guidelines for STM32N6x5 and STM32N6x7........... 37
+14.1 PCB stack-up................................................................. 37
+14.2 Crystal oscillator .............................................................. 38
+14.3 Power supply decoupling ....................................................... 38
+14.4 High-speed signal layout ....................................................... 39
+14.4.1 SDMMC bus interface ................................................... 39
+14.4.2 Flexible memory controller (FMC) interface.................................... 41
+14.4.3 Extended-SPI interface (XSPI) ............................................. 41
+14.4.4 ADF interface .......................................................... 44
+14.4.5 Embedded trace macrocell (ETM) .......................................... 44
+Revision history ....................................................................... 46
+List of tables .......................................................................... 49
+List of figures.......................................................................... 50
+AN5967
+Contents
+AN5967 - Rev 5 page 48/51
+
+===== PDF PAGE 49 =====
+List of tables
+Table 1.  Reference documents ................................................................ 2
+Table 2.  Acronyms ......................................................................... 3
+Table 3.  Main power supplies.................................................................. 6
+Table 4.  Main supplies group .................................................................. 7
+Table 5.  Auxiliary supplies group ............................................................... 7
+Table 6.  Power supply pins .................................................................. 12
+Table 7.  System pins ...................................................................... 13
+Table 8.  Package summary .................................................................. 18
+Table 9.  Package thermal characteristics......................................................... 18
+Table 10.  Boot source description .............................................................. 24
+Table 11.  USB high-speed PCB routing recommendations ............................................. 29
+Table 12.  ETH RMII pins..................................................................... 32
+Table 13.  ETH RGMII pins ................................................................... 35
+Table 14.  CSI PCB routing recommendations ...................................................... 36
+Table 15.  Document revision history ............................................................. 46
+AN5967
+List of tables
+AN5967 - Rev 5 page 49/51
+
+===== PDF PAGE 50 =====
+List of figures
+Figure 1.  Power supply overview .............................................................. 5
+Figure 2.  STM32N6 power-on sequence (two steps execution).......................................... 9
+Figure 3.  Power off sequence with VDD = 3.3 V ................................................... 10
+Figure 4.  Power-off sequence with VDD = 1.8 V ................................................... 11
+Figure 5.  STM32N6 - VDD = 3.3 V - Internal SMPS - USB application example .............................. 12
+Figure 6.  STM32N6 - VDD = 1.8 V - Internal SMPS – no USB application example ........................... 12
+Figure 7.  Device startup with VDDCORE supplied directly from SMPS step-down converter ...................... 15
+Figure 8.  Device startup with VDDCORE supplied from an external regulator ................................ 16
+Figure 9.  STM32CubeMX example screenshot.................................................... 19
+Figure 10.  HSE source clock ................................................................. 21
+Figure 11.  LSE external clock ................................................................ 22
+Figure 12.  LSE crystal resonators.............................................................. 22
+Figure 13.  SD-Card with embedded level shifter connection............................................ 28
+Figure 14.  USB hi-speed host example .......................................................... 29
+Figure 15.  10/100M Ethernet PHY connection example............................................... 30
+Figure 16.  10/100M Ethernet PHY connection (with REFCLK from RCC)................................... 31
+Figure 17.  Gigabit Ethernet PHY connection with VDD = 3.3 V (RTL8211F) ................................. 33
+Figure 18.  Gigabit Ethernet PHY connection (ADIN1300xCPZ) ......................................... 33
+Figure 19.  Gigabit Ethernet PHY connection with VDD = 1.8 V (RTL8211F) ................................. 34
+Figure 20.  CSI example .................................................................... 36
+Figure 21.  Layer PCB stack-up ............................................................... 37
+Figure 22.  Six layer PCB stack-up example ...................................................... 37
+Figure 23.  Decoupling capacitor placement depending on package type ................................... 38
+Figure 24.  Example of decoupling capacitor placed underneath ......................................... 38
+Figure 25.  microSD™ card interconnection example ................................................. 40
+Figure 26.  SD card interconnection example ...................................................... 40
+Figure 27.  XSPI direct mode example........................................................... 43
+Figure 28.  XSPI multiplexed interconnection example ................................................ 44
+AN5967
+List of figures
+AN5967 - Rev 5 page 50/51
+
+===== PDF PAGE 51 =====
+IMPORTANT NOTICE – READ CAREFULLY
+STMicroelectronics NV and its subsidiaries (“ST”) reserve the right to make changes, corrections, enhancements, modifications, and improvements to ST 
+products and/or to this document at any time without notice.
+In the event of any conflict between the provisions of this document and the provisions of any contractual arrangement in force between the purchasers and 
+ST, the provisions of such contractual arrangement shall prevail.
+The purchasers should obtain the latest relevant information on ST products before placing orders. ST products are sold pursuant to ST’s terms and 
+conditions of sale in place at the time of order acknowledgment.
+The purchasers are solely responsible for the choice, selection, and use of ST products and ST assumes no liability for application assistance or the design of 
+the purchasers’ products.
+No license, express or implied, to any intellectual property right is granted by ST herein.
+Resale of ST products with provisions different from the information set forth herein shall void any warranty granted by ST for such product.
+If the purchasers identify an ST product that meets their functional and performance requirements but that is not designated for the purchasers' market 
+segment, the purchasers shall contact ST for more information.
+ST and the ST logo are trademarks of ST. For additional information about ST trademarks, refer to www.st.com/trademarks. All other product or service names 
+are the property of their respective owners.
+Information in this document supersedes and replaces information previously supplied in any prior versions of this document.
+© 2026 STMicroelectronics – All rights reserved
+AN5967
+AN5967 - Rev 5 page 51/51

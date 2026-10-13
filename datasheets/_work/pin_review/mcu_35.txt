@@ -1,0 +1,54 @@
+STM32N6x5xx                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            STM32N6x7xx
+
+
+                                  •                                                                   Memory-mapped data transfers from a source to a destination:
+                                               –                                                        Peripheral-to-memory
+                                               –                                                       Memory-to-peripheral
+                                               –                                                       Memory-to-memory
+                                               –                                                        Peripheral-to-peripheral
+                                  •                                                                   Transfer arbitration based on a 4-grade programmed priority at channel level:
+                                               –                                                       One high priority traffic class, for time-sensitive channels (queue 3)
+                                               –                                                        Three low priority traffic classes, with a weighted round-robin allocation for non
+                                                            time-sensitive channels (queues 0, 1, 2)
+                                  •                                                                   Per channel event generation, on any of th  e following events: tran sfer complete, half
+                                               transfer complete,  data transfer error, user setting error, link transfer error, completed
+                                               suspension, and trigger overrun
+                                  •                                                                   Per channel interrupt generation, with separately programmed interrupt enable per
+                                               event
+                                  •                                                                   16 concurrent GPDMA channels:
+                                               –                                                        Per channel FIFO for queuing s ource and destination transfers
+                                               –                                                        Intra-channel GPDMA transfers chaining via programmable linked-list into
+                                                            memory, supporting two execution modes: run-to-completion and link step mode.
+                                               –                                                        Intra-channel and inter-channel GPDMA transfers chaining via programmable
+                                                            GPDMA input triggers connection to GPDMA task completion events
+                                  •                                                                   Per linked-list item within a channel:
+                                               –                                                        Separately programmed source and destination transfers
+                                               –                                                        Programmable data handling between source and destination: byte-based
+                                                            reordering, packing or unpacking, padd  ing or truncation, sign extension and
+                                                            left/right realignment
+                                               –                                                        Programmable number of data bytes to be transferred from the source, defining
+                                                            the block level
+                                               –                                                        Linear source and destination addres  sing: either fixed or contiguously
+                                                            incremented addressing, programmed at a   block level, between successive burst
+                                                            transfers
+                                               –                                                        2D source and destination addressing:   programmable signed address offsets
+                                                            between successive burst transfers (non-  contiguous addressing within a block,
+                                                            combined with programmable signed address offsets between successive blocks,
+                                                            at a second 2D/repeated block level, for a reduced set of channels
+                                               –                                                        Support for scatter-gather (multi-buffer transfers), data interleaving and
+                                                            deinterleaving via 2D addressing
+                                               –                                                        Programmable GPDMA request and trigger selection
+                                               –                                                        Programmable GPDMA half transfer and transfer complete events generation
+                                               –                                                            Pointer to the next linked-list item and it  s data structure in memory, with automatic
+                                                            update of the GPDMA linked-list control registers
+                                               –                                                        Channel abort and restart
+                                  •                                                                  Debug:
+                                               –                                                        Channel suspend and resume support
+                                               –                                                        Channel status reporting, including FIFO level, and event flags
+                                  •                                                                   TrustZone support:
+
+
+
+                                                                                                                        DS14791 Rev 10                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          35/263
+
+                                                                                                                                                                                                                                                                                                        80

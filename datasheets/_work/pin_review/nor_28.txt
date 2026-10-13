@@ -1,0 +1,58 @@
+                                                                                                      W25Q128JV
+
+
+The   W25Q128JV          is  also  backward  compatible  to  Winbond’s  previous  generations  of  serial  flash
+memories, in which the Status Register-1&2 can be written using a single “Write Status Register-1 (01h)”
+command. To complete the Write Status Register-1&2 instruction, the /CS pin must be driven high after
+the sixteenth bit of data that is clocked in as shown in Figure 9b. If /CS is driven high after the eighth
+clock, the Write Status Register-1 (01h) instruction will only program the Status Register-1, the Status
+Register-2 will not be affected (Previous generations will clear CMP and QE bits).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                          Figure 9b. Write Status Register-1/2 Instruction
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                               - 27 -

@@ -1,0 +1,51 @@
+Functional overview                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    STM32N6x5xx STM32N6x7xx
+
+
+                                    unused for video purposes, and is accessible   by the system as a c ontiguous extension of
+                                    the system SRAM.
+                                    The VENC supports the following features:
+                                    •                                                                   Video encode:
+                                                  –                                                       codecs: H264 (MPEG4_Part10/AVC, baseline/Main/High up to 5.2)
+                                                  –                                                        performance: 1080p15 for H264
+                                    •                                                                   Still-image encode:
+                                                  –                                                        codecs: JPEG (baseline interleaved)
+                                                  –                                                        performance: 300 Mpixel/s for JPEG
+                                    •                                                                  VENCRAM:
+                                                  –                                                        size: 128 Kbytes
+                                                  –                                                        access: can be statically assign ed to the system by SYSCFG settings
+                                    •                                                                   Security via RIF:
+                                                  –                                                        the VENC is protected by a default ta  rget and controller control (RISUP and
+                                                                RIMU)
+                                                  –                                                        by default, the VENC works in non-protected mode
+                                                  –                                                        the VENC can be set in protected mode, for instance to handle DRM tasks with a
+                                                                secure datapath. In such cases, the drivers must run in a protected process.
+                                    •                                                                   Synchronization from an upstream perip  heral: pixels can be streamed from an
+                                                  upstream peripheral (such as the camera) di   rectly to the VENC, without writing to a full
+                                                  frame buffer, nor requiring external bandwidth.
+                                    •                                                                   Encode with multiple codecs on a same  system: the VENC hardware processes the
+                                                  encode tasks sequentially, interleaved at fram   e level. Performance is  shared across all
+                                                  the tasks.
+
+3.31                                                                                            JPEG codec (JPEG)
+
+                                    The hardware 8-bit JPEG codec encodes un   compressed image data stream or decodes
+                                    JPEG-compressed image data stream. It also fully manages JPEG headers.
+                                    JPEG codec main features are:
+                                    •                                                                   High-speed fully-synchronous operation
+                                    •                                                                   Configurable as encoder or decoder
+                                    •                                                                   Single-clock-per-pixel encode/decode
+                                    •                                                                   RGB, YCbCr, YCMK and BW (gra yscale) image color space support
+                                    •                                                                   8-bit depth per image component at encode/decode
+                                    •                                                                   JPEG header generator/parser with enable/disable
+                                    •                                                                   Four programmable quantization tables
+                                    •                                                                   Single-clock Huffman coding and decoding
+                                    •                                                                   Fully-programmable Huffman tables (two AC and two DC)
+                                    •                                                                   Fully-programmable minimum coded unit (MCU)
+                                    •                                                                   Concurrent input and output data stream interfaces
+
+
+
+
+
+
+54/263                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          DS14791 Rev 10

@@ -1,0 +1,62 @@
+                                                                                                         W25Q128JV
+
+
+
+8.2.35    Global Block/Sector Lock (7Eh)
+All Block/Sector Lock bits can be set to 1 by the Global Block/Sector Lock instruction. The command must
+be issued by driving /CS low, shifting the instruction code “7Eh” into the Data Input (DI) pin on the rising
+edge of CLK, and then driving /CS high. A Write Enable instruction must be executed before the device
+will accept the Global Block/Sector Lock Instruction (Status Register bit WEL= 1).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                       Figure 56. Global Block Lock Instruction for SPI Mode
+
+
+8.2.36     Global Block/Sector Unlock (98h)
+All Block/Sector Lock bits can be set to 0 by the Global Block/Sector Unlock instruction. The command
+must be issued by driving /CS low, shifting the instruction code “98h” into the Data Input (DI) pin on the
+rising edge of CLK, and then driving /CS high. A Write Enable instruction must be executed before the
+device will accept the Global Block/Sector Unlock Instruction (Status Register bit WEL= 1).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                      Figure 57. Global Block Unlock Instruction for SPI Mode
+
+
+
+
+
+
+
+
+                                                                           Publication Release Date: December 24, 2024
+                                                              - 58 -                                                Revision M

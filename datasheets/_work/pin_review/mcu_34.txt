@@ -1,0 +1,50 @@
+Functional overview                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    STM32N6x5xx STM32N6x7xx
+
+3.7 General-purpose inputs/outputs (GPIOs)
+
+                             Each general-purpose I/O port has four 32-b  it configuration registers (GPIOx_MODER,
+                             GPIOx_OTYPER, GPIOx_OSPEEDR,  and GPIOx_PUPDR), two 32 -bit data registers
+                             (GPIOx_IDR and GPIOx_ODR), a 16-bit reset r   egister (GPIOx_BRR), and a 32-bit set/reset
+                             register (GPIOx_BSRR).
+                             In addition, all GPIOs have a 32-bit locking    register (GPIOx_LCKR), two couples of 32-bit
+                             advanced configuration registers (GPIOx_DELAYRL/H, GPIOx_ADVCFGRL/H), and two
+                             32-bit alternate function selection re  gisters (GPIOx_AFRH and GPIOx_AFRL).
+                             Access to each general-purpose I/O configurati   on bit can be restricted to secure-only and/or
+                             privileged-only.
+                             The main features are:
+                             •                                                                   Multiple choice of conf igurations per I/O port:
+                                        –                                                        Input configuration in floating,  pull-up/down, or analog state
+                                        –                                                        Analog configuration (output buffer and Schmitt trigger input disabled)
+                                        –                                                               Output configuration, or alte  rnate function configuration, in push-pull or open drain
+                                                   state, with pull-up or pull-down activated
+                             •                                                                   Data present on the I/O pin sampled to   the input data register GPIOx_IDR (input
+                                        configuration) or to the peripheral   (alternate function configuration)
+                             •                                                                   Output buffer on the I/O pin driven by the output data register GPIOx_ODR (output
+                                        configuration) or by the peripheral   (alternate function configuration)
+                             •                                                                  I/O data output atomic read/modify through GPIOx_ BSRR and GPIOx_BRR
+                             •                                                                   Speed selection for each I/O (GPIOx_OSPEEDR)
+                             •                                                                   Lock mechanism (GPIOx_LCKR) to selectivel  y freeze the I/O port configurations
+                             •                                                                   Highly-flexible pin multiplexing , enabling the use of I/O pins as GPIOs, or as one of
+                                        several possible peripheral functions
+                             •                                                                   Programmable delay to the input or the output path (GPIOx_DELAYR)
+                             •                                                                   Double edge selection, clock inversion,  and optional retime (GPIOx_ADVCFGR)
+                             •                                                                   Possibility to restrict each I/O contro l to secure-only and/or privileged-only
+
+3.8 System configuration controller (SYSCFG)
+
+                             The devices feature a set of configur  ation registers. The SYSCFG manages:
+                                        –                                                        Cortex-M55 internal settings (such as TCM, CACHE, or vectors)
+                                        –                                                        Iterconnect, security, and memory settings
+                                        –                                                        I/O compensation cells
+
+3.9                                                                                                                        General purpose direct memory access controller (GPDMA)
+
+                             The GPDMA controller is a bus controller an  d system peripheral, used to perform
+                             programmable data transfers between memory  -mapped peripherals and/or memories via
+                             linked-lists, upon the control of an off-loaded CPU.
+                             The GPDMA main features are:
+                             •                                                                   Dual bidirectional AHB controller
+
+
+
+34/263                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          DS14791 Rev 10

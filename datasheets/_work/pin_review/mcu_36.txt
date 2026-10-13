@@ -1,0 +1,52 @@
+Functional overview                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    STM32N6x5xx STM32N6x7xx
+
+
+                                                       –                                                        Support for secure and non-secure GPDMA transfers, independently at a first
+                                                                      channel level, and independently at a    source/destination and link sublevels.
+                                                       –                                                        Secure and non-secure interrupts reporting, resulting from any of the respectively
+                                                                      secure and non-secure channels.
+                                                       –                                                        TrustZone-aware AHB target port, protecting any GPDMA secure resource
+                                                                      (register, register field) from a non-secure access.
+                                        •                                                                   Privileged/unprivileged support:
+                                                       –                                                        Support for privileged and unprivileged GPDMA transfers, independently at a
+                                                                      channel level
+                                                       –                                                                      Privileged-aware AHB   target   port
+
+                                                                                            Table 8. GPDMA1 channel implementation
+                                       Hardware parameters
+  Channel                                                                                                                                    Features                                                                                                                                                                                                                                                                                                                                                                                                                     Comment
+             x                  dma_fifo_                                        dma_
+                                      size[x]                       addressing[x]
+
+                                                                                                                   –            8 bytes, 2 words FIFO                                                 Typically allocated for GPDMA transfers
+     0 to 11                                                                                                             2                                                                                                                                                                                                 0–            Fixed/contiguously between an APB/AHB peripheral and SRAM.
+                                                                                                                         incremented addressing
+                                                                                                                                                                                                      Can be used for GPDMA transfers, between
+   12 to 15                                                                                                 4                                                                                                                                                                                             1                                                                                                                         –            32 bytes, 8 words FIFO–            2D addressinga demanding AHB peripheral and SRAM, or
+                                                                                                                                                                                                      for transfers from/to external memories.
+
+3.10                                                                                            High performance direct memory access controller (HPDMA)
+
+                                        The HPDMA is used to perform programma   ble data transfers between memory-mapped
+                                        peripherals, and/or memories via linked-lists,    upon the control of an off-loaded CPU.
+                                        Main features:
+                                        •                                                                   Single bidirectional AXI controller and   single bidirectional AHB controller
+                                        •                                                                   Memory-mapped data transfers from a source to a destination:
+                                                       –                                                        Peripheral-to-memory
+                                                       –                                                       Memory-to-peripheral
+                                                       –                                                       Memory-to-memory
+                                                       –                                                        Peripheral-to-peripheral
+                                        •                                                                   Transfer arbitration based on a 4-grade programmed priority at channel level:
+                                                       –                                                       One high priority traffic class, for time-sensitive channels (queue 3)
+                                                       –                                                        Three low priority traffic classes, with a weighted round-robin allocation for non
+                                                                      time-sensitive channels (queues 0, 1, 2)
+                                        •                                                                   Per channel event generation, on any of the following events:
+                                                       –                                                       Transfer complete, half transfer complete
+                                                       –                                                        Data transfer error, user setting error, link transfer error
+                                                       –                                                        Completed suspension
+                                                       –                                                        Trigger overrun
+                                        •                                                                   Per channel interrupt generation, with separately programmed interrupt enable per
+                                                       event
+
+
+36/263                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          DS14791 Rev 10

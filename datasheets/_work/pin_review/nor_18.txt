@@ -1,0 +1,58 @@
+                                                                                                   W25Q128JV
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                  Figure 4c. Status Register-3
+
+7.1.5    Write Protect Selection (WPS) – Volatile/Non-Volatile Writable
+The WPS bit is used to select which Write Protect scheme should be used. When WPS=0, the device will
+use the combination of CMP, SEC, TB, BP[2:0] bits to protect a specific area of the memory array. When
+WPS=1, the device will utilize the Individual Block Locks to protect any individual sector or blocks. The
+default value for all Individual Block Lock bits is 1 upon device power on or after reset.
+
+7.1.6    Output Driver Strength (DRV1, DRV0) – Volatile/Non-Volatile Writable
+The DRV1 & DRV0 bits are used to determine the output driver strength for the Read operations.
+                                   DRV1, DRV0                     Driver Strength
+                                         0, 0                           100%
+                                         0, 1                           75%(1)
+
+                                         1, 0                            50%
+                                         1, 1                           25%(2)
+
+                             Notes:
+
+                                1.   Factory default for part numbers with ordering options “IN”
+                                2.   Factory default for part numbers with ordering options “IQ”.
+
+7.1.7    Reserved Bits – Non Functional
+There are a few reserved Status Register bits that may be read out as a “0” or “1”. It is recommended to
+ignore the values of those bits. During a “Write Status Register” instruction, the Reserved Bits can be
+written as “0”, but there will not be any effects.
+
+
+
+
+
+
+                                                             - 17 -

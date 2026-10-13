@@ -1,0 +1,61 @@
+Figure 34. PT Pin and Block Protection Mode Operation
+
+                                                                           Power On
+
+
+                                        PT pin = low                                                                                                                                                                                                                                                                                                                                                                                                  PT pin = high
+
+
+
+         WP# Protection Mode                                                                                   Block Protection Mode (PT)
+
+       1. WP# pin = low to protect whole chip                                                                 1. Blcok Protection mode enable with BPx bit = 1
+       2. Block Protection mode disable                                                                       2. Whole Blocks are protected after power on
+
+
+                                                                                                                      Temporary Protection/
+                                                                                                                      Un-Proteciton (By CMD)
+
+                                                                                                                1. Set Feature command (EFh) sets BPx bit,
+                                                                                                                Invert bit and complementary bit value
+
+
+                                                  Block Protection Area (By CMD)                                                                         SP bit = 1
+
+                                                                                                                       Solid Protection Mode
+                                                                                                                1. Set Feature command with SP bit = 1 fixes
+                                                                                                                    current block protecion/un-protection status
+                                                                                                                2. Only next Power On cycle can disable
+                                                                                                                    Solid Protection mode
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                               56

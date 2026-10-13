@@ -1,0 +1,79 @@
+Figure 35-2. AC Waveforms for Page Program Random Data Two-plane (ONFI)
+
+                                                                                                                                                                                                                                                                                                                                 A
+          CLE
+
+
+          CE#
+
+
+
+                                          tWC                                                                                              tADL                                                 tWC                                        tADL
+
+         WE#
+
+
+                                                                                                                                                                                                                                                                                           tWB
+           ALE
+
+
+
+           RE#
+
+
+
+                                      80h              1st Address      2nd Address      3rd Address     4th Address      5th Address              Din                                                                            Din85h1st Address2nd AddressDin                                                                            Din11h
+     IO[7:0]                                               Cycle            Cycle           Cycle            Cycle            Cycle                                                                               Cycle           Cycle
+                                                                                                                                                                                                                                                                                                             tDBSY
+
+
+         R/B#                                                                                                                                                                                            Reapeat if needed
+                                                                                                                                                                                                                                                                                                            Busy
+                             A
+         CLE
+
+
+         CE#
+
+
+
+                                                                                                                                          tADL                                                tWC                                        tADL
+
+        WE#
+
+
+                                                                                                                                                                                                                                                                                         tWB
+
+         ALE
+
+
+         RE#
+
+
+
+                                        80h           1st Address     2nd Address      3rd Address      4th Address       5th Address            Din                                                                           Din85h1st Address2nd AddressDin                                                                            Din10h70hStatus
+    IO[7:0]                                               Cycle           Cycle            Cycle           Cycle             Cycle                                                                              Cycle           Cycle                                                                                                          Output
+
+
+                                                                                                                                                                                                                                                                                                          tPROG
+        R/B#                                                                                                                                                                                                    Reapeat if needed
+                                                                                                                                                                                                                                                                                                          Busy
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                         59

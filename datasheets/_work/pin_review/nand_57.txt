@@ -1,0 +1,49 @@
+6-16.      Two-Plane Operations
+
+The device is divided into two planes for performance improvement, which provides ONFI two-plane
+commend set, and traditional two-plane command set. In the two-plane operation, the NAND device
+may proceed the same type operation (for example: Program or Erase) on the two planes concurrent or
+overlapped by the two-plane command sets.  The different type operations cannot be done in the two-plane
+operations; for example, it cannot be done to erase one plane and program the other plane concurrently.
+The plane address A18 must be different from each selected plane address. The page address A12-A17 of
+individual plane must be the same for two-plane operation.
+The Status Read command (70h) may check the device status in the two-plane operation, if the result is
+failed and then the Status Enhanced Read (78h) may check which plane is failed.
+
+6-17.      Two-plane Program (ONFI & Traditional)and Two-plane Cache Program
+(ONFI & Traditional)
+
+The two-plane program command (80h-11h) may input data to cache buffer and wait for the final plane data
+input with command (80h-10h) and then transfer all data to NAND array. As for the two-plane cache program
+operation, it can be achieved by a two-plane program command (80h-11h) with a cache program command
+(80h-15h), and the final address input with the confirm command (80h-10h). Please refer to the waveforms of
+Figure 35-1. AC Waveforms for Two-plane Program (ONFI) and Figure 36. AC Waveforms for Two-plane
+Cache Program (ONFI) for details. The random data input command (85h) can be also used in the two-plane
+program operation for changing the column address, please refer to Figure 35-2. AC Waveforms for Page
+Program Random Data Two-plane (ONFI). The traditional two-plane page program and cache program
+commands describe in Figure 38. AC waveforms for Two-plane Program (Traditional) and Figure  39. AC
+waveforms for Two-plane Cache Program (Traditional).
+  Notes:
+               1.  Page number should be the same for both planes.
+               2. Block address [29:18] can be different.
+               For examples:
+                  If the user issues 80h-(block address 5h, page address 5h) -11h - 80h -
+                            (block address - 18h, page address 5h) - 10h,
+                 the programmed page is
+                            - Plane 0: block address 18h, page address 5h
+                            - Plane 1: block address 5h, page address 5h
+                                                                                                                                                                                                                                                                                                                                                                                          (Note: Block address = A[29:18], page address = A[17:12])
+
+
+6-18.      Two-plane Block Erase (ONFI & Traditional)
+
+The two-plane erase command (60h-D1h) may erase the selected blocks in parallel from each plane, with
+setting the 1st and 2nd block address by (60h-D1h) & (60h-D0h) command and then erase two selected blocks
+from NAND array. Please refer to the following waveforms of two-plane erase for details. Traditional two-
+plane block erase command describes in Figure 40. AC waveforms for Two-plane Erase (Traditional).
+
+
+
+
+
+                                                                     57

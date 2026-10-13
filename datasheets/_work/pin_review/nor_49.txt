@@ -1,0 +1,64 @@
+                                                                                                          W25Q128JV
+
+
+
+8.2.25     Read Manufacturer / Device ID Quad I/O (94h)
+The Read Manufacturer / Device ID Quad I/O instruction is an alternative to the Read Manufacturer /
+Device ID instruction that provides both the JEDEC assigned manufacturer ID and the specific device ID
+at 4x speed.
+
+The Read Manufacturer / Device ID Quad I/O instruction is similar to the Fast Read Quad I/O instruction.
+The instruction is initiated by driving the /CS pin low and shifting the instruction code “94h” followed by a
+four clock dummy cycles and then a 24-bit address (A23-A0) of 000000h, but with the capability to input
+the Address bits four bits per clock. After which, the Manufacturer ID for Winbond (EFh) and the Device ID
+are shifted out four bits per clock on the falling edge of CLK with most significant bit (MSB) first as shown
+in  Figure    41.  The  Device  ID  values  for  the           W25Q128JV         are  listed  in    Manufacturer  and  Device
+Identification table. The Manufacturer and Device IDs can be read continuously, alternating from one to
+the other. The instruction is completed by driving /CS high.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                   Figure 41. Read Manufacturer / Device ID Quad I/O Instruction
+
+   Note:
+   The “Continuous Read Mode” bits M(7-0) must be set to Fxh to be compatible with Fast Read Quad I/O instruction.
+
+
+
+                                                                            Publication Release Date: December 24, 2024
+                                                               - 48 -                                                Revision M

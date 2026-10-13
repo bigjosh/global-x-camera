@@ -1,0 +1,56 @@
+6-15-2. Get Feature (ONFI)
+
+The Get Feature command is to read sub-feature parameter. After sending the Get Feature command (EEh)
+and following specific feature, the host may read out the P1-P4 sub- feature parameter data.  Once sending
+the EEh command, the NAND device will remain in the Get Feature mode until next valid command is sent.
+The Status Read command (70h) can be used to check the completion.  To continue the read operation, a
+following read command (00h) to re-enable the data out is necessary.
+Please refer to the following waveform of Get Feature Operation for details.
+
+
+Figure 28. AC Waveforms for Get Feature (ONFI) Operation
+
+
+                                                                      tCLR
+            CLE
+
+
+
+           CE#
+
+
+
+           WE#
+
+
+
+                                                                       tAR
+
+            ALE
+
+
+
+
+                                                                                  tRC
+            RE#                                                      tRR
+                                                    tWB
+                                                                 tFEAT
+
+       IO[7:0]                     EEh                                                                                                                              FeatureFeatureFeatureFeatureFeature
+                                                   Address                       Dout 0         Dout 1          Dout 2          Dout 3
+
+
+
+          R/B#
+                                                                 Busy
+
+
+
+
+
+
+
+
+
+
+                                                                       49

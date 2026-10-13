@@ -1,0 +1,52 @@
+STM32N6x5xx                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            STM32N6x7xx
+
+
+                                         Main features:
+                                         •                                                                   AHB interface
+                                         •                                                                   One serial digital input:
+                                                         –                                                        Configurable SPI interface to connect various digital sensors
+                                                         –                                                       Configurable Manchester coded interface support
+                                                         –                                                        Compatible with PDM interface to support digital microphones
+                                         •                                                                   Two common clocks input/output for  Σ∆ modulators
+                                         •                                                                   One flexible digital f ilter path including:
+                                                         –                                                        An MCIC filter configurable in Sinc4 or Si  nc5 filter with adjust able decimation ratio
+                                                         –                                                        A reshape filter to improve the out-off band rejection and in-band ripple
+                                                         –                                                        A high-pass filter to cancel the DC offset
+                                                         –                                                       Gain control
+                                                         –                                                        Saturation blocks
+                                         •                                                                   • Clock absence detector
+                                         •                                                                  • Sound activity detector
+                                         •                                                                  • 24-bit signed output data resolution
+                                         •                                                                  • Continuous or single conversion
+                                         •                                                                   • Possibility to delay the selected bitstream
+                                         •                                                                   • One trigger input
+                                         •                                                                   • Autonomous functionality in Stop modes
+                                         •                                                                   • DMA can be used to read the conversion data
+                                         •                                                                  • Interrupts services
+
+3.25 Camera subsystem
+
+                                         The camera subsystem is built around a double path:
+                                         •                                                                     a low resolution path, with the DCMI and a low-frequency parallel interface, supporting
+                                                         sensors up to 24 Mpixel/s
+                                         •                                                                   a high resolution path, with the DCMIPP and a high frequency parallel interface or
+                                                         serial CSI-2 interface (RGB or rawBayer), targeting sensors up to 5 Mpixels at 30 fps
+                                         For the connection of a camera sensor, it is recommended to use the DCMIPP. The DCMI is
+                                         recommended only in two noticeable cases:
+                                         •                                                                   to get backward compatibility with forme r platforms that embed also the DCMI
+                                         •                                                                  to input the pixels from a second camera sensor
+Note:                                                                                                                      The DCMIPP inputs pixels from one sensor via the CSI-  2 interface, while the DCMI gets
+                                         pixels from the second sensor via the parallel interface.
+                                         The DCMI path offers the following summarized maximum features:
+                                         •                                                                  Parallel input: 80 MHz on  14-bit input capability
+                                         •                                                                   Central DMA to extract and dump its pixels
+                                         •                                                                   Software extraction of its pixel data
+
+
+
+
+
+
+                                                                                                                                                DS14791 Rev 10                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          49/263
+
+                                                                                                                                                                                                                                                                                                                                                                   80

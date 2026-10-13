@@ -1,0 +1,69 @@
+6-12.    Reset
+
+The reset command FFh resets the read/program/erase operation and clear the status register to be E0h (when
+WP# is high). The reset command during the program/erase operation will result in the content of the selected
+locations(perform programming/erasing) might be partially programmed/erased.
+If the Flash memory has already been set to reset stage with reset command, the additional new reset
+command is invalid.
+
+
+Figure 22. AC waveforms for Reset Operation
+
+
+       CLE
+
+
+
+      CE#
+
+
+
+      WE#
+
+
+
+       ALE
+
+
+
+       RE#
+                       tWB
+
+
+    IO[7:0]         FFh
+
+
+
+
+
+                             tRST
+      R/B#
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                              40

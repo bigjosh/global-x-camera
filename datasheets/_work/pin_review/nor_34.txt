@@ -1,0 +1,64 @@
+                                                                                                   W25Q128JV
+
+
+
+
+
+
+8.2.11     Fast Read Quad I/O (EBh)
+The Fast Read Quad I/O (EBh) instruction is similar to the Fast Read Dual I/O (BBh) instruction except
+that address and data bits are input and output through four pins IO0, IO1, IO2 and IO3 and four Dummy
+clocks are required in SPI mode prior to the data output. The Quad I/O dramatically reduces instruction
+overhead allowing faster random access for code execution (XIP) directly from the Quad SPI. The Quad
+Enable bit (QE) of Status Register-2 must be set to enable the Fast Read Quad I/O Instruction.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                            Figure 24a. Fast Read Quad I/O Instruction (M7-M0 should be set to Fxh)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                             - 33 -

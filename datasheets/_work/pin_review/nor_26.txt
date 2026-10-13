@@ -1,0 +1,60 @@
+                                                                                                    W25Q128JV
+
+
+8.2.3     Write Disable (04h)
+The Write Disable instruction (Figure 7) resets the Write Enable Latch (WEL) bit in the Status Register to
+a 0. The Write Disable instruction is entered by driving /CS low, shifting the instruction code “04h” into the
+DI pin and then driving /CS high. Note that the WEL bit is automatically reset after Power-up and upon
+completion of the Write Status Register, Erase/Program Security Registers, Page Program, Quad Page
+Program, Sector Erase, Block Erase, Chip Erase and Reset instructions.
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                        Figure 7. Write Disable Instruction for SPI Mode
+
+8.2.4     Read Status Register-1 (05h), Status Register-2 (35h) & Status Register-3 (15h)
+The Read Status Register instructions allow the 8-bit Status Registers to be read. The instruction is
+entered by driving /CS low and shifting the instruction code “05h” for Status Register-1, “35h” for Status
+Register-2 or “15h” for Status Register-3 into the DI pin on the rising edge of CLK. The status register bits
+are then shifted out on the DO pin at the falling edge of CLK with most significant bit (MSB) first as shown
+in Figure 8. Refer to section 7.1 for Status Register descriptions.
+
+The Read Status Register instruction may be used at any time, even while a Program, Erase or Write
+Status Register cycle is in progress. This allows the BUSY status bit to be checked to determine when the
+cycle is complete and if the device can accept another instruction. The Status Register can be read
+continuously, as shown in Figure 8. The instruction is completed by driving /CS high.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                           Figure 8a. Read Status Register Instruction
+
+
+
+
+
+
+
+
+
+                                                              - 25 -

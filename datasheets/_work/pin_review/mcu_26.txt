@@ -1,0 +1,63 @@
+Functional overview                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    STM32N6x5xx STM32N6x7xx
+
+3.4.2                                                                                                  Power supply schemes
+
+3.4.3 Core domain
+
+                              The core domain supply can be provided by the SMPS step-down converter, or by an
+                              external supply (VDDCORE). VCORE supplies all the digital circuitries, except for the backup
+                              domain, and the retention domain in Standby mode. When a system reset occurs, the
+                              SMPS step-down converter is enabled to deliver   0.81 V, hence the system can start up in
+                              any supply configuration.
+                              The system startup sequence from power-on in   different supply configurations is controlled
+                              through power management.
+
+3.4.4 SMPS usage
+
+                              The devices embed an SMPS to provide the V   CORE supply. The SMPS generates this
+                              voltage on VLXSMPS, with a total external capacitor of 60 (4x 15) μF (typical). The SMPS
+                              requires an external coil of 0.9 μH (typical). See AN5967 “ Getting started with the hardware
+                              development for STM32N6 MCUs”, available on  www.st.com.
+                              Two configurations exist (see Figure 2), namely SMPS step-down converter supply on and
+                              off (bypass mode). In the latter the step-down converter supply is disabled.
+
+                                                                                    Figure 2. SMPS configurations
+
+
+                                                   VDDA18PMU                                                                                                                   VDDA18PMU
+
+External supply                                        VDDSMPS                                                                                                                     VDDSMPS
+      Typ. = 1.8 V                                    VLXSMPS                                SMPS                                                                                 VLXSMPS                                SMPS
+
+                                                      VFBSMPS                                  (on)                                                                               VFBSMPS                                  (off)
+
+
+                                                      VSSSMPS                                                                                                                     VSSSMPS
+
+                                                     VDDCORE                                            VCORE                          External supply                           VDDCORE
+                                                                                                                                    Typ. = 0.81/0.89 V                                                                             VCORE
+
+
+                                                                VSS                                                                                                                         VSS
+
+
+
+                                              SMPS supply                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   External supply (bypass)MSv70449V5
+
+3.4.5 Backup domain
+
+                              To retain the content of the backup domain (R   TC, backup registers, and backup RAM) when
+                              VDD is turned off, the VBAT pin can be connect  ed to an optional voltage supplied from a
+                              battery or another sour ce. The switching to V BAT is controlled by the power-down reset
+                              (PDR) embedded in the bloc k that monitors the V DD supply.
+
+3.4.6 Analog supply
+
+                              The analog supply domain is powered by dedicated VDDA18ADC and VSSA pins, which
+                              allow the supply to be filtered and shielded from noise on the PCB, thus improving ADC
+                              conversion accuracy.
+
+
+
+
+26/263                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          DS14791 Rev 10

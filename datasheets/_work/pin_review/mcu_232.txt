@@ -1,0 +1,70 @@
+Electrical characteristics                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      STM32N6x5xx STM32N6x7xx
+
+
+                                                                                                                                                                                        Figure 64. Ethernet MII timing diagram
+
+
+
+
+
+                                                                                                  MII_RX_CLK
+
+                                                                                                                                                   tsu(RXD)                                                                                                                           tih(RXD)
+                                                                                                                                                      tsu(ER)                                                                                                                            tih(ER)
+                                                                                                                                                      tsu(DV)                                                                                                                            tih(DV)
+
+
+                                                                                                 MII_RXD[3:0]
+                                                                                                      MII_RX_DV
+                                                                                                      MII_RX_ER
+
+
+
+
+
+
+                                                                                                   MII_TX_CLK
+
+
+                                                                                                                                                                                                                                                          td(TXEN)
+                                                                                                                                                                                                                                                             td(TXD)
+
+
+
+                                                                                                       MII_TX_EN
+                                                                                                  MII_TXD[3:0]
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ai15668b
+
+                                                                                  Table 123. Dynamic characteristics: Ethernet MAC signals for RGMII ID    (1)(2)(3)
+
+                                                                                  Symbol                                                                                                                                                                                                                                                                                                                                                                                                              Rating                                                                                                                                                                                                                                                                                                                                                                                Min                                                           Typ                                                Max                                           Unit
+
+                                                                                           Tcyc                                                                                                        Clock cycle duration                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    7.5                                                                                  8                                                                           8.5
+                                                                       Tskew_R (RXD)                                       Receive data skew time                                                                                                                                                                                                                                                                                                                                                                                                                                                          -1(4)-0.5(4)
+                                                                          Tskew R (DV)                                                   Receive valid skew time                                                                                                                                                                                                                                                                                                                                                                                                                                             -1(4)         -0.5(4)
+                                                                     Tsetup T (TXEN)                                   Transmit enable to clock output setup time                                                                                                                                                                          1.4(5)                                                                                       --                                                            ns
+                                                                          TsetupT(TXD)                                                 Transmit data to clock output setup time                                                                                                                                                                                                            1.4(5)      --
+                                                                        Thold T (TXEN)                                         Transmit clock to transmit enable output hold time                                                                1.4 (5)      --
+                                                                          Thold T (TXD)                                                  Transmit clock to data output hold time                                                                                                                                                                                                                              1.4(5)      --
+
+                                                              1.                          Evaluated by characterization. Not tested in production.
+                                                              2.                          RGMII TX/RX data bits are retimed.
+                                                              3.                          Test done at 100 MHz.
+                                                              4.                          With delay on RGMII_RX_CLK (GPIOx_DELAYR) = 0b1110.
+                                                              5.                          With delay on RGMII_TX_CLK (GPIOx_DELAYR) = 0b1010.
+
+                                                              USART (SPI mode) interface
+                                                              Unless otherwise specified, the parameters given in the table below are derived from tests
+                                                              performed under the ambient temperature, f  PCLKx  frequency, and VDD  supply voltage
+                                                              conditions summarized in Table 24, with the following configuration:
+                                                              •                                                                     Output speed set to OSPEEDRy[1:0] = 10
+                                                              •                                                                      Capacitive load C L   = 30 pF
+                                                              •                                                                      Measurement points done at CMOS levels: 0.5 V  DD
+                                                              •                                                                        I/O compensation cell activated
+                                                              •                                                                        HSLV activated when V DD ≤ 2.7 V
+
+
+
+232/263                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        DS14791 Rev 10

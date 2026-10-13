@@ -1,0 +1,74 @@
+Figure 15-2. AC Waveforms for Sequence of Cache Program
+
+                                                                                                                                                                                                                A
+   IO[7:0]         80h     1st Address2nd Address3rd Address4th Address5th AddressDinDin      15h             80h     1st Address2nd Address3rd Address4th Address5th AddressDinDin
+                             Cycle  Cycle   Cycle  Cycle  Cycle                                                         Cycle  Cycle   Cycle  Cycle   Cycle                              15h             80h
+
+
+
+
+      R/B#
+
+                                                                                         Busy - tCBSY                                                                                 Busy - tCBSY
+
+                        A
+
+   IO[7:0]         80h     1st Address2nd Address3rd Address4th Address5th AddressDinDin      15h             80h     1st Address2nd Address3rd Address4th Address5th AddressDinDin       10h            70h
+                             Cycle  Cycle   Cycle  Cycle  Cycle                                                         Cycle  Cycle   Cycle  Cycle   Cycle
+
+
+
+
+      R/B#
+                                                                                          Busy - tCBSY                                                                                Busy - tPROG
+
+
+      Note:            tPROG = Page(Last) programming time + Page (Last-1) programming time - Input cycle time of
+                       command & address - Data loading time of page (Last).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                    Note 2
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                       31

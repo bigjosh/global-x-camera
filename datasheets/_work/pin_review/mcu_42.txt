@@ -1,0 +1,54 @@
+Functional overview                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    STM32N6x5xx STM32N6x7xx
+
+
+                                   Main features are:
+                                   •                                                                  Uses CRC-32 (Ethernet) polynomial: 0x4C11DB7
+                                                 (x32 + x26 + x23 + x22 + x16 + x12 + x11 + x10 + x8 + x7 + x5 + x4 + x2 + x +1)
+                                   •                                                                          Alternatively, uses fully pr ogrammable polynomial with programmable size (7, 8, 16, 32
+                                                 bits)
+                                   •                                                                   Handles 8-,16-, 32-bit data size
+                                   •                                                                  Programmable CRC initial value
+                                   •                                                                   Single input/output 32-bit data register
+                                   •                                                                  • Input buffer to avoid bus stall during calculation
+                                   •                                                                  CRC computation done in four AHB clock  cycles (HCLK) for  the 32-bit data size
+                                   •                                                                   General-purpose 8-bit register (can be used for temporary storage)
+                                   •                                                                   Reversibility options on I/O data
+                                   •                                                                  Accessed through AHB target peripheral by 32-bit words only, with the exception of
+                                                 CRC_DR register, which can be accessed by words, right-aligned half-words, and
+                                                 right-aligned bytes
+
+3.16                                                                                            Flexible memory controller (FMC)
+
+                                   The FMC includes three memory controllers  , namely the NOR/PSRAM, the NAND, and the
+                                   synchronous DRAM (SDRAM/Mob  ile LPSDR SDRAM) controller. Its main features are:
+                                   •                                                                   Interface with static-memory mapped devices including:
+                                                 –                                                        Static random access memory (SRAM)
+                                                 –                                                        NOR flash memory/OneNAND flash memory
+                                                 –                                                        PSRAM (four memory subregions)
+                                                 –                                                       Ferroelectric RAM (FRAM, FeRAM)
+                                                 –                                                        NAND flash memory with ECC hardware to check up to 8 Kbytes of data
+                                   •                                                                  Interface with synchronous DRAM (SDRAM/Mobile LPSDR SDRAM) memories
+                                   •                                                                   Burst mode support for faster access to synchronous devices such as NOR flash
+                                                 memory, PSRAM and SDRAM)
+                                   •                                                                  Programmable continuous clock output for asynchronous and synchronous accesses
+                                   •                                                                   8-,16- or 32-bit wide data bus
+                                   •                                                                  Independent chip-select cont rol for each memory region
+                                   •                                                                  Independent configuration for each memory region
+                                   •                                                                   Write enable and byte lane select outputs for use with PSRAM, SRAM and SDRAM
+                                                 devices
+                                   •                                                                   External asynchronous wait control
+                                   At startup the FMC pins  must be configured by the user  application. The FMC input/output
+                                   pins not used by the application   can be used for other purposes.
+
+
+
+
+
+
+
+
+
+
+
+
+42/263                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          DS14791 Rev 10

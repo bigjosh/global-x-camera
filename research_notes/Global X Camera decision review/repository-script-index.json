@@ -1,0 +1,617 @@
+[
+  {
+    "path": "docs/review/_power-work/build_power_findings.py",
+    "head": "import hashlib\nimport json\nfrom pathlib import Path\n\nROOT = Path(__file__).resolve().parents[3]\nOUT = ROOT / 'docs/review'\n\n\ndef pdf(relative, pages, detail):\n    path = ROOT / 'datasheets' / relative\n    sidecar = json.loads(Path(str(path) + '.source.json').read_text(encoding='utf-8'))\n    return {'type': 'manufacturer_pdf', 'path': path.relative_to(ROOT).as_posix(),\n            'pdf_pages': pages, 'url': sidecar['source_url'],\n            'sha256': sidecar['sha256'], 'detail': detail}\n\n\ndef source(refs, detail):\n    return {'type': 'recovered_design', 'path': 'hardware/reconstruction/schematic-connectivity.json',\n            'references': refs, 'detail': detail,\n            'values_source': 'imports/flux/2026-09-05/bigjosh-global-x-camera.flx; per-instance properties including unit fields'}\n\n\nfindings = [\n    {'id': 'PWR-001', 'severity': 'blocker', 'confidence': 'confirmed',\n     'title': 'Battery latch pull-down back-drives the MCU shutter input',\n     'references': ['Q1','Q3','R1','R2','D3','SW1','U1'],\n     'observed': 'D3 anode is LATCH_PULLDOWN and cathode is SHUTTER_SENSE at U1 F3/PC13. When SW1 and Q2 are open, the path common PFET source -> R1 1 MOhm -> R2 100 kOhm -> D3 remains connected to PC13. There is no voltage translation or independent low-voltage switch contact.',\n     'evidence': [source(['U1.F3','D3.1','D3.2','R1','R2','SW1'], 'SHUTTER_SENSE contains only PC13, D3 cathode and SW1.1; LATCH_PULLDOWN contains R2, Q2 drain and D3 anode.'),\n                  pdf('processor/STM32N657X0_DS14791_datasheet.pdf', [96,138], 'PC13 is a TT input; Table 21 limits TT input voltage to 3.6 V in the 3.3 V range.'),\n                  pdf('discretes/HUASHUO_AO3401A_datasheet_LCSC_copy.pdf', [2], 'AO3401A threshold magnitude 0.5-1.5 V, on-resistance specified at VGS=-2.5 V.')],\n     'consequence': 'Full PFET turn-off would raise SHUTTER_SENSE toward the 8-13.2 V battery source, beyond PC13 rating. If input structures clamp near the powered 3.3 V domain, current through R1 instead sustains several volts of negative VGS and can keep the battery switch on. The exact clamp/injection waveform needs measurement, but the circuit cannot both turn fully off and keep PC13 within its allowed voltage range.',\n     'quantitative_bounds': {'example_PC13_clamp_V':3.6,'example_D3_drop_V':0.6,'battery_V':[8,13.2], 'resulting_R1_drop_V':[3.454545,8.181818]},\n     'recommendation': 'Separate battery-level latch actuation from MCU shutter sensing using an isolated second contact or a properly rated transistor/level-shift circuit. Verify powered-off, boot, release, repeated press and shutdown states before layout; an MCU pull-up or series resistor alone does not remove this latch interaction.'},\n    {'id':'PWR-002','severity':'high','confidence':'confirmed',\n     'title':'PFET gate divider has no absolute-maximum margin at fresh-cell voltage',",
+    "markers": [
+      [
+        33,
+        "     'recommendation': 'Separate battery-level latch actuation from MCU shutter sensing using an isolated second contact or a properly rated transistor/level-shift circuit. Verify powered-off, boot, release, repeated press and shutdown states before layout; an MCU pull-up or series resistor alone does not remove this latch interaction.'},"
+      ],
+      [
+        41,
+        "     'recommendation':'Provide substantial gate-voltage margin. For example, R2=330 kOhm with R1=1 MOhm and 1% tolerances gives a DC worst case below 10 V at 13.2 V and about 6 V drive at an 8 V source. Alternatively choose an appropriately rated PFET/clamp scheme. Recheck source/gate transients and clamp leakage at the actual microampere bias; the example divider is a proposal, not an applied edit.'},"
+      ],
+      [
+        48,
+        "     'recommendation':'Add explicit USB-priority source selection and battery reverse-current control independent of PWR_ON. Coordinate this with the redesigned latch and mandatory MCU main/auxiliary sequencing. Keep the battery path disabled during USB-only download unless its use is intentionally requested.'},"
+      ],
+      [
+        52,
+        "     'observed':'The source specifies four series CR2032 cells, 8-13.2 V, and a provisional 3.3 V peak load of 1.2 A. No production battery MPN or measured boot/capture/save current waveform is provided. The main reservoir is only 4x47 uF plus C3=22 uF nominal.',"
+      ],
+      [
+        53,
+        "     'evidence':[source(['U2','C3','C4','C5','C6','C7'],'U2 Role Details contains the 1.2 A provisional peak budget; capacitors are per-instance 22 uF and 47 uF values.'),pdf('reference/CR2032_Energizer_reference.pdf',[1],'Unselected reference candidate: 235 mAh rating at 15 kOhm; published pulse test is approximately 6.8 mA for 2 seconds. These are typical reference conditions, not a universal maximum-current rating.'),pdf('power/TI_TPS6213x_TPS62132_datasheet.pdf',[15,16],'Input/output capacitor selection and DC-bias reduction must be evaluated.')],"
+      ],
+      [
+        54,
+        "     'quantitative_bounds':{'load_W':3.96,'assumed_buck_efficiency':0.9,'ideal_input_current_A_at_13_2V':1/3,'ideal_input_current_A_at_8V':0.55,'nominal_reservoir_uF':210,'nominal_energy_J_to_zero':0.5*210e-6*3.3**2,'nominal_energy_J_3V3_to_3V0':0.5*210e-6*(3.3**2-3**2),'hold_time_s_3V3_to_3V0_at_3_96W':0.5*210e-6*(3.3**2-3**2)/3.96,'max_per_cell_Thevenin_resistance_ohm_at_12V_for_3_96W':12**2/(16*(3.96/.9))},"
+      ],
+      [
+        55,
+        "     'consequence':'At the provisional peak, each cell must carry roughly 333-550 mA before source sag. The 210 uF bank supports only about 50 microseconds between 3.3 and 3.0 V. Series cells multiply both voltage and resistance; the architecture cannot be qualified by the mAh number. This does not prove every CR2032 fails at the actual workload; that workload remains unmeasured.',"
+      ],
+      [
+        56,
+        "     'recommendation':'Before fixing battery mechanics or power routing, select a cell and measure boot, capture and complete NAND-save current over state of charge and temperature with realistic contacts. Replay that waveform on the cell stack and record rail minima and energy. If the source cannot sustain it, change battery chemistry/form factor, lower actual power, or design a deliberately charged energy reservoir with an honest startup-latency budget.'},"
+      ],
+      [
+        63,
+        "     'recommendation':'Select exact production magnetics and MLCCs before placement, verify effective L/C, RMS/saturation current and loss over the operating range, then replace generic footprints with manufacturer land patterns. Verify U2 LC transient response around its roughly 210 uF reservoir and downstream load. Do not claim the existing 0603 parts are impossible; they are presently unqualified.'},"
+      ],
+      [
+        70,
+        "     'recommendation':'Raise the L3 procurement requirements to the current ST limits and choose a qualified footprint. Allocate the complete local VDDSMPS bank; if sharing U7 output capacitors, justify placement/loop inductance and still supply the required local small capacitors. Select output MLCCs to meet ST impedance/transient requirements; check whether four15 uF or the existing88 uF bank is appropriate. Retain the correctly connected 2 Ohm/2.2 nF snubber and separate V08CAP capacitor.'},"
+      ],
+      [
+        76,
+        "     'consequence':'The converter can keep attempting operation far below the stated four-cell endpoint. Pack voltage alone also cannot distinguish one weak cell from three stronger cells. Collapse during a NAND write remains possible; a nominal 8 V assumption does not prevent it.',"
+      ],
+      [
+        77,
+        "     'recommendation':'Define the selected-cell discharge and pulse-sag policy, then implement battery monitoring/cutoff that can act before an unsafe or unreliable capture. Consider cell imbalance and startup pulse sag when choosing thresholds. Maintain power-fail-tolerant storage behavior; regulator PG outputs currently provide no warning to firmware.'},"
+      ],
+      [
+        85,
+        "     'recommendation':'Set a complete off-state current budget, qualify a selected cell and isolation devices over temperature, and measure cleaned/contaminated assembled-board leakage with all interfaces absent/present as appropriate. RTC single-cell loading must be included when evaluating imbalance.'},"
+      ]
+    ]
+  },
+  {
+    "path": "tmp/archive-latch-candidates.py",
+    "head": "import hashlib\nimport json\nimport sys\nfrom pathlib import Path\n\nfrom pypdf import PdfReader\n\nroot = Path(__file__).resolve().parents[1]\nlibrary = root / 'datasheets'\nrelative = Path('candidates/power-latch/Diodes_DMP2077UCA3.pdf')\noriginal = root / 'docs/review/evidence/pmos-candidates/Diodes_DMP2077UCA3_candidate_datasheet.pdf'\nold = json.loads(original.with_suffix('.pdf.source.json').read_text())\ndata = original.read_bytes()\nassert hashlib.sha256(data).hexdigest() == old['sha256']\npdf = PdfReader(original)\nassert len(pdf.pages) == old['pages']\ntarget = library / relative\ntarget.parent.mkdir(parents=True, exist_ok=True)\ntarget.write_bytes(data)\nrecord = {\n    'path': relative.as_posix(),\n    'title': old['title'],\n    'parts': 'DMP2077UCA3-7; DMP2077UCA3-7A',\n    'source_url': old['url'],\n    'resolved_url': old['resolved_url'],\n    'source_page': 'https://www.diodes.com/part/view/DMP2077UCA3',\n    'retrieved_utc': old['retrieved_utc'],\n    'bytes': len(data),\n    'pages': len(pdf.pages),\n    'sha256': old['sha256'],\n    'note': 'Unselected candidate; no BOM change. ' + old['note'],\n    'first_page_excerpt': ' '.join(pdf.pages[0].extract_text().split())[:1600],\n}\ntarget.with_suffix('.pdf.source.json').write_text(json.dumps(record, indent=2) + '\\n')\nprint('Archived verified DMP2077UCA3 PDF and provenance.')",
+    "markers": []
+  },
+  {
+    "path": "tmp/check-power-doc.py",
+    "head": "import json\nimport re\nimport xml.etree.ElementTree as ET\nfrom pathlib import Path\n\nroot = Path(__file__).resolve().parents[1]\ndoc = root / 'power.md'\nbody = doc.read_text(encoding='utf-8')\nlinks = re.findall(r'\\]\\(([^)]+)\\)', body)\nmissing = []\nlocal = []\nfor link in links:\n    if link.startswith(('https://', 'http://', '#')):\n        continue\n    target = (root / link.split('#')[0]).resolve()\n    local.append(str(target))\n    if not target.exists():\n        missing.append(str(target))\nET.parse(root / 'docs/power/power-latch.svg')\ncalc = json.loads((root/'docs/power/power-calculations.json').read_text())\nassert round(calc['fixed_load'][0]['pair_drop']*1000,3)==110.115\nassert round(calc['fixed_load'][2]['vgs_magnitude'],3)==8.941\nassert round(calc['gate_vgs_max_unloaded_1pct'],3)==9.048\nassert round(calc['ten_year_charge_mAh']['213.2'],2)==18.68\nbaseline = root/'hardware/reconstruction/schematic-connectivity.json'\nimport hashlib\nbaseline_hash=hashlib.sha256(baseline.read_bytes()).hexdigest()\nreport={'local_links_checked':len(local),'missing_links':missing,\n        'svg_xml_valid':True,'calculation_spot_checks':'passed',\n        'connectivity_baseline_sha256':baseline_hash,\n        'gate_ratio_min':calc['gate_ratio_min_1pct'],\n        'gate_ratio_max':calc['gate_ratio_max_1pct']}\n(root/'docs/power/document-validation.json').write_text(json.dumps(report,indent=2)+'\\n')\nprint(json.dumps(report,indent=2))\nassert not missing",
+    "markers": []
+  },
+  {
+    "path": "tmp/datasheet-downloads/memory/check_hashes.py",
+    "head": "import hashlib,json\nfrom pathlib import Path\nfrom pypdf import PdfReader\npaths=list(Path('datasheets/connectors').glob('*.pdf'))+list(Path('datasheets/controls').glob('*.pdf'))+[Path('datasheets/sensors_timing/CX3225SA_series_datasheet.pdf')]+list(Path('datasheets/reference').glob('*.pdf'))\nfor p in paths:\n    r=json.loads(p.with_suffix('.pdf.source.json').read_text(encoding='utf-8'))\n    pdf=PdfReader(p)\n    assert len(pdf.pages)==r['pages']\n    assert len(p.read_bytes())==r['bytes']\n    assert hashlib.sha256(p.read_bytes()).hexdigest()==r['sha256']\n    full=' '.join((page.extract_text() or '') for page in pdf.pages)\n    print(p.name,len(pdf.pages),'text_chars',len(full))\n    if p.name in ['TC2030-IDC-NL_datasheet_footprint.pdf','B3U_switch_datasheet.pdf','BM28B0.6-30DS_51_product_guidelines.pdf','USB4105_specification.pdf']:\n        print(full[:220].encode('ascii','replace').decode())\nreport=Path('datasheets/_work/memory/coverage_report.json')\nold=json.loads(report.read_text(encoding='utf-8'))\nold['status']='Memory and RV-3028-C8 archive coverage verified. LIS2DW12 documentation is tracked separately in the catalog.'\nold['verified_documents'].insert(4,'datasheets/memory/Macronix_AN0340_NAND_interrupted_program_erase.pdf') if 'datasheets/memory/Macronix_AN0340_NAND_interrupted_program_erase.pdf' not in old['verified_documents'] else None\nPath('datasheets/memory/coverage-notes.json').write_text(json.dumps(old,indent=2)+'\\n',encoding='utf-8')\nreport.unlink()",
+    "markers": []
+  },
+  {
+    "path": "tmp/datasheet-downloads/memory/fetch_memory.py",
+    "head": "from concurrent.futures import ThreadPoolExecutor\nimport sys\nsys.path.insert(0,'tools')\nfrom fetch_datasheet import fetch\njobs=[('https://www.winbond.com/resource-files/w25q128jv%20revf%2003272018%20plus.pdf','memory/W25Q128JV_datasheet_RevF.pdf','W25Q128JVPIQ','Winbond W25Q128JV datasheet Revision F', 'https://www.winbond.com/hq/support/documentation/?__locale=en&pno=W25Q128JV','Includes IQ variant and package P 8-WSON 6x5 mm. Official index lists newer 2025 document; exact current file retrieval pending. IQ has factory QE=1; do not conflate with IM variant.')]\nfor job in jobs:\n    try: fetch(*job)\n    except Exception as e: print('FAILED',str(e))",
+    "markers": []
+  },
+  {
+    "path": "tmp/datasheet-downloads/memory/fetch_nand.py",
+    "head": "import sys\nfrom concurrent.futures import ThreadPoolExecutor\nsys.path.insert(0,'tools')\nfrom fetch_datasheet import fetch\njobs=[\n('https://www.macronix.com/Lists/Datasheet/Attachments/8461/MX30LF2G18AC%2C%203V%2C%202Gb%2C%20v1.4.pdf', 'memory/MX30LF2G18AC_datasheet_PM2129_v1.4.pdf', 'MX30LF2G18AC-TI', 'Macronix MX30LF2G18AC/MX30LF4G18AC datasheet PM2129 Rev 1.4', 'https://www.mxic.com.tw/zh-tw/products/NAND-Flash/SLC-NAND-Flash/Pages/spec.aspx?epn=MX30LF2G18AC-XKI&m=SLC+NAND&n=PM2129&p=MX30LF2G18AC', 'Exact industrial -TI (48-TSOP) covered. PM2386 v1.5 is J-grade and is not the correct -TI datasheet. Includes command/program/erase, ECC requirements, bad block management, and packaging.'),\n('https://www.macronix.com/Lists/ApplicationNote/Attachments/2005/AN0545V2%20-%20NAND%20Design-In%20Notice.pdf', 'memory/Macronix_AN0545_NAND_design_in_notice.pdf', 'MX30LF2G18AC-TI', 'Macronix AN0545 NAND Design-In Notice Ver 2', 'https://www.macronix.com/en-us/support/technical-documentation/Pages/SLC-NAND-Flash.aspx', 'Family-level software design guidance: ECC, bad blocks, partition table, UBI and erased-page behavior; exact device datasheet controls.'),\n('https://www.macronix.com/Lists/ApplicationNote/Attachments/1909/AN0278V1%2520-%2520BB%2520information%2520introduction.pdf', 'memory/Macronix_AN0278_bad_block_information.pdf', 'MX30LF2G18AC-TI', 'Macronix AN0278 Bad Block Information Introduction', 'https://www.macronix.com/en-us/support/technical-documentation/Pages/SLC-NAND-Flash.aspx', 'Factory bad-block markers and bad-block table creation; exact device datasheet controls.')]\ndef run(job):\n    try: fetch(*job)\n    except Exception as e: print('FAILED',job[1],str(e))\nwith ThreadPoolExecutor(max_workers=3) as pool: list(pool.map(run,jobs))",
+    "markers": []
+  },
+  {
+    "path": "tmp/datasheet-downloads/memory/fetch_nand_notes.py",
+    "head": "import sys\nfrom concurrent.futures import ThreadPoolExecutor\nsys.path.insert(0,'tools')\nfrom fetch_datasheet import fetch\njobs=[\n('https://www.macronix.com/Lists/ApplicationNote/Attachments/2069/AN0719V2-MGRT-MX30LF2G18AC%20to%20MX30LF2G28AD.pdf', 'memory/Macronix_AN0719_MX30LF2G18AC_to_MX30LF2G28AD_migration.pdf', 'MX30LF2G18AC-TI', 'Macronix AN0719 migration from MX30LF2G18AC to MX30LF2G28AD', 'https://www.mxic.com.tw/en-us/products/NAND-Flash/SLC-NAND-Flash/Pages/spec.aspx?m=SLC+NAND&n=PM2129&p=MX30LF2G18AC', 'Reference for manufacturer-recommended successor only; no BOM substitution made. Preliminary note; 18AC and 28AD have different spare-area sizes and 4-bit versus 8-bit ECC requirements.'),\n('https://www.macronix.com/Lists/ApplicationNote/Attachments/1913/AN0289V1-Wear%20Leveling%20in%20NAND%20Flash%20Memory.pdf', 'memory/Macronix_AN0289_NAND_wear_leveling.pdf', 'MX30LF2G18AC-TI', 'Macronix AN0289 Wear Leveling in NAND Flash Memory', 'https://www.macronix.com/en-us/support/technical-documentation/Pages/SLC-NAND-Flash.aspx', 'General NAND wear-leveling concepts; example part is MX30LF1G08AA, use exact 18AC datasheet for device limits.'),\n('https://www.macronix.com/Lists/ApplicationNote/Attachments/1920/AN0339V1-Endurance%20and%20Retention%20of%20NAND%20Flash.pdf', 'memory/Macronix_AN0339_NAND_endurance_retention.pdf', 'MX30LF2G18AC-TI', 'Macronix AN0339 Program/Erase Cycling Endurance and Data Retention of Macronix SLC NAND', 'https://www.macronix.com/en-us/support/technical-documentation/Pages/SLC-NAND-Flash.aspx', 'Family-level retention/endurance context relevant to long shelf-life image storage; exact device datasheet controls.')]\ndef run(job):\n    try: fetch(*job)\n    except Exception as e: print('FAILED',job[1],str(e))\nwith ThreadPoolExecutor(max_workers=3) as pool: list(pool.map(run,jobs))",
+    "markers": [
+      [
+        6,
+        "('https://www.macronix.com/Lists/ApplicationNote/Attachments/2069/AN0719V2-MGRT-MX30LF2G18AC%20to%20MX30LF2G28AD.pdf', 'memory/Macronix_AN0719_MX30LF2G18AC_to_MX30LF2G28AD_migration.pdf', 'MX30LF2G18AC-TI', 'Macronix AN0719 migration from MX30LF2G18AC to MX30LF2G28AD', 'https://www.mxic.com.tw/en-us/products/NAND-Flash/SLC-NAND-Flash/Pages/spec.aspx?m=SLC+NAND&n=PM2129&p=MX30LF2G18AC', 'Reference for manufacturer-recommended successor only; no BOM substitution made. Preliminary note; 18AC and 28AD have different spare-area sizes and 4-bit versus 8-bit ECC requirements.'),"
+      ]
+    ]
+  },
+  {
+    "path": "tmp/datasheet-downloads/memory/fetch_nand_reliability.py",
+    "head": "import sys\nfrom concurrent.futures import ThreadPoolExecutor\nsys.path.insert(0,'tools')\nfrom fetch_datasheet import fetch\njobs=[\n('https://www.macronix.com/Lists/ApplicationNote/Attachments/1924/AN0363V1%20-%20Managing%20Unexpected%20NAND%20Flash%20Power%20Loss%20In%20Embedded%20Systems.pdf', 'memory/Macronix_AN0363_NAND_unexpected_power_loss.pdf', 'MX30LF2G18AC-TI', 'Macronix AN0363 Managing Unexpected NAND Flash Power Loss in Embedded Systems', 'https://www.macronix.com/en-us/support/technical-documentation/Pages/SLC-NAND-Flash.aspx', 'Software handling of interrupted program/erase and metadata recovery; relevant to switched-power image capture/storage.'),\n('https://www.macronix.com/Lists/ApplicationNote/Attachments/1910/AN0271V1-NAND%2520Error%2520Correction%2520Codes%2520Introduction-0217.pdf', 'memory/Macronix_AN0271_NAND_ECC_introduction.pdf', 'MX30LF2G18AC-TI', 'Macronix AN0271 NAND Error Correction Codes Introduction', 'https://www.macronix.com/en-us/support/technical-documentation/Pages/SLC-NAND-Flash.aspx', 'General ECC implementation guidance, including BCH; exact 18AC part requires 4-bit correction per (512+16) bytes.')]\ndef run(job):\n    try: fetch(*job)\n    except Exception as e: print('FAILED',job[1],str(e))\nwith ThreadPoolExecutor(max_workers=2) as pool: list(pool.map(run,jobs))",
+    "markers": []
+  },
+  {
+    "path": "tmp/datasheet-downloads/memory/fetch_sensors.py",
+    "head": "from concurrent.futures import ThreadPoolExecutor\nimport sys\nsys.path.insert(0, 'tools')\nfrom fetch_datasheet import fetch\njobs = [\n('https://www.microcrystal.com/fileadmin/Media/Products/RTC/Datasheet/RV-3028-C8.pdf', 'sensors_timing/RV-3028-C8_datasheet.pdf', 'RV-3028-C8-32.768kHz-1PPM-TA-QC', 'Micro Crystal RV-3028-C8 datasheet', 'https://www.microcrystal.com/en/products/real-time-clock-rtc-modules/rv-3028-c8', 'Exact C8 package, TA/QC standard commercial variant; ordering table included.'),\n('https://www.microcrystal.com/fileadmin/Media/Products/RTC/App.Manual/RV-3028-C8_App-Manual.pdf', 'sensors_timing/RV-3028-C8_application_manual.pdf', 'RV-3028-C8-32.768kHz-1PPM-TA-QC', 'Micro Crystal RV-3028-C8 application manual', 'https://www.microcrystal.com/en/products/real-time-clock-rtc-modules/rv-3028-c8', 'Includes registers, EEPROM update procedure, backup switchover, trickle charge, and layout/handling.'),\n('https://www.st.com/resource/en/datasheet/lis2dw12.pdf', 'sensors_timing/LIS2DW12_datasheet.pdf', 'LIS2DW12TR', 'ST LIS2DW12 datasheet', 'https://www.st.com/en/mems-and-sensors/lis2dw12.html', 'TR is tape and reel; exact orderable variant listed.'),\n('https://www.st.com/resource/en/application_note/an5038-lis2dw12-alwayson-3d-accelerometer-stmicroelectronics.pdf', 'sensors_timing/LIS2DW12_AN5038_application_note.pdf', 'LIS2DW12TR', 'ST AN5038 LIS2DW12 always-on 3-axis accelerometer', 'https://www.st.com/en/mems-and-sensors/lis2dw12.html', 'Configuration and embedded motion/wake-up functions.')]\ndef run(job):\n    try: return fetch(*job)\n    except Exception as e: print('FAILED', job[1], str(e))\nwith ThreadPoolExecutor(max_workers=4) as pool: list(pool.map(run,jobs))",
+    "markers": []
+  },
+  {
+    "path": "tmp/datasheet-downloads/memory/inspect_sites.py",
+    "head": "import urllib.request, pathlib, re\nfor name, url in [('winbond', 'https://www.winbond.com/hq/support/documentation/downloadV2022.jsp?__locale=en&level=1&xmlPath=/support/resources/.content/item/DA00-W25Q128JV.html'), ('macronix', 'https://www.macronix.com/en-us/support/technical-documentation/Pages/SLC-NAND-Flash.aspx')]:\n    try:\n        data=urllib.request.urlopen(url, timeout=40).read().decode('utf-8','replace')\n        pathlib.Path('datasheets/_work/memory/'+name+'.html').write_text(data,encoding='utf-8')\n        print(name, len(data))\n        for line in data.splitlines():\n            if ('.pdf' in line.lower() and 'winbond'==name) or ('MX30LF2G18AC' in line) or ('Bad Block' in line): print(line[:2500])\n    except Exception as e: print(name, str(e))",
+    "markers": []
+  },
+  {
+    "path": "tmp/datasheet-downloads/memory/qa_coverage.py",
+    "head": "import json\nfrom pathlib import Path\nfrom pypdf import PdfReader\nr=json.loads(Path('datasheets/parts-inventory.json').read_text(encoding='utf-8'))\nfor row in r['bom_rows']:\n    if row.get('Designator','') in ['J1','J2','J3','SW1','D1','Y1'] or any(s in row.get('Manufacturer Part Number','') for s in ['B3U','SML-P','CX3225','BM28','USB4105','TC2030']):\n        print(json.dumps({k:v for k,v in row.items() if k in ['Designator','Manufacturer Part Number','Manufacturer Name','Value','Description','Specification','Comment']},ensure_ascii=True))\npaths=list(Path('datasheets/connectors').glob('*.pdf'))+list(Path('datasheets/controls').glob('*.pdf'))+[Path('datasheets/sensors_timing/CX3225SA_series_datasheet.pdf')]+list(Path('datasheets/reference').glob('*.pdf'))\nfor p in paths:\n    meta=json.loads(p.with_suffix('.pdf.source.json').read_text(encoding='utf-8'))\n    pdf=PdfReader(p)\n    print('\\nFILE',p, 'PAGES',len(pdf.pages), 'META PARTS',meta['parts'],'NOTE',meta['note'])\n    for i,page in enumerate(pdf.pages):\n        t=page.extract_text() or ''\n        if len(t)<200 or (i < 4 and any(s in t for s in ['BM28B0.6','B3U-1000','CX3225SA','PCB Layout','Recommended PCB','Land Pattern'])):\n            print('PAGE',i+1,'TEXT',t[:3500].encode('ascii','replace').decode())",
+    "markers": [
+      [
+        15,
+        "        if len(t)<200 or (i < 4 and any(s in t for s in ['BM28B0.6','B3U-1000','CX3225SA','PCB Layout','Recommended PCB','Land Pattern'])):"
+      ]
+    ]
+  },
+  {
+    "path": "tmp/datasheet-downloads/memory/qa_exact_crystal.py",
+    "head": "from pathlib import Path\nfrom pypdf import PdfReader\nimport hashlib,json,pypdfium2 as pdfium\np=Path('datasheets/sensors_timing/CX3225SA40000D0PTWCC_specification_TI_forum_copy.pdf')\nr=json.loads(p.with_suffix('.pdf.source.json').read_text(encoding='utf-8'))\nb=p.read_bytes(); pdf=PdfReader(p)\nassert len(b)==r['bytes'] and hashlib.sha256(b).hexdigest()==r['sha256'] and len(pdf.pages)==r['pages']\nfor i,page in enumerate(pdf.pages):\n    t=page.extract_text() or ''\n    print('PAGE',i+1,'CHARS',len(t))\n    print(t[:1500].encode('ascii','replace').decode())\nd=pdfium.PdfDocument(p)\nfor n in [0,1]:\n    d[n].render(scale=2).to_pil().save('datasheets/_work/memory/qa_renders/crystal_exact_'+str(n+1)+'.png')\nnotes={\n'connectors/BM28B0.6-30DS_51_drawing.pdf.source.json':'Exact part drawing; manufacturer marks it \"HRS DRAWING FOR REFERENCE\".',\n'connectors/BM28_series_catalog.pdf.source.json':'BM28 series catalog; applicable project MPN is listed for coverage. Use the archived exact part drawing and specification for variant-specific dimensions and limits.',\n'connectors/BM28B0.6-30DS_51_product_guidelines.pdf.source.json':'BM28 series handling and assembly guideline ETAD-H1016-00, linked from the exact part product page; not a variant-specific electrical specification.'}\nfor name,note in notes.items():\n    q=Path('datasheets')/name\n    v=json.loads(q.read_text(encoding='utf-8'))\n    v['note']=note\n    q.write_text(json.dumps(v,indent=2,ensure_ascii=False)+'\\n',encoding='utf-8')",
+    "markers": []
+  },
+  {
+    "path": "tmp/datasheet-downloads/memory/read_nor.py",
+    "head": "from pypdf import PdfReader\nr=PdfReader('datasheets/memory/W25Q128JV_datasheet_RevM.pdf')\nfor i in [16,62,75,76]:\n    print('PAGE',i+1)\n    print(r.pages[i].extract_text())",
+    "markers": []
+  },
+  {
+    "path": "tmp/datasheet-downloads/memory/render_crystal_electrical.py",
+    "head": "import pypdfium2 as p\npdf=p.PdfDocument('datasheets/sensors_timing/CX3225SA40000D0PTWCC_specification_TI_forum_copy.pdf')\nfor i in [2,4]: pdf[i].render(scale=2).to_pil().save('datasheets/_work/memory/qa_renders/crystal_exact_'+str(i+1)+'.png')",
+    "markers": []
+  },
+  {
+    "path": "tmp/datasheet-downloads/memory/render_hirose.py",
+    "head": "import pypdfium2 as p\npdf=p.PdfDocument('datasheets/connectors/BM28B0.6-30DS_51_drawing.pdf')\npdf[0].render(scale=2).to_pil().save('datasheets/_work/memory/qa_renders/hirose_mechanical.png')\npdf[2].render(scale=2).to_pil().save('datasheets/_work/memory/qa_renders/hirose_land_actual.png')",
+    "markers": []
+  },
+  {
+    "path": "tmp/datasheet-downloads/memory/render_qa.py",
+    "head": "import pypdfium2 as pdfium\nfrom pathlib import Path\nroot=Path('datasheets/_work/memory/qa_renders')\nroot.mkdir(parents=True,exist_ok=True)\nfor name,path,index in [('hirose_land','datasheets/connectors/BM28B0.6-30DS_51_drawing.pdf',1),('usb4105','datasheets/connectors/USB4105_drawing.pdf',0),('cx3225sa','datasheets/sensors_timing/CX3225SA_series_datasheet.pdf',0)]:\n    pdf=pdfium.PdfDocument(path)\n    im=pdf[index].render(scale=2.0).to_pil()\n    target=root/(name+'.png')\n    im.save(target)\n    print(str(target.resolve()))",
+    "markers": []
+  },
+  {
+    "path": "tmp/datasheet-downloads/memory/review_variants.py",
+    "head": "from pypdf import PdfReader\nfrom pathlib import Path\nfor file in ['datasheets/memory/W25Q128JV_datasheet_RevM.pdf','datasheets/memory/MX30LF2G18AC_datasheet_PM2129_v1.4.pdf']:\n    reader=PdfReader(file)\n    print(file)\n    for i,page in enumerate(reader.pages):\n        t=page.extract_text() or ''\n        if any(s in t for s in ['QE bit','Pad width','W25Q128JVPIQ','MX30LF2G18AC-TI','R/B# is an open','POWER-UP','Power Cycle']):\n            print('PAGE', i+1)\n            for line in t.splitlines():\n                if any(s.lower() in line.lower() for s in ['QE','ZP','PIQ','power cycle','MX30LF2G18AC-TI','R/B# is an open']): print(line)",
+    "markers": []
+  },
+  {
+    "path": "tmp/datasheet-downloads/memory/revise_coverage_review.py",
+    "head": "from pathlib import Path\np=Path('datasheets/coverage-review.md')\nt=p.read_text(encoding='utf-8')\nt=t.replace('the CX3225SA crystal catalog,','the two CX3225SA crystal documents,')\nstart=t.index('- **One remaining exact-part gap:**')\nend=t.index('\\n- **Connector',start)\nt=t[:start]+'''- **Y1 has exact historical coverage, with a source limitation:** `sensors_timing/CX3225SA40000D0PTWCC_specification_TI_forum_copy.pdf` explicitly covers `CX3225SA40000D0PTWCC`. Its nine pages identify Kyocera drawing UKY1C-H1-18849-00[43], issued November 8, 2018 to Digi-Key. Page 3 specifies the exact 40 MHz, 8.0 pF variant, and page 5 gives its land pattern. The sidecar correctly identifies a Kyocera-authored, user-uploaded TI E2E copy; a current manufacturer-hosted controlled exact specification remains unavailable. The separate current CX3225SA series catalog should remain general coverage: its standard electrical table is not the selected variant specification.''' +t[end:]\nt=t.replace('all 12 reviewed PDFs','all 13 reviewed PDFs')\nt=t.replace('and the CX3225SA catalog page were rendered','the CX3225SA catalog page, and exact crystal specification pages 3 and 5 were rendered')\nstart=t.index('- **Small metadata improvement:**')\nend=t.index('\\n\\nNo source PDFs',start)\nt=t[:start]+'''- **Hirose metadata qualifications recorded:** the exact drawing sidecar now preserves the manufacturer's \"HRS DRAWING FOR REFERENCE\" qualification. The BM28 catalog and ETAD-H1016-00 product guidelines are now explicitly marked as series guidance in their sidecars, while retaining the applicable project MPN in the `parts` field.''' +t[end:]\np.write_text(t,encoding='utf-8')",
+    "markers": []
+  },
+  {
+    "path": "tmp/datasheet-downloads/memory/update_notes.py",
+    "head": "import json\nfrom pathlib import Path\np=Path('datasheets/memory/W25Q128JV_datasheet_RevM.pdf.source.json')\nr=json.loads(p.read_text(encoding='utf-8'))\nr['note']='Current primary datasheet linked by Winbond index (index date January 8, 2025; PDF release December 24, 2024). Exact W25Q128JVPIQ, package P 8-WSON 6x5 mm. Ordering option Q has QE=1 fixed in status register-2; IM/M DTR is a different variant. Includes power-cycle requirements for repeated switched-rail operation.'\np.write_text(json.dumps(r,indent=2,ensure_ascii=False)+'\\n',encoding='utf-8')",
+    "markers": []
+  },
+  {
+    "path": "tmp/datasheet-downloads/memory/verify_memory.py",
+    "head": "import json\nfrom pathlib import Path\nfrom pypdf import PdfReader\nowned=list(Path('datasheets/memory').glob('*.pdf'))+[Path('datasheets/sensors_timing/RV-3028-C8_datasheet.pdf'),Path('datasheets/sensors_timing/RV-3028-C8_application_manual.pdf')]\nfor p in owned:\n    r=json.loads(p.with_suffix('.pdf.source.json').read_text(encoding='utf-8'))\n    assert len(PdfReader(p).pages)==r['pages']\n    print(p.name, r['pages'])\nreport={\n 'status':'Memory and RTC complete; processor_camera_docs collecting LIS2DW12 and AN5038 through in-app browser because ST HTTP download fails.',\n 'verified_documents':[str(p).replace('\\\\','/') for p in owned],\n 'coverage_notes':[\n  'Winbond W25Q128JVPIQ exact part in Rev M PDF p77. Q option means QE=1 fixed (PDF p76), not writable configuration default. For IM/M-DTR reference a different document.',\n  'Winbond repeated power-cycle requirements: section 9.3.1 PDF p63; CS must track VCC during ramp.',\n  'MX30LF2G18AC-TI: -T is 48-TSOP, -I industrial -40 to +85 C, exact table PDF p8. Needs 4-bit ECC per (512+16)B (PDF p7). PM2386 v1.5 belongs J-grade; PM2129 v1.4 is archived exact industrial reference.',\n  'Macronix manufacturer recommends MX30LF2G28AD as successor; 8-bit ECC and spare-area geometry differ. AN0719 is reference only; no substitution made.',\n  'RTC uses exact C8 package docs, not C7. Backup switching disabled on delivery (manual PDF p46); CLKOUT initially enabled; EEPROM configuration procedure matters for permanent behavior (manual sections 4.6,7). Non-rechargeable source must not have trickle charger enabled.',\n  'AN0340 and AN0363 explain interrupted NAND program/erase and recovery. AN0271/0278/0289/0339/0545 cover ECC, bad blocks, wear, retention and design-in.'\n ]}\nPath('datasheets/_work/memory/coverage_report.json').write_text(json.dumps(report,indent=2)+'\\n',encoding='utf-8')",
+    "markers": [
+      [
+        16,
+        "  'Macronix manufacturer recommends MX30LF2G28AD as successor; 8-bit ECC and spare-area geometry differ. AN0719 is reference only; no substitution made.',"
+      ]
+    ]
+  },
+  {
+    "path": "tmp/datasheet-downloads/processor/archive_browser.py",
+    "head": "import ast, sys, json, time, re, io\nfrom pathlib import Path\nsys.path.insert(0,'tools')\nimport fetch_datasheet\nitems=[]\nfor n in ast.parse(Path('datasheets/_work/processor/fetch_batch1.py').read_text(encoding='utf-8-sig')).body:\n if isinstance(n, ast.Assign) and any(isinstance(t,ast.Name) and t.id=='items' for t in n.targets): items=ast.literal_eval(n.value)\nextra=[\n('data_brief/cam-55g0.pdf','camera/CAM-55G0_DB5266_module_brief.pdf','CAM-5G0-079CLR','DB5266 CAM-55G0 module interface, optical and mechanical specifications','DB5266'),\n('application_note/an5050-octospi-interface-on-stm32-microcontrollers-stmicroelectronics.pdf','processor/STM32_AN5050_XSPI_memory_interface.pdf','STM32N657X0H3Q','AN5050 Octo-SPI, Hexadeca-SPI and XSPI interfaces','AN5050'),\n('application_note/an5946-how-to-optimize-lowpower-modes-on-stm32n6-mcus-stmicroelectronics.pdf','processor/STM32N6_AN5946_low_power.pdf','STM32N657X0H3Q','AN5946 STM32N6 low-power modes','AN5946'),\n('application_note/an2639-soldering-recommendations-and-package-information-for-leadfree-ecopack2-mcus-and-mpus-stmicroelectronics.pdf','processor/STM32_AN2639_package_assembly.pdf','STM32N657X0H3Q','AN2639 ECOPACK2 soldering and package recommendations','AN2639'),\n('application_note/an2867-guidelines-for-oscillator-design-on-stm8afals-and-stm32-mcusmpus-stmicroelectronics.pdf','processor/STM32_AN2867_oscillator_design.pdf','STM32N657X0H3Q','AN2867 STM32 oscillator design guidelines','AN2867'),\n('application_note/an1709-emc-design-guide-for-stm8-stm32-and-legacy-mcus-stmicroelectronics.pdf','processor/STM32_AN1709_EMC_design.pdf','STM32N657X0H3Q','AN1709 EMC design guide','AN1709'),\n('application_note/an5836-vd55g0-visible-domain-limitation-stmicroelectronics.pdf','camera/VD55G0_AN5836_visible_domain_limitations.pdf','VD55G0; CAM-5G0-079CLR','AN5836 VD55G0 visible domain limitation','AN5836'),\n('technical_note/tn1478-defective-pixel-specification-of-the-vd55g0-global-shutter-image-sensor-stmicroelectronics.pdf','camera/VD55G0_TN1478_defective_pixels.pdf','VD55G0; CAM-5G0-079CLR','TN1478 VD55G0 defective pixel specification','TN1478'),\n('application_note/an5835-using-vd55g0-with-an-stm32-mcu-stmicroelectronics.pdf','camera/VD55G0_AN5835_legacy_STM32_bridge.pdf','VD55G0; CAM-5G0-079CLR','AN5835 VD55G0 with legacy STM32 via MIPID02 bridge','AN5835'),\n('datasheet/lis2dw12.pdf','sensors_timing/LIS2DW12_datasheet.pdf','LIS2DW12TR','LIS2DW12 low-power accelerometer datasheet','DS11811'),\n('application_note/an5038-lis2dw12-alwayson-3d-accelerometer-stmicroelectronics.pdf','sensors_timing/LIS2DW12_AN5038_application_note.pdf','LIS2DW12TR','AN5038 LIS2DW12 application note','AN5038')]\nitems=[(*i,next(s for s in ['DS14791','AN5967','AN6000','RM0486','UM3234','ES0620','DS13170','UM2829','CAM-5G0-079CLR'] if s in i[1] or s in i[3])) for i in items]\nitems += [('https://www.st.com/resource/en/'+u,p,parts,title,None,token) for u,p,parts,title,token in extra]\nPath('datasheets/_work/processor/items.json').write_text(json.dumps(items,indent=2),encoding='utf8')\nfrom pypdf import PdfReader\nfiles=[]\nfor p in Path('C:/Users/joshd/Downloads').iterdir():\n if p.suffix.lower() not in ['.tmp','.pdf'] or p.stat().st_mtime < time.time()-7200: continue\n try:\n  mtime=p.stat().st_mtime; data=p.read_bytes(); r=PdfReader(io.BytesIO(data)); first=r.pages[0].extract_text(); files.append((p.name,mtime,first,data))\n except Exception: pass\nfor url,path,parts,title,page,token in items:\n target=Path('datasheets')/path\n if target.exists(): continue\n candidates=[entry for entry in files if (re.search(re.escape(token)+r'\\s+(?:-\\s*)?Rev',entry[2]) or (token=='CAM-5G0-079CLR' and entry[2].lstrip().startswith(token) and 'Schematic diagrams' in entry[2]) or (token=='LIS2DW12' and 'LIS2DW12' in entry[2] and 'AN5038' not in entry[2]))]\n if not candidates:\n  print('PENDING',path); continue",
+    "markers": [
+      [
+        12,
+        "('application_note/an2639-soldering-recommendations-and-package-information-for-leadfree-ecopack2-mcus-and-mpus-stmicroelectronics.pdf','processor/STM32_AN2639_package_assembly.pdf','STM32N657X0H3Q','AN2639 ECOPACK2 soldering and package recommendations','AN2639'),"
+      ]
+    ]
+  },
+  {
+    "path": "tmp/datasheet-downloads/processor/check_download.py",
+    "head": "from pathlib import Path\nfrom pypdf import PdfReader\np=Path('C:/Users/joshd/Downloads/36df9eae-42e5-4ed0-b5d7-dc683bbabd01.tmp')\nprint(p.stat())\nprint(p.read_bytes()[:15])\ntry:\n r=PdfReader(p); print(len(r.pages)); print(r.pages[0].extract_text()[:900])\nexcept Exception as e: print(repr(e))",
+    "markers": []
+  },
+  {
+    "path": "tmp/datasheet-downloads/processor/check_lis.py",
+    "head": "from pypdf import PdfReader\nr=PdfReader('C:/Users/joshd/Downloads/lis2dw12.pdf'); print(len(r.pages)); print(r.pages[0].extract_text().encode('ascii','replace').decode())",
+    "markers": []
+  },
+  {
+    "path": "tmp/datasheet-downloads/processor/fetch_batch1.py",
+    "head": "import sys, concurrent.futures\nsys.path.insert(0, 'tools')\nfrom fetch_datasheet import fetch\nitems = [\n('https://www.st.com/resource/en/datasheet/stm32n657x0.pdf','processor/STM32N657X0_DS14791_datasheet.pdf','STM32N657X0H3Q','DS14791 STM32N6x5xx/STM32N6x7xx datasheet','https://www.st.com/en/microcontrollers-microprocessors/stm32n657x0.html'),\n('https://www.st.com/resource/en/application_note/an5967-getting-started-with-hardware-development-for-stm32n6-mcus-stmicroelectronics.pdf','processor/STM32N6_AN5967_hardware_design.pdf','STM32N657X0H3Q','AN5967 Getting started with hardware development for STM32N6 MCUs',None),\n('https://www.st.com/resource/en/application_note/an6000-how-to-build-the-discrete-power-supply-for-stm32n6-mcus-stmicroelectronics.pdf','processor/STM32N6_AN6000_discrete_power_supply.pdf','STM32N657X0H3Q','AN6000 How to build the discrete power supply for STM32N6 MCUs',None),\n('https://www.st.com/resource/en/reference_manual/rm0486-stm32n647657xx-armbased-32bit-mcus-stmicroelectronics.pdf','processor/STM32N6_RM0486_reference_manual.pdf','STM32N657X0H3Q','RM0486 STM32N6 reference manual',None),\n('https://www.st.com/resource/en/user_manual/um3234-how-to-proceed-with-boot-rom-on-stm32n6-mcus-stmicroelectronics.pdf','processor/STM32N6_UM3234_boot_ROM.pdf','STM32N657X0H3Q','UM3234 How to proceed with boot ROM on STM32N6 MCUs',None),\n('https://www.st.com/resource/en/errata_sheet/es0620-stm32n6xxxx-device-errata-stmicroelectronics.pdf','processor/STM32N6_ES0620_errata.pdf','STM32N657X0H3Q','ES0620 STM32N6xxxx device errata',None),\n('https://www.st.com/resource/en/datasheet/vd55g0.pdf','camera/VD55G0_DS13170_datasheet.pdf','VD55G0; CAM-5G0-079CLR','DS13170 VD55G0 sensor datasheet','https://www.st.com/en/imaging-and-photonics-solutions/vd55g0.html'),\n('https://www.st.com/resource/en/user_manual/um2829-how-to-integrate-and-configure-the-vd55g0-device-from-a-hardware-and-software-perspective-stmicroelectronics.pdf','camera/VD55G0_UM2829_integration_registers.pdf','VD55G0; CAM-5G0-079CLR','UM2829 VD55G0 hardware/software integration and register manual',None),\n('https://www.st.com/resource/en/schematic_pack/cam-5g0-079clr-schematic.pdf','camera/CAM-5G0-079CLR_schematic.pdf','CAM-5G0-079CLR','CAM-5G0-079CLR module schematic','https://www.st.com/en/evaluation-tools/cam-55g0.html')]\ndef one(item):\n try: return fetch(*item)\n except Exception as e: print('FAILED',item[1], repr(e),flush=True)\nwith concurrent.futures.ThreadPoolExecutor(max_workers=4) as ex:\n list(ex.map(one,items))",
+    "markers": []
+  },
+  {
+    "path": "tmp/datasheet-downloads/processor/links.py",
+    "head": "import urllib.request, re, concurrent.futures\nurls=['https://www.st.com/en/evaluation-tools/cam-55g0.html','https://www.st.com/en/imaging-and-photonics-solutions/cmos-image-sensors/documentation.html','https://www.st.com/en/microcontrollers-microprocessors/stm32n6-series/documentation.html']\ndef one(u):\n try:\n  data=urllib.request.urlopen(u,timeout=20).read().decode()\n  print(u, '\\n', '\\n'.join(sorted(set(re.findall(r'[^\\s\"<>]+(?:\\.pdf|\\.zip)',data)))))\n except Exception as e: print(u,e)\nwith concurrent.futures.ThreadPoolExecutor(max_workers=3) as e: list(e.map(one,urls))",
+    "markers": []
+  },
+  {
+    "path": "tmp/datasheet-downloads/processor/list_downloads.py",
+    "head": "from pathlib import Path\nfrom pypdf import PdfReader\nfor p in sorted(Path('C:/Users/joshd/Downloads').iterdir(),key=lambda p:p.stat().st_mtime,reverse=True):\n if p.suffix.lower() not in ['.tmp','.pdf'] or p.stat().st_mtime < 1788590000: continue\n try:\n  r=PdfReader(p); s=' '.join(r.pages[0].extract_text().split()); print(p.name,len(r.pages),s[:120].encode('ascii','replace').decode(),s[-250:].encode('ascii','replace').decode())\n except Exception as e: print(p.name,str(e))",
+    "markers": []
+  },
+  {
+    "path": "tmp/datasheet-downloads/processor/test_more.py",
+    "head": "import urllib.request, concurrent.futures, importlib.util\nprint('curl_cffi',importlib.util.find_spec('curl_cffi'),flush=True)\nurls=['https://aem.st.com/resource/en/datasheet/vd55g0.pdf','https://www.st.com/resource/en/datasheet/vd55g0.pdf','http://www.st.com/resource/en/datasheet/vd55g0.pdf','https://www.mouser.com/datasheet/2/389/vd55g0-2900239.pdf']\ndef one(u):\n try:\n  with urllib.request.urlopen(u,timeout=7) as r: data=r.read()\n  print(u,len(data),data[:30],flush=True)\n except Exception as e: print(u,str(e),flush=True)\nwith concurrent.futures.ThreadPoolExecutor(max_workers=4) as ex: list(ex.map(one,urls))",
+    "markers": []
+  },
+  {
+    "path": "tmp/datasheet-downloads/processor/test_urls.py",
+    "head": "import urllib.request, concurrent.futures, time\nurls=['https://www.st.com.cn/resource/en/datasheet/vd55g0.pdf','https://www.st.com/content/ccc/resource/technical/document/application_note/group2/ed/1c/28/49/da/2b/42/28/DM00979119/files/DM00979119.pdf/jcr%3Acontent/translations/en.DM00979119.pdf','https://www.st.com/resource/en/datasheet/vd55g0.pdf?download=true','https://www.st.com/resource/en/datasheet/vd55g0.pdf?x=1']\ndef one(u):\n try:\n  start=time.time()\n  with urllib.request.urlopen(u, timeout=10) as r: data=r.read()\n  print(u, len(data), data[:8], time.time()-start,flush=True)\n except Exception as e: print(u,repr(e),flush=True)\nwith concurrent.futures.ThreadPoolExecutor(max_workers=4) as ex: list(ex.map(one,urls))",
+    "markers": []
+  },
+  {
+    "path": "tmp/datasheet-downloads/processor/verify.py",
+    "head": "import json,re\nfrom pathlib import Path\nfrom pypdf import PdfReader\nfor folder in ['processor','camera']:\n for p in sorted((Path('datasheets')/folder).glob('*.pdf')):\n  r=PdfReader(p); s=r.pages[0].extract_text() or ''; revisions=re.findall(r'(?:DS\\d+|RM\\d+|AN\\d+|UM\\d+|ES\\d+|TN\\d+|DB\\d+)\\s+(?:-\\s*)?Rev\\s+\\d+',s)\n  print(p.name,len(r.pages),revisions)\n  assert p.with_suffix(p.suffix+'.source.json').exists()\nfor p in [Path('datasheets/processor/STM32N6_AN6000_discrete_power_supply.pdf.source.json')]:\n d=json.loads(p.read_text()); d['note']=d['note'].replace('validated.Supplementary','validated. Supplementary'); p.write_text(json.dumps(d,indent=2)+'\\n')",
+    "markers": []
+  },
+  {
+    "path": "tmp/design-review/build_review_index.py",
+    "head": "\"\"\"Assemble the review register and verify reference coverage without editing hardware.\"\"\"\nfrom pathlib import Path\nfrom collections import Counter, defaultdict\nimport hashlib, json, re, sys\n\nROOT = Path(__file__).resolve().parents[2]\nOUT = ROOT / 'docs/review'\nsys.path.insert(0, str(ROOT / 'tools'))\nfrom kicad_sexpr import parse, children\n\nbaseline_path = ROOT / 'hardware/reconstruction/schematic-connectivity.json'\nbaseline_hash = hashlib.sha256(baseline_path.read_bytes()).hexdigest()\nbaseline = json.loads(baseline_path.read_text(encoding='utf-8'))\nall_findings = []\nfor name in ['power', 'mcu', 'camera-memory']:\n    obj = json.loads((OUT / f'{name}-findings.json').read_text(encoding='utf-8'))\n    for finding in obj['findings']:\n        finding = dict(finding)\n        finding['source_report'] = f'{name}-review.md'\n        all_findings.append(finding)\n\nsystem = (OUT / 'system-review.md').read_text(encoding='utf-8')\nsys_findings = []\nfor match in re.finditer(r'^### ([A-Z]+-\\d{3}) \u2014 ([^\\n]+)\\n(.*?)(?=^### |^## |\\Z)', system, re.M | re.S):\n    ident, title, body = match.groups()\n    rating = re.search(r'\\*\\*([A-Za-z]+) / ([A-Za-z]+)', body)\n    assert rating, ident\n    sources = re.findall(r'\\[([^\\]]+)\\]\\(([^)]+)\\)', body)\n    sys_findings.append({'id': ident, 'title': title,\n        'severity': rating[1].lower(), 'confidence': rating[2].lower(),\n        'detail_markdown': body.strip(), 'source_report': 'system-review.md',\n        'evidence_links': [{'label': label, 'target': target} for label,target in sources]})\n(OUT / 'system-findings.json').write_text(json.dumps({'date':'2026-09-05',\n    'connectivity_sha256': baseline_hash, 'findings':sys_findings}, indent=2, ensure_ascii=False)+'\\n', encoding='utf-8')\nall_findings.extend(sys_findings)",
+    "markers": [
+      [
+        45,
+        "    'scope':'Pre-layout evidence review; no circuit edits; recommendations are not all confirmed failures',"
+      ],
+      [
+        48,
+        "    f'Reviewed 2026-09-05. **{len(all_findings)} tracked findings/recommendations:** '+', '.join(f'{counts[k]} {k}' for k in severity_order)+'.', '',"
+      ],
+      [
+        53,
+        "lines += ['', 'The [JSON register](findings.json) contains detailed evidence, recommendations and the baseline hash. The finding identifiers remain stable across the linked reports. NAND PT was checked against its explicit low-or-floating allowance and is not an actionable defect.', '']"
+      ],
+      [
+        91,
+        "    f'Baseline SHA256: `{baseline_hash}`. All737 terminals are present; dedicated pin/voltage tables and no-connect treatment are in the MCU and reconstruction reports. CAM1 is external; SW2/SW3 are inferred optional DNP parts. Generic passive values retain native per-instance units, but lack production MPNs.', '',"
+      ]
+    ]
+  },
+  {
+    "path": "tmp/hardware-review/mcu/build_report.py",
+    "head": "import hashlib, json, re\nfrom pathlib import Path\n\nROOT = Path('D:/Github/global-x-camera')\nout = ROOT/'docs/review'\nout.mkdir(parents=True, exist_ok=True)\nsource = ROOT/'hardware/reconstruction/schematic-connectivity.json'\ndesign = json.loads(source.read_text(encoding='utf-8'))\npins = design['components']['U1']['pins']\ndocs = {\n 'DS': 'STM32N657X0_DS14791_datasheet',\n 'AN': 'STM32N6_AN5967_hardware_design',\n 'UM': 'STM32N6_UM3234_boot_ROM',\n 'RM': 'STM32N6_RM0486_reference_manual',\n 'ES': 'STM32N6_ES0620_errata',\n}\nmeta = {k: json.loads((ROOT/'datasheets/processor'/f'{v}.pdf.source.json').read_text(encoding='utf-8')) for k,v in docs.items()}\n\ndef ev(key, pages, detail):\n m = meta[key]\n return dict(type='manufacturer_pdf',path='datasheets/'+m['path'],pdf_pages=pages,url=m['source_url'],sha256=m['sha256'],detail=detail)\n\nfindings=[]\ndef add(num,severity,confidence,title,refs,observed,consequence,fix,evidence):\n findings.append(dict(id=f'MCU-{num:03}',severity=severity,confidence=confidence,title=title,references=refs,observed=observed,consequence=consequence,recommended_fix=fix,evidence=evidence))\n\nadd(1,'blocker','confirmed','Boot NOR chip select is on the wrong ROM pin',['U1.P14','U1.R17','U5','R13'],\n 'BOOT_XSPI_NCS connects U1 P14/PN12 to NOR /CS. PN12 AF9 is XSPIM_P2_NCS2. U1 R17/PN1 is unused. Other boot pins are PN6 CLK and PN2/PN3 IO0/IO1.',\n 'STM32N6 ROM uses a fixed PN1 AF9 chip select for serial NOR; the selected flash is not addressed by the ROM. Firmware in that flash cannot repair the pin selection before it has booted.',\n 'Move BOOT_XSPI_NCS and its pull-up to U1 R17/PN1, AF9 XSPIM_P2_NCS1. Keep PN6/PN2/PN3; PN4/PN5 may serve quad data after the FSBL. Recheck pin-map and cold boot with a minimal signed/headered FSBL.',\n [ev('UM',[13,14,28],'Sections 3.4.5-3.4.6, Table 27: fixed legacy SPI boot on PN6/PN1/PN2/PN3.'),ev('DS',[87,106,132],'VFBGA264 ball map and Table 20: PN1=NCS1; PN12=NCS2 at AF9.')])\nadd(2,'blocker','confirmed','Main and auxiliary MCU supplies cannot perform the mandatory sequence',['U1','U2','U7','U11'],\n 'The single 1V8 net joins F6/VDDA18AON to VDDSMPS, VDDA18PMU, VDDA18ADC, VDDA18CSI, VDDA18USB and other domains. U7 EN is tied directly to 3V3. USB-derived 3V3_USB is generated independently from VBUS. PWR_ON only drives the battery latch.',\n 'AN5967 requires main VDD and VDDA18AON first, then auxiliary domains after PWR_ON rises. On shutdown auxiliary rails must discharge below0.6V while main supplies remain in their operating ranges. Tying AON to the auxiliary1.8V consumers prevents that independent sequence. USB-derived auxiliary power can also precede the main group. A successful bench startup would not establish compliance across corners.',\n 'Separate the main1.8V AON domain from auxiliary domains and implement PWR_ON-controlled auxiliary enables with defined discharge and ordering on both battery and USB. Observe permitted exceptions for IO supplies tied to VDD and PLL tied to AON. Capture every rail and PWR_ON during cold start, shutdown, hot plug, brownout and rapid retry before release. Coordinate the latch fixes in power-review.md.',",
+    "markers": [
+      [
+        25,
+        " findings.append(dict(id=f'MCU-{num:03}',severity=severity,confidence=confidence,title=title,references=refs,observed=observed,consequence=consequence,recommended_fix=fix,evidence=evidence))"
+      ],
+      [
+        44,
+        " 'DS14791 Table24 recommends input voltage at most the receiving supply+0.3V in the1.8V range (about2.1V here).3.3V violates that operating limit. In default VRSEL=0 the TT absolute maximum is3.6V, so immediate damage is not proven; after selecting1.8V VRSEL=1 its absolute maximum is1.98V, making this also an overstress path.',"
+      ],
+      [
+        74,
+        " 'ES0620 describes revision-dependent reset/boot fallbacks and all-revision clock/SMPS limitations. A stuck reset path or invalid flash state may require a real power cycle. REV_ID alone does not distinguish Z/B/X in this errata; assuming generic STM32 reset behavior would weaken recovery.',"
+      ],
+      [
+        141,
+        " for key in ['title','observed','consequence','recommended_fix']: f[key]=readable(f[key])"
+      ],
+      [
+        153,
+        "Review date:2026-09-05. Device:U1 STM32N657X0H3Q, VFBGA264,14\u00d714mm,0.8mm pitch. This review uses the current generated schematic's physical balls and native per-instance values. It does not assume that EDIF aliases, net names, or a zero-error ERC prove peripheral compatibility. No schematic was changed."
+      ],
+      [
+        167,
+        " text+=f\"### {f['id']} \u2014 {f['title']}\\n\\n**{f['severity']} / {f['confidence']}**. {f['observed']}\\n\\n{f['consequence']}\\n\\n**Action:** {f['recommended_fix']}\\n\\n\""
+      ],
+      [
+        197,
+        "ROM normal serial-NOR boot uses PN6/PN1/PN2/PN3, AF9; BOOT0=0 and BOOT1=0 select flash boot, with unfused default selecting serial NOR. BOOT1=1 requests development boot where allowed by lifecycle state and takes priority over BOOT0. BOOT0=1/BOOT1=0 selects serial recovery. Final OTP/lifecycle settings must be recorded, not inferred from the pin straps. The default SPI read is0Bh with24-bit addressing and8 dummy cycles. PN4/PN5 are application quad-data pins rather than ROM boot data pins. Keep IO2/WP and IO3/HOLD safe during reset; the memory review owns exact flash-state and pull-up details."
+      ]
+    ]
+  },
+  {
+    "path": "tools/build_ltc3621_diagram.py",
+    "head": "\"\"\"Rebuild the LTC3621 pushbutton connection diagram, as vector SVG and PNG.\n\nRun with Python and Pillow installed. This script writes only the two named\ndiagram assets; it does not modify the KiCad design or the earlier power latch.\nThe illustrated L/C values are starting values, not qualified component MPNs.\n\"\"\"\n\nimport html\nimport math\nfrom pathlib import Path\n\nfrom PIL import Image, ImageDraw, ImageFont\n\n\nROOT = Path(__file__).resolve().parents[1]\nOUT = ROOT / \"docs\" / \"power\"\nW, H, SCALE = 1600, 1560, 2\nINK = \"#172c43\"\nPOWER = \"#175a83\"\nCONTROL = \"#127569\"\nMUTED = \"#586777\"\nAMBER = \"#875b0d\"\n\n\nclass Drawing:\n    \"\"\"Emit the same drawing primitives into SVG and a high resolution PNG.\"\"\"\n\n    def __init__(self):\n        self.image = Image.new(\"RGB\", (W * SCALE, H * SCALE), \"white\")\n        self.raster = ImageDraw.Draw(self.image)\n        self.svg = [\n            f'<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"{W}\" height=\"{H}\" viewBox=\"0 0 {W} {H}\">',\n            \"<title>LTC3621 fixed 3.3 V regulator with a pushbutton and GPIO hold diode</title>\",\n            \"<desc>Two panels connected by named RUN, BAT+ and GND nets. Power-stage pins use the MS8E package numbering. MODE/SYNC is connected to INTVCC for Burst Mode. A normally open button and resistor divider start RUN; a BAS116 diode holds RUN from a 3.3 V GPIO. STM32N6 sequencing and USB source control are not implemented in this diagram.</desc>\",\n            '<rect width=\"100%\" height=\"100%\" fill=\"white\"/>',",
+    "markers": [
+      [
+        223,
+        "    d.text(1170, 1130, \"A held button overrides OFF.\", 18, MUTED)"
+      ]
+    ]
+  },
+  {
+    "path": "tools/build_power_document_assets.py",
+    "head": "\"\"\"Build the archived September 5 PMOS diagram and engineering estimates.\n\nThe calculations are a DC screening model, not a SPICE model or qualification.\n\"\"\"\nimport html\nimport json\nimport math\nfrom pathlib import Path\nfrom PIL import Image, ImageDraw, ImageFont\nimport pypdfium2 as pdfium\n\nROOT = Path(__file__).resolve().parents[1]\nOUT = ROOT / 'docs/power'\nOUT.mkdir(parents=True, exist_ok=True)\nW, H, SCALE = 1600, 1020, 2\nim = Image.new('RGB', (W*SCALE, H*SCALE), 'white')\ndraw = ImageDraw.Draw(im)\nsvg = [f'<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"{W}\" height=\"{H}\" viewBox=\"0 0 {W} {H}\">',\n       '<rect width=\"100%\" height=\"100%\" fill=\"white\"/>',\n       '<title>Proposed battery latch with side-actuated shutter switch</title>',\n       '<desc>Two common-source PMOS devices, a protected gate divider, a mechanical switch and an NMOS holding driver. MAIN_HOLD is an interface to a required, unimplemented sequencer.</desc>']\nINK, POWER, GATE, LOGIC, MUTED = '#172c43', '#175a83', '#a55a0b', '#127569', '#586777'\n\ndef line(points, color=INK, width=3):\n    draw.line([(x*SCALE,y*SCALE) for x,y in points], fill=color, width=width*SCALE)\n    svg.append(f'<polyline points=\"{\" \".join(f\"{x},{y}\" for x,y in points)}\" fill=\"none\" stroke=\"{color}\" stroke-width=\"{width}\" stroke-linejoin=\"round\"/>')\n\ndef box(x,y,w,h,fill='#f3f7fb',color=INK):\n    draw.rectangle((x*SCALE,y*SCALE,(x+w)*SCALE,(y+h)*SCALE),fill=fill,outline=color,width=2*SCALE)\n    svg.append(f'<rect x=\"{x}\" y=\"{y}\" width=\"{w}\" height=\"{h}\" rx=\"4\" fill=\"{fill}\" stroke=\"{color}\" stroke-width=\"2\"/>')\n\ndef text(x,y,value,size=21,color=INK,bold=False,anchor='left'):\n    fontpath = Path('C:/Windows/Fonts') / ('segoeuib.ttf' if bold else 'segoeui.ttf')\n    font = ImageFont.truetype(str(fontpath),size*SCALE)\n    pilanchor = {'left':'lt','middle':'mt','right':'rt'}[anchor]",
+    "markers": []
+  },
+  {
+    "path": "tools/build_power_tree.py",
+    "head": "\"\"\"Draw the recovered camera power tree as SVG and PNG.\n\nThis is a documented connectivity view, not a proposed schematic or simulation.\nThe battery-chain topology comes from spec.md; rail wiring comes from the\nreconstructed connectivity JSON. No KiCad files are changed.\n\"\"\"\nimport hashlib\nimport html\nimport json\nfrom pathlib import Path\n\nfrom PIL import Image, ImageDraw, ImageFont\n\nROOT = Path(__file__).resolve().parents[1]\nOUT = ROOT / 'docs/power'\nW, H, SCALE = 2400, 2240, 2\nINK, MUTED = '#172c43', '#5d6e80'\nBLUE, TEAL, PURPLE, ORANGE = '#17648d', '#12796e', '#714c9e', '#a36214'\nRULE = '#d4e0e9'\n\n\nclass Drawing:\n    def __init__(self):\n        self.image = Image.new('RGB', (W*SCALE, H*SCALE), 'white')\n        self.draw = ImageDraw.Draw(self.image)\n        self.parts = [\n            f'<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"{W}\" height=\"{H}\" viewBox=\"0 0 {W} {H}\">',\n            '<title>Global X Camera: recovered power supply tree</title>',\n            '<desc>Battery and USB-C input paths, the shared 3.3 V supply, external 1.8 V buck, internal MCU core supply, camera rails, memory, RTC and accelerometer. The proposed LTC3621 and AON/AUX split are explicitly not implemented in this recovered tree.</desc>',\n            '<rect width=\"100%\" height=\"100%\" fill=\"white\"/>',\n        ]\n        self.text_bounds = []\n\n    def text(self, x, y, value, size=26, color=INK, bold=False, align='left'):\n        font = ImageFont.truetype('C:/Windows/Fonts/' + ('segoeuib.ttf' if bold else 'segoeui.ttf'), size*SCALE)",
+    "markers": []
+  },
+  {
+    "path": "tools/build_schematic.py",
+    "head": "\"\"\"Reconstruct an editable KiCad schematic from audited Flux source data.\n\nNo source export is edited. Deliberate reconstruction decisions are written\nseparately, and KiCad's own exported netlist is checked by validate_schematic.py.\n\"\"\"\nimport base64\nimport copy\nfrom collections import defaultdict\nimport json\nimport math\nfrom pathlib import Path\nimport re\nimport uuid\n\nfrom kicad_sexpr import Atom as A, child, children, dumps, parse\n\nROOT = Path(__file__).resolve().parents[1]\nOUT = ROOT / 'hardware' / 'kicad'\nREC = ROOT / 'hardware' / 'reconstruction'\nFLUX = ROOT / 'imports' / 'flux' / '2026-09-05'\nKICAD = Path.home() / 'AppData/Local/Programs/KiCad/10.0'\nPROJECT = 'global-x-camera'\nNS = uuid.UUID('f155a839-ec29-47c8-9c13-c147f896fdd2')\nS = lambda text: parse(text)\nQ = lambda text: json.dumps(str(text), ensure_ascii=False)\nUID = lambda text: str(uuid.uuid5(NS, text))\nGRID = 1.27\ndef snap(x): return round(round(x / GRID) * GRID, 4)\ndef num(x): return round(float(x), 4)\ndef natural(text): return [int(x) if x.isdigit() else x for x in re.split(r'(\\d+)', str(text))]\ndef yes(value): return str(value).lower() in ('true', 'yes', '1')\n\n\ndef fx(size=1.27, justify='', hide=False):\n    return S(f'(effects (font (size {size} {size})) {\"(justify \" + justify + \")\" if justify else \"\"} {\"(hide yes)\" if hide else \"\"})')",
+    "markers": [
+      [
+        3,
+        "No source export is edited. Deliberate reconstruction decisions are written"
+      ],
+      [
+        251,
+        "                self.text('UNRESOLVED '+pin,px,py-1.27,1.016)"
+      ],
+      [
+        318,
+        "    circuit=copy.deepcopy(source['components']);types={};decisions=[]"
+      ],
+      [
+        324,
+        "            for ref,pins in review.get('recommended_additional_pins',{}).items():"
+      ],
+      [
+        327,
+        "                    circuit[ref]['pins'][pin]={'name':info['name'],'terminal_uid':None,'net':info['recommended_net'],"
+      ],
+      [
+        330,
+        "                    decisions.append({'reference':ref,'pin':pin,'net':info['recommended_net'],'kind':'manufacturer_documented_missing_contact',"
+      ],
+      [
+        338,
+        "            decisions.append({'reference':ref,'pin':pin,'net':net,'kind':'documented_intent_inference',"
+      ],
+      [
+        419,
+        "    cover.text('Read ../reconstruction/README.md for source reconciliation, assumptions, pin audits and ERC findings.',12.7,43.18)"
+      ],
+      [
+        448,
+        "    (REC/'reconstruction-decisions.json').write_text(json.dumps(decisions,indent=2)+'\\n',encoding='utf-8')"
+      ],
+      [
+        449,
+        "    (REC/'schematic-connectivity.json').write_text(json.dumps({'components':circuit,'decisions':decisions},indent=2)+'\\n',encoding='utf-8')"
+      ],
+      [
+        453,
+        "             'inferred_endpoints':decisions}"
+      ]
+    ]
+  },
+  {
+    "path": "tools/calculate_ltc3621_power.py",
+    "head": "\"\"\"Reproducible screening calculations for power.md; not a circuit simulation.\n\nSpecified values retain their test conditions in power.md. Efficiency and\ncapacitor insulation resistance are assumptions, not manufacturer guarantees.\n\"\"\"\nfrom pathlib import Path\nimport json\n\nROOT = Path(__file__).resolve().parents[1]\nR_START = 330_000.0\nR_OFF = R_GPIO = 100_000.0\nV_OUT = 3.3\nI_OUT = 0.250\nL = 6.8e-6\nF = 1e6\n\n\ndef parallel(a, b):\n    return a * b / (a + b)\n\n\ndef divider(vbat, rstart=R_START, roff=R_OFF, run_sink_a=0.0):\n    return vbat * roff / (rstart + roff) - run_sink_a * parallel(rstart, roff)\n\n\nbutton_rows = []\nfor v in (8.0, 13.0, 13.2):\n    current = v / (R_START + R_OFF)\n    button_rows.append({\n        \"v_battery_v\": v,\n        \"v_run_v\": divider(v),\n        \"button_current_ua\": current * 1e6,\n        \"r_start_power_mw\": current**2 * R_START * 1e3,\n        \"r_off_power_mw\": current**2 * R_OFF * 1e3,\n    })",
+    "markers": [
+      [
+        4,
+        "capacitor insulation resistance are assumptions, not manufacturer guarantees."
+      ],
+      [
+        42,
+        "        \"efficiency_assumption\": eff, \"output_power_w\": pout,"
+      ],
+      [
+        48,
+        "cin_insulation_assumption_ohm = 100e6"
+      ],
+      [
+        50,
+        "cin_leak = 13 / cin_insulation_assumption_ohm"
+      ],
+      [
+        56,
+        "    \"assumptions\": {"
+      ],
+      [
+        60,
+        "        \"capacitor_insulation_ohm_ASSUMED\": cin_insulation_assumption_ohm,"
+      ],
+      [
+        74,
+        "        \"warning\": \"12 V regulator data borrowed as references; CIN resistance assumed; unallocated paths excluded\","
+      ],
+      [
+        76,
+        "        \"cin_assumed_leakage_ua\": cin_leak * 1e6,"
+      ]
+    ]
+  },
+  {
+    "path": "tools/calculate_microsd_tradeoff.py",
+    "head": "\"\"\"Reproduce illustrative cold-cycle microSD sensitivity; not card predictions.\"\"\"\nimport json\nimport math\nfrom pathlib import Path\n\nROOT = Path(__file__).resolve().parents[1]\nASSUMPTIONS = {\n    \"image_bytes\": 486220,\n    \"sector_bytes\": 512,\n    \"capture_complete_ms\": 50.0,\n    \"sd_power_on_ms\": 0.0,\n    \"effective_payload_rate_mb_per_s\": 20.0,\n    \"sd_voltage_v\": 3.3,\n    \"sd_idle_current_ma\": 2.0,\n    \"other_board_power_w\": 0.2,\n    \"common_converter_efficiency\": 0.85,\n}\nSCENARIOS = [\n    {\"name\": \"short_ready\", \"sd_ready_ms\": 20.0, \"tail_ms\": 10.0},\n    {\"name\": \"intermediate_ready\", \"sd_ready_ms\": 100.0, \"tail_ms\": 25.0},\n    {\"name\": \"long_ready\", \"sd_ready_ms\": 1000.0, \"tail_ms\": 250.0},\n]\nNAND_WRITE_MS = 94.70496\nNAND_BUSY_ENERGY_MJ = 2.5704\n\n\ndef energy_mj(voltage_v, current_ma, duration_ms):\n    return voltage_v * current_ma * duration_ms / 1000.0\n\n\ndef calculate(scenario, current_ma, nand_partial_mj):\n    a = ASSUMPTIONS\n    sectors = math.ceil(a[\"image_bytes\"] / a[\"sector_bytes\"])\n    padded_bytes = sectors * a[\"sector_bytes\"]\n    payload_ms = padded_bytes / (a[\"effective_payload_rate_mb_per_s\"] * 1000.0)",
+    "markers": [
+      [
+        7,
+        "ASSUMPTIONS = {"
+      ],
+      [
+        32,
+        "    a = ASSUMPTIONS"
+      ],
+      [
+        54,
+        "        \"assumed_sd_init_write_tail_current_ma\": current_ma,"
+      ],
+      [
+        78,
+        "    a = ASSUMPTIONS"
+      ],
+      [
+        86,
+        "    assumed_peak_load_w = a[\"sd_voltage_v\"] * 0.1 + a[\"other_board_power_w\"]"
+      ],
+      [
+        89,
+        "        \"status\": \"All SD scenarios are assumptions for sensitivity, not measured or guaranteed card predictions.\","
+      ],
+      [
+        90,
+        "        \"assumptions\": a,"
+      ],
+      [
+        102,
+        "        \"assumed_peak_load_example\": {"
+      ],
+      [
+        106,
+        "            \"load_power_w\": assumed_peak_load_w,"
+      ],
+      [
+        109,
+        "                str(voltage): assumed_peak_load_w / (voltage * a[\"common_converter_efficiency\"]) * 1000"
+      ],
+      [
+        112,
+        "            \"qualification\": \"Assumed load example, not a specified or measured peak. Each series cell carries the stack current.\","
+      ],
+      [
+        117,
+        "            \"The 50 ms capture completion and 20 MB/s effective payload rate are assumptions; all camera startup and capture timing remain to be measured.\","
+      ],
+      [
+        119,
+        "            \"50 mA and 100 mA are assumed equal initialization/write/tail currents, and 2 mA is assumed idle current. These are not Kingston or other card datasheet claims.\","
+      ],
+      [
+        124,
+        "            \"85 percent common converter efficiency is an assumption; real rail efficiencies and quiescent currents can differ.\","
+      ],
+      [
+        125,
+        "            \"The load example excludes simultaneous camera loads not captured in the 200 mW assumption; real inrush and card peaks require separate measurements.\","
+      ],
+      [
+        131,
+        "                      \"scenarios\": results, \"assumed_peak_load_example\": report[\"assumed_peak_load_example\"]}, indent=2))"
+      ]
+    ]
+  },
+  {
+    "path": "tools/calculate_nand_tradeoff.py",
+    "head": "\"\"\"Reproduce NAND timing and conditional energy scenarios; not measured limits.\"\"\"\nimport json\nimport math\nfrom pathlib import Path\n\nROOT = Path(__file__).resolve().parents[1]\nPARTS = {\n    \"original\": dict(part=\"MX30LF2G18AC-TI\", voltage=3.3, spare_bytes=64,\n                     cycle_ns=20, program_typ_us=300, program_max_us=600,\n                     program_typ_ma=15, program_max_ma=30,\n                     erase_typ_ms=1, erase_max_ms=3.5, read_max_us=25),\n    \"alliance\": dict(part=\"AS9F14G08SA-45BIN\", voltage=1.8, spare_bytes=128,\n                     cycle_ns=45, program_typ_us=300, program_max_us=700,\n                     program_typ_ma=None, program_max_ma=20,\n                     erase_typ_ms=3.5, erase_max_ms=10, read_max_us=30),\n}\n\n\ndef calculate(image_bytes, p):\n    pages = math.ceil(image_bytes / 2048)\n    blocks = math.ceil(pages / 64)\n    transfer_ms = pages * (2048 + p[\"spare_bytes\"]) * p[\"cycle_ns\"] / 1e6\n    busy_typ_ms = pages * p[\"program_typ_us\"] / 1000\n    busy_max_ms = pages * p[\"program_max_us\"] / 1000\n    return dict(\n        image_bytes=image_bytes, pages=pages, blocks_if_aligned=blocks,\n        full_spare_transfer_ms=transfer_ms,\n        program_busy_typ_ms=busy_typ_ms, program_busy_max_ms=busy_max_ms,\n        write_typ_program_fastest_bus_ms=transfer_ms + busy_typ_ms,\n        write_max_program_fastest_bus_ms=transfer_ms + busy_max_ms,\n        readback_max_array_fastest_bus_ms=transfer_ms + pages*p[\"read_max_us\"]/1000,\n        erase_aligned_typ_ms=blocks*p[\"erase_typ_ms\"],\n        erase_aligned_max_ms=blocks*p[\"erase_max_ms\"],\n        busy_typ_energy_mj=(None if p[\"program_typ_ma\"] is None else\n                            p[\"voltage\"]*p[\"program_typ_ma\"]*busy_typ_ms/1000),",
+    "markers": [
+      [
+        53,
+        "                              assumed_alliance_program_ma=alliance_ma,"
+      ],
+      [
+        60,
+        "    assumptions=["
+      ],
+      [
+        64,
+        "        \"Erase counts assume block-aligned image allocation, no metadata or bad-block retries.\","
+      ]
+    ]
+  },
+  {
+    "path": "tools/calculate_quad_nand_tradeoff.py",
+    "head": "\"\"\"Reproduce quad-versus-parallel NAND screening models, not measured camera limits.\"\"\"\nimport json\nimport math\nfrom pathlib import Path\n\nROOT = Path(__file__).resolve().parents[1]\nIMAGE_BYTES = 644 * 604 * 10 // 8\nPARTS = {\n    \"alliance_x8\": dict(part=\"AS9F14G08SA-45BIN\", page=2048, spare=128,\n                        cycle_ns=45, program_typ_us=300, program_max_us=700,\n                        program_typ_ma=None, program_max_ma=20, host_ecc=True,\n                        read_typ_us=None, read_max_us=30),\n    \"winbond_quad\": dict(part=\"W25N04KWZEIR\", page=2048, spare=128,\n                         clocks_mhz=[50, 100], program_typ_us=250, program_max_us=700,\n                         program_typ_ma=25, program_max_ma=35, host_ecc=False,\n                         read_typ_us=45, read_max_us=65),\n    \"micron_quad\": dict(part=\"MT29F4G01ABBFDWB-IT:F\", page=4096, spare=256,\n                        clocks_mhz=[50, 83], program_typ_us=240, program_max_us=600,\n                        program_typ_ma=20, program_max_ma=25, host_ecc=False,\n                        read_typ_us=90, read_max_us=170),\n    \"macronix_quad_randomizer_off\": dict(part=\"MX35UF4G24AD-Z4I8\", page=4096, spare=256,\n                        clocks_mhz=[50, 100], program_typ_us=320, program_max_us=700,\n                        program_typ_ma=23, program_max_ma=30, host_ecc=True),\n    \"macronix_quad_randomizer_on\": dict(part=\"MX35UF4G24AD-Z4I8\", page=4096, spare=256,\n                        clocks_mhz=[50, 100], program_typ_us=360, program_max_us=740,\n                        program_typ_ma=23, program_max_ma=30, host_ecc=True),\n}\n\n\ndef calculate(p, clock_mhz, include_spare):\n    pages = math.ceil(IMAGE_BYTES / p[\"page\"])\n    byte_count = pages * (p[\"page\"] + (p[\"spare\"] if include_spare else 0))\n    if clock_mhz is None:\n        transfer_ms = byte_count * p[\"cycle_ns\"] / 1e6\n        command_ms = 0  # Same baseline as earlier parallel comparison.",
+    "markers": [
+      [
+        91,
+        "              results=results, capacity=capacities, verification=verification, assumptions=["
+      ]
+    ]
+  },
+  {
+    "path": "tools/catalog_flux_snapshot.py",
+    "head": "\"\"\"Catalog unchanged Flux downloads and audit their exported coverage.\"\"\"\nfrom datetime import datetime, timezone\nimport hashlib\nimport json\nfrom pathlib import Path\nimport xml.etree.ElementTree as ET\nimport zipfile\n\nfrom inventory_parts import names, parse_edif, walk\n\nROOT = Path(__file__).resolve().parents[1]\nSNAPSHOT = ROOT / \"imports\" / \"flux\" / \"2026-09-05\"\n\n\ndef edif_summary(path):\n    tree = parse_edif(path.read_text(encoding=\"utf-8-sig\"))\n    instances = {names(i[1])[0]: names(i[1])[1] for i in walk(tree, \"instance\")}\n    cells = {names(i[1])[1]: next(walk(i, \"cellRef\"))[1] for i in walk(tree, \"instance\")}\n    port_names = {names(c[1])[0]: {names(p[1])[0]: names(p[1])[1] for p in walk(c, \"port\")}\n                  for c in walk(tree, \"cell\")}\n    nets = {}\n    for net in walk(tree, \"net\"):\n        connections = []\n        for port in walk(net, \"portRef\"):\n            ref = next(walk(port, \"instanceRef\"))[1]\n            connections.append([instances[ref], port[1]])\n        nets[names(net[1])[1]] = sorted(connections)\n    display_nets = {net: sorted([ref, port_names[cells[ref]][port]] for ref, port in pins)\n                    for net, pins in nets.items()}\n    return {\"instances\": cells, \"nets\": nets, \"display_nets\": display_nets,\n            \"counts\": {\"instances\": len(instances), \"nets\": len(nets),\n                       \"endpoints\": sum(len(p) for p in nets.values())}}\n\n\ndef main():",
+    "markers": []
+  },
+  {
+    "path": "tools/fetch_datasheet.py",
+    "head": "\"\"\"Download an unchanged source document and record its provenance.\n\nUsage: python tools/fetch_datasheet.py URL RELATIVE_PDF --parts PARTS --title TITLE\n       [--source-page URL] [--note NOTE]\nPaths are relative to datasheets/. PDF content is checked before it is saved.\n\"\"\"\nimport argparse\nimport hashlib\nimport json\nimport os\nfrom datetime import datetime, timezone\nfrom io import BytesIO\nfrom pathlib import Path\nimport shutil\nimport subprocess\nimport tempfile\nimport urllib.request\n\nfrom pypdf import PdfReader\n\nROOT = Path(__file__).resolve().parents[1] / \"datasheets\"\n\ndef get_bytes(url):\n    \"\"\"Use the Windows certificate store via system curl when available.\"\"\"\n    curl = shutil.which(\"curl.exe\") if os.name == \"nt\" else None\n    if curl:\n        with tempfile.TemporaryDirectory(prefix=\"camera-doc-\") as temporary:\n            target = Path(temporary) / \"download\"\n            result = subprocess.run(\n                [curl, \"--fail\", \"--location\", \"--silent\", \"--show-error\",\n                 \"--retry\", \"1\", \"--connect-timeout\", \"15\", \"--max-time\", \"90\",\n                 \"--user-agent\", \"Mozilla/5.0\", \"--output\", str(target),\n                 \"--write-out\", \"%{url_effective}\", url],\n                capture_output=True, text=True, timeout=200, check=False)\n            if result.returncode:",
+    "markers": []
+  },
+  {
+    "path": "tools/fetch_supporting_docs.py",
+    "head": "\"\"\"Source list for connectors, controls, crystal and unselected-part references.\"\"\"\nfrom concurrent.futures import ThreadPoolExecutor, as_completed\nfrom fetch_datasheet import fetch\n\nHIROSE = \"https://www.hirose.com/en/product/document?clcode=CL0673-5021-0-51&productname=BM28B0.6-30DS%2f2-0.35V(51)&series=BM28&lang=en&\"\nHPAGE = \"https://www.hirose.com/en/product/p/CL0673-5021-0-51\"\n\nDOCS = [\n    (\"https://gct.co/files/drawings/usb4105.pdf\", \"connectors/USB4105_drawing.pdf\", \"USB4105-GF-A\", \"GCT USB4105 connector drawing, pinout and recommended PCB layout\", \"https://gct.co/connector/usb4105\", \"\"),\n    (\"https://gct.co/files/specs/usb4105-spec.pdf\", \"connectors/USB4105_specification.pdf\", \"USB4105-GF-A\", \"GCT USB4105 product specification\", \"https://gct.co/connector/usb4105\", \"\"),\n    (\"https://www.tag-connect.com/wp-content/uploads/bsk-pdf-manager/2019/12/TC2030-IDC-NL-Datasheet-Rev-B.pdf\", \"connectors/TC2030-IDC-NL_datasheet_footprint.pdf\", \"TC2030-IDC-NL\", \"Tag-Connect TC2030-IDC-NL Rev B footprint and cable drawing\", \"https://www.tag-connect.com/product/tc2030-idc-nl\", \"J2 is a bare PCB pad/hole pattern; cable pin numbering does not independently define the custom SWD signal assignment.\"),\n    (HIROSE + \"documenttype=2DDrawing&documentid=0001121806\", \"connectors/BM28B0.6-30DS_51_drawing.pdf\", \"BM28B0.6-30DS/2-0.35V(51)\", \"Hirose BM28B0.6-30DS/2-0.35V(51) exact connector drawing\", HPAGE, \"\"),\n    (HIROSE + \"documenttype=SpecSheet&documentid=0001121808\", \"connectors/BM28B0.6-30DS_51_specification.pdf\", \"BM28B0.6-30DS/2-0.35V(51)\", \"Hirose BM28B0.6-30DS/2-0.35V(51) specification\", HPAGE, \"\"),\n    (HIROSE + \"documenttype=Guideline&documentid=0001442212\", \"connectors/BM28B0.6-30DS_51_product_guidelines.pdf\", \"BM28B0.6-30DS/2-0.35V(51)\", \"Hirose BM28 product handling and assembly guidelines\", HPAGE, \"\"),\n    (HIROSE + \"documenttype=Catalog&documentid=en_BM28_CAT\", \"connectors/BM28_series_catalog.pdf\", \"BM28B0.6-30DS/2-0.35V(51)\", \"Hirose BM28 series catalog and recommended land patterns\", HPAGE, \"\"),\n    (\"https://omronfs.omron.com/en_US/ecb/products/pdf/en-b3u.pdf\", \"controls/B3U_switch_datasheet.pdf\", \"B3U-3000P\", \"Omron B3U tactile switch datasheet\", \"https://components.omron.com/us-en/products/switches/B3U\", \"Use the B3U-3000P side-actuated, no-ground-terminal, no-boss variant. Alternate official file host used because components.omron.com returned HTTP 403.\"),\n    (\"https://fscdn.rohm.com/en/products/databook/datasheet/opto/led/chip_mono/sml-p11mtt86(r)-e.pdf\", \"controls/SML-P11MTT86R_datasheet.pdf\", \"SML-P11MTT86R\", \"ROHM SML-P11MTT86(R) LED datasheet\", \"https://www.rohm.com/products/led/chip-leds-mono-color-type/standard/sml-p11mt_r_-product\", \"\"),\n    (\"https://ele.kyocera.com/assets/products/crystal-device/cx3225sa_e.pdf\", \"sensors_timing/CX3225SA_series_datasheet.pdf\", \"CX3225SA40000D0PTWCC\", \"Kyocera CX3225SA crystal series catalog and package drawing\", \"https://ele.kyocera.com/en/product/crystal-device/crystal_units/cx3225sa/cx3225sa/\", \"Series-level coverage; confirm the exact 40 MHz ordering-code electrical limits with the exact part specification.\"),\n    (\"https://e2e.ti.com/cfs-file/__key/communityserver-discussions-components-files/1023/CX3225SA40000D0PTWCC_5F00_DS.pdf\", \"sensors_timing/CX3225SA40000D0PTWCC_specification_TI_forum_copy.pdf\", \"CX3225SA40000D0PTWCC\", \"Kyocera CX3225SA40000D0PTWCC exact electrical specification (TI forum-hosted copy)\", \"https://e2e.ti.com/support/sensors-group/sensors/f/sensors-forum/1281050/awr2243-awr2243-casecade-crystal?keymatch=MMWCAS-RF-EVM&tisearch=e2e-sitesearch\", \"Kyocera-authored exact-MPN specification uploaded by a forum user to TI E2E. Supplemental historical copy, not a current manufacturer-hosted controlled document; official series datasheet archived separately.\"),\n    (\"https://data.energizer.com/pdfs/cr2032_eu.pdf\", \"reference/CR2032_Energizer_reference.pdf\", \"CR2032 (manufacturer not selected)\", \"Energizer CR2032 reference datasheet\", \"https://energizer.com/product/power/specialty/2032-battery/\", \"Reference candidate only. Project specifies four CR2032 cells but has not selected a battery manufacturer; no BOM substitution made.\"),\n    (\"https://www.murata.com/-/media/webrenewal/tool/library/common-pdf/note/note_dynamic-model_i101e.ashx?cvid=20230421010000000000&la=en-gb\", \"reference/Murata_MLCC_dynamic_model_DC_bias.pdf\", \"Generic MLCC capacitors (MPNs not selected)\", \"Murata MLCC dynamic models, DC bias and temperature dependence\", \"https://article.murata.com/en-us/article/mlcc-dynamic-model-supports-circuit-simulations\", \"Design reference only; does not establish characteristics of the project's unselected capacitors.\"),\n]\n\nif __name__ == \"__main__\":\n    with ThreadPoolExecutor(max_workers=5) as pool:\n        work = {pool.submit(fetch, *doc): doc for doc in DOCS}\n        for future in as_completed(work):\n            doc = work[future]\n            try:\n                result = future.result()\n                print(\"OK\", result[\"path\"], result[\"pages\"])\n            except Exception as exc:\n                print(\"FAILED\", doc[1], str(exc))",
+    "markers": [
+      [
+        9,
+        "    (\"https://gct.co/files/drawings/usb4105.pdf\", \"connectors/USB4105_drawing.pdf\", \"USB4105-GF-A\", \"GCT USB4105 connector drawing, pinout and recommended PCB layout\", \"https://gct.co/connector/usb4105\", \"\"),"
+      ],
+      [
+        15,
+        "    (HIROSE + \"documenttype=Catalog&documentid=en_BM28_CAT\", \"connectors/BM28_series_catalog.pdf\", \"BM28B0.6-30DS/2-0.35V(51)\", \"Hirose BM28 series catalog and recommended land patterns\", HPAGE, \"\"),"
+      ]
+    ]
+  },
+  {
+    "path": "tools/find_document_links.py",
+    "head": "\"\"\"Print document links from a public product page.\"\"\"\nfrom concurrent.futures import ThreadPoolExecutor\nfrom html import unescape\nimport json\nimport re\nimport sys\nfrom urllib.parse import urljoin\nfrom fetch_datasheet import get_bytes\n\ndef inspect(url):\n    try:\n        body, resolved = get_bytes(url)\n        links = re.findall(r'''href=[\"']([^\"']+)''', body.decode(\"utf-8\", errors=\"replace\"))\n        matches = [urljoin(resolved, unescape(link)) for link in links\n                   if any(term in link.lower() for term in [\".pdf\", \"datasheet\", \"document?\", \"specification\"])]\n        print(json.dumps({\"page\": url, \"links\": list(dict.fromkeys(matches))}, ensure_ascii=True))\n    except Exception as exc:\n        print(json.dumps({\"page\": url, \"error\": str(exc)}))\n\nif __name__ == \"__main__\":\n    with ThreadPoolExecutor(max_workers=4) as pool:\n        list(pool.map(inspect, sys.argv[1:]))",
+    "markers": []
+  },
+  {
+    "path": "tools/index_datasheets.py",
+    "head": "\"\"\"Validate downloaded PDFs and regenerate the part-to-document catalog.\"\"\"\nimport hashlib\nimport json\nfrom pathlib import Path\nimport re\nfrom pypdf import PdfReader\n\nROOT = Path(__file__).resolve().parents[1]\nLIB = ROOT / \"datasheets\"\n\nALIASES = {\n    \"STM32N657X0H3Q\": [\"STM32N657\", \"STM32N6\"],\n    \"CAM-5G0-079CLR\": [\"CAM-5G0-079CLR\", \"VD55G0\"],\n    \"TPS62132RGTR\": [\"TPS62132\", \"TPS6213x\"],\n    \"TPS62825DMQR\": [\"TPS62825\", \"TPS6282x\"],\n    \"TLV70033DDCT\": [\"TLV700\"], \"TLV70028DDCR\": [\"TLV700\"],\n    \"NCP115AMX120TCG\": [\"NCP115\"], \"TPS22918DBVT\": [\"TPS22918\"],\n    \"RV-3028-C8-32.768kHz-1PPM-TA-QC\": [\"RV-3028-C8\"],\n    \"LIS2DW12TR\": [\"LIS2DW12\"], \"W25Q128JVPIQ\": [\"W25Q128JV\"],\n    \"MX30LF2G18AC-TI\": [\"MX30LF2G18AC\"],\n    \"BM28B0.6-30DS/2-0.35V(51)\": [\"BM28B0.6-30DS\", \"BM28\"],\n    \"1N4148W-13-F\": [\"1N4148W\"],\n}\n\ndef normalize(value):\n    return re.sub(r\"[^a-z0-9]\", \"\", str(value).lower())\n\ndef esc(value):\n    return str(value).replace(\"|\", \"\\\\|\").replace(\"\\n\", \" \")\n\ndef main():\n    inventory = json.loads((LIB / \"parts-inventory.json\").read_text(encoding=\"utf-8\"))\n    records, errors = [], []\n    for path in sorted(LIB.rglob(\"*.pdf.source.json\")):\n        if \"_work\" in path.parts:",
+    "markers": [
+      [
+        82,
+        "             \"- CR2032 identifies a cell type, not a selected battery manufacturer. The Energizer sheet is a reference candidate, not a BOM decision.\","
+      ]
+    ]
+  },
+  {
+    "path": "tools/inventory_parts.py",
+    "head": "\"\"\"Extract original BOM columns and EDIF connectivity without inventing pin numbers.\"\"\"\nimport json\nfrom pathlib import Path\nimport re\n\nROOT = Path(__file__).resolve().parents[1]\n\ndef parse_edif(text):\n    tokens = re.findall(r'\"(?:\\\\.|[^\"\\\\])*\"|[()]|[^\\s()]+', text)\n    stack, root = [], None\n    for token in tokens:\n        if token == \"(\":\n            value = []\n            if stack:\n                stack[-1].append(value)\n            else:\n                root = value\n            stack.append(value)\n        elif token == \")\":\n            stack.pop()\n        else:\n            stack[-1].append(token[1:-1] if token.startswith('\"') else token)\n    if stack:\n        raise ValueError(\"Unclosed EDIF lists\")\n    return root\n\ndef walk(tree, kind):\n    if isinstance(tree, list):\n        if tree and tree[0] == kind:\n            yield tree\n        for child in tree:\n            if isinstance(child, list):\n                yield from walk(child, kind)\n\ndef names(item):",
+    "markers": [
+      [
+        83,
+        "                errors.append({\"net\": net[\"name\"], \"unresolved_connection\": connection})"
+      ],
+      [
+        95,
+        "    print(f\"EDIF endpoint validation: {len(endpoint_nets)} unique endpoints; {len(errors)} unresolved or conflicting entries\")"
+      ]
+    ]
+  },
+  {
+    "path": "tools/kicad_sexpr.py",
+    "head": "\"\"\"Small lossless-enough S-expression reader/writer for KiCad project generation.\"\"\"\nimport json\nimport re\n\n\nclass Atom(str):\n    pass\n\n\ndef parse(text):\n    tokens = re.findall(r'\"(?:\\\\.|[^\"\\\\])*\"|[()]|[^\\s()]+', text)\n    stack = []\n    root = None\n    for token in tokens:\n        if token == '(':\n            node = []\n            if stack:\n                stack[-1].append(node)\n            else:\n                root = node\n            stack.append(node)\n        elif token == ')':\n            stack.pop()\n        else:\n            if token.startswith('\"'):\n                value = json.loads(token)\n            else:\n                value = Atom(token)\n            stack[-1].append(value)\n    assert not stack\n    return root\n\n\ndef dumps(node):\n    if isinstance(node, list):",
+    "markers": []
+  },
+  {
+    "path": "tools/reconcile_flux_connectivity.py",
+    "head": "\"\"\"Reconcile unchanged Flux sources into physical pin connectivity.\n\nUses EDIF logical-name groups, native terminal UUID/number mappings and explicit\nno-connects, and IPC coordinates for the ambiguous J3 connector. Does not infer\nthe three unrecovered optional-switch connections; candidate intent is separate.\n\"\"\"\nimport base64\nfrom collections import Counter, defaultdict\nimport hashlib\nimport json\nfrom pathlib import Path\nimport re\nimport xml.etree.ElementTree as ET\n\nfrom inventory_parts import names, parse_edif, walk\n\nROOT = Path(__file__).resolve().parents[1]\nSNAP = ROOT / 'imports/flux/2026-09-05'\nOUT = ROOT / 'hardware/reconstruction'\n\n\ndef properties(values):\n    return {p['name']: p.get('value') for p in values.values() if p.get('name')}\n\n\ndef edif(path):\n    tree = parse_edif(path.read_text(encoding='utf-8-sig'))\n    cells = {names(c[1])[0]: {names(p[1])[0]: names(p[1])[1] for p in walk(c, 'port')}\n             for c in walk(tree, 'cell')}\n    instances = {names(i[1])[0]: (names(i[1])[1], next(walk(i, 'cellRef'))[1])\n                 for i in walk(tree, 'instance')}\n    result = defaultdict(list)\n    for n in walk(tree, 'net'):\n        for p in walk(n, 'portRef'):\n            ref, cell = instances[next(walk(p, 'instanceRef'))[1]]",
+    "markers": [
+      [
+        61,
+        "                   'status': 'no_connect' if is_nc else 'unresolved',"
+      ],
+      [
+        182,
+        "    # are resolved through native node terminalId, not parsed as assumed numbers."
+      ],
+      [
+        220,
+        "        if pin['status'] == 'unresolved':"
+      ],
+      [
+        228,
+        "    # Audit the native schematic graph rather than assuming that it reconstructs"
+      ],
+      [
+        245,
+        "    resolved_nets, unresolved = defaultdict(list), []"
+      ],
+      [
+        251,
+        "            if pin['status'] == 'unresolved': unresolved.append({'reference': ref, 'pin': number,"
+      ],
+      [
+        271,
+        "        'unresolved': unresolved, 'conflicts': conflicts, 'j3_geometry_matches': j3_matches,"
+      ],
+      [
+        276,
+        "    print('Unresolved:', json.dumps(unresolved))"
+      ]
+    ]
+  },
+  {
+    "path": "tools/relayout_schematic.py",
+    "head": "\"\"\"Create an independent, electrically equivalent human-readable schematic.\n\nReads the recovered KiCad files, preserving symbol pin identities and component\nproperties. Only this script's sibling output directory is written.\n\"\"\"\nimport copy\nimport hashlib\nimport json\nimport math\nfrom pathlib import Path\nimport re\nimport shutil\nimport uuid\nfrom collections import defaultdict\nfrom kicad_sexpr import Atom as A, child, children, dumps, parse\n\nROOT = Path(__file__).resolve().parents[1]\nSRC = ROOT / 'hardware/kicad'\nOUT = ROOT / 'hardware/kicad-readable'\nPROJECT = 'global-x-camera-readable'\nNS = uuid.UUID('925dba91-f425-48a4-b761-7e8ce873cc6e')\nuid = lambda s: str(uuid.uuid5(NS, str(s)))\nQ = lambda s: json.dumps(str(s), ensure_ascii=False)\nS = parse\nsnap = lambda n: round(round(float(n)/1.27)*1.27, 4)\nxy = lambda p: tuple(snap(v) for v in p)\nROOT_ID = uid('root')\nCIRCUIT = json.loads((ROOT/'hardware/reconstruction/schematic-connectivity.json').read_text())['components']\nINST = {}\nLIB = {}\nBASE_HASH = {}\nfor f in SRC.glob('*.kicad_sch'):\n    BASE_HASH[f.name] = hashlib.sha256(f.read_bytes()).hexdigest()\n    t = parse(f.read_text(encoding='utf8'))\n    for lib in children(child(t, 'lib_symbols'), 'symbol'):",
+    "markers": [
+      [
+        560,
+        "    cover.text('This is a layout-only revision. Existing design issues, source assumptions and DNP choices remain for the ongoing electrical review.',12.7,50.8)"
+      ]
+    ]
+  },
+  {
+    "path": "tools/render_schematic.py",
+    "head": "\"\"\"Render KiCad PDF for visual QA; does not author or alter the source PDF.\"\"\"\nfrom pathlib import Path\nimport pypdfium2 as pdfium\nfrom PIL import Image, ImageDraw\n\nROOT=Path(__file__).resolve().parents[1]\nout=ROOT/'tmp/schematic-review'\nout.mkdir(parents=True,exist_ok=True)\ndoc=pdfium.PdfDocument(ROOT/'hardware/kicad/global-x-camera.pdf')\nthumbs=[]\nfor i in range(len(doc)):\n    im=doc[i].render(scale=1.75).to_pil().convert('RGB')\n    im.save(out/f'page-{i+1:02}.png')\n    im.thumbnail((620,440))\n    canvas=Image.new('RGB',(640,470),'#eeeeee');canvas.paste(im,(10,22))\n    ImageDraw.Draw(canvas).text((10,3),f'Page {i+1}',fill='black');thumbs.append(canvas)\nfor k in range(0,len(thumbs),6):\n    c=Image.new('RGB',(1280,1410),'white')\n    for j,t in enumerate(thumbs[k:k+6]):c.paste(t,((j%2)*640,(j//2)*470))\n    c.save(out/f'contact-{k//6+1}.png')\nprint(f'Rendered {len(doc)} pages')",
+    "markers": []
+  },
+  {
+    "path": "tools/validate_footprints.py",
+    "head": "\"\"\"Load generated footprints in KiCad and verify schematic physical-pin coverage.\n\nRun with KiCad's bundled Python (pcbnew required). This checks parsing and pad\nidentity only; it does not approve land geometry or manufacturing rules.\n\"\"\"\nfrom collections import Counter\nimport hashlib\nimport json\nfrom pathlib import Path\nimport re\n\nimport pcbnew\n\nROOT = Path(__file__).resolve().parents[1]\nOUT = ROOT / 'hardware/reconstruction'\nLIBRARY = ROOT / 'hardware/kicad/GX.pretty'\nSOURCE = OUT / 'schematic-connectivity.json'\n\n\ndef natural(value):\n    return [int(s) if s.isdigit() else s for s in re.split(r'(\\d+)', str(value))]\n\n\ndef digest(path):\n    return hashlib.sha256(path.read_bytes()).hexdigest()\n\n\ndef main():\n    connectivity = json.loads(SOURCE.read_text(encoding='utf-8'))\n    expected = {ref: component for ref, component in connectivity['components'].items()\n                if ref != 'CAM1' and not component.get('external_to_host_pcb', False)}\n    files = sorted(LIBRARY.glob('*.kicad_mod'), key=lambda p: natural(p.name))\n    results, loaded_refs = [], set()\n    ignored_counts = Counter()\n",
+    "markers": []
+  },
+  {
+    "path": "tools/validate_readable_schematic.py",
+    "head": "\"\"\"Check that the presentation revision preserves the recovered circuit.\"\"\"\nimport hashlib\nimport json\nfrom pathlib import Path\nimport re\nimport xml.etree.ElementTree as ET\nfrom kicad_sexpr import child, children, parse, dumps\n\nROOT=Path(__file__).resolve().parents[1]\nSRC=ROOT/'hardware/kicad'\nOUT=ROOT/'hardware/kicad-readable'\n\ndef read_netlist(path):\n    tree=ET.parse(path).getroot()\n    return {(n.get('ref'),n.get('pin')):net.get('name')\n            for net in tree.findall('./nets/net') for n in net.findall('node')\n            if not n.get('ref').startswith('#')}\n\ndef read_schematic(folder):\n    properties={};pins={};marks=0;buses={};instances=set()\n    for f in folder.glob('*.kicad_sch'):\n        tree=parse(f.read_text(encoding='utf8'))\n        marks+=len(children(tree,'no_connect'))\n        for bus in children(tree,'bus_alias'):buses[bus[1]]=child(bus,'members')[1:]\n        for s in children(tree,'symbol'):\n            pr={p[1]:p[2] for p in children(s,'property')};ref=pr['Reference']\n            if ref.startswith('#'):continue\n            unit=int(child(s,'unit')[1]);instances.add((ref,unit))\n            properties[ref,unit]=(pr,tuple((k,str(child(s,k)[1])) for k in ['in_bom','on_board','dnp']))\n        for s in children(child(tree,'lib_symbols'),'symbol'):\n            ref=s[1].split(':')[-1]\n            if ref not in {r for r,u in instances}:continue\n            for group in children(s,'symbol'):\n                unit=int(re.search(r'_(\\d+)_\\d+$',group[1])[1])\n                for p in children(group,'pin'):",
+    "markers": []
+  },
+  {
+    "path": "tools/validate_schematic.py",
+    "head": "\"\"\"Compare KiCad's exported netlist with the explicit reconstruction baseline.\"\"\"\nfrom collections import defaultdict\nimport json\nfrom pathlib import Path\nimport re\nimport xml.etree.ElementTree as ET\n\nROOT=Path(__file__).resolve().parents[1]\nREC=ROOT/'hardware/reconstruction'\n\n\ndef main():\n    baseline=json.loads((REC/'schematic-connectivity.json').read_text(encoding='utf-8'))\n    source=json.loads((REC/'connectivity.json').read_text(encoding='utf-8'))\n    xml=ET.parse(REC/'kicad-netlist.xml').getroot()\n    actual_refs={e.get('ref') for e in xml.findall('./components/comp') if not e.get('ref','').startswith('#')}\n    expected_refs=set(baseline['components'])\n    actual={};errors=[];netmap={}\n    for net in xml.findall('./nets/net'):\n        endpoints=[]\n        for n in net.findall('node'):\n            if n.get('ref','').startswith('#'):continue\n            key=(n.get('ref'),n.get('pin'))\n            if key in actual:errors.append({'duplicate_endpoint':key})\n            actual[key]=net.get('name');endpoints.append(key)\n        netmap[net.get('name')]=endpoints\n    expected={};nc=[]\n    for ref,c in baseline['components'].items():\n        for pin,info in c['pins'].items():\n            key=(ref,pin)\n            if info.get('net'):expected[key]=info['net']\n            elif info['status']=='no_connect':nc.append(key)\n            else:errors.append({'unresolved_baseline':key})\n    for key,net in expected.items():\n        if actual.get(key)!=net:errors.append({'endpoint':key,'expected_net':net,'actual_net':actual.get(key)})",
+    "markers": [
+      [
+        33,
+        "            else:errors.append({'unresolved_baseline':key})"
+      ],
+      [
+        71,
+        "        'recovered_connected_endpoints_preserved':preserved,'documented_decisions':len(baseline['decisions']),"
+      ]
+    ]
+  }
+]

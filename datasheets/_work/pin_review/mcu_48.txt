@@ -1,0 +1,50 @@
+Functional overview                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    STM32N6x5xx STM32N6x7xx
+
+
+                                       The MDF can receive, via its serial interfaces,  streams coming from various digital sensors.
+                                       It supports SPI, Manchester coded 1-wire, and PDM interface standards.
+                                       Main features:
+                                       •                                                                   AHB interface
+                                       •                                                                   Six serial digital inputs
+                                                      –                                                        configurable SPI interface to connect digital sensors
+                                                      –                                                       configurable Manchester coded interface support
+                                                      –                                                        compatible with PDM interface to support digital microphones
+                                       •                                                                   Two common clocks input/output for  Σ∆ modulators
+                                       •                                                                   Flexible matrix (BSMX) for connecti on between filters and digital inputs
+                                       •                                                                   Two inputs to connect the internal ADCs
+                                       •                                                                  Six flexible digital filter paths, including:
+                                                      –                                                       A configurable CIC filter:
+                                                                     >                                                       Can be split into two CIC  filters: high-resolution filt er and out-off limit detector
+                                                                     >                                                       Can be configured in Sinc4 and Sinc5 filters
+                                                                     >                                                       Adjustable decimation ratio
+                                                      –                                                        A reshape filter to improve the out-off band rejection and in-band ripple
+                                                      –                                                        A high-pass filter to cancel the DC offset
+                                                      –                                                        An offset error cancellation
+                                                      –                                                       Gain control
+                                                      –                                                        Saturation blocks
+                                                      –                                                        An out-off limit detector
+                                       •                                                                   Short-circuit detector
+                                       •                                                                   Clock absence detector
+                                       •                                                                   16- or 24-bit signed output data resolution
+                                       •                                                                   Continuous or single conversion
+                                       •                                                                   Possibility to delay indepen dently each bitstream
+                                       •                                                                  Various trigger possibilities
+                                       •                                                                   Break generation on out-of limit or short-circuit detector events
+                                       •                                                                   Autonomous functionality in Stop modes
+                                       •                                                                   DMA can be used to read the conversion data
+                                       •                                                                   Interrupts services
+
+3.24                                                                                            Audio digital filter (ADF)
+
+                                       The audio digital filter (ADF) is a high perfo  rmance module dedicated to the connection of
+                                       external sigma-delta (Σ∆) modulators, mainly for audio capture signals and metering.
+                                       The ADF features one digital serial interface (SITF0) and one digital filter (DFLT0) with
+                                       flexible digital processing options in orde  r to offer up to 24-bit final resolution.
+                                       The ADF serial interface supports SPI, Manchester coded 1-wire, and PDM interface
+                                       standards.
+
+
+
+
+
+48/263                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          DS14791 Rev 10

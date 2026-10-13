@@ -1,0 +1,57 @@
+Functional overview                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    STM32N6x5xx STM32N6x7xx
+
+
+                                                         –                                                        CID-aware AHB target port, with integr  ated semaphores for a concurrent control
+                                                                         from any of the CPUs
+
+                                                                                        Table 9. Implementation of HPDMA1 channels
+                                                 Hardware parameters
+    Channel x                              dma_fifo_                                         dma_                                                                                                                          Features
+                                                size[x]                         addressing[x]
+
+                                                                                                                                Channel x (x = 0 to 11) is implemented with:
+                                                                                                                                –            a FIFO of 16 bytes, 4 words, 2 double-words
+    x = 0 to 11                                                                                                         3                                                                                                                                                                                            0–            fixed/contiguously incremented addressing
+                                                                                                                                These channels can be used for HPDMA transfers between an APB or
+                                                                                                                                AHB peripheral, an AHB/AXI SRAM, or CPU TCM.
+                                                                                                                                Channel x (x = 12 to 15) is implemented with:
+                                                                                                                                –            a FIFO of 64 bytes, 8 double-words
+ x = 12  to 15                                                                                           5                                                                                                                                                                                            1–            2D addressing
+                                                                                                                                These channels can be also used for HPDMA transfers, including AXI
+                                                                                                                                external memories.
+
+
+                                                                                                                         Table 10. HPDMA1 in low-power modes
+                                                                                                        Feature                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          Low-power modes
+
+                                                                                                      Wake-up                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              HPDMA1 in Sleep mode
+
+3.11 Chrom-ART Accelerator controller (DMA2D)
+
+                                         The Chrom-ART Accelerator (DMA2D) is a specialized DMA dedicated to image
+                                         manipulation. It can perform the following operations:
+                                         •                                                                   Fill a part or the whole of a dest ination image with  a specific color
+                                         •                                                                   Copy a part or the whole of a source image    into a part or the whole of a destination
+                                                         image
+                                         •                                                                   Copy a part or the whole of a source image    into a part or the whole of a destination
+                                                         image with a pixel format conversion
+                                         •                                                                   Blend a part and/or two complete source images with different pixel format and copy
+                                                         the result into a part or the whole of a de  stination image with a different color format
+                                         All the classical color coding schemes are supported, from 4- up to 32-bit per pixel with
+                                         indexed or direct color mode, including block    based YCbCr to handle JPEG decoder output.
+                                         The DMA2D has its own dedicated memories for CLUTs (color look-up tables).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+38/263                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          DS14791 Rev 10

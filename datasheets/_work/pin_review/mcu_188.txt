@@ -1,0 +1,77 @@
+Electrical characteristics                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      STM32N6x5xx STM32N6x7xx
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                          Table 81. Synchronous multiplexed PSRAM write timings   (1)
+
+                                   Symbol                                                                                                                                                                                                                                                                                                     Parameter                                                                                                                                                                                                                                                                                                                                                                                          Min                                                                                                                                                                                                                                                                                                         Max                                                                                                                                                       Unit
+
+                                        tw(CLK)                                                                                               FMC_CLK period                                                                                                                                                                                                                                                                                                                                                                R × Tfmc_ker_ck -  0.5(2)                                                                                                                                                                                         -
+
+                     td(CLKL-NExL)                                                        FMC_CLK low to FMC_NEx low (x = 0…2)               -5
+
+
+                 td(CLKH_NExH)                                               FMC_CLK high to FMC_NEx high (x = 0…2)                                                                                                                                                                                                                                                                                                                                                                                                                                                                           R × Tfmc_ker_ck / 2 + 5(2)                                                                                                                                                                                -
+
+               td(CLKL-NADVL)                                            FMC_CLK low to FMC_NADV low                                                                                                                                                                                                                                                                                     -                                                                                                                                                                                                                                                                                                                                                        1
+              td(CLKL-NADVH)                                          FMC_CLK low to FMC_NADV high                                                                                                                                                                                                                                                       0.5                                                                                                                                                                                                                                                                                                                                          -
+
+                            td(CLKL-AV)                                                                       FMC_CLK low to FMC_Ax valid (x = 16…25)               -0
+
+
+                         td(CLKH-AIV)                                                               FMC_CLK high to FMC_Ax invalid (x = 16…25)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         R × Tfmc_ker_ck(2)                                                                                                                                                                                                                                  -
+
+                  td(CLKL-NWEL)                                                  FMC_CLK low to FMC_NWE low                                                                                                                                                                                                                                                                                                -                                                                                                                                                                                                                                                                                                                                      1.5                                ns
+
+                td(CLKH-NWEH)                                            FMC_CLK high to FMC_NWE high                                                                                                                            R × Tfmc_ker_ck / 2(2)                                                                                                                                                                                                             -
+                       td(CLKL-ADV)                                                           FMC_CLK low to FMC_AD[15:0] valid                                                                                                                                                                                                                      -                                                                                                                                                                                                                                                                                                                                            5
+                     td(CLKL-ADIV)                                                         FMC_CLK low to FMC_AD[15:0] invalid                                                                                                                                                                                                 0                                                                                                                                                                                                                                                                                                                                                        -
+
+                    td(CLKL-DATA)                                                      FMC_A/D[15:0] valid data after FMC_CLK low                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  -5
+
+                    td(CLKL-NBLL)                                                       FMC_CLK low to FMC_NBL low                                                                                                                                                                                                                                                                                                              0                                                                                                                                                                                                                                                                                                                                                        -
+                  td(CLKH-NBLH)                                                 FMC_CLK high to FMC_NBL high                                                                                                                                        R × Tfmc_ker_ck / 2(2)                                                                                                                                                                                                           -
+
+            tsu(NWAIT-CLKH)                                      FMC_NWAIT valid before FMC_CLK high                  5-
+
+               th(CLKH-NWAIT)                                            FMC_NWAIT valid after FMC_CLK high                                                                                                                                                                                               0                                                                                                                                                                                                                                                                                                                                                        -
+
+     Tcew(NExL -NWAIT)                      FMC_NWAIT valid after FMC_NEx low (x = 0…2)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   -                                                                                                                                                                                                                              (DATLAT + 2.5) × Tfmc_ker_ck × R -  10.5                                                   -
+
+1.                          Evaluated by characterization. Not tested in production.
+2.                          Clock ratio R = FMC_CLK period / FMC_ker_CLK period.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+188/263                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        DS14791 Rev 10

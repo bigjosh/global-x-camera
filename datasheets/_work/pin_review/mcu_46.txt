@@ -1,0 +1,49 @@
+Functional overview                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    STM32N6x5xx STM32N6x7xx
+
+
+                                       The ADCs main features are:
+                                                     –                                                        12-, 10-, 8- or 6-bit configurable resolution
+                                                     –                                                        Conversion time independent from the AHB bus clock frequency
+                                                     –                                                       Faster conversion time by lowering resolution
+                                                     –                                                        Management of single-ended or differential inputs (programmable per channels)
+                                                     –                                                        AHB target bus interface to allow fast data handling
+                                                     –                                                        Offset calibration support
+                                                     –                                                       Channel-wise programmable sampling time
+                                                     –                                                        Flexible sampling time control
+                                                     –                                                        Up to four injected channels (analog inputs assignment to regular or injected
+                                                                    channels is fully configurable)
+                                                     –                                                        Data alignment with in-built data coherency
+                                                     –                                                        Data can be managed by DMA for regular channel conversions
+                                                     –                                                       Data can be routed to MDF for post processing
+                                                     –                                                        Four dedicated data registers for the injected channels
+                                       •                                                                   Low-power features
+                                                     –                                                        Speed adaptive low-power mode to reduce ADC consumption when operating at
+                                                                    low frequency
+                                                     –                                                        Allows slow bus frequency application   while keeping optimum ADC performance
+                                                     –                                                        Provides automatic control to avoid ADC overrun in low AHB bus clock frequency
+                                                                    application (Auto-delay mode)
+                                       •                                                                   Oversampler
+                                                     –                                                        32-bit data register
+                                                     –                                                       Ratio adjustable from 2 to 1024
+                                                     –                                                        Programmable data right shift
+                                       •                                                                   Data preconditioning
+                                                     –                                                       Gain compensation
+                                                     –                                                        Offset compensation
+                                       •                                                                   Analog input channels
+                                                     –                                                        External analog inputs (per ADC): up to 17 GPIO pads
+                                                     –                                                        One channel for the internal reference voltage (VREFINT)
+                                                     –                                                       One channel for monitoring the external VBAT power supply pin
+                                                     –                                                        One channel connected to the analog positive reference voltage VREF+
+                                                     –                                                        One channel for monitoring V DDCORE internal voltage
+                                       •                                                                   Start-of-conversion can be initiated:
+                                                     –                                                        By software for both regular and injected conversions
+                                                     –                                                        By hardware triggers with configurable po  larity (internal timers events or GPIO
+                                                                    input events) for both regular and injected conversions
+                                       •                                                                   Conversion modes
+                                                     –                                                        Each ADC can convert a single channel or can scan a sequence of channels
+                                                     –                                                        Single mode converts selected inputs once per trigger
+                                                     –                                                        Continuous mode converts selected inputs continuously
+                                                     –                                                        Discontinuous mode
+
+
+46/263                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          DS14791 Rev 10

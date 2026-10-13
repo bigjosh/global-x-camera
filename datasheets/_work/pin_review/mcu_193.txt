@@ -1,0 +1,60 @@
+STM32N6x5xx                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            STM32N6x7xx
+
+
+                                                                                               Figure 33. Synchronous multiplexed PSRAM write timings
+
+                                                                                        tw(CLK)                                                                                                  tw(CLK)                                                                                                                                                                                                          BUSTURN = 0
+
+                                  FMC_CLK
+                                                          td(CLKL-NADVL)                                                                                                            Data latency = 0 (2 cycles)
+                                                                                                                                                                          td(CLKL-NADVH)
+                           FMC_NADV
+
+                                                                                                                                   td(CLKL-AV)                                                                                                                                                                                                                           td(CLKH-AIV)
+
+                   FMC_A[25:16]
+
+                                                                                                                                   td(CLKL-NWEL)                                                                                                                                                                                                                   td(CLKH-NWEH)
+                               FMC_NWE
+
+                                                                                                                                                                                                                                                                                                              td(CLKL-Data)
+                                                                td(CLKL-ADV)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             td(CLKL-ADIV)
+                  FMC_AD[15:0]                                                                                                                                                                                                                                                                                                       AD[15:0]                                                                                                                                                                                                                                                                                                                                                                  D1                                                                                                                                                                                                                                                                                               D2
+
+
+                                                                                                                                   td(CLKL-NExL)                                                                                                                                                                                                                      td(CLKH-NExH)
+
+                                  FMC_NEx
+
+                        FMC_NWAIT                                                                                       td(NExL-NWAITV)                                                                                       tsu(NWAITV-CLKH)                                                                               th(CLKH-NWAITV)
+           (WAITCFG = 0b,
+              WAITPOL = 0b)                                                                                                                                                                                                                                                                                                                                                                                                td(CLKH-NBLH)
+                                                                                                                                                                                                                                                                     tsu(NWAITV-CLKH)                                                                 th(CLKH-NWAITV)
+                                  FMC_NBL
+
+
+                       Expected sampling edge at memory side                                                                                                                                                                                                                                                                                                                                                                                        MS32758V3
+
+                                                          NAND flash memory controller waveforms and timings
+                                                          Figure 34 and Figure 35 represent synchronous waveforms, and    Table 84 and Table 85
+                                                          provide the corresponding timings. The result   s shown in these tables are obtained with the
+                                                          following FMC configuration:
+                                                          •                                                                  FMC_SetupTime = 0x01
+                                                          •                                                                  FMC_WaitSetupTime = 0x03
+                                                          •                                                                   FMC_HoldSetupTime = 0x02
+                                                          •                                                                  FMC_HiZSetupTime = 0x01
+                                                          •                                                                   Bank = FMC_Bank_NAND
+                                                          •                                                                   MemoryDataWidth = FMC_MemoryDataWidth_16b
+                                                          •                                                                   ECC = FMC_ECC_Enable
+                                                          •                                                                   ECCPageSize = FMC_ECCPageSize_512Bytes
+                                                          •                                                                   TCLRSetupTime = 0
+                                                          •                                                                   TARSetupTime = 0
+                                                          •                                                                   Capacitive load CL = 30 pF
+                                                          In all timing tables, T fmc_ker_ck is the fmc_ker_ck clock period.
+
+
+
+
+                                                                                                                                                                                                         DS14791 Rev 10                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        193/263
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                238

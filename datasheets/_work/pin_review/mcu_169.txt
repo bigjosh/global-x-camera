@@ -1,0 +1,62 @@
+STM32N6x5xx                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            STM32N6x7xx
+
+
+
+                                             2.                          Refer to AN1709, “EMI radiated test” section.
+                                             3.                          Refer to AN1709, “EMI level classification” section.
+
+5.3.15 Electrical sensitivity characteristics
+
+                                             Based on three different tests (ESD, latch-up   ) using specific measurement methods, the
+                                             device is stressed in order to determine its pe   rformance in terms of  electrical sensitivity.
+
+                                             Electrostatic discharge (ESD)
+                                             Electrostatic discharges (a positive then a negati   ve pulse) are applied to the pins of each
+                                             sample according to ea ch pin combination. This test  conforms to the ANSI/ESDA/JEDEC
+                                             JS-001 and ANSI/ESDA/JEDEC JS-002 standards.
+
+                                                                                                     Table 63. ESD absolute maximum ratings (1)
+        Symbol                                                                                                                                                                                                                                          Ratings                                                                                                                                                                                                                                                                                                                                            Conditions                                                                                                                                                            Package                                      Class                                                   Max                                                 Unit
+
+    VESD(HBM)                                Electrostatic discharge voltage                                                                                 TA = 25°C, conforming to                                                                                                                         22000(2)
+                                             (human body model)                                                                                              ANSI/ESDA/JEDEC JS-001                                                                                               All
+                                                                                                                                                             TA = 25°C, conforming to                                                                                                                                                                             V
+    VESD(CDM)                               Electrostatic discharge voltage (charge device model)                                                            ANSI/ESDA/JEDEC JS-002                                                                                                                                                                                                                                                 C1                                                                              250
+
+1.                          Evaluated by characterization, not tested in production, unless otherwise specified.
+2.                          400 V for USB_PD_CC1 and USB_PD_CC2 pins.
+
+                                             Static latch-up
+                                             The following complementary static tests are required on three parts to assess the latch-up
+                                             performance:
+                                             •                                                                   a supply overvoltage is applied to each power supply pin
+                                             •                                                                   a current injection is applied to each input, output and configurable I/O pin.
+                                             These tests are compliant with EI  A/JESD 78A IC latch-up standard.
+
+                                                                                                                                                 Table 64. Electrical sensitivity  (1)
+
+                                                    Symbol                                                                                                                                   Parameter                                                                                                                                                                                                                                                                                                                                                                     Conditions                                                                                                                                                                                                                                                                                                                                            Class
+
+                                                            LU                                                                              Static latch-up class                                                                    TJ = 130°C conforming to JESD78                                                                                                                                                                                                                                                                            II.A
+
+                                             1.                          Evaluated by characterization, not tested in production, unless otherwise specified.
+
+5.3.16 I/O current injection characteristics
+
+                                             As a general rule, current injection to the I/O pins, due to external voltage below V    SS or
+                                             above VDD (for standard, 3.3 V-capable I/O pins)  should be avoided during normal product
+                                             operation. However, in order to give an indicati  on of the robustness of the microcontroller if
+                                             abnormal injection accidenta lly happens, some susceptibilit y tests are performed on a
+                                             sample basis during device characterization.
+
+
+
+
+
+
+
+
+
+                                                                                                                                                            DS14791 Rev 10                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        169/263
+
+                                                                                                                                                                                                                                                                                                                                                                                                 238

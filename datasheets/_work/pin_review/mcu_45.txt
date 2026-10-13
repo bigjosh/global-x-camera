@@ -1,0 +1,54 @@
+STM32N6x5xx                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            STM32N6x7xx
+
+
+                             Main SDMMC features:
+                             •                                                                   Compliance with Embedded MultiM  ediaCard System Specification Version 5.1. Card
+                                         support for three different databus modes:  1-bit (default), 4-bit and 8-bit. HS200
+                                         SDMMC_CK speed limited to maximum allowed I/O speed, HS400 is not supported.
+                             •                                                                   Full compatibility with previous versions  of MultiMediaCards (b ackward compatibility).
+                             •                                                                     Full compliance with SD memory card spec   ification version 6.0 (SDR104 SDMMC_CK
+                                         speed limited to maximum allowed I/O speed, SPI mode and UHS-II mode not
+                                         supported).
+                             •                                                                   Full compliance with SDIO card specification version 4.0. Card support for 1-bit
+                                         (default) and 4-bit databus modes. SDR104 SDMMC_CK speed limited to maximum
+                                         allowed I/O speed, SPI mode and UHS-II mode not supported.
+                             •                                                                     Data transfer up to 208 Mbyte/s for the 8-  bit mode, depending upon maximum allowed
+                                         I/O speed.
+                             •                                                                   Data and command output enable signals to control external bidirectional drivers.
+                             •                                                                   IDMA linked list support.
+                             The MultiMediaCard/SD bus connects cards to the host.
+                             The current version of the SDMMC supports   only one SD/SDIO/eMMC card at any one
+                             time, and a stack of eMMCs.
+
+3.19                                                                                             SDMMC delay block (DLYB)
+
+                             This block is used to generate two output clocks dephased from two input clocks. The phase
+                             of each output clock must be programmed by   the user application. The output clocks are
+                             then used to clock the data transmitted/received by another peripheral such as an SDMMC.
+                             The delay block has the following features:
+                             •                                                                   Frequency for Lock mode in the 50 to 208 MHz range
+                             •                                                                   32 phases (delay taps)
+                             •                                                                   Bypass mode for operation below 50 MHz
+
+3.20                                                                                            Analog-to-digital converters (ADC)
+
+                             The devices embed two ADCs (ADC1, ADC2) tigh  tly coupled, which can operate in Dual
+                             mode (ADC1 is controller).
+                             Each ADC consists of one 12-bit successive approximation analog-to-digital converter, and
+                             has up to 20 multiplexed channels. The conversions can be performed in Single,
+                             Continuous, Scan, or Discontinuous mode. The re  sult is stored in a left- or right-aligned
+                             (default configuration) 32-bit data register. The ADCs are mapped on the AHB bus for fast
+                             data handling.
+                             The analog watchdog features allow the application to detect if the input voltage goes
+                             outside the user-defined high or low thresholds.
+                             A built-in hardware oversampler improves analog performance, while off-loading the related
+                             computational burden from the CPU.
+                             An efficient low-power mode is implemented   for very low consumption at low frequencies.
+
+
+
+
+
+                                                                                                       DS14791 Rev 10                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          45/263
+
+                                                                                                                                                                                                                                                              80

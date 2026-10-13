@@ -1,0 +1,85 @@
+          Figure 37. AC Waveforms for Two-plane Erase (ONFI)
+
+
+         CLE                                   tCLS                                                                                                                                                                                                                       tCLS
+
+
+                                                              tCLH                                                                                                                                                                                                                       tCLH
+          CE#                                 tCS
+
+
+
+
+
+                                                                                                           tWC                                                                                                                                                                                                                        tWC
+        WE#
+
+
+
+
+
+                                                                 tALH                                     tALS                                                                                                                                                                              tALH                                     tALS
+
+          ALE
+
+
+
+                                                                                                                                                                                                             tWB                                                                                                                                                                                                                        tWB
+         RE#
+
+
+
+
+
+                                                  tDS                       tDH                                                                                                                 tDHtDS                                                                                                                                                                                                                                                                  tDHtDStDHtDStDS                       tDH                                                                                                                 tDHtDS                                                                                                                                                                                                                                                                  tDHtDStDHtDS
+
+IO[7:0]                                                  60h                                                                                                                                             D1h                                                                        60h                                                                                                                                            D0h                                        70h                    Stauts
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     Output
+
+                                                                                     3rd Address                             4th Address                           5th Address                                          tDBSY                                                                                   3rd Address                             4th Address                           5th Address                                          tERASE
+                                                                                            Cycle                                  Cycle                                  Cycle                                                                                                                                        Cycle                                  Cycle                                 Cycle
+     R/B#
+
+
+
+          Figure 38. AC waveforms for Two-plane Program (Traditional)
+
+      IO[x:0]                              80h                 1st Address2nd Address3rd Address4th Address5th Address                                                Din                                 Din                      11h                                   81h                                  2nd Address3rd Address4th Address5th Address                                         Din                                  Din
+                                                                   Cycle             Cycle              Cycle             Cycle             Cycle                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               1st AddressCycleCycleCycleCycleCycle10h70h
+                                                                                   Amax - A19 : Fixed “Low”                                                                                                                                                                                                     Amax - A19 : Valid
+                                                                                    A18             : Fixed “Low”                                                                                                                                                                                               A18             : Fixed “High”
+                                                                                   A12 - A17   : Fixed “Low”                                                                                                                                                                                                    A12 - A17    : Valid
+                                                                                   A11 - A0     : Valid                                                                                                                                                                                                         A11 - A0      : Valid
+                                                                                                      Plane 0                                                                                                                                                                                                                       Plane 1
+             R/B#
+                                                                                                                                                                                                                                         Busy - tDBSY                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           Busy - tPROG
+
+          Figure 39. AC waveforms for Two-plane Cache Program (Traditional)
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   A
+      IO[x:0]                            80h                1st Address2nd Address3rd Address4th Address5th Address                                            Din                                Din                    11h                                  81h                1st Address2nd Address3rd Address4th Address5th Address                                           Din                                Din
+                                                                Cycle             Cycle             Cycle           Cycle             Cycle                                                                                                                                          Cycle            Cycle             Cycle            Cycle            Cycle                                                                              15h                                  80h
+                                                                                     Amax - A19 : Fixed “Low”                                                                                                                                                                                       Amax - A19 : Valid
+                                                                                     A18             : Fixed “Low”                                                                                                                                                                                  A18             : Fixed “High”
+                                                                                     A12 - A17   : Fixed “Low”                                                                                                                                                                                      A12 - A17    : Valid
+                                                                                     A11 - A0     : Valid                                                                                                                                                                                           A11 - A0      : Valid
+                                                                                                       Plane 0                                                                                                                                                                                                         Plane 1
+             R/B#
+
+                                                                                                                                                                                                                            Busy - tDBSY                                                                                                                                                                                                           Busy - tCBSY
+
+                                                     A
+
+      IO[x:0]                            80h                1st Address2nd Address3rd Address4th Address5th Address                                            Din                               Din                      11h                                 81h                1st Address2nd Address3rd Address4th Address5th Address                                           Din                                Din                     10h                                 70h
+                                                                Cycle             Cycle             Cycle           Cycle             Cycle                                                                                                                                          Cycle            Cycle             Cycle            Cycle            Cycle
+                                                                                     Amax - A19 : Fixed “Low”                                                                                                                                                                                       Amax - A19 : Valid
+                                                                                     A18             : Fixed “Low”                                                                                                                                                                                  A18             : Fixed “High”
+                                                                                     A12 - A17   : Fixed “Low”                                                                                                                                                                                      A12 - A17    : Valid
+                                                                                     A11 - A0     : Valid                                                                                                                                                                                           A11 - A0      : Valid
+                                                                                                       Plane 0                                                                                                                                                                                                         Plane 1
+             R/B#
+                                                                                                                                                                                                                               Busy - tDBSY                                                                                                                                                                                                           Busy - tPROG
+
+
+
+                                                                                                                                                                                                                                                             61

@@ -1,0 +1,51 @@
+Functional overview                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    STM32N6x5xx STM32N6x7xx
+
+
+                                              –                                                       External clock source over LPTIM input  (working with no LP oscillator running,
+                                                           used by pulse counter application)
+                                  •                                                                   16-bit ARR autoreload register
+                                  •                                                                   16-bit capture/compare register
+                                  •                                                                   Continuous/One-shot mode
+                                  •                                                                   Selectable software/h ardware input trigger
+                                  •                                                                  Programmable digital glitch filter
+                                  •                                                                   Configurable output: pulse, PWM
+                                  •                                                                  Configurable I/O polarity
+                                  •                                                                  Encoder mode
+                                  •                                                                   Repetition counter
+                                  •                                                                   Up to two independent channels for:
+                                              –                                                        Input capture
+                                              –                                                        PWM generation (edge-aligned mode)
+                                              –                                                        One-pulse mode output
+                                  •                                                                  Interrupt generation on ten events
+                                  •                                                                   DMA request generation on the following events:
+                                              –                                                        Update event
+                                              –                                                        Input capture
+
+3.39 Independent watchdog (IWDG)
+
+                                  This peripheral offers a high safety level, thanks to its capability to detect malfunctions due
+                                  to software or hardwa re failures. The IWDG is clocked by an independent clock, and stays
+                                  active even if the main clock fails. In addition,    the watchdog function is performed in the V  DD
+                                  voltage domain, allowing the IWDG to remain functional even in low-power modes. Refer to
+                                  the dedicated section of the reference manual to check it s capabilities in this product.
+                                  The IWDG is best suited for applications th  at require the watchdog to run as a totally
+                                  independent process outside the main application,    making it very reliable to detect any
+                                  unexpected behavior. Its main features are:
+                                  •                                                                   12-bit down-counter
+                                  •                                                                   Dual voltage domain, enabling   operation in low-power modes
+                                  •                                                                  Independent clock
+                                  •                                                                   Early wake-up interrupt generation
+                                  •                                                                   Reset generation in case of timeout and   of refresh outside the expected window
+
+3.40 System window watchdog (WWDG)
+
+                                  The WWDG is used to detect the occurrence   of a software fault, usually generated by
+                                  external interference or by unforeseen logical conditions, which causes the application
+                                  program to abandon its normal sequence.
+                                  The watchdog circuit generates a reset on expiry of a programmed time period, unless the
+                                  program refreshes the contents of the down-counter before bit T6 is cleared. A reset is also
+                                  generated if the 7-bit down-counter value (in    the control register) is refreshed before the
+
+
+
+64/263                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          DS14791 Rev 10

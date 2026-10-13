@@ -1,0 +1,14 @@
+{
+  "path": "memory/Macronix_AN0340_NAND_interrupted_program_erase.pdf",
+  "title": "Macronix AN0340 Managing the Effects of an Unexpected Power Loss on NAND Flash Program and Erase Operations",
+  "parts": "MX30LF2G18AC-TI",
+  "source_url": "https://www.macronix.com/Lists/ApplicationNote/Attachments/1921/AN0340V1-Preparing%20NAND%20Flash%20for%20an%20Unexpected%20Power%20Loss.pdf",
+  "resolved_url": "https://www.macronix.com/Lists/ApplicationNote/Attachments/1921/AN0340V1-Preparing%20NAND%20Flash%20for%20an%20Unexpected%20Power%20Loss.pdf",
+  "source_page": "https://www.macronix.com/en-us/support/technical-documentation/Pages/SLC-NAND-Flash.aspx",
+  "retrieved_utc": "2026-09-05T06:53:00.967393+00:00",
+  "bytes": 505569,
+  "pages": 5,
+  "sha256": "2cce64003699fb311933398581489a75ae4b660314c5ab10441248579a42eec6",
+  "note": "Device-cell behavior during interrupted program/erase; explains unstable bits even when early checksum appears valid. Companion to AN0363 recovery guidance.",
+  "first_page_excerpt": "Managing the Effects of an Unexpected Power Loss on NAND Flash Program and Erase Operations 1 P/N: AN0340 REV. 1, OCT. 21, 2014 TECHNICAL NOTE Introduction SLC NAND Flash memory is a widely adopted choice of storage media in embedded applications where it is used to store operating system images, software applications, user data, and system data. When a system is powered on, the code is normally transferred from NAND to system DRAM for execution. If during use, an application requires the NAND Flash be programmed or erased, typically the Status Register can be read to verify that the Program or Erase operation completed successfully. However, should an unexpected power loss event occur during a Program or Erase operation, not only is it possible that the operation did not complete, but the Status Register verification check may also have not occurred. In some cases, if the removal of power is towards the completion of the Erase/Program operation, the flash management software may not find checksum errors after the power is back on. Since the Erase/Program operation is not completed with Status Register checks, the blocks which received the interrupted Program or Erase operations may have “unstable bit” behavior later on. NAND Flash Program and Erase Internal Operations Compared to reading or writing from/to a DRAM, altering the content of a NAND Flash memory is a slow process. Erasing a NAND Flash block typically takes 1ms. and programming a page typically takes 300us. Structurally, each NAND Flash memory cell is a MOS transistor with a floating gate capable of retaining tr"
+}

@@ -1,0 +1,66 @@
+6-8.                                                      ID Read
+
+The device contains ID codes that identify the device type and the manufacturer. The ID READ command
+sequence includes one command Byte (90h), one address byte (00h).  The Read ID command 90h may
+provide the manufacturer ID (C2h) of one-byte and device ID (DAh for 2Gb, DCh for 4Gb) of one-byte, also
+Byte2, Byte3, and Byte4 ID code are followed.
+
+The device support ONFI Parameter Page Read, by sending the ID Read (90h) command and following one
+byte address (20h), the four-byte data returns the value of 4Fh-4Eh-46h-49h for the ASCII code of "O"-"N"-
+"F"-"I" to identify the ONFI parameter page.
+
+Table 2. ID Codes Read Out by ID Read Command 90H
+                    ID Codes                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     2Gb, x8, 3V
+                   Byte0-Manufacturer                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         C2h
+                   Byte1: Device ID                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               DAh
+                   Byte2                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            90h
+                   Byte3                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            95h
+                   Byte4                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            06h
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     4Gb, x8, 3V
+                   Byte0-Manufacturer                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         C2h
+                   Byte1: Device ID                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              DCh
+                   Byte2                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            90h
+                   Byte3                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            95h
+                   Byte4                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            56h
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      33

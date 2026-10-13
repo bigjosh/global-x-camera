@@ -1,0 +1,64 @@
+STM32N6x5xx                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            STM32N6x7xx
+
+
+                                                                                                                                              Figure 1. Power supply overview
+
+                                                                       32-bit
+                                                                          AHB                                                                                                                               Register interface                                                                                                       RCC
+                                                                             bus
+
+                                                                  PDR_ON                                                           POR/PDR                                                                                                                                                                               pwr_por_rstn
+
+                                                                                VDD                                                                                                                 BOR                                                                                                                  pwr_bor_rstn
+
+                                                                             VBAT                                           Backup domain                                                Temperature
+                                                                    V08CAP                                                                                                                  thresholds                                                                                                                   pwr_wkup
+
+                                                                                                                                                                                                     VBAT                                                                                                                pwrds
+                                                       VDDA18AON                                                             System supply                                                  thresholds
+
+                                                      VDDA18PMU                                                                                                                                 VDDCORE
+                                                             VDDSMPS                                                                     SMPS                                                   monitor
+                                                              VLXSMPS                                                              step-down
+                                                               VFBSMPS                                                              converter                                                                                                         Power
+                                                                                                                                                                                                Voltage                                      management
+                                                              VSSSMPS                                                                                                                            scaling
+                                                              VDDCORE
+
+                                                                                 VSS                                                                                                                                                                                                                                              EXTI
+
+                                                                 PWR_ON                                                       PWR control
+
+                                                                                                                                                                                                                                                                                                                    exti_wkup
+                                                      VDDA18ADC
+                                                                           VSSA                                            Analog domain
+                                                                       VREF+
+                                                                        VREF-
+
+                                                              WKUP[4:1]                                                            Wake-up                                                                                                                                                                          Wake-up event
+
+                                                                     VDDIO2
+                                                                     VDDIO3                                                                                                                pwr_pvd_wkup
+                                                                      VDDIO4                                              PVD and PVM                                                                                                                                                                               Wake-up event
+                                                                     VDDIO5                                                                                           pwr_pvm_x_wkup[5:0]                                                                                                                           Wake-up event
+
+                                                            VDD33USB
+
+                                                                                                                                                                                                                                                                                                                                           MSv70447V2
+
+3.4.1 Voltage scaling
+                                            The VCORE domain is supplied from a single voltage regulator that supports voltage scaling
+                                            with the following features:
+                                            •                                                                   Run mode voltage scaling
+                                                             –VOoSw l
+                                                             –VOiSg hh
+                                            •                                                                   Stop mode voltage scaling
+                                                             –                                                       SVOS low
+                                                             –                                                       SVOS high
+
+
+
+
+                                                                                                                                                         DS14791 Rev 10                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          25/263
+
+                                                                                                                                                                                                                                                                                                                                                                                           80

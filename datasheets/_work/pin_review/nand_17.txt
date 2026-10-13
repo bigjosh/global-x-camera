@@ -1,0 +1,61 @@
+6-2.                Page Read
+
+The MX30LFxG18AC array is accessed in Page of 2,112 bytes. External reads begins after the R/B# pin
+goes to READY.
+The Read operation may also be initiated by writing the 00h command and giving the address (column and
+row address) and being confirmed by the 30h command, the MX30LFxG18AC begins the internal read
+operation and the chip enters busy state. The data can be read out  in sequence after the chip is ready. Refer
+to the waveform for Read Operation as below.
+If the host side uses a sequential access time (tRC) of less than 30ns, the data can be latched on the next
+falling edge of RE# as the waveform of EDO mode (Figure 9-2).
+To access the data in the same page randomly, a command of 05h may be written and only column address
+following and then confirmed by E0h command.
+
+
+
+Figure 6. AC Waveforms for Read Cycle
+
+          CLE
+
+                                            tCLS           tCLH                                                                                                                                                                                       tCLS                                  tCLH
+
+
+                                          tCS
+          CE#
+
+
+                                                                                                 tWC
+
+         WE#
+
+
+                                                                            tALS
+                                                                                                                                                                                                                                        tALH                                                tAR
+                                                             tALH
+           ALE
+
+                                                                                                                                                                                                                                                                                                           tRR
+
+                                                                                                                                                                                                                                                                               tR                         tRC                                                                                tOH
+           RE#
+                                                                                                                                                                                                                                                                      tWB                                        tREA
+                                                tDS                               tDH                                                                                           tDS                 tDH                                                                              tDS                       tDH                                                                                                                                                                                                                                                                                                                                                                                                                         tDS                       tDH                                                       tDS             tDHtDS                tDHtDS                       tDH
+
+   IO[7:0]                                            00h                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    30h1st AddressCycle2nd AddressCycle3rd AddressCycle4th AddressCycle5th AddressCycleDoutDout
+
+
+
+
+        R/B#
+
+                                                                                                                                                                                                                                                                                   Busy
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                       17

@@ -1,0 +1,301 @@
+{
+  "schema_version": 1,
+  "date": "2026-09-05",
+  "scope": "ERC pin type recommendations for auxiliary devices; no connectivity or physical pin-number changes",
+  "source_native_sha256": "6da7be0451f25cee64d67e8072e4fb0b201687bf9c56cfb6292dd439a3d16aac",
+  "report": "aux-pin-map-review.md",
+  "pin_types": {
+    "U2": {
+      "1": "power_out",
+      "2": "passive",
+      "3": "passive",
+      "4": "open_collector",
+      "5": "input",
+      "6": "power_in",
+      "7": "input",
+      "8": "input",
+      "9": "input",
+      "10": "power_in",
+      "11": "power_in",
+      "12": "power_in",
+      "13": "input",
+      "14": "input",
+      "15": "power_in",
+      "16": "power_in",
+      "17": "power_in"
+    },
+    "U4": {
+      "1": "power_in",
+      "2": "power_in",
+      "3": "input",
+      "4": "passive",
+      "5": "power_out"
+    },
+    "U7": {
+      "1": "input",
+      "2": "open_collector",
+      "3": "input",
+      "4": "power_in",
+      "5": "power_out",
+      "6": "power_in"
+    },
+    "U8": {
+      "1": "output",
+      "2": "open_collector",
+      "3": "input",
+      "4": "bidirectional",
+      "5": "power_in",
+      "6": "power_in",
+      "7": "power_in",
+      "8": "input"
+    },
+    "U9": {
+      "1": "power_in",
+      "2": "power_in",
+      "3": "input",
+      "4": "passive",
+      "5": "power_out"
+    },
+    "U10": {
+      "1": "power_out",
+      "2": "power_in",
+      "3": "input",
+      "4": "power_in",
+      "5": "power_in"
+    },
+    "U11": {
+      "1": "input",
+      "2": "input",
+      "3": "bidirectional",
+      "4": "bidirectional",
+      "5": "passive",
+      "6": "power_in",
+      "7": "power_in",
+      "8": "power_in",
+      "9": "power_in",
+      "10": "power_in",
+      "11": "bidirectional",
+      "12": "output"
+    },
+    "U12": {
+      "1": "power_in",
+      "2": "power_in",
+      "3": "input",
+      "4": "output",
+      "5": "passive",
+      "6": "power_out"
+    },
+    "Q1": {
+      "1": "input",
+      "2": "passive",
+      "3": "passive"
+    },
+    "Q3": {
+      "1": "input",
+      "2": "passive",
+      "3": "passive"
+    },
+    "Q2": {
+      "1": "input",
+      "2": "passive",
+      "3": "passive"
+    },
+    "D1": {
+      "1": "passive",
+      "2": "power_in",
+      "3": "passive",
+      "4": "passive",
+      "5": "power_in",
+      "6": "passive"
+    },
+    "D2": {
+      "2": "passive",
+      "1": "passive"
+    },
+    "D3": {
+      "1": "passive",
+      "2": "passive"
+    },
+    "LED1": {
+      "2": "passive",
+      "1": "passive"
+    },
+    "SW1": {
+      "1": "passive",
+      "2": "passive"
+    },
+    "SW2": {
+      "1": "passive",
+      "2": "passive"
+    },
+    "SW3": {
+      "1": "passive",
+      "2": "passive"
+    },
+    "J1": {
+      "B1_A12": "passive",
+      "A1_B12": "passive",
+      "A7": "passive",
+      "SH1": "passive",
+      "B7": "passive",
+      "A5": "passive",
+      "A6": "passive",
+      "SH2": "passive",
+      "SH3": "passive",
+      "B6": "passive",
+      "B5": "passive",
+      "A4_B9": "passive",
+      "A8": "passive",
+      "B4_A9": "passive",
+      "B8": "passive",
+      "SH4": "passive"
+    },
+    "J2": {
+      "6": "passive",
+      "2": "passive",
+      "3": "passive",
+      "4": "passive",
+      "1": "passive",
+      "5": "passive"
+    },
+    "J3": {
+      "29": "passive",
+      "15": "passive",
+      "13": "passive",
+      "26": "passive",
+      "4": "passive",
+      "9": "passive",
+      "7": "passive",
+      "25": "passive",
+      "30": "passive",
+      "2": "passive",
+      "5": "passive",
+      "1": "passive",
+      "27": "passive",
+      "14": "passive",
+      "6": "passive",
+      "21": "passive",
+      "28": "passive",
+      "20": "passive",
+      "24": "passive",
+      "22": "passive",
+      "8": "passive",
+      "23": "passive",
+      "10": "passive",
+      "3": "passive",
+      "17": "passive",
+      "11": "passive",
+      "19": "passive",
+      "16": "passive",
+      "18": "passive",
+      "12": "passive"
+    },
+    "Y1": {
+      "1": "passive",
+      "3": "passive",
+      "4": "passive",
+      "2": "passive"
+    }
+  },
+  "type_notes": {
+    "open_collector": "KiCad token used for open-drain outputs as well as open-collector outputs.",
+    "U2.1_2_3_and_U7.5": "U2 pins1/2/3 are physical terminals of one switch-node output on BUCK3V3_SW. For ERC keep pin1 power_out and model duplicate pins2/3 passive. U7.5 remains power_out. These are switching nodes, not regulated DC rail labels; inductors remain passive.",
+    "U10.5": "Native library numbering for unnumbered manufacturer EPAD; retained and typed power_in for required GND connection.",
+    "U4.4_U9.4_U11.5": "Manufacturer allows these NC terminals to be tied to a supply/ground as described; passive preserves that permission rather than forbidding connections.",
+    "U11.3": "SDO output or SA0 address input; bidirectional represents both roles.",
+    "U11.11": "INT2 output or external clock input in the supported special mode; bidirectional.",
+    "U11.7": "RES must connect to GND; power_in is a conservative schematic ground-connection model.",
+    "U12.4": "CT sources the timing-capacitor charge; output follows manufacturer I/O table.",
+    "U12.5": "QOD is an internally resistive switched discharge path to GND. Model passive for ERC to represent this analog terminal and the datasheet-supported direct VOUT tie; it is not a power source. Supersedes the initial open_collector abstraction.",
+    "J1_J2_J3": "Connector contacts are passive boundary connections; the peripheral on either side determines drive direction.",
+    "LED1": "Both pins passive. Reconciled physical pad 1=STATUS_LED_K and 2=STATUS_LED_A agree with footprint cathode marking. Duplicate-name EDIF aliases are not physical pin numbers."
+  },
+  "findings": [
+    {
+      "id": "AUX-001",
+      "reference": "U7",
+      "status": "confirmed_type_error",
+      "details": "Native SW pin 5 is powerIn; recommended power_out."
+    },
+    {
+      "id": "AUX-003",
+      "reference": "U7/U10",
+      "status": "known_footprint_override_dependency",
+      "details": "Effective Flux board has footprint copper corrections; cached source payload alone does not reproduce them."
+    }
+  ],
+  "resolved_findings": [
+    {
+      "id": "AUX-002",
+      "reference": "LED1",
+      "status": "resolved_alias_mapping_error",
+      "details": "Initial audit inferred physical pad numbers from duplicate-name EDIF ordering. Native canonical net anchor establishes pad 1=STATUS_LED_K; remaining group member gives pad 2=STATUS_LED_A. Source polarity agrees with footprint; probable defect finding withdrawn.",
+      "evidence": "connectivity.json components.LED1.pins"
+    }
+  ],
+  "connectivity_source": "connectivity.json",
+  "erc_review": {
+    "initial_findings": {
+      "total_errors": 15,
+      "undriven_rails": 7,
+      "duplicate_switch_output_conflicts": 7,
+      "supported_qod_vout_connection_conflict": 1
+    },
+    "model_adjustments": [
+      {
+        "reference": "U2",
+        "pins": {
+          "1": "power_out",
+          "2": "passive",
+          "3": "passive"
+        },
+        "required_common_net": "BUCK3V3_SW",
+        "reason": "Same internal switch output with multiple physical terminals; retain one ERC driver and passive duplicates."
+      },
+      {
+        "reference": "U1",
+        "pins": {
+          "J1": "power_out",
+          "J2": "passive",
+          "J3": "passive",
+          "J4": "passive",
+          "J5": "passive",
+          "J6": "passive"
+        },
+        "required_common_net": "MCU_SMPS_SW",
+        "reason": "Duplicate terminals of the internal SMPS switch output; recommendation for generator MCU model, not inserted into auxiliary pin_types."
+      },
+      {
+        "reference": "U12",
+        "pins": {
+          "5": "passive",
+          "6": "power_out"
+        },
+        "required_common_net": "ACCEL_1V8_SW",
+        "reason": "Analog QOD discharge terminal tied directly to VOUT, explicitly supported by TI TPS22918 p13 section8.3.2."
+      }
+    ],
+    "power_flag_nets": [
+      "SYS_IN",
+      "3V3",
+      "1V8",
+      "VCORE_0V81",
+      "USB_VBUS",
+      "BAT_CELL1_TAP",
+      "GND",
+      "BAT_PLUS"
+    ],
+    "power_flag_reasons": {
+      "SYS_IN": "Supply downstream of passive MOSFET/diode paths.",
+      "3V3": "Regulated output side of L1.",
+      "1V8": "Regulated output side of L2.",
+      "VCORE_0V81": "Regulated output side of L3.",
+      "USB_VBUS": "External USB supply.",
+      "BAT_CELL1_TAP": "External always-on RTC battery tap.",
+      "GND": "Common external supply return.",
+      "BAT_PLUS": "External battery source; no initial undriven-power report at passive endpoint, but source annotation is appropriate."
+    },
+    "no_global_erc_suppression": true,
+    "validation_required": "Rerun ERC after specific model/source annotations and compare exported netlist against reconciled physical connectivity."
+  }
+}

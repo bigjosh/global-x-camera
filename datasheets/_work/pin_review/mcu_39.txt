@@ -1,0 +1,52 @@
+STM32N6x5xx                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            STM32N6x7xx
+
+
+                                       The main DMA2D features are:
+                                       •                                                                   Single AXI controller bus architecture
+                                       •                                                                     AHB target programming interf  ace supporting 8-,16-,32-bit accesses (except for CLUT
+                                                      accesses which are 32-bit)
+                                       •                                                                   User-programmable working area size
+                                       •                                                                   User-programmable offset for sources and   destination areas expressed in pixels or
+                                                      bytes
+                                       •                                                                   User-programmable sources and destinati   on addresses on the whole memory space
+                                       •                                                                   Up to two sources with blending operation
+                                       •                                                                   Alpha value that can be modified (source value, fixed value, or modulated value)
+                                       •                                                                   User programmable source and destination color format
+                                       •                                                                   Up to 12 color formats supported, from 4- up    to 32-bit per pixel with indirect or direct
+                                                      color coding
+                                       •                                                                  Block based (8x8) YCbCr support with 4:4:4, 4:2:2 and 4:2:0 chroma sub-sampling
+                                                      factors
+                                       •                                                                   Two internal memories for CLUT  storage in indirect color mode
+                                       •                                                                   Automatic CLUT loading or CLUT programming via the CPU
+                                       •                                                                   User programmable CLUT size
+                                       •                                                                   Internal timer to  control AXI   bandwidth
+                                       •                                                                   Operating modes:
+                                                      –                                                       Register-to-memory
+                                                      –                                                       Memory-to-memory
+                                                      –                                                        Memory-to-memory with pixel format conversion
+                                                      –                                                        Memory-to-memory with pixel format conversion and blending
+                                                      –                                                       Memory-to memory with pixel format  conversion, blending, and fixed color
+                                                                    foreground
+                                                      –                                                       Memory-to memory with pixel format  conversion, blending, and fixed color
+                                                                    background
+                                       •                                                                   Area filling with a fixed color
+                                       •                                                                   Copy from an area to another
+                                       •                                                                   Copy with pixel format conversion between source and destination images
+                                       •                                                                   Copy from two sources with indepe  ndent color format and blending
+                                       •                                                                   Output buffer byte swapping to support refresh of displays through parallel interface
+                                       •                                                                  Abort and suspend of DMA2D operations
+                                       •                                                                  Watermark interrupt on a user programmable destination line
+                                       •                                                                  Interrupt generation on bus error or access conflict
+                                       •                                                                  Interrupt generation on process completion
+
+3.12 Chrom-GRC (GFXMMU)
+
+                                       The Chrom-GRC (GFXMMU) is a graphical oriented memory management unit aimed to
+                                       optimize memory usage according to the display shape. Main features are:
+                                       •                                                                   Fully programmable display shape to phys   ically store only the visible pixel
+
+
+
+                                                                                                                                       DS14791 Rev 10                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          39/263
+
+                                                                                                                                                                                                                                                                                                                                              80

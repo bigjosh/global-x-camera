@@ -1,0 +1,14 @@
+{
+  "path": "memory/Macronix_AN0278_bad_block_information.pdf",
+  "title": "Macronix AN0278 Bad Block Information Introduction",
+  "parts": "MX30LF2G18AC-TI",
+  "source_url": "https://www.macronix.com/Lists/ApplicationNote/Attachments/1909/AN0278V1%2520-%2520BB%2520information%2520introduction.pdf",
+  "resolved_url": "https://www.macronix.com/Lists/ApplicationNote/Attachments/1909/AN0278V1%2520-%2520BB%2520information%2520introduction.pdf",
+  "source_page": "https://www.macronix.com/en-us/support/technical-documentation/Pages/SLC-NAND-Flash.aspx",
+  "retrieved_utc": "2026-09-05T06:49:04.675003+00:00",
+  "bytes": 208553,
+  "pages": 4,
+  "sha256": "bcc8aba3c52fe4ce83e900f9c35477ccf1ebc571480fe5c01c26cd7f215c8900",
+  "note": "Factory bad-block markers and bad-block table creation; exact device datasheet controls.",
+  "first_page_excerpt": "APPLICATION NOTE Bad Block Information Introduction P/N: AN-0278 Ver.:01, Nov. 19, 2013 1 1. Introduction Today, NAND flash is used in many fields, such as c onsumer, industrial, and automotive. Compared with NOR flash, NAND flash has the advantage of ava ilability at higher densities and lower cost per bit. However, NAND flash has the disadvantage of requiring system management of bad blocks, while NOR flash does not. This application note describes how Macronix marks bad blocks in NAND flash and recommends the creation and usage of a bad block table to properly manage bad blocks. 2. Initial Bad Block Marker NAND flash cell structure is different from NOR flash and is allowed to ship with up to 2% of its blocks initially marked as bad. Bad blocks should never be used again for data storage. It is necessary to know how the flash vendor marks bad blocks before a system can locate and avoid using them. Macronix follows the industry standard method of ma rking bad blocks by programming non-FFh data into the 1 st byte of the 1 st or 2 nd page of a block’s spare area. Figure 2-1 shows the initial bad block marker location in the spare area. Figure 2-1: Macronix NAND flash Memory Array Structure 3. Bad Block Table Build Up Although the initial bad blocks are marked by the flash vendor, they could be inadvertently erased and destroyed by a user that does not pay attention to them. To prevent this from occurring, it is necessary to always know where any bad blocks are located. Co ntinually checking for bad block markers during normal use would be very time consuming, so it is h igh"
+}

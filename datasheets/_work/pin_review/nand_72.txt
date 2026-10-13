@@ -1,0 +1,56 @@
+ 8-2-1. WP# Signal
+
+ WP# going Low can cause program and erase operations automatically reset.
+ The enabling & disabling of the both operations are as below:
+
+
+Figure 45-1. Enable Programming of WP# Signal                   WE#
+
+
+                                                               IO[7:0]                 80h             10h
+
+
+                                                                WP#                  tWW
+
+
+
+
+Figure 45-2. Disable Programming of WP# Signal                  WE#
+
+
+                                                               IO[7:0]                 80h             10h
+
+
+                                                                                    tWW
+                                                                WP#
+
+
+
+Figure 45-3. Enable Erasing of WP# Signal                       WE#
+
+
+                                                               IO[7:0]                 60h             D0h
+
+
+                                                                WP#                 tWW
+
+
+
+
+Figure 45-4. Disable Erasing of WP# Signal                      WE#
+
+
+                                                              IO[7:0]                  60h             D0h
+
+
+                                                                                    tWW
+                                                                WP#
+
+
+
+
+
+
+
+
+                                                          72

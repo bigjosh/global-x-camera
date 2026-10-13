@@ -1,0 +1,62 @@
+                                                                                                   W25Q128JV
+
+
+8.2.32   Individual Block/Sector Lock (36h)
+The Individual Block/Sector Lock provides an alternative way to protect the memory array from adverse
+Erase/Program. In order to use the Individual Block/Sector Locks, the WPS bit in Status Register-3 must
+be  set to 1. If WPS=0, the write protection will be determined by the combination of CMP, SEC, TB,
+BP[2:0] bits in the Status Registers. The Individual Block/Sector Lock bits are volatile bits. The default
+values after device power up or after a Reset are 1, so the entire memory array is being protected.
+
+To lock a specific block or sector as illustrated in Figure 4d, an Individual Block/Sector Lock command
+must be issued by driving /CS low, shifting the instruction code “36h” into the Data Input (DI) pin on the
+rising edge of CLK, followed by a 24-bit address and then driving /CS high. A Write Enable instruction
+must be executed before the device will accept the Individual Block/Sector Lock Instruction (Status
+Register bit WEL= 1).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                       Figure 53a. Individual Block/Sector Lock Instruction
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                             - 55 -

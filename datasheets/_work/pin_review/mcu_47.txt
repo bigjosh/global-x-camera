@@ -1,0 +1,60 @@
+STM32N6x5xx                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            STM32N6x7xx
+
+
+                                 •                                                                   Interrupt generation at ADC ready, the end of sampling, the end of conversion (regular
+                                              or injected), end of sequence conversion (reg   ular or injected), analog watchdog 1, 2 or
+                                              three or overrun events
+                                 •                                                                   Three analog watchdogs per ADC
+                                 •                                                                   Input range: V SSA ≤ VIN ≤ VREF+
+
+3.21                                                                                             Digital temperature sensor (DTS)
+
+                                 The DTS is a high precision low-power juncti   on temperature sensor (TS), composed of a
+                                 configurable controller plus two embedded temperature sensors (TS0 and TS1). The
+                                 controller features a generic interface that enables the DTS to be accessed in read and
+                                 write modes, through the APB bus.
+                                 The main features are:
+                                 •                                                                   For each temperature sensor, two progra  mmable (rise or fall) hardware alarms
+                                              incorporating hysteresis and status regi sters recording the minimum and maximum
+                                              data values received
+                                 •                                                                   A power-up timer with IRQ to support manual operation
+
+3.22 Voltage reference buffer (VREFBUF)
+
+                                 The devices embed a voltage reference buffer   supporting 1.21 and 1.5 V, which can be
+                                 used as reference for ADCs and for external components through the VREF+ pin.
+
+                                                                                                         Figure 6. VREFBUF block diagram
+
+
+
+                                                                       VREFINT                                         +
+                                                                                                                                                                                                     VREF+
+
+                                                                                                                       -
+
+
+
+
+
+
+
+
+
+                                                                                                                                                              VSSA                                                                                        MSv64430V2
+
+
+3.23                                                                                            Multi-function digital filter (MDF)
+
+                                 The multi-function digital filter (MDF) is a high performance module dedicated to the
+                                 connection of external sigma-delta ( Σ∆) modulators, mainly for audio capture signals, motor
+                                 control, and metering.
+                                 The MDF features six digital serial interfaces (SITFx) and digital filters (DFLTx) with flexible
+                                 digital processing options to offer up to 24-bit final resolution.
+                                 The DFLTx of the MDF also include the f  ilters of the audio digital filter (ADF).
+
+
+
+                                                                                                                    DS14791 Rev 10                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          47/263
+
+                                                                                                                                                                                                                                                                                               80

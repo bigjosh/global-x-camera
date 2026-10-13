@@ -1,0 +1,55 @@
+STM32N6x5xx                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            STM32N6x7xx
+
+
+                                •                                                                   One set of write-only and lockable 256-bit    controller key register s per block cipher
+                                            (normal, fast)
+                                •                                                                   Two sets of lockable cipher contexts (128-bit key, IV), usable for stream and block
+                                            ciphers
+                                •                                                                   Optimization for XSPI data  pre-fetching mechanism  (stream cipher only)
+                                •                                                                  Read-write arbitration scheme, for better read performances
+                                •                                                                   AHB configuration port
+                                •                                                                   AXI system bus controller/target interfaces (64-bit)
+                                            –                                                        Support for any AXI-64bit read transactions
+                                            –                                                           When encryption is enabled, support for AXI -64bit INCRx (x = 1 to 8) and WRAPx
+                                                        (x = 4) write transactions
+
+3.37                                                                                             Public key accelerator (PKA)
+
+                                PKA (public key accelerator) is intended for the computation of cryptographic public key
+                                primitives, specifically thos e related to RSA, Diffie-He llmann or ECC (elliptic curve
+                                cryptography) over GF(p) (Galois fields). To    achieve high performance at a reasonable cost,
+                                these operations are executed in the Montgomery domain.
+                                This function is available only on  STM32N655xx and STM32N657xx devices.
+                                For a given operation, all needed computations are performed within the accelerator, so no
+                                further hardware/software elaboration is ne  eded to process the inputs or the outputs.
+                                When manipulating secrets, the PKA incorporat  es a protection against side-channel attacks
+                                (SCA), including differential power analysis   (DPA), certified SESIP and PSA security
+                                assurance level 3.
+                                PKA main features are:
+                                •                                                                   Acceleration of RSA, DH and ECC over GF  (p) operations, based on the Montgomery
+                                            method for fast modu lar multiplications:
+                                            –                                                        RSA modular exponentiation, RSA chinese remainder theorem (CRT)
+                                                        exponentiation
+                                            –                                                        ECC scalar multiplication, point on curve check, complete addition, double base
+                                                        ladder, projective to affine
+                                            –                                                        ECDSA signature generation and verification
+                                •                                                                   Capability to handle operands  up to 4160 bits for RSA/DH and 640 bits for ECC
+                                •                                                                  When manipulating secrets: protection against side-channel attacks (SCA), including
+                                            differential power analysis (DPA), certifi ed SESIP and PSA security  assurance level 3
+                                •                                                                     Applicable to modular exponentiation, ECC    scalar multiplication and ECDSA signature
+                                            generation
+                                •                                                                   Arithmetic and modular operations such as    addition, subtractio n, multiplication,
+                                            modular reduction, modular inversion, co  mparison, and Montgomery multiplication
+                                •                                                                   Built-in Montgomery domain inward and outward transformations
+                                •                                                                   AMBA AHB target peripheral, accessible through 32-bit word single accesses only
+                                            (otherwise an AHB bus error is generated, and write accesses are ignored)
+
+
+
+
+
+
+
+                                                                                                                DS14791 Rev 10                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          59/263
+
+                                                                                                                                                                                                                                                                                    80

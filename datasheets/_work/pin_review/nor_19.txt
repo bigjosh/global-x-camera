@@ -1,0 +1,51 @@
+                                                                                                W25Q128JV
+
+
+
+7.1.8      W25Q128JV Status Register Memory Protection (WPS = 0, CMP = 0)
+
+     STATUS REGISTER(1)                         W25Q128JV (128M-BIT) MEMORY PROTECTION(3)
+
+SEC     TB     BP2     BP1      BP0     PROTECTED               PROTECTED               PROTECTED          PROTECTED
+                                          BLOCK(S)              ADDRESSES                 DENSITY           PORTION(2)
+
+ X       X       0       0       0          NONE                    NONE                    NONE               NONE
+ 0       0       0       0       1       252 thru 255       FC0000h – FFFFFFh               256KB           Upper 1/64
+ 0       0       0       1       0       248 thru 255       F80000h – FFFFFFh               512KB           Upper 1/32
+ 0       0       0       1       1       240 thru 255       F00000h – FFFFFFh                1MB            Upper 1/16
+ 0       0       1       0       0       224 thru 255       E00000h – FFFFFFh                2MB             Upper 1/8
+ 0       0       1       0       1       192 thru 255       C00000h – FFFFFFh                4MB             Upper 1/4
+ 0       0       1       1       0       128 thru 255       800000h – FFFFFFh                8MB             Upper 1/2
+
+ 0       1       0       0       1          0 thru 3        000000h – 03FFFFh               256KB           Lower 1/64
+ 0       1       0       1       0          0 thru 7        000000h – 07FFFFh               512KB           Lower 1/32
+ 0       1       0       1       1         0 thru 15        000000h – 0FFFFFh                1MB            Lower 1/16
+ 0       1       1       0       0         0 thru 31        000000h – 1FFFFFh                2MB             Lower 1/8
+ 0       1       1       0       1         0 thru 63        000000h – 3FFFFFh                4MB             Lower 1/4
+ 0       1       1       1       0        0 thru 127        000000h – 7FFFFFh                8MB             Lower 1/2
+ X       X       1       1       1        0 thru 255        000000h – FFFFFFh               16MB                ALL
+
+ 1       0       0       0       1            255           FFF000h – FFFFFFh                4KB            U - 1/4096
+ 1       0       0       1       0            255           FFE000h – FFFFFFh                8KB            U - 1/2048
+
+ 1       0       0       1       1            255           FFC000h – FFFFFFh               16KB            U - 1/1024
+ 1       0       1       0       X            255           FF8000h – FFFFFFh               32KB             U - 1/512
+
+ 1       1       0       0       1             0            000000h – 000FFFh                4KB             L - 1/4096
+ 1       1       0       1       0             0            000000h – 001FFFh                8KB             L - 1/2048
+
+ 1       1       0       1       1             0            000000h – 003FFFh               16KB             L - 1/1024
+
+ 1       1       1       0       X             0            000000h – 007FFFh               32KB             L - 1/512
+
+Notes:
+  3.  X = don’t care
+  4.  L = Lower; U = Upper
+  5.  If any Erase or Program command specifies a memory region that contains protected data portion, this
+      command will be ignored.
+
+
+
+
+                                                                     Publication Release Date: December 24, 2024
+                                                         - 18 -                                           Revision M

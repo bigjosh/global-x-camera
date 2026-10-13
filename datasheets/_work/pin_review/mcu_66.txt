@@ -1,0 +1,52 @@
+Functional overview                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    STM32N6x5xx STM32N6x7xx
+
+
+                                •                                                                   The RTC is functional in VBAT mode and in all low-power modes when clocked by the
+                                            LSE.
+                                •                                                                   All RTC events (alarm, wake-up timer, timestamp) can generate an interrupt and wake
+                                            up the device from the low-power modes.
+
+3.42                                                                                            Tamper and backup registers (TAMP)
+
+                                The anti-tamper detection circuit is used to pr  otect sensitive data from external attacks.
+                                32 32-bit backup registers are retained in all low-power modes and in V    BAT mode. The
+                                backup registers, as well as ot her secrets in the device, are protected by this anti-tamper
+                                detection circuit with eight tamper pins and t  en internal tampers. The external tamper pins
+                                can be configured for edge or level detection with    or without filtering, or active tamper, which
+                                increases the security level by auto checking   that the tamper pins are not externally opened
+                                or shorted.
+                                TAMP main features:
+                                •                                                                   A tamper detection can erase the back   up registers, backup SRAM, SRAM2,
+                                            cryptographic peripherals. The protect  ed resources are named “device secrets”.
+                                •                                                                  32 32-bit backup registers:
+                                            –                                                               The backup registers (TAMP_BKPxR) are implemented in the backup domain that
+                                                        remains powered-on by V BAT when the VDD power is switched off.
+                                •                                                                   Up to seven tamper pins for seven external tamper detection events:
+                                            –                                                        Active tamper mode: continuous comparis  on between tamper output and input to
+                                                        protect from physical open-short attacks.
+                                            –                                                           Flexible active tamper I/O management: from four meshes (each input associated
+                                                        to its own exclusive output) to 7 meshes (single output shared for up to seven
+                                                        tamper inputs)
+                                            –                                                        Passive tampers: ultra-low power edge    or level detection wit h internal pull-up
+                                                        hardware management.
+                                            –                                                        Configurable digital filter.
+                                •                                                                   Ten internal tamper events to protect against transient or environmental perturbation
+                                            attacks
+                                •                                                                   Each tamper can be configured in two modes:
+                                            –                                                        Confirmed mode: immediate erase of se  crets on tamper detection, including
+                                                        backup registers erase
+                                            –                                                        Potential mode: most of the secrets   erase following a tamper detection are
+                                                        launched by software
+                                •                                                                   Any tamper detection can generate a RTC timestamp event.
+                                •                                                                   TrustZone support:
+                                            –                                                        Tamper secure or non-secure configuration
+                                            –                                                        Backup registers configuration in three configurable-size areas:
+                                •                                                                   One read/write secure area
+                                •                                                                   One write secure/read non-secure area
+                                •                                                                  Put configurable-size areas in a menu
+                                •                                                                   One read/write non-secure area
+
+
+
+
+66/263                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          DS14791 Rev 10

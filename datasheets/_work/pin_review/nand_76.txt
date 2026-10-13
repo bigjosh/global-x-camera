@@ -1,0 +1,73 @@
+Figure 50. Erase Flow Chart
+
+                                                                                 Start
+
+
+                                                                          Command 60h
+
+
+                                                                       Set Block Address
+
+
+                                                                         Command D0h
+
+
+                                                                     Read Status Register
+
+
+
+                                                                              SR[6] = 1 ?              No
+                                                                           (or R/B# = 1 ?)
+
+
+                                                                                     Yes
+
+                                                                             SR[0] = 0 ?               No                                            *Erase Error
+
+
+                                                                                     Yes
+
+                                                                         Erase Completed
+
+                                         *    The failed blocks will be identified and given errors
+                                              in status register bits for attempts on erasing them.
+Figure 51. Read Flow Chart
+
+
+                                                                               Start
+
+
+                                                                         Command 00h
+
+
+                                                                          Set Address
+
+
+                                                                         Command 30h
+
+                                                                     Read Status Register
+
+
+
+                                                                            SR[6] = 1 ?          No
+                                                                          (or R/B# = 1 ?)
+
+                                                                                     Yes
+
+                                                                         Read Data Out
+
+
+                                                                         ECC Generation
+
+
+                                      ECC handling
+                                      by the host controller              Verify ECC             No      Reclaim the Error
+
+
+                                                                                  Yes
+
+                                                                     Page Read Completed
+
+
+
+                                                                                76

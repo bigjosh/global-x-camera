@@ -1,0 +1,153 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1560" viewBox="0 0 1600 1560">
+<title>LTC3621 fixed 3.3 V regulator with a pushbutton and GPIO hold diode</title>
+<desc>Two panels connected by named RUN, BAT+ and GND nets. Power-stage pins use the MS8E package numbering. MODE/SYNC is connected to INTVCC for Burst Mode. A normally open button and resistor divider start RUN; a BAS116 diode holds RUN from a 3.3 V GPIO. STM32N6 sequencing and USB source control are not implemented in this diagram.</desc>
+<rect width="100%" height="100%" fill="white"/>
+<text x="55" y="58.7" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="35" font-weight="700" text-anchor="start" fill="#172c43">LTC3621 pushbutton power latch</text>
+<text x="55" y="98.03999999999999" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="22" font-weight="400" text-anchor="start" fill="#586777">8–13.2 V input  |  Fixed 3.3 V output  |  250 mA illustrative load  |  Common ground</text>
+<rect x="40" y="135" width="1520" height="590" fill="#fbfdff" stroke="#d1dce5" stroke-width="2"/>
+<text x="65" y="173.86" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="23" font-weight="700" text-anchor="start" fill="#175a83">1  POWER STAGE</text>
+<text x="600" y="213.86" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="23" font-weight="700" text-anchor="start" fill="#172c43">U_PWR  LTC3621EMS8E-3.3#PBF</text>
+<rect x="610" y="250" width="360" height="370" fill="#f3f7fb" stroke="#172c43" stroke-width="2"/>
+<text x="790" y="283.76" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="18" font-weight="400" text-anchor="middle" fill="#586777">MS8E + exposed pad</text>
+<text x="630" y="317.22" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="21" font-weight="700" text-anchor="start" fill="#175a83">2  VIN</text>
+<text x="630" y="397.22" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="21" font-weight="700" text-anchor="start" fill="#172c43">3  RUN</text>
+<text x="630" y="557.22" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="21" font-weight="700" text-anchor="start" fill="#172c43">4  PGOOD</text>
+<text x="950" y="317.22" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="21" font-weight="700" text-anchor="end" fill="#175a83">SW  1</text>
+<text x="950" y="397.22" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="21" font-weight="700" text-anchor="end" fill="#172c43">FB  5</text>
+<text x="950" y="477.22" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="21" font-weight="700" text-anchor="end" fill="#172c43">INTVCC  6</text>
+<text x="950" y="557.22" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="21" font-weight="700" text-anchor="end" fill="#172c43">MODE/SYNC  7</text>
+<text x="715" y="607.58" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="19" font-weight="700" text-anchor="middle" fill="#172c43">SGND  8</text>
+<text x="865" y="607.58" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="19" font-weight="700" text-anchor="middle" fill="#172c43">GND  EP9</text>
+<text x="90" y="273.86" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="23" font-weight="700" text-anchor="start" fill="#175a83">BAT+</text>
+<text x="90" y="297.58" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="19" font-weight="400" text-anchor="start" fill="#175a83">8–13.2 V</text>
+<polyline points="90,310 610,310" fill="none" stroke="#175a83" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="310" cy="310" r="5" fill="#175a83"/>
+<polyline points="310,310 310,384.0" fill="none" stroke="#175a83" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="290,384.0 330,384.0" fill="none" stroke="#175a83" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="290,396.0 330,396.0" fill="none" stroke="#175a83" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="310,396.0 310,470" fill="none" stroke="#175a83" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="342" y="382.4" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="20" font-weight="700" text-anchor="start" fill="#175a83">C_IN</text>
+<text x="342" y="412.4" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="20" font-weight="400" text-anchor="start" fill="#175a83">10 µF · 25 V</text>
+<polyline points="294,470 326,470" fill="none" stroke="#172c43" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="299,477 321,477" fill="none" stroke="#172c43" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="305,484 315,484" fill="none" stroke="#172c43" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="500,390 610,390" fill="none" stroke="#127569" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="525" y="361.04" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="22" font-weight="700" text-anchor="end" fill="#127569">RUN</text>
+<text x="525" y="382.76" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="18" font-weight="400" text-anchor="end" fill="#586777">from panel 2</text>
+<polyline points="580,550 610,550" fill="none" stroke="#172c43" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="572,542 588,558" fill="none" stroke="#172c43" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="572,558 588,542" fill="none" stroke="#172c43" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="555" y="553.76" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="18" font-weight="400" text-anchor="end" fill="#586777">NC</text>
+<polyline points="715,620 715,660" fill="none" stroke="#172c43" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="699,660 731,660" fill="none" stroke="#172c43" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="704,667 726,667" fill="none" stroke="#172c43" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="710,674 720,674" fill="none" stroke="#172c43" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="865,620 865,660" fill="none" stroke="#172c43" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="849,660 881,660" fill="none" stroke="#172c43" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="854,667 876,667" fill="none" stroke="#172c43" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="860,674 870,674" fill="none" stroke="#172c43" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="970,310 1040,310" fill="none" stroke="#175a83" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="1040.0,310.0 1041.4,306.5584417691149 1042.8,303.20162612375117 1044.2,300.01220900572997 1045.6,297.0687244495656 1047.0,294.44365081389594 1048.4,292.20162612375117 1049.8,290.3978564678559 1051.2,289.0767566415066 1052.6,288.27085650690697 1054.0,288.0 1055.4,288.27085650690697 1056.8,289.0767566415066 1058.2,290.3978564678559 1059.6,292.20162612375117 1061.0,294.44365081389594 1062.4,297.0687244495656 1063.8,300.01220900572997 1065.2,303.20162612375117 1066.6,306.5584417691149 1068.0,310.0 1068.0,310.0 1069.4,306.5584417691149 1070.8,303.20162612375117 1072.2,300.01220900572997 1073.6,297.0687244495656 1075.0,294.44365081389594 1076.4,292.20162612375117 1077.8,290.3978564678559 1079.2,289.0767566415066 1080.6,288.27085650690697 1082.0,288.0 1083.4,288.27085650690697 1084.8,289.0767566415066 1086.2,290.3978564678559 1087.6,292.20162612375117 1089.0,294.44365081389594 1090.4,297.0687244495656 1091.8,300.01220900572997 1093.2,303.20162612375117 1094.6,306.5584417691149 1096.0,310.0 1096.0,310.0 1097.4,306.5584417691149 1098.8,303.20162612375117 1100.2,300.01220900572997 1101.6,297.0687244495656 1103.0,294.44365081389594 1104.4,292.20162612375117 1105.8,290.3978564678559 1107.2,289.0767566415066 1108.6,288.27085650690697 1110.0,288.0 1111.4,288.27085650690697 1112.8,289.0767566415066 1114.2,290.3978564678559 1115.6,292.20162612375117 1117.0,294.44365081389594 1118.4,297.0687244495656 1119.8,300.01220900572997 1121.2,303.20162612375117 1122.6,306.5584417691149 1124.0,310.0 1124.0,310.0 1125.4,306.5584417691149 1126.8,303.20162612375117 1128.2,300.01220900572997 1129.6,297.0687244495656 1131.0,294.44365081389594 1132.4,292.20162612375117 1133.8,290.3978564678559 1135.2,289.0767566415066 1136.6,288.27085650690697 1138.0,288.0 1139.4,288.27085650690697 1140.8,289.0767566415066 1142.2,290.3978564678559 1143.6,292.20162612375117 1145.0,294.44365081389594 1146.4,297.0687244495656 1147.8,300.01220900572997 1149.2,303.20162612375117 1150.6,306.5584417691149 1152.0,310.0" fill="none" stroke="#175a83" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="1096" y="256.22" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="21" font-weight="700" text-anchor="middle" fill="#175a83">L_PWR</text>
+<text x="1096" y="284.22" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="21" font-weight="400" text-anchor="middle" fill="#175a83">6.8 µH</text>
+<polyline points="1152,310 1460,310" fill="none" stroke="#175a83" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="1450" y="271.86" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="23" font-weight="700" text-anchor="end" fill="#175a83">3V3_MAIN</text>
+<text x="1450" y="297.58" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="19" font-weight="400" text-anchor="end" fill="#175a83">3.3 V</text>
+<circle cx="1190" cy="310" r="5" fill="#175a83"/>
+<polyline points="1190,310 1190,390 970,390" fill="none" stroke="#175a83" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="1270" cy="310" r="5" fill="#175a83"/>
+<polyline points="1270,310 1270,364.0" fill="none" stroke="#175a83" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="1250,364.0 1290,364.0" fill="none" stroke="#175a83" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="1250,376.0 1290,376.0" fill="none" stroke="#175a83" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="1270,376.0 1270,430" fill="none" stroke="#175a83" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="1302" y="362.4" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="20" font-weight="700" text-anchor="start" fill="#175a83">C_OUT</text>
+<text x="1302" y="392.4" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="20" font-weight="400" text-anchor="start" fill="#175a83">22 µF · 10 V</text>
+<polyline points="1254,430 1286,430" fill="none" stroke="#172c43" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="1259,437 1281,437" fill="none" stroke="#172c43" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="1265,444 1275,444" fill="none" stroke="#172c43" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="1460,310 1460,480" fill="none" stroke="#175a83" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="1370" y="480" width="160" height="118" fill="#f1f8f6" stroke="#127569" stroke-width="2"/>
+<text x="1450" y="515.22" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="21" font-weight="700" text-anchor="middle" fill="#172c43">Generic MCU</text>
+<text x="1450" y="553.86" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="23" font-weight="700" text-anchor="middle" fill="#127569">250 mA</text>
+<text x="1450" y="582.76" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="18" font-weight="400" text-anchor="middle" fill="#586777">design point</text>
+<polyline points="1460,598 1460,660" fill="none" stroke="#172c43" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="1444,660 1476,660" fill="none" stroke="#172c43" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="1449,667 1471,667" fill="none" stroke="#172c43" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="1455,674 1465,674" fill="none" stroke="#172c43" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="970,470 1210,470" fill="none" stroke="#175a83" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="1090" cy="470" r="5" fill="#175a83"/>
+<polyline points="1090,470 1090,550 970,550" fill="none" stroke="#175a83" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="1210,470 1210,554.0" fill="none" stroke="#175a83" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="1190,554.0 1230,554.0" fill="none" stroke="#175a83" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="1190,566.0 1230,566.0" fill="none" stroke="#175a83" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="1210,566.0 1210,650" fill="none" stroke="#175a83" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="1242" y="552.4" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="20" font-weight="700" text-anchor="start" fill="#175a83">C_INT</text>
+<text x="1242" y="582.4" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="20" font-weight="400" text-anchor="start" fill="#175a83">1 µF · 10 V</text>
+<polyline points="1194,650 1226,650" fill="none" stroke="#172c43" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="1199,657 1221,657" fill="none" stroke="#172c43" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="1205,664 1215,664" fill="none" stroke="#172c43" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="1010" y="599.94" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#175a83">MODE → INTVCC</text>
+<text x="1010" y="625.76" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="18" font-weight="700" text-anchor="start" fill="#175a83">Burst Mode</text>
+<text x="75" y="688.04" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="22" font-weight="700" text-anchor="start" fill="#172c43">BAT− = GND = MCU ground</text>
+<rect x="40" y="750" width="1520" height="490" fill="#fbfefd" stroke="#cfdfd9" stroke-width="2"/>
+<text x="65" y="788.86" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="23" font-weight="700" text-anchor="start" fill="#127569">2  BUTTON START + GPIO HOLD</text>
+<text x="90" y="888.86" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="23" font-weight="700" text-anchor="start" fill="#175a83">BAT+</text>
+<polyline points="90,930 300,930" fill="none" stroke="#127569" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="300" cy="930" r="4" fill="#127569"/>
+<polyline points="300,930 360,903" fill="none" stroke="#127569" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="375" cy="930" r="4" fill="#127569"/>
+<polyline points="375,930 440,930" fill="none" stroke="#127569" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="300" y="833.22" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="21" font-weight="700" text-anchor="middle" fill="#127569">SW_START</text>
+<text x="300" y="862.4" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="20" font-weight="400" text-anchor="middle" fill="#172c43">KMR232NG ULC LFS</text>
+<text x="300" y="889.76" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="18" font-weight="400" text-anchor="middle" fill="#586777">Top-actuated · normally open</text>
+<polyline points="440,930 533.0,930" fill="none" stroke="#127569" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="533.0" y="917" width="84" height="26" fill="white" stroke="#127569" stroke-width="2"/>
+<polyline points="617.0,930 710,930" fill="none" stroke="#127569" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="575.0" y="872.22" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="21" font-weight="700" text-anchor="middle" fill="#127569">R_START</text>
+<text x="575.0" y="903.22" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="21" font-weight="400" text-anchor="middle" fill="#127569">330 kΩ · 1%</text>
+<polyline points="710,930 1360,930" fill="none" stroke="#127569" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="1390" y="935.86" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="23" font-weight="700" text-anchor="start" fill="#127569">RUN</text>
+<text x="1388" y="965.76" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="18" font-weight="400" text-anchor="start" fill="#586777">to pin 3</text>
+<circle cx="980" cy="930" r="5" fill="#127569"/>
+<polyline points="980,930 980,1020.0" fill="none" stroke="#127569" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="968" y="1020.0" width="24" height="60" fill="white" stroke="#127569" stroke-width="2"/>
+<polyline points="980,1080.0 980,1170" fill="none" stroke="#127569" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="1010" y="1042.22" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="21" font-weight="700" text-anchor="start" fill="#127569">R_OFF</text>
+<text x="1010" y="1074.22" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="21" font-weight="400" text-anchor="start" fill="#127569">100 kΩ · 1%</text>
+<polyline points="964,1170 996,1170" fill="none" stroke="#172c43" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="969,1177 991,1177" fill="none" stroke="#172c43" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="975,1184 985,1184" fill="none" stroke="#172c43" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="90" y="1018.86" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="23" font-weight="700" text-anchor="start" fill="#127569">GPIO HOLD</text>
+<text x="90" y="1048.58" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="19" font-weight="400" text-anchor="start" fill="#127569">3.3 V domain</text>
+<polyline points="90,1080 562,1080" fill="none" stroke="#127569" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="280" cy="1080" r="5" fill="#127569"/>
+<polyline points="280,1080 280,1110.0" fill="none" stroke="#127569" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="268" y="1110.0" width="24" height="60" fill="white" stroke="#127569" stroke-width="2"/>
+<polyline points="280,1170.0 280,1200" fill="none" stroke="#127569" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="310" y="1132.22" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="21" font-weight="700" text-anchor="start" fill="#127569">R_GPIO</text>
+<text x="310" y="1164.22" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="21" font-weight="400" text-anchor="start" fill="#127569">100 kΩ · 1%</text>
+<polyline points="264,1200 296,1200" fill="none" stroke="#172c43" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="269,1207 291,1207" fill="none" stroke="#172c43" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="275,1214 285,1214" fill="none" stroke="#172c43" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="562,1062 562,1098 598,1080 562,1062" fill="none" stroke="#127569" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="598,1058 598,1102" fill="none" stroke="#127569" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="598,1080 820,1080 820,930" fill="none" stroke="#127569" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="820" cy="930" r="5" fill="#127569"/>
+<text x="590" y="1018.22" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="21" font-weight="700" text-anchor="middle" fill="#127569">D_HOLD</text>
+<text x="590" y="1049.22" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="21" font-weight="400" text-anchor="middle" fill="#172c43">BAS116,235</text>
+<text x="555" y="1122.76" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="18" font-weight="400" text-anchor="end" fill="#127569">A · pin 1</text>
+<text x="610" y="1122.76" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="18" font-weight="400" text-anchor="start" fill="#127569">K · pin 3</text>
+<text x="590" y="1159.76" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="18" font-weight="400" text-anchor="middle" fill="#586777">Pin 2: NC</text>
+<text x="1170" y="1031.4" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="20" font-weight="700" text-anchor="start" fill="#127569">HOLD high: stays on</text>
+<text x="1170" y="1065.58" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="19" font-weight="400" text-anchor="start" fill="#172c43">HOLD low + button open:</text>
+<text x="1170" y="1095.58" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="19" font-weight="400" text-anchor="start" fill="#172c43">regulator shuts down</text>
+<text x="1170" y="1144.76" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="18" font-weight="400" text-anchor="start" fill="#586777">A held button overrides OFF.</text>
+<rect x="40" y="1265" width="1520" height="235" fill="#fff9eb" stroke="#c5a561" stroke-width="2"/>
+<text x="65" y="1301.04" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="22" font-weight="700" text-anchor="start" fill="#875b0d">INTEGRATION BOUNDARY</text>
+<text x="65" y="1337.4" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="20" font-weight="400" text-anchor="start" fill="#172c43">N6 already controls internal-SMPS shutdown and PWR_ON. External AUX switching/discharge is not shown.</text>
+<text x="65" y="1369.4" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="20" font-weight="400" text-anchor="start" fill="#172c43">Main supplies must remain valid until every AUX rail is below 0.6 V; qualify the external delay or hold-up.</text>
+<text x="65" y="1401.4" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="20" font-weight="400" text-anchor="start" fill="#172c43">Direct GPIO HOLD is only the latch core. A dedicated sequencer IC is optional; USB source control is still required.</text>
+<text x="65" y="1433.4" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="20" font-weight="400" text-anchor="start" fill="#172c43">RUN must not exceed VIN in any supply state. Take over HOLD before the start button is released.</text>
+<text x="65" y="1465.4" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="20" font-weight="400" text-anchor="start" fill="#172c43">L/C values are starting values; qualify exact MPNs, derating, startup, load response and current capability.</text>
+<text x="55" y="1535.58" font-family="Segoe UI,DejaVu Sans,Arial,sans-serif" font-size="19" font-weight="400" text-anchor="start" fill="#586777">Electrical connection diagram, not a package view. Filled dots join branches; matching RUN, BAT+ and GND labels join nets.</text>
+</svg>

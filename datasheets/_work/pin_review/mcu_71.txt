@@ -1,0 +1,52 @@
+STM32N6x5xx                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            STM32N6x7xx
+
+
+                                    •                                                                   Received/transmitted bytes are buffered in    reserved SRAM using centralized DMA.
+                                    •                                                                   Separate enable bits for transmitter and receiver
+                                    •                                                                   Separate signal polarity control for transmission and reception
+                                    •                                                                        Swappable Tx/Rx pin configuration
+                                    •                                                                   Hardware flow control for modem and RS-485 transceiver
+                                    •                                                                   Communication control/error detection flags
+                                    •                                                                   Parity control:
+                                                  –                                                       Transmits parity bit
+                                                  –                                                        Checks parity of received data byte
+                                    •                                                                  Interrupt sources with flags
+                                    •                                                                   Multiprocessor communications: wake-up from    Mute mode by idle line detection or
+                                                  address mark detection
+                                    •                                                                   Wake-up from Stop mode
+                                    USART extended features are:
+                                    •                                                                  LIN controller synchronous break send cap ability and LIN target break detection
+                                                  capability
+                                    •                                                                   13-bit break generation and 10/11 bit break detection when USART is hardware
+                                                  configured for LIN
+                                    •                                                                   IrDA SIR encoder decoder supporting 3/16 bit duration for Normal mode
+                                    •                                                                  Smartcard mode
+                                    •                                                                  Support of T = 0 and T = 1 asynchronous protocols for smartcards as defined in the
+                                                  ISO/IEC 7816-3 standard
+                                    •                                                                   0.5 and 1.5 stop bits for Smartcard operation
+                                    •                                                                   Support for Modbus communication
+                                                  –                                                        Timeout feature
+                                                  –                                                        CR/LF character recognition
+
+3.45.2 LPUART
+
+                                    The LPUART is an UART that enables bidi rectional UART communications with a limited
+                                    power consumption.
+                                    Only 32.768 kHz LSE clock is required to enable UART communications up to 9600 bauds.
+                                    Higher baud rates can be reached when the    LPUART is clocked by other clock sources.
+                                    Even when the microcontroller is in low-power mode, the LPUA  RT can wait for an incoming
+                                    UART frame while having an extremely low energy consumption.
+                                    The LPUART includes all necessary hardware support to make asynchronous serial
+                                    communications possible with minimum power   consumption. It supports Half-duplex,
+                                    Single-wire communications, and modem operations (CTS/RTS). It also supports
+                                    multiprocessor communications. DMA can be used for data transmission/reception
+                                    LPUART main features are:
+                                    •                                                                   Full-duplex asynchronous communications
+                                    •                                                                  NRZ standard format (mark/space)
+                                    •                                                                  Programmable baud rate
+                                    •                                                                   From 300 to 9600 bauds using a 32.768 kHz clock source.
+
+
+                                                                                                                               DS14791 Rev 10                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          71/263
+
+                                                                                                                                                                                                                                                                                                                         80

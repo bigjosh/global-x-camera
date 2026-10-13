@@ -1,0 +1,63 @@
+6-15-1. Set Feature (ONFI)
+
+The Set Feature command is to change the power-on default feature set. After sending the Set Feature
+command (EFh) and following specific feature and then input the P1-P4 parameter data to change the default
+power-on feature set. Once sending the EFh command, the NAND device will remain in the Set Feature
+mode until next valid command is sent.
+The Status Read command (70h) may check the completion of the Set Feature.
+
+Figure 27. AC Waveforms for Set Feature (ONFI) Operation
+
+                  CLE
+
+
+                  CE#
+
+
+
+                                                tWC                       tADL
+
+                 WE#
+
+
+                                                                                                                                 tWB
+
+                  ALE
+
+
+
+                  RE#
+
+
+             IO[7:0]                           EFh                                                                              FeatureAddressDin                                                                                                                           DinDin                                                                                                                      Din
+
+                                                                                                                                                  tFEAT
+
+                R/B#
+                                                                                                                                                  Busy
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                            48

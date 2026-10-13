@@ -1,0 +1,53 @@
+STM32N6x5xx                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            STM32N6x7xx
+
+
+                                down-counter reaches the window register value. This implies that the counter must be
+                                refreshed in a limited window.
+                                The WWDG clock is prescaled   from the APB clock, and has a  configurable time-window that
+                                can be programmed to detect abnormally late or early application behavior.
+                                The WWDG is best suited for  applications requiring the watchdog to react within an
+                                accurate timing window. The WWDG main features are:
+                                •                                                                  Programmable free-running down-counter
+                                •                                                                   Conditional reset (if watchdog activated)
+                                            –                                                       When the down-counter value becomes lower than 0x40
+                                            –                                                        If the down-counter is reloaded outside the window
+                                •                                                                   Early wake-up interrupt (EWI): triggered (if enabled and the watchdog activated) when
+                                            the down-counter is equal to 0x40
+
+3.41 Real-time clock (RTC)
+
+                                The RTC is an independent BCD timer/counter    that provides an automatic wake-up to
+                                manage all low-power modes.
+                                The RTC provides a time of- day clock/calendar with programmable alarm interrupts. As
+                                long as the supply voltage remains in the oper  ating range, it never st ops, regardless of the
+                                device status (Run mode, low-power mode or    under reset). The RTC is functional in V  BAT
+                                mode.
+                                Its main features are:
+                                •                                                                          Calendar with subseconds, seconds, minutes,    hours (12 or 24 format), week day, date,
+                                            month, year, in BCD (binary-coded decimal) format.
+                                •                                                                   Binary mode with 32-bit free-running counter.
+                                •                                                                   Automatic correction for 28, 29 (leap   year), 30, and 31 days of the month.
+                                •                                                                   Two programmable alarms.
+                                •                                                                      On-the-fly correction from 1 to 32767 RTC clo   ck pulses. (can be used to synchronize it
+                                            with a controller clock).
+                                •                                                                   Reference clock detection: a more precise se  cond source clock (50 or 60 Hz) can be
+                                            used to enhance the calendar precision.
+                                •                                                                   Digital calibration circuit with 0.95 ppm reso  lution, to compensate for quartz crystal
+                                            inaccuracy.
+                                •                                                                   Timestamp, which can be used to save the calendar content: can be triggered by an
+                                            event on the timestamp pin, or by a   tamper event, or by a switch to V BAT mode.
+                                •                                                                   17-bit auto-reload wake-up timer (WUT) for periodic events with programmable
+                                            resolution and period.
+                                •                                                                   TrustZone support:
+                                            –                                                        RTC fully securable
+                                            –                                                        Alarm A, alarm B, wake-up timer and ti  mestamp individual secure or non-secure
+                                                         configuration
+                                •                                                                   Alarm A, alarm B, wake-up timer and ti  mestamp individual privilege protection
+                                •                                                                   The RTC is supplied through a switch that takes power either from the V    DD supply
+                                            when present, or from the VBAT pin.
+
+
+
+                                                                                                                DS14791 Rev 10                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          65/263
+
+                                                                                                                                                                                                                                                                                     80

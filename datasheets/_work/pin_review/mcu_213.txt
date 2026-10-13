@@ -1,0 +1,63 @@
+STM32N6x5xx                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            STM32N6x7xx
+
+
+                                                                                    Table 105. MDF characteristics  (1) (continued)
+         Symbol Parameter   Conditions Min     Typ  Max Unit
+
+         tSUCCKO                                                                Data setup time w.r.t.                              Controller SPI mode,                                                                 - 3-
+                                            MDF_CCK[1:0] output                                                                     MDF_CCK[1:0]
+                                                                                                                                    configured in output,
+         tHDCCKO                                                              Data hold time w.r.t. MDF_CCK[1:0] output                               0--measured on rising and
+                                                                                                                                    falling edge                                                                                                                                                          ns
+       tSUCCKOLF                                                 Data setup time w.r.t.                                             LF_MASTER SPI mode,                                                                        14                                                                                                                                                                       -                                                                                                  -
+                                            MDF_CCK[1:0] output                                                                     MDF_CCK[1:0]
+                                                                                                                                    configured in output,
+      tHDCCKOLF                                               Data hold time w.r.t. MDF_CCK[1:0] output                               0 -    -measured on rising and
+                                                                                                                                    falling edge
+
+1.                          Evaluated by characterization. Not tested in production.
+2.                          Tmdf_proc_ck is the period of the MDF processing clock.
+
+                                                                                                                             Figure 47. MDF timing diagram
+
+                                                                            tSUCKI                 tHDCKI                tSUCKI               tHDCKI                                                 fCKI, fCCKI, FCCKO, fCCKOLF
+                                                                            tSUCCKI                tHDCCKI               tSUCCKI              tHDCCKI
+                                                                            tSUCCKO                tHDCCKO               tSUCCKO              tHDCCKO                                        tLCKI, tLCCKI,                            tHCKI, tHCCKI,
+                                                                            tSUCCKOLF              tHDCCKOLFtSUCCKOLFtHDCCKOLF                                                                    tLCCKO                                     tHCCKO
+
+                   MDF_CKIx (I)
+                   MDF_CCK (I/O)
+
+                   MDF_SDIx (I)
+
+                                                                                                                                                                                                                                                                                             MSv69125V1
+
+5.3.30                                                                        Audio digital filter (ADF) characteristics
+                                      Unless otherwise specified,  the parameters given in   Table 106 are derived from tests
+                                      performed under the ambient temperature, f   AHB frequency, and V DD supply voltage
+                                      conditions summarized in Table 24, with the following configuration:
+                                      •                                                                   Output speed is set to OSPEEDRy[1:0] = 11
+                                      •                                                                  Measurement points are done at CMOS levels: 0.5 V  DD
+                                      •                                                                   I/O compensation cell activated
+                                      •                                                                   HSLV activated when V DD ≤ 2.7 V
+                                      •                                                                   Voltage scale is set to VOS0
+                                      Refer to Section 5.3.17 for more details on the input/output alternate function
+                                      characteristics.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                    DS14791 Rev 10                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        213/263
+
+                                                                                                                                                                                                                                                                                                                                      238

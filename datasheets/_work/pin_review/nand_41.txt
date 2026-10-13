@@ -1,0 +1,56 @@
+6-13.      Parameter Page Read (ONFI)
+
+The NAND Flash device support ONFI Parameter Page Read and the parameter can be read out by sending
+the command of ECh and giving the address 00h.  The NAND device information may refer to the table of
+parameter page(ONFI), there are three copies of 256-byte data and additional redundant parameter pages.
+Once sending the ECh command, the NAND device will remain in the Parameter Page Read mode until next
+valid command is sent.
+The Random Data Out command set (05h-E0h) can be used to change the parameter location for the specific
+parameter data random read out.
+The Status Read command (70h) can be used to check the completion with a following read command (00h)
+to enable the data out.
+
+
+Figure 23. AC waveforms for Parameter Page Read (ONFI) Operation
+
+
+                                                         tCLR
+         CLE
+
+
+
+         CE#
+
+
+
+        WE#
+
+
+
+                                                         tAR
+
+         ALE
+
+
+
+
+                                                                   tRC
+         RE#                                            tRR
+                                          tWB
+
+                                                    tR
+
+     IO[7:0]                ECh                                                                                                                             00hParameter 0Parameter 0Parameter 0Parameter 1
+                                                                  Dout 0       Dout 1                    Dout 255    Dout 0
+
+
+
+
+        R/B#
+                                                     Busy
+
+
+
+
+
+                                                                      41

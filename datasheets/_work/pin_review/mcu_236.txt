@@ -1,0 +1,58 @@
+Electrical characteristics                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      STM32N6x5xx STM32N6x7xx
+
+
+                                                               Table 126. USB PHY characteristics  (1) (continued)
+                 Symbol                                                                                                                                                                               Parameter                                                                                                                                                                                                                                                                                                         Conditions                                                                                                                                                                                                                                                           Min                                            Typ                                                Max                                    Unit
+
+                                                                                                  HS transmit, maximum transition density(2)                                                      -                                                      13.35                          17.92
+                                                                                                  HS transmit, minimum transition density(3)       -9.699.71
+                                                                                                  HS idle(4)                                                                  -5.105.67
+                                                                                                  FS transmit, maximum transition density(5)       -5.145.71
+                                                                                                  LS transmit, maximum transition density(6)       -5.125.69
+             IVDDA18USB                                                                                                    Supply current on VDDA1V8USBSuspend(7)                                                               -0.040.08              mA
+
+                                                                                                  Sleep(8)                                                                    -0.040.08
+                                                                                                                                VDATDETENB = 0,                                                               .483.88
+                                                                                                  Battery                       VDATSRCENB = 1                         -3
+                                                                                                  charging                      VDATDETENB = 1,                                                               .164.55
+                                                                                                                                VDATSRCENB = 1(9)                     -4
+                                                                                                  HS transmit, maximum transition density(2)      -3.393.64
+                                                                                                  HS transmit, minimum transition density(3)       -2.322.53
+                                                                                                  HS idle(4)                                                                  -2.152.34
+                                                                                                  FS transmit, maximum transition density(5)                                                          -                                                      16.84                          16.84
+                                                                                                  LS transmit, maximum transition density(6)                                                           -                                                      13.39                          14.81
+               IVDD33USB                                                                                                            Supply current on VDD33USBSuspend(7)                                                               -0.070.17       mA
+
+                                                                                                  Sleep(8)                                                                    -0.070.17
+                                                                                                                                VDATDETENB = 0,                                                               .152.35
+                                                                                                  Battery                       VDATSRCENB = 1                         -2
+                                                                                                  charging                      VDATDETENB = 1,                                                               .152.34
+                                                                                                                                VDATSRCENB = 1(9)                     -2
+
+1.                          Evaluated by characterization and not tested in production, unless otherwise specified.
+2.                          Packet transmission by one transceiver operating in device mode while driving all 0s data (constant JKJK on DP/DM).
+       Loading of 10 pF. Transfers do not include any interpacket delay.
+3.                               Packet transmission by one transceiver operating in device mode while driving all 1s data (alternating 7-bit strings of J, then
+       K on DP/DM). Loading of 10 pF. Transfers do not include any interpacket delay.
+4.                          HS receive mode with no traffic on the line.
+5.                          Packet transmission by one transceiver operating in device mode while driving all 0s data (constant JKJK on DP/DM).
+       Loading of 50 pF. Transfers do not include any interpacket delay.
+6.                          Packet transmission by one transceiver operating in host mode while driving all 0s data (constant JKJK on DP/DM).
+       Loading of 600 pF. Transfers do not include any interpacket delay.
+7.                          Suspend when operating in device mode with no far-side host termination on DP/DM during measurements.
+       Measurements taken when COMMONONN (SYSCFG_USB2PHYxCR.USB2PHYxCMN) is deasserted.
+8.                          Sleep mode when operating in device mode with no far-side host termination on DP/DM during measurements.
+9.                          PHY is in suspend (with clocks turned OFF), nondriving mode and operating as a portable device in the “dead battery”
+       condition.
+
+
+
+
+
+
+
+
+
+
+
+236/263                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        DS14791 Rev 10

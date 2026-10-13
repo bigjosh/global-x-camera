@@ -1,0 +1,54 @@
+STM32N6x5xx                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            STM32N6x7xx
+
+
+                                          –                                                        Counter with CBC-MAC (CCM) mode
+                              •                                                                  16-byte data block processing, supporting cipher key lengths of 128, 192 and 256 bits
+                              •                                                                            14 or 18 clock cycle latency in ECB mode    for processing one 16-byte block with 128-bit
+                                          or 256-bit key, respectively
+                              •                                                                   Using dedicated key bus, optional key sh  aring with side-channel resistant SAES
+                                          peripheral (shared-key mode), controlled by SAES
+                              •                                                                   Integrated key scheduler to compute the last round key for ECB/CBC decryption
+                              •                                                                  256-bit of write-only registers for storing the cryptographic keys (eight 32-bit registers)
+                              •                                                                   128-bit of registers for storing initia  lization vectors (four 32-bit registers)
+                              •                                                                   32-bit input buffer associated with an internal input FI FO of eight 32-bit words,
+                                          corresponding to two AES blocks
+                              •                                                                   32-bit output buffer associated with an inte rnal output FIFO of eight 32-bit words,
+                                          corresponding to two AES blocks
+                              •                                                                              Automatic data flow control supporting two   direct memory access (DMA) channels, one
+                                          for incoming data, one for processed data. The output FIFO supports both single and
+                                          burst transfers, while the input FI FO supports only burst transfers.
+                              •                                                                   Data swapping logic to suppor t 1-, 8-, 16- or 32-bit data
+                              •                                                                   AMBA AHB target peripheral, accessible through 32-bit word single accesses only.
+                                          Other access types generates an AHB error, and write accesses are ignored.
+                              •                                                                   Possibility for software to  suspend a message if CRYP needs to process another
+                                          message with a higher priority, then resume the original message
+
+3.35                                                                                            Hash processor (HASH)
+
+                              The hash processor is a fully compliant im plementation of the secure hash algorithm
+                              (SHA-1, SHA-2 family) and the HMAC (keyed-hash message authentication code)
+                              algorithm. HMAC is suitable for applicat ions requiring message authentication.
+                              The hash processor computes FIPS (Federal Information Processing Standards) approved
+                              digests of length of 160, 224, 256 bits, for mess   ages of any length less than 264 bits (for
+                              SHA-1, SHA-224 and SHA-256) or less than 2128 bits (for SHA-384, SHA-512).
+                              HASH main features are:
+                              •                                                                   Suitable for data authenticati  on applications, compliant with:
+                                          –                                                        Federal Information Processing Standa  rds Publication FIPS  PUB 180-4, Secure
+                                                      Hash Standard (SHA-1 and SHA-2 family)
+                                          –                                                        Federal Information Processing Standa  rds Publication FIPS PUB 186-4, Digital
+                                                      Signature Standard (DSS)
+                                          –                                                       Internet Engineering Task Force (IETF) Request For Comments RFC 2104,
+                                                      HMAC: Keyed-Hashing for Message Authentication and Federal Information
+                                                      Processing Standards Publication FIPS   PUB 198-1, The Keyed-Hash Message
+                                                      Authentication Code (HMAC)
+                              •                                                                   Fast computation of SHA-1, SHA2-2  24, SHA2-256, SHA2-384, and SHA2-512
+                                          –                                                        82 (respectively 66) clock cycles for proc  essing one 512-bit block of data using
+                                                      SHA-1 (respectively SHA-256) algorithm
+                                          –                                                        98 clock cycles for processing one 1024-bit block of data using either SHA2-384
+                                                      or SHA2-512 algorithm
+
+
+
+                                                                                                          DS14791 Rev 10                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          57/263
+
+                                                                                                                                                                                                                                                                       80

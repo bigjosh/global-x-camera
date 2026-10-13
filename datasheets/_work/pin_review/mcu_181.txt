@@ -1,0 +1,77 @@
+STM32N6x5xx                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            STM32N6x7xx
+
+
+                                                                                              Figure 27. Asynchronous non multiplexed SRAM/PSRAM/NOR write waveforms
+
+                                                                                                                                                                                                                                                                                                                                               tw(NE)
+
+                                                                                                                             FMC_NEx
+
+
+
+                                                                                                                           FMC_NOE
+                                                                                                                                                                                                                                                   tv(NWE_NE)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         t   h(NE_NWE)tw(NWE)
+
+                                                                                                                         FMC_NWE
+
+                                                                                                                                                                                                                                                       tv(A_NE)                                                                                                                       th(A_NWE)
+
+                                                                                                                FMC_A[25:0]                                                                                                                                                                                                               Address
+                                                                                                                                                                                                                                                           tv(BL_NE)                                                                                                            th(BL_NWE)
+
+                                                                                                         FMC_NBL[1:0]                                                                                                                                                                                                                                             NBL
+
+                                                                                                                                                                                                                                                             tv(Data_NE)                                                                                           th(Data_NWE)
+
+                                                                                                                FMC_D[15:0]                                                                                                                                                                                                                                                                                   Data
+                                                                                                                                                                                                                                               t   v(NADV_NE)
+
+                                                                                                                                                                                                                                                    tw(NADV)
+                                                                                                           FMC_NADV                  (1)
+
+
+
+
+                                                                                                              FMC_NWAIT
+
+                                                                                                                                                                                                                                                                                                                                                                                                                          th(NE_NWAIT)
+
+                                                                                                                                                                                                                                                                                                                                                                                                 tsu(NWAIT_NE)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                MS32754V1
+
+                                                                           1.                          Mode 2/B, C, and D only. In mode 1, FMC_NADV is not used.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                                                                                      DS14791 Rev 10                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        181/263
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      238

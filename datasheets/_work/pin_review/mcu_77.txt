@@ -1,0 +1,52 @@
+STM32N6x5xx                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            STM32N6x7xx
+
+
+                                The MDIOS can operate in Stop mode, option ally waking up the device if the MDIO
+                                controller performs a read or a write to one of its MDIOS registers.
+                                The MDIOS includes the following features:
+                                •                                                                  32 MDIOS register addresses, each of  which is managed using separate input and
+                                             output data registers:
+                                             –                                                        32 x 16-bit firmware read/write, MD IOS read-only output data registers
+                                             –                                                        32 x 16-bit firmware read-only, MDIOS write-only input data registers
+                                •                                                                   Configurable target (port) address
+                                •                                                                   Independently maskable interrupts/events:
+                                             –                                                        MDIOS register write
+                                             –                                                        MDIOS register read
+                                             –                                                        MDIOS protocol error
+                                •                                                                   Able to operate in and to wake up from Stop mode
+
+3.50                                                                                             Controller area network with  flexible data rate (FDCAN)
+
+                                The controller area network (CAN) subsystem    consists of three CAN modules, a shared
+                                message RAM and a clock calibration unit. Refer    to the product memory organization for the
+                                base address of each of them.
+                                FDCAN modules are compliant wit h ISO 11898-1: 2015 (CAN prot ocol specification version
+                                2.0 part A, B) and CAN FD protocol specification version 1.0.
+                                In addition, the first CAN module FDCAN1 supp orts time triggered CAN (TTCAN), specified
+                                in ISO 11898-4, including event synchronized    time-triggered communication, global system
+                                time, and clock drift compensation. The FDCAN1    contains additional registers, specific to
+                                the time triggered feature. The CAN FD opti  on can be used together with event-triggered
+                                and time-triggered CAN communication.
+                                A 10 Kbyte message RAM implements   filters, receive FIFOs, rece ive buffers, transmit event
+                                FIFOs, transmit buffers (and triggers for TTC  AN). This message RAM is shared between
+                                the FDCAN modules.
+                                The common clock calibration unit is optional.    It can be used to generate a calibrated clock
+                                for each FDCAN from the HSI internal RC os  cillator and the PLL,  by evaluating CAN
+                                messages received by the FDCAN1.
+                                The main features are:
+                                •                                                                   Conform with CAN protocol version 2.0 part A, B, and ISO 11898-1: 2015, -4
+                                •                                                                   CAN FD with max. 64 data bytes supported
+                                •                                                                   TTCAN protocol level 1 and level 2 completely in hardware (FDCAN1 only)
+                                •                                                                   Event synchronized time-triggered communication supported (FDCAN1 only)
+                                •                                                                   CAN error logging
+                                •                                                                   AUTOSAR and J1939 support
+                                •                                                                  Improved acceptance filtering
+                                •                                                                   Two configurable receive FIFOs
+                                •                                                                   Separate signaling on reception of high priority messages
+                                •                                                                   Up to 64 dedicated receive buffers
+
+
+
+                                                                                                                 DS14791 Rev 10                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          77/263
+
+                                                                                                                                                                                                                                                                                        80

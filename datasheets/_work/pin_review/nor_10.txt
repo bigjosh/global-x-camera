@@ -1,0 +1,54 @@
+                                                                                                  W25Q128JV
+
+
+4.    PIN DESCRIPTIONS
+4.1    Chip Select (/CS)
+
+The SPI Chip Select (/CS) pin enables and disables device operation. When /CS is high the device is
+deselected and the Serial Data Output (DO, or IO0, IO1, IO2, IO3) pins are at high impedance. When
+deselected, the devices power consumption will be at standby levels unless an internal erase, program or
+write status register cycle is in progress. When /CS              is brought low the device will be selected, power
+consumption will increase to active levels and instructions can be written to and data read from the device.
+After power-up, /CS must transition from high to low before a new instruction will be accepted. The /CS
+input must track the VCC supply level at power-up              and power-down (see “Write Protection” and Figure
+58). If needed a pull-up resister on the /CS pin can be used to accomplish this.
+4.2    Serial Data Input, Output and IOs (DI, DO and IO0, IO1, IO2, IO3)
+
+The W25Q128JV supports standard SPI, Dual SPI and Quad SPI operation. Standard SPI instructions
+use the unidirectional DI (input) pin to serially write instructions, addresses or data to the device on the
+rising edge of the Serial Clock (CLK) input pin. Standard SPI also uses the unidirectional DO (output) to
+read data or status from the device on the falling edge of CLK.
+Dual and Quad SPI instructions use the bidirectional IO pins to serially write instructions, addresses or
+data to the device on the rising edge of CLK and read data or status from the device on the falling edge of
+CLK. Quad SPI instructions require the non-volatile Quad Enable bit (QE) in Status Register-2 to be set.
+When QE=1, the /WP pin becomes IO2 and the /HOLD pin becomes IO3.
+4.3     Write Protect (/WP)
+
+The Write Protect (/WP) pin can be used to prevent the Status Register from being written. Used in
+conjunction with the Status Register’s Block Protect (CMP, SEC, TB, BP2, BP1 and BP0) bits and Status
+Register Protect (SRP) bits, a portion as small as a 4KB sector or the entire memory array can be
+hardware protected. The /WP pin is active low.
+4.4    HOLD (/HOLD)
+
+The /HOLD pin allows the device to be paused while it is actively selected. When /HOLD is brought low,
+while /CS is low, the DO pin will be at high impedance and signals on the DI and CLK pins will be ignored
+(don’t care). When /HOLD is brought high,             device operation can resume. The /HOLD function can be
+useful when multiple devices are sharing the same SPI signals. The /HOLD pin is active low. When the
+QE bit of Status Register-2 is set for Quad I/O, the /HOLD pin function is not available since this pin is
+used for IO3. See Figure 1a-c for the pin configuration of Quad I/O operation.
+
+4.5    Serial Clock (CLK)
+
+The SPI Serial Clock Input (CLK) pin provides the timing for serial input and output operations. ("See SPI
+Operations")
+
+4.6    Reset (/RESET)
+
+A dedicated hardware /RESET pin is available on SOIC-16 and TFBGA packages. When it’s driven low for
+a minimum period of ~1µS, this device will terminate any external or internal operations and return to its
+power-on state.
+
+Note: Hardware /RESET pin is available on SOIC-16 or TFBGA; please contact Winbond for this package.
+
+
+                                                             - 9 -

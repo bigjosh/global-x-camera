@@ -1,0 +1,61 @@
+Figure 8. AC Waveforms for Read Operation (with CE# Don't Care)
+
+
+
+                    CLE
+
+
+
+                                                                                                                                                                                                                                                                                           CE# Don’t Care
+
+                     CE#
+
+
+                   WE#
+
+
+
+
+                     ALE
+
+
+                     RE#
+
+
+
+
+            IO[7:0]                                          00h                                                                                                                                                                                                                                                                                                                                                                                                                                            Start Addr (5 Cycles)                                                                                                                                                                                                       30hData Output (Sequential)
+
+
+
+                  R/B#
+
+                                                                                                                                                                                                                                                                    Busy
+
+
+           Note:                           The CE# "Don't Care" feature may simplify the system interface, which allows controller to directly
+                                           download the code from flash device, and the CE# transitions will not stop the read operation
+                                           during the latency time.
+
+Figure 9-1. AC Waveforms for Sequential Data Out Cycle (After Read)
+
+
+                                                                                                    t  CEA
+                              CE#
+                                                                                                                                           tRC                                                                                                                                                                               tCHZ
+                                                                                                                                   tRP                                                               t REHt RP                                                       t REH                                                               t RPtRPtCOH
+
+                              RE#                                                                                                                     tRHZ                                                    tRHZ                                              tRHZ                                                 tRHZ
+
+                                                                                                                              tREA                                                  tOHtREA                                            tOHtREA                  t  OH                                               tOH
+
+                   IO[7:0]                                                                                                                Dout0                                                                                                                                                        Dout1                                                                                                                                                   Dout2                                                                                                                                             DoutN
+
+                                                                                                        tRR
+
+                            R/B#
+
+
+
+
+                                                                                                                                                                                                 19

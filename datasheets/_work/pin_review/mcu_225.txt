@@ -1,0 +1,63 @@
+STM32N6x5xx                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            STM32N6x7xx
+
+
+                                                                                                                                                                   Table 115. I2C analog filter characteristics  (1)
+                                                                Symbol                                                                                                                                                                                                                                                                                                                                                                                                        Parameter                                                                                                                                                                                                                                                                                                                                                                                                                             Min                                                                   Max                                                                          Unit
+
+                                                                           tAF                                                                                     Maximum pulse width of spikes suppressed by analog filter                                                              50(2)                                                                                                                                 230(3)                                          ns
+
+                                                            1.                          Evaluated by characterization. Not tested in production.
+                                                            2.                          Spikes with widths below tAF(min) are filtered.
+                                                            3.                          Spikes with widths above tAF(max) are not filtered.
+
+                                                            I3C interface
+
+                                                            The I3C interface meets the timing requirements of the MIPI   ® I3C specification v1.1.
+                                                            The I3C peripheral supports:
+                                                            •                                                                  I3C SDR-only as controller
+                                                            •                                                                  I3C SDR-only as target
+                                                            •                                                                  I3C SCL bus clock frequency up to 12.5 MHz
+                                                            The parameters given in   Ta   b   l   e    11   6 are obtained with the following configuration:
+                                                            •                                                                   Output speed is set to OSPEEDRy[1:0] = 10
+                                                            •                                                                   I/O compensation cell activated
+                                                            •                                                                   HSLV activated when V DD ≤ 2.7 V
+                                                            •                                                                   Voltage scale is set to VOS[0] = 1.
+
+                                                                                                                                  Table 116. I3C open-dr ain measured timing (1)
+                                                                                                                                                                                                                                                    I3C open drain mode                                            Timing measurements
+       Symbol                                                                                                                                                              Parameter                                                                                                                                                        Conditions                                                                                                                             Unit
+                                                                                                                                                                                                                                                                 Min                                                                                                                           Max                                                                                                                                 Min                                                                                                                                       Max
+
+          tSU_OD                                               SDA data setup time during open drain mode                                                                                                                                                                                                             Controller                                                                                                                     3                                                                                                                                                                        -                                                                                                                                                     20(2)          -ns
+
+1.                          Evaluated by characterization. Not tested in production.
+2.                          This timing is not in line with minimal value in MIPI specification. This can be mitigated by adjusting the clock stall time on
+               the Tbit phase through the I3C_TIMINGR2 register, and/or by increasing the SCL low duration in the TIMINGR0 register.
+               For further details, refer to AN5879 “Introduction to I3C for STM32 MCUs”.
+
+
+                                                                                                                                      Table 117. I3C push-pull measured timing(1)
+                                                                                                                                                                                                                                                  I3C push-pull mode                                                          Timing measurements                                                  Unit
+            Symbol                                                                                                                                                  Parameter                                                                                                                               Conditions
+                                                                                                                                                                                                                                                           Min                                                                                                                            Max                                                                                                                                    Min                                                                                                                                           Max                                                                                                                      -
+
+
+               tSU_PP                                                               SDA signal data setup in push-pull mode                                                                                                                                              Controller                                                                                                                        3                                                                                                                                                                         -                                                                                                                                                        18(2)          -ns
+
+
+1.                          Evaluated by characterization. Not tested in production.
+2.                          This timing is not in line with minimal value in MIPI specification. This can be mitigated by adjusting the clock stall time on
+               the Tbit phase through the I3C_TIMINGR2 register, and/or by increasing the SCL low duration in the TIMINGR0 register.
+               For further details, refer to AN5879 “Introduction to I3C for STM32 MCUs”.
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                                 DS14791 Rev 10                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        225/263
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   238

@@ -1,0 +1,51 @@
+STM32N6x5xx                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            STM32N6x7xx
+
+
+                                                             –                                                        Control FIFO (C-FIFO) for control words to be sent on the I3C bus
+                                                             –                                                        Optional status FIFO (S-FIFO) for status words as received on the I3C bus
+                                                             –                                                        For each FIFO, optional DMA mode with a dedicated DMA channel
+                                            •                                                                  Messages:
+                                                             –                                                        Legacy I2C read/write messages to legacy I2C targets in Fm/Fm+
+                                                             –                                                        I3C SDR read/write private messages
+                                                             –                                                        I3C SDR broadcast CCC messages
+                                                             –                                                        I3C SDR read/write direct CCC messages
+                                            •                                                                   Frame-level management, when controller:
+                                                             –                                                        Optional C-FIFO and TX-FIFO preload
+                                                             –                                                       Multiple messages encapsulation
+                                                             –                                                        Optional arbitrable header generation on the I3C bus
+                                                             –                                                        HDR exit pattern generation on the I3C bus for error recovery
+                                            •                                                                  Programmable bus timing, when controller:
+                                                             –                                                       SCL high and low period
+                                                             –                                                        SDA hold time
+                                                             –                                                        Bus free (minimum) time
+                                                             –                                                        Bus available/idle condition time
+                                                             –                                                        Clock stall time
+                                            •                                                                   Target-initiated requests management:
+                                                             –                                                        Simultaneous support up to four targets, when controller
+                                                             –                                                             In-band interrupts, with programmable IBI payload (up to four bytes), with pending
+                                                                              read notification support
+                                                             –                                                        Bus control request, with recovery flow support and hand-off delay
+                                                             –                                                       Hot-join mechanism
+                                            •                                                                   HDR exit pattern detection when target
+                                            •                                                                   Bus error management:
+                                                             –                                                        CEx with x = 0, 1, 2, 3 when controller
+                                                             –                                                        TEx with x = 0, 1, ..., 6 when target
+                                                             –                                                        Bus control switch error and recovery
+                                                             –                                                       Target reset
+                                            •                                                                   Individual programmable  event-based management:
+                                                             –                                                        Per-event identification with flag reporting and clear control
+                                                             –                                                        Host application notification via flag po lling, and/or via interr upt with a per-event
+                                                                              programmable enable
+                                                             –                                                        Error type identification
+                                            •                                                                   Wake-up from low-power mode(s):
+                                                             –                                                        Acknowledged target request completion, when controller
+                                                             –                                                        Missed start detection, when target
+                                                             –                                                        Reset pattern detection, when target
+                                            •                                                                   Wake-up from Stop mode(s), as controller:
+                                                             –                                                       On an in-band interrupt without payload
+
+
+
+                                                                                                                                                           DS14791 Rev 10                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          69/263
+
+                                                                                                                                                                                                                                                                                                                                                                                              80

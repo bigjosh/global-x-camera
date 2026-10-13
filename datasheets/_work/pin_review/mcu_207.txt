@@ -1,0 +1,78 @@
+STM32N6x5xx                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            STM32N6x7xx
+
+
+                                                                                                                                                         Figure 45. ADC accuracy characteristics
+
+
+                                                                                                                                                        [1LSB =                                                                                                                                      VDDAVREF+(or                 )]
+                                                                                 Output code                                                                                             2n                            2n
+                                                                                                                                                                                                                                   EG
+                                                                                 2n-1                                                                                                                                                                                                     (1) Example of an actual transfer curve
+                                                                                 2n-2                                                                                                                                                                                                     (2) Ideal transfer curve
+                                                                                                                                                                                                                                                                                          (3) End-point correlation line
+                                                                                 2n-3                                                                                             (2)                                                                                                     n = ADC resolution
+
+                                                                                                                                                                                                                                                                                          ET = total unadjusted error: maximum deviation
+                                                                                                                                                                ET                                               (3)                                                                                 between the actual and ideal transfer curves
+                                                                                        7                                                                                                                                   (1)                                                           EO = offset error: maximum deviation between the first
+                                                                                        6                                                                                                                                                                                                            actual transition and the first ideal one
+                                                                                        5                EO                                                             EL                                                                                                                EG = gain error: deviation between the last ideal
+                                                                                        4                                                                                                                                                                                                            transition and the last actual one
+                                                                                                                                                                            ED                                                                                                            ED = differential linearity error: maximum deviation
+                                                                                        3                                                                                                                                                                                                            between actual steps and the ideal one
+                                                                                        2                                                                                                                                                                                                 EL = integral linearity error: maximum deviation between
+                                                                                        1                                                          1 LSB ideal                                                                                                                                       any actual transition and the end point correlation line
+                                                                                        0                                                                                                                                                                                VREF+ (VDDA)
+                                                                                           VSSA
+
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                            MSv19880V6
+
+                                                                                                                            Figure 46. Typical connection diagram using the ADC
+                                                                                                                                              with TT pins featuring analog switch function
+
+
+
+                                                                                                                                                                                                                                               VDDA(4)                                   VREF+(4)
+
+                                                                                                                                                                                                                                I/O                                                                             Sample-and-hold ADC  converter
+                                                                                                                                                                                                                         analog
+                                                                               RAIN(1)                                                                                                                                    switch                                                                                       RADC
+                                                                                                                                                                                                                                                                                                                                                                                    Converter
+
+                                                             VAIN                                                             Cparasitic(2)                                                                                                                 Ilkg(3)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 CADCSampling
+                                                                                                                                                                                                                                                                         switch with
+                                                                                                                                                                                                                                                                        multiplexing
+                                                                                                                                                                           VSS                                 VSS                                                                                                                        VSSA
+
+                                                                                                                                                                                                                                                                                                                                                                                                       MSv67871V3
+
+                                                     1.                          Refer to Table 97 for the values of RAIN, RADC and CADC.
+                                                     2.                          Cparasitic represents the capacitance of the PCB (dependent on soldering RADC, and PCB layout quality)
+                                                                  plus the pad capacitance (refer to Table 65). A high Cparasitic value downgrades conversion accuracy. To
+                                                                  remedy this, fADC should be reduced.
+                                                     3.                          Refer to Table 65 for the value of Ilkg.
+                                                     4.                          Refer to Figure 16 .
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                        DS14791 Rev 10                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        207/263
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                      238

@@ -1,0 +1,61 @@
+Electrical characteristics                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      STM32N6x5xx STM32N6x7xx
+
+5.3.29 Multifunction digital filter (MDF) characteristics
+
+                                                     Unless otherwise specified,  the parameters given in   Table 105 for MDF are derived from
+                                                     tests performed under the ambient temperature, f   AHB frequency, and V DD supply voltage
+                                                     conditions summarized in Table 24, with the following configuration:
+                                                     •                                                                   Output speed is set to OSPEEDRy[1:0] = 11
+                                                     •                                                                  Measurement points are done at CMOS levels: 0.5 V  DD
+                                                     •                                                                   I/O compensation cell activated
+                                                     •                                                                   HSLV activated when V DD ≤ 2.7 V
+                                                     •                                                                   Voltage scale is set to VOS0
+                                                     Refer to Section 5.3.17 for more details on the input/output alternate function
+                                                     characteristics.
+                                                                                                                                               Table 105. MDF characteristics (1)
+
+             Symbol Parameter   Conditions Min     Typ  Max Unit
+
+                                                              Input clock frequency  via
+                      fCKI                                    MDF_CKIx pin, in target SPI                                                                                                                                                                                                                                    -                                                                                                                                                                                    -                                                                                 25
+                                                              mode
+                                                              Input clock frequency  via
+                    fCCKI                                     MDF_CCK[1:0] pin, in target                                                                                                                                                                                                                                    -                                                                                                                                                                                    -                                                                                 25
+                                                              SPI mode
+                                                                                                                                                                                         1.65 < VDD < 3.6 V                                                                                                                                                                                                                     MHz
+                  fCCKO                                                                                Output clock frequency, in controller SPI mode                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              -                                                                                                                                                                                    -                                                                                 25
+
+
+              fCCKOLF                                                                 Output clock frequency, in LF_MASTER SPI mode                              --5
+
+
+                  fSYMB                                                                                 Input symbol rate,in Manchester  mode                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       -                                                                                                                                                                                    -                                                                                 20
+
+
+         tHCKI, tLCKI                                             MDF_CKIx input clock high and low time                                                                                                                                                                                                                                                                                           Target SPI mode                                                                                                                                     2 × Tmdf_proc_ck(2)    --
+
+
+    tHCCKI, tLCCKI                           MDF_CCK[1:0] input clock high and low time                                                                                                                                                                                                                     Target SPI mode                                                                                                                                                      2 × Tmdf_proc_c --
+
+               tHCCKO,                                        MDF_CCK[1:0] output clock
+                tLCCKO                                        high and low time                                                                                                                                                                                                                     Controller SPI mode                                                                                                  2 × Tmdf_proc_ck      --
+           tHCCKOLF,                                          MDF_CCK[1:0] output clock
+            tLCCKOLF                                          high and low time                                                                                                                                                                                                                     LF_MASTER SPI mode                                                                       Tmdf_proc_ck --
+                                                                                                                                                                                                                                                                                                                                                                                                                                    ns
+                  tSUCKI                                                                                Data setup time w.r.t. MDF_CKIx input                                                                                                                                                                                                                                   Target SPI mode, 2.5 -     -
+                                                                                                                                                                                         measured on rising and
+                 tHDCKI                                                                              Data hold time w.r.t.                                                               falling edge
+                                                              MDF_CKIx input                                   0--
+               tSUCCKI                                                                      Data setup time w.r.t.                                                                       Target SPI mode,                                                                                                                 3 -    -
+                                                              MDF_CCK[1:0] input                                                                                                         MDF_CCK[1:0]
+                                                                                                                                                                                         configured in input,
+               tHDCCKI                                                                    Data hold time w.r.t. MDF_CCK[1:0] input                                0--measured on rising and
+                                                                                                                                                                                         falling edge
+
+
+
+
+
+
+
+212/263                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        DS14791 Rev 10

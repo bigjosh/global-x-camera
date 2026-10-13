@@ -1,0 +1,53 @@
+STM32N6x5xx                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            STM32N6x7xx
+
+3.17 XSPI interface
+
+3.17.1                                                                        Extended-SPI interface (XSPI)
+
+                                   The XSPI supports most  external serial memori es such as serial PSR AMs, serial NAND and
+                                   serial NOR flash memories, HyperRAM™ and HyperFlash™ memories, with the following
+                                   functional modes:
+                                   •                                                                  Indirect: all the operations are perfo rmed using the XSPI re gisters to preset
+                                                commands, addresses, data and transfer parameters.
+                                   •                                                                   Automatic status-pollin g (available only in regular command protocol): the external
+                                                memory status register is periodically read    and an interrupt can be generated in case of
+                                                flag setting.
+                                   •                                                                   Memory-mapped mode: the external memory is memory mapped and it is seen by the
+                                                system as if it was an internal memory, supporting both read and write operations.
+                                   The XSPI supports the fo llowing protocols with a ssociated frame formats:
+                                   •                                                                   regular-command frame format with the command, address, alternate byte, dummy
+                                                cycles and data phase
+                                   •                                                                   HyperBus™ frame format
+                                   Main features:
+                                   •                                                                   Functional modes: indirect, automati  c status-polling, and memory-mapped
+                                   •                                                                  Read and write support in memory-mapped mode
+                                   •                                                                   Support for single, dual, quad, and octal communication
+                                   •                                                                   Dual-memory configuration, where 8 bits   can be sent/received simultaneously by
+                                                accessing two quad or octal memories in parallel
+                                   •                                                                   XSPI mode accessing a single 16-bit memory
+                                   •                                                                   SDR (single-data rate) and DTR (double-transfer rate) support
+                                   •                                                                   Data strobe support
+                                   •                                                                   Fully programmable opcode
+                                   •                                                                   Fully programmable frame format
+                                   •                                                                   Support wrapped-type access to memory in read direction
+                                   •                                                                  HyperBus support
+                                   •                                                                   Integrated FIFO for re ception and transmission
+                                   •                                                                   8-, 16-, and 32-bit data accesses allowed
+                                   •                                                                   DMA protocol support
+                                   •                                                                   DMA channel for indirect mode operations
+                                   •                                                                  Interrupt generation on FIFO threshold, ti  meout, operation complete, and access error
+                                   •                                                                   AXI acceptance 2: acceptance is offered based on a read transaction followed by a
+                                                second write or read request (acknowledged on the bus), while the first one is being
+                                                processed
+                                   •                                                                   Dual chip select support (NCS1 and NCS2)
+                                   •                                                                            Extended external memory support: if two same size external memories (extmem1 and
+                                                extmem2) are connected to the same I/O po  rt, contiguously in the memory map and
+                                                driven by a single XSPI. This  XSPI automatically switches CS   to extmem1 or extmem2,
+                                                according to the address on interconnect side.
+
+
+
+
+                                                                                                                          DS14791 Rev 10                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          43/263
+
+                                                                                                                                                                                                                                                                                                            80

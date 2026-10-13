@@ -1,0 +1,59 @@
+Functional overview                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    STM32N6x5xx STM32N6x7xx
+
+
+                                                       The SPI main features are:
+                                                       •                                                                   Full-duplex synchronous transfers on three lines
+                                                       •                                                                   Half-duplex synchronous transfer on tw  o lines (with bidirectional data line)
+                                                       •                                                                  Simplex synchronous transfers on two lines (with unidirectional data line)
+                                                       •                                                                   From 4- to 32-bit data size selection
+                                                       •                                                                   Multicontroller or mult itarget mode capability
+                                                       •                                                                  Dual-clock domain (the peripheral kernel cl  ock is independent from the APB bus clock)
+                                                       •                                                                  Baud rate prescaler up to kernel frequency divided by two, or bypass from RCC in
+                                                                            controller mode
+                                                       •                                                                  Protection of configuration and setting
+                                                       •                                                                  Hardware or software management of  SS for both controller and target
+                                                       •                                                                   Adjustable minimum delays between data and between SS and data flow
+                                                       •                                                                  Configurable SS signal polarity and  timing, MISO x MOSI swap capability
+                                                       •                                                                  Programmable clock polarity and phase
+                                                       •                                                                   Programmable data order with M SB-first or LSB-first shifting
+                                                       •                                                                  Programmable number of data within a transaction to control SS and CRC
+                                                       •                                                                  Dedicated transmission and receptio n flags with interrupt capability
+                                                       •                                                                   Support of SPI Motorola ® and Texas Instruments ® formats
+                                                       •                                                                   Hardware CRC feature can verify the integr  ity of the communication at the end of
+                                                                            transaction by:
+                                                                            –                                                        Adding CRC value in Tx mode
+                                                                            –                                                        Automatic CRC error checking for Rx mode
+                                                       •                                                                   Error detection with in terrupt capability in case of data over run, CRC error, data
+                                                                            underrun, the mode fault, and frame error, depending upon the operating mode
+                                                       •                                                                   Two 8-bit width embedded Rx and Tx FIFO  s, whose size depends upon the instance
+                                                       •                                                                  Configurable FIFO thresholds (data packing)
+                                                       •                                                                   Configurable behavior at target underru  n condition (support of cascaded circular
+                                                                            buffers)
+                                                       •                                                                   Configurable behavior at target underru  n condition (support of cascaded circular
+                                                                            buffers)
+                                                       •                                                                          Optional status pin RDY signaling that the target device is ready to handle the data flow
+
+
+
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Table 14. SPI features
+
+                                                                                                         Feature                                                                                                                                                                                                                                                            SPI1, SPI2, SPI3, SPI6                                                                                                                                                                                                                                             SPI4, SPI5
+
+                                                          Data and CRC size                                                                                                                                                                                                                                Configurable from 4 to 32 bits                                                              Configurable from 4 to 16 bits
+                                                          CRC computation                                                                                                                                                                                                                                                                                          CRC polynomial length, CRC polynomial length,
+                                                                                                                                                                                                   configurable from 5 to 33 bits                                                                                                      configurable from 5 to 17 bits
+                                                          Size of FIFOs                                                                                                                                                                                                                                                                                                                                                                                                                                                            16x8 bits                                                                                                                                                                                                                                                                                                                                                                         8x8 bits
+                                                          Number of data control (TSIZE)                                                                                                                                                                                                                                                                                                                                                                                                                               Up to 65536
+                                                          I2S feature                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     Yes                                                                                                                                                                                                                                                                                                                                                                                                                                                            No
+
+
+
+
+
+
+
+74/263                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          DS14791 Rev 10

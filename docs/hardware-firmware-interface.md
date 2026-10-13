@@ -1,0 +1,86 @@
+# Hardware / firmware interface: current contract and recovered pin map
+
+**Updated: October 13, 2026.** Current behavior follows the [project decision register](decisions/2026-10-13-project-baseline.md), [specification](../spec.md) and [power implementation study](../power.md). Accepted behavior is not implemented or measured firmware. The existing firmware design still needs integration; its absence does not block justified hardware corrections.
+
+**Historical pin-map evidence:** the connection table below preserves the September 5 EDIF/recovered CAD, not the newly selected CAM-6G3-073CLR/LTC3621 circuit. The [full design review](DESIGN-REVIEW.md) and its physical pin/voltage tables identify confirmed faults. Preserve that evidence while revising the affected connections; this document does not certify them.
+
+## Evidence and status
+
+- **Current requirement:** accepted behavior in the decision register and current sections of [spec.md](../spec.md). Historical implementation sections describe the recovered circuit and do not override later decisions.
+- **Exported connection:** connectivity present in [netlist.edif](../netlist.edif), indexed in [parts-inventory.json](../datasheets/parts-inventory.json). The export contains logical MCU ports, without the physical package-ball mapping or proof that the selected peripheral functions are valid.
+- **To reconcile:** a hardware/firmware decision requiring document review, the existing firmware design, or measurements. These are focused review items, not reasons to pause all hardware work.
+
+The original EDIF has 146 components and 81 nets. The completed [KiCad reconstruction](../hardware/reconstruction/README.md) has 148 components, including optional SW2/SW3, and 81 nets. Reference designators and recovered connectivity are evidence to preserve in the record, not a prohibition on correcting confirmed faults.
+
+The [Flux snapshot](../imports/flux/2026-09-05/README.md) was reconciled during reconstruction, including physical J3/LED aliases and documented additions/inferences. An October 12 export still matched the reviewed reconstructed connectivity; the new camera/power decisions and electrical corrections have not been applied. ERC consistency is not evidence of circuit qualification. See the reconstruction record and [current specification status](../spec.md#8-current-verification-status).
+
+## Current behavior and firmware contract
+
+**Capture and capacity:** STM32N6 remains active; Himax is abandoned. The prototype uses CAM-6G3-073CLR / VD56G3 with 73° diagonal field of view and uncompressed packed RAW10 at full native resolution. Retain at least 200 photos between downloads. Each packed image payload is 1,916,420 bytes before metadata; actual capacity, NAND part/interface, allocation and reserve policy remain to be qualified. The former 644 × 604 VD55G0 image describes the recovered circuit only.
+
+**Timing and input:** with USB disconnected, a shutter press starts the main supply; it must last until early firmware establishes GPIO HOLD. From fully powered off, **start of exposure must occur within ≤50 ms of the shutter-button press**. Exposure duration, frame readout, save and shutdown are measured separately afterward. Ignore additional presses during capture/save, finish the current operation and queue no exposure. A new capture requires a fresh press after ready; a busy press held through completion must not become a deferred shot.
+
+**Storage:** preserve existing committed photos and refuse new captures when no usable slot remains; indicate full using the status LED. Full payload readback plus checksum comparison is configurable and enabled by default during bring-up/initial testing; it may be disabled later. In either mode, generate integrity metadata/checksums, wait for program completion, check status/failures, perform required ECC/bad-block/recovery handling, and read back and verify the final durable commit record before successful-save shutdown. ECC status does not verify an unread payload. The criterion for later disabling full readback remains unsettled; firmware and the final storage format remain unimplemented.
+
+**Power and shutdown:** four series CR2032 cells through LTC3621 are selected. The room-temperature 100 nA OFF target applies to the complete main path, including regulator and external pack-connected leakage; retained RTC cell-tap backup is additional and must be measured/budgeted separately. After safe save, prepare peripherals and shutdown configuration, then enter genuine N6 Standby while an ordinary HOLD GPIO remains driven until entry. Standby makes that GPIO high impedance; Stop retains its configuration. Retain external pulldowns, select a pin outside the documented exceptions and prevent held-button wake retriggering. In the existing divider/HOLD concept, a held button keeps the buck enabled until release. External PWR_ON/AUX sequencing and any optional RUN-to-ground shutdown delay remain unimplemented: AUX must discharge below 0.6 V before main supplies leave their valid range. See [power.md §6](../power.md#6-camera-integration-requirements).
+
+**USB:** USB powers download/explicit-erase mode independently of the batteries and the shutter has no operation. Emulate a host-visible USB mass-storage drive presenting photos as files. Choose the easiest practical emulated filesystem and photo representation during prototype firmware work; host write/delete semantics are not selected. Connecting USB or downloading does not erase photos; reclaim saved-photo space through an explicit USB erase action after download. USB detection, source isolation and unintended battery-converter enable remain hardware integration work, including the Nucleo test arrangement.
+
+**Deferred directions:** VD5943/custom optics, spring-driven mechanical frame advance and FD-03 series-capacitor pulse start remain future work. FD-03 could permit shutdown despite a held button; it is not the optional RUN-to-ground delay and does not replace the current divider/HOLD baseline. No capacitor values or SPST-reset-bleed/SPDT arrangement are selected.
+
+The recovered specification records a 40 MHz HSE, execution from internal SRAM after early boot loading, and primary/redundant FSBL locations of `0x00000` / `0x40000`. Reconcile these inherited implementation inputs with boot ROM behavior and the existing firmware; they are not independently validated boot settings.
+
+The recovered VD55G0 camera connection uses one CSI-2 data lane plus differential clock, a 1.8 V configuration bus, an MCU-generated master clock and shutdown/analog-enable controls. Its historical sequence keeps shutdown asserted, establishes core and I/O rails, delays analog enable by approximately 1 ms, establishes MCLK and releases shutdown. Do not carry these values into VD56G3 unchanged: verify the selected module's supplies, connector, supported lane/mode, clocks, register sequence and exposure-start timing.
+
+## Historical exported control connections
+
+The entries below are **U1 logical port names from EDIF**, not BGA ball coordinates. Peripheral-looking net names do not establish alternate-function validity. Grouped entries retain corresponding order.
+
+| Named net(s) | U1 logical port(s) | Recorded purpose / reconciliation point |
+| --- | --- | --- |
+| `PWR_HOLD` | `PWR_ON` | Recovered connection drives Q2; R3 pulls down. This is the dedicated hardware PWR_ON output, automatically asserted before firmware and low in Standby, not an ordinary GPIO. The new diode HOLD needs a suitable ordinary GPIO; external AUX sequencing still uses the hardware signal as appropriate. |
+| `SHUTTER_SENSE` | `PC13` | SW1 grounds the net and D3 couples it to the battery-level latch. Confirmed PWR-001 overvoltage path; do not reuse unchanged. New low-voltage sensing, if needed, must respect ignored busy presses and USB inactivity. |
+| `CAM_AVDD_EN` | `PC12` | U9 analog LDO enable; R21 pulls down. Intended to be asserted after lower camera rails are valid. |
+| `CAM_XSHUTDOWN` | `PC8` | Camera shutdown control; R20 pulls down. Intended to stay low until the required supplies and clock are ready. |
+| `CAM_MCLK` | `PC9` | Drives module `CLKIN`, also TP13. Check this exact pin's clock-output capability and intended rate; the spec records a nominal accepted range of 6–27 MHz. |
+| `I2C4_SCL`, `I2C4_SDA` | `PC10`, `PC11` | Camera configuration bus, 4.7 kOhm pull-ups to 1.8 V. Validate actual peripheral assignment and bank voltage. |
+| `CAM_CSI_CLK_P`, `CAM_CSI_CLK_N` | `CSI_CKP`, `CSI_CKN` | Dedicated CSI clock receiver. |
+| `CAM_CSI_D0_P`, `CAM_CSI_D0_N` | `CSI_D0P`, `CSI_D0N` | Dedicated CSI lane 0; module endpoints are named `DATA1P` / `DATA1N`. Verify connector physical mapping and supported one-lane mode. |
+| `BOOT_XSPI_CLK`, `BOOT_XSPI_NCS` | `PN6`, `PN12` | Confirmed MCU-001: ROM serial-NOR boot requires NCS on PN1/R17, not the recovered PN12/P14. Keep this historical row as evidence; implement and verify the correction before boot qualification. |
+| `BOOT_XSPI_IO0` … `BOOT_XSPI_IO3` | `PN2`, `PN3`, `PN4`, `PN5` | Four NOR data signals. Confirm boot configuration, I/O voltage, device state at reset, and recovery path. |
+| `BOOT0`, `BOOT1` | `BOOT0`, `PA6` | Strap nets have pulldowns; BOOT0 has TP6. Confirm boot modes and physical recovery access. |
+| `NAND_NWP` | `PA4` | NAND active-low write protect; R16 pulls down. Firmware must deliberately deassert protection for program/erase. |
+| `NAND_RNB` | `PF2` | Confirmed MCU-003: PF2 is FMC_NWAIT, not FMC_RNB; PA7/R12 provides FMC_RNB if parallel NAND is retained. Resolve pin/controller, completion, failure and timeout handling against the ultimately selected memory interface. |
+| `RTC_I2C1_SCL`, `RTC_I2C1_SDA` | `PE5`, `PE6` | RTC bus pulled up to switched 3.3 V; validate alternate functions. Spec requires RV-3028 `BSM=11` and timestamp/status validation. |
+| `RTC_INT_N` | `PH2` | Confirmed MCU-004: recovered 3.3 V pull-up drives a 1.8 V VDDIO4 bank. Correct the voltage-domain connection before use; interrupt use/polarity remains a firmware choice. |
+| `ACCEL_PWR_EN` | `PC1` | U12 load-switch enable with R32 pulldown. Enable, wait for valid data, sample orientation, then disable. |
+| `ACCEL_I2C_SCL`, `ACCEL_I2C_SDA` | `PC2`, `PC3` | Dedicated software-I2C bus, specified at 100 kHz with 10 kOhm pull-ups to switched 1.8 V. Spec permits remapping to voltage-compatible GPIOs for routing. |
+| `ACCEL_INT1` | `PC4` | Optional accelerometer data-ready/diagnostic input. |
+| `STATUS_LED_K` | `PC0` | LED cathode, with anode fed through R12 from 3.3 V. Intended active-low indication. |
+| `SWDIO`, `SWCLK`, `SWO`, `NRST` | `PA13`, `PA14`, `PB5`, `NRST` | J2 debug connections. Preserve probe access; check exact package mapping and Tag-Connect contact assignment. |
+
+Confirmed mapping/fault references: [MCU review](review/mcu-review.md) and [power review](review/power-review.md). The remaining rows preserve recovered signals and require selected-module and voltage-domain reconciliation; they are not a final prototype pin assignment.
+
+## Integration work before release
+
+| Interface | Current requirement / recovered evidence | Evidence or implementation still needed | Hardware work that can proceed |
+| --- | --- | --- | --- |
+| Boot and first power hold | External NOR; corrected fixed ROM NCS; ordinary GPIO HOLD as early as boot permits, with button held until takeover. | Reconcile boot mode/header, NOR initialization and voltage, FSBL placement, GPIO bank/pin and minimum successful press duration. No guaranteed arbitrary quick-tap start is established. | Correct the known ROM chip-select fault; revise latch, supplies and debug, preserving boot/recovery access. |
+| ≤50 ms exposure-start target | Settled: shutter-button press to start of exposure from fully powered off. Exposure duration, readout, save and shutdown follow separately. | Instrument ramp, ROM/FSBL, load, clocks and selected camera initialization through exposure start. No measured compliance exists; this is no longer an open definition of acquisition. | Provide measurement access and establish startup estimates alongside hardware integration. |
+| Rail sequencing | N6 main/AUX ordering and selected-module sequencing must be implemented; inherited firmware rail actions do not control the existing automatic enables. | **The EDIF ties U7.EN to 3V3 and U10.EN to 1V8**, and joins main/AON and AUX loads on one 1V8 rail. `PG_3V3` and `PG_1V8` have no exported U1 connection. Separate the required domains and qualify enable/discharge timing before adopting the revised firmware sequence. | Revise regulator enable/discharge and power-good wiring, reset conditions, default pulls and rail measurement access. |
+| CSI operating mode and throughput | CAM-6G3-073CLR / VD56G3, full native uncompressed packed RAW10; old one-lane VD55G0 wiring is historical. | Qualify the selected module's lane/mode, clocks, supplies, connector, receiver configuration and RAM/timing budget. Check relevant MCU/sensor errata. | Correct connector geometry and plan selected-module/MCU placement; obtain fabricator impedance geometry. |
+| Clock and pin capabilities | Recovered 40 MHz HSE; PC9 feeds camera clock; named camera/RTC I2C buses. | Reconcile clock tree, alternate functions, I/O-bank voltages and output rate with the selected camera and firmware. Net labels alone are insufficient. | Reuse the validated package mapping while reviewing revised signal assignments and reserving the camera-clock route. Recovered assignments are not a final prototype pin map. |
+| NAND integrity and latency | Minimum 200 usable photos; optional full payload readback, mandatory completion/failure checks and verified durable commit; preserve photos when full. | Choose/qualify the memory part/interface, ECC/OOB and bad-block layout, format, reserve, commit/recovery implementation and measured write/readback energy. CRCs alone are not ECC. | Review the selected interface/controller, voltage, protection defaults, decoupling and placement; do not freeze the old 2 Gbit parallel part by inference. |
+| USB / backup / switched sensors | USB-powered host-visible drive for download/explicit erase, shutter inactive; retained separate RTC backup; switched accelerometer. | Implement emulated filesystem/photo files, source detection/inhibit and reverse isolation, RTC configuration persistence, accelerometer data latency and unpowered-pin states. | Review USB/Nucleo power injection and isolation, correct RTC interrupt voltage, preserve debug/measurement access and qualify switched-rail interfaces. |
+
+The archived manufacturer documents for these checks are indexed in [datasheets/README.md](../datasheets/README.md). This note identifies work to validate; it does not claim the datasheet checks or timing measurements are complete.
+
+## Work sequence while firmware is integrated
+
+1. Use the completed KiCad reconstruction and its evidence as the historical starting point. Apply the selected camera/power integration and confirmed electrical corrections, recording intentional connectivity changes separately.
+2. Review the revised supplies/latch, default states, voltage domains, pin functions, boot wiring and footprints. Use the integration table to resolve interfaces that can change copper.
+3. Establish placement groups, decoupling and power-loop placement, BGA escape feasibility, camera/USB routing corridors, and mechanical reserves using a conventional four-layer process as the working target.
+4. Reconcile the firmware's existing pin/clock configuration, boot/startup sequence, sensor mode, and storage integrity design when those artifacts arrive. A concise pin map and startup timing outline are useful even before the complete firmware tree is integrated.
+5. Freeze affected pin assignments and high-speed routing constraints after their checks; obtain actual fabricator stackup and manufacturing rules before final routing geometry and release verification.
+
+Firmware integration runs alongside hardware work. It is required to validate the shared interface and end-to-end behavior; it does not block circuit corrections, footprint validation or placement planning. The 1.6 mm/four-layer PCB is provisional, and the ≤5 mm finished-product thickness is a design target that may be exceeded by the functional prototype.

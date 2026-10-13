@@ -1,0 +1,62 @@
+                                                                                                  W25Q128JV
+
+
+8.2.20     Erase / Program Resume (7Ah)
+The Erase/Program Resume instruction “7Ah” must be written                      to resume the Sector or Block Erase
+operation or the Page Program operation after an Erase/Program Suspend. The Resume instruction “7Ah”
+will be accepted by the device only if the SUS bit in the Status Register equals to 1 and the BUSY bit
+equals to 0. After issued the SUS bit will be cleared from 1 to 0 immediately, the BUSY bit will be set from
+0 to 1 within 200ns and the Sector or Block will complete the erase operation or the page will complete the
+program operation. If the SUS bit equals to 0 or the BUSY bit equals to 1, the Resume instruction “7Ah”
+will be ignored by the device. The Erase/Program Resume instruction sequence is shown in Figure 36a.
+
+Resume instruction is ignored if the previous Erase/Program Suspend operation was interrupted by
+unexpected power off. It is also required that a subsequent Erase/Program Suspend instruction not to be
+issued within a minimum of time of “tSUS” following a previous Resume instruction.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                        Figure 36a. Erase/Program Resume Instruction
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                            - 43 -
