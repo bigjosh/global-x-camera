@@ -369,6 +369,14 @@ If the read indicates future media unreliability, permanently exclude the whole 
 
 Only an explicit host delete removes a photo. No read success, error or retirement triggers automatic deletion or relocation. A complete recovered object may transfer successfully while carrying integrity warnings; actual truncation/link failure still fails. PTP object names may be fetched before the current payload read, so current-read filename updates require host qualification; EXIF must describe the actual RAM buffer. Do not add background scans to work around name timing. See the [accepted read policy](docs/decisions/ecc-read-error-review.md).
 
+### 6.9 Slot-state persistence — provisional October 14, 2026
+
+Use a RAM lookup table backed by redundant append-only NAND journals and protected checkpoints as the prototype working direction (D-30). The fixed-slot model distinguishes FREE/PARTIAL/FULL occupancy from GOOD/BAD health. Allocate only slots established as FREE and GOOD; make allocation durable before payload writes, and complete the required save checks and verified commit before FULL. Host-authorized deletion must recover safely and establish successful erase before reusable FREE; BAD remains permanent through deletion and later good reads.
+
+Exact record encoding, physical reserve, checkpoint rotation, copy/commit protocol and startup bounds remain to design and qualify. The illustrative 16-block metadata reserve is not a frozen layout. No repeated in-place programming of state bits is assumed.
+
+Retain off-NAND table storage and in-slot allocation/commit/health records as future directions (FD-04/FD-05). A first page reading FF alone is not sufficient evidence that the entire slot is safely erased. Vendor factory-bad markers must be preserved; runtime retirement must not modify retained photos, hide them from reads or change their physical mapping. See the [slot-state analysis](docs/decisions/slot-state-storage-review.md).
+
 ## 7. Validation and bring-up
 
 Adapt the recovered circuit checklist below to the implemented CAM-6G3-073CLR/LTC3621 revision; references to Q1/Q3 and old rail names are not instructions to retain the superseded power path.

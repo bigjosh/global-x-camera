@@ -1,8 +1,8 @@
 # Fixed image slots and persistent state tables
 
-October 14, 2026. **User-proposed working direction; backing storage and exact metadata redundancy remain undecided.** This follows the [additional redundancy discussion](storage-redundancy-review.md). Existing accepted requirements in [D-17 and D-26–D-29](2026-10-13-project-baseline.md) still apply. No new hardware part or on-media format is selected here.
+October 14, 2026. **Provisional prototype choice: RAM slot table backed by redundant append-only NAND journals and protected checkpoints.** The user asked to “pencil in the journal system” and retain both off-NAND table storage and in-slot state as future directions. Exact physical format, reserve size, recovery protocol and broader metadata redundancy remain to design and qualify. Existing accepted requirements in [D-17 and D-26–D-30](2026-10-13-project-baseline.md) still apply.
 
-## User proposal
+## Fixed-slot working model
 
 Use one fixed-size slot per capture. Each slot contains a fixed number of NAND blocks sufficient for image data and image metadata. Track two independent attributes:
 
@@ -15,9 +15,9 @@ For a new capture, scan the table for the first FREE and GOOD slot. Persist PART
 
 PARTIAL corresponds conceptually to the accepted USED-without-DONE state; FULL corresponds to a valid completed commit. This is not a choice of bit encoding. An interrupted photo remains occupied and its bytes are retained without automatic erase or overwrite until explicit deletion; the interruption may have corrupted the current write. The user specifically described deletion of FULL slots; the host interface for explicitly deleting PARTIAL captures still needs definition.
 
-The user raised concern about wear from rewriting redundant NAND state tables on every change and suggested FRAM as an alternative. This note records that proposal without treating the earlier two-copy NAND layout as approved.
+The user raised concern about wear from rewriting redundant NAND state tables on every change and suggested FRAM as an alternative. After the partial-programming discussion below, the user provisionally selected journaling. That choice does not freeze the earlier proposal's exact per-photo metadata duplication or the on-media layout.
 
-## Recommendation for discussion
+## Provisional prototype approach
 
 Keep the lookup table in ordinary MCU RAM while powered. Persist changes in **two append-only NAND metadata journals, with protected checkpoints and rotation across reserved erase blocks**. Reconstruct the RAM table from a checkpoint plus a bounded journal tail at startup. FRAM remains a strong alternative if measured startup, energy or firmware complexity justifies another chip.
 
@@ -50,7 +50,7 @@ Sixteen reserved blocks occupy 2 MiB with 128 KiB blocks or 4 MiB with 256 KiB b
 
 ## Follow-up: individual bit updates and wear
 
-October 14 clarification: the user asked whether successive 1-to-0 changes in the same page are possible and whether each costs a full erase/program cycle. This is an explanation and device constraint, not approval of the proposed journal.
+October 14 clarification: the user asked whether successive 1-to-0 changes in the same page are possible and whether each costs a full erase/program cycle. These device constraints informed the subsequent provisional journal choice.
 
 At the logical level, an erased SLC NAND cell reads 1 and programming can change it to 0; restoring it to 1 requires erasing its entire block. NAND does not provide an independently erasable page or a general-purpose bit-write interface. The host loads bytes into a volatile page buffer and issues an array-program operation. Multiple edits to the buffer before a single execute are not multiple physical NAND programs and are not durable until execution completes.
 
@@ -65,7 +65,7 @@ A partial program is **not automatically one complete program/erase endurance cy
 
 For the illustrative 64-page block, programming each fresh page once and then erasing the block for reuse is one block program/erase cycle, not 64 block erase cycles. This is why the journal estimate divides page programs by pages per block. Its estimate does not rely on repeatedly programming individual bits within a page.
 
-For the proposed state table, use a fresh page for each durable record under the conservative layout; do not encode later PARTIAL/FULL/BAD transitions by revisiting bits in an already-programmed ECC page. The backing-medium decision remains open.
+For the proposed state table, use a fresh page for each durable record under the conservative layout; do not encode later PARTIAL/FULL/BAD transitions by revisiting bits in an already-programmed ECC page. Journaling is now the provisional choice; the alternatives below remain future research.
 
 Sources:
 - [Alliance AS5F Rev.3.1](https://www.alliancememory.com/wp-content/uploads/AllianceMemory_AS5F_QSPI_NAND_Flash_3V-1Gb-8Gb_1p8V-2Gb-4Gb-8Gb_Ver3.1_O.pdf), pages 29–33, 36 and 39: load/execute distinction, block erase and parameter-page limit.
@@ -86,7 +86,28 @@ Sources:
 
 For the factory-bad-block capacity example, the archived W25N04KW has 4,096 blocks and specifies a minimum of 4,016 valid blocks. Fifteen 128 KiB blocks can hold the 1,916,420-byte RAW10 payload plus about 49 KiB of metadata. Contiguous groups yield floor(4,096 / 15) = 273 groups; 80 bad blocks scattered across distinct groups could reduce this to 193 even before metadata reserve. A known-good-block mapping avoids that particular loss mechanism. This is an illustrative geometry, not the final layout.
 
-## Sources and next decision
+## Future directions retained October 14
+
+The user's instruction is to keep both alternatives open, independently or in combination:
+
+1. **Store the slot table outside the image NAND.** Investigate FRAM, suitably isolated boot NOR or another nonvolatile location. Preserve the same power-off retention, transaction integrity, permanent retirement and startup requirements.
+2. **Make each slot describe its own state.** Investigate the user's proposed all-FF = FREE, final-page completion marker = FULL, otherwise programmed = PARTIAL scheme, with a first-page scan to find a candidate free slot. Investigate using the device's existing bad-block marking mechanism for GOOD/BAD where its exact programming and preservation rules permit. This is a research direction, not an approved allocation test or a finished implementation.
+
+A promising refinement is a protected non-FF allocation header written and verified before any payload, followed by image/metadata pages and a dedicated fresh commit page programmed last. The commit must carry/check the slot/photo identity and generation, length and integrity information and match the header; a bare magic constant is insufficient. A valid commit establishes completion of the save transaction, not perpetual payload integrity. Current-read ECC/CRC checks still apply. Reserved commit pages, duplication and their capacity cost remain to design.
+
+**First-page FF is only a candidate hint.** It cannot establish that every block is erased: deletion might erase the first block and then lose power, leaving later blocks and an old commit record. Erasing the header block last reduces that particular case but does not solve interrupted erase of the header block itself. Even reading all user bytes as FF does not prove successful erase completion or healthy ECC/spare state. A failed, suspect or unreadable metadata page must not be interpreted as FREE.
+
+A future layout needs durable deletion intent and recovery rules until every reusable block has completed erase/status checks and reusable state is established. This may use protected in-slot records plus a small external deletion/retirement ledger, or another proven scheme. Merely erasing again when a first page looks FF is not authorized while the slot might contain an undeleted current photo. PARTIAL captures remain retained until explicit deletion.
+
+**Factory markers identify physical blocks, not whole image slots.** For the Alliance candidate, the documented marker is in the first spare-area location of the first page of each block, read before any program or erase operation. These are specific reserved bytes; do not assume entire reserved pages are freely available for repeated status updates. Preserve original factory markers and the immutable slot-to-block map. Adding a runtime marker to a live page may violate one-program/ECC restrictions and must not corrupt an existing photo.
+
+For the provisional journal, keep permanent runtime slot retirement in protected healthy management storage. A retired slot remains readable and stays excluded from future allocation after deletion. A future use of vendor-supported grown-bad markers must retain those semantics and must not cause a generic skip-bad reader to hide images or renumber their physical mapping. Blank factory markers alone do not prove GOOD, and failure to persist a new retirement record cannot silently authorize reuse.
+
+Only metadata pages need be inspected for the proposed scan; a full payload scan is not selected. Bound and measure the worst-case metadata scan alongside startup against the 50 ms exposure requirement. Do not treat a typical per-page read time or an early free slot as a worst-case guarantee.
+
+Sources: [Alliance Rev.3.1](https://www.alliancememory.com/wp-content/uploads/AllianceMemory_AS5F_QSPI_NAND_Flash_3V-1Gb-8Gb_1p8V-2Gb-4Gb-8Gb_Ver3.1_O.pdf), pages 39 and 43, for program count and factory-marker location; the [prior interrupted-operation review](../review/camera-memory-review.md#mem-002---power-fail-recovery-must-respect-partial-program-and-erase-rules) for the historical Macronix warning about interrupted program/erase retention; [Winbond AN0000040](https://du4vjmorpxp6c.cloudfront.net/winbond-application-notes/qspi-nand/an40-how-to-work-with-winbond-serial-nand-flash-build-in-ecc-v1.pdf), page 1, for the distinction between blank-looking user data and already-programmed ECC. The recovery refinements are engineering analysis; their exact-part implementation remains unqualified.
+
+## Sources and remaining work
 
 Primary references checked October 14, 2026:
 
@@ -98,4 +119,4 @@ Primary references checked October 14, 2026:
 - [Archived W25Q128JV Rev M](../../datasheets/memory/W25Q128JV_datasheet_RevM.pdf), printed page 4: sector erase geometry/endurance for the historical boot-NOR candidate.
 - [STM32N657X0 product information](https://www.st.com/en/microcontrollers-microprocessors/stm32n657x0.html) and [archived DS14791](../../datasheets/processor/STM32N657X0_DS14791_datasheet.pdf), section 3.4.5: SRAM/backup SRAM and its power dependency.
 
-**Current decision requested:** use the redundant NAND journal for the prototype, keeping FRAM as an alternative if timing, energy or implementation complexity warrants it. The user's fixed-slot proposal is recorded; neither its exact physical format nor the backing-medium recommendation is approved by this note.
+**Current status:** the journal system is provisionally selected for the prototype. Off-NAND table storage and in-slot state/possible bad-block-marker reuse are retained as future directions. Exact metadata format, redundancy, erase recovery and allocation qualification remain engineering work; no first-page-FF shortcut is adopted.
