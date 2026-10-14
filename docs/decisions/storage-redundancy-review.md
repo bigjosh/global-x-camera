@@ -2,6 +2,8 @@
 
 October 14, 2026. **Recommendation for discussion, not approved.** The user asked what additional redundancy to use after accepting [D-29's request-driven reads without relocation](2026-10-13-project-baseline.md). The existing ECC, CRC-32C, mandatory commit verification, source-preserving read behavior and explicit-only deletion remain in force.
 
+**Follow-up:** the user proposed fixed-size image slots with FREE/PARTIAL/FULL and GOOD/BAD state, and asked whether FRAM or another method should hold the state tables. The [slot-state storage review](slot-state-storage-review.md) is now the current discussion. The NAND-specific two-copy layout below remains a proposal; choosing FRAM would require a corresponding transactional layout there.
+
 ## Recommendation
 
 For the prototype, **store one copy of each image payload, with two separately protected copies of critical metadata in different physical erase blocks**. Keep the selected NAND's required ECC and the original-image CRC-32C. Do not add image mirroring or software parity across images at this stage.
@@ -46,4 +48,4 @@ Additional payload parity could cost less space than full mirroring, but would a
 - [Winbond's technical FAQ](https://www.winbond.com/hq/support/faq/technical/?__locale=en), checked October 14, describes built-in ECC and media failure/bad-block handling. That is device-management context, not a vendor endorsement of this proposed two-copy metadata format. Exact-part documentation takes precedence over generic FAQ rules.
 - This proposal does not establish ten-year retention through 1,000 cycles. Both metadata and pixels still require exact-part qualification. It preserves fresh whole-image NAND-to-RAM reads only on host image requests, current-read warning export, permanent predictive-error retirement and explicit-only photo deletion.
 
-**Decision requested:** one image payload copy with two independently protected copies of critical metadata; no added image mirroring or software parity for the prototype. Exact layout and recovery protocol remain engineering work.
+**Proposal still pending:** one image payload copy with two independently protected copies of critical metadata; no added image mirroring or software parity for the prototype. The current decision is where/how to persist the user's proposed slot-state table, covered in the [slot-state storage review](slot-state-storage-review.md). Exact layout and recovery protocol remain engineering work.
