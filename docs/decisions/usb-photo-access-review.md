@@ -16,9 +16,10 @@ These are interface choices; the device still needs its own durable NAND allocat
 
 ## Accepted behavior and implementation obligations
 
-- Use stable photo identifiers/handles to enumerate committed records and serve object metadata and image bytes. Generate the selected export format and valid EXIF during USB access as already planned; omit BAD fields. File format/container, thumbnail behavior and precise host compatibility remain to test.
+- Use stable photo identifiers/handles to enumerate committed records using catalog metadata. Each image-data request freshly reads the original NAND image fully into RAM, checks it, and serves that request's result; do not pre-scan image payloads, reuse an earlier request's pixels, refresh or relocate images. Generate the selected export format and valid EXIF during USB access as already planned; omit BAD fields. File format/container, thumbnail behavior and precise host compatibility remain to test.
 - Treat a host's explicit per-photo delete operation as authorization to delete that selected photo. Persist deletion state safely, then reclaim NAND blocks without damaging other photos. Logical deletion and physical block erasure may occur at different times. Acknowledging deletion must mean the logical deletion is durable; physical erase scheduling and interrupted-erase recovery remain implementation work.
 - Download/read success does not itself trigger deletion or prove the host has durably backed up the photo. The host application can offer a user-selected delete-after-import workflow that sends a separate delete request. Report transfer/delete failures to the host. Distinguish successful delivery of an explicitly identified recovered image from verification of the original image; host-visible integrity diagnostics must preserve the user's ability to keep recovered bytes.
+- Current-read warnings use filename/EXIF, but PTP can supply a filename before the payload read detects a new error. Qualify object-information updates and real host behavior; the returned EXIF must describe the actual RAM buffer. No background image scan is permitted to precompute warning names.
 - Keep capture disabled in USB mode even though PTP includes optional remote-camera operations. Advertise only supported operations. Preserve the accepted incomplete USED/not-DONE policy and avoid accidental reclamation when other photos are deleted.
 
 PTP gives firmware a specific image-delete request instead of filesystem block changes. The protocol choice is approved, but the stack is not integrated or qualified. Test list/download/delete, errors and disconnect recovery on the Nucleo and intended hosts before freezing implementation. The generated photo format remains to be selected; packed RAW10 alone is not a generally recognized picture file.
@@ -36,6 +37,7 @@ PTP gives firmware a specific image-delete request instead of filesystem block c
 1. **Settled:** PTP camera interface and explicit per-photo host deletion.
 2. **Settled:** [ECC/CRC-32C, damaged-photo recovery and block retirement](ecc-read-error-review.md). Complete recovered-image objects may transfer successfully while carrying integrity warnings; real transfer failures still report errors.
 3. **Settled:** `_RECOVERED` filename suffix plus EXIF UserComment for damaged exports.
-4. **Current:** handling retained data on retired blocks; USB-powered verified copy-out is proposed. Additional redundancy follows. Ten-year retention must not require periodic USB refresh.
+4. **Settled:** fresh full-image NAND-to-RAM reads only on host image-data requests, no relocation/refresh, and predictive-error slot retirement without deleting the image.
+5. **Next:** additional redundancy. Ten-year retention remains a qualification requirement; repeated reads of an already marginal image are not guaranteed to succeed.
 
 The [decision register](2026-10-13-project-baseline.md) remains authoritative. D-25 supersedes the drive-presentation portion of D-12 and selects explicit per-photo deletion; USB power and inactive-shutter requirements remain unchanged.

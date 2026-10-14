@@ -9,7 +9,8 @@ October 14, 2026. **Ten-year room-temperature retention and 1,000 complete reuse
 3. USB photo-transfer and deletion — **settled: PTP with explicit per-photo deletion**; see the [USB access review](usb-photo-access-review.md).
 4. [ECC and read-error handling](ecc-read-error-review.md) — **settled:** ECC/CRC-32C, recoverable damaged-image export and permanent block retirement.
 5. Damaged-image warning — **settled:** `_RECOVERED` filename suffix plus EXIF UserComment.
-6. **Current:** handling retained data on retired blocks; verified USB copy-out is proposed. Additional redundancy follows separately.
+6. **Settled:** each host image-data request freshly reads/checks the original NAND image in RAM; no relocation/refresh. Predictive media errors retire its slot without deleting it.
+7. **Next:** additional redundancy.
 
 Discuss one item at a time. This review does not change the accepted RAW10/capacity, configurable payload readback, explicit-erase, USED/DONE or USB error-reporting policies.
 
@@ -17,7 +18,7 @@ Discuss one item at a time. This review does not change the accepted RAW10/capac
 
 Require **10 years of retention at room temperature (approximately 25°C as the reference), fully unpowered, with no refresh needed**. Successfully committed photos and the metadata needed to identify, decode and verify them must remain recoverable using the selected device's required ECC. No periodic wake, battery power, USB connection or maintenance write may be required during that retention interval. Removing or exhausting the batteries must not itself shorten this storage requirement; maintaining the running RTC clock is a separate matter.
 
-This is an accepted requirement, not demonstrated compliance. Qualification must cover the agreed erase/reuse lifetime and temperature history; the acceptance must not silently apply only to new, uncycled memory. Sustained hot-car storage is not covered by this room-temperature requirement. Optional maintenance during USB use must not be necessary to satisfy the ten-year fully-unpowered requirement. The accepted read policy distinguishes verified corrections from damaged-image recovery and retires marginal/damaged image blocks from future allocation. Handling the retained marginal data safely remains to resolve; retirement alone does not refresh it.
+This is an accepted requirement, not demonstrated compliance. Qualification must cover the agreed erase/reuse lifetime and temperature history; the acceptance must not silently apply only to new, uncycled memory. Sustained hot-car storage is not covered by this room-temperature requirement. No image relocation or refresh is selected. The accepted read policy checks the whole original image in RAM only on host image-data requests, reports current-read warnings and retires a slot from future writes on predictive media errors. Retired images stay in place until host deletion; later reads may deteriorate. Retirement alone does not restore retention, so exact-part qualification must account for vendor marginal-data requirements.
 
 ## Evidence checked October 14
 
@@ -33,6 +34,6 @@ Confirm the exact part's retention conditions, required ECC, supported temperatu
 
 Require a storage lifetime of **1,000 complete fill/download/explicit-erase cycles**, while retaining the accepted ten-year room-temperature unpowered requirement for photos saved at the end of that rated usage. At the accepted minimum capacity of 200 photos, this represents **200,000 photo saves** across the storage lifetime; it is not a guarantee of battery life or mechanical shutter life.
 
-This is an accepted workload, not 1,000 lifetime downloads or an assertion that every physical NAND block sees exactly 1,000 erases. Partial downloads do not consume an erase cycle, while allocation metadata, retries, recovery and any later adopted refresh can concentrate physical wear. Qualification must cover worn memory and avoid metadata wear hotspots; headline NAND endurance alone does not prove simultaneous ten-year retention. Exact part, ECC, wear distribution and room-temperature retention after this usage remain to qualify.
+This is an accepted workload, not 1,000 lifetime downloads or an assertion that every physical NAND block sees exactly 1,000 erases. Partial downloads do not consume an erase cycle, while allocation/retirement metadata, retries and recovery can concentrate physical wear. Qualification must cover worn memory and avoid metadata wear hotspots; headline NAND endurance alone does not prove simultaneous ten-year retention. Exact part, ECC, wear distribution and room-temperature retention after this usage remain to qualify.
 
-No storage part, refresh strategy or redundancy scheme is selected by the retention/reuse approvals. Subsequent decisions settle PTP/per-photo deletion and ECC/CRC-32C with damaged-photo recovery and retirement. The `_RECOVERED`/EXIF warning is also selected. Handling retained data on retired blocks is the current discussion.
+No exact storage part or additional redundancy scheme is selected by the retention/reuse approvals. Subsequent decisions settle PTP/per-photo deletion and ECC/CRC-32C with damaged-photo recovery and retirement. The `_RECOVERED`/EXIF warning is also selected. Request-driven RAM reads with no relocation or refresh and predictive-error slot retirement are settled. Additional redundancy is the next discussion.
