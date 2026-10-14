@@ -30,8 +30,10 @@ The provisional journal may keep protected records in different erase blocks. It
 
 The earlier recommendation duplicated photo descriptors/capture attributes separately from pixels. It is **not selected**. Its arithmetic remains context: two copies of 200 raw image payloads alone require 766,568,000 bytes, about 731.1 MiB, exceeding the 512 MiB planning capacity before overhead. Object replication is not selected.
 
-## Next discussion
+## PARTIAL objects and next discussion
 
-**PARTIAL objects after interrupted saves:** how to present retained data and permit explicit deletion over USB. Recommend best-effort recovery access with a clear incomplete/recovered warning, without claiming a successful capture or automatically deleting the object. Some partial objects may lack sufficient attributes or image bytes for a viewable export. This USB policy is not yet approved.
+**Approved, D-32:** return whatever image data can be read from FULL or PARTIAL objects on host request. Mark incompleteness and read errors through EXIF and/or PTP; retain _RECOVERED naming and explicit-only deletion. Missing final checksum/optional attributes or inability to generate EXIF must not suppress safely attributable readable bytes. PARTIAL retrieval does not certify a successful original save.
+
+**Current discussion:** slot allocation and wear distribution. Circular first-FREE-and-GOOD search after the previous allocation is recommended, not approved; it keeps existing photos in place and spreads reuse among currently free healthy slots. See the [slot-state review](slot-state-storage-review.md).
 
 See the [decision register](2026-10-13-project-baseline.md), [slot-state implementation/future directions](slot-state-storage-review.md), [accepted read policy](ecc-read-error-review.md), and [specification](../../spec.md).

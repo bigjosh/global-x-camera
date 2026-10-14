@@ -13,7 +13,7 @@ Use one fixed-size slot per capture. Each slot contains a fixed number of NAND b
 
 For a new capture, scan the table for the first FREE and GOOD slot. Persist PARTIAL before writing image data, and persist FULL only after successful completion of the required save checks. USB deletion can release a FULL slot. A read error predictive of future media failure permanently marks the image slot BAD for future allocation without deleting its existing image.
 
-PARTIAL corresponds conceptually to the accepted USED-without-DONE state; FULL corresponds to a valid completed commit. This is not a choice of bit encoding. An interrupted photo remains occupied and its bytes are retained without automatic erase or overwrite until explicit deletion; the interruption may have corrupted the current write. The user specifically described deletion of FULL slots; the host interface for explicitly deleting PARTIAL captures still needs definition.
+PARTIAL corresponds conceptually to the accepted USED-without-DONE state; FULL corresponds to a valid completed commit. This is not a choice of bit encoding. An interrupted photo remains occupied and its bytes are retained without automatic erase or overwrite until explicit deletion; the interruption may have corrupted the current write. D-32 subsequently approves USB retrieval and explicit deletion of PARTIAL objects, with best-effort image data and EXIF and/or PTP error/incomplete warnings. Protocol details remain to implement.
 
 The user raised concern about wear from rewriting redundant NAND state tables on every change and suggested FRAM as an alternative. After the partial-programming discussion below, the user provisionally selected journaling. The subsequent D-31 decision supersedes the earlier per-photo metadata duplication proposal: object contents are stored once, while storage-control redundancy and the on-media layout depend on the implementation.
 
@@ -112,6 +112,16 @@ For the provisional journal, keep permanent runtime slot retirement in protected
 Only metadata pages need be inspected for the proposed scan; a full payload scan is not selected. Bound and measure the worst-case metadata scan alongside startup against the 50 ms exposure requirement. Do not treat a typical per-page read time or an early free slot as a worst-case guarantee.
 
 Sources: [Alliance Rev.3.1](https://www.alliancememory.com/wp-content/uploads/AllianceMemory_AS5F_QSPI_NAND_Flash_3V-1Gb-8Gb_1p8V-2Gb-4Gb-8Gb_Ver3.1_O.pdf), pages 39 and 43, for program count and factory-marker location; the [prior interrupted-operation review](../review/camera-memory-review.md#mem-002---power-fail-recovery-must-respect-partial-program-and-erase-rules) for the historical Macronix warning about interrupted program/erase retention; [Winbond AN0000040](https://du4vjmorpxp6c.cloudfront.net/winbond-application-notes/qspi-nand/an40-how-to-work-with-winbond-serial-nand-flash-build-in-ecc-v1.pdf), page 1, for the distinction between blank-looking user data and already-programmed ECC. The recovery refinements are engineering analysis; their exact-part implementation remains unqualified.
+
+## Current discussion: allocation and wear
+
+**Recommendation, not approved:** search for the next FREE and GOOD slot starting just after the last durably allocated slot, wrapping at the end. This would refine the user's original first-FREE-and-GOOD proposal by changing the starting point from a fixed beginning to a circular cursor. Skip FULL, PARTIAL and BAD slots; preserve the accepted stop-when-full behavior.
+
+Include/reconstruct the cursor through ordinary allocation journal records/checkpoints so a separate frequently rewritten pointer is not required. Advance it consistently with durable allocation, including interrupted saves; deletion must not reset it to slot zero. Exact recovery rules remain implementation work.
+
+This spreads reuse among currently free healthy slots when several are available. It does not move retained objects or guarantee equal lifetime wear across occupied and free slots; if only one slot is free, there is no allocation alternative. Journal-block wear distribution remains a separate storage-system obligation. Track/qualify actual erase counts rather than treating the 1,000 complete device-reuse requirement as a bound on every possible partial-delete workload.
+
+[Macronix AN0289](https://www.macronix.com/Lists/ApplicationNote/Attachments/1913/AN0289V1-Wear%20Leveling%20in%20NAND%20Flash%20Memory.pdf), page 1, explains why repeated reuse of a few blocks can reach local endurance limits while other blocks remain lightly used. Circular free-slot search is the project recommendation derived from that principle; no extra relocation, image refresh or numerical endurance guarantee is adopted.
 
 ## Sources and remaining work
 
