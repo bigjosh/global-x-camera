@@ -35,6 +35,7 @@ PTP gives firmware a specific image-delete request instead of filesystem block c
 
 1. **Settled:** PTP camera interface and explicit per-photo host deletion.
 2. **Settled:** [ECC/CRC-32C, damaged-photo recovery and block retirement](ecc-read-error-review.md). Complete recovered-image objects may transfer successfully while carrying integrity warnings; real transfer failures still report errors.
-3. **Current:** warning/diagnostic representation; then safe handling of retained marginal data and additional redundancy. Ten-year retention must not require periodic USB refresh.
+3. **Settled:** `_RECOVERED` filename suffix plus EXIF UserComment for damaged exports.
+4. **Current:** handling retained data on retired blocks; USB-powered verified copy-out is proposed. Additional redundancy follows. Ten-year retention must not require periodic USB refresh.
 
 The [decision register](2026-10-13-project-baseline.md) remains authoritative. D-25 supersedes the drive-presentation portion of D-12 and selects explicit per-photo deletion; USB power and inactive-shutter requirements remain unchanged.

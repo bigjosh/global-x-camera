@@ -7,8 +7,9 @@ User decision: “yes lets lock in the ECC and checksum policy and record it. fo
 ## Discussion order
 
 1. **Settled:** device-appropriate ECC, CRC-32C, best-effort damaged-photo export, and BAD/retired blocks excluded from future writes.
-2. **Current:** how the host identifies a recovered/damaged export. EXIF was suggested by the user; EXIF UserComment plus a visible filename suffix is recommended below, not yet selected.
-3. Safe handling of retained data on marginal/retired blocks, including any USB-powered relocation and interruption recovery; then additional redundancy.
+2. **Settled:** damaged-image exports use the `_RECOVERED` filename suffix and EXIF UserComment.
+3. **Current:** handling retained data on retired blocks. USB-powered verified copy-out with source preservation is proposed below, not yet approved.
+4. Additional redundancy and detailed reserve/metadata implementation.
 
 ## Accepted read policy
 
@@ -33,7 +34,7 @@ Retain available data even when some returned bytes cannot be trusted. Recoverab
 
 Prefer preparing the entire approximately 1.916 MB RAW10 image and its integrity classification in RAM before export, if the firmware memory budget permits. Form a valid export container/header around recovered pixels where possible; visible pixel corruption is acceptable, but not every application is guaranteed to display every damaged export. Preserve source bytes for later attempts and explicit user deletion. Generating an export does not rewrite the source image or its original CRC.
 
-**Recommended warning representation, pending selection:** use a visible `_RECOVERED` filename suffix for damaged/unverified exports and an EXIF **UserComment (0x9286)** when the chosen export format supports EXIF. Include integrity state, original CRC/check result, counts of uncorrectable pages, known affected image ranges, missing/fill ranges and block-retirement status. Record unknown locations or counts as unknown. Distinguish `verified-after-correction`, `verified-storage-marginal` and `damaged/unverified`; do not label a checksum-valid corrected image as visually corrupt. Detailed encodings and any diagnostic sidecar remain open.
+**Warning representation approved October 14:** the user said, “yes lets use the _RECOVERED suffix and EXIF comment for damaged images.” Add `_RECOVERED` immediately before the extension of damaged/unverified exported filenames, and include EXIF **UserComment (0x9286)** in the export. Select a container that can carry this required metadata; the exact image format remains open. Include integrity state, original CRC/check result, counts of uncorrectable pages, known affected image ranges, missing/fill ranges and block-retirement status. Record unknown locations or counts as unknown. Distinguish `verified-after-correction`, `verified-storage-marginal` and `damaged/unverified`; do not label a checksum-valid corrected image as visually corrupt. Detailed encodings and any diagnostic sidecar remain open.
 
 EXIF can carry the information but does not guarantee a visible warning in every importer/viewer; a filename suffix provides another cue, although hosts may rename files. Export format, tag encoding, PTP object metadata/size, stable handles and host behavior need testing. No vendor-specific PTP extension or sidecar is selected.
 
@@ -53,7 +54,27 @@ BAD means **unavailable for future allocation**, not erased, unreadable by polic
 
 Persist retirement in a protected, power-loss-safe allocation/bad-block record using healthy reserved storage. Do not blindly program a physical spare-area bad-block marker into live image pages: reserved-byte, ECC and partial-program rules depend on the exact part. Preserve manufacturer factory markers; factory-bad blocks were never valid image allocations. The logical retirement record must survive restart, explicit deletion and normal reuse without causing scans to discard old photos. Failure to establish trustworthy allocation state prevents unsafe new allocations under F-10.
 
-Retirement protects **future writes**; it does not repair current contents or by itself satisfy a vendor's marginal-data refresh requirement. Safe USB relocation, spare-space handling and interrupted-maintenance recovery remain to decide. No automatic source erasure or relocation is authorized by this retirement decision.
+Retirement protects **future writes**; it does not repair current contents or by itself satisfy a vendor's marginal-data refresh requirement. Safe USB relocation, spare-space handling and interrupted-maintenance recovery remain to decide. No automatic source erasure or relocation is authorized by this retirement decision. The following copy-out policy is the current recommendation awaiting approval.
+
+## Proposed handling of data on retired blocks — pending approval
+
+Recommend **copying recoverable photo data to healthy NAND while USB-powered**, retaining the original source blocks. Leaving the only copy in retired storage avoids extra writes and capacity use, but does not address further deterioration or device-specific marginal-data handling requirements. Copy-out protects future reads; it does not reconstruct lost pixels.
+
+| Source state | Proposed copy and verification |
+|---|---|
+| Marginal media, but ECC-corrected image matches the original CRC-32C | Copy the complete verified image, then read back the full destination and compare against the original CRC before publishing its mapping. The image remains verified and does not acquire a damaged-image suffix solely due to prior media health. |
+| Damaged/unverified photo with recoverable content | Copy the recoverable snapshot, preserving original image identity, expected CRC, failure classification and known error/missing-range map. Store an additional CRC-32C of that snapshot and fully read it back to verify the copy. This verifies faithful copying, not the original capture; exports remain `_RECOVERED` with EXIF diagnostics. |
+| No healthy destination space, copy/verification failure, or USB interruption | Preserve the original source and permanent retirement records. Keep download and explicit deletion available where metadata is trustworthy; report maintenance incomplete. Never overwrite another photo or silently claim the data was repaired. |
+
+Use the existing USED/DONE concepts in a qualified maintenance transaction: reserve a healthy destination, write its payload and protected metadata, fully read back and verify it, establish/read back its valid commit, and only then publish the preferred-copy mapping through power-loss-safe metadata. Keep the original mapping authoritative until that final commit. Preserve source addresses afterward for future recovery attempts until explicit photo deletion. Do not automatically erase/reuse the retired source blocks.
+
+Full destination readback is mandatory for this proposed USB maintenance even if capture-time readback has been disabled. A damaged snapshot's own CRC and the original expected CRC have distinct meanings and must not overwrite one another. Known original damage does not repeatedly condemn healthy destination blocks: assess new media errors against the snapshot actually written. If later source recovery yields better data, do not replace that better result with an older degraded snapshot; copy selection/versioning must preserve provenance.
+
+Prioritize the user's download and run bounded maintenance while USB remains available. No battery-powered periodic refresh or requirement for periodic USB connections is introduced. Record whether a copy is pending or committed so subsequent reads/reconnections do not create endless duplicates. An interrupted destination stays identifiable and excluded from unsafe allocation; its cleanup and retries need a qualified recovery design.
+
+Keep one logical photo identity for host access, choosing a committed healthy copy for ordinary reads; retain the original source for explicit recovery. Account for any other photos sharing a retired erase block. Serialize explicit photo deletion against maintenance so a late copy cannot resurrect a deleted photo. Deletion does not reactivate retired blocks.
+
+The tradeoff is healthy capacity consumed by replacement copies while retired source blocks remain unusable for new writes. Reserve size is not selected here; it must cover payload, metadata and interruption recovery while meeting the accepted 200-photo/1,000-cycle requirements. Lack of room leaves maintenance incomplete rather than authorizing data loss. A best-effort rescue after errors is not proof of the ten-year retention guarantee.
 
 ## Evidence checked October 14
 
@@ -64,4 +85,4 @@ Retirement protects **future writes**; it does not repair current contents or by
 
 ## Boundaries
 
-Ten-year room-temperature retention without power or refresh still applies through 1,000 complete reuse cycles. Best-effort recovery is a failure response, not satisfaction of that retention guarantee. The retirement reserve and capacity loss need qualification. Capture-time optional full payload readback and mandatory save/commit verification remain unchanged; this decision concerns later reads of stored photos. Exact NAND selection, physical layout, metadata protection, diagnostic presentation, maintenance and additional redundancy remain implementation or discussion work. No hardware or firmware compliance is claimed.
+Ten-year room-temperature retention without power or refresh still applies through 1,000 complete reuse cycles. Best-effort recovery is a failure response, not satisfaction of that retention guarantee. The retirement reserve and capacity loss need qualification. Capture-time optional full payload readback and mandatory save/commit verification remain unchanged; this decision concerns later reads of stored photos. Exact NAND selection, physical layout, metadata protection, diagnostic encoding/interoperability, maintenance and additional redundancy remain implementation or discussion work. `_RECOVERED` and EXIF UserComment are selected; automatic copy-out is still proposed. No hardware or firmware compliance is claimed.

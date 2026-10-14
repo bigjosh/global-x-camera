@@ -70,7 +70,7 @@ A payload write, enabled readback check or final commit failure receives **five 
 
 ## F-06 Existing photo unreadable — approved
 
-**Refined October 14:** apply ECC and stored CRC-32C, then return as much safely attributable image data as is recoverable, with explicit damaged/unverified diagnostics when integrity fails. Preserve original bytes, expected CRC and other photos. Do not pass missing-range placeholders off as captured pixels. Retire all blocks used by a marginal/damaged image from future allocation without preventing existing reads. A complete recovered object can transfer successfully; actual transfer failure still reports a USB error. No new capture LED code is selected. EXIF/filename warning representation remains to select; see the [accepted read policy](ecc-read-error-review.md).
+**Refined October 14:** apply ECC and stored CRC-32C, then return as much safely attributable image data as is recoverable, with explicit damaged/unverified diagnostics when integrity fails. Preserve original bytes, expected CRC and other photos. Do not pass missing-range placeholders off as captured pixels. Retire all blocks used by a marginal/damaged image from future allocation without preventing existing reads. A complete recovered object can transfer successfully; actual transfer failure still reports a USB error. No new capture LED code is selected. Damaged exports use the approved `_RECOVERED` filename suffix and EXIF UserComment; exact encoding and host presentation remain to qualify; see the [accepted read policy](ecc-read-error-review.md).
 
 ## F-07 Time or orientation unavailable — approved
 

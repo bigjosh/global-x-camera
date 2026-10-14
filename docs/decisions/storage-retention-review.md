@@ -8,7 +8,8 @@ October 14, 2026. **Ten-year room-temperature retention and 1,000 complete reuse
 2. Expected erase/reuse lifetime — **settled: 1,000 complete fill/download/explicit-erase cycles**.
 3. USB photo-transfer and deletion — **settled: PTP with explicit per-photo deletion**; see the [USB access review](usb-photo-access-review.md).
 4. [ECC and read-error handling](ecc-read-error-review.md) — **settled:** ECC/CRC-32C, recoverable damaged-image export and permanent block retirement.
-5. Diagnostic presentation is current; safe handling of retained marginal data and additional redundancy follow separately.
+5. Damaged-image warning — **settled:** `_RECOVERED` filename suffix plus EXIF UserComment.
+6. **Current:** handling retained data on retired blocks; verified USB copy-out is proposed. Additional redundancy follows separately.
 
 Discuss one item at a time. This review does not change the accepted RAW10/capacity, configurable payload readback, explicit-erase, USED/DONE or USB error-reporting policies.
 
@@ -34,4 +35,4 @@ Require a storage lifetime of **1,000 complete fill/download/explicit-erase cycl
 
 This is an accepted workload, not 1,000 lifetime downloads or an assertion that every physical NAND block sees exactly 1,000 erases. Partial downloads do not consume an erase cycle, while allocation metadata, retries, recovery and any later adopted refresh can concentrate physical wear. Qualification must cover worn memory and avoid metadata wear hotspots; headline NAND endurance alone does not prove simultaneous ten-year retention. Exact part, ECC, wear distribution and room-temperature retention after this usage remain to qualify.
 
-No storage part, refresh strategy or redundancy scheme is selected by the retention/reuse approvals. Subsequent decisions settle PTP/per-photo deletion and ECC/CRC-32C with damaged-photo recovery and retirement. Diagnostic presentation is the current discussion.
+No storage part, refresh strategy or redundancy scheme is selected by the retention/reuse approvals. Subsequent decisions settle PTP/per-photo deletion and ECC/CRC-32C with damaged-photo recovery and retirement. The `_RECOVERED`/EXIF warning is also selected. Handling retained data on retired blocks is the current discussion.
