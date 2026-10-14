@@ -1,12 +1,13 @@
 # Storage retention review
 
-October 14, 2026. **Ten-year room-temperature retention is approved.** After settling the [failure response map](failure-response-review.md), the user accepted the retention recommendation: “yes lets lock in 10 years at room temp with no power or refresh needed.” Earlier reliability discussions had not selected a duration. Erase/reuse lifetime and detailed error-correction behavior remain open.
+October 14, 2026. **Ten-year room-temperature retention and 1,000 complete reuse cycles are approved.** After settling the [failure response map](failure-response-review.md), the user accepted the retention recommendation: “yes lets lock in 10 years at room temp with no power or refresh needed.” The subsequent reuse approval was: “yes lets lock in 1000 complete reuse cycles.” Detailed error-correction behavior remains open.
 
 ## Discussion order
 
 1. Unpowered retention — **settled: ten years at room temperature, no power or refresh needed**.
-2. Expected erase/reuse lifetime — **current item**; qualification must also account for temperature history.
-3. ECC, integrity checking and any optional USB-time refresh implementation.
+2. Expected erase/reuse lifetime — **settled: 1,000 complete fill/download/explicit-erase cycles**.
+3. USB photo-transfer and explicit-delete protocol — current user question; see the [USB access review](usb-photo-access-review.md).
+4. ECC, integrity checking and any optional USB-time maintenance — next, after the USB question.
 
 Discuss one item at a time. This review does not change the accepted RAW10/capacity, configurable payload readback, explicit-erase, USED/DONE or USB error-reporting policies.
 
@@ -26,10 +27,10 @@ This is an accepted requirement, not demonstrated compliance. Qualification must
 
 Confirm the exact part's retention conditions, required ECC, supported temperature profile and cycling history against vendor documentation/qualification evidence. Protect allocation/index/commit metadata as well as pixels. Prototype write/read and power-cut tests can validate the storage implementation, but cannot by themselves establish a ten-year retention guarantee; an appropriate supplier-backed accelerated-retention qualification is needed.
 
-## Next item: erase/reuse lifetime — proposal only
+## Accepted erase/reuse lifetime
 
-Recommend a storage-life target of **1,000 complete fill/download/explicit-erase cycles**, while retaining the accepted ten-year unpowered requirement for photos saved at the end of that rated usage. At the accepted minimum capacity of 200 photos, this represents **200,000 photo saves** across the storage lifetime; it is not a guarantee of battery life or mechanical shutter life.
+Require a storage lifetime of **1,000 complete fill/download/explicit-erase cycles**, while retaining the accepted ten-year room-temperature unpowered requirement for photos saved at the end of that rated usage. At the accepted minimum capacity of 200 photos, this represents **200,000 photo saves** across the storage lifetime; it is not a guarantee of battery life or mechanical shutter life.
 
-This is a proposed workload, not 1,000 lifetime downloads or an assertion that every physical NAND block sees exactly 1,000 erases. Partial downloads do not consume an erase cycle, while allocation metadata, retries, recovery and any later adopted refresh can concentrate physical wear. The tradeoff is qualification of worn memory and avoiding metadata wear hotspots; headline NAND endurance alone does not prove simultaneous ten-year retention. Exact part, ECC, wear distribution and room-temperature retention after this usage remain to qualify.
+This is an accepted workload, not 1,000 lifetime downloads or an assertion that every physical NAND block sees exactly 1,000 erases. Partial downloads do not consume an erase cycle, while allocation metadata, retries, recovery and any later adopted refresh can concentrate physical wear. Qualification must cover worn memory and avoid metadata wear hotspots; headline NAND endurance alone does not prove simultaneous ten-year retention. Exact part, ECC, wear distribution and room-temperature retention after this usage remain to qualify.
 
-**Pending user decision:** adopt 1,000 complete fill/download/explicit-erase cycles as the storage reuse target. No storage part, refresh strategy or redundancy scheme is selected by the retention approval.
+No storage part, refresh strategy or redundancy scheme is selected by these approvals. The user has moved on to error correction and asked whether a standard USB protocol can expose photos and explicit deletion without filesystem emulation; that protocol question is being discussed first.
