@@ -1,6 +1,6 @@
-# Project decisions and discoveries through October 13, 2026
+# Project decisions and discoveries through October 14, 2026
 
-This is the durable decision register for Global X Camera. It consolidates the October 12–13 review and points to the repository's engineering evidence. The repository, rather than a chat or Page, is the project record. Current requirements are implemented in documentation, not yet in a revised circuit or integrated firmware.
+This is the durable decision register for Global X Camera. It consolidates the October 12–14 review and points to the repository's engineering evidence. The repository, rather than a chat or Page, is the project record. Current requirements are implemented in documentation, not yet in a revised circuit or integrated firmware.
 
 Read this with [spec.md](../../spec.md), [power.md](../../power.md), the [consolidated review](../../reports/Global%20X%20Camera%20decision%20review.md), and the [prototype research record](../prototype/prototype-parts-and-camera-research.md). Historical studies retain their original assumptions; a later explicit decision below takes precedence.
 
@@ -36,6 +36,7 @@ The [prior-session synthesis](../../research_notes/Global%20X%20Camera%20decisio
 | D-20 | **Save magic BAD values for unavailable time/orientation; omit the corresponding unavailable EXIF fields when generating files over USB.** | F-07. Save the photo despite missing metadata; do not invent a timestamp/orientation. Exact sentinel encoding and generated file representation remain firmware details. |
 | D-21 | **No additional prototype response selected for boot failure or firmware hang.** | F-08. No red code, watchdog, automatic restart or guaranteed shutdown is added. This is an accepted limitation, not a claim that recovery is impossible; a stuck HOLD can keep power enabled. |
 | D-22 | **USB connection/disconnection during an operation is allowed, without a separate error code.** | F-09. Implement transitions consistently with preservation of prior photos, D-17 interrupted saves, explicit erase and shutter-inactive USB mode. Uninterrupted power/transfer is not yet established; source isolation and transition testing remain required. |
+| D-23 | **Retain successfully saved photos for ten years at room temperature with no power or refresh needed.** | Explicit October 14 approval quoted in the [retention review](storage-retention-review.md). Approximately 25°C is the reference; include the metadata needed to recover the images. No battery, USB connection or maintenance write may be required during retention. Qualify against the agreed lifetime wear profile; erase/reuse count is the next decision. This is a requirement, not demonstrated compliance. |
 
 ## Future directions explicitly retained
 
@@ -71,7 +72,7 @@ FD-03 is different from the optional **RUN-to-ground capacitor** in D-11: the se
 
 - Native SLC NAND needs explicit bad-block, ECC, metadata, commit and interrupted-write recovery design. Disabling full-image readback does not remove those obligations. A program-status check is not a readback ECC result. Loss of power before a valid commit must not expose an incomplete photo as successfully saved; exact recovery implementation remains open.
 - Micron's modeled write-only advantage over Winbond nearly disappears when full readback is included. MCU-on time and complete-save energy matter alongside NAND-only figures. Exact device/interface selection remains open; parallel NAND, 1.8 V quad NAND, 3.3 V quad NAND and microSD studies are candidates rather than adopted new pin maps.
-- Long-term unpowered retention, acceptable loss, corrected-error response and refresh opportunities during USB operation are unresolved. USB filesystem, photo-file representation and host write/delete behavior are deferred. Internal raw storage need not be identical to the emulated host filesystem.
+- **Ten-year room-temperature retention with no power or refresh needed is accepted (D-23).** Erase/reuse lifetime, exact-part retention qualification, corrected-error response and any optional USB maintenance remain open. USB filesystem, photo-file representation and host write/delete behavior are deferred. Internal raw storage need not be identical to the emulated host filesystem.
 - Rust was explored, not selected. No recovered integrated camera firmware was found. The firmware framework should be chosen against boot, capture, storage, USB and power behavior, not assumed from a prior language discussion.
 
 ### Recovered design and manufacturing
@@ -87,12 +88,12 @@ Discuss unresolved choices one at a time. Do not reopen settled choices merely b
 
 The user initially requested individual failure discussions and then supplied responses to the entire checklist. The [failure response review](failure-response-review.md) now records all accepted policies (D-15 through D-22 and the D-04 timing clarification). The policy review is complete; implementation and qualification remain.
 
-**Current discussion, October 14:** the [storage retention review](storage-retention-review.md) proposes ten years fully unpowered at a 25°C reference temperature, without required periodic refresh. This is awaiting the user's decision and is not an accepted requirement. Exact-part temperature/wear conditions and retention qualification remain open.
+**Current discussion, October 14:** ten-year room-temperature retention with no power or refresh is approved (D-23). The [storage retention review](storage-retention-review.md) now proposes a storage lifetime of **1,000 complete fill/download/explicit-erase cycles**; this reuse count is awaiting the user's decision. Exact-part temperature/wear conditions and retention qualification remain open.
 
 | Order | Open item | What closes it |
 |---|---|---|
 | 1 | Implement accepted fault behavior and power transitions | Implement the accepted response map, red LED/count timing, failure detection and safe state/source transitions. Boot/hang has no additional prototype recovery requirement. Review and qualify the complete sequence; do not reopen settled response policies. |
-| 2 | Storage qualification and retention | Exact NAND/interface/carrier, actual usable 200-photo capacity, ECC and USED/DONE encoding with torn-write recovery, unpowered retention and corrected-error/refresh behavior. Host access to incomplete/suspect images is not yet specified. |
+| 2 | Storage qualification and reuse lifetime | Select the erase/reuse lifetime; qualify the accepted ten-year room-temperature unpowered retention through that wear profile. Exact NAND/interface/carrier, actual usable 200-photo capacity, ECC and USED/DONE encoding with torn-write recovery and corrected-error/optional-refresh behavior remain open. Host access to incomplete/suspect images is not yet specified. |
 | 3 | Power and physical implementation | Exact regulator/rails/passives and load margin, AUX discharge, USB priority/isolation, HOLD timing and safe pins; measured cold start, leakage, weak-cell and source-transition tests. |
 | 4 | Manufacturing and prototype package | Actual purchased-parts reconciliation, PCB stackup/escape, mechanical section, assembly service/quantity and current supply evidence. |
 | 5 | Optional features and firmware choices | Flash requirement, directional photopic metering role/optics, firmware language/framework. Emulated filesystem selection is intentionally deferred to firmware work. |

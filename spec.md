@@ -2,18 +2,19 @@
 
 **Project:** Global X Camera  
 **Project URL:** https://www.flux.ai/bigjosh/global-x-camera  
-**Updated:** 2026-10-13; recovered-design descriptions originated 2026-09-05.  
+**Updated:** 2026-10-14; recovered-design descriptions originated 2026-09-05.
 **Design state:** Prototype selections below are locked. The recovered KiCad schematic still contains the earlier VD55G0 camera and TPS62132/AO3401A power circuit, including known review findings; it has not yet been revised or qualified for this prototype.
 
-Current decisions and their remaining implementation boundaries are indexed in the [October 13 decision register](docs/decisions/2026-10-13-project-baseline.md). This specification defines the current requirements; explicitly historical circuit descriptions preserve the unchanged CAD evidence.
+Current decisions and their remaining implementation boundaries are indexed in the [project decision register](docs/decisions/2026-10-13-project-baseline.md). This specification defines the current requirements; explicitly historical circuit descriptions preserve the unchanged CAD evidence.
 
-## Locked prototype decisions — October 12–13, 2026
+## Locked prototype decisions — October 12–14, 2026
 
 | Item | User decision |
 | --- | --- |
 | Processor direction | STM32N6 remains active; Himax is abandoned. |
 | Camera module | **ST CAM-6G3-073CLR**, using **VD56G3**, with **73° diagonal field of view**. This replaces CAM-5G0-079CLR/VD55G0 as the prototype selection. |
 | Photo capacity | **At least 200 full-native-resolution, uncompressed packed RAW10 photos between downloads** from CAM-6G3-073CLR / VD56G3. This is a capacity requirement; the exact NAND part and implemented storage format remain to be qualified. |
+| Photo retention | **Approved October 14: ten years at room temperature, fully unpowered, with no refresh needed.** Approximately 25°C is the reference. Include successfully committed images and metadata needed to recover them. No periodic wake, battery, USB connection or maintenance write may be required. Qualify retention through the agreed erase/reuse lifetime, which remains to be selected; see §6.7. |
 | Full image readback | **Approved October 13:** full payload readback plus checksum comparison is configurable, enabled by default during bring-up/initial testing, and may be disabled later. Required save checks and final commit-record readback verification remain mandatory; see §6.1. Firmware implementation remains pending. |
 | Storage full | **Approved October 13:** preserve existing committed photos, reject new captures when no usable slot remains, and indicate storage full with the status LED. Reclaim saved-photo space through an explicit USB erase action after download; connection or download alone must not erase photos. Firmware implementation remains pending. |
 | Presses while busy | **Approved October 13:** ignore additional shutter presses during capture/save, finish the current operation unless a fault requires abort, and do not queue another exposure. A new capture requires a fresh press after ready and an actual power cycle of the main capture electronics after shutdown. |
@@ -348,6 +349,12 @@ For the red-coded faults below, emit the stated number of red flashes while powe
 | USB inserted or removed during operation | Allowed; qualify power/source transitions. No seamless-continuity guarantee or concurrent host-write behavior is selected. Shutter inactivity in USB mode remains required. |
 | Exposure-start timing | Meet the deterministic **≤50 ms** design budget through qualification. No runtime timing-failure code is selected. |
 
+### 6.7 Photo retention — approved October 14, 2026
+
+Successfully committed photos and the metadata needed to locate, decode and verify them must remain recoverable for **ten years at room temperature (approximately 25°C reference), fully unpowered, with no refresh required**. Use the selected NAND's required ECC on retrieval; batteries, RTC backup, periodic waking and USB maintenance must not be prerequisites for retention. This is not a requirement that the RTC continue keeping time without its backup supply.
+
+Qualify the exact part, ECC and storage layout against this requirement over the agreed erase/reuse lifetime. The number of supported reuse cycles is still open; do not assume the retention requirement applies only to uncycled memory. Higher-temperature storage and optional USB-time maintenance need separate evaluation. No measured ten-year retention result is established by this approval. See the [retention review and evidence](docs/decisions/storage-retention-review.md).
+
 ## 7. Validation and bring-up
 
 Adapt the recovered circuit checklist below to the implemented CAM-6G3-073CLR/LTC3621 revision; references to Q1/Q3 and old rail names are not instructions to retain the superseded power path.
@@ -375,6 +382,7 @@ Adapt the recovered circuit checklist below to the implemented CAM-6G3-073CLR/LT
 - Validate QSPI boot and redundant FSBL selection.
 - Run destructive NAND bad-block, program, readback, interrupted-write, and recovery tests.
 - Confirm full image readback/checksum comparison is enabled by default for bring-up. Validate that disabling it retains required completion/status checks, integrity metadata, ECC/recovery handling and final commit-record readback verification before normal shutdown.
+- Qualify ten-year room-temperature photo and recovery-metadata retention without power or refresh across the agreed reuse lifetime. Use exact-part vendor retention/ECC evidence and an appropriate accelerated-retention qualification; ordinary prototype read/write tests alone do not demonstrate ten years.
 - Verify busy presses do not interrupt the current capture/save or queue a shot, and another image requires an actual main-power cycle after shutdown plus a fresh press after ready. Verify the shutter is inactive in USB mode and downloads do not erase photos.
 - Exercise F-01 before exposure, during capture/save and through post-save shutdown: one red flash where power permits, abnormal abort without falsely reporting incomplete/unverified data as saved, preservation of committed photos, and no automatic wake/retake before a main-power cycle. Qualify battery detection and interrupted-write recovery separately.
 - Exercise F-02 through capture, USED marking, data/metadata programming and DONE/commit, including torn-marker and shared-block cases. Verify previously saved photos and valid committed current images survive, written incomplete bytes remain retained and distinguishable from successful photos, and recovery does not trigger a replacement exposure.
