@@ -18,7 +18,7 @@ These are interface choices; the device still needs its own durable NAND allocat
 
 - Use stable photo identifiers/handles to enumerate committed records and serve object metadata and image bytes. Generate the selected export format and valid EXIF during USB access as already planned; omit BAD fields. File format/container, thumbnail behavior and precise host compatibility remain to test.
 - Treat a host's explicit per-photo delete operation as authorization to delete that selected photo. Persist deletion state safely, then reclaim NAND blocks without damaging other photos. Logical deletion and physical block erasure may occur at different times. Acknowledging deletion must mean the logical deletion is durable; physical erase scheduling and interrupted-erase recovery remain implementation work.
-- Download/read success does not itself trigger deletion or prove the host has durably backed up the photo. The host application can offer a user-selected delete-after-import workflow that sends a separate delete request. Report transfer/delete failures to the host.
+- Download/read success does not itself trigger deletion or prove the host has durably backed up the photo. The host application can offer a user-selected delete-after-import workflow that sends a separate delete request. Report transfer/delete failures to the host. Distinguish successful delivery of an explicitly identified recovered image from verification of the original image; host-visible integrity diagnostics must preserve the user's ability to keep recovered bytes.
 - Keep capture disabled in USB mode even though PTP includes optional remote-camera operations. Advertise only supported operations. Preserve the accepted incomplete USED/not-DONE policy and avoid accidental reclamation when other photos are deleted.
 
 PTP gives firmware a specific image-delete request instead of filesystem block changes. The protocol choice is approved, but the stack is not integrated or qualified. Test list/download/delete, errors and disconnect recovery on the Nucleo and intended hosts before freezing implementation. The generated photo format remains to be selected; packed RAW10 alone is not a generally recognized picture file.
@@ -34,6 +34,7 @@ PTP gives firmware a specific image-delete request instead of filesystem block c
 ## Discussion queue
 
 1. **Settled:** PTP camera interface and explicit per-photo host deletion.
-2. **Current:** [ECC and read-error handling](ecc-read-error-review.md), including PTP error reporting. Then discuss any USB-powered repair/relocation policy and additional redundancy. PTP does not replace NAND error correction. Previously accepted unreadable-photo behavior remains host-visible USB error reporting; ten-year retention must not depend on periodic power or refresh.
+2. **Settled:** [ECC/CRC-32C, damaged-photo recovery and block retirement](ecc-read-error-review.md). Complete recovered-image objects may transfer successfully while carrying integrity warnings; real transfer failures still report errors.
+3. **Current:** warning/diagnostic representation; then safe handling of retained marginal data and additional redundancy. Ten-year retention must not require periodic USB refresh.
 
 The [decision register](2026-10-13-project-baseline.md) remains authoritative. D-25 supersedes the drive-presentation portion of D-12 and selects explicit per-photo deletion; USB power and inactive-shutter requirements remain unchanged.

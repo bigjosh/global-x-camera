@@ -14,7 +14,7 @@ The [decision register](2026-10-13-project-baseline.md), [specification](../../s
 | F-03b | Exposure/frame capture fails, times out or yields an incomplete frame | Three red flashes, then shutdown. |
 | F-04 | Photo storage is absent, unidentified or unresponsive | Four red flashes, then shutdown. |
 | F-05 | Writing a new photo, enabled readback verification or final commit fails | Five red flashes, then shutdown; do not treat the image as successfully saved. |
-| F-06 | An existing committed photo cannot be read reliably | Report the read failure to the host over USB when detected during reading. |
+| F-06 | An existing committed photo cannot be read reliably | Return recoverable image data with damaged/unverified diagnostics, preserve its source and retire its blocks from future allocation. True transfer failures still report a USB error; see the October 14 read-policy refinement. |
 | F-07 | RTC time or orientation data is unavailable or invalid | Save an explicit magic BAD value at capture time; omit the corresponding unavailable EXIF fields when generating photo files over USB. Save the image. |
 | F-08 | Boot fails or firmware hangs/resets | No additional prototype indication or recovery mechanism selected. Firmware that cannot run cannot be relied upon to indicate or shut down. |
 | F-09 | USB is inserted/removed during an operation | Allowed; no separate error code. Implement source transitions consistently with photo preservation and the existing inactive-shutter USB mode. |
@@ -70,7 +70,7 @@ A payload write, enabled readback check or final commit failure receives **five 
 
 ## F-06 Existing photo unreadable — approved
 
-Detect this when reading the stored image and report the read failure to the host over USB. No additional capture-cycle LED code is selected. Preserve other photos and do not substitute fabricated image data or silently erase a failing record. Exact host error representation and corrected-error/refresh policy remain firmware/storage work.
+**Refined October 14:** apply ECC and stored CRC-32C, then return as much safely attributable image data as is recoverable, with explicit damaged/unverified diagnostics when integrity fails. Preserve original bytes, expected CRC and other photos. Do not pass missing-range placeholders off as captured pixels. Retire all blocks used by a marginal/damaged image from future allocation without preventing existing reads. A complete recovered object can transfer successfully; actual transfer failure still reports a USB error. No new capture LED code is selected. EXIF/filename warning representation remains to select; see the [accepted read policy](ecc-read-error-review.md).
 
 ## F-07 Time or orientation unavailable — approved
 

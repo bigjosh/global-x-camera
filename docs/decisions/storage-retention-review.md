@@ -1,13 +1,14 @@
 # Storage retention review
 
-October 14, 2026. **Ten-year room-temperature retention and 1,000 complete reuse cycles are approved.** After settling the [failure response map](failure-response-review.md), the user accepted the retention recommendation: “yes lets lock in 10 years at room temp with no power or refresh needed.” The subsequent reuse approval was: “yes lets lock in 1000 complete reuse cycles.” Detailed error-correction behavior remains open.
+October 14, 2026. **Ten-year room-temperature retention and 1,000 complete reuse cycles are approved.** After settling the [failure response map](failure-response-review.md), the user accepted the retention recommendation: “yes lets lock in 10 years at room temp with no power or refresh needed.” The subsequent reuse approval was: “yes lets lock in 1000 complete reuse cycles.” ECC/CRC-32C, damaged-photo recovery and block retirement were subsequently accepted in the [read policy](ecc-read-error-review.md).
 
 ## Discussion order
 
 1. Unpowered retention — **settled: ten years at room temperature, no power or refresh needed**.
 2. Expected erase/reuse lifetime — **settled: 1,000 complete fill/download/explicit-erase cycles**.
 3. USB photo-transfer and deletion — **settled: PTP with explicit per-photo deletion**; see the [USB access review](usb-photo-access-review.md).
-4. [ECC and read-error handling](ecc-read-error-review.md) — current item; USB-powered repair/relocation and any additional redundancy follow separately.
+4. [ECC and read-error handling](ecc-read-error-review.md) — **settled:** ECC/CRC-32C, recoverable damaged-image export and permanent block retirement.
+5. Diagnostic presentation is current; safe handling of retained marginal data and additional redundancy follow separately.
 
 Discuss one item at a time. This review does not change the accepted RAW10/capacity, configurable payload readback, explicit-erase, USED/DONE or USB error-reporting policies.
 
@@ -15,7 +16,7 @@ Discuss one item at a time. This review does not change the accepted RAW10/capac
 
 Require **10 years of retention at room temperature (approximately 25°C as the reference), fully unpowered, with no refresh needed**. Successfully committed photos and the metadata needed to identify, decode and verify them must remain recoverable using the selected device's required ECC. No periodic wake, battery power, USB connection or maintenance write may be required during that retention interval. Removing or exhausting the batteries must not itself shorten this storage requirement; maintaining the running RTC clock is a separate matter.
 
-This is an accepted requirement, not demonstrated compliance. Qualification must cover the agreed erase/reuse lifetime and temperature history; the acceptance must not silently apply only to new, uncycled memory. Sustained hot-car storage is not covered by this room-temperature requirement. Optional maintenance during USB use must not be necessary to satisfy the ten-year fully-unpowered requirement. The response to corrected/marginal reads after power is restored remains a separate implementation discussion.
+This is an accepted requirement, not demonstrated compliance. Qualification must cover the agreed erase/reuse lifetime and temperature history; the acceptance must not silently apply only to new, uncycled memory. Sustained hot-car storage is not covered by this room-temperature requirement. Optional maintenance during USB use must not be necessary to satisfy the ten-year fully-unpowered requirement. The accepted read policy distinguishes verified corrections from damaged-image recovery and retires marginal/damaged image blocks from future allocation. Handling the retained marginal data safely remains to resolve; retirement alone does not refresh it.
 
 ## Evidence checked October 14
 
@@ -33,4 +34,4 @@ Require a storage lifetime of **1,000 complete fill/download/explicit-erase cycl
 
 This is an accepted workload, not 1,000 lifetime downloads or an assertion that every physical NAND block sees exactly 1,000 erases. Partial downloads do not consume an erase cycle, while allocation metadata, retries, recovery and any later adopted refresh can concentrate physical wear. Qualification must cover worn memory and avoid metadata wear hotspots; headline NAND endurance alone does not prove simultaneous ten-year retention. Exact part, ECC, wear distribution and room-temperature retention after this usage remain to qualify.
 
-No storage part, refresh strategy or redundancy scheme is selected by these approvals. The subsequent PTP/per-photo-deletion decision settles USB access; the current discussion is ECC and read-error handling.
+No storage part, refresh strategy or redundancy scheme is selected by the retention/reuse approvals. Subsequent decisions settle PTP/per-photo deletion and ECC/CRC-32C with damaged-photo recovery and retirement. Diagnostic presentation is the current discussion.
