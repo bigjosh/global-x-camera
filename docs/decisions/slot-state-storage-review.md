@@ -48,6 +48,31 @@ This is a **base estimate before overhead**, not a final endurance proof. Durabl
 
 Sixteen reserved blocks occupy 2 MiB with 128 KiB blocks or 4 MiB with 256 KiB blocks. Include this once in the overall metadata/bad-block reserve; do not count it as free extra capacity. The archived Winbond and Micron candidate datasheets give headline endurance of 60,000 and 100,000 cycles respectively. The arithmetic suggests a journal need not create a wear bottleneck, but those headline numbers do not establish ten-year retention after the required cycling profile or qualify an unselected NAND part.
 
+## Follow-up: individual bit updates and wear
+
+October 14 clarification: the user asked whether successive 1-to-0 changes in the same page are possible and whether each costs a full erase/program cycle. This is an explanation and device constraint, not approval of the proposed journal.
+
+At the logical level, an erased SLC NAND cell reads 1 and programming can change it to 0; restoring it to 1 requires erasing its entire block. NAND does not provide an independently erasable page or a general-purpose bit-write interface. The host loads bytes into a volatile page buffer and issues an array-program operation. Multiple edits to the buffer before a single execute are not multiple physical NAND programs and are not durable until execution completes.
+
+Repeated programming of one page between erases is called partial-page programming, and is allowed only under the exact device's limits. A one-bit data change still counts as a page-program operation against that limit. With on-die ECC, changing protected data also changes its parity code; even a data-only 1-to-0 change may require an impossible 0-to-1 change in already-programmed parity. Sector alignment, one-time programming of protected sectors, spare-area coverage and page order therefore matter.
+
+| Device evidence | Consequence |
+|---|---|
+| Alliance AS5F family Rev.3.1, October 2024, includes AS5F14G04SND-10LIN. Parameter-page table 11-3, page 39, byte 110 is 01h programs per page; partial-program attributes are 00h. | Treat the evaluation candidate as one array program per page between erases. Do not transfer another vendor's four-program allowance to it or assume disabling ECC removes that limit. Confirm the exact delivered revision before implementing its driver. |
+| W25N04KW Rev C, printed pages 17 and 63: four partial programs per page total, including spare/parity; with ECC enabled, a main sector and its corresponding protected spare data must be programmed together. Printed pages 39/66 require increasing page order. | Four does not mean unlimited bit changes or four arbitrary rewrites of a previously programmed ECC sector. Consume fresh supported units and follow exact sequencing. |
+
+A partial program is **not automatically one complete program/erase endurance cycle**: it does not erase the block. Nevertheless, program pulses cause electrical stress and can disturb other cells. Wear cannot be calculated by counting only changed bits, nor is there a universal conversion of one partial program into a fraction of an erase cycle. Track both block erase/cycling history and the independent per-page program limit; the device's endurance rating assumes supported programming sequences.
+
+For the illustrative 64-page block, programming each fresh page once and then erasing the block for reuse is one block program/erase cycle, not 64 block erase cycles. This is why the journal estimate divides page programs by pages per block. Its estimate does not rely on repeatedly programming individual bits within a page.
+
+For the proposed state table, use a fresh page for each durable record under the conservative layout; do not encode later PARTIAL/FULL/BAD transitions by revisiting bits in an already-programmed ECC page. The backing-medium decision remains open.
+
+Sources:
+- [Alliance AS5F Rev.3.1](https://www.alliancememory.com/wp-content/uploads/AllianceMemory_AS5F_QSPI_NAND_Flash_3V-1Gb-8Gb_1p8V-2Gb-4Gb-8Gb_Ver3.1_O.pdf), pages 29–33, 36 and 39: load/execute distinction, block erase and parameter-page limit.
+- [Winbond W25N04KW Rev C](https://media.digikey.com/pdf/Data%20Sheets/Winbond%20PDFs/W25N04KW_Ver_C_8-12-22.pdf), printed pages 17, 37–39, 63 and 66: ECC, buffer versus array operations, partial-program count and page order.
+- [Winbond AN0000040](https://du4vjmorpxp6c.cloudfront.net/winbond-application-notes/qspi-nand/an40-how-to-work-with-winbond-serial-nand-flash-build-in-ecc-v1.pdf), page 1: ECC parity can already be programmed even when user data looks blank. This application note illustrates the ECC pitfall using W25N01GV; exact-part rules above govern the candidate devices.
+- Micron TN-29-17, *NAND Flash Design and Use Considerations*, program-disturb section, describes increased partial-page programming as increasing disturb exposure. The indexed manufacturer-authored excerpt was readable; its historical PDF mirror was unavailable during this check. It supplies general mechanism context, not exact-part limits.
+
 ## State and recovery details to resolve in implementation
 
 - **FREE must mean erased and verified safe to program.** Make the host deletion authorization durable before starting erase; publish FREE only after all reusable slot blocks pass the required erase/status checks. A deletion/reclaim transaction may therefore need an internal pending state even if the user-visible occupancy model has only three states. Recover interrupted deletion without resurrecting a deleted photo or allocating partially erased media.
