@@ -87,6 +87,8 @@ Discuss unresolved choices one at a time. Do not reopen settled choices merely b
 
 The user initially requested individual failure discussions and then supplied responses to the entire checklist. The [failure response review](failure-response-review.md) now records all accepted policies (D-15 through D-22 and the D-04 timing clarification). The policy review is complete; implementation and qualification remain.
 
+**Current discussion, October 14:** the [storage retention review](storage-retention-review.md) proposes ten years fully unpowered at a 25°C reference temperature, without required periodic refresh. This is awaiting the user's decision and is not an accepted requirement. Exact-part temperature/wear conditions and retention qualification remain open.
+
 | Order | Open item | What closes it |
 |---|---|---|
 | 1 | Implement accepted fault behavior and power transitions | Implement the accepted response map, red LED/count timing, failure detection and safe state/source transitions. Boot/hang has no additional prototype recovery requirement. Review and qualify the complete sequence; do not reopen settled response policies. |
