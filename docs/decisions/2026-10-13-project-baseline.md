@@ -30,6 +30,7 @@ The [prior-session synthesis](../../research_notes/Global%20X%20Camera%20decisio
 | D-14 | **Record decisions and discoveries in this repository and commit/push the consolidated project.** | Message 050. The Page is a convenience view. Preserve historical evidence while distinguishing it from current requirements. |
 | D-15 | **Low battery detected at any point in the cycle: one red LED flash, abort the cycle and enter shutdown.** | Subsequent explicit user approval, quoted in [F-01](failure-response-review.md#f-01-low-battery-detected-at-any-point-in-the-cycle--approved). No automatic retry or resumption in the same powered session. Indication requires enough remaining power; sudden loss before firmware can act is a separate case. Thresholds and timing remain unqualified. |
 | D-16 | **Shutdown is the lowest attainable power state; another image requires a power cycle.** | Same user clarification, recorded in the [failure response review](failure-response-review.md#shutdown-definition--approved). A firmware wake/software reset is insufficient. Main capture electronics must power-cycle; RTC backup may remain. Held-button Standby and actual rail-discharge/rearm requirements still apply. |
+| D-17 | **Abrupt power loss may lose the current uncommitted photo, but previously saved photos must be preserved.** | Explicit user approval quoted in [F-02](failure-response-review.md#f-02-abrupt-power-loss--approved). Recover valid complete committed records on next startup, ignore partial writes and do not automatically retake. Keep the current photo too if already validly committed. Storage layout/recovery and power-cut qualification remain implementation obligations. |
 
 ## Future directions explicitly retained
 
@@ -79,7 +80,7 @@ FD-03 is different from the optional **RUN-to-ground capacitor** in D-11: the se
 
 Discuss unresolved choices one at a time. Do not reopen settled choices merely because their implementation still needs engineering.
 
-The user requested that failure reasons be considered individually. The [failure response review](failure-response-review.md) tracks that discussion, separating proposed responses from approved decisions. Low-battery handling at any cycle phase and the shutdown/power-cycle definition are now approved (D-15/D-16). Abrupt power loss before firmware can act is the next case.
+The user requested that failure reasons be considered individually. The [failure response review](failure-response-review.md) tracks that discussion, separating proposed responses from approved decisions. Low-battery handling, the shutdown/power-cycle definition and abrupt-loss preservation policy are approved (D-15/D-16/D-17). Camera initialization failure is next; frame-transfer failures will be discussed separately.
 
 | Order | Open item | What closes it |
 |---|---|---|
