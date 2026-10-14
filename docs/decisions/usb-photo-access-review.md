@@ -1,10 +1,10 @@
 # USB photo access and explicit deletion
 
-October 14, 2026. **Research and proposal, not a replacement decision.** The user approved 1,000 complete storage reuse cycles, moved to error correction, and asked whether hosts know a protocol for transferring photos and identifying images to delete without filesystem emulation.
+October 14, 2026. **PTP with explicit per-photo deletion is approved.** The user said: “yes lets lock in PTP with explicit per-photo deletion.” This replaces the earlier host-visible drive/emulated-filesystem requirement. The user has moved on to ECC and read-error handling, including reporting failures over PTP.
 
-## Answer and recommendation
+## Accepted interface
 
-**Yes: Picture Transfer Protocol (PTP) provides object-level camera access.** A host can enumerate photos, obtain their information/data and send an explicit object-delete request. A host-visible disk filesystem is not required. Recommend evaluating **PTP over USB** first for this camera; MTP is a broader related object-transfer alternative. This recommendation would replace the earlier host-visible drive requirement if approved. USB-powered operation, the inactive shutter and no erase merely on connection/download remain settled.
+Use **Picture Transfer Protocol (PTP) over USB**. A host can enumerate photos, obtain their information/data and send an explicit per-photo delete request. A host-visible disk filesystem is not required. PTP replaces the earlier drive-emulation requirement; MTP and USB Mass Storage below are retained comparisons. USB-powered operation, the inactive shutter and no erase merely on connection/download remain settled.
 
 | Route | What the host accesses | Consequence for this camera |
 |---|---|---|
@@ -14,14 +14,14 @@ October 14, 2026. **Research and proposal, not a replacement decision.** The use
 
 These are interface choices; the device still needs its own durable NAND allocation, image/metadata records, ECC and recovery. Transport alone does not make packed RAW10 a recognized picture file.
 
-## Proposed mapping, pending approval
+## Accepted behavior and implementation obligations
 
 - Use stable photo identifiers/handles to enumerate committed records and serve object metadata and image bytes. Generate the selected export format and valid EXIF during USB access as already planned; omit BAD fields. File format/container, thumbnail behavior and precise host compatibility remain to test.
-- Treat a host's explicit photo-delete operation as authorization to delete that selected photo. Persist the resulting deletion state safely, then reclaim NAND blocks without damaging other photos. Logical deletion and physical block erasure may occur at different times. Per-photo deletion, as distinct from a separate explicit erase action, is not yet an approved product behavior.
+- Treat a host's explicit per-photo delete operation as authorization to delete that selected photo. Persist deletion state safely, then reclaim NAND blocks without damaging other photos. Logical deletion and physical block erasure may occur at different times. Acknowledging deletion must mean the logical deletion is durable; physical erase scheduling and interrupted-erase recovery remain implementation work.
 - Download/read success does not itself trigger deletion or prove the host has durably backed up the photo. The host application can offer a user-selected delete-after-import workflow that sends a separate delete request. Report transfer/delete failures to the host.
 - Keep capture disabled in USB mode even though PTP includes optional remote-camera operations. Advertise only supported operations. Preserve the accepted incomplete USED/not-DONE policy and avoid accidental reclamation when other photos are deleted.
 
-PTP improves the semantic fit: firmware receives a specific image-delete request rather than inferring intent from filesystem block changes. This is an engineering recommendation, not proof that a complete PTP stack is already integrated or smaller than every possible MSC implementation. A minimal list/download/delete interoperability test on the Nucleo and intended hosts should precede freezing the implementation.
+PTP gives firmware a specific image-delete request instead of filesystem block changes. The protocol choice is approved, but the stack is not integrated or qualified. Test list/download/delete, errors and disconnect recovery on the Nucleo and intended hosts before freezing implementation. The generated photo format remains to be selected; packed RAW10 alone is not a generally recognized picture file.
 
 ## Primary evidence checked October 14
 
@@ -33,7 +33,7 @@ PTP improves the semantic fit: firmware receives a specific image-delete request
 
 ## Discussion queue
 
-1. **Current:** whether to replace drive emulation with a PTP camera interface and explicit per-photo host deletion.
-2. **Next:** ECC, end-to-end integrity checks, handling corrected versus uncorrectable reads, and any optional maintenance while USB-powered. PTP/MTP/MSC do not replace NAND error correction. Previously accepted unreadable-photo behavior remains host-visible USB error reporting; ten-year retention must not depend on periodic power or refresh.
+1. **Settled:** PTP camera interface and explicit per-photo host deletion.
+2. **Current:** [ECC and read-error handling](ecc-read-error-review.md), including PTP error reporting. Then discuss any USB-powered repair/relocation policy and additional redundancy. PTP does not replace NAND error correction. Previously accepted unreadable-photo behavior remains host-visible USB error reporting; ten-year retention must not depend on periodic power or refresh.
 
-The [decision register](2026-10-13-project-baseline.md) remains authoritative. D-12 has not yet been superseded.
+The [decision register](2026-10-13-project-baseline.md) remains authoritative. D-25 supersedes the drive-presentation portion of D-12 and selects explicit per-photo deletion; USB power and inactive-shutter requirements remain unchanged.

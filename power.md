@@ -265,7 +265,7 @@ The LTC3621 does not specify a guaranteed active output-discharge function. R_OF
 
 ### USB, debugger and battery isolation
 
-**USB behavior approved October 13:** USB supplies the camera in download/explicit-erase mode, presenting stored photos through a firmware-emulated drive. The shutter has no operation in USB mode. Filesystem selection is deferred to prototype firmware; USB must not enable the battery converter. The filesystem and the safe power-source circuit are separate implementation tasks.
+**USB behavior updated October 14:** USB supplies a **PTP camera interface with explicit per-photo deletion**, replacing drive/filesystem emulation. The shutter has no operation in USB mode; connecting/downloading alone never deletes photos. USB must not enable the battery converter. PTP transfer/delete recovery and the safe power-source circuit remain separate implementation tasks; see the [accepted USB interface](docs/decisions/usb-photo-access-review.md).
 
 The drawing is a **battery-only core**. It does not retain the old two-PMOS bidirectional OFF isolation. A synchronous buck's output can backfeed VIN through internal structures; RUN low is not proof of reverse-current blocking. Do not parallel a USB-derived 3.3 V supply onto this output, or preserve the old SYS_IN diode topology unchanged, without a reviewed source-selection circuit.
 

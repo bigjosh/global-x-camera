@@ -6,8 +6,8 @@ October 14, 2026. **Ten-year room-temperature retention and 1,000 complete reuse
 
 1. Unpowered retention — **settled: ten years at room temperature, no power or refresh needed**.
 2. Expected erase/reuse lifetime — **settled: 1,000 complete fill/download/explicit-erase cycles**.
-3. USB photo-transfer and explicit-delete protocol — current user question; see the [USB access review](usb-photo-access-review.md).
-4. ECC, integrity checking and any optional USB-time maintenance — next, after the USB question.
+3. USB photo-transfer and deletion — **settled: PTP with explicit per-photo deletion**; see the [USB access review](usb-photo-access-review.md).
+4. [ECC and read-error handling](ecc-read-error-review.md) — current item; USB-powered repair/relocation and any additional redundancy follow separately.
 
 Discuss one item at a time. This review does not change the accepted RAW10/capacity, configurable payload readback, explicit-erase, USED/DONE or USB error-reporting policies.
 
@@ -33,4 +33,4 @@ Require a storage lifetime of **1,000 complete fill/download/explicit-erase cycl
 
 This is an accepted workload, not 1,000 lifetime downloads or an assertion that every physical NAND block sees exactly 1,000 erases. Partial downloads do not consume an erase cycle, while allocation metadata, retries, recovery and any later adopted refresh can concentrate physical wear. Qualification must cover worn memory and avoid metadata wear hotspots; headline NAND endurance alone does not prove simultaneous ten-year retention. Exact part, ECC, wear distribution and room-temperature retention after this usage remain to qualify.
 
-No storage part, refresh strategy or redundancy scheme is selected by these approvals. The user has moved on to error correction and asked whether a standard USB protocol can expose photos and explicit deletion without filesystem emulation; that protocol question is being discussed first.
+No storage part, refresh strategy or redundancy scheme is selected by these approvals. The subsequent PTP/per-photo-deletion decision settles USB access; the current discussion is ECC and read-error handling.
