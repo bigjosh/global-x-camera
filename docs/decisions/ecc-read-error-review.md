@@ -8,7 +8,7 @@ The user's clarification includes: “we should always read the image from NAND 
 
 1. **Settled:** ECC/CRC-32C, best-effort export, read warnings, explicit-only deletion and permanent slot retirement.
 2. **Settled:** fresh, whole-image NAND-to-RAM reads only on host image-data requests; no image relocation or background refresh.
-3. **Next:** any additional redundancy. Physical metadata protection, slot retirement, capacity and host interoperability remain implementation/qualification work.
+3. **Current:** [additional redundancy](storage-redundancy-review.md). One image payload copy with two independently protected metadata copies is proposed, not approved. Physical layout, slot retirement, capacity and host interoperability remain to qualify.
 
 ## Accepted request-driven read sequence
 

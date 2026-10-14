@@ -94,7 +94,7 @@ Discuss unresolved choices one at a time. Do not reopen settled choices merely b
 
 The user initially requested individual failure discussions and then supplied responses to the entire checklist. The [failure response review](failure-response-review.md) now records all accepted policies (D-15 through D-22 and the D-04 timing clarification). The policy review is complete; implementation and qualification remain.
 
-**Current status, October 14:** D-29 settles request-driven full-image RAM reads from original NAND, current-read warnings, predictive-error slot retirement and explicit-only deletion. USB copy-out/relocation is rejected. The next discussion is additional redundancy. RAM capacity, PTP filename timing, protected retirement/deletion metadata and exact-part reliability thresholds remain engineering work; see the [accepted read policy](ecc-read-error-review.md).
+**Current status, October 14:** D-29 settles request-driven full-image RAM reads from original NAND, current-read warnings, predictive-error slot retirement and explicit-only deletion. USB copy-out/relocation is rejected. **Current discussion:** [additional redundancy](storage-redundancy-review.md). Recommend one image payload copy plus two protected copies of critical metadata in different erase blocks; no added payload mirroring/parity. This recommendation is not yet approved. RAM capacity, PTP filename timing, protected retirement/deletion metadata and exact-part reliability thresholds remain engineering work; see the [accepted read policy](ecc-read-error-review.md).
 
 | Order | Open item | What closes it |
 |---|---|---|
