@@ -1,51 +1,37 @@
-# Additional storage redundancy
+# Stored photo objects and storage-system redundancy
 
-October 14, 2026. **Journal persistence provisionally selected; broader redundancy layout still a recommendation.** The user asked what additional redundancy to use after accepting [D-29's request-driven reads without relocation](2026-10-13-project-baseline.md), then provisionally selected the journal under D-30. The existing ECC, CRC-32C, mandatory commit verification, source-preserving read behavior and explicit-only deletion remain in force.
+October 14, 2026. **Accepted object policy, D-31:** an image and its photo metadata form one stored object. Store that object once; do not separately duplicate its pixels, name, timestamp, orientation or other photo attributes. Redundancy in the storage structures belongs to the chosen storage implementation. The [journal system remains provisional under D-30](slot-state-storage-review.md).
 
-**Follow-up:** the [slot-state storage review](slot-state-storage-review.md) records the provisional RAM table plus redundant NAND journals/checkpoints. Off-NAND table storage and in-slot status/possible vendor bad-block-marker reuse remain future directions. The exact duplication of every descriptor and recovery format below are not frozen by the provisional journal choice.
+The user's clarification supersedes the earlier recommendation for one image payload plus two copies of critical photo metadata: “consider the image and the meta data about the image (name, time, etc) to be a single stored object - and we do not duplicate any of it.”
 
-## Recommendation
+## Object and storage responsibilities
 
-For the prototype, **store one copy of each image payload, with two separately protected copies of critical metadata in different physical erase blocks**. Keep the selected NAND's required ECC and the original-image CRC-32C. Do not add image mirroring or software parity across images at this stage.
-
-Metadata redundancy protects the information needed to identify/recover photos and avoid unsafe reuse; it does not repair missing pixels. Two metadata copies on one NAND chip do not protect against whole-chip, controller, power-system or common firmware failure.
-
-| Information | Proposed protection |
+| Information | Policy |
 |---|---|
-| Per-photo identity/generation, slot mapping, image length/format, original image CRC, capture metadata or BAD sentinels | Two independently readable, ECC-protected and CRC-32C-checked metadata records in different erase blocks. Both identify the same photo generation; an old header from a previous use of the slot must not identify a new photo. |
-| Allocation and USED/DONE commit state | Redundant, versioned records with explicit transaction/commit validity. An intact header alone is not proof that image saving completed. Preserve interrupted occupied allocations under the existing policy. |
-| Explicit deletion state | Redundant durable deletion records tied to the photo identity/generation. Do not lose a deletion merely because one metadata block fails, or let stale indexes resurrect a deleted photo. |
-| Permanent retired-slot/bad-block allocation state | Redundant protected persistent records; do not make a retired slot free after reboot or deletion because one map copy was lost. Preserve manufacturer factory-bad information. |
-| Image pixels | One original payload plus device-required ECC and the accepted image CRC-32C. No extra payload copy or cross-image parity. |
+| Stored photo object | Pixels and photo attributes are one logical object stored once. Its serialized representation and exported USB file format remain to implement. |
+| Storage control structures | Slot/block mapping, occupancy/health, allocation/commit transactions, deletion, permanent retirement, journals and checkpoints may use implementation-defined redundancy. No universal copy count is selected here. |
+| Integrity mechanisms | Device-required ECC, the original-image CRC-32C and required final commit verification remain. These checks/codes are not additional copies of the photo object. |
 
-Metadata CRC detects corruption; ECC and a surviving independent copy provide recovery opportunities. Store records in byte ranges actually covered by the selected device's ECC. Do not assume arbitrary spare/OOB bytes are protected or available for repeated marker programming.
+Storage records may repeat structural references, transaction identities, generations and integrity information needed for recovery. This does not authorize a second backup of photo attributes in a redundant catalog or journal.
 
-## Recovery and write obligations
+D-31 does not change the approved image-payload CRC-32C coverage or replace it with a whole-object checksum. Serialization and integrity protection for the remaining object fields must be designed without duplicating those fields. A single logical object may span multiple NAND pages/blocks and does not imply one atomic hardware write.
 
-Place the two copies in different physical erase blocks, not just different pages of the same block. Give records identity, version/generation, a checksum and transaction validity. Read back and verify the required metadata copies before declaring a successful capture commit or acknowledging a completed deletion. This does not turn capture-time full-payload readback into a mandatory operation when its approved switch is off.
+## Recovery obligations remain
 
-If one copy fails its integrity/commit checks and the other is valid, use the valid copy under the qualified version/transaction rules. Two valid but unexplained conflicting records are not a majority vote: preserve data, avoid unsafe allocation and apply the existing metadata-failure policy rather than guessing. A sequence number alone is not proof of a completed update.
+- Make allocation durable before programming the object, then establish and verify a valid final commit before treating it as successfully saved.
+- Preserve prior objects and interrupted-save bytes. Only explicit host deletion removes data; recovery must not silently free occupied or retired storage.
+- Keep permanent retirement separate from permission to read existing objects. Later read success or deletion does not undo BAD.
+- Freshly read original NAND into RAM on each USB image-data request and apply accepted ECC/checksum/warnings. No background payload scan, relocation or refresh is added.
+- Design and qualify storage-control redundancy, transaction/erase recovery, checkpoint rotation, wear, capacity and startup bounds. Verify all records required by the implementation before acknowledging success.
 
-Use append-only updates and safe metadata checkpoint rotation/compaction as needed, with old valid state retained until replacement metadata is verified. Exact layout and interruption cleanup remain to design. These are management-record operations, not image relocation, image refresh or background payload scans. A catalog cache may be rebuilt from valid metadata without reading all photo payloads.
+The provisional journal may keep protected records in different erase blocks. Its replica count, reserve size and recovery format remain implementation details to qualify; D-31 does not impose a fixed pair of photo-metadata copies or remove D-30's provisional journal redundancy. Multiple records on one NAND do not protect against failure of that whole chip.
 
-Size the metadata reserve and rotate writes to avoid concentrating the 1,000 full reuse cycles onto a few cells. Qualify power interruption during both-copy creation, commit, deletion, retirement and metadata compaction; losing one copy must not silently free occupied/retired storage or hide every image. Initial layout, write counts and energy depend on the final NAND geometry and must be measured.
+## Superseded proposal and capacity context
 
-## Capacity tradeoff
+The earlier recommendation duplicated photo descriptors/capture attributes separately from pixels. It is **not selected**. Its arithmetic remains context: two copies of 200 raw image payloads alone require 766,568,000 bytes, about 731.1 MiB, exceeding the 512 MiB planning capacity before overhead. Object replication is not selected.
 
-The selected image contains **1,916,420 bytes** of packed RAW10 before metadata. For the current **4 Gbit / 512 MiB planning device**:
+## Next discussion
 
-- Two copies of 200 payloads require **766,568,000 bytes, approximately 731.1 MiB**, before headers, bad blocks or reserves. This cannot meet 200 photos in 512 MiB.
-- The bare duplicated-payload ceiling is **140 photos**, ignoring all overhead.
-- Under the earlier illustrative 2 MiB-per-payload slot and 20% reserve model, duplication gives approximately **102 photos**, versus 204 single-copy slots. This is a planning calculation, not a qualified layout.
-- Metadata duplication consumes much less capacity than a second 1.916 MB payload per photo, but NAND page/block allocation and write-energy overhead must still be budgeted.
+**PARTIAL objects after interrupted saves:** how to present retained data and permit explicit deletion over USB. Recommend best-effort recovery access with a clear incomplete/recovered warning, without claiming a successful capture or automatically deleting the object. Some partial objects may lack sufficient attributes or image bytes for a viewable export. This USB policy is not yet approved.
 
-Additional payload parity could cost less space than full mirroring, but would add coding/recovery complexity. Parity spanning photos can require reading other images to recover a requested photo and complicates independent deletion and whole-slot retirement. Per-image parity remains a possible future study; no parity overhead, code or implementation is selected.
-
-## Evidence and boundaries
-
-- Current [image/capacity requirements](../../spec.md) supply the payload size and planning capacity; the arithmetic above is derived here.
-- The [camera/memory review](../review/camera-memory-review.md) already identifies protected metadata, redundant allocation state, torn writes and exact-part partial-program rules as engineering requirements. Its recovered parallel-NAND details are historical; they do not select the current serial-NAND layout.
-- [Winbond's technical FAQ](https://www.winbond.com/hq/support/faq/technical/?__locale=en), checked October 14, describes built-in ECC and media failure/bad-block handling. That is device-management context, not a vendor endorsement of this proposed two-copy metadata format. Exact-part documentation takes precedence over generic FAQ rules.
-- This proposal does not establish ten-year retention through 1,000 cycles. Both metadata and pixels still require exact-part qualification. It preserves fresh whole-image NAND-to-RAM reads only on host image requests, current-read warning export, permanent predictive-error retirement and explicit-only photo deletion.
-
-**Remaining proposal:** one image payload copy with independently protected critical metadata; no added image mirroring or software parity for the prototype. Redundant journal persistence is provisionally selected under D-30. Exact per-photo metadata duplication, physical layout and recovery protocol remain engineering work; see the [slot-state review](slot-state-storage-review.md).
+See the [decision register](2026-10-13-project-baseline.md), [slot-state implementation/future directions](slot-state-storage-review.md), [accepted read policy](ecc-read-error-review.md), and [specification](../../spec.md).

@@ -10,7 +10,8 @@ October 14, 2026. **Ten-year room-temperature retention and 1,000 complete reuse
 4. [ECC and read-error handling](ecc-read-error-review.md) — **settled:** ECC/CRC-32C, recoverable damaged-image export and permanent block retirement.
 5. Damaged-image warning — **settled:** `_RECOVERED` filename suffix plus EXIF UserComment.
 6. **Settled:** each host image-data request freshly reads/checks the original NAND image in RAM; no relocation/refresh. Predictive media errors retire its slot without deleting it.
-7. **Current:** [additional redundancy](storage-redundancy-review.md); metadata duplication without image mirroring is proposed, not approved.
+7. **Settled:** [single stored photo object](storage-redundancy-review.md), including pixels and photo attributes, with no object-content duplication. Storage-control redundancy depends on implementation; journaling remains provisional.
+8. **Current:** USB access and explicit deletion of PARTIAL objects after interrupted saves.
 
 Discuss one item at a time. This review does not change the accepted RAW10/capacity, configurable payload readback, explicit-erase, USED/DONE or USB error-reporting policies.
 
@@ -36,4 +37,4 @@ Require a storage lifetime of **1,000 complete fill/download/explicit-erase cycl
 
 This is an accepted workload, not 1,000 lifetime downloads or an assertion that every physical NAND block sees exactly 1,000 erases. Partial downloads do not consume an erase cycle, while allocation/retirement metadata, retries and recovery can concentrate physical wear. Qualification must cover worn memory and avoid metadata wear hotspots; headline NAND endurance alone does not prove simultaneous ten-year retention. Exact part, ECC, wear distribution and room-temperature retention after this usage remain to qualify.
 
-No exact storage part or additional redundancy scheme is selected by the retention/reuse approvals. Subsequent decisions settle PTP/per-photo deletion and ECC/CRC-32C with damaged-photo recovery and retirement. The `_RECOVERED`/EXIF warning is also selected. Request-driven RAM reads with no relocation or refresh and predictive-error slot retirement are settled. Additional redundancy is the current discussion; no new scheme is approved.
+No exact storage part or additional redundancy scheme is selected by the retention/reuse approvals. Subsequent decisions settle PTP/per-photo deletion and ECC/CRC-32C with damaged-photo recovery and retirement. The `_RECOVERED`/EXIF warning is also selected. Request-driven RAM reads with no relocation or refresh and predictive-error slot retirement are settled. D-30 provisionally selects journaling; D-31 stores each photo object and its attributes once, leaving storage-control redundancy to implementation. PARTIAL-object USB access is the current discussion.

@@ -8,7 +8,8 @@ The user's clarification includes: “we should always read the image from NAND 
 
 1. **Settled:** ECC/CRC-32C, best-effort export, read warnings, explicit-only deletion and permanent slot retirement.
 2. **Settled:** fresh, whole-image NAND-to-RAM reads only on host image-data requests; no image relocation or background refresh.
-3. **Current:** [additional redundancy](storage-redundancy-review.md). One image payload copy with two independently protected metadata copies is proposed, not approved. Physical layout, slot retirement, capacity and host interoperability remain to qualify.
+3. **Settled:** [D-31's single-object policy](storage-redundancy-review.md): pixels and photo attributes are stored once; storage-control redundancy depends on the implementation. D-30's journal remains provisional.
+4. **Current:** USB presentation and explicit deletion of interrupted PARTIAL objects; no presentation/reclamation policy is selected yet beyond retaining bytes until explicit deletion.
 
 ## Accepted request-driven read sequence
 
@@ -78,4 +79,4 @@ The USB copy-out proposal is **rejected/superseded**, not awaiting approval. The
 
 Ten-year room-temperature retention without power/refresh through 1,000 complete reuse cycles remains the storage qualification requirement. Best-effort rescue after detected errors does not satisfy that guarantee. The Micron/Winbond candidate requirements cited above call for refresh/removal at specified marginal conditions; the approved no-relocation policy does not perform that maintenance or restore original media reliability. Account for this in exact-part qualification without silently adding maintenance.
 
-Memory sizing, predictive-error thresholds, permanent retirement metadata, reserve/capacity loss, same-request filename behavior and any additional redundancy remain to engineer. Payload reads occur only on host image requests during USB retrieval; existing capture verification and metadata reads are separate. No hardware or firmware compliance is claimed.
+Memory sizing, predictive-error thresholds, permanent retirement metadata, reserve/capacity loss, same-request filename behavior and storage-control redundancy remain to engineer. Photo-object duplication is excluded by D-31. Payload reads occur only on host image requests during USB retrieval; existing capture verification and metadata reads are separate. No hardware or firmware compliance is claimed.

@@ -179,7 +179,7 @@ U6 is MX30LF2G18AC-TI, powered at 3.3 V. It connects directly to 3.3 V-powered S
 - WP# with a 10 kOhm pulldown so program/erase is inhibited until firmware deliberately drives the MCU output high.
 - PT with a 100 kOhm pulldown.
 
-The NAND is 2 Gbit SLC, approximately 256 MiB raw before bad-block and metadata overhead. Firmware must never assume all blocks are usable. A robust format should maintain redundant metadata, monotonic sequence numbers, CRCs, committed/uncommitted states, and recovery scanning after an interrupted save.
+The NAND is 2 Gbit SLC, approximately 256 MiB raw before bad-block and metadata overhead. Firmware must never assume all blocks are usable. A robust format should protect storage-control metadata using implementation-appropriate redundancy, monotonic sequence numbers, CRCs, committed/uncommitted states, and recovery scanning after an interrupted save. This historical storage description does not require duplicating photo-object attributes; §6.10 defines the accepted object/control boundary.
 
 ## 3.6 Boot flash
 
@@ -376,6 +376,14 @@ Use a RAM lookup table backed by redundant append-only NAND journals and protect
 Exact record encoding, physical reserve, checkpoint rotation, copy/commit protocol and startup bounds remain to design and qualify. The illustrative 16-block metadata reserve is not a frozen layout. No repeated in-place programming of state bits is assumed.
 
 Retain off-NAND table storage and in-slot allocation/commit/health records as future directions (FD-04/FD-05). A first page reading FF alone is not sufficient evidence that the entire slot is safely erased. Vendor factory-bad markers must be preserved; runtime retirement must not modify retained photos, hide them from reads or change their physical mapping. See the [slot-state analysis](docs/decisions/slot-state-storage-review.md).
+
+### 6.10 Photo object and storage-control boundary — approved October 14, 2026
+
+An image and its photo metadata, including name, time, orientation and other capture attributes, are one stored object. Store that object once; do not separately duplicate its pixels or photo attributes. A single object can span multiple pages/blocks and does not imply an atomic hardware write.
+
+Redundancy used by allocation maps, occupancy/health state, commit/deletion/retirement transactions, journals and checkpoints depends on the storage implementation. D-30's redundant journal remains a provisional approach; this object policy does not impose a universal storage-record copy count. Structural references, transaction identities/generations and integrity information may repeat, but must not become a second backup of photo attributes in a catalog/journal.
+
+Device-required ECC, the original image-payload CRC-32C and required final commit verification remain unchanged. Exact object serialization, protection of other object fields and storage-control recovery remain to implement; do not silently change the approved CRC domain. The prior recommendation for duplicated photo metadata is superseded. See the [accepted policy](docs/decisions/storage-redundancy-review.md).
 
 ## 7. Validation and bring-up
 
