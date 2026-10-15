@@ -1,6 +1,6 @@
 # Prototype parts and camera research
 
-Updated October 14, 2026. This is the retained procurement and feasibility record from the October 12–13 discussion, with the October 14 prototype-build decision added. The approved prototype uses **NUCLEO-N657X0-Q / STM32N6, CAM-6G3-073CLR / VD56G3 at 73° diagonal field of view, and four series CR2032 cells feeding LTC3621**. The recovered KiCad design still contains the older camera and power circuitry. See the [current specification](../../spec.md), [power design](../../power.md), and [decision review](../../reports/Global%20X%20Camera%20decision%20review.md) for governing decisions.
+Updated October 14, 2026. This is the retained procurement and feasibility record from the October 12–13 discussion, with the October 14 prototype-build and exposure-control decisions added. The approved prototype uses **NUCLEO-N657X0-Q / STM32N6, CAM-6G3-073CLR / VD56G3 at 73° diagonal field of view, and four series CR2032 cells feeding LTC3621**. The recovered KiCad design still contains the older camera and power circuitry. See the [current specification](../../spec.md), [power design](../../power.md), and [decision review](../../reports/Global%20X%20Camera%20decision%20review.md) for governing decisions.
 
 **The user confirmed the DigiKey order was placed** in the [review transcript, Message 014](../../research_notes/Global%20X%20Camera%20decision%20review/chat_sources/2026-10-12-13-current-review.md). Its exact line items, quantities, substitutions and delivery dates are **unknown**. Message 004 explicitly says NUCLEO-N657X0-Q had been added to the cart; Messages 007 and 013 contain recommendations, not an exported paid order. Reconcile receipts before buying duplicates.
 
@@ -10,6 +10,7 @@ Updated October 14, 2026. This is the retained procurement and feasibility recor
 | --- | --- |
 | Processor | STM32N6 active; Himax abandoned. NUCLEO-N657X0-Q is the development board identified by the user. |
 | First prototype assembly | **D-35, October 14:** the user will assemble it around NUCLEO-N657X0-Q. Custom-PCB manufacturer/assembler selection is deferred; prior JLCPCB/PCBWay studies remain background. |
+| Exposure-time control | **D-36, October 14:** potentiometer feeding an MCU ADC, sampled and applied before acquisition. Exact part, resistance/taper, ADC pin, supply/reference and time range/mapping are TBD. Include settling/conversion/configuration in the 50 ms budget and meet the existing OFF-current target. |
 | Prototype camera | **CAM-6G3-073CLR**, monochrome VD56G3, **73° diagonal**. The 84° module is not the selected substitute. |
 | Power source and regulator | Four CR2032 cells in series through LTC3621. Exact regulator suffix, output rails, supporting components and wiring remain implementation choices. |
 | Finished-product thickness | Target ≤5 mm; a thicker functional prototype is acceptable. A module below 5 mm does not prove the complete PCB/enclosure stack meets that target. |
