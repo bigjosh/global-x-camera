@@ -9,6 +9,8 @@ Current decisions and their remaining implementation boundaries are indexed in t
 
 **Power review in progress, October 14:** [rail requirements, phase timing and conversion proposals](docs/power/2026-10-14-power-tree-review.md) now precede wiring. The selected camera requires 2.8 V / 1.8 V / 1.15 V. A 5.0 V LTC3621 output is recommended for the Nucleo bench, with existing downstream regulators; custom-board voltage/topology remains open. These are engineering findings/proposals, not additional locked choices or applied CAD changes.
 
+**Direct 3.3 V follow-up:** evaluate the [Nucleo modification](docs/power/2026-10-14-power-tree-review.md#direct-33-v-nucleo-operation--feasibility-study) before fixing the LTC3621 output. Separate main and switched auxiliary 3.3 V feeds appear feasible; simple header injection or tying these domains together is insufficient. This is a feasibility study, not an approved voltage or assembly instruction.
+
 ## Locked prototype decisions — October 12–14, 2026
 
 | Item | User decision |

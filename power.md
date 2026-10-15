@@ -18,6 +18,8 @@ The retained implementation study uses **LTC3621EMS8E-3.3#PBF**, converting appr
 
 **Power fundamentals review, October 14:** the [current rail/phase and conversion review](docs/power/2026-10-14-power-tree-review.md) recommends **5.0 V from LTC3621 for the Nucleo bench**, retaining its existing regulators and the camera adapter. This is an unapproved proposal; exact source feed/isolation and measured loads remain open. The selected camera requires **2.8 V, 1.8 V and 1.15 V**. A separate custom-board 3.3 V candidate remains open. The 3.3 V circuit and values below are still the historical study, not the selected bench implementation.
 
+**Direct 3.3 V follow-up:** the user asked about bypassing the 5 V stage. The [Nucleo modification study](docs/power/2026-10-14-power-tree-review.md#direct-33-v-nucleo-operation--feasibility-study) identifies a feasible circuit direction: separate direct 3.3 V main and PWR_ON-switched 3.3 V auxiliary feeds, retaining lower-voltage regulation. It is not a documented jumper mode or verified rework recipe; exact isolation links and USB handling remain open. Investigate this before freezing the output voltage.
+
 ## 1. Requirements and scope
 
 | Item | Working basis |

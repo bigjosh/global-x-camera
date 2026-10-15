@@ -4,6 +4,8 @@ This document describes the **current recovered wiring**, including its existing
 
 **October 14 review:** see the [selected-camera/Nucleo rail requirements and proposed power tree](2026-10-14-power-tree-review.md) for the current discussion. It proposes 5.0 V for the Nucleo bench and keeps custom-board output voltage open. CAM-6G3-073CLR needs 2.8 V, 1.8 V and 1.15 V. Neither this proposal nor the selected components have been applied to the recovered diagram below.
 
+**Direct 3.3 V follow-up:** the [Nucleo modification study](2026-10-14-power-tree-review.md#direct-33-v-nucleo-operation--feasibility-study) now evaluates eliminating the bench 5 V stage while preserving separate main/AUX control. No voltage or rework recipe is approved.
+
 ![Battery and USB-C power paths through regulators to the camera's power consumers](power-tree.svg)
 
 The electrical source is [schematic-connectivity.json](../../hardware/reconstruction/schematic-connectivity.json), reconstructed from the recovered Flux project. [The native inventory](../../imports/flux/2026-09-05/native-inventory.json) supplies component identities and passive values. The four-cell arrangement comes from [spec.md §2.5](../../spec.md); individual cells and production battery holders are not netlisted PCB components.

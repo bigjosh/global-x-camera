@@ -6,11 +6,38 @@ Review in order: (1) required rails and their activity through a cycle; (2) LTC3
 
 ## Recommendation for discussion
 
+**Follow-up on direct 3.3 V, October 14:** the user asked whether the Nucleo could be modified to eliminate the 5 V intermediate supply. A direct 3.3 V architecture appears feasible with rework to both 3.3 V domains; investigate it before freezing the output voltage. The 5 V recommendation below is the convenient baseline using existing regulation, not an intrinsic requirement of the image-capture electronics. Neither output is approved. See the [modification study](#direct-33-v-nucleo-operation--feasibility-study) below.
+
 **Use a 5.0 V LTC3621 output for the NUCLEO-N657X0-Q bench prototype, retaining the Nucleo and camera adapter's existing downstream regulators.** The Nucleo has a 5 V internal distribution bus; feeding a single 3.3 V header does not supply its complete regulator tree. This recommendation concerns architecture, not an approved external-power connection. The board VIN header requires 7–12 V; do not connect the proposed 5 V there. Resolve the bus feed, jumper positions, USB isolation and actual board revision before wiring. [Nucleo manual, Rev 4, pp16–20 and31](https://www.st.com/resource/en/user_manual/um3417-stm32n6-nucleo144-board-mb1940-stmicroelectronics.pdf).
 
 The recommended DC1863A evaluation board uses the **adjustable LTC3621EMS8E#PBF** and has a 5 V selection at JP7. Its 5 V performance row specifies input at least 5.2 V and output up to 1 A. Exact order contents have not been supplied. The older fixed `LTC3621EMS8E-3.3#PBF` study cannot be changed to 5 V by adjusting a feedback divider. Converter ratings do not establish the CR2032 pack's pulse capability. [DC1863A manual, pp1–2 and BOM](https://www.analog.com/media/en/technical-documentation/user-guides/dc1863af.pdf), [LTC3621 datasheet](https://www.analog.com/media/en/technical-documentation/data-sheets/ltc3621-3621-2.pdf).
 
 For a future compact PCB, **3.3 V from LTC3621 is a candidate**, with efficient conversion to 1.8 V and local camera regulation. Direct 1.8 V remains an alternative requiring camera-analog voltage generation plus changes to RTC backup and HOLD interfaces. Neither custom-board choice is selected. Compare measured energy per complete capture, startup time, area and shutdown behavior before choosing; a voltage alone does not determine system efficiency.
+
+## Direct 3.3 V Nucleo operation — feasibility study
+
+The [Nucleo manual, Rev 4, §§7.4 and8.5](https://www.st.com/resource/en/user_manual/um3417-stm32n6-nucleo144-board-mb1940-stmicroelectronics.pdf) documents USB-derived 5 V or VIN 7–12 V supply modes, not a 3.3 V external-source jumper mode. CN5.4 is marked a 3.3 V output. Simply applying 3.3 V there does not power all regulator inputs and can drive an unpowered regulator backwards.
+
+The power architecture has two different 3.3 V domains. Main `VDDIO` must remain valid while auxiliary `VDD3V3` shuts down; shorting them together would defeat sequencing. The following circuit-level modification is an engineering proposal, not verified assembly instructions:
+
+| Existing branch on MB1940 C02 | Proposed treatment with a 3.3 V upstream supply |
+|---|---|
+| U33, LD39020 3.3 V main regulator | Isolate its output and feed the main domain directly from the external regulated 3.3 V. |
+| U34, ST1S31 3.3 V auxiliary buck | Isolate its output and feed the auxiliary domain through a PWR_ON-controlled load switch with suitable discharge. Preserve independent AUX shutdown. |
+| U17, TPS62088 core buck | Retain; its supported input range includes 3.3 V. Keep hardware PWR_ON control and the existing core voltage selection. |
+| U23, LD39020 1.8 V AON; U26, LD56100 1.8 V AUX | Retain subject to circuit checks. U23 can receive 3.3 V upstream; U26 continues receiving the switched 3.3 V auxiliary rail. |
+
+Component references and domain separation come from the [official MB1940 C02 schematic, sheet9](https://www.st.com/resource/en/schematic_pack/mb1940-n657x0q-c02-schematic.pdf), available in indexed text. R102 and R132 are apparent candidate links around the two 3.3 V outputs; **their exact net placement and suitability for isolation have not been visually verified, so they are not removal instructions**. Prefer confirmed removable links to an irreversible trace cut. Removing a current-measurement bypass alone is insufficient: CN12's measurement paths retain parallel precision shunts, including R112/R111 on VDDIO. Check every remaining path before injection.
+
+Regulator feasibility is supported by [TPS62088: 2.4–5.5 V input](https://www.ti.com/lit/ds/symlink/tps62088.pdf), [LD39020: 1.5–5.5 V input](https://www.st.com/resource/en/datasheet/ld39020.pdf), and [ST1S31: 2.8–5.5 V input with finite minimum off-time](https://www.st.com/resource/en/datasheet/st1s31.pdf). U33 cannot regulate a full 3.3 V from an equal input; U34 likewise cannot guarantee its 3.3 V output at a 3.3 V input. LD39020 also limits VOUT to VIN + 0.3 V in its absolute ratings, reinforcing the need to isolate its output when externally fed. Merely reducing the original 5 V bus to 3.3 V without modifying these branches is not the proposed solution.
+
+A [TPS22918](https://www.ti.com/product/TPS22918) is an example load-switch candidate: 1–5.5 V input, adjustable rise time and output discharge, 53 milliohms typical at 3.3 V; an [evaluation board](https://www.ti.com/tool/TPS22918EVM) exists. This would replace a voltage-conversion function with a controlled connection, adding little voltage drop. It is not selected, and current capacity, ramp/discharge timing and reverse-current behavior must be checked for this application. It does not by itself solve USB isolation. Placing it downstream of LTC3621 means it has no direct battery feed when the main rail is fully off.
+
+Keep USB/ST-LINK raw 5 V isolated from any bus repurposed for 3.3 V, including during debugging. The existing CN9 source jumpers must not reconnect raw 5 V to that modified bus. USB operation would require a regulated/protected path into the new architecture. Retained unused regulators and board features also contribute load; check their enable/feedback behavior rather than leave a disconnected feedback loop active. Preserve AON startup tracking and main hold-up until all AUX/core rails discharge. Actual board revision, disconnect pads, complete load paths and startup/shutdown waveforms remain to verify.
+
+Expected savings depend on load distribution: the core and existing auxiliary 3.3 V stages already use switching converters. A 5-to-3.3 V linear branch has about 66% ideal conversion efficiency, but that ratio is not the efficiency of the entire board. Compare measured energy per capture for the modified arrangement.
+
+**Evidence boundary:** the full schematic exceeded the web reader's size limit and direct HTTPS downloads from ST's global/China hosts did not produce a usable PDF. A community attachment redirected to HTML and was not accepted as schematic evidence. This study combines the manufacturer manual, indexed official schematic text and regulator datasheets. No exact trace cut, complete rework recipe, hardware change or demonstrated operation is claimed.
 
 ## Rails and consumers
 
