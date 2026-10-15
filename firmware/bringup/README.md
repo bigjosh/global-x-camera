@@ -129,3 +129,25 @@ The lower-level `VD6G_Init()` additionally requests 10 ms with shutdown asserted
 Recommended first experiment, not yet implemented: record stage timestamps in RAM and print only after capture. Separate MCU startup/clock setup, camera reset and readiness, sensor configuration, receiver setup, stream command, first received frame start and first completed frame. Collect repeated runs and error counts. First measure the existing path; then compare changes individually, starting with the redundant probe and timing-path logging. Clock changes must be accounted for if using CPU cycle counts.
 
 The current debugger load bypasses autonomous ROM-to-flash loading and starts with USB power already present. It cannot measure full cold-power startup or battery/rail rise. A received frame-start event is not itself a verified exposure-start timestamp. Final 50 ms qualification needs an external timing reference and a qualified sensor exposure indication or optical test, alongside the actual boot and power path. Follow-up experiments should test the first usable frame/manual settings, full-resolution RAW10 integrity, and repeated startup/link errors before battery/energy measurements.
+
+## Available instruments and proposed external measurements
+
+On October 15 the user confirmed owning a **Saleae Logic Pro 8** and **Joulescope JS110**. Windows detected the Logic Pro 8 during preparation. This records available equipment, not completed probe wiring or external measurements. The JS110 model was explicitly confirmed by the user; JS220 wiring assumptions do not apply.
+
+Work through (1) external logic timing, (2) synchronized current/energy, then (3) autonomous cold-power startup. For the first step retain the working USB power and board jumper configuration, including development-mode JP2. The following accessible points are documented by [ST UM3417 Rev4, Tables 16, 19 and 20](https://www.st.com/resource/en/user_manual/um3417-stm32n6-nucleo144-board-mb1940-stmicroelectronics.pdf):
+
+| Proposed Saleae connection | Nucleo point | Meaning |
+|---|---|---|
+| Ground | CN5 pin 6 or 7, GND | Common signal reference |
+| Channel 0 | CN5 pin 3, RESET / NRST | MCU reset reference; not power-on or exposure start |
+| Channel 1 | Arduino D2, CN13 pin 3, PD0 | Candidate startup-stage marker; firmware not implemented yet |
+| Channel 2 | Arduino D4, CN13 pin 5, PE0 | Candidate frame/synchronization marker; firmware not implemented yet |
+| Channel 3, optional | CN15 pin 4, PE5 | Existing USART1 TX activity, 115200 baud |
+
+PD0 and PE0 are unused by the inspected capture application, main initialization and selected Nucleo camera support paths. Match header labels/pin 1 on the physical board before wiring. Arduino digital signals are 3.3 V; use the Logic Pro 8's 3.3 V threshold setting for this first group. Saleae's threshold is shared across channels, and all probe grounds are common with host USB ground: connect them to board GND, not to a supply or either end of a current shunt. See [thresholds](https://www.saleae.com/support/specifications-hardware/electrical-characteristics/supported-voltages) and [ground connections](https://www.saleae.com/support/specifications-hardware/electrical-characteristics/are-the-ground-pins-required-for-each-input-used).
+
+The camera's reset/enable and I2C signals are on fine-pitch CN6 rather than the listed easy header points. A suitable breakout or verified pad is needed before adding those probes; do not probe the CSI differential lanes for this timing test. Firmware markers indicate software events and retain the exposure-timestamp limitations above.
+
+The [JS110 user guide, section 12](https://download.joulescope.com/docs/JoulescopeUsersGuide/JoulescopeUsersGuide_v1_3.pdf) provides two GPI inputs recorded with current/voltage. Fan out a selected 3.3 V firmware marker to Saleae and **JS110 IN0**, with the JS110 GPIO reference configured for 3.3 V, to align traces. The JS110 digital I/O is referenced to host USB ground even though its measurement side is isolated. Enabling GPI uses one sample bit, leaving 13-bit current/voltage samples instead of 14; retain that setting with results. Keep GPO outputs disconnected for the initial measurement.
+
+The JS110 must measure current in series with the selected positive supply path; its USB host connection does not power the target. Exact source/adapter wiring remains to settle. An initial whole-board USB-input measurement can include ST-Link/LED/regulator overhead and is useful for comparisons if labeled accordingly. Target-only energy requires a separately verified supply boundary with no bypass feed; CN9 alone does not remove the debugger supply branch through D2, and CN12 shunt pairs are not ready-made series ammeter inputs. See the [debugger/power isolation study](../../docs/power/nucleo-debug-isolation.md). No PCB rework or supply injection is prescribed here. Final main-path OFF-current qualification must account for instrument/probe loading and the separate RTC budget.
