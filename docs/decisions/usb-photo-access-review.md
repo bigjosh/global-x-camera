@@ -2,6 +2,10 @@
 
 October 14, 2026. **PTP with explicit per-photo deletion is approved.** The user said: “yes lets lock in PTP with explicit per-photo deletion.” This replaces the earlier host-visible drive/emulated-filesystem requirement. ECC/read-error policy was subsequently settled. On October 15 the user selected **16-bit grayscale PNG**, accepting lossless compression because export occurs on USB power (D-40).
 
+**D-43 — USB detail review deferred, October 15:** defer PNG/PTP implementation details until firmware bring-up. Keep the selected PNG/PTP behavior and early bring-up checks for host interoperability, current-read warning/filename timing, compressed object size and RAM use. This postpones implementation choices, not those requirements. The next review is the ≤50 ms cold-power-to-exposure-start target; physical prototype modifications remain paused until the board is in hand.
+
+Bring-up should prove two interactions early: real-host PNG list/download/delete with current-read recovery warnings, and a memory/size strategy compatible with PTP object-information requests before image data. Re-encoding one checked RAM snapshot can reduce output buffering but does not by itself settle an earlier advertised length if a later fresh NAND read produces different damaged data. These are retained engineering checks, not reasons to reopen the accepted format now.
+
 ## Accepted interface
 
 Use **Picture Transfer Protocol (PTP) over USB**. A host can enumerate photos, obtain their information/data and send an explicit per-photo delete request. A host-visible disk filesystem is not required. PTP replaces the earlier drive-emulation requirement; MTP and USB Mass Storage below are retained comparisons. USB-powered operation, the inactive shutter and no erase merely on connection/download remain settled.

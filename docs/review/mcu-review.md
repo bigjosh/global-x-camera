@@ -66,6 +66,8 @@ Evidence: [Section 5.3.18, Table 71 and Figure 25: CEXT maximum 10 nF; VIL maxim
 
 ### MCU-006 — The 50 ms capture target needs a bounded cold-boot payload and measured startup budget
 
+**Current requirement, October 15:** D-04 is fully-off button press to exposure start; the deadline definition is settled. ROM payload risk below remains relevant, while complete-frame timing is measured separately. See the [current risk review](../decisions/50ms-cold-start-review.md) for selected VD56G3 revision evidence and measurement priorities.
+
 **high / measurement**. The design physically cold-starts and loads firmware from serial NOR before capture; the spec targets image acquisition within 50 ms. ROM uses 32 MHz single-bit data transfer, not a quad data boot.
 
 The ideal ROM data ceiling is4MB/s:100 KiB already needs 25.6 ms and 200 KiB needs 51.2 ms, before command/software/authentication overhead, rail startup, clock settling or sensor initialization. Large FSBL payloads alone can consume the complete budget. This is a quantitative risk, not a claim that every possible small FSBL fails.

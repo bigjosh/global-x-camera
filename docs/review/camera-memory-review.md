@@ -69,6 +69,8 @@ Evidence:
 
 ## CAM-002 - Sensor revision can make a 50 ms cold capture impossible
 
+**Current-scope note, October 15:** the numbers below concern the historical VD55G0. The selected VD56G3 module has a different revision/patch dependency; see the [current cold-start review](../decisions/50ms-cold-start-review.md). D-04 now measures the start of exposure, not completion/readout.
+
 **high / conditional.** The module BOM does not identify the sensor silicon cut. Official ST driver revision 0x1111 uses cut1_patch=6868 bytes; revision 0x1120 uses cut2_patch=260 bytes, loaded at each power-on. UM2829 describes the patch load/activation before BOOT and STREAMING.
 
 At the sensor maximum 1 MHz I2C rate, patch data plus ACK alone takes at least 61.812 ms for cut1 or 2.340 ms for cut2. At 400 kHz those bounds are 154.530 and 5.850 ms. The cut1 path already exceeds 50 ms before power ramp, MCU boot, configuration, exposure, or readout. These are transfer lower bounds, not measured startup times.
@@ -84,6 +86,8 @@ Evidence:
 - [docs/review/evidence/vd55g0_patches.h](../../docs/review/evidence/vd55g0_patches.h).
 
 ## CAM-003 - Define exposure completion and first valid frame for the 50 ms requirement
+
+**Requirement settled since this historical review:** D-04 defines button press from fully off to start of exposure; D-38/D-39 select fixed 1×/1× gain and manual exponential exposure control. VD55G0-specific data below is historical. Qualify the selected VD56G3 first exposure using the [current review](../decisions/50ms-cold-start-review.md).
 
 **high / measurement.** The specification requires full native resolution and bit depth within 50 ms. VD55G0 full depth is 10-bit, with RAW10 output, not 9-bit fast mode or RAW8. Autoexposure updates from preceding frame statistics; a cold first frame is not guaranteed to have converged exposure. The host must provide CLKIN before XSHUTDOWN release and wait for READY_TO_BOOT before I2C access.
 

@@ -7,7 +7,7 @@
 
 Current decisions and their remaining implementation boundaries are indexed in the [project decision register](docs/decisions/2026-10-13-project-baseline.md). This specification defines the current requirements; explicitly historical circuit descriptions preserve the unchanged CAD evidence.
 
-**Prototype-work status, October 15:** board modifications and debugger-isolation rework are paused until the board is in hand. Gain and exposure range/curve are selected under D-38/D-39; D-40 selects losslessly compressed 16-bit grayscale PNG export on USB power, while hardware tuning remains pending; the existing requirements remain in force.
+**Prototype-work status, October 15:** board modifications and debugger-isolation rework are paused until the board is in hand. Gain and exposure range/curve are selected under D-38/D-39; D-40 selects losslessly compressed 16-bit grayscale PNG export on USB power, while hardware tuning remains pending. D-43 defers USB implementation details to firmware bring-up and makes the 50 ms cold-start target the current review; the existing requirements remain in force.
 
 **Power review findings, October 14:** [rail requirements, phase timing and conversion proposals](docs/power/2026-10-14-power-tree-review.md) now precede wiring. The selected camera requires 2.8 V / 1.8 V / 1.15 V. A 5.0 V LTC3621 output is recommended for the Nucleo bench, with existing downstream regulators; custom-board voltage/topology remains open. These are engineering findings/proposals, not additional locked choices or applied CAD changes.
 
@@ -293,7 +293,7 @@ The recovered design used a CAM-6G3 reference STEP while electrically specifying
 
 The staged workflow remains the starting point, but the inherited rail actions and sensor initialization below must be reconciled with CAM-6G3-073CLR and the LTC3621 implementation. No existing firmware or timing model is thereby qualified for the new module. The sequence below describes successful capture/save; faults follow §§6.4–6.6 instead of requiring a successful-save sequence.
 
-For battery-powered capture with USB disconnected, the firmware implementation should use a staged, latency-measured startup:
+For battery-powered capture with USB disconnected, the firmware implementation should use a staged, latency-measured startup. This list expresses required functions and dependencies, not a requirement to serialize independent settling/initialization. The [October 15 cold-start review](docs/decisions/50ms-cold-start-review.md) prioritizes sensor revision/patch loading, ROM-loaded code size, power ramp and bounded allocation recovery:
 
 1. Establish PWR_HOLD immediately after reset.
 2. Initialize clocks from HSE and configure the core/IO domains.

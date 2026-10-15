@@ -1,6 +1,6 @@
 # Global X Camera
 
-An STM32N6-based, credit-card-size monochrome global-shutter camera project. This repository is the durable project record; chat and Page copies are working views. Updated through October 14, 2026.
+An STM32N6-based, credit-card-size monochrome global-shutter camera project. This repository is the durable project record; chat and Page copies are working views. Updated through October 15, 2026.
 
 **Public repository:** [bigjosh/global-x-camera](https://github.com/bigjosh/global-x-camera), created at the user's explicit request on October 13, 2026. The default branch is `main`.
 
@@ -13,6 +13,8 @@ An STM32N6-based, credit-card-size monochrome global-shutter camera project. Thi
 5. [Prototype parts and camera research](docs/prototype/prototype-parts-and-camera-research.md) — procurement status, sensor/optics comparisons and qualification limits.
 6. [Hardware and firmware interface](docs/hardware-firmware-interface.md) — current behavior requirements and inherited pin-map obligations.
 7. [Prototype power-cost comparison](docs/power/power-cost-comparison.md) — estimated battery energy for 5 V Nucleo, modified 3.3 V and custom hardware, with assumptions and a reproducible calculation.
+
+8. [50 ms cold-start risk review](docs/decisions/50ms-cold-start-review.md) — sensor revision, MCU boot load, power startup and storage recovery risks; no measured timing compliance yet.
 
 ## Current position
 
