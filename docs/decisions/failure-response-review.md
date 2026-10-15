@@ -4,6 +4,10 @@ The user settled the complete response map on October 13, 2026, after first appr
 
 The [decision register](2026-10-13-project-baseline.md), [specification](../../spec.md), and [power study](../../power.md) govern existing requirements. Storage-full behavior, ignored busy presses and inactive shutter operation in USB mode are already settled. This review addresses failures and transitions beyond those decisions.
 
+## Capture indication and failure priority — October 15
+
+**D-41 — capture indication, approved October 15:** flash yellow from power-up throughout startup, exposure, readout and saving. After the save completes successfully, show steady green for **0.25 s (250 ms)**, then perform the accepted shutdown sequence. Successful save includes all required checks, any enabled full-image readback, and verified durable commit. Red-coded capture faults replace yellow/green with the existing red code and abort to shutdown; never show success for a failed save. Existing nonfatal missing-metadata behavior, USB error reporting and limitations for boot/hang or sudden power loss remain as listed below. Yellow cadence and red flash timing remain to qualify; the green duration is selected. Storage-full pattern remains a separate pending decision.
+
 ## Accepted response map
 
 | Case | Failure or transition | Status |

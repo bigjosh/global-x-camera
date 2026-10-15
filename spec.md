@@ -15,7 +15,7 @@ Current decisions and their remaining implementation boundaries are indexed in t
 
 **Power-cost follow-up:** the [comparative energy model](docs/power/power-cost-comparison.md) suggests removing debugger/power-indicator overhead before undertaking direct 3.3 V rework. After those removals in both cases, the model predicts about 7% lower cycle energy from 3.3 V; a custom board offers further savings through lower-voltage conversion and removal/gating of unused loads. All values are estimates and no output voltage is newly selected.
 
-## Locked prototype decisions — October 12–14, 2026
+## Locked prototype decisions — October 12–15, 2026
 
 | Item | User decision |
 | --- | --- |
@@ -28,6 +28,7 @@ Current decisions and their remaining implementation boundaries are indexed in t
 | Photo retention | **Approved October 14: ten years at room temperature, fully unpowered, with no refresh needed.** Approximately 25°C is the reference. Include successfully committed images and metadata needed to recover them. No periodic wake, battery, USB connection or maintenance write may be required. Qualify retention through the accepted 1,000 complete reuse cycles; see §6.7. |
 | Storage reuse lifetime | **Approved October 14: 1,000 complete fill/download/explicit-erase cycles**, representing at least 200,000 photo saves at 200 photos per fill. The ten-year retention requirement still applies to photos saved after rated usage. Account for actual physical block and metadata wear; hardware compliance remains unqualified. |
 | Full image readback | **Approved October 13:** full payload readback plus checksum comparison is configurable, enabled by default during bring-up/initial testing, and may be disabled later. Required save checks and final commit-record readback verification remain mandatory; see §6.1. Firmware implementation remains pending. |
+| Capture indication | **D-41, approved October 15:** flashing yellow from power-up through capture and saving; steady green for 0.25 s only after required checks and verified durable commit, then shutdown. Existing red codes override normal indication on capture faults. Yellow cadence and indicator hardware remain to qualify. |
 | Storage full | **Approved October 13:** preserve existing committed photos, reject new captures when no usable slot remains, and indicate storage full with the status LED. Reclaim saved-photo space through an explicit USB erase action after download; connection or download alone must not erase photos. Firmware implementation remains pending. |
 | Presses while busy | **Approved October 13:** ignore additional shutter presses during capture/save, finish the current operation unless a fault requires abort, and do not queue another exposure. A new capture requires a fresh press after ready and an actual power cycle of the main capture electronics after shutdown. |
 | USB mode | **Updated October 14: USB-powered PTP camera interface with explicit per-photo deletion.** This replaces drive/filesystem emulation. The shutter remains inactive. Connection or download alone never deletes photos. D-40 selects losslessly compressed 16-bit grayscale PNG, generated on USB power. Encoding, safe deletion/reclamation, host interoperability and USB power isolation remain implementation work. |
@@ -64,7 +65,7 @@ The PCB is intended to be both the electronic assembly and a structural rear sur
 3. The processor asserts its power-hold signal before the user releases the switch.
 4. The processor boots from external Quad-SPI NOR, establishes clocks and rails, and checks for a usable storage slot. If none remains, it preserves existing committed photos, rejects the capture and indicates storage full with the status LED. Otherwise, it initializes the camera, reads orientation and time, and captures one image.
 5. The image is written to raw SLC NAND with firmware-managed bad blocks/pages.
-6. The status LED communicates capture/save state. Ignore additional shutter presses while capture/save is busy, finish the current operation unless a fault requires abort, and queue no exposure. Another image requires a power cycle of the main capture electronics after shutdown and a fresh press after ready.
+6. Flash yellow from power-up throughout capture/save; after required checks and verified durable commit, show steady green for 0.25 s before shutdown. Red-coded faults override normal indication (D-41). Ignore additional shutter presses while capture/save is busy, finish the current operation unless a fault requires abort, and queue no exposure. Another image requires a power cycle of the main capture electronics after shutdown and a fresh press after ready.
 7. After all required save checks and verification of the durable NAND commit record, firmware prepares peripherals and the required shutdown sequence, then enters Standby. The ordinary HOLD GPIO becomes high impedance, releasing the diode hold path. With the shutter released, the main supply turns off after any qualified shutdown delay; a held shutter keeps the buck enabled while the MCU remains in Standby until release. Full image readback follows the configurable policy in §6.1.
 8. When USB-C is attached, USB powers the camera's download/explicit-erase mode independently of the batteries. Firmware presents photos through PTP and accepts explicit per-photo delete requests; the shutter has no operation. Attaching USB or downloading images does not itself delete them. Persist deletion safely and reclaim only the corresponding storage without harming other photos.
 9. At any phase of a cycle, detected low battery causes one red LED flash while sufficient power remains, followed by abort to the shutdown state. Abort is not proof of a successful save; retain an already valid, committed current image and never claim an incomplete or unverified image was saved. See §6.4 for the power-cycle and data-preservation requirements.
@@ -217,7 +218,7 @@ The USB channel is intended for 90 Ohm differential impedance. It should be rout
 
 ## 3.10 User interface and debug
 
-SW1 is an Omron B3U-3000P side-actuated SPST-NO shutter switch located at the top edge near the right side. It serves both as the physical latch start and an MCU-readable shutter signal. LED1 is a low-current SML-P11MTT86R yellow-green 0402 LED driven at approximately 1 mA through R12=1.5 kOhm. It is intended to face the rear through a PCB/enclosure optical opening.
+SW1 is an Omron B3U-3000P side-actuated SPST-NO shutter switch located at the top edge near the right side. It serves both as the physical latch start and an MCU-readable shutter signal. LED1 is a low-current SML-P11MTT86R yellow-green 0402 LED driven at approximately 1 mA through R12=1.5 kOhm. It is intended to face the rear through a PCB/enclosure optical opening. This is the recovered hardware, not a compliant three-color implementation of D-41; select distinct yellow, green and red indication hardware during the deferred board work.
 
 J2 is a TC2030-IDC-NL six-pad Tag-Connect pattern carrying SWDIO, SWCLK, SWO, NRST, VTref, and GND. The final product has no populated debug connector. BOOT0, reset, rails, camera I2C, RTC I2C, camera clock, camera rails, and battery tap have compact test pads. Optional BOOT and RESET switch footprints are excluded from the production BOM.
 
@@ -304,7 +305,7 @@ For battery-powered capture with USB disconnected, the firmware implementation s
 8. Enable camera analog rail, satisfy the selected module's delays, release XSHUTDOWN, and apply the potentiometer-selected exposure setting before beginning the saved exposure within ≤50 ms of shutter-button press from fully powered off. Then complete exposure and read out the full-resolution frame.
 9. Mark the save's storage blocks USED at the beginning of saving, then record timestamp/orientation or their BAD sentinels, exposure/configuration actually used, sequence number, image payload, and generated checksum/integrity metadata to raw NAND.
 10. Complete the required save checks, optional full payload readback, redundant allocation metadata update and successful-end DONE marking under §§6.1 and 6.5. Read back and verify the final durable commit record before treating the photo as successfully saved.
-11. Only after all required operations and checks complete successfully, indicate save completion, prepare peripherals and the required rail-shutdown sequence, then enter genuine Standby so the ordinary HOLD GPIO automatically becomes high impedance. Leave HOLD driven until Standby entry; Stop mode does not perform this release.
+11. Keep flashing yellow until all required operations and checks, including verified durable commit, complete successfully. Then show steady green for 0.25 s, prepare peripherals and the required rail-shutdown sequence, and enter genuine Standby so the ordinary HOLD GPIO automatically becomes high impedance. Leave HOLD driven until Standby entry; Stop mode does not perform this release.
 
 All phases should be instrumented during bring-up. Budget the **≤50 ms shutter-button-to-exposure-start interval** across power ramp, boot-ROM/FSBL, firmware load, clock configuration, camera rails, initialization, ADC/reference startup, input settling, potentiometer sampling and exposure programming, and any other prerequisite to starting exposure. Record the actual exposure-start event. Measure exposure duration, frame readout/transfer, nonvolatile save including NAND programming and metadata commit, and shutdown as separate later intervals. The deadline is a deterministic design/timing qualification requirement, not a selected runtime error code. No current measurements establish compliance with this cold-start requirement.
 
@@ -330,7 +331,7 @@ The exact LED pattern and erase-interface details remain implementation work. Th
 
 ### 6.3 Presses while busy — approved October 13, 2026
 
-Ignore additional shutter presses during capture and save. Finish the current operation unless a fault requires abort, without queuing another exposure. A new capture requires an actual power cycle of the main capture electronics after shutdown and a fresh press after ready; a press made while busy, even if still held at completion, must not become a deferred shot. The existing held-button Standby behavior still applies. Exact busy/ready indication and input handling remain implementation work, and USB mode keeps the shutter inactive.
+Ignore additional shutter presses during capture and save. Finish the current operation unless a fault requires abort, without queuing another exposure. A new capture requires an actual power cycle of the main capture electronics after shutdown and a fresh press after ready; a press made while busy, even if still held at completion, must not become a deferred shot. The existing held-button Standby behavior still applies. D-41 selects flashing yellow while busy and steady green for 0.25 s after successful save; yellow cadence, startup latency, hardware and input handling remain implementation work. USB mode keeps the shutter inactive.
 
 ### 6.4 F-01: low-battery abort and shutdown state — approved October 13, 2026
 
@@ -423,6 +424,19 @@ An initial firmware mapping candidate for normalized knob position `x` from 0 to
 
 Measure shutter-button press from fully powered off to the saved exposure's start, later readout/save/shutdown intervals, and energy per complete capture under equivalent exposure/configuration and verification settings. Use those results to prioritize startup, driver or runtime changes; no savings follow merely from the label “bare metal.” Retain required hardware delays, integrity/commit checks, fault behavior and shutdown sequencing. D-40 selects 16-bit grayscale PNG export. Hardware integration, measured compliance, encoder integration and exact runtime/USB choices remain open.
 
+
+### 6.14 Capture status indication — approved October 15, 2026
+
+**D-41 — capture indication, approved October 15:** flash yellow from power-up throughout startup, exposure, readout and saving. After the save completes successfully, show steady green for **0.25 s (250 ms)**, then perform the accepted shutdown sequence. Successful save includes all required checks, any enabled full-image readback, and verified durable commit. Red-coded capture faults replace yellow/green with the existing red code and abort to shutdown; never show success for a failed save.
+
+The user specified: “flashing yellow starting at power up and until write completes - then it turns to green for 0.25s. any error in the process show the Red LED codes.” This replaces the proposal to leave the LED off while busy.
+
+Implement yellow indication from startup, with the earliest controllable point and actual power-up-to-indication latency qualified on hardware; firmware-driven blinking cannot be assumed before firmware executes. Yellow cadence/duty cycle, red flash timing, LED currents, drivers and pins are not selected. Keep indication nonblocking so it does not delay the ≤50 ms exposure-start target. Qualify placement/shielding against light entering the image while yellow flashes during exposure. The existing single yellow-green LED does not establish distinct yellow/green/red capability.
+
+Include flashing load and the 250 ms green interval in complete-cycle energy and latency measurements. Required rails/MCU state during green remain to design; do not assume this costs only LED energy. The prior power-cost model excludes these new contributions. Power/debug modifications remain paused until the board arrives.
+
+Preserve the accepted response map: unavailable time/orientation is recorded BAD and does not by itself fail a photo; USB faults retain host reporting; boot/hang or abrupt power loss cannot guarantee a firmware indication. A detected low-battery fault during yellow or green takes precedence and uses its existing one-red-flash shutdown response, preserving any already committed photo. No new code is assigned to these exceptions or to storage full by this decision.
+
 ## 7. Validation and bring-up
 
 Adapt the recovered circuit checklist below to the implemented CAM-6G3-073CLR/LTC3621 revision; references to Q1/Q3 and old rail names are not instructions to retain the superseded power path.
@@ -445,6 +459,8 @@ Adapt the recovered circuit checklist below to the implemented CAM-6G3-073CLR/LT
 - Measure true off-state leakage across temperature and humidity conditions relevant to storage.
 
 ### 7.3 Functional checks
+
+- Qualify D-41 startup/yellow cadence, flashing during capture/save without optical contamination, no green before required checks and durable commit, steady green duration of 250 ms, red-code priority and subsequent shutdown. Measure the added indication energy and complete-cycle duration.
 
 - Establish SWD access and boot recovery.
 - Validate QSPI boot and redundant FSBL selection.
