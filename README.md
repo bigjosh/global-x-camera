@@ -12,6 +12,7 @@ An STM32N6-based, credit-card-size monochrome global-shutter camera project. Thi
 4. [Consolidated project review](reports/Global%20X%20Camera%20decision%20review.md) — project-wide synthesis and engineering backlog.
 5. [Prototype parts and camera research](docs/prototype/prototype-parts-and-camera-research.md) — procurement status, sensor/optics comparisons and qualification limits.
 6. [Hardware and firmware interface](docs/hardware-firmware-interface.md) — current behavior requirements and inherited pin-map obligations.
+7. [Prototype power-cost comparison](docs/power/power-cost-comparison.md) — estimated battery energy for 5 V Nucleo, modified 3.3 V and custom hardware, with assumptions and a reproducible calculation.
 
 ## Current position
 

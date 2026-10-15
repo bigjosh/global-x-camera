@@ -11,6 +11,8 @@ Current decisions and their remaining implementation boundaries are indexed in t
 
 **Direct 3.3 V follow-up:** evaluate the [Nucleo modification](docs/power/2026-10-14-power-tree-review.md#direct-33-v-nucleo-operation--feasibility-study) before fixing the LTC3621 output. Separate main and switched auxiliary 3.3 V feeds appear feasible; simple header injection or tying these domains together is insufficient. This is a feasibility study, not an approved voltage or assembly instruction.
 
+**Power-cost follow-up:** the [comparative energy model](docs/power/power-cost-comparison.md) suggests removing debugger/power-indicator overhead before undertaking direct 3.3 V rework. After those removals in both cases, the model predicts about 7% lower cycle energy from 3.3 V; a custom board offers further savings through lower-voltage conversion and removal/gating of unused loads. All values are estimates and no output voltage is newly selected.
+
 ## Locked prototype decisions — October 12–14, 2026
 
 | Item | User decision |
