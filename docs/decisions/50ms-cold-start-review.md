@@ -66,6 +66,48 @@ ROM overhead, headers/checks, power rise and subsequent startup add time. A fast
 
 Do not sum all illustrative numbers into a predicted startup time: some tasks can overlap, and the measurements/bounds for the critical path are incomplete. No new per-stage timing allocations or relaxed target are approved here.
 
+## Power and rail startup follow-up — October 15
+
+The largest supply-side uncertainty is **a slow, interrupted or repeated startup under battery load**, rather than a known regulator delay that alone exceeds 50 ms. Review in this order: (1) battery/inrush margin; (2) hardware rail/reset sequencing; (3) camera power/clock overlap; (4) button-to-HOLD continuity. These are engineering findings and recommendations, not additional accepted circuit decisions. Prototype modifications remain paused until the board arrives.
+
+| Priority | Risk to exposure-start timing | Recommended treatment and tradeoff |
+|---|---|---|
+| 1 | Four series CR2032s sag while capacitors charge and loads turn on. A downstream reset/restart can consume the available margin or prevent boot altogether. | Qualify one clean startup with the weakest allowed pack and real contacts. Start only necessary loads. Parallel startup reduces latency but increases simultaneous current demand. |
+| 2 | Incorrect main/AON tracking, auxiliary/core sequencing, reset timing or boot-NOR readiness prevents deterministic execution. | Preserve the MCU's hardware-controlled sequence; measure the complete chain. Typical converter figures do not establish a board-level maximum. |
+| 3 | Camera power and its clock begin unnecessarily late, adding their startup after MCU loading rather than overlapping it. | Start them at the earliest electrically valid point, with XSHUTDOWN held low until all camera supplies and CLKIN are valid. Verify the adapter's enable wiring before relying on overlap. |
+| 4 | Button bounce/release or a slow RUN network interrupts power before GPIO HOLD takes over. | Assert HOLD at the earliest safe firmware point; qualify actual button waveforms and any RC network. More filtering/hold time can increase initial delay. |
+
+### Battery and capacitor margin
+
+Series cells each carry the full pack current, and their resistances add. Higher pack voltage reduces converter input current for a given output power; it does not divide that current among the four cells. The [existing energy model](../power/power-cost-comparison.md) estimates about 64 mA from a 12 V pack during its illustrative stock-board capture phase, excluding startup capacitor charging. This is not measured startup demand. [Energizer's CR2032 reference](https://data.energizer.com/pdfs/cr2032.pdf) characterizes approximately 6.8 mA, two-second pulses; that test is neither a maximum-current rating nor qualification of our load.
+
+Charging capacitance requires `I = C × dV/dt`, before adding operating load. For scale only, charging **100 µF to 5 V in 1 ms requires 0.5 A average capacitor current**. This is an illustrative rail-side calculation, not an assumed board capacitance or battery current. The actual path, capacitance, load turn-on and source impedance must be measured. A larger output reservoir can reduce later voltage dips but increases charge demand at every cold start. An input reservoir can help supply pulses but introduces recharge and battery-side leakage constraints under the 100 nA OFF target. No reservoir value or placement is selected here.
+
+The [LTC3621 datasheet](https://www.analog.com/media/en/technical-documentation/data-sheets/ltc3621-3621-2.pdf), pp4–5 and11, lists **0.8 ms typical** soft-start with no maximum. Its 1 A output rating does not establish what the cells can deliver. RUN has guaranteed high/low levels of 1.0 V/0.3 V; these are not a characterized 0.7 V hysteresis band or a precision battery cutoff. Its internal UVLO also does not establish a suitable four-cell low-battery threshold. A useful output may fail before that internal UVLO trips.
+
+### Rail and clock timing evidence
+
+The Nucleo's main/AON stage precedes hardware PWR_ON-controlled core/AUX branches. These branches can overlap. [AN5967 Rev6 §§3.4–3.5](https://www.st.com/resource/en/application_note/an5967-getting-started-with-hardware-development-for-stm32n6-mcus-stmicroelectronics.pdf) requires AON's POR crossing within 250 µs after main VDD's POR crossing; this is a tracking limit, not a mandatory 250 µs wait. During shutdown, AUX must discharge below 0.6 V while main/AON remain valid. Test short off intervals as well as a fully discharged start: residual charge and backfeed can change reset behavior.
+
+| Component or condition | Datasheet timing | Interpretation |
+|---|---|---|
+| [LD39020 main/AON LDOs, table5](https://www.st.com/resource/en/datasheet/ld39020.pdf) | 100 µs typical, enable to 95% | Specified test conditions; not a maximum board delay. |
+| [TPS62088 core buck, table6.5 and §7.3.4](https://www.ti.com/lit/ds/symlink/tps62088.pdf) | 1.25 ms typical, enable to 95% | Includes 250 µs delay and about 1 ms ramp. Overload/restart behavior can extend this. |
+| [ST1S31 AUX buck, table4](https://www.st.com/resource/en/datasheet/st1s31.pdf) | 400 µs typical soft-start | Core and AUX branches need not wait for one another. |
+| [LD56100 AUX LDO, table5](https://www.st.com/resource/en/datasheet/ld56100.pdf) | 60 µs typical, enable to 95% at 1.8 V | Downstream input must first be adequate. |
+| [STM32N657 DS14791 Rev11 table27](https://www.st.com/resource/en/datasheet/stm32n657x0.pdf) | 200 µs minimum reset temporization; 180 µs minimum core-ready detection | Neither is a guaranteed maximum; do not sum them into a complete boot estimate. |
+| [ECS-2520MVLC oscillator, p1](https://ecsxtal.com/store/pdf/ECS-2520MVLC.pdf) | **5 ms maximum** startup, referenced to 90% VDD | The [STEVAL-CAM-M0I schematic, sheet2](https://www.st.com/resource/en/schematic_pack/steval-cam-m0i-schematic.pdf) identifies the 12 MHz member. Verify the fitted part/revision. Start early enough to overlap other work where possible. |
+
+The sensor's 2.8 V, 1.8 V and 1.15 V supplies and external clock may start in any order, but must be valid before XSHUTDOWN release. The [VD56G3 datasheet §7.3](https://www.st.com/resource/en/datasheet/vd56g3.pdf) imposes no need to serialize those three supplies. Its 20 µs typical POR figure is not complete sensor boot time. The boot NOR must likewise meet its own power/reset requirements before ROM access; [UM3417 §7.12](https://www.st.com/resource/en/user_manual/um3417-stm32n6-nucleo144-board-mb1940-stmicroelectronics.pdf) documents the board's 1.8 V flash and reset adaptation. Exact NOR readiness and complete board timing remain to qualify.
+
+The historical [RUN/HOLD study](../../power.md) includes an optional RUN-to-ground capacitor, distinct from the deferred series held-button-defense capacitor. With its illustrative 330 kΩ/100 kΩ divider, a 1 µF RUN capacitor takes approximately 30–59 ms to reach 1.0 V for a 13.2–8 V pack; 100 nF takes about 3–6 ms. These are nominal RC calculations, not selected values or the regulator's actual switching threshold. Check this delay before adding a shutdown hold capacitor.
+
+### First power verification
+
+Once the board is available, compare a stiff laboratory source with actual cells and a controllable source-resistance model. Observe button/RUN, pack voltage/current, upstream output, main/AON, PWR_ON, AUX/core, reset, camera clock and an early firmware marker in correlated traces. Test fresh and depleted packs, intended temperature limits, button bounce and short/long off intervals. Confirm rails remain valid through the load changes leading to exposure. USB/debug connections must not secretly supply power or retain state during the cold-start test.
+
+The first recommended criterion is **one reliable startup without brownout/restart across the allowed battery conditions**. Then measure its latency contribution and optimize overlap. No complete rail-time budget or compliance result is inferred from the component figures above.
+
 ## Recommended first verification
 
 Verify the camera revision during bring-up and retain that check in factory commissioning under D-44. When the board arrives, implement the minimal staged boot under D-45 and instrument:
