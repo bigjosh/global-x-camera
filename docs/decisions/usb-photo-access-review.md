@@ -1,6 +1,6 @@
 # USB photo access and explicit deletion
 
-October 14, 2026. **PTP with explicit per-photo deletion is approved.** The user said: “yes lets lock in PTP with explicit per-photo deletion.” This replaces the earlier host-visible drive/emulated-filesystem requirement. The user has moved on to ECC and read-error handling, including reporting failures over PTP.
+October 14, 2026. **PTP with explicit per-photo deletion is approved.** The user said: “yes lets lock in PTP with explicit per-photo deletion.” This replaces the earlier host-visible drive/emulated-filesystem requirement. ECC/read-error policy was subsequently settled. On October 15, after selecting fixed gain and the exposure-pot range/curve, the user returned to the exported image-file format; that choice remains open.
 
 ## Accepted interface
 
@@ -23,6 +23,35 @@ These are interface choices; the device still needs its own durable NAND allocat
 - Keep capture disabled in USB mode even though PTP includes optional remote-camera operations. Advertise only supported operations. Preserve the accepted incomplete USED/not-DONE policy and avoid accidental reclamation when other photos are deleted.
 
 PTP gives firmware a specific image-delete request instead of filesystem block changes. The protocol choice is approved, but the stack is not integrated or qualified. Test list/download/delete, errors and disconnect recovery on the Nucleo and intended hosts before freezing implementation. The generated photo format remains to be selected; packed RAW10 alone is not a generally recognized picture file.
+
+## Exported image format options — October 15 proposal
+
+PTP transport and explicit deletion are already approved. The remaining choice is the file representation generated from the stored photo on a USB request. **Recommendation, not yet approved:** uncompressed 16-bit grayscale TIFF for simple prototype export and pixel inspection. Monochrome DNG is the stronger alternative if raw-photo editing is the priority. Neither choice changes the single stored packed-RAW10 object.
+
+| File option | All ten sensor bits retained? | Benefits and tradeoffs |
+|---|---|---|
+| Uncompressed 16-bit grayscale TIFF | Yes, with a documented reversible sample mapping | Simple fixed-size encoder, straightforward pixel inspection and Exif metadata. Approximately 3.07 MB per native image plus metadata. Deliberate sample scaling/linear interpretation is needed; test the intended viewers and PTP importers. |
+| Monochrome DNG | Yes | Raw-camera interpretation, including black/white levels, plus Exif. More tags and validation than a basic TIFF. An initial uncompressed 16-bit implementation has the same pixel size. Custom monochrome-camera compatibility still needs testing in intended raw editors. |
+| 16-bit grayscale PNG | Yes | Lossless DEFLATE and variable output size; supports significant-bit and Exif metadata. More encoding work than an uncompressed TIFF; application handling of metadata varies. |
+| Ordinary 8-bit grayscale JPEG | No | Convenient viewing and smaller, lossy files. Requires rendering/tone mapping and compression. Consider a later convenience rendition, not the only export when retaining all original precision matters. |
+
+Native image arithmetic: 1124 × 1364 = 1,533,136 pixels; packed RAW10 payload = **1,916,420 bytes**. A 16-bit export uses **3,066,272 pixel bytes** (3.07 decimal MB / 2.92 MiB), excluding headers, metadata and any preview. This is USB output size, not an increase in NAND allocation. Export generation occurs under USB power, after the accepted fresh whole-image NAND-to-RAM read and integrity check. A second full expanded-image RAM buffer is not inherently required: uncompressed samples can be expanded in chunks from the checked buffer. Firmware still needs a complete RAM and transfer-length budget.
+
+Implementation findings, not additional approvals:
+
+- A 16-bit TIFF containing unscaled values 0–1023 will generally look very dark. Define reversible full-range scaling and correct linear-light interpretation; do not silently label raw linear pixels as display-encoded sRGB. PNG provides `sBIT=10` for original precision after scaling. DNG can retain original sample codes and describe black/white levels explicitly.
+- A monochrome DNG can use one sample per pixel with LinearRaw interpretation; no Bayer demosaicing is involved. A packed 10-bit DNG is not a direct copy of MIPI RAW10 packing. Initial 16-bit unpacking avoids that packing mismatch.
+- TIFF, DNG, PNG and Exif/JPEG have recognized PTP object-format identifiers, but that does not guarantee import, thumbnail, deletion or warning display in every host application. Windows WIC explicitly supports 16-bit grayscale TIFF/PNG and 8-bit grayscale JPEG; a decoder table is not an end-to-end camera qualification.
+- Build a valid recovered-image container around available pixels where possible, with clearly identified missing ranges and the accepted warnings. Do not discard readable bytes merely because a valid picture cannot be constructed. No change to D-28/D-32: `_RECOVERED` and Exif UserComment and/or PTP diagnostics remain required as applicable; optional missing metadata must not block recovery. Warning-name timing when PTP requests object information before reading payload remains open for every format.
+- A later USB-only preview could be derived from the same NAND object without storing another photo copy. It is not selected now; exposing multiple PTP objects for one photo would require explicit deletion semantics.
+
+Sources checked October 15:
+
+- [Microsoft WIC native codec formats](https://learn.microsoft.com/en-us/windows/win32/wic/-wic-codec-native-pixel-formats): TIFF, PNG and JPEG decoder/encoder tables.
+- [Adobe DNG 1.7.1 specification](https://helpx.adobe.com/content/dam/help/en/camera-raw/digital-negative/jcr_content/root/content/flex/items/position/position-par/download_section_733958301/download-1/DNG_Spec_1_7_1_0.pdf): raw interpretation, packing, black/white levels and Exif structure.
+- [W3C PNG specification, third edition](https://www.w3.org/TR/png-3/): 16-bit grayscale, lossless coding, significant bits and `eXIf`.
+- [libgphoto2 PTP definitions](https://github.com/gphoto/libgphoto2/blob/master/camlibs/ptp2/ptp.h): Exif/JPEG `0x3801`, PNG `0x380B`, TIFF `0x380D`, DNG `0x3811` (PTP 1.1); TIFF/EP is a separate code.
+- [CIPA Exif specification](https://www.cipa.jp/std/documents/e/DC-X008-Translation-2019-E.pdf): UserComment tag and character-code prefix.
 
 ## Primary evidence checked October 14
 
