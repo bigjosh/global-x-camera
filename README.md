@@ -15,6 +15,7 @@ An STM32N6-based, credit-card-size monochrome global-shutter camera project. Thi
 7. [Prototype power-cost comparison](docs/power/power-cost-comparison.md) — estimated battery energy for 5 V Nucleo, modified 3.3 V and custom hardware, with assumptions and a reproducible calculation.
 
 8. [50 ms cold-start risk review](docs/decisions/50ms-cold-start-review.md) — sensor revision, MCU boot load, power startup and storage recovery risks; no measured timing compliance yet.
+9. [First camera capture](firmware/bringup/README.md) — working RAM-only Nucleo/VD56G3 test, reproduction scripts, sensor identity and measured results.
 
 ## Current position
 
@@ -22,7 +23,9 @@ The prototype uses STM32N6, CAM-6G3-073CLR / VD56G3 at 73° diagonal field of vi
 
 The main-path OFF-current target is 0.1 µA at room temperature, with RTC backup separately budgeted. The finished-product thickness target is ≤5 mm; a thicker functional prototype is allowed. These are requirements, not measured results.
 
-The recovered KiCad design still contains the older camera, memories and power circuit. A reviewed reconstruction and clean ERC are not a fabrication release. The [47-item engineering review](docs/DESIGN-REVIEW.md) remains the implementation backlog until findings are closed with evidence. No integrated firmware or measured full capture/save/shutdown cycle is recorded.
+**Hardware bring-up, October 15:** the delivered Nucleo and mounted CAM-6G3-073CLR produced recognizable 640 × 480 monochrome snapshots at 10 ms exposure and unity gain. The sensor reports model `0x5603`, revision `0x3110`, ROM `0x0420`; this revision selects the inspected driver's fast-boot path. The [RAM-only test](firmware/bringup/README.md) retrieves pixels through ST-Link and preserves the code and diagnostics. An earlier startup CSI error remains to investigate; final snapshots reported no new errors. Full-resolution RAW10, cold-start timing, battery operation, NAND and PTP remain unverified. No OTP or external flash was programmed, and no power/debug isolation rework was performed.
+
+The recovered KiCad design still contains the older camera, memories and power circuit. A reviewed reconstruction and clean ERC are not a fabrication release. The [47-item engineering review](docs/DESIGN-REVIEW.md) remains the implementation backlog until findings are closed with evidence. No integrated product firmware or measured full capture/save/shutdown cycle is recorded.
 
 ## Record structure and precedence
 
@@ -34,6 +37,7 @@ The recovered KiCad design still contains the older camera, memories and power c
 | `docs/review/`, `docs/DESIGN-REVIEW.md` | Findings about the recovered circuit; retain until fixed or explicitly superseded. |
 | `docs/power/`, `docs/manufacturing/` | Dated models and candidate studies. Their assumptions and stock snapshots remain historical. |
 | `hardware/` | Recovered editable KiCad projects, provenance and validation; see [hardware README](hardware/README.md). |
+| `firmware/bringup/` | Reproducible RAM-only camera capture test; local scene images stay in ignored temporary storage. |
 | `imports/flux/` | Original Flux exports and recovery evidence. |
 | `datasheets/` | Local primary-source archive with source manifests. |
 | `research_notes/Global X Camera decision review/` | Initial audit, coverage inventories, historical chat evidence and current-review evidence export. |

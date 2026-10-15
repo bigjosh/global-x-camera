@@ -2,7 +2,7 @@
 
 Reviewed October 15, 2026. **The principal risks are sensor revision/patch loading, the MCU's initial firmware load, battery/rail startup, and bounded storage-state recovery.** D-44/D-45 now establish the mitigation policy: newest sensor revision verified at factory commissioning, plus a minimal bootstrap and optimized staged loading. No measured end-to-end result establishes compliance; these constraints address the identified risks without proving a 50 ms result.
 
-D-43 defers USB implementation details to firmware bring-up. This review covers D-04: physical shutter-button press, starting fully powered off, to **start of the saved exposure**. Exposure duration, frame readout, NAND payload writing/readback/commit, PNG encoding and the 250 ms green success indication occur afterward. Existing power, preservation, manual exposure and full-storage policies remain requirements. Board modifications stay paused until the board arrives.
+D-43 defers USB implementation details to firmware bring-up. This review covers D-04: physical shutter-button press, starting fully powered off, to **start of the saved exposure**. Exposure duration, frame readout, NAND payload writing/readback/commit, PNG encoding and the 250 ms green success indication occur afterward. Existing power, preservation, manual exposure and full-storage policies remain requirements. The board has now arrived and supports the RAM-only capture proof below; power/debug modifications remain deferred.
 
 ## Accepted constraints — October 15
 
@@ -23,6 +23,8 @@ The early boot stage must retain HOLD takeover, required rail/clock setup, senso
 | Cross-cutting | **Convenience initialization and serial waits consume the remaining margin.** | Overlap independent work, bound optional metadata reads, settle/sample the exposure ADC promptly, and make yellow indication nonblocking. Keep USB, PNG and unrelated peripherals out of battery capture startup. |
 
 ## Sensor evidence and a conditional hard limit
+
+**Measured unit, October 15:** the [first Nucleo capture](../../firmware/bringup/README.md) read model `0x5603`, revision `0x3110` and ROM `0x0420` from the delivered camera. The embedded VD6G driver bundled in the pinned capture example recognizes the `0x31` upper revision byte and takes its fast-boot path. This closes the identity question for this unit only. The diagnostic test's approximately 803 ms capture sequence includes repeated initialization and three settling frames; it is not a cold-power-to-exposure measurement and does not test the 50 ms requirement. A startup CSI control error needs investigation before link qualification.
 
 [ST UM2602 Rev 8](https://www.st.com/resource/en/user_manual/um2602-how-to-integrate-and-configure-the-vd56g3-vd66gy-and-vd16gz-devices-from-a-hardware-and-software-perspective-stmicroelectronics.pdf) distinguishes the CCA fast-boot variant from earlier devices and describes its exemption from firmware/video-timing uploads. Supplies and CLKIN must be valid before reset release; READY_TO_BOOT, BOOT completion and configuration still precede streaming. Fast boot does not mean zero initialization time.
 
@@ -68,7 +70,7 @@ Do not sum all illustrative numbers into a predicted startup time: some tasks ca
 
 ## Power and rail startup follow-up — October 15
 
-The largest supply-side uncertainty is **a slow, interrupted or repeated startup under battery load**, rather than a known regulator delay that alone exceeds 50 ms. Review in this order: (1) battery/inrush margin; (2) hardware rail/reset sequencing; (3) camera power/clock overlap; (4) button-to-HOLD continuity. These are engineering findings and recommendations, not additional accepted circuit decisions. Prototype modifications remain paused until the board arrives.
+The largest supply-side uncertainty is **a slow, interrupted or repeated startup under battery load**, rather than a known regulator delay that alone exceeds 50 ms. Review in this order: (1) battery/inrush margin; (2) hardware rail/reset sequencing; (3) camera power/clock overlap; (4) button-to-HOLD continuity. These are engineering findings and recommendations, not additional accepted circuit decisions. Power/debug modifications remain deferred; subsequent USB-powered capture bring-up has not tested battery startup.
 
 | Priority | Risk to exposure-start timing | Recommended treatment and tradeoff |
 |---|---|---|

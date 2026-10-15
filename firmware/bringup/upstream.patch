@@ -1,0 +1,100 @@
+diff --git a/Gcc/STM32N657xx_nucleo.ld b/Gcc/STM32N657xx_nucleo.ld
+index bc61736..21fdc5c 100644
+--- a/Gcc/STM32N657xx_nucleo.ld
++++ b/Gcc/STM32N657xx_nucleo.ld
+@@ -122,7 +122,7 @@ SECTIONS
+ 
+     . = ALIGN(4);
+     _edata = .;        /* define a global symbol at data end */
+-    ASSERT ((_edata < _fsbl_start_address), "Error : Application will erase fsbl");
++    /* RAM-only development load: no resident FSBL to preserve here. */
+ 
+   } >AXISRAM2_P2_S
+ 
+diff --git a/Inc/app.h b/Inc/app.h
+index 283c40c..ef77c2d 100644
+--- a/Inc/app.h
++++ b/Inc/app.h
+@@ -19,7 +19,7 @@
+ #ifndef APP_H
+ #define APP_H
+ 
+-#define USE_DCACHE
++/* D-cache disabled for initial DMA/SWD frame verification. */
+ 
+ void app_run(void);
+ 
+diff --git a/Lib/Camera_Middleware/sensors/cmw_vd56g3.c b/Lib/Camera_Middleware/sensors/cmw_vd56g3.c
+index cfcef25..42099dc 100644
+--- a/Lib/Camera_Middleware/sensors/cmw_vd56g3.c
++++ b/Lib/Camera_Middleware/sensors/cmw_vd56g3.c
+@@ -164,7 +164,7 @@ static void VD6G_Delay(struct VD6G_Ctx *ctx, uint32_t delay_in_ms)
+ 
+ static void VD6G_Log(struct VD6G_Ctx *ctx, int lvl, const char *format, va_list ap)
+ {
+-#if 0
++#if 1
+   const int current_lvl = VD6G_LVL_DBG(0);
+ 
+   if (lvl > current_lvl)
+diff --git a/Makefile b/Makefile
+index e8707f7..f789d37 100644
+--- a/Makefile
++++ b/Makefile
+@@ -53,12 +53,12 @@ BUILD_DIR = build
+ ######################################
+ # C sources
+ C_SOURCES += Src/main.c
+-C_SOURCES += Src/app.c
++C_SOURCES += Src/capture_app.c
+ C_SOURCES += Src/app_jpg.c
+ C_SOURCES += Src/app_cvt.c
+-C_SOURCES += Src/app_fuseprogramming.c
++
+ C_SOURCES += Src/stm32n6xx_it.c
+-C_SOURCES += Src/app_cam.c
++
+ C_SOURCES += Src/freertos_bsp.c
+ 
+ # ASM sources
+diff --git a/Src/main.c b/Src/main.c
+index 9565c28..c1bd6dc 100644
+--- a/Src/main.c
++++ b/Src/main.c
+@@ -322,7 +322,7 @@ static void main_thread_fct(void *arg)
+ 
+   CONSOLE_Config();
+ 
+-  Fuse_Programming();
++  printf("RAM-only bring-up: no OTP or external flash writes\n");
+ 
+   /*** External RAM and NOR Flash *********************************************/
+ #ifdef STM32N6570_DK_REV
+@@ -330,11 +330,7 @@ static void main_thread_fct(void *arg)
+   BSP_XSPI_RAM_EnableMemoryMappedMode(0);
+ #endif
+ 
+-  BSP_XSPI_NOR_Init_t NOR_Init;
+-  NOR_Init.InterfaceMode = BSP_XSPI_NOR_OPI_MODE;
+-  NOR_Init.TransferRate = BSP_XSPI_NOR_DTR_TRANSFER;
+-  BSP_XSPI_NOR_Init(0, &NOR_Init);
+-  BSP_XSPI_NOR_EnableMemoryMappedMode(0);
++  /* External flash is not used by the SRAM capture test. */
+ 
+   ret = BSP_LED_Init(LED_GREEN);
+   assert(ret == BSP_ERROR_NONE);
+diff --git a/mks/cmw.mk b/mks/cmw.mk
+index a4809a3..47584b3 100644
+--- a/mks/cmw.mk
++++ b/mks/cmw.mk
+@@ -20,6 +20,10 @@ ifneq (,$(findstring VD1943, $(SENSOR_LIST)))
+ C_SOURCES_CMW += $(CMW_REL_DIR)/sensors/cmw_vd1943.c
+ C_SOURCES_CMW += $(CMW_REL_DIR)/sensors/vd1943/vd1943.c
+ endif
++ifneq (,$(findstring VD56G3, $(SENSOR_LIST)))
++C_SOURCES_CMW += $(CMW_REL_DIR)/sensors/cmw_vd56g3.c
++C_SOURCES_CMW += $(CMW_REL_DIR)/sensors/vd6g/vd6g.c
++endif
+ C_SOURCES_CMW += $(ISP_REL_DIR)/isp/Src/isp_algo.c
+ C_SOURCES_CMW += $(ISP_REL_DIR)/isp/Src/isp_awb_algo.c
+ C_SOURCES_CMW += $(ISP_REL_DIR)/isp/Src/isp_ae_algo.c
