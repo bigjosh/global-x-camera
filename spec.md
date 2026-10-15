@@ -3,7 +3,7 @@
 **Project:** Global X Camera  
 **Project URL:** https://www.flux.ai/bigjosh/global-x-camera  
 **Updated:** 2026-10-14; recovered-design descriptions originated 2026-09-05.
-**Design state:** Prototype selections below are locked. The recovered KiCad schematic still contains the earlier VD55G0 camera and TPS62132/AO3401A power circuit, including known review findings; it has not yet been revised or qualified for this prototype.
+**Design state:** Prototype selections below are locked. The recovered KiCad schematic still contains the earlier VD55G0 camera and TPS62132/AO3401A power circuit, including known review findings; it has not yet been revised or qualified for this prototype. D-35 selects a self-assembled Nucleo-based first prototype; a custom camera PCB and its manufacturer remain later work.
 
 Current decisions and their remaining implementation boundaries are indexed in the [project decision register](docs/decisions/2026-10-13-project-baseline.md). This specification defines the current requirements; explicitly historical circuit descriptions preserve the unchanged CAD evidence.
 
@@ -12,6 +12,7 @@ Current decisions and their remaining implementation boundaries are indexed in t
 | Item | User decision |
 | --- | --- |
 | Processor direction | STM32N6 remains active; Himax is abandoned. |
+| Prototype build route | **Approved October 14 (D-35): the user will assemble the first prototype around NUCLEO-N657X0-Q.** Defer the custom-PCB manufacturer/assembler decision; no JLCPCB or PCBWay direction is adopted. |
 | Camera module | **ST CAM-6G3-073CLR**, using **VD56G3**, with **73° diagonal field of view**. This replaces CAM-5G0-079CLR/VD55G0 as the prototype selection. |
 | Photo capacity | **At least 200 full-native-resolution, uncompressed packed RAW10 photos between downloads** from CAM-6G3-073CLR / VD56G3. This is a capacity requirement; the exact NAND part and implemented storage format remain to be qualified. |
 | Photo retention | **Approved October 14: ten years at room temperature, fully unpowered, with no refresh needed.** Approximately 25°C is the reference. Include successfully committed images and metadata needed to recover them. No periodic wake, battery, USB connection or maintenance write may be required. Qualify retention through the accepted 1,000 complete reuse cycles; see §6.7. |

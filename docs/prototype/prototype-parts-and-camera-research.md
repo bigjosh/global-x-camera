@@ -1,6 +1,6 @@
 # Prototype parts and camera research
 
-Updated October 13, 2026. This is the retained procurement and feasibility record from the October 12–13 discussion. The approved prototype uses **NUCLEO-N657X0-Q / STM32N6, CAM-6G3-073CLR / VD56G3 at 73° diagonal field of view, and four series CR2032 cells feeding LTC3621**. The recovered KiCad design still contains the older camera and power circuitry. See the [current specification](../../spec.md), [power design](../../power.md), and [decision review](../../reports/Global%20X%20Camera%20decision%20review.md) for governing decisions.
+Updated October 14, 2026. This is the retained procurement and feasibility record from the October 12–13 discussion, with the October 14 prototype-build decision added. The approved prototype uses **NUCLEO-N657X0-Q / STM32N6, CAM-6G3-073CLR / VD56G3 at 73° diagonal field of view, and four series CR2032 cells feeding LTC3621**. The recovered KiCad design still contains the older camera and power circuitry. See the [current specification](../../spec.md), [power design](../../power.md), and [decision review](../../reports/Global%20X%20Camera%20decision%20review.md) for governing decisions.
 
 **The user confirmed the DigiKey order was placed** in the [review transcript, Message 014](../../research_notes/Global%20X%20Camera%20decision%20review/chat_sources/2026-10-12-13-current-review.md). Its exact line items, quantities, substitutions and delivery dates are **unknown**. Message 004 explicitly says NUCLEO-N657X0-Q had been added to the cart; Messages 007 and 013 contain recommendations, not an exported paid order. Reconcile receipts before buying duplicates.
 
@@ -9,6 +9,7 @@ Updated October 13, 2026. This is the retained procurement and feasibility recor
 | Item | Status at consolidation |
 | --- | --- |
 | Processor | STM32N6 active; Himax abandoned. NUCLEO-N657X0-Q is the development board identified by the user. |
+| First prototype assembly | **D-35, October 14:** the user will assemble it around NUCLEO-N657X0-Q. Custom-PCB manufacturer/assembler selection is deferred; prior JLCPCB/PCBWay studies remain background. |
 | Prototype camera | **CAM-6G3-073CLR**, monochrome VD56G3, **73° diagonal**. The 84° module is not the selected substitute. |
 | Power source and regulator | Four CR2032 cells in series through LTC3621. Exact regulator suffix, output rails, supporting components and wiring remain implementation choices. |
 | Finished-product thickness | Target ≤5 mm; a thicker functional prototype is acceptable. A module below 5 mm does not prove the complete PCB/enclosure stack meets that target. |
@@ -19,6 +20,8 @@ Updated October 13, 2026. This is the retained procurement and feasibility recor
 These decisions are recorded in the [decision review](../../reports/Global%20X%20Camera%20decision%20review.md). The direct camera/battery/regulator choice is [review transcript, Message 020](../../research_notes/Global%20X%20Camera%20decision%20review/chat_sources/2026-10-12-13-current-review.md). They do not establish measured performance, a finished driver, a revised CAD design or a released bill of materials.
 
 ## Development hardware and shopping record
+
+**Build route:** use the Nucleo as the MCU base and reconcile the already ordered modules/adapters before finalizing their wiring and power/control connections. The user will assemble this prototype. This decision does not confirm the order's exact contents or require a new custom camera PCB or factory assembly selection.
 
 The normal ST promodule connection is **camera 30-pin board connector → STEVAL-CAM-M0I1 P-board → 22-pin CSI cable → Nucleo camera connector**. A promodule does not plug directly into the Nucleo's 22-pin cable connector. The adapter supplies the camera rails; its included 22-pin, 10 cm FFC should be accounted for before adding duplicate cables. Verify cable contact orientation and the exact adapter revision before connecting power. [ST P-board](https://www.st.com/en/evaluation-tools/steval-cam-m0i.html)
 
