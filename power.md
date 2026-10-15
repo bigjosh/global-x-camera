@@ -1,6 +1,6 @@
 # Global X Camera power design
 
-**Updated:** October 13, 2026, America/New_York. **Status:** the user has locked **four CR2032 cells in series through LTC3621** for the prototype and clarified the Standby handoff below. The detailed pushbutton-start circuit remains an unimplemented, untested engineering study originating September 7.
+**Updated:** October 14, 2026, America/New_York. **Status:** the user has locked **four CR2032 cells in series through LTC3621** for the prototype and clarified the Standby handoff below. The detailed pushbutton-start circuit remains an unimplemented, untested engineering study originating September 7.
 
 Use the [October 13 decision register](docs/decisions/2026-10-13-project-baseline.md) and [current specification](spec.md) for the accepted behavior. This study distinguishes that behavior from historical calculations, proposed component values and the unchanged recovered CAD.
 
@@ -15,6 +15,8 @@ The retained implementation study uses **LTC3621EMS8E-3.3#PBF**, converting appr
 **The user-confirmed room-temperature OFF target is 0.1 µA (100 nA) for the complete main power path, superseding the earlier <1 µA target. It has not been demonstrated.** This includes regulator shutdown current and input-capacitor, switch, PCB and other pack-connected leakage. The retained RTC cell-tap drain is additional and excluded from the 100 nA target; it must be measured and budgeted separately. The regulator's 0.1 µA typical shutdown current alone equals the target at its stated test condition, before external leakage. Its 1 µA maximum at 12 V and 25°C is a component specification, not the current project target or a board guarantee. The exact regulator also has only prototype-scale stock verified. These remain qualification requirements.
 
 **The STM32N6 already provides autonomous internal-SMPS shutdown and a hardware PWR_ON output.** The remaining board requirement is to switch/discharge its external auxiliary rails and keep the main supplies valid until shutdown completes. The direct GPIO latch below does not establish that external ordering; a separate sequencing IC is not inherently required. See §6.
+
+**Power fundamentals review, October 14:** the [current rail/phase and conversion review](docs/power/2026-10-14-power-tree-review.md) recommends **5.0 V from LTC3621 for the Nucleo bench**, retaining its existing regulators and the camera adapter. This is an unapproved proposal; exact source feed/isolation and measured loads remain open. The selected camera requires **2.8 V, 1.8 V and 1.15 V**. A separate custom-board 3.3 V candidate remains open. The 3.3 V circuit and values below are still the historical study, not the selected bench implementation.
 
 ## 1. Requirements and scope
 

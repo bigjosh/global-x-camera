@@ -7,6 +7,8 @@
 
 Current decisions and their remaining implementation boundaries are indexed in the [project decision register](docs/decisions/2026-10-13-project-baseline.md). This specification defines the current requirements; explicitly historical circuit descriptions preserve the unchanged CAD evidence.
 
+**Power review in progress, October 14:** [rail requirements, phase timing and conversion proposals](docs/power/2026-10-14-power-tree-review.md) now precede wiring. The selected camera requires 2.8 V / 1.8 V / 1.15 V. A 5.0 V LTC3621 output is recommended for the Nucleo bench, with existing downstream regulators; custom-board voltage/topology remains open. These are engineering findings/proposals, not additional locked choices or applied CAD changes.
+
 ## Locked prototype decisions — October 12–14, 2026
 
 | Item | User decision |

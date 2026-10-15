@@ -2,6 +2,8 @@
 
 This document describes the **current recovered wiring**, including its existing rail sharing and control connections. It accompanies [the vector diagram](power-tree.svg) and [the PNG diagram](power-tree.png). LTC3621 and CAM-6G3-073CLR/VD56G3 are now selected for the prototype, but those changes and the required STM32N6 supply regrouping have **not** been applied to this connectivity snapshot. The diagram is evidence of existing CAD, not the selected future power implementation; see [current decisions](../../spec.md) and [power implementation](../../power.md).
 
+**October 14 review:** see the [selected-camera/Nucleo rail requirements and proposed power tree](2026-10-14-power-tree-review.md) for the current discussion. It proposes 5.0 V for the Nucleo bench and keeps custom-board output voltage open. CAM-6G3-073CLR needs 2.8 V, 1.8 V and 1.15 V. Neither this proposal nor the selected components have been applied to the recovered diagram below.
+
 ![Battery and USB-C power paths through regulators to the camera's power consumers](power-tree.svg)
 
 The electrical source is [schematic-connectivity.json](../../hardware/reconstruction/schematic-connectivity.json), reconstructed from the recovered Flux project. [The native inventory](../../imports/flux/2026-09-05/native-inventory.json) supplies component identities and passive values. The four-cell arrangement comes from [spec.md §2.5](../../spec.md); individual cells and production battery holders are not netlisted PCB components.
