@@ -74,6 +74,8 @@ Sources: [MB1940 C02 schematic, sheets7/9/10/13](https://www.st.com/resource/en/
 
 ## Scope, uncertainties and validation
 
+**Follow-up:** the [debugger-isolation investigation](nucleo-debug-isolation.md) distinguishes ST's individual-rail measurement provisions from whole-system battery measurement and records the candidate D2 and signal/sense disconnects. The debugger-isolated rows above remain conditional estimates until that separation is implemented and verified.
+
 The custom example retains the same MCU load and cycle duration. Its savings come from supply conversion, removing unused hardware and camera gating. Lower clocks, sleep during NAND busy periods, shorter boot paths and different storage are further possibilities, not savings already claimed here. A compliant custom AON/core/AUX sequencing design remains necessary.
 
 Startup capacitor charging, USB operation, separate RTC-backup energy and the button/RUN-divider energy are excluded. C14's 220 µF stores 2.75 mJ at 5 V or 1.20 mJ at 3.3 V; stored energy is not total energy drawn while charging. Initial inrush and phase transitions therefore need measurement. These omissions and unmeasured workloads mean the absolute figures can shift materially; the model is useful for choosing what to investigate first.
