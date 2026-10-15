@@ -1,5 +1,7 @@
 # Nucleo debugger isolation and power measurement
 
+**October 15 status:** at the user's request, prototype PCB modifications, debugger isolation and related physical rework are paused until the Nucleo board is in hand. Preserve the studies and verification tasks for that point; continue other design decisions now. No hardware change or additional voltage approval is implied.
+
 **October 14, 2026.** The user asked to establish how to isolate the debug portion of NUCLEO-N657X0-Q for realistic power measurements. This is a documented investigation and proposed rework plan, not a claim that hardware has been modified or qualified. It supplements the [energy comparison](power-cost-comparison.md) and [power-tree review](2026-10-14-power-tree-review.md). The goal is that the camera's battery does not supply ST-LINK, and that a connected debugger cannot keep the camera powered after shutdown.
 
 ## What ST provides

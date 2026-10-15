@@ -1,5 +1,7 @@
 # Power-tree review: Nucleo prototype and compact camera
 
+**October 15 status:** at the user's request, prototype PCB modifications, debugger isolation and related physical rework are paused until the Nucleo board is in hand. Preserve the studies and verification tasks for that point; continue other design decisions now. No hardware change or additional voltage approval is implied.
+
 **Reviewed October 14, 2026. Status: engineering findings and proposals, awaiting the user's voltage/topology decision.** No new output voltage, regulator part, wiring instruction or CAD change is approved by this review. The user redirected the discussion to power fundamentals before prototype wiring. The accepted four-series-CR2032/LTC3621 direction, 50 ms exposure-start deadline, 100 nA main-path OFF target and separately powered RTC remain in force.
 
 Review in order: (1) required rails and their activity through a cycle; (2) LTC3621 output; (3) downstream conversion, sequencing and USB source selection. Discuss one decision at a time. The September [recovered power tree](power-tree.md) and [RUN/HOLD study](../../power.md) remain historical implementation evidence, not a completed design for the selected camera and Nucleo.
