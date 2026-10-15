@@ -6,7 +6,11 @@ The [decision register](2026-10-13-project-baseline.md), [specification](../../s
 
 ## Capture indication and failure priority — October 15
 
-**D-41 — capture indication, approved October 15:** flash yellow from power-up throughout startup, exposure, readout and saving. After the save completes successfully, show steady green for **0.25 s (250 ms)**, then perform the accepted shutdown sequence. Successful save includes all required checks, any enabled full-image readback, and verified durable commit. Red-coded capture faults replace yellow/green with the existing red code and abort to shutdown; never show success for a failed save. Existing nonfatal missing-metadata behavior, USB error reporting and limitations for boot/hang or sudden power loss remain as listed below. Yellow cadence and red flash timing remain to qualify; the green duration is selected. Storage-full pattern remains a separate pending decision.
+**D-41 — capture indication, approved October 15:** flash yellow from power-up throughout startup, exposure, readout and saving. After the save completes successfully, show steady green for **0.25 s (250 ms)**, then perform the accepted shutdown sequence. Successful save includes all required checks, any enabled full-image readback, and verified durable commit. Red-coded capture faults replace yellow/green with the existing red code and abort to shutdown; never show success for a failed save. Existing nonfatal missing-metadata behavior, USB error reporting and limitations for boot/hang or sudden power loss remain as listed below. Yellow cadence and red flash timing remain to qualify; the green duration is selected. D-42 separately selects seven red flashes then shutdown for storage full; this capacity condition is distinct from the existing fault map.
+
+## Storage full — approved October 15
+
+**D-42 — storage-full indication, approved October 15:** when no usable FREE-and-GOOD slot remains, stop normal yellow indication, show **seven red flashes**, then enter the accepted shutdown state. Take no new photo, show no green success indication and preserve stored photos. This is capacity exhaustion, distinct from fault codes 1–6; it does not itself imply bad media or authorize retirement/erase. Flash timing remains to implement. An unresponsive storage device or unreadable allocation metadata retains its existing fault response; do not classify failed discovery as known capacity exhaustion. Explicit host deletion is still required to reclaim stored-photo space.
 
 ## Accepted response map
 
@@ -66,7 +70,7 @@ Exposure/frame capture or readout failure receives **three red flashes**, follow
 
 ## F-04 Storage unresponsive — approved
 
-An absent, unidentified or unresponsive photo-storage device receives **four red flashes**, followed by shutdown. Storage full remains its separate settled condition: preserve photos and refuse new captures until an explicit erase frees space. No full-condition flash count is selected here.
+An absent, unidentified or unresponsive photo-storage device receives **four red flashes**, followed by shutdown. Storage full remains its separate settled condition: preserve photos and refuse new captures until an explicit erase frees space. D-42 selects seven red flashes then shutdown for the full condition; this does not classify full as a device failure.
 
 ## F-05 New-photo save failure — approved
 
