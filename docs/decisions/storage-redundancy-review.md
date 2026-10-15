@@ -30,10 +30,10 @@ The provisional journal may keep protected records in different erase blocks. It
 
 The earlier recommendation duplicated photo descriptors/capture attributes separately from pixels. It is **not selected**. Its arithmetic remains context: two copies of 200 raw image payloads alone require 766,568,000 bytes, about 731.1 MiB, exceeding the 512 MiB planning capacity before overhead. Object replication is not selected.
 
-## PARTIAL objects and next discussion
+## PARTIAL objects and provisional allocation
 
 **Approved, D-32:** return whatever image data can be read from FULL or PARTIAL objects on host request. Mark incompleteness and read errors through EXIF and/or PTP; retain _RECOVERED naming and explicit-only deletion. Missing final checksum/optional attributes or inability to generate EXIF must not suppress safely attributable readable bytes. PARTIAL retrieval does not certify a successful original save.
 
-**Current discussion:** slot allocation and wear distribution. Circular first-FREE-and-GOOD search after the previous allocation is recommended, not approved; it keeps existing photos in place and spreads reuse among currently free healthy slots. See the [slot-state review](slot-state-storage-review.md).
+**Provisionally accepted, D-33:** circular first-FREE-and-GOOD search after the last durable allocation, with the cursor recovered through allocation records and checkpoints. This keeps existing photos in place and spreads reuse among currently free healthy slots. The user explicitly leaves the page/block layout and off-NAND table location open for a later storage implementation review. See the [slot-state review](slot-state-storage-review.md).
 
 See the [decision register](2026-10-13-project-baseline.md), [slot-state implementation/future directions](slot-state-storage-review.md), [accepted read policy](ecc-read-error-review.md), and [specification](../../spec.md).
