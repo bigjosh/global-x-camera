@@ -139,4 +139,4 @@ Primary references checked October 14, 2026:
 
 **Required follow-up before freezing storage:** select the exact NAND geometry and interface; specify slot-to-block mapping, object/control page placement, ECC/OOB use and allowed program order; define allocation, commit, deletion, retirement and power-loss recovery; size and protect journal/checkpoint reserves; verify cursor reconstruction, startup bounds, usable capacity and wear. Compare an off-NAND table implementation if it materially simplifies those requirements. The existing cursor explanation is an implementation direction, not a completed page/block format or a decision against FRAM/other nonvolatile table storage.
 
-**Next product discussion:** whether the first prototype needs flash. Storage and power implementation/qualification remain tracked engineering work; neither is declared complete.
+**Next discussion:** manufacturing and assembly planning. Photographic flash is deferred from the prototype under D-34 and retained as FD-06. Storage and power implementation/qualification remain tracked engineering work; neither is declared complete.
