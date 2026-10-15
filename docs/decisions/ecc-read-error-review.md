@@ -10,7 +10,7 @@ The user's clarification includes: “we should always read the image from NAND 
 2. **Settled:** fresh, whole-image NAND-to-RAM reads only on host image-data requests; no image relocation or background refresh.
 3. **Settled:** [D-31's single-object policy](storage-redundancy-review.md): pixels and photo attributes are stored once; storage-control redundancy depends on the implementation. D-30's journal remains provisional.
 4. **Settled, D-32:** PARTIAL objects are available for best-effort USB retrieval and explicit deletion. Return whatever safely attributable image data can be read and indicate read errors/incompleteness through EXIF and/or PTP.
-5. **Current:** slot allocation and wear distribution; circular FREE-and-GOOD allocation is proposed, not approved.
+5. **Provisional, D-33:** circular FREE-and-GOOD allocation is accepted for now. The page/block layout and off-NAND table alternatives remain open. D-37 settles the firmware starting point; exported image format and PTP/host interoperability remain to resolve during implementation.
 
 ## PARTIAL objects and universal best-effort retrieval — approved October 14
 

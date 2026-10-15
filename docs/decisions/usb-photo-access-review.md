@@ -40,6 +40,6 @@ PTP gives firmware a specific image-delete request instead of filesystem block c
 4. **Settled:** fresh full-image NAND-to-RAM reads only on host image-data requests, no relocation/refresh, and predictive-error slot retirement without deleting the image.
 5. **Settled:** one stored object contains pixels and photo attributes, without duplication; storage-control redundancy depends on implementation (D-31). Journaling remains provisional (D-30).
 6. **Settled, D-32:** best-effort retrieval and explicit deletion of PARTIAL objects, returning readable image data with EXIF and/or PTP warnings. Ten-year retention remains a qualification requirement; repeated reads of an already marginal image are not guaranteed to succeed.
-7. **Current:** slot allocation and wear distribution.
+7. **Provisional allocation, D-33:** circular FREE-and-GOOD search with journal/checkpoint cursor recovery. Detailed page/block design and off-NAND table alternatives remain open. D-37 settles the firmware starting point; the exported image format, runtime/USB middleware and host interoperability remain implementation decisions.
 
 The [decision register](2026-10-13-project-baseline.md) remains authoritative. D-25 supersedes the drive-presentation portion of D-12 and selects explicit per-photo deletion; USB power and inactive-shutter requirements remain unchanged.

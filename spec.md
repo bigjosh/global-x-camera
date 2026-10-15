@@ -13,6 +13,7 @@ Current decisions and their remaining implementation boundaries are indexed in t
 | --- | --- |
 | Processor direction | STM32N6 remains active; Himax is abandoned. |
 | Prototype build route | **Approved October 14 (D-35): the user will assemble the first prototype around NUCLEO-N657X0-Q.** Defer the custom-PCB manufacturer/assembler decision; no JLCPCB or PCBWay direction is adopted. |
+| Firmware starting point | **Approved October 14 (D-37): C with STM32CubeN6/HAL for bring-up, with readiness to use streamlined bare-metal startup/runtime and LL/direct-register code to improve power or timing.** HAL does not require an RTOS; runtime and USB middleware remain open. Measure gains while preserving accepted behavior. |
 | Camera module | **ST CAM-6G3-073CLR**, using **VD56G3**, with **73° diagonal field of view**. This replaces CAM-5G0-079CLR/VD55G0 as the prototype selection. |
 | Exposure-time control | **Approved October 14 (D-36): potentiometer into an MCU ADC input, sampled and applied before capture.** Exact part, ADC wiring and exposure range/mapping are TBD. Startup, settling, conversion and programming must fit the ≤50 ms exposure-start budget; the existing OFF-current target still applies. |
 | Photo capacity | **At least 200 full-native-resolution, uncompressed packed RAW10 photos between downloads** from CAM-6G3-073CLR / VD56G3. This is a capacity requirement; the exact NAND part and implemented storage format remain to be qualified. |
@@ -405,6 +406,12 @@ Both FULL and PARTIAL objects support explicit host deletion. Retrieval never ma
 **D-36 — prototype exposure time:** use a potentiometer connected to an MCU ADC input. Sample it before acquiring the image, map the reading to exposure time and apply that setting before the saved exposure begins. Exact potentiometer part, resistance/taper, ADC pin/reference, wiring, filtering, exposure range/mapping, invalid-input handling and gain policy remain to select. Include input/reference startup, settling, sampling and sensor setting application in the existing ≤50 ms exposure-start budget. The control circuit must meet the existing main-path OFF-current requirement; no permanently battery-powered divider is selected. Record the exposure/configuration actually used in the existing single photo object.
 
 The separate narrow-field photopic light-sensor proposal is unselected background. Manual exposure-time selection does not decide gain/auto-gain behavior or an automatic metering implementation. Check sensor-supported exposure bounds and timing quantization when defining the ADC-to-time mapping; no numeric range or linear/logarithmic mapping is frozen.
+
+### 6.13 Firmware starting point and optimization path — approved October 14, 2026
+
+**D-37 implementation boundary:** use C and STM32CubeN6/HAL as the initial bring-up base. Keep camera, storage, power/control and USB hardware access behind simple replaceable interfaces so timing/energy-critical paths can move to LL/direct-register code or streamlined bare-metal startup/runtime without changing the accepted behavior. HAL use and RTOS use are separate choices: bare-metal firmware can use HAL, and this decision does not select an RTOS or USB middleware. ST documents HAL/LL and optional middleware separately in [STM32CubeN6](https://github.com/STMicroelectronics/STM32CubeN6); its [driver component](https://github.com/STMicroelectronics/stm32n6xx-hal-driver) supports selecting needed functions.
+
+Measure shutter-button press from fully powered off to the saved exposure's start, later readout/save/shutdown intervals, and energy per complete capture under equivalent exposure/configuration and verification settings. Use those results to prioritize startup, driver or runtime changes; no savings follow merely from the label “bare metal.” Retain required hardware delays, integrity/commit checks, fault behavior and shutdown sequencing. Hardware integration, measured compliance, exported image format and exact runtime/USB choices remain open.
 
 ## 7. Validation and bring-up
 
