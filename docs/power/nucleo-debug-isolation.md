@@ -31,6 +31,8 @@ Debugger USB VBUS ─ D1 ──┘
 
 CN9 also connects `5V_STLK` to the target when its 1–2 jumper is fitted. During separately powered bench measurements, that connection must remain open so debugger USB does not supply the camera. Target-USB, external supply and any other source paths must match the chosen test configuration. Exact external 5 V injection and source-isolation wiring remain in the power-tree review.
 
+**October 15 clarification — CN9 completely open, external power applied directly to `5V`:** the schematic still shows the path `5V → D2 → U10 → 3V3_STLK → debugger`. D2 connects to the global `5V` net, not `5V_STLK`; this branch never passes through CN9. Sheet9 identifies CN9's common side as `5V` (pins2/4/6), with `5V_STLK` on pin1. Removing the source-selection jumper therefore does not remove D2's separate feed. This was independently rechecked against official indexed sheets9/13; delivered-board population and physical continuity remain to verify. The source-selection connector and the debugger supply diode solve different isolation paths.
+
 Opening D2 alone does **not** disconnect the target-facing signal and voltage-sense networks. They can load the camera or introduce unintended powering depending on pin type, direction and supply state. Do not assume every interface pin has the same clamp behavior, or claim a quantified leakage from the schematic alone. JP3 cannot remove these physical connections.
 
 ## Interface paths to verify on the actual board
