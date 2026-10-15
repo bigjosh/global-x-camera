@@ -22,6 +22,8 @@ Current decisions and their remaining implementation boundaries are indexed in t
 | Processor direction | STM32N6 remains active; Himax is abandoned. |
 | Prototype build route | **Approved October 14 (D-35): the user will assemble the first prototype around NUCLEO-N657X0-Q.** Defer the custom-PCB manufacturer/assembler decision; no JLCPCB or PCBWay direction is adopted. |
 | Firmware starting point | **Approved October 14 (D-37): C with STM32CubeN6/HAL for bring-up, with readiness to use streamlined bare-metal startup/runtime and LL/direct-register code to improve power or timing.** HAL does not require an RTOS; runtime and USB middleware remain open. Measure gains while preserving accepted behavior. |
+| Sensor revision and commissioning | **D-44, approved October 15:** use only the newest sensor revision; factory commissioning reads and confirms identity/revision against the expected newest supported build revision. Actual hardware and fast-boot behavior remain to qualify. |
+| Boot loading | **D-45, approved October 15:** minimize bootstrap size/time and optimize additional code size, placement and loading order. Start sensor initialization before loading later-needed code such as NAND programming; overlap safe work with sensor waits. Preserve required capture, power and storage checks. |
 | Camera module | **ST CAM-6G3-073CLR**, using **VD56G3**, with **73° diagonal field of view**. This replaces CAM-5G0-079CLR/VD55G0 as the prototype selection. |
 | Exposure-time control | **Approved October 14 (D-36): potentiometer into an MCU ADC input, sampled and applied before capture.** D-38/D-39 set fixed 1×/1× gain and an exponential fastest-supported-to-1 s exposure curve, to be tuned on hardware. Exact part, ADC wiring and numeric sensor timing limits are TBD. Startup, settling, conversion and programming must fit the ≤50 ms exposure-start budget; the existing OFF-current target still applies. |
 | Photo capacity | **At least 200 full-native-resolution, uncompressed packed RAW10 photos between downloads** from CAM-6G3-073CLR / VD56G3. This is a capacity requirement; the exact NAND part and implemented storage format remain to be qualified. |
@@ -293,7 +295,13 @@ The recovered design used a CAM-6G3 reference STEP while electrically specifying
 
 The staged workflow remains the starting point, but the inherited rail actions and sensor initialization below must be reconciled with CAM-6G3-073CLR and the LTC3621 implementation. No existing firmware or timing model is thereby qualified for the new module. The sequence below describes successful capture/save; faults follow §§6.4–6.6 instead of requiring a successful-save sequence.
 
-For battery-powered capture with USB disconnected, the firmware implementation should use a staged, latency-measured startup. This list expresses required functions and dependencies, not a requirement to serialize independent settling/initialization. The [October 15 cold-start review](docs/decisions/50ms-cold-start-review.md) prioritizes sensor revision/patch loading, ROM-loaded code size, power ramp and bounded allocation recovery:
+For battery-powered capture with USB disconnected, the firmware implementation must use the optimized staged startup accepted in D-45.
+
+**D-44/D-45 — cold-start constraints, approved October 15:** use only the newest image-sensor revision, confirmed during factory commissioning. Optimize the bootstrap loader for minimum practical size and startup time, and optimize the size, placement and loading order of additional code. Start sensor initialization before loading code needed only later, such as NAND payload programming. Overlap later loading with sensor hardware waits where safe; do not require the full application to load before sensor initialization begins. Exact memory layout and staging remain implementation work, and the 50 ms target still needs measurement.
+
+The early boot stage must retain HOLD takeover, required rail/clock setup, sensor initialization and dependencies needed to meet exposure timing. Establish trustworthy storage availability before exposure under the existing full-storage policy; a small metadata/read path may therefore be needed early even when NAND payload-programming code loads later. CSI/DMA/buffer setup must be ready when the sensor produces data. Later loads must not block critical sensor transactions or overwrite executing code, active DMA buffers or required interrupt state. The loader strategy, code placement and use of hardware waits are to be measured and implemented; no specific overlay, DMA loader, FSBL byte limit or memory map is frozen.
+
+This list expresses required functions and dependencies, not a requirement to serialize independent settling/initialization. The [October 15 cold-start review](docs/decisions/50ms-cold-start-review.md) prioritizes sensor revision/patch loading, ROM-loaded code size, power ramp and bounded allocation recovery:
 
 1. Establish PWR_HOLD immediately after reset.
 2. Initialize clocks from HSE and configure the core/IO domains.
@@ -459,6 +467,9 @@ Adapt the recovered circuit checklist below to the implemented CAM-6G3-073CLR/LT
 - Measure true off-state leakage across temperature and humidity conditions relevant to storage.
 
 ### 7.3 Functional checks
+
+- Factory commissioning: read and record sensor identity/revision and confirm the newest revision expected for the build (D-44). Reject older/mismatched units from commissioning. Update the supported revision and startup qualification when silicon changes.
+- Measure D-45 bootstrap size/time, code placement/loading stages, sensor initialization start before later NAND-writer loading, and end-to-end exposure start from true power-off. Include required metadata availability and receiver readiness.
 
 - Qualify D-41 startup/yellow cadence, flashing during capture/save without optical contamination, no green before required checks and durable commit, steady green duration of 250 ms, red-code priority and subsequent shutdown. Measure the added indication energy and complete-cycle duration.
 

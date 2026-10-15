@@ -1,15 +1,23 @@
 # Risks to the 50 ms cold-start exposure target
 
-Reviewed October 15, 2026. **The principal risks are sensor revision/patch loading, the MCU's initial firmware load, battery/rail startup, and bounded storage-state recovery.** No measured end-to-end result establishes compliance. The fast-boot sensor variant and a small early capture program remove two identifiable obstacles, but do not prove a 50 ms result.
+Reviewed October 15, 2026. **The principal risks are sensor revision/patch loading, the MCU's initial firmware load, battery/rail startup, and bounded storage-state recovery.** D-44/D-45 now establish the mitigation policy: newest sensor revision verified at factory commissioning, plus a minimal bootstrap and optimized staged loading. No measured end-to-end result establishes compliance; these constraints address the identified risks without proving a 50 ms result.
 
 D-43 defers USB implementation details to firmware bring-up. This review covers D-04: physical shutter-button press, starting fully powered off, to **start of the saved exposure**. Exposure duration, frame readout, NAND payload writing/readback/commit, PNG encoding and the 250 ms green success indication occur afterward. Existing power, preservation, manual exposure and full-storage policies remain requirements. Board modifications stay paused until the board arrives.
+
+## Accepted constraints — October 15
+
+**D-44/D-45 — cold-start constraints, approved October 15:** use only the newest image-sensor revision, confirmed during factory commissioning. Optimize the bootstrap loader for minimum practical size and startup time, and optimize the size, placement and loading order of additional code. Start sensor initialization before loading code needed only later, such as NAND payload programming. Overlap later loading with sensor hardware waits where safe; do not require the full application to load before sensor initialization begins. Exact memory layout and staging remain implementation work, and the 50 ms target still needs measurement.
+
+Factory commissioning must read and record actual sensor identity/revision and compare it with the expected newest revision for the production build; older or mismatched sensors do not pass commissioning. The inspected driver currently identifies cut 3 (`0x31` upper revision byte) as fast boot. This evidence is not a permanent definition of “newest”: update the expected identity and supported startup path when silicon changes, and verify that the qualified path still fits the timing requirement. No new runtime LED code or cold-start revision scan is prescribed by this commissioning decision.
+
+The early boot stage must retain HOLD takeover, required rail/clock setup, sensor initialization and dependencies needed to meet exposure timing. Establish trustworthy storage availability before exposure under the existing full-storage policy; a small metadata/read path may therefore be needed early even when NAND payload-programming code loads later. CSI/DMA/buffer setup must be ready when the sensor produces data. Later loads must not block critical sensor transactions or overwrite executing code, active DMA buffers or required interrupt state. The loader strategy, code placement and use of hardware waits are to be measured and implemented; no specific overlay, DMA loader, FSBL byte limit or memory map is frozen.
 
 ## Risk priority and closure
 
 | Priority | Risk | What closes it |
 |---|---|---|
-| 1 | **Sensor revision can make the target impossible.** ST's supported older cut-2 startup uploads firmware and video-timing patches; the cut-3 fast-boot path skips both. | Read and record the delivered module's identity/revision, qualify the supported fast-boot startup path and confirm revision control for later supply. Do not skip a required patch to manufacture a timing result. |
-| 2 | **The ROM loads too much firmware before camera setup starts.** Initial serial-NOR loading is slower than the flash's eventual quad/octal operating mode. | Keep the ROM-loaded first-stage bootloader small, start camera prerequisites early, and load only capture-critical code before exposure. Measure actual cold ROM-to-first-code delay. |
+| 1 | **Sensor revision can make the target impossible.** ST's supported older cut-2 startup uploads firmware and video-timing patches; the cut-3 fast-boot path skips both. | D-44 requires the newest revision and commissioning verification. Qualify the supported fast-boot startup path and production revision controls. The older-patch path is outside the accepted build policy; do not skip required patches on a mismatched part. |
+| 2 | **The ROM loads too much firmware before camera setup starts.** Initial serial-NOR loading is slower than the flash's eventual quad/octal operating mode. | D-45 requires a small fast bootstrap and optimized code placement/loading. Begin sensor initialization before loading later code such as NAND programming; measure actual cold ROM-to-first-code delay and critical-path loading. |
 | 3 | **Cell sag, inrush, rail sequencing and clocks delay or restart startup.** A regulator's typical soft-start figure is not a complete-system startup bound. | Measure real cell/board rail ramps, reset, clock readiness and HOLD takeover over the intended battery/temperature range; obey required main/AON/AUX and camera sequencing. |
 | 4 | **Storage recovery becomes a scan before every shot.** The camera must know a safe usable slot exists before taking a photo; full storage must reject capture. | Bound checkpoint discovery, validation and journal replay, including nearly full media and interrupted transactions. Do not use an unbounded whole-device scan on the normal shot path. |
 | Cross-cutting | **Convenience initialization and serial waits consume the remaining margin.** | Overlap independent work, bound optional metadata reads, settle/sample the exposure ADC promptly, and make yellow indication nonblocking. Keep USB, PNG and unrelated peripherals out of battery capture startup. |
@@ -28,7 +36,7 @@ The official ST driver was inspected at commit **`aff46eb958f4e8dbab4a8b00abbe28
 
 Reproduction: strip C comments, count comma-separated entries in `patch_cut2[]` and `vtpatch[]`, including the four `VT_REVISION` entries. The VT descriptor sizes also total 6,092. These are array bytes, not source-file lengths.
 
-**Calculated payload-plus-ACK lower bound:** `17,092 × 9 / 1,000,000 = 153.828 ms` at 1 MHz I²C; at 400 kHz it is 384.57 ms. Addresses, transaction overhead, commands and all other startup work add time. Thus this supported legacy path cannot satisfy 50 ms from fully off. This is conditional on the delivered silicon; it is not a finding that the ordered module uses the older revision.
+**Calculated payload-plus-ACK lower bound:** `17,092 × 9 / 1,000,000 = 153.828 ms` at 1 MHz I²C; at 400 kHz it is 384.57 ms. Addresses, transaction overhead, commands and all other startup work add time. Thus this supported legacy path cannot satisfy 50 ms from fully off. This documents why the older revision is excluded under D-44; it is not a finding that the ordered module uses that revision. Actual units still need the required identity/commissioning check.
 
 [CAM-56G3 DB5264 Rev 3](https://www.st.com/resource/en/data_brief/cam-56g3.pdf) identifies CAM-6G3-073CLR as a VD56G3 module, but does not guarantee its silicon cut. Read the actual identity and retain lot/revision evidence. The historical VD55G0 cut-1/cut-2 patch calculations in the September camera review are for a different sensor and must not be reused here.
 
@@ -60,7 +68,7 @@ Do not sum all illustrative numbers into a predicted startup time: some tasks ca
 
 ## Recommended first verification
 
-First verify the camera revision. When the board arrives, use a small standalone boot image and instrument:
+Verify the camera revision during bring-up and retain that check in factory commissioning under D-44. When the board arrives, implement the minimal staged boot under D-45 and instrument:
 
 `button edge → rails/reset → first FSBL GPIO marker → camera clock/reset → sensor ready → actual exposure start`
 
