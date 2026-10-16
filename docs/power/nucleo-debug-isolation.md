@@ -55,7 +55,28 @@ Reference: [MB1940-N657X0Q-C02 official schematic](https://www.st.com/resource/e
 
 Full target-interface disconnection will disable the onboard debug/serial connection until restored. Prefer a recoverable arrangement, or plan to use CN1 with an external probe once the embedded interface is electrically separated. The stock-board manual's instruction to keep embedded ST-LINK running still applies to an unmodified board; using an unpowered, still-connected debugger is not a documented alternative.
 
-## Two useful test configurations
+## Reversible JS110 insertion — October 16
+
+For the current ST-Link-USB-powered bench, replace the **CN9 STLK source-selection jumper on pins 1–2** with the Joulescope JS110 current path. This preserves the existing USB source and upstream eFuse rather than injecting a new external supply. It does not select an LTC3621 output voltage.
+
+| JS110 terminal | Connection |
+|---|---|
+| IN+ | CN9 pin 1, `5V_STLK` from the ST-Link USB power switch |
+| OUT+ | CN9 pin 2, common target-board `5V` rail |
+| IN− | Board GND, for example CN5 pin 6 |
+| OUT− | Board GND, for example CN5 pin 7 |
+
+Disconnect board USB/external power before wiring. Remove the CN9 1–2 shunt and leave all other CN9 pairs open. Keep the source and return leads short. Power the JS110 through its own host USB, select automatic current ranging, and reconnect only the Nucleo's ST-Link USB at CN10; target USB CN8 and external VIN/5V feeds remain disconnected. Leave boot configuration as already selected for RAM development. The JS110 replaces the jumper; do not leave a parallel jumper that bypasses it.
+
+Flow: `CN10 USB → board eFuse → CN9.1 → JS110 IN+ → current shunt → OUT+ → CN9.2 → target-board regulators/camera`. ST-Link also has a direct USB supply branch, so this setup keeps the probe available while switching the main target feed.
+
+The pin mapping is corroborated by [UM3417 Rev4 §7.4.1 and Arduino connector table](https://www.st.com/resource/en/user_manual/um3417-stm32n6-nucleo144-board-mb1940-stmicroelectronics.pdf) and indexed [MB1940 C02 schematic sheet 9](https://www.st.com/resource/en/schematic_pack/mb1940-n657x0q-c02-schematic.pdf): pin 1 is `5V_STLK`, 3 is `5V_USB_SNK`, 5 is `5V_VIN`, and pins 2/4/6 share `5V`. Ground points are CN5 pins 6/7. A usable drawing could not be downloaded in this pass, so no physical left/right orientation is claimed. Identify pin 1 on the board; with all sources disconnected, CN9 pin 2 can be checked for direct continuity to CN5 pin 5 (`5V`). JS110 terminal roles follow its [user guide Rev1.3 §6](https://download.joulescope.com/docs/JoulescopeUsersGuide/JoulescopeUsersGuide_v1_3.pdf). This is a documented hookup recommendation, not confirmation the user has wired it or that measurements passed.
+
+**Measurement boundary:** current through CN9 includes the target-board regulators, MCU, camera and other downstream board loads. It is not isolated MCU current or a final-product energy result. D1 supplies the debugger directly from USB, but D2 diode-ORs the measured target 5V into the same debugger-regulator input and could share some debugger load; do not claim complete debugger exclusion. D2 points from target 5V toward the debugger, so it is not itself a direct USB-to-target bypass when the target feed is off. No D2 removal or other component rework is required for this initial hookup.
+
+Before calling JS110 on/off a true cold cycle, measure target rail decay with the JS110 off; powered SWD, UART, reset and sensing paths can retain residual power. Observe the switched target 5V and 3.3V, not just JS110's voltage display: on the standard front panel JS110 senses voltage at IN, upstream of its disconnect. Its display can therefore still show source voltage while OUT is disconnected. If the target remains powered, resolve the bypass instead of interpreting reset/reinitialization as a cold-power measurement.
+
+## Further measurement configurations
 
 1. **Development measurements:** power ST-LINK from its USB connector and the target from its separate, measured supply; isolate the D2 branch and the CN9 STLINK-to-target source connection after confirming the circuit. Use CN12 to diagnose individual MCU rails. This retains debug capability and removes the debugger's main supply from the battery budget, but sense-network loading and debugger effects remain. It does not qualify true cold boot, final shutdown or 100 nA OFF current.
 2. **Standalone qualification:** debugger USB unplugged, main debugger feed open, all connected target/debug signal and sense paths isolated, and firmware booting independently from NOR. Measure the complete main input upstream of LTC3621, including camera, storage, converter losses, startup and shutdown. Keep the RTC backup as the accepted separate budget. This is the configuration needed for final battery energy and main-path leakage claims.
