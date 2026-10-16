@@ -138,11 +138,13 @@ Work through (1) external logic timing, (2) synchronized current/energy, then (3
 
 | Proposed Saleae connection | Nucleo point | Meaning |
 |---|---|---|
-| Ground | CN5 pin 6 or 7, GND | Common signal reference |
+| Ground | CN15 pin 20, or CN5 pin 6 or 7, GND | Common signal reference |
 | Channel 0 | CN5 pin 3, RESET / NRST | MCU reset reference; not power-on or exposure start |
-| Channel 1 | Arduino D2, CN13 pin 3, PD0 | Candidate startup-stage marker; firmware not implemented yet |
-| Channel 2 | Arduino D4, CN13 pin 5, PE0 | Candidate frame/synchronization marker; firmware not implemented yet |
+| Channel 1 | **CN15 pin 33, PD0** (also Arduino D2, CN13 pin 3) | Candidate startup-stage marker; firmware not implemented yet |
+| Channel 2 | **CN15 pin 29, PE0** (also Arduino D4, CN13 pin 5) | Candidate frame/synchronization marker; firmware not implemented yet |
 | Channel 3, optional | CN15 pin 4, PE5 | Existing USART1 TX activity, 115200 baud |
+
+**October 16 connector preference:** the user prefers CN5/CN15 because they are physically easier to connect. Use CN5 pin 3 for reset and CN15 pins 33/29 for the same PD0/PE0 marker signals previously assigned at CN13; the MCU pin selection is unchanged. CN15 pin 20 provides a convenient ground if the CN5 ground positions are occupied by JS110 leads. The mapping is also independently present in [ST-hosted UM3417 Rev3, Table 13](https://community.st.com/ysqtg83639/attachments/ysqtg83639/stm32-mcu-products-forum/292292/1/um3417-stm32n6-nucleo144-board-mb1940-stmicroelectronics-12.pdf). This records the revised connection plan, not completed physical wiring.
 
 PD0 and PE0 are unused by the inspected capture application, main initialization and selected Nucleo camera support paths. Match header labels/pin 1 on the physical board before wiring. Arduino digital signals are 3.3 V; use the Logic Pro 8's 3.3 V threshold setting for this first group. Saleae's threshold is shared across channels, and all probe grounds are common with host USB ground: connect them to board GND, not to a supply or either end of a current shunt. See [thresholds](https://www.saleae.com/support/specifications-hardware/electrical-characteristics/supported-voltages) and [ground connections](https://www.saleae.com/support/specifications-hardware/electrical-characteristics/are-the-ground-pins-required-for-each-input-used).
 
