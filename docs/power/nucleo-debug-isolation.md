@@ -82,6 +82,28 @@ Before calling JS110 on/off a true cold cycle, measure target rail decay with th
 
 ## Further measurement configurations
 
+### Separate 5 V source for repeated boot experiments
+
+**October 16 proposal, pending supply selection and physical wiring:** feed the JS110 from an independent regulated **5.0 V** supply, replacing its connection to protected `5V_STLK`. This removes U6 and ST-LINK's source-enable decision from the target's main supply path. It has not yet been tested on this bench.
+
+| Connection | Destination |
+|---|---|
+| External supply positive | JS110 IN+; disconnect its previous CN9 pin 1 connection |
+| External supply negative | JS110 IN− / common board ground |
+| JS110 OUT+ | CN9 pin 2, target `5V` |
+| JS110 OUT− | Board GND; existing ground wiring can remain |
+| CN9 selector jumpers | All absent; no direct source-to-target bypass |
+
+Use a regulated, current-limited source. Power down while changing the current-path wiring. Leave target USB CN8 and VIN disconnected. Keep normal flash boot selected: JP1 and JP2 pins 1–2. ST-LINK USB CN10 can provide the debugger's own supply during target cycling; the JS110's host USB remains connected for API control.
+
+Before repeated cycling, resolve the [existing external-SMPS bring-up warning](2026-10-14-power-tree-review.md): UM3417 Rev4 §7.4.3 warns of potentially damaging inrush when unused `VDDSMPS` and `VDDA1V8PMU` are not grounded, and states the board schematic omits that recommendation. Delivered-board compliance remains unverified. This does not establish why our source tripped, and a bench supply's current limit alone is not proof the condition is safe. Do not increase available current simply to defeat the observed protection response.
+
+`CN9.1` and `CN15.8` carry protected `5V_STLK`, so neither bypasses the ST-LINK switch. `CN3.6`, `CN3.18`, `CN5.5`, and TP2 are target `5V`, not independent input sources. Raw `VBUS_STLK` exists upstream of U6, but no convenient header/test-point connection to it was verified; a board solder tap is not the selected approach. [UM3417 §§7.4.1, 8.1, 8.5 and 8.6](https://www.st.com/resource/en/user_manual/um3417-stm32n6-nucleo144-board-mb1940-stmicroelectronics.pdf), [schematic sheets 9 and 13](https://www.st.com/resource/en/schematic_pack/mb1940-n657x0q-c02-schematic.pdf)
+
+The existing D2 branch can still supply or share the debugger-regulator load from measured target `5V`. D1 blocks reverse feed into raw USB through that diode-OR branch. This setup therefore permits separate supply control but does not establish debugger-free energy measurement or eliminate signal-driven residual power. No D2 rework is needed for the first cycling trial. Verify target-rail decay and restoration with the LP8, then verify flash-boot markers over repeated API-controlled cycles before calling the arrangement reliable.
+
+### Measurement isolation goals
+
 1. **Development measurements:** power ST-LINK from its USB connector and the target from its separate, measured supply; isolate the D2 branch and the CN9 STLINK-to-target source connection after confirming the circuit. Use CN12 to diagnose individual MCU rails. This retains debug capability and removes the debugger's main supply from the battery budget, but sense-network loading and debugger effects remain. It does not qualify true cold boot, final shutdown or 100 nA OFF current.
 2. **Standalone qualification:** debugger USB unplugged, main debugger feed open, all connected target/debug signal and sense paths isolated, and firmware booting independently from NOR. Measure the complete main input upstream of LTC3621, including camera, storage, converter losses, startup and shutdown. Keep the RTC backup as the accepted separate budget. This is the configuration needed for final battery energy and main-path leakage claims.
 
