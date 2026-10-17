@@ -62,12 +62,13 @@ class FakeDriver:
 
 class RecoverySessionTests(unittest.TestCase):
     def exercise(self, commands=(), *, enabled=True, initial=None, failures=None,
-                 inject_interrupt=False):
+                 inject_interrupt=False, interface="nmos"):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             args = SimpleNamespace(device='u/js110/fake', duration=5,
                 control=root/'control.json', response=root/'response.json',
-                log=root/'log.jsonl', recovery_output=enabled, stream_log=None)
+                log=root/'log.jsonl', recovery_output=enabled, stream_log=None,
+                recovery_interface=interface)
             driver = FakeDriver(initial, failures)
             requests = iter([dict(request, id=str(i)) for i, request in enumerate([
                 *commands, {'state': 'stop'}])])
@@ -206,8 +207,70 @@ class RecoverySessionTests(unittest.TestCase):
         self.assertLess(driver.commands.index((session.GPO_TOPICS[0], 0)),
                         driver.commands.index((session.RANGE_TOPIC, 128)))
 
+    def test_diode_releases_high_asserts_low_and_restores_original_low_with_warning(self):
+        code, driver, records, final = self.exercise([
+            {'state': 'recovery', 'asserted': True}, {'state': 'query'},
+            {'state': 'recovery', 'asserted': False}], interface='diode')
+        self.assertEqual(code, 0)
+        ready = next(item for item in records if item['event'] == 'ready')['recovery_output']
+        self.assertEqual(ready['interface'], 'active_low_diode')
+        self.assertEqual(ready['gpo0'], 1)
+        self.assertFalse(ready['asserted'])
+        responses = [item['recovery_output'] for item in records if item['event'] == 'response']
+        self.assertEqual([(item['gpo0'], item['asserted']) for item in responses[:3]],
+                         [(0, True), (0, True), (1, False)])
+        self.assertTrue(final['recovery_output']['asserted'])
+        self.assertIn('next boot may enter recovery', final['recovery_output']['restore_warning'])
+        self.assertEqual(driver.settings, driver.initial)
+        self.assert_other_output_untouched(driver)
+
+    def test_diode_off_supply_releases_high_before_enabling_and_restores_off_first(self):
+        initial = {session.EXTIO_TOPIC: 0, session.GPO_TOPICS[0]: 0, session.GPO_TOPICS[1]: 0}
+        code, driver, _, final = self.exercise(initial=initial, interface='diode')
+        self.assertEqual(code, 0)
+        gpio = [(topic, value) for topic, value in driver.commands
+                if topic in (session.EXTIO_TOPIC, *session.GPO_TOPICS)]
+        self.assertEqual(gpio, [(session.GPO_TOPICS[0], 1), (session.EXTIO_TOPIC, 3300),
+                               (session.EXTIO_TOPIC, 0), (session.GPO_TOPICS[0], 0)])
+        self.assertEqual(driver.settings, driver.initial)
+        self.assertTrue(final['ok'])
+        self.assert_other_output_untouched(driver)
+
+    def test_diode_starting_high_is_restored_after_assert_usb_failure(self):
+        initial = {session.GPO_TOPICS[0]: 1}
+        code, driver, _, final = self.exercise([{'state': 'recovery', 'asserted': True}],
+            initial=initial, interface='diode', failures={(session.GPO_TOPICS[0], 0): 1})
+        self.assertEqual(code, 1)
+        self.assertEqual(driver.settings, driver.initial)
+        self.assertFalse(final['recovery_output']['asserted'])
+        self.assertNotIn('restore_warning', final['recovery_output'])
+        self.assertEqual(final['recovery_restore_errors'], [])
+
+    def test_diode_failed_initial_release_restores_maybe_changed_output(self):
+        code, driver, records, final = self.exercise(interface='diode',
+            failures={(session.GPO_TOPICS[0], 1): 1})
+        self.assertEqual(code, 1)
+        self.assertFalse(any(item['event'] == 'ready' for item in records))
+        self.assertEqual(driver.settings, driver.initial)
+        self.assertEqual(final['recovery_restore_errors'], [])
+
+    def test_cli_interface_requires_opt_in_before_importing_driver(self):
+        argv = ['js110_session.py', '--control', 'a', '--response', 'b', '--log', 'c',
+                '--recovery-interface', 'diode']
+        with patch.object(sys, 'argv', argv), patch.object(sys, 'stderr', io.StringIO()), \
+                self.assertRaises(SystemExit) as caught:
+            session.main()
+        self.assertEqual(caught.exception.code, 2)
+
 
 class RecoveryOwnershipTests(unittest.TestCase):
+    def test_unknown_interface_is_rejected_without_device_access(self):
+        driver = FakeDriver()
+        with self.assertRaises(ValueError):
+            session.RecoveryOutput(driver, 'unknown')
+        self.assertEqual(driver.queries, [])
+        self.assertEqual(driver.commands, [])
+
     def test_unowned_output_change_prevents_shared_voltage_restore_without_overwrite(self):
         driver = FakeDriver({session.EXTIO_TOPIC: 0, session.GPO_TOPICS[1]: 0})
         recovery = session.RecoveryOutput(driver)

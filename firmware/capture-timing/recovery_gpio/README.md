@@ -2,7 +2,8 @@
 
 This offline builder adds a small recovery guard to the exact tested v25 prefix.
 It copies the receiver unchanged. It does not program the board or operate any
-instrument. Hardware qualification and the external sink connection are pending.
+instrument. The user connected a diode sink on October 17; hardware qualification
+is pending.
 
 The October 17 bench attempt found approximately 0 V at the JS110 input and all
 three monitored target rails throughout the requested off/on cycle. No firmware
@@ -11,14 +12,21 @@ restored. The previous v25 image remains the last verified installed firmware;
 the v34b guard is built and independently reviewed, but **not installed or
 hardware-qualified**. Compact build and bench facts are in
 [preparation evidence](../evidence/2026-10-17-recovery-preparation/summary.json).
+The subsequent [diode-connection checks](../evidence/2026-10-17-recovery-preparation/diode-followup.json)
+again found IN+ near 0 V and the shared GPIO supply already off. Pin-state and
+normal/recovery tests are still pending; no flash or GPIO settings were changed
+in those checks.
 
 PE1 on **CN15 pin 24** is an input with its internal pull-up enabled. With the
 input unconnected or released, execution continues through the original normal
 flash-boot path. Pulling PE1 low before a cold start requests recovery. Use an
 open-drain sink referred to target ground to prevent a separately powered output
 from feeding an unpowered MCU. The [JS110 interface](../../boot-timing/js110-recovery-output.md)
-uses OUT0 to control a small NMOS, with a gate pull-down to preserve normal boot
-when disconnected. Electrical qualification remains a separate step.
+supports a small NMOS or the user's diode connection (PE1 anode, OUT0 cathode).
+Select the matching host-helper polarity: diode OUT0 low requests recovery and
+OUT0 high releases it; the NMOS option uses the opposite polarity. Shared GPIO
+supply-off release is a separate, unverified alternative. Electrical qualification
+remains a separate step.
 
 The guard is the first C action after the existing minimal vector entry. It
 enables the GPIOE clock, configures only PE1 as input/pull-up, and starts the DWT

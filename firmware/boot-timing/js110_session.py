@@ -39,9 +39,11 @@ can exceed the range and clip the reported current. This helper changes no
 source voltage, protection threshold, voltage range, or range-suppression mode.
 
 Optional --recovery-output owns OUT0 for an active-high NMOS recovery interface.
-It initially releases recovery (OUT0=0) and accepts state=recovery with a strict
-JSON boolean asserted. It preserves the initial OUT0 and shared I/O voltage on
-exit, never writes OUT1, and reports retained GPIO settings (not measured pins).
+Use --recovery-interface diode for a PE1-anode/OUT0-cathode diode sink instead.
+It initially releases recovery (NMOS OUT0=0; diode OUT0=1) and accepts
+state=recovery with a strict JSON boolean asserted. It preserves the initial
+OUT0 and shared I/O voltage on exit, never writes OUT1, and reports retained GPIO
+settings (not measured pins).
 See js110-recovery-output.md for wiring, shared-voltage guards and limitations.
 """
 
@@ -72,8 +74,12 @@ GPO_TOPICS = ("s/gpo/0/value", "s/gpo/1/value")
 class RecoveryOutput:
     """Opt-in OUT0 ownership. No calls occur for legacy power-only sessions."""
 
-    def __init__(self, device):
+    def __init__(self, device, interface="nmos"):
+        if interface not in ("nmos", "diode"):
+            raise ValueError("Recovery interface must be nmos or diode")
         self.device = device
+        self.interface = interface
+        self.released_level = int(interface == "diode")
         self.starting = {}
         self.changed = set()
 
@@ -91,10 +97,11 @@ class RecoveryOutput:
         values = self.query()
         if self.starting and values[GPO_TOPICS[1]] != self.starting[GPO_TOPICS[1]]:
             raise RuntimeError("OUT1 changed unexpectedly; helper does not own OUT1")
-        return {"scope": "retained_settings_not_measured_pins", "interface": "active_high_nmos",
+        return {"scope": "retained_settings_not_measured_pins",
+                "interface": "active_low_diode" if self.interface == "diode" else "active_high_nmos",
                 "extio_voltage_mv": values[EXTIO_TOPIC],
                 "gpo0": int(values[GPO_TOPICS[0]]), "gpo1": int(values[GPO_TOPICS[1]]),
-                "asserted": bool(values[GPO_TOPICS[0]])}
+                "asserted": int(values[GPO_TOPICS[0]]) != self.released_level}
 
     def _write(self, topic, value):
         # A failed USB call may still have changed hardware; restore it anyway.
@@ -118,10 +125,10 @@ class RecoveryOutput:
                     live = True
             if live:
                 raise RuntimeError("Cannot enable shared I/O voltage while another GPIO route is active")
-        # Release before enabling the shared supply to avoid a retained-high
-        # OUT0 briefly asserting the NMOS during setup.
-        if self.starting[GPO_TOPICS[0]] != 0:
-            self._write(GPO_TOPICS[0], 0)
+        # Release before enabling the shared supply: low for NMOS, high for
+        # diode. This ordering does not establish the actual unpowered pin state.
+        if self.starting[GPO_TOPICS[0]] != self.released_level:
+            self._write(GPO_TOPICS[0], self.released_level)
         if voltage != 3300:
             self._write(EXTIO_TOPIC, 3300)
         return self.snapshot()
@@ -132,7 +139,7 @@ class RecoveryOutput:
         before = self.snapshot()
         if before["extio_voltage_mv"] != 3300:
             raise RuntimeError("Recovery I/O voltage changed unexpectedly")
-        self._write(GPO_TOPICS[0], int(asserted))
+        self._write(GPO_TOPICS[0], self.released_level ^ int(asserted))
         after = self.snapshot()
         if after["asserted"] != asserted or after["extio_voltage_mv"] != 3300:
             raise RuntimeError("Recovery output retained state did not match request")
@@ -161,6 +168,10 @@ class RecoveryOutput:
         if self.starting:
             try:
                 current = self.snapshot()
+                if self.interface == "diode" and self.starting[GPO_TOPICS[0]] == 0:
+                    current["restore_warning"] = (
+                        "Restored OUT0=0 is the diode interface's recovery polarity; "
+                        "the next boot may enter recovery. Retained settings are not measured pin levels.")
                 if self.query() != self.starting:
                     raise RuntimeError("Recovery settings differ from starting values")
             except Exception as exc:
@@ -451,7 +462,7 @@ def run_session(args, driver_factory, driver_version):
                     raise RuntimeError(f"Required device not found; available={paths}")
                 with driver.open(args.device, mode="restore", timeout=5.0) as device:
                     starting_range = device.query(RANGE_TOPIC, timeout=5.0)
-                    recovery = RecoveryOutput(device) if recovery_enabled else None
+                    recovery = RecoveryOutput(device, getattr(args, "recovery_interface", "nmos")) if recovery_enabled else None
                     starting_stats = None
                     starting_stream_settings = {}
                     stream_subscriptions = []
@@ -640,11 +651,16 @@ def main():
     parser.add_argument("--stream-log", type=Path,
                         help="Optional JSONL full-rate i/v chunk summaries; no raw samples retained.")
     parser.add_argument("--recovery-output", action="store_true",
-                        help="Own OUT0 for active-high NMOS recovery; release initially and restore on exit. "
+                        help="Own OUT0 for recovery; release initially and restore on exit. "
                              "If shared I/O voltage starts off, other rear GPIO pins must be disconnected.")
+    parser.add_argument("--recovery-interface", choices=("nmos", "diode"),
+                        help="OUT0 polarity: nmos active high (default), diode active low. Requires --recovery-output.")
     parser.add_argument("--duration", type=float, default=1800,
                         help="Maximum session seconds, >0 and <=1800 (default 1800).")
     args = parser.parse_args()
+    if args.recovery_interface is not None and not args.recovery_output:
+        parser.error("--recovery-interface requires --recovery-output")
+    args.recovery_interface = args.recovery_interface or "nmos"
     if not math.isfinite(args.duration) or not 0 < args.duration <= 1800:
         parser.error("--duration must be >0 and <=1800 seconds")
     paths = [args.control, args.response, args.log]

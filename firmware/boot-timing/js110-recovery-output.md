@@ -2,12 +2,93 @@
 
 `js110_session.py --recovery-output` adds optional OUT0 control to the existing
 single-owner power session. This is an **active-high NMOS interface**, not a direct
-push-pull connection to the MCU. The implementation has offline tests; wiring,
+push-pull connection to the MCU. Select `--recovery-interface diode` for the
+user's alternative **active-low diode sink**. The implementation has offline tests; wiring,
 actual GPIO levels and autonomous recovery still require bench verification.
 Without the flag, the helper does not read or write GPIO settings and rejects
 recovery commands. Existing power-control requests retain their behavior.
 
 ## Connection and polarity
+
+| Interface option | Wiring from PE1 to OUT0 | OUT0 normal boot | OUT0 recovery |
+|---|---|---|---|
+| `nmos` (default) | NMOS drain at PE1, gate at OUT0, source at ground | Low | High |
+| `diode` | Diode anode at PE1, cathode/stripe at OUT0 | High | Low |
+
+### Diode interface
+
+The user's October 17 bench connection has the diode pointing **into OUT0**:
+PE1 → diode anode → diode cathode/stripe → JS110 OUT0. Use
+`--recovery-output --recovery-interface diode`; using the default NMOS mode on
+this wiring reverses the requested boot selection.
+
+The MCU pull-up supplies the high level. With OUT0 high, the diode blocks an
+external high level from sourcing normal forward current into an unpowered PE1.
+With OUT0 low, it sinks PE1 through the diode; PE1's low voltage is approximately
+the diode's forward drop plus OUT0's low voltage. That drop must be measured or
+validated against the MCU input threshold; its value depends on the unknown diode
+and the weak pull-up current. Reverse leakage and capacitance also depend on the
+diode. A retained JS110 setting alone does not prove a valid PE1 level.
+
+The disconnected diode lead leaves normal boot selected by the MCU's internal
+pull-up. The JS110 buffer's documented power-off isolation also supports release
+when its external supply is grounded, but the complete connected/unpowered
+instrument behavior remains a bench qualification item; see the shared-supply
+discussion below.
+The two devices must have a common ground. Do not connect JS110 +5 V to MCU VDD.
+
+### Can OUT0 float?
+
+The public JS110 API exposes only low/high for each output, with no individual
+output-enable or open-drain setting. `s/extio/voltage = 0` turns **the shared GPIO
+supply** off. This also affects OUT1 and the external input thresholds; it is not
+an independent OUT0 float command, and does not switch target power.
+
+The [JS110 user guide, section 8.10](https://download.joulescope.com/docs/JoulescopeUsersGuide/JoulescopeUsersGuide_v1_3.pdf#page=14)
+identifies the GPIO buffers as SN74LVC2T45. The [TI buffer datasheet](https://www.ti.com/lit/ds/symlink/sn74lvc2t45.pdf)
+guarantees high impedance when either supply is at ground and specifies power-off
+leakage of at most ±1 µA at 25 °C (±2 µA over its specified temperature range).
+Thus bank-off **should** float both outputs if the JS110 supply-off command brings
+that supply to ground. This is an inference from the component specification,
+not yet a measured property of this bench or an explicit JS110 high-impedance
+guarantee. A retained voltage setting is not a physical voltage measurement.
+
+Verify release with the target powered: with the bank off and retained OUT0 first
+low then high, PE1 should follow its own weak pull-up and pull-down. Through the
+diode this tests release of PE1, not the direct OUT0 voltage or leakage current.
+First verify the powered diode matrix: pull-up/OUT0-low → low,
+pull-up/OUT0-high → high, pull-down/OUT0-high → low, pull-down/OUT0-low → low.
+The pull-down/high test distinguishes a releasing diode from a direct or shorted
+connection before trying OUT0 high with target power removed.
+
+On October 17 the initial API read found the shared GPIO supply already set to
+0 mV, both retained outputs low, and target-current range automatic. JS110 IN+
+measured approximately 0 V, so neither this release test nor the diode matrix
+could run. No new recovery firmware was installed. With the bank powered at
+3.3 V, OUT0 high already releases a correctly oriented diode; floating is an
+optional alternative requiring its own verification.
+
+The prepared `test_pe1_diode.py` helper runs these powered pin tests through
+the JS110 API and SWD. It requires fresh source voltage of at least 4.5 V,
+the exact completed v25 receiver, an already-enabled GPIOE clock, and exclusive
+bench ownership. It changes only PE1 input/pull fields and the owned JS110 GPIO
+settings; it does not reset, cycle target power or write flash. It restores
+settings and resumes the MCU only after the full test and restoration succeed.
+The helper has offline guard tests but has **not run on this hardware** yet.
+
+Once source power is restored and the other rear GPIO signal pins are confirmed
+disconnected, use a new output directory:
+
+```powershell
+python firmware/boot-timing/test_pe1_diode.py `
+  --out tmp/bringup/pe1-diode-matrix-01 `
+  --execute --exclusive-bench --other-gpio-disconnected --test-supply-off
+```
+
+This does not install or qualify the early boot guard. Normal/recovery boots,
+target-off rail behavior, and analog low-level margin remain separate checks.
+
+### NMOS interface
 
 Use a suitable small logic-level NMOS as an open-drain pull-down:
 
@@ -56,6 +137,8 @@ the sink interface, rather than a mismatch between the powered logic levels.
 ## Opt-in and shared-supply guards
 
 Start the existing helper with its normal mailbox paths and `--recovery-output`.
+For the diode wiring also pass `--recovery-interface diode`. The explicit
+interface option is rejected unless output ownership is enabled.
 Do not open another driver client just to control OUT0. The session uses restore
 mode, records both retained GPO values and the shared I/O voltage, and releases
 OUT0 before reporting ready.
@@ -68,8 +151,9 @@ The starting shared I/O supply must be **3300 mV or off (0)**:
   rear GPIO signal pins must be disconnected before using this option. The helper
   additionally rejects a retained-high OUT1, either enabled GPI stream, or either
   nonzero current/voltage LSB route. These software guards cannot detect a wire.
-  OUT0 is released before the shared supply is enabled, even if its retained value
-  initially was high.
+  OUT0 is released before the shared supply is enabled: low for NMOS, high for
+  diode. This ordering controls retained settings, not the physical unpowered
+  output state before the I/O supply is enabled.
 - Other voltages are rejected before GPIO changes. There is no automatic
   conversion from a voltage another instrument connection might require.
 
@@ -98,19 +182,23 @@ cycle so the input is stable before the boot guard samples it.
 Ready, successful command responses, queries and the final stop record include
 `recovery_output` with both GPO values and the shared voltage. These are
 **retained settings, not measurements of the physical pins**. An asserted flag
-does not prove that the transistor or MCU input responded. Verify pin levels,
+uses the selected polarity and the snapshot identifies `active_high_nmos` or
+`active_low_diode`. It does not prove that the transistor, diode or MCU input responded. Verify pin levels,
 normal/recovery branch selection, debug access and power-rail discharge/restoration
 with the external capture before calling the mechanism autonomous.
 
 On stop, timeout, Ctrl-C or a handled error, the helper attempts to restore the
 starting OUT0 value and any changed I/O voltage before restoring the original
 current range. If the supply originally was off, it restores that supply first,
-then restores a possibly high retained OUT0. Every changed setting is attempted
+then restores the original retained OUT0. Every changed setting is attempted
 even if an earlier restoration reports an error. OUT1 is never overwritten.
 Any failed restoration makes the final result unsuccessful. A killed process,
 device disconnect or host failure can prevent restoration. The original state
-may itself have OUT0 high; restoring it can leave recovery asserted for the next
-boot, and the final response makes that explicit.
+may itself have OUT0 high in NMOS mode, or **OUT0 low in diode mode**; restoring it
+can leave recovery asserted for the next boot. For a restored diode low, the final
+snapshot includes an explicit `restore_warning`. Settings restoration deliberately
+does not promise to leave the boot selection released. Check the final response
+and actual rails before ending an experiment.
 
 ## Driver contract and verification
 
@@ -130,5 +218,7 @@ essential. [Pinned JS110 driver source](https://github.com/jetperch/joulescope_d
 `tests/test_js110_recovery.py` exercises legacy isolation, mailbox validation,
 power-independent assert/release, initial high-output ordering, shared-supply
 rejection, partial-success USB failures, restoration failures, interrupts and
-unexpected OUT1 changes. These tests use an in-memory fake device and never
+unexpected OUT1 changes. Diode tests cover inverted assert/release, high-before-
+supply ordering, restoration to original low with a warning, restored high after
+failed assertion, failed initial release, and explicit CLI ownership. These tests use an in-memory fake device and never
 import or operate an instrument driver.

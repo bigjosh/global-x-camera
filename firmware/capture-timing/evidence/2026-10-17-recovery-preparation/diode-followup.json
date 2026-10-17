@@ -1,0 +1,329 @@
+{
+  "date": "2026-10-17",
+  "status": "diode_connected_testing_blocked_by_missing_source_power",
+  "connection_reported_by_user": "PE1 to JS110 OUT0 through a diode pointing into OUT0; assumed PE1 anode / OUT0 cathode pending electrical verification",
+  "firmware_written": false,
+  "gpio_settings_changed": false,
+  "power_settings_changed": false,
+  "gpio_supply_off_release": "inferred from buffer datasheet; not bench verified",
+  "tests_not_run": [
+    "powered PE1 pull-up/pull-down diode matrix",
+    "shared GPIO supply-off release",
+    "target-off back-power check with OUT0 high",
+    "normal/recovery flash boot selection"
+  ],
+  "observations": [
+    {
+      "source": "tmp/bringup/diode-smoke-js-initial.json",
+      "source_sha256": "1dd8b647eced45e63cd0a2b1fa1e0538d915cfbe32790d991f6d0391642f59ee",
+      "utc": null,
+      "settings": {
+        "s/i/range/select": 128,
+        "s/extio/voltage": 0,
+        "s/gpo/0/value": 0,
+        "s/gpo/1/value": 0,
+        "s/sstats/ctrl": 1
+      },
+      "statistics": {
+        "time": {
+          "samples": {
+            "value": [
+              106266000000,
+              106267000000
+            ],
+            "units": "samples"
+          },
+          "utc": {
+            "value": [
+              297961569350348051,
+              297961569887218963
+            ],
+            "units": "time64"
+          },
+          "sample_freq": {
+            "value": 2000000,
+            "units": "Hz"
+          },
+          "range": {
+            "value": [
+              53133.0,
+              53133.5
+            ],
+            "units": "s"
+          },
+          "delta": {
+            "value": 0.5,
+            "units": "s"
+          },
+          "decimate_factor": {
+            "value": 1,
+            "units": "samples"
+          },
+          "decimate_sample_count": {
+            "value": 1000000,
+            "units": "samples"
+          },
+          "accum_samples": {
+            "value": [
+              0,
+              106267000000
+            ],
+            "units": "samples"
+          },
+          "time_map": {
+            "offset_time": 297961568276606227,
+            "offset_counter": 106264000000,
+            "counter_rate": 2000000.0
+          }
+        },
+        "signals": {
+          "current": {
+            "avg": {
+              "value": 0.0,
+              "units": "A"
+            },
+            "std": {
+              "value": 0.0,
+              "units": "A"
+            },
+            "min": {
+              "value": -2.2351741790771484e-07,
+              "units": "A"
+            },
+            "max": {
+              "value": 2.1606683731079102e-07,
+              "units": "A"
+            },
+            "p2p": {
+              "value": 4.3958425521850586e-07,
+              "units": "A"
+            },
+            "integral": {
+              "value": 0.0,
+              "units": "C"
+            }
+          },
+          "voltage": {
+            "avg": {
+              "value": -0.00040435791015625,
+              "units": "V"
+            },
+            "std": {
+              "value": 0.0,
+              "units": "V"
+            },
+            "min": {
+              "value": -0.00490570068359375,
+              "units": "V"
+            },
+            "max": {
+              "value": 0.00417327880859375,
+              "units": "V"
+            },
+            "p2p": {
+              "value": 0.0090789794921875,
+              "units": "V"
+            }
+          },
+          "power": {
+            "avg": {
+              "value": 0.0,
+              "units": "W"
+            },
+            "std": {
+              "value": 0.0,
+              "units": "W"
+            },
+            "min": {
+              "value": 0.0,
+              "units": "W"
+            },
+            "max": {
+              "value": 0.0,
+              "units": "W"
+            },
+            "p2p": {
+              "value": 0.0,
+              "units": "W"
+            },
+            "integral": {
+              "value": 0.0,
+              "units": "J"
+            }
+          }
+        },
+        "accumulators": {
+          "charge": {
+            "value": 5112.510623164475,
+            "int_value": 23024700937411231744,
+            "int_scale": 2.220446049250313e-16,
+            "units": "C"
+          },
+          "energy": {
+            "value": 24971.89132939279,
+            "int_value": 112463400485789892608,
+            "int_scale": 2.220446049250313e-16,
+            "units": "J"
+          }
+        },
+        "source": "sensor"
+      }
+    },
+    {
+      "source": "tmp/bringup/diode-smoke-js-float-query.json",
+      "source_sha256": "75bddb6d6b9f1f001f00eb4698f2d5c53003861734db4be059831d6792bb8c69",
+      "utc": "2026-10-17T18:57:15.904538+00:00",
+      "settings": {
+        "s/i/range/select": 128,
+        "s/extio/voltage": 0,
+        "s/gpo/0/value": 0,
+        "s/gpo/1/value": 0,
+        "s/sstats/ctrl": 1
+      },
+      "statistics": {
+        "time": {
+          "samples": {
+            "value": [
+              106868000000,
+              106869000000
+            ],
+            "units": "samples"
+          },
+          "utc": {
+            "value": [
+              297961892569326314,
+              297961893106197226
+            ],
+            "units": "time64"
+          },
+          "sample_freq": {
+            "value": 2000000,
+            "units": "Hz"
+          },
+          "range": {
+            "value": [
+              53434.0,
+              53434.5
+            ],
+            "units": "s"
+          },
+          "delta": {
+            "value": 0.5,
+            "units": "s"
+          },
+          "decimate_factor": {
+            "value": 1,
+            "units": "samples"
+          },
+          "decimate_sample_count": {
+            "value": 1000000,
+            "units": "samples"
+          },
+          "accum_samples": {
+            "value": [
+              0,
+              106869000000
+            ],
+            "units": "samples"
+          },
+          "time_map": {
+            "offset_time": 297961891495584490,
+            "offset_counter": 106866000000,
+            "counter_rate": 2000000.0
+          }
+        },
+        "signals": {
+          "current": {
+            "avg": {
+              "value": 0.0,
+              "units": "A"
+            },
+            "std": {
+              "value": 0.0,
+              "units": "A"
+            },
+            "min": {
+              "value": -2.086162567138672e-07,
+              "units": "A"
+            },
+            "max": {
+              "value": 2.086162567138672e-07,
+              "units": "A"
+            },
+            "p2p": {
+              "value": 4.172325134277344e-07,
+              "units": "A"
+            },
+            "integral": {
+              "value": 0.0,
+              "units": "C"
+            }
+          },
+          "voltage": {
+            "avg": {
+              "value": -0.00041961669921875,
+              "units": "V"
+            },
+            "std": {
+              "value": 0.0,
+              "units": "V"
+            },
+            "min": {
+              "value": -0.00490570068359375,
+              "units": "V"
+            },
+            "max": {
+              "value": 0.00417327880859375,
+              "units": "V"
+            },
+            "p2p": {
+              "value": 0.0090789794921875,
+              "units": "V"
+            }
+          },
+          "power": {
+            "avg": {
+              "value": 0.0,
+              "units": "W"
+            },
+            "std": {
+              "value": 0.0,
+              "units": "W"
+            },
+            "min": {
+              "value": 0.0,
+              "units": "W"
+            },
+            "max": {
+              "value": 0.0,
+              "units": "W"
+            },
+            "p2p": {
+              "value": 0.0,
+              "units": "W"
+            },
+            "integral": {
+              "value": 0.0,
+              "units": "J"
+            }
+          }
+        },
+        "accumulators": {
+          "charge": {
+            "value": 5112.510623164475,
+            "int_value": 23024700937411231744,
+            "int_scale": 2.220446049250313e-16,
+            "units": "C"
+          },
+          "energy": {
+            "value": 24971.89132939279,
+            "int_value": 112463400485789892608,
+            "int_scale": 2.220446049250313e-16,
+            "units": "J"
+          }
+        },
+        "source": "sensor"
+      }
+    }
+  ]
+}
