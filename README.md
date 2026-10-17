@@ -1,6 +1,6 @@
 # Global X Camera
 
-An STM32N6-based, credit-card-size monochrome global-shutter camera project. This repository is the durable project record; chat and Page copies are working views. Updated through October 16, 2026.
+An STM32N6-based, credit-card-size monochrome global-shutter camera project. This repository is the durable project record; chat and Page copies are working views. Updated through October 17, 2026.
 
 **Public repository:** [bigjosh/global-x-camera](https://github.com/bigjosh/global-x-camera), created at the user's explicit request on October 13, 2026. The default branch is `main`.
 
@@ -16,7 +16,7 @@ An STM32N6-based, credit-card-size monochrome global-shutter camera project. Thi
 
 8. [50 ms cold-start risk review](docs/decisions/50ms-cold-start-review.md) — sensor revision, MCU boot load, power startup and storage recovery risks; no measured timing compliance yet.
 9. [First camera capture](firmware/bringup/README.md) — working RAM-only Nucleo/VD56G3 test, reproduction scripts, sensor identity and measured results.
-10. [First GPIO boot timing](firmware/boot-timing/bench-results-2026-10-16.md) — two autonomous starts, roughly 63 ms from the 5 V rise, including a roughly 50 ms reset hold whose source remains unresolved.
+10. [Automated power cycling and first GPIO](firmware/boot-timing/bench-results-2026-10-17.md) — three recorded CN8-powered autonomous starts, 15.20–15.43 ms from NRST rising to the first GPIO; includes the earlier source/reset problem and measurement limits.
 
 ## Current position
 
@@ -28,7 +28,7 @@ The main-path OFF-current target is 0.1 µA at room temperature, with RTC backup
 
 The recovered KiCad design still contains the older camera, memories and power circuit. A reviewed reconstruction and clean ERC are not a fabrication release. The [47-item engineering review](docs/DESIGN-REVIEW.md) remains the implementation backlog until findings are closed with evidence. No integrated product firmware or measured full capture/save/shutdown cycle is recorded.
 
-**Autonomous boot, October 16:** the separate [first-GPIO image](firmware/boot-timing/README.md) is now programmed in NOR after a complete backup. Two USB power-ups reached PD0 62.75–62.91 ms after the target 5 V rail first crossed 4.50 V. Approximately 50 ms was spent with NRST held low, whose source remains unresolved; the observed NRST edge to PD0 took 12.92–13.43 ms. No sensor capture occurs in this image, so the 50 ms exposure requirement remains unqualified. The board is currently in normal flash boot (JP1/JP2 pins 1–2).
+**Autonomous boot, October 17:** the separate [first-GPIO image](firmware/boot-timing/README.md) remains programmed in NOR after a complete backup. CN8 USB → CN9.3 → JS110 → CN9.2 now supports API-controlled power cycling: three recorded repeats reached PD0 **15.20–15.43 ms after NRST rose**, or **22.67–22.90 ms after target 5 V crossed 0.5 V**. Both measured rails had stayed below 0.1 V for about 13 seconds. A one-time hardware-reset pulse released an initially stuck NRST; no debugger command occurred during the repeat cycles. The earlier approximately 50 ms reset hold did not recur, although its cause remains unresolved. No sensor capture occurs in this image, so the 50 ms exposure requirement remains unqualified. The board remains in normal flash boot (JP1/JP2 pins 1–2); the original [October 16 results](firmware/boot-timing/bench-results-2026-10-16.md) describe the earlier ST-LINK-powered setup.
 
 ## Record structure and precedence
 

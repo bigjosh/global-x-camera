@@ -1,5 +1,7 @@
 # First GPIO autonomous boot measurements — October 16, 2026
 
+**Later result:** the [October 17 CN8 supply experiment](bench-results-2026-10-17.md) demonstrated three recorded API-controlled power cycles and autonomous boots after a one-time reset-release diagnostic. Use that setup for continued bench work. The source limitation and next steps below describe the historical CN9.1/ST-LINK route; their measurements remain valid for that setup.
+
 The NUCLEO-N657X0-Q successfully loaded the small first-GPIO image from its onboard external NOR on two recorded power-up events. The first PD0 marker occurred **62.911 ms** and **62.748 ms** after the target 5 V rail crossed 4.50 V. Approximately 49.5–49.8 ms of each interval elapsed with NRST still low; execution reached PD0 approximately 12.9–13.4 ms after NRST rose.
 
 This proves autonomous execution of this payload on this board. It **does not qualify the 50 ms button-to-exposure requirement**, measure sensor exposure, or establish a 63 ms minimum for an optimized custom STM32N6 design. The source of the approximately 50 ms reset hold remains unresolved. Only the named external rails were observed; complete discharge of every MCU and camera power domain was not measured.

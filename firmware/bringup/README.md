@@ -4,7 +4,7 @@ The NUCLEO-N657X0-Q and mounted CAM-6G3-073CLR captured a recognizable monochrom
 
 This is a hardware and image-capture proof. It does not qualify full-resolution RAW10 capture, the 50 ms cold-start target, battery operation, NAND storage, PTP, or the production PNG export path.
 
-**Current bench state, October 16:** the separate [first-GPIO timing image](../boot-timing/README.md) is now in external NOR, with JP1/JP2 both on pins 1–2 for normal flash boot. Return JP2 to pins 2–3 to run this RAM-only camera test again. The timing experiment backed up the original NOR, measured two autonomous starts, and did not change OTP or security settings.
+**Current bench state, October 17:** the separate [first-GPIO timing image](../boot-timing/README.md) remains in external NOR, with JP1/JP2 both on pins 1–2 for normal flash boot. **CN8 → CN9 pin 3 → JS110 → CN9 pin 2** now supports API-controlled power cycling: three recorded repeats booted autonomously without debugger commands during those cycles. An initial `HWRSTPULSE` released an already stuck-low NRST before testing; the cause remains unresolved. See the [October 17 results and timing-reference limits](../boot-timing/bench-results-2026-10-17.md); the late 4.50 V rail crossing does not measure the entire cold boot. Three repeats do not establish a worst-case timing bound, and exposure-start compliance remains unqualified. The board stayed powered after the JS110 session closed. Return JP2 to pins 2–3 with board power removed to run this RAM-only camera test again. The original NOR backup and [October 16 measurements](../boot-timing/bench-results-2026-10-16.md) are preserved; no OTP or security settings were changed.
 
 ## Hardware and tools
 
