@@ -1,0 +1,121 @@
+"""Verify an exact early recovery park before low-SRAM NOR maintenance.
+
+Reads RAM/registers and halts only after parked-status and live-code checks.
+Never writes RAM, runs a helper, sends NOR commands, resets, or changes power.
+The normal post-capture high-SRAM cache helper is not applicable here.
+"""
+import argparse
+import json
+from pathlib import Path
+import struct
+import sys
+
+HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE.parent))
+from prepare_maintenance import registers
+from bench import sha
+from nor_bench import Bench
+
+PREFIX_ADDRESS = 0x34180400
+STATUS_ADDRESS = 0x341F7000
+FIELDS = ('magic schema words state reason pin nominal_hz settle_cycles '
+          'begin_cycle sample_cycle elapsed_cycles polls idr moder pupdr '
+          'ahb4enr demcr dwt_ctrl control ipsr primask dbgcr ap_unlock reserved').split()
+# An unknown/self-consistent build is insufficient authorization to halt.
+APPROVED = {
+    '528bd09755a2de84d0eadf497015facebe21da680d502fdbf494bcf7ef4e106f':
+        {'bytes': 4400, 'park': 0x3418078C,
+         'sector': '570657ab294bac79e47c90113c45ef4b2e71f986ab3a1f1cd52fc9895b0fa009'},
+}
+
+
+def checked_build(build):
+    manifest = json.loads((build/'manifest.json').read_text())
+    code = (build/'stage1.bin').read_bytes()
+    approved = APPROVED.get(sha(code))
+    if not approved or len(code) != approved['bytes']:
+        raise ValueError('Recovery prefix is not in the reviewed allowlist')
+    if manifest.get('stage1_raw_sha256') != sha(code):
+        raise ValueError('Prefix differs from manifest')
+    if (manifest.get('program_sha256') != approved['sector'] or
+            sha((build/'capture_sector_0.bin').read_bytes()) != approved['sector']):
+        raise ValueError('Unreviewed recovery sector')
+    spec = manifest.get('recovery_gpio', {})
+    expected = dict(status_address=hex(STATUS_ADDRESS), status_words=len(FIELDS),
+                    status_fields=FIELDS, park_address=hex(approved['park']),
+                    park_bytes='fee7', settle_cycles=40000, max_polls=100000,
+                    pin='PE1', active_low=True, internal_pull='up')
+    if any(spec.get(k) != v for k, v in expected.items()):
+        raise ValueError('Recovery layout differs from reviewed schema')
+    offset = approved['park']-PREFIX_ADDRESS
+    if code[offset:offset+2] != bytes.fromhex('fee7'):
+        raise ValueError('Recovery park instruction differs')
+    return code, approved
+
+
+def validate_status(words):
+    if len(words) != len(FIELDS):
+        raise ValueError('Incomplete recovery status')
+    s = dict(zip(FIELDS, words))
+    expected = dict(magic=0x52475031, schema=1, words=24, state=3, reason=1,
+                    pin=0x40001, nominal_hz=400000000, settle_cycles=40000,
+                    control=0, ipsr=0, primask=1, dbgcr=0xB451B400, ap_unlock=0xB4)
+    if any(s[k] != v for k, v in expected.items()):
+        raise ValueError('Not a requested early recovery park')
+    if (s['idr'] & 2 or s['moder'] & 12 or s['pupdr'] & 12 != 4 or
+            s['elapsed_cycles'] < 40000 or not 0 <= s['polls'] < 100000 or
+            (s['sample_cycle']-s['begin_cycle']) & 0xFFFFFFFF != s['elapsed_cycles'] or
+            not s['ahb4enr'] & (1 << 4) or not s['demcr'] & (1 << 24) or
+            not s['dwt_ctrl'] & 1 or s['dwt_ctrl'] & (1 << 25)):
+        raise ValueError('Pin, settling, or timer evidence is inconsistent')
+    return s
+
+
+def validate_context(context, park, ccr, fpccr):
+    if (context.get('PC') != park or context.get('CONTROL') != 0 or
+            context.get('PRIMASK') != 1 or context.get('FAULTMASK') != 0 or
+            context.get('XPSR', 511) & 511 or
+            not context.get('XPSR', 0) & (1 << 24) or
+            ccr & 0x30000 or fpccr & 1):
+        raise ValueError('Not the reviewed awake, uncached, integer-only recovery context')
+
+
+def validate_xspi_clock(enabled, reset):
+    if enabled & 0x2020 != 0x2020 or reset & 0x2020:
+        raise ValueError('Do not read unclocked or reset XSPI/XSPIM')
+
+
+def main():
+    p = argparse.ArgumentParser(description=__doc__)
+    p.add_argument('--build', type=Path, required=True)
+    p.add_argument('--out', type=Path, required=True)
+    a = p.parse_args()
+    code, approved = checked_build(a.build)
+    b = Bench(a.out)
+    status = validate_status(struct.unpack('<24I', b.upload(STATUS_ADDRESS, 96, 'recovery-status.bin')))
+    if b.upload(PREFIX_ADDRESS, len(code), 'live-prefix.bin') != code:
+        raise ValueError('Live prefix differs; no halt or maintenance authorized')
+    context = registers(b.call('-halt', '-coreReg'))
+    def word(address, name):
+        return struct.unpack('<I', b.upload(address, 4, name+'.bin'))[0]
+    ccr, fpccr = word(0xE000ED14, 'ccr'), word(0xE000EF34, 'fpccr')
+    validate_context(context, approved['park'], ccr, fpccr)
+    enabled, reset = word(0x56028260, 'ahb5enr'), word(0x56028220, 'ahb5rstr')
+    validate_xspi_clock(enabled, reset)
+    sr = word(0x58025020, 'xspi-sr')
+    if sr & 0x7F20:  # FLEVEL[14:8] or BUSY[5]. No transaction is initiated.
+        raise ValueError('XSPI controller is not idle with empty FIFO')
+    # Recheck the record after halt; no cache helper is required or executed.
+    after = validate_status(struct.unpack('<24I', b.upload(STATUS_ADDRESS, 96, 'recovery-status-halted.bin')))
+    if after != status:
+        raise ValueError('Recovery status changed while validating park')
+    result = dict(passed=True, status=status, context=context, ccr=ccr, fpccr=fpccr,
+                  prefix_sha256=sha(code), xspi_sr=sr, core_left_halted=True,
+                  ram_writes=False, nor_commands=False,
+                  next_step='Reviewed low-SRAM nor_bench INFO, then separately guarded WRITE')
+    (a.out/'result.json').write_text(json.dumps(result, indent=2)+'\n')
+    print(json.dumps(result))
+
+
+if __name__ == '__main__':
+    main()

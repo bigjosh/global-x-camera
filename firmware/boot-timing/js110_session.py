@@ -37,6 +37,12 @@ unobserved stream boundaries, and do not establish finite or unclipped readings.
 The 2A state selects a fixed measurement range, NOT a 2 A current limit. Inrush
 can exceed the range and clip the reported current. This helper changes no
 source voltage, protection threshold, voltage range, or range-suppression mode.
+
+Optional --recovery-output owns OUT0 for an active-high NMOS recovery interface.
+It initially releases recovery (OUT0=0) and accepts state=recovery with a strict
+JSON boolean asserted. It preserves the initial OUT0 and shared I/O voltage on
+exit, never writes OUT1, and reports retained GPIO settings (not measured pins).
+See js110-recovery-output.md for wiring, shared-voltage guards and limitations.
 """
 
 import argparse
@@ -59,6 +65,107 @@ STREAM_TOPICS = {"s/i/!data": ("current", "A"),
                  "s/v/!data": ("voltage", "V")}
 RANGE_STATES = {"off": 0, "auto": 128, "2A": 2}
 SUPPORTED_STATES = [*RANGE_STATES, "query", "stop"]
+EXTIO_TOPIC = "s/extio/voltage"
+GPO_TOPICS = ("s/gpo/0/value", "s/gpo/1/value")
+
+
+class RecoveryOutput:
+    """Opt-in OUT0 ownership. No calls occur for legacy power-only sessions."""
+
+    def __init__(self, device):
+        self.device = device
+        self.starting = {}
+        self.changed = set()
+
+    def query(self):
+        values = {topic: self.device.query(topic, timeout=5.0)
+                  for topic in (EXTIO_TOPIC, *GPO_TOPICS)}
+        for topic in GPO_TOPICS:
+            if type(values[topic]) not in (bool, int) or values[topic] not in (0, 1):
+                raise RuntimeError(f"Invalid retained GPIO value: {topic}={values[topic]!r}")
+        if type(values[EXTIO_TOPIC]) is not int or values[EXTIO_TOPIC] < 0:
+            raise RuntimeError("Invalid retained external-I/O voltage")
+        return values
+
+    def snapshot(self):
+        values = self.query()
+        if self.starting and values[GPO_TOPICS[1]] != self.starting[GPO_TOPICS[1]]:
+            raise RuntimeError("OUT1 changed unexpectedly; helper does not own OUT1")
+        return {"scope": "retained_settings_not_measured_pins", "interface": "active_high_nmos",
+                "extio_voltage_mv": values[EXTIO_TOPIC],
+                "gpo0": int(values[GPO_TOPICS[0]]), "gpo1": int(values[GPO_TOPICS[1]]),
+                "asserted": bool(values[GPO_TOPICS[0]])}
+
+    def _write(self, topic, value):
+        # A failed USB call may still have changed hardware; restore it anyway.
+        self.changed.add(topic)
+        self.device.publish(topic, value, timeout=5.0)
+        if self.device.query(topic, timeout=5.0) != value:
+            raise RuntimeError(f"Retained setting mismatch after writing {topic}")
+
+    def start(self):
+        self.starting = self.query()
+        voltage = self.starting[EXTIO_TOPIC]
+        if voltage not in (0, 3300):
+            raise RuntimeError("Recovery output requires existing I/O voltage 3300 mV or off")
+        if voltage == 0:
+            # This supply serves both outputs and both input thresholds. Even
+            # OUT1=0 changes from unpowered to driven-low when it is enabled.
+            # The CLI flag also requires other rear GPIO pins disconnected.
+            live = self.starting[GPO_TOPICS[1]] != 0
+            for topic in ("s/gpi/0/ctrl", "s/gpi/1/ctrl", "s/i/lsb_src", "s/v/lsb_src"):
+                if self.device.query(topic, timeout=5.0) != 0:
+                    live = True
+            if live:
+                raise RuntimeError("Cannot enable shared I/O voltage while another GPIO route is active")
+        # Release before enabling the shared supply to avoid a retained-high
+        # OUT0 briefly asserting the NMOS during setup.
+        if self.starting[GPO_TOPICS[0]] != 0:
+            self._write(GPO_TOPICS[0], 0)
+        if voltage != 3300:
+            self._write(EXTIO_TOPIC, 3300)
+        return self.snapshot()
+
+    def set_asserted(self, asserted):
+        if type(asserted) is not bool:
+            raise ValueError("Recovery asserted must be a JSON boolean")
+        before = self.snapshot()
+        if before["extio_voltage_mv"] != 3300:
+            raise RuntimeError("Recovery I/O voltage changed unexpectedly")
+        self._write(GPO_TOPICS[0], int(asserted))
+        after = self.snapshot()
+        if after["asserted"] != asserted or after["extio_voltage_mv"] != 3300:
+            raise RuntimeError("Recovery output retained state did not match request")
+        return after
+
+    def restore(self):
+        """Try every owned setting even if an earlier restoration fails."""
+        errors = []
+        order = (EXTIO_TOPIC, GPO_TOPICS[0]) if self.starting.get(EXTIO_TOPIC) == 0 else (
+            GPO_TOPICS[0], EXTIO_TOPIC)
+        for topic in order:
+            if topic not in self.changed:
+                continue
+            try:
+                if topic == EXTIO_TOPIC:
+                    # Never disable a shared supply if an unowned output has
+                    # changed during the session. Do not overwrite that pin.
+                    if self.device.query(GPO_TOPICS[1], timeout=5.0) != self.starting[GPO_TOPICS[1]]:
+                        raise RuntimeError("OUT1 changed; refusing shared-voltage restoration")
+                self.device.publish(topic, self.starting[topic], timeout=5.0)
+                if self.device.query(topic, timeout=5.0) != self.starting[topic]:
+                    raise RuntimeError("Restored recovery setting does not match starting value")
+            except Exception as exc:
+                errors.append(("recovery_restore_error", topic, str(exc)))
+        current = None
+        if self.starting:
+            try:
+                current = self.snapshot()
+                if self.query() != self.starting:
+                    raise RuntimeError("Recovery settings differ from starting values")
+            except Exception as exc:
+                errors.append(("recovery_restore_error", "verification", str(exc)))
+        return current, errors
 
 
 def stamp():
@@ -326,6 +433,8 @@ def run_session(args, driver_factory, driver_version):
     removed = threading.Event()
     stop_id = None
     stream = None
+    recovery_enabled = bool(getattr(args, "recovery_output", False))
+    supported_states = SUPPORTED_STATES + (["recovery"] if recovery_enabled else [])
     exit_code = 0
     deadline = time.monotonic() + args.duration
     for path in (args.response, args.log):
@@ -342,11 +451,14 @@ def run_session(args, driver_factory, driver_version):
                     raise RuntimeError(f"Required device not found; available={paths}")
                 with driver.open(args.device, mode="restore", timeout=5.0) as device:
                     starting_range = device.query(RANGE_TOPIC, timeout=5.0)
+                    recovery = RecoveryOutput(device) if recovery_enabled else None
                     starting_stats = None
                     starting_stream_settings = {}
                     stream_subscriptions = []
                     reason = "timeout"
                     try:
+                        if recovery is not None:
+                            recovery.start()
                         device.subscribe(STATS_TOPIC, "pub", stats.receive)
                         # Without --stream-log, enable only native statistics.
                         starting_stats = device.query("s/sstats/ctrl", timeout=5.0)
@@ -367,12 +479,15 @@ def run_session(args, driver_factory, driver_version):
                                          if value == args.device else None)
                         report.emit("ready", response=True, device=args.device,
                                     driver_version=driver_version, open_mode="restore",
-                                    supported_states=SUPPORTED_STATES,
+                                    supported_states=supported_states,
                                     starting_range=starting_range, range=starting_range,
                                     voltage_range=device.query("s/v/range/select", timeout=5.0),
                                     stream_log=None if stream is None else str(args.stream_log),
                                     starting_stream_settings=starting_stream_settings,
-                                    duration_s=args.duration, statistics=stats.snapshot())
+                                    duration_s=args.duration, statistics=stats.snapshot(),
+                                    **({} if recovery is None else {
+                                        "starting_recovery_settings": recovery.starting,
+                                        "recovery_output": recovery.snapshot()}))
                         last_stats = 0
                         while time.monotonic() < deadline:
                             if removed.is_set():
@@ -408,21 +523,32 @@ def run_session(args, driver_factory, driver_version):
                                 continue
                             seen_ids.add(id_key)
                             state = request.get("state")
-                            if state not in (*RANGE_STATES, "query", "stop"):
+                            if state not in supported_states:
                                 report.emit("response", response=True, id=request_id,
-                                            supported_states=SUPPORTED_STATES,
-                                            ok=False, error="State must be off, auto, 2A, query, or stop")
+                                            supported_states=supported_states,
+                                            ok=False, error=("Recovery control requires --recovery-output"
+                                                if state == "recovery" else
+                                                "State must be one of: " + ", ".join(supported_states)))
+                                continue
+                            if state == "recovery" and type(request.get("asserted")) is not bool:
+                                report.emit("response", response=True, id=request_id, state=state,
+                                            supported_states=supported_states, ok=False,
+                                            error="Recovery asserted must be a JSON boolean")
                                 continue
                             command_start = stamp()
                             if state in RANGE_STATES:
                                 device.publish(RANGE_TOPIC, RANGE_STATES[state], timeout=5.0)
+                            elif state == "recovery":
+                                recovery.set_asserted(request["asserted"])
                             command_end = stamp()
                             current_range = device.query(RANGE_TOPIC, timeout=5.0)
                             report.emit("response", response=True, id=request_id, state=state,
-                                        supported_states=SUPPORTED_STATES,
+                                        supported_states=supported_states,
                                         ok=True, range=current_range,
                                         command_start=command_start, command_end=command_end,
-                                        statistics=stats.snapshot())
+                                        statistics=stats.snapshot(),
+                                        **({} if recovery is None else {
+                                            "recovery_output": recovery.snapshot()}))
                             if state == "stop":
                                 stop_id = request_id
                                 reason = "stop"
@@ -439,6 +565,12 @@ def run_session(args, driver_factory, driver_version):
                         # cleaning up subscriptions, even when file I/O failed.
                         restore_error = None
                         restored_range = None
+                        restored_recovery = None
+                        recovery_errors = []
+                        if recovery is not None:
+                            restored_recovery, recovery_errors = recovery.restore()
+                            if recovery_errors:
+                                exit_code = 1
                         try:
                             device.publish(RANGE_TOPIC, starting_range, timeout=5.0)
                             restored_range = device.query(RANGE_TOPIC, timeout=5.0)
@@ -447,7 +579,7 @@ def run_session(args, driver_factory, driver_version):
                         except Exception as exc:
                             restore_error = str(exc)
                             exit_code = 1
-                        cleanup_errors = []
+                        cleanup_errors = list(recovery_errors)
                         for topic in stream_subscriptions:
                             try:
                                 driver.unsubscribe(topic, stream.callback, timeout=5.0)
@@ -481,7 +613,13 @@ def run_session(args, driver_factory, driver_version):
                                     ok=exit_code == 0, starting_range=starting_range,
                                     range=restored_range, restore_error=restore_error,
                                     stream=stream_status,
-                                    statistics=stats.snapshot())
+                                    statistics=stats.snapshot(),
+                                    **({} if recovery is None else {
+                                        "starting_recovery_settings": recovery.starting,
+                                        "recovery_output": restored_recovery,
+                                        "recovery_restore_errors": [
+                                            {"topic": topic, "error": error}
+                                            for _, topic, error in recovery_errors]}))
         except Exception as exc:
             report.emit("fatal", response=True, ok=False, error=str(exc))
             exit_code = 1
@@ -501,6 +639,9 @@ def main():
     parser.add_argument("--log", type=Path, required=True)
     parser.add_argument("--stream-log", type=Path,
                         help="Optional JSONL full-rate i/v chunk summaries; no raw samples retained.")
+    parser.add_argument("--recovery-output", action="store_true",
+                        help="Own OUT0 for active-high NMOS recovery; release initially and restore on exit. "
+                             "If shared I/O voltage starts off, other rear GPIO pins must be disconnected.")
     parser.add_argument("--duration", type=float, default=1800,
                         help="Maximum session seconds, >0 and <=1800 (default 1800).")
     args = parser.parse_args()

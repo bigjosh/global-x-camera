@@ -14,6 +14,8 @@ The no-reset policy is qualified only for the observed discharged cold cycle. It
 
 The follow-up [lane-startup investigation](../../reports/Camera%20lane%20startup%20mismatch.md) separates sensor firmware readiness, receiver clock acquisition and data-lane state tracking. Its [isolated diagnostic builds](late_phy/README.md) preserve raw PHY history. Second-trigger experiments are explicitly excluded from first-frame latency claims; completed captures and quiet error flags must be considered separately.
 
+The [early GPIO recovery candidate](recovery_gpio/README.md) adds PE1/CN15.24 as a default-normal, internally pulled-up recovery input before camera or additional NOR loading. Its v34b build and JS110 OUT0 control are offline-tested; installation and externally requested recovery remain pending target power and the sink wiring.
+
 ## Bench ownership and reversible maintenance
 
 Only one controller may use the physical instruments or debugger. Follow the repository [instrument instructions](../../AGENTS.md). Current power is CN8 USB → CN9 pin 3 → JS110 IN+ → OUT+ → CN9 pin 2, with CN9 shunts absent. BOOT0 and BOOT1 remain in normal flash-boot positions. Saleae and Joulescope are controlled through APIs.

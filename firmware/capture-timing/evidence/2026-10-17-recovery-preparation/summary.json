@@ -1,0 +1,56 @@
+{
+  "date": "2026-10-17",
+  "status": "offline_prepared_hardware_blocked",
+  "candidate": "v34b: v25 receiver unchanged plus early PE1 recovery guard",
+  "prefix_raw_sha256": "528bd09755a2de84d0eadf497015facebe21da680d502fdbf494bcf7ef4e106f",
+  "sector_sha256": "570657ab294bac79e47c90113c45ef4b2e71f986ab3a1f1cd52fc9895b0fa009",
+  "prefix_raw_bytes": 4400,
+  "added_raw_bytes": 392,
+  "recovery_park_address": "0x3418078c",
+  "firmware_written": false,
+  "last_verified_installed_sector": "c43721b29f437546d3090632495f4527f4ba34d4af773a23214cdd86a0adb817",
+  "observations": [
+    "User confirms JP2 returned to pins 1\u20132.",
+    "AP1 read could not connect. Subsequent JS110 statistics measured approximately 0 V at its input.",
+    "One requested off/on cycle showed all three target rail probes near 0 V throughout 27.816512 seconds.",
+    "No firmware was written and no recovery GPIO output was driven.",
+    "JS110 helper restored starting automatic current range and released ownership; source and target remained unpowered."
+  ],
+  "pending": [
+    "User availability/model of small NMOS for OUT0 interface",
+    "Target supply restoration",
+    "Normal boot and requested recovery hardware qualification",
+    "Promotion to all future experimental prefixes after qualification"
+  ],
+  "independent_review": "Prefix disassembly/order, memory layout, exact parking instruction, host context and XSPI guards reviewed; no blocking issue found.",
+  "files": {
+    "candidate-manifest.json": {
+      "bytes": 6185,
+      "sha256": "286eed5bd75cc2f3f6e3b595bdb54fa282cf91ccac8a86783a21c7f1ba117f1a"
+    },
+    "candidate-prefix.bin": {
+      "bytes": 4400,
+      "sha256": "528bd09755a2de84d0eadf497015facebe21da680d502fdbf494bcf7ef4e106f"
+    },
+    "candidate-boot-image.bin": {
+      "bytes": 5440,
+      "sha256": "3936baab05fb7125f9c0799885780914760e523a70f646eee68893fbbdc89741"
+    },
+    "unpowered-rails.json": {
+      "bytes": 360,
+      "sha256": "33704005da1c5b3006f7af78b5c9d04e0200b2f3cc74708c066854300c767f57"
+    },
+    "power-cycle.jsonl": {
+      "bytes": 4397,
+      "sha256": "1df8cfaa6db4c1e6dbf20f570bd3ae8f78a2cc60634db35c8b141c90ad37f292"
+    },
+    "session-stopped.json": {
+      "bytes": 688,
+      "sha256": "97fd1321cd818cd454df29960b7b3d248624a82b39fdba6e551bf2bc905ff763"
+    },
+    "initial-debug-read.log": {
+      "bytes": 296,
+      "sha256": "683267082b610c5c2b85c921f6b2440da711daacee1f8eacfae39cd0c84effb0"
+    }
+  }
+}
