@@ -57,6 +57,16 @@ class RecoveryParkTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 checks.validate_xspi_clock(enabled, reset)
 
+    def test_rom_icache_state_is_rejected_until_disabled_without_relaxing_dcache(self):
+        c = dict(PC=0x3418078C, CONTROL=0, PRIMASK=1, FAULTMASK=0, XPSR=0x01000000)
+        # The actual v34b park retained ROM's CCR=0x20201. The revised firmware
+        # clears only IC, preserving the other CCR bits and the host DC guard.
+        with self.assertRaises(ValueError):
+            checks.validate_context(c, c['PC'], 0x20201, 0)
+        checks.validate_context(c, c['PC'], 0x201, 0)
+        with self.assertRaises(ValueError):
+            checks.validate_context(c, c['PC'], 0x10201, 0)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -1,0 +1,177 @@
+{
+  "schema": 1,
+  "reviewed_utc": "2026-10-17T19:18:31.839480+00:00",
+  "scope": "Follow-up after the earlier failed-boot checkpoint. Executing camera code and the powered active-output diode matrix are now observed; guard installation/recovery qualification is outside this completed evidence set.",
+  "previous_checkpoint": "independent-summary.json",
+  "earlier_boot_block_no_longer_current": true,
+  "camera_run": {
+    "waveform_review": "diode-development-cold-01-waveform-review.json",
+    "pc": "0x34302B0C",
+    "stage": 40,
+    "frames": 1,
+    "image_integrity_matches": true,
+    "visual_qualification": "pending human/model inspection; statistics alone do not prove a valid image",
+    "camera_error": "0x8000",
+    "receiver_sha256": "85313ae05070d80717c29a8a546bf56976930ac1f47b92e4ae70576ae72c940f",
+    "nrst_to_pd0_ms": 15.839840000001715,
+    "pd0_to_first_pe0_us": 27.999999996808356
+  },
+  "matrix_runs": [
+    {
+      "name": "pe1-diode-matrix-03",
+      "passed": false,
+      "samples": [],
+      "restore_errors": [],
+      "core_halt_attempted": true,
+      "core_resumed": false,
+      "error": "ValueError: Core halt/privileged Thread context was not confirmed",
+      "live_receiver": {
+        "bytes": 11964,
+        "normalized_sha256": "85313ae05070d80717c29a8a546bf56976930ac1f47b92e4ae70576ae72c940f",
+        "normalization": "Only final SystemCoreClock word restored to its 64000000 initializer for hash comparison; live word is400000000.",
+        "runtime_clock_hz": 400000000
+      },
+      "classification": "The halt check used a later CLI connection; CLI disconnect can resume execution. This failure does not establish failed camera boot or a failed diode test; zero pin samples were taken."
+    },
+    {
+      "name": "pe1-diode-matrix-04",
+      "passed": false,
+      "samples": [
+        {
+          "shared_supply_mv": 3300,
+          "pull": "up",
+          "out0_retained": 0,
+          "idr": 0,
+          "pe1": 0,
+          "expected": 0,
+          "passed": true
+        },
+        {
+          "shared_supply_mv": 3300,
+          "pull": "up",
+          "out0_retained": 1,
+          "idr": 2,
+          "pe1": 1,
+          "expected": 1,
+          "passed": true
+        },
+        {
+          "shared_supply_mv": 3300,
+          "pull": "down",
+          "out0_retained": 1,
+          "idr": 0,
+          "pe1": 0,
+          "expected": 0,
+          "passed": true
+        },
+        {
+          "shared_supply_mv": 3300,
+          "pull": "down",
+          "out0_retained": 0,
+          "idr": 0,
+          "pe1": 0,
+          "expected": 0,
+          "passed": true
+        },
+        {
+          "shared_supply_mv": 0,
+          "pull": "up",
+          "out0_retained": 0,
+          "idr": 0,
+          "pe1": 0,
+          "expected": 1,
+          "passed": false
+        }
+      ],
+      "restore_errors": [],
+      "core_halt_attempted": true,
+      "core_resumed": false,
+      "error": "RuntimeError: PE1 diode matrix mismatch; subsequent combinations skipped",
+      "live_receiver": {
+        "bytes": 11964,
+        "normalized_sha256": "85313ae05070d80717c29a8a546bf56976930ac1f47b92e4ae70576ae72c940f",
+        "normalization": "Only final SystemCoreClock word restored to its 64000000 initializer for hash comparison; live word is400000000.",
+        "runtime_clock_hz": 400000000
+      }
+    },
+    {
+      "name": "pe1-diode-matrix-05-active",
+      "passed": true,
+      "samples": [
+        {
+          "shared_supply_mv": 3300,
+          "pull": "up",
+          "out0_retained": 0,
+          "idr": 0,
+          "pe1": 0,
+          "expected": 0,
+          "passed": true
+        },
+        {
+          "shared_supply_mv": 3300,
+          "pull": "up",
+          "out0_retained": 1,
+          "idr": 2,
+          "pe1": 1,
+          "expected": 1,
+          "passed": true
+        },
+        {
+          "shared_supply_mv": 3300,
+          "pull": "down",
+          "out0_retained": 1,
+          "idr": 0,
+          "pe1": 0,
+          "expected": 0,
+          "passed": true
+        },
+        {
+          "shared_supply_mv": 3300,
+          "pull": "down",
+          "out0_retained": 0,
+          "idr": 0,
+          "pe1": 0,
+          "expected": 0,
+          "passed": true
+        }
+      ],
+      "restore_errors": [],
+      "core_halt_attempted": true,
+      "core_resumed": true,
+      "error": null,
+      "live_receiver": {
+        "bytes": 11964,
+        "normalized_sha256": "85313ae05070d80717c29a8a546bf56976930ac1f47b92e4ae70576ae72c940f",
+        "normalization": "Only final SystemCoreClock word restored to its 64000000 initializer for hash comparison; live word is400000000.",
+        "runtime_clock_hz": 400000000
+      }
+    }
+  ],
+  "active_four_combinations_passed_twice": true,
+  "supply_off_observation": {
+    "shared_supply_mv": 0,
+    "retained_out0": 0,
+    "pe1_internal_pull": "up",
+    "measured_pe1_idr": 0,
+    "remaining_off_combinations_tested": false,
+    "interpretation": "Disabling shared GPIO supply did not release this connected PE1 input under the measured condition. Do not use supply-off as a qualified float/release state."
+  },
+  "helper_source": {
+    "path": "firmware/boot-timing/test_pe1_diode.py",
+    "bytes": 19080,
+    "sha256": "2c70466b9bafc4acb6f092f67b0886f39d891f47ce95f26f75edce3f6654e1ca"
+  },
+  "helper_offline_tests_source": {
+    "path": "firmware/boot-timing/tests/test_pe1_diode_guards.py",
+    "bytes": 14699,
+    "sha256": "f2818a14636c42c978b0107f4fd1b0860d523793f5c3859296dd17919cd3a472"
+  },
+  "limitations": [
+    "The observations establish digital input behavior at these bench conditions, not diode forward voltage or analogue noise margin.",
+    "No target-off backfeed qualification follows from the powered pull matrix.",
+    "CLI disconnect may resume the completed camera idle loop; only the same-command halt checks demonstrate halt during their connection.",
+    "The v25 camera retains its known0x8000 error flag; no new zero-error camera claim is made.",
+    "No physical BOOT0/BOOT1 position is inferred from the development directory name.",
+    "No files from the in-progress guard installation were read or included."
+  ]
+}

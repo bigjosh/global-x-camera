@@ -14,11 +14,11 @@ The no-reset policy is qualified only for the observed discharged cold cycle. It
 
 The follow-up [lane-startup investigation](../../reports/Camera%20lane%20startup%20mismatch.md) separates sensor firmware readiness, receiver clock acquisition and data-lane state tracking. Its [isolated diagnostic builds](late_phy/README.md) preserve raw PHY history. Second-trigger experiments are explicitly excluded from first-frame latency claims; completed captures and quiet error flags must be considered separately.
 
-The [early GPIO recovery candidate](recovery_gpio/README.md) adds PE1/CN15.24 as a default-normal, internally pulled-up recovery input before camera or additional NOR loading. Its v34b build and JS110 OUT0 control are offline-tested; installation and externally requested recovery remain pending target power and the sink wiring.
+The installed [early GPIO recovery guard](recovery_gpio/README.md), revision v34c, adds PE1/CN15.24 as a default-normal, internally pulled-up recovery input before camera or additional NOR loading. Normal capture, externally requested recovery and actual flash reprogramming from early recovery passed on October 17. With the user's diode, use the JS110 shared GPIO supply at 3300 mV and OUT0 high for normal boot or low for recovery. Supply-off did not reliably release the pin. Preserve this guard in all subsequent experimental images; detailed checks and provenance are in the [qualification evidence](evidence/2026-10-17-diode-recovery-smoke/guard-qualification/qualification-summary.json).
 
 ## Bench ownership and reversible maintenance
 
-Only one controller may use the physical instruments or debugger. Follow the repository [instrument instructions](../../AGENTS.md). Current power is CN8 USB → CN9 pin 3 → JS110 IN+ → OUT+ → CN9 pin 2, with CN9 shunts absent. BOOT0 and BOOT1 remain in normal flash-boot positions. Saleae and Joulescope are controlled through APIs.
+Only one controller may use the physical instruments or debugger. Follow the repository [instrument instructions](../../AGENTS.md). Current power is CN8 USB → CN9 pin 3 → JS110 IN+ → OUT+ → CN9 pin 2, with CN9 shunts absent. The current BOOT jumper position demonstrably boots flash; leave it unchanged and select recovery through PE1. Saleae and Joulescope are controlled through APIs.
 
 `cold_experiment.py` records a physical off/on cycle, validates discharge/restoration of all three probed rails, retrieves the completed image, checks byte integrity, and correlates every PE0 event. Correlation begins inside the measured discharged interval so threshold bounce during the preceding power-down cannot be mistaken for a boot. No debugger traffic occurs during the boot/capture interval.
 

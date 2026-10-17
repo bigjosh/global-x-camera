@@ -3,8 +3,10 @@
 `js110_session.py --recovery-output` adds optional OUT0 control to the existing
 single-owner power session. This is an **active-high NMOS interface**, not a direct
 push-pull connection to the MCU. Select `--recovery-interface diode` for the
-user's alternative **active-low diode sink**. The implementation has offline tests; wiring,
-actual GPIO levels and autonomous recovery still require bench verification.
+user's alternative **active-low diode sink**. The powered diode logic matrix
+passed on October 17; analog input margin and autonomous boot-guard qualification
+are separate from that pin-level test. See the
+[bench evidence](../capture-timing/evidence/2026-10-17-diode-recovery-smoke/).
 Without the flag, the helper does not read or write GPIO settings and rejects
 recovery commands. Existing power-control requests retain their behavior.
 
@@ -31,10 +33,10 @@ and the weak pull-up current. Reverse leakage and capacitance also depend on the
 diode. A retained JS110 setting alone does not prove a valid PE1 level.
 
 The disconnected diode lead leaves normal boot selected by the MCU's internal
-pull-up. The JS110 buffer's documented power-off isolation also supports release
-when its external supply is grounded, but the complete connected/unpowered
-instrument behavior remains a bench qualification item; see the shared-supply
-discussion below.
+pull-up. With the diode connected, use the JS110 shared GPIO supply at **3.3 V**:
+OUT0 high releases PE1 for normal boot, and OUT0 low requests recovery.
+The observed supply-off/retained-low combination **did not release PE1**; do not
+use that state as a substitute for OUT0 high.
 The two devices must have a common ground. Do not connect JS110 +5 V to MCU VDD.
 
 ### Can OUT0 float?
@@ -48,41 +50,50 @@ The [JS110 user guide, section 8.10](https://download.joulescope.com/docs/Joules
 identifies the GPIO buffers as SN74LVC2T45. The [TI buffer datasheet](https://www.ti.com/lit/ds/symlink/sn74lvc2t45.pdf)
 guarantees high impedance when either supply is at ground and specifies power-off
 leakage of at most ±1 µA at 25 °C (±2 µA over its specified temperature range).
-Thus bank-off **should** float both outputs if the JS110 supply-off command brings
-that supply to ground. This is an inference from the component specification,
-not yet a measured property of this bench or an explicit JS110 high-impedance
-guarantee. A retained voltage setting is not a physical voltage measurement.
+The JS110 guide also identifies a VEMI45AA-HNH protection/filter on the pins.
+Those component specifications motivated a supply-off test; they do not prove
+that commanding the complete instrument's supply to 0 mV floats its output.
+Neither the internal supply voltage nor direct OUT0 leakage was measured.
 
-Verify release with the target powered: with the bank off and retained OUT0 first
-low then high, PE1 should follow its own weak pull-up and pull-down. Through the
-diode this tests release of PE1, not the direct OUT0 voltage or leakage current.
-First verify the powered diode matrix: pull-up/OUT0-low → low,
-pull-up/OUT0-high → high, pull-down/OUT0-high → low, pull-down/OUT0-low → low.
-The pull-down/high test distinguishes a releasing diode from a direct or shorted
-connection before trying OUT0 high with target power removed.
+The October 17 tests measured these PE1 input-register states on the powered MCU:
 
-On October 17 the initial API read found the shared GPIO supply already set to
-0 mV, both retained outputs low, and target-current range automatic. JS110 IN+
-measured approximately 0 V, so neither this release test nor the diode matrix
-could run. No new recovery firmware was installed. With the bank powered at
-3.3 V, OUT0 high already releases a correctly oriented diode; floating is an
-optional alternative requiring its own verification.
+| Shared GPIO supply setting | PE1 internal pull | OUT0 setting | PE1 readback | Result |
+|---|---|---|---|---|
+| 3300 mV | Up | Low | Low | Pass |
+| 3300 mV | Up | High | High | Pass |
+| 3300 mV | Down | High | Low | Pass |
+| 3300 mV | Down | Low | Low | Pass |
+| 0 mV | Up | Low | Low | **Failed release**; expected high |
 
-The prepared `test_pe1_diode.py` helper runs these powered pin tests through
+All four powered combinations passed in both `pe1-diode-matrix-04` and
+`pe1-diode-matrix-05-active`. The latter completed restoration and an explicit
+final core run. The supply-off test stopped at its first failed row, so its
+remaining combinations were not tested. Through the diode, the successful rows
+establish functional sinking/release and absence of enough sourcing to defeat
+PE1's weak pull-down. They do not measure diode drop, leakage or analog margin.
+The failed row establishes that the tested supply-off/retained-low state is
+unsuitable for releasing recovery. Any alternative floating mode remains a
+separate research question; the operating method is 3.3 V with OUT0 high/low.
+
+The `test_pe1_diode.py` helper runs these powered pin tests through
 the JS110 API and SWD. It requires fresh source voltage of at least 4.5 V,
 the exact completed v25 receiver, an already-enabled GPIOE clock, and exclusive
 bench ownership. It changes only PE1 input/pull fields and the owned JS110 GPIO
-settings; it does not reset, cycle target power or write flash. It restores
-settings and resumes the MCU only after the full test and restoration succeed.
-The helper has offline guard tests but has **not run on this hardware** yet.
+settings; it does not reset, cycle target power or write flash. It checks SRAM
+enables before reading the exact receiver/trace. It verifies halt, DHCSR and the
+exact completed v25 idle PC within one CLI connection, then issues halt within
+every subsequent target read/write connection. Disconnect may resume the idle
+loop, including after a failed test; **persistent halt is not guaranteed**.
+The helper attempts restoration on either outcome and issues an explicit final
+run only after the full matrix and restoration succeed.
 
-Once source power is restored and the other rear GPIO signal pins are confirmed
-disconnected, use a new output directory:
+To repeat the powered matrix with the exact v25 baseline and the other rear GPIO
+signal pins disconnected, use a new output directory:
 
 ```powershell
 python firmware/boot-timing/test_pe1_diode.py `
-  --out tmp/bringup/pe1-diode-matrix-01 `
-  --execute --exclusive-bench --other-gpio-disconnected --test-supply-off
+  --out tmp/bringup/pe1-diode-active-new `
+  --execute --exclusive-bench --other-gpio-disconnected
 ```
 
 This does not install or qualify the early boot guard. Normal/recovery boots,
@@ -199,6 +210,13 @@ can leave recovery asserted for the next boot. For a restored diode low, the fin
 snapshot includes an explicit `restore_warning`. Settings restoration deliberately
 does not promise to leave the boot selection released. Check the final response
 and actual rails before ending an experiment.
+
+Both powered matrix runs started with the shared supply off and retained OUT0
+low, and restored those settings. The failed release test shows why restoring
+that original state can hold PE1 low once its pull-up is enabled and thereby
+request recovery on a later guarded boot. Establish **3300 mV / OUT0 high** before
+requesting normal boot; do not infer normal selection from a successful settings
+restoration or a closed helper session.
 
 ## Driver contract and verification
 

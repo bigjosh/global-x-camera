@@ -1,0 +1,25 @@
+{
+  "passed": false,
+  "driver_version": "2.5.4",
+  "samples": [],
+  "limitations": "Bounded, opt-in powered PE1/JS110 diode wiring test; no reset or power control.\n\nPE1 (CN15.24) is the diode anode, JS110 OUT0 its cathode. Only PE1 input mode\nand weak pulls are changed. IDR observations establish logic behavior, not\nanalog diode drop, noise margin, zero leakage, or target-off backfeed safety.\nThe optional supply-off matrix tests whether the *powered* MCU follows its\nown pulls with the JS110 shared external-I/O supply disabled. It must not be\ndescribed as a target power-off test or assumed to prove a high-impedance pin.\n\nRequires exclusive bench ownership and the exact completed v25 receiver. Saves\nand restores PE1 fields and owned JS110 settings; never writes OUT1 or the\ncurrent range. Failure after halt leaves the core halted. Only an entirely\nsuccessful matrix and restoration resumes it. Importing this module is inert.\n",
+  "reset_flash_power_commands": false,
+  "core_resumed": false,
+  "restore_errors": [],
+  "starting_js": {
+    "s/extio/voltage": 0,
+    "s/gpo/0/value": 0,
+    "s/gpo/1/value": 0,
+    "s/i/range/select": 128,
+    "s/sstats/ctrl": 1
+  },
+  "error": "RuntimeError: CLI call 1 failed; inspect its saved log. No automatic reset/retry.",
+  "final_js": {
+    "s/extio/voltage": 0,
+    "s/gpo/0/value": 0,
+    "s/gpo/1/value": 0,
+    "s/i/range/select": 128,
+    "s/sstats/ctrl": 1
+  },
+  "core_halt_attempted": false
+}

@@ -3,6 +3,7 @@ from pathlib import Path
 from contextlib import redirect_stdout
 import io
 import json
+import struct
 import sys
 import tempfile
 from types import SimpleNamespace
@@ -14,6 +15,120 @@ import test_pe1_diode as smoke
 
 
 class DiodeSmokeGuards(unittest.TestCase):
+    class HaltBench:
+        """Each connection closes with the core running, as observed on bench."""
+        def __init__(self, output, *, halted_dhcsr=0x00130003, pc=0x34302B0C):
+            self.output, self.calls, self.uploads = output, [], []
+            self.halted_dhcsr, self.pc = halted_dhcsr, pc
+            self.values = {smoke.MEMENR: 0xF, smoke.AHB4ENR: 16,
+                           smoke.AHB4RSTR: 0, smoke.MODER: 12, smoke.PUPDR: 0,
+                           smoke.DHCSR: 0x01110000}
+        def bytes(self, address, length):
+            if address == 0x343F0000:
+                words = [0] * 64
+                words[0], words[1], words[5] = 0x43545031, 40, 1
+                return struct.pack('<64I', *words)
+            if address == 0x34300000:
+                return bytes(length)  # Receiver checker is mocked for control-flow tests.
+            return struct.pack('<I', self.values[address])
+        def upload(self, address, length, name):
+            self.uploads.append((address, length))
+            return self.bytes(address, length)
+        def call(self, *args, **kwargs):
+            self.calls.append(args)
+            if args[0] != '-halt':
+                raise AssertionError('Post-check operation must halt in its own command')
+            if '-u' in args:
+                index = args.index('-u')
+                address, length, path = int(args[index+1], 16), int(args[index+2]), args[index+3]
+                data = struct.pack('<I', self.halted_dhcsr) if address == smoke.DHCSR else self.bytes(address, length)
+                Path(path).write_bytes(data)
+            if '-w32' in args:
+                index = args.index('-w32')
+                self.values[int(args[index+1], 16)] = int(args[index+2], 16)
+            return f'PC = 0x{self.pc:08X}\nXPSR = 0x01000000\nCONTROL = 0x0C\nFAULTMASK = 0x00\n'
+
+    def test_halt_and_dhcsr_are_verified_in_one_connection_and_each_access_rehalts(self):
+        with tempfile.TemporaryDirectory() as directory:
+            bench = self.HaltBench(Path(directory))
+            target = smoke.Target(bench)
+            with patch.object(smoke, 'check_receiver'):
+                initial = target.check_and_halt()
+            first = bench.calls[0]
+            self.assertEqual(first[:4], ('-halt', '-u', hex(smoke.DHCSR), '4'))
+            self.assertEqual(first[-1], '-coreReg')
+            self.assertEqual(initial['dhcsr_within_halt_command'], 0x00130003)
+            self.assertTrue(initial['halt_verified_in_command'])
+            self.assertEqual(initial['persistent_halt_after_disconnect'], 'not_guaranteed')
+            uploads_before = len(bench.uploads)
+            target.write_field(smoke.PUPDR, 1, 'test-pull')
+            self.assertEqual(len(bench.uploads), uploads_before)
+            self.assertTrue(all(call[0] == '-halt' for call in bench.calls))
+            self.assertEqual(bench.values[smoke.PUPDR], 4)
+            # Explicit final-running check must not accidentally halt again.
+            self.assertEqual(target.read(smoke.DHCSR, 'running', halt=False), 0x01110000)
+            self.assertEqual(len(bench.uploads), uploads_before + 1)
+
+    def test_same_command_halt_bit_and_exact_idle_pc_are_required_before_mutation(self):
+        for bad in ({'halted_dhcsr': 0x01110000}, {'pc': 0x34301000}):
+            with self.subTest(bad=bad), tempfile.TemporaryDirectory() as directory:
+                bench = self.HaltBench(Path(directory), **bad)
+                target = smoke.Target(bench)
+                with patch.object(smoke, 'check_receiver'), self.assertRaisesRegex(ValueError, 'v25 idle'):
+                    target.check_and_halt()
+                self.assertFalse(target.halt_verified_in_command)
+                self.assertFalse(target.modified)
+                self.assertEqual(len(bench.calls), 1)
+                with self.assertRaises(ValueError):
+                    target.write_field(smoke.PUPDR, 1, 'must-refuse')
+
+    def test_disabled_sram_prevents_any_trace_receiver_or_core_access(self):
+        class Bench:
+            def __init__(self, enabled):
+                self.enabled, self.uploads = enabled, []
+            def upload(self, address, length, name):
+                self.uploads.append((address, length))
+                if address != smoke.MEMENR:
+                    raise AssertionError('Unexpected high-SRAM or other target access')
+                return struct.pack('<I', self.enabled)
+            def call(self, *args, **kwargs):
+                raise AssertionError('No halt or target write allowed with disabled SRAM')
+
+        # Reject a missing bank even if all unrelated enable bits are set.
+        for enabled in (0, 0xFFFFFFFE, 0xFFFFFFFD, 0xFFFFFFFB, 0xFFFFFFF7):
+            with self.subTest(enabled=hex(enabled)):
+                bench = Bench(enabled)
+                target = smoke.Target(bench)
+                with self.assertRaisesRegex(ValueError, 'AXISRAM3..6 must already be enabled'):
+                    target.check_and_halt()
+                self.assertEqual(bench.uploads, [(0x5602824C, 4)])
+                self.assertFalse(target.halt_attempted)
+                self.assertFalse(target.modified)
+
+    def test_memory_is_rechecked_before_receiver_after_valid_trace(self):
+        class Bench:
+            def __init__(self):
+                self.enables, self.uploads = iter((0xF, 0x7)), []
+            def upload(self, address, length, name):
+                self.uploads.append((address, length))
+                if address == smoke.MEMENR:
+                    return struct.pack('<I', next(self.enables))
+                if address == 0x343F0000:
+                    words = [0] * 64
+                    words[0], words[1], words[5] = 0x43545031, 40, 1
+                    return struct.pack('<64I', *words)
+                raise AssertionError('Receiver read must not occur after a bank is disabled')
+            def call(self, *args, **kwargs):
+                raise AssertionError('No core or register mutation permitted')
+
+        bench = Bench()
+        target = smoke.Target(bench)
+        with self.assertRaisesRegex(ValueError, 'RCC_MEMENR=0x00000007'):
+            target.check_and_halt()
+        self.assertEqual(bench.uploads, [(smoke.MEMENR, 4), (0x343F0000, 256),
+                                         (smoke.MEMENR, 4)])
+        self.assertFalse(target.halt_attempted)
+
     def test_source_requires_finite_fresh_complete_window(self):
         good = {'age_s': 0.1, 'voltage': {'min': 4.5, 'avg': 4.8, 'max': 4.9}}
         self.assertIs(smoke.check_supply(good), good)
@@ -106,14 +221,16 @@ class SessionRestorationTests(unittest.TestCase):
             def __init__(self, bench):
                 self.bench = bench
                 self.halt_attempted = False
+                self.halt_verified_in_command = False
                 self.pull = 0
                 self.restored = False
             def check_and_halt(self):
                 self.halt_attempted = True
+                self.halt_verified_in_command = True
                 return {'moder': 3, 'pupdr': 0}
             def write_field(self, address, setting, name):
                 if address == smoke.PUPDR: self.pull = setting
-            def read(self, address, name):
+            def read(self, address, name, **kwargs):
                 if address != smoke.IDR: return 0
                 if bad_diode: return 2
                 if dev.values[smoke.EXTIO_TOPIC] == 0: return 2 if self.pull == 1 else 0

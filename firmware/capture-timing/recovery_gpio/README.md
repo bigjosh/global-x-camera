@@ -1,21 +1,50 @@
-# Early GPIO recovery candidate
+# Early GPIO recovery guard
 
 This offline builder adds a small recovery guard to the exact tested v25 prefix.
 It copies the receiver unchanged. It does not program the board or operate any
-instrument. The user connected a diode sink on October 17; hardware qualification
-is pending.
+instrument. The user connected a diode sink on October 17. The powered pin matrix
+and v34b normal/recovery boot selection have now passed. The v34b recovery park
+retained ROM's enabled instruction cache, so the maintenance checker correctly
+refused it. Revision **v34c** disables and invalidates that cache only on the
+recovery branch. Its normal capture, requested recovery, and autonomous NOR
+maintenance have now passed; see the
+[diode and recovery evidence](../evidence/2026-10-17-diode-recovery-smoke/).
 
-The October 17 bench attempt found approximately 0 V at the JS110 input and all
-three monitored target rails throughout the requested off/on cycle. No firmware
-was written. The power helper stopped cleanly with its initial automatic range
-restored. The previous v25 image remains the last verified installed firmware;
-the v34b guard is built and independently reviewed, but **not installed or
-hardware-qualified**. Compact build and bench facts are in
-[preparation evidence](../evidence/2026-10-17-recovery-preparation/summary.json).
-The subsequent [diode-connection checks](../evidence/2026-10-17-recovery-preparation/diode-followup.json)
-again found IN+ near 0 V and the shared GPIO supply already off. Pin-state and
-normal/recovery tests are still pending; no flash or GPIO settings were changed
-in those checks.
+The earlier approximately-0-V source-power blocker and the then-uninstalled
+candidate are historical preparation results, superseded by the powered tests
+and v34b installation. Their original records remain in
+[preparation evidence](../evidence/2026-10-17-recovery-preparation/summary.json)
+and the [initial diode checks](../evidence/2026-10-17-recovery-preparation/diode-followup.json).
+
+The [guard qualification](../evidence/2026-10-17-diode-recovery-smoke/guard-qualification/)
+established both v34c paths:
+
+- With OUT0 high, the guard recorded normal state 2, PE1 high and 40,002 elapsed
+  DWT cycles. Capture reached stage 40 with one complete frame and passed image
+  integrity checks.
+- With OUT0 low before a cold start, it recorded parked state 3, reason 1, PE1
+  low and 40,004 elapsed cycles. Debug access worked; the exact live prefix and
+  park PC `0x3418078C` matched, `CCR=0x201` confirmed both caches disabled, and
+  XSPI was idle. The low-SRAM NOR INFO operation succeeded.
+- In that same early recovery session, real erase/program operations changed the
+  sector from v34c to v34b and then back to v34c. Both full 65,536-byte readbacks
+  matched their intended images. Each operation reported result 0, flags `0x2F`,
+  changed/erased/completed mask `0x3`, 22 programmed pages and 24 write-enable
+  commands. No boot-jumper change was needed.
+- After restoring v34c, another discharged cold boot captured a recognizable
+  room image with matching byte integrity. The guard recorded PE1 high and
+  40,002 elapsed cycles. The power session closed cleanly; its original settings
+  were restored, then the GPIO supply was deliberately set to 3300 mV and OUT0
+  high for the next normal boot. Reopening the JS110 confirmed those settings,
+  and an MCU input read confirmed PE1 high. Target power remained on in auto
+  range. The final image and raw waveforms remain local; compact evidence is
+  in the qualification directory.
+
+These tests qualify the GPIO escape and flash-maintenance path. They do not add
+the separate delayed-data-receiver D-PHY fix: this guarded image retains the
+v25 camera receiver unchanged. A later final-state record, rather than this
+qualification sequence, establishes which image and output settings are left
+on the board.
 
 PE1 on **CN15 pin 24** is an input with its internal pull-up enabled. With the
 input unconnected or released, execution continues through the original normal
@@ -24,9 +53,19 @@ open-drain sink referred to target ground to prevent a separately powered output
 from feeding an unpowered MCU. The [JS110 interface](../../boot-timing/js110-recovery-output.md)
 supports a small NMOS or the user's diode connection (PE1 anode, OUT0 cathode).
 Select the matching host-helper polarity: diode OUT0 low requests recovery and
-OUT0 high releases it; the NMOS option uses the opposite polarity. Shared GPIO
-supply-off release is a separate, unverified alternative. Electrical qualification
-remains a separate step.
+OUT0 high releases it; the NMOS option uses the opposite polarity. Keep the shared
+GPIO supply at **3300 mV** for diode control. Four powered combinations passed:
+pull-up/OUT0-low read low, pull-up/OUT0-high read high, and both pull-down
+combinations read low. These are functional input readings, not analog-margin
+or leakage measurements.
+
+Commanding the shared supply off with retained OUT0 low **failed to release
+PE1**: its input still read low with its internal pull-up enabled. The remaining
+supply-off combinations were skipped after that failure. Do not use bank-off as
+the normal-boot setting. The helper restores its starting settings, which in
+these tests were bank-off/OUT0-low; successful restoration can therefore leave a
+recovery request for the next boot. Before ending a session intended to leave
+normal boot selected, deliberately establish and verify **3300 mV / OUT0 high**.
 
 The guard is the first C action after the existing minimal vector entry. It
 enables the GPIOE clock, configures only PE1 as input/pull-up, and starts the DWT
@@ -46,6 +85,13 @@ become a maintenance authorization. Debug opening uses the existing volatile
 BSEC settings. **Recovery is a firmware debug park, not the ROM's BOOT1
 development mode.** There is no reset, ROM jump, OTP write, WFI, or BKPT.
 
+On v34c's recovery branch, `SCB_DisableICache()` executes the CMSIS barrier and
+instruction-cache invalidation sequence before entering the park. It clears only
+the instruction-cache enable; it does not disable or clean an unexpectedly
+enabled data cache. Host validation still rejects enabled data cache. Normal
+capture skips this cache operation. The earlier v34b park selected the right
+branch but had `CCR=0x20201`, so it was not authorized for uncached maintenance.
+
 The recovery path precedes expanded-SRAM initialization, sensor setup, receiver
 setup, DMA and the application's NOR read. A maintenance controller must still
 verify the exact live prefix bytes, exact park PC/instruction, CPU context,
@@ -57,7 +103,7 @@ or an asserted input alone does not prove safe maintenance.
 ```powershell
 python firmware/capture-timing/recovery_gpio/build.py `
   --base tmp/bringup/capture-raw10-trim-os-v25-20261017 `
-  --output tmp/bringup/capture-recovery-pe1-v34-20261017
+  --output tmp/bringup/capture-recovery-pe1-new
 ```
 
 The input sector must have SHA-256
@@ -68,9 +114,19 @@ the guard source hashes, generated prefix hashes, status layout and exact
 `fee7` park instruction address. The archived receiver manifest remains
 byte-identical and continues to reference the frozen original source files.
 
-The first v34 build is 4,400 raw prefix bytes versus 4,008 for v25: **392 extra
-bytes**. Its ROM image including header/alignment is 5,440 bytes, still below the
-8 KiB receiver offset. Source size is not a measured boot-time cost.
+| Revision | Raw prefix | Wrapped ROM image | Status |
+|---|---:|---:|---|
+| v25 baseline | 4,008 bytes | 5,056 bytes | Original capture baseline |
+| v34b | 4,400 bytes | 5,440 bytes | Normal capture and requested park passed; enabled I-cache prevented maintenance authorization |
+| v34c | 4,432 bytes | 5,472 bytes | Normal capture, requested uncached park, NOR INFO and real verified erase/program round trip passed |
+
+The v34c full-sector SHA-256 is
+`14b6015e0c5705ce5bde655470977851e32cce01fa0164ccda163b892dca3222`;
+its raw prefix SHA-256 is
+`b22939a1b6c2d30a18043c4c7cfc7f6ac63e53ea15acd9368bf2e1039bc73abe`.
+Its park remains `0x3418078C`. The receiver and all bytes after the new prefix
+remain identical to v25. The prefix is still below the 8 KiB receiver offset.
+Source size is not a measured boot-time cost.
 
 ## Status schema
 
@@ -110,14 +166,17 @@ capacitance and the actual transition must still be checked on the bench.
 
 ## Making this protection permanent
 
-After both normal boot and externally requested recovery are measured, promote
-the reviewed guard hooks to the maintained prefix builder and require recovery
-metadata for newly generated experimental images. Historical frozen builds are
-immutable evidence; rebuilding them does not automatically add this guard.
-The NOR programming workflow should reject a new experimental image lacking a
-reviewed guard unless the specific historical restoration is explicitly
-intended. Receiver experiments should use an already validated guarded prefix
-and retain its startup ordering.
+Future experimental firmware must preserve the reviewed early recovery guard;
+receiver experiments should reuse the qualified guarded prefix and retain its
+startup ordering. v34c's normal, recovery and maintenance paths have been
+qualified on this bench. Historical frozen builds are immutable evidence and
+may lack the guard; restoring one must be an explicit choice.
+
+The dedicated builder inserts and validates the hooks. The generic prefix
+builders and NOR programming workflow do **not yet enforce** guard presence for
+every new image. Adding that enforcement remains implementation work; until it
+exists, review the source, manifest and exact programmed image before each new
+experiment rather than assuming the guard survived a rebuild.
 
 This cannot recover a corrupt boot header, missing/overwritten guard, failure
 before the guard or debug opening, failed hardware, or a closed security

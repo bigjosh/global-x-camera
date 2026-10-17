@@ -9,8 +9,11 @@ described as a target power-off test or assumed to prove a high-impedance pin.
 
 Requires exclusive bench ownership and the exact completed v25 receiver. Saves
 and restores PE1 fields and owned JS110 settings; never writes OUT1 or the
-current range. Failure after halt leaves the core halted. Only an entirely
-successful matrix and restoration resumes it. Importing this module is inert.
+current range. Halt is verified within one CLI connection; CLI disconnect may
+resume the core. Every later target access halts again within its own command.
+The exact v25 completed idle loop may execute between connections, including
+after failure; persistent halt is not promised. Only an entirely successful
+matrix/restoration issues an explicit final run. Importing this module is inert.
 """
 import argparse
 import hashlib
@@ -28,6 +31,12 @@ from nor_bench import Bench
 GPIOE = 0x56021000
 MODER, PUPDR, IDR = GPIOE, GPIOE + 12, GPIOE + 16
 AHB4ENR, AHB4RSTR = 0x5602825C, 0x5602821C
+# STM32N657 CMSIS: RCC secure base 0x56028000, MEMENR offset 0x24C;
+# AXISRAM3EN..AXISRAM6EN are bits 0..3. A disabled SRAM access can stall
+# the debugger transport, so check this live register before every SRAM read.
+MEMENR, LIVE_SRAM_ENABLE_MASK = 0x5602824C, 0xF
+DHCSR = 0xE000EDF0
+V25_IDLE_PCS = (0x34302B0C, 0x34302B0E)  # NOP / branch-to-NOP in frozen v25.
 PIN_MASK, FIELD_MASK = 2, 12
 V25_RECEIVER_SHA = '85313ae05070d80717c29a8a546bf56976930ac1f47b92e4ae70576ae72c940f'
 V25_RECEIVER_BYTES = 11964
@@ -86,23 +95,51 @@ class Target:
         self.bench, self.reads = bench, 0
         self.initial = None
         self.halt_attempted = False
+        self.halt_verified_in_command = False
         self.modified = False
 
-    def read(self, address, name):
+    def halted_upload(self, address, length, name, *extra):
+        path = self.bench.output / name
+        if path.exists():
+            raise FileExistsError(path)
+        text = self.bench.call('-halt', '-u', hex(address), str(length), path, *extra)
+        data = path.read_bytes()
+        if len(data) != length:
+            raise RuntimeError('Incomplete halted upload: ' + str(path))
+        return data, text
+
+    def upload(self, address, length, name, *, halt=None):
+        if halt is None:
+            halt = self.halt_verified_in_command
+        if halt:
+            return self.halted_upload(address, length, name)[0]
+        return self.bench.upload(address, length, name)
+
+    def read(self, address, name, *, halt=None):
         self.reads += 1
-        return struct.unpack('<I', self.bench.upload(address, 4, f'{self.reads:03d}-{name}.bin'))[0]
+        return struct.unpack('<I', self.upload(address, 4, f'{self.reads:03d}-{name}.bin', halt=halt))[0]
 
     def write_field(self, address, setting, name):
+        if not self.halt_verified_in_command:
+            raise ValueError('Target writes require a verified halted v25 idle context')
         current = self.read(address, name + '-before')
         desired = field(current, setting)
         self.modified = True  # A failed CLI may still have changed the register.
-        self.bench.call('-w32', hex(address), hex(desired))
+        self.bench.call('-halt', '-w32', hex(address), hex(desired))
         if self.read(address, name + '-after') != desired:
             raise RuntimeError(name + ' readback differs')
 
+    def upload_live_sram(self, address, length, name):
+        enabled = self.read(MEMENR, 'memory-enable-before-' + name)
+        if enabled & LIVE_SRAM_ENABLE_MASK != LIVE_SRAM_ENABLE_MASK:
+            raise ValueError(
+                f'AXISRAM3..6 must already be enabled before live SRAM access; '
+                f'RCC_MEMENR=0x{enabled:08X}')
+        return self.upload(address, length, name)
+
     def check_and_halt(self):
-        check_trace(self.bench.upload(0x343F0000, 256, 'completed-trace.bin'))
-        check_receiver(self.bench.upload(0x34300000, V25_RECEIVER_BYTES, 'live-receiver.bin'))
+        check_trace(self.upload_live_sram(0x343F0000, 256, 'completed-trace.bin'))
+        check_receiver(self.upload_live_sram(0x34300000, V25_RECEIVER_BYTES, 'live-receiver.bin'))
         enabled, reset = self.read(AHB4ENR, 'clock'), self.read(AHB4RSTR, 'reset')
         if not enabled & 16 or reset & 16:
             raise ValueError('GPIOE must already be clocked and released from reset')
@@ -110,17 +147,24 @@ class Target:
         if (moder >> 2) & 3 not in (0, 3):
             raise ValueError('PE1 must initially be input or analog; no output contention test')
         self.halt_attempted = True
-        text = self.bench.call('-halt', '-coreReg')
+        # A later connection may resume the core. Verify S_HALT and core
+        # context in this same command, rather than a separate DHCSR upload.
+        dhcsr_bytes, text = self.halted_upload(DHCSR, 4, 'halt-context-dhcsr.bin', '-coreReg')
+        dhcsr = struct.unpack('<I', dhcsr_bytes)[0]
         regs = {name: int(value, 16) for name, value in re.findall(
             r'^(PC|XPSR|CONTROL|FAULTMASK)\s*=\s*0x([0-9A-Fa-f]+)', text, re.M)}
-        if (not self.read(0xE000EDF0, 'dhcsr') & (1 << 17) or
+        if (not dhcsr & (1 << 17) or regs.get('PC') not in V25_IDLE_PCS or
                 regs.get('XPSR', 511) & 511 or regs.get('CONTROL', 3) & ~12 or
                 regs.get('FAULTMASK') != 0):
-            raise ValueError('Core halt/privileged Thread context was not confirmed')
-        check_trace(self.bench.upload(0x343F0000, 256, 'halted-trace.bin'))
+            raise ValueError('Core halt/privileged v25 idle Thread context was not confirmed')
+        self.halt_verified_in_command = True
+        check_trace(self.upload_live_sram(0x343F0000, 256, 'halted-trace.bin'))
         if self.read(MODER, 'halted-moder') != moder or self.read(PUPDR, 'halted-pupdr') != pupdr:
             raise ValueError('GPIO configuration changed during halt; no pin changes made')
-        self.initial = {'moder': moder, 'pupdr': pupdr, 'core': regs}
+        self.initial = {'moder': moder, 'pupdr': pupdr, 'core': regs,
+                        'dhcsr_within_halt_command': dhcsr,
+                        'halt_verified_in_command': True,
+                        'persistent_halt_after_disconnect': 'not_guaranteed'}
         return self.initial
 
     def restore(self):
@@ -159,7 +203,8 @@ def run(args, driver_factory, driver_version):
     out.mkdir(parents=True, exist_ok=False)
     result = {'passed': False, 'driver_version': driver_version, 'samples': [],
               'limitations': __doc__, 'reset_flash_power_commands': False,
-              'core_resumed': False, 'restore_errors': []}
+              'core_resumed': False, 'restore_errors': [],
+              'persistent_halt_after_disconnect': 'not_guaranteed'}
     target = Target(Bench(out / 'swd'))
     stats = Statistics()
 
@@ -281,10 +326,11 @@ def run(args, driver_factory, driver_version):
                     result['passed'] = good and not result['restore_errors']
                     if result['passed']:
                         target.bench.call('-run', success='Core run')
-                        if target.read(0xE000EDF0, 'resumed-dhcsr') & (1 << 17):
+                        if target.read(DHCSR, 'resumed-dhcsr', halt=False) & (1 << 17):
                             raise RuntimeError('Core remained halted after resume')
                         result['core_resumed'] = True
                     result['core_halt_attempted'] = target.halt_attempted
+                    result['halt_verified_in_command'] = target.halt_verified_in_command
     except (Exception, KeyboardInterrupt) as exc:
         result['passed'] = False
         result['error'] = type(exc).__name__ + ': ' + str(exc)

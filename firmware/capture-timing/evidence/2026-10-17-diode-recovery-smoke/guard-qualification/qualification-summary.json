@@ -1,0 +1,897 @@
+{
+  "schema": 3,
+  "scope": "Completed v34b and v34c normal/recovery and actual NOR erase/program/readback qualification, followed by a completed normal capture from restored v34c and an observed high PE1 after the JS110 session closed.",
+  "v34b": {
+    "install_readback": {
+      "byte_for_byte_match": true,
+      "bytes": 65536,
+      "sha256": "570657ab294bac79e47c90113c45ef4b2e71f986ab3a1f1cd52fc9895b0fa009",
+      "changed_mask": 3,
+      "erased_mask": 3,
+      "completed_mask": 3,
+      "pages_programmed": 22
+    },
+    "normal_status": {
+      "magic": 1380405297,
+      "schema": 1,
+      "words": 24,
+      "state": 2,
+      "reason": 0,
+      "pin": 262145,
+      "nominal_hz": 400000000,
+      "settle_cycles": 40000,
+      "begin_cycle": 3,
+      "sample_cycle": 40007,
+      "elapsed_cycles": 40004,
+      "polls": 3595,
+      "idr": 2,
+      "moder": 4294967281,
+      "pupdr": 4,
+      "ahb4enr": 270424,
+      "demcr": 17825792,
+      "dwt_ctrl": 2147483649,
+      "control": 0,
+      "ipsr": 0,
+      "primask": 1,
+      "dbgcr": 3025253376,
+      "ap_unlock": 180,
+      "reserved": 0
+    },
+    "captures": [
+      {
+        "source": "diode-guard-install-01/cold",
+        "completed": true,
+        "stage": 40,
+        "frames": 1,
+        "receiver_sha256": "85313ae05070d80717c29a8a546bf56976930ac1f47b92e4ae70576ae72c940f",
+        "image_integrity_matches": true,
+        "camera_error": "0x8000",
+        "visual_qualification_from_capture_script": "pending human/model inspection; statistics alone do not prove a valid image",
+        "timing_events_matched": true,
+        "nrst_to_pd0_ms": 16.179520000001446,
+        "rail_validation": {
+          "passed": true,
+          "common_off_s": 18.192576,
+          "common_off_window_s": [
+            2.340834162,
+            20.533410162
+          ],
+          "final": {
+            "3": {
+              "min_v": 3.268,
+              "max_v": 3.309,
+              "median_v": 3.293
+            },
+            "4": {
+              "min_v": 4.827,
+              "max_v": 4.858,
+              "median_v": 4.852
+            },
+            "5": {
+              "min_v": 3.281,
+              "max_v": 3.287,
+              "median_v": 3.281
+            }
+          },
+          "limitation": "No direct core/always-on rail probe; this proves discharge of the three named rails."
+        }
+      },
+      {
+        "source": "diode-guard-return-normal-01",
+        "completed": true,
+        "stage": 40,
+        "frames": 1,
+        "receiver_sha256": "85313ae05070d80717c29a8a546bf56976930ac1f47b92e4ae70576ae72c940f",
+        "image_integrity_matches": true,
+        "camera_error": "0x8000",
+        "visual_qualification_from_capture_script": "pending human/model inspection; statistics alone do not prove a valid image",
+        "timing_events_matched": true,
+        "nrst_to_pd0_ms": 16.438720000000018,
+        "rail_validation": {
+          "passed": true,
+          "common_off_s": 18.139007999999997,
+          "common_off_window_s": [
+            2.482594162,
+            20.621602162
+          ],
+          "final": {
+            "3": {
+              "min_v": 3.268,
+              "max_v": 3.309,
+              "median_v": 3.293
+            },
+            "4": {
+              "min_v": 4.811,
+              "max_v": 4.852,
+              "median_v": 4.852
+            },
+            "5": {
+              "min_v": 3.281,
+              "max_v": 3.287,
+              "median_v": 3.281
+            }
+          },
+          "limitation": "No direct core/always-on rail probe; this proves discharge of the three named rails."
+        }
+      }
+    ],
+    "requested_recovery": {
+      "status": {
+        "magic": 1380405297,
+        "schema": 1,
+        "words": 24,
+        "state": 3,
+        "reason": 1,
+        "pin": 262145,
+        "nominal_hz": 400000000,
+        "settle_cycles": 40000,
+        "begin_cycle": 3,
+        "sample_cycle": 40005,
+        "elapsed_cycles": 40002,
+        "polls": 3595,
+        "idr": 0,
+        "moder": 4294967281,
+        "pupdr": 4,
+        "ahb4enr": 270424,
+        "demcr": 17825792,
+        "dwt_ctrl": 2147483649,
+        "control": 0,
+        "ipsr": 0,
+        "primask": 1,
+        "dbgcr": 3025253376,
+        "ap_unlock": 180,
+        "reserved": 0
+      },
+      "live_prefix_sha256": "528bd09755a2de84d0eadf497015facebe21da680d502fdbf494bcf7ef4e106f",
+      "context_observed_in_halt_command": {
+        "R0": 3025253376,
+        "R1": 3,
+        "R2": 1,
+        "R3": 874475520,
+        "R4": 40005,
+        "R5": 0,
+        "R6": 0,
+        "R7": 39999,
+        "R8": 0,
+        "R9": 0,
+        "R10": 0,
+        "R11": 0,
+        "R12": 3,
+        "SP": 874020808,
+        "LR": 873990399,
+        "PC": 873990028,
+        "XPSR": 16777216,
+        "MSP": 874020808,
+        "PSP": 873478128,
+        "PRIMASK": 1,
+        "FAULTMASK": 0,
+        "BASEPRI": 0,
+        "CONTROL": 0
+      },
+      "ccr": "0x20201",
+      "fpccr": "0xc0000004",
+      "input_recovery_park_observed": true,
+      "maintenance_qualification_passed": false,
+      "maintenance_rejection": "CCR.IC remains enabled (CCR 0x20201); check_park correctly rejected the context before XSPI/NOR actions. No successful result.json exists for this run.",
+      "persistent_halt_after_disconnect": "not_guaranteed",
+      "rail_validation": {
+        "passed": true,
+        "common_off_s": 18.082208,
+        "common_off_window_s": [
+          16.093026162,
+          34.175234162
+        ],
+        "final": {
+          "3": {
+            "min_v": 3.268,
+            "max_v": 3.314,
+            "median_v": 3.293
+          },
+          "4": {
+            "min_v": 4.811,
+            "max_v": 4.847,
+            "median_v": 4.832
+          },
+          "5": {
+            "min_v": 3.281,
+            "max_v": 3.287,
+            "median_v": 3.281
+          }
+        },
+        "limitation": "No direct core/always-on rail probe; this proves discharge of the three named rails."
+      },
+      "boot_summary": {
+        "references": {
+          "ch3": "auxiliary 3.3 V crossing 2.97 V",
+          "ch4": "target 5 V crossing 4.50 V"
+        },
+        "analog_sample_spacing_us": 32.000000000000774,
+        "digital_sample_spacing_us": 0.16,
+        "cycles": [
+          {
+            "target_5v_4_5v_crossing_s": 34.198658162,
+            "aux_3v3_2_97v_crossing_s": 34.190498162,
+            "nrst_rise_s": 34.187424,
+            "pd0_rise_s": 34.20349264,
+            "pe0_rise_s": null,
+            "target_5v_to_pd0_ms": 4.834477999999365,
+            "aux_3v3_to_pd0_ms": 12.994478000003085,
+            "nrst_to_pd0_ms": 16.0686400000003,
+            "preceding_observed_off_s": {
+              "3": 18.093088,
+              "4": 19.630656000000002
+            }
+          }
+        ],
+        "limitations": [
+          "No MCU PGOOD or always-on/core rail probe in this channel map.",
+          "Observed off intervals do not alone prove every MCU rail was discharged.",
+          "Off means samples below 0.1 V on the named rail; a single low sample can arm a crossing.",
+          "Analog spacing is measured from the CSV; digital spacing requires capture-config.json.",
+          "Timing is for this image and this board supply setup."
+        ]
+      }
+    }
+  },
+  "v34c": {
+    "qualification_status": "completed: normal capture, requested early recovery, NOR INFO, actual erase/program/readback round trip, final restored normal capture, and post-session PE1 high",
+    "sector_sha256": "14b6015e0c5705ce5bde655470977851e32cce01fa0164ccda163b892dca3222",
+    "install_readback": {
+      "byte_for_byte_match": true,
+      "bytes": 65536,
+      "sha256": "14b6015e0c5705ce5bde655470977851e32cce01fa0164ccda163b892dca3222",
+      "changed_mask": 3,
+      "erased_mask": 3,
+      "completed_mask": 3,
+      "pages_programmed": 22
+    },
+    "normal_status": {
+      "magic": 1380405297,
+      "schema": 1,
+      "words": 24,
+      "state": 2,
+      "reason": 0,
+      "pin": 262145,
+      "nominal_hz": 400000000,
+      "settle_cycles": 40000,
+      "begin_cycle": 3,
+      "sample_cycle": 40005,
+      "elapsed_cycles": 40002,
+      "polls": 3595,
+      "idr": 2,
+      "moder": 4294967281,
+      "pupdr": 4,
+      "ahb4enr": 270424,
+      "demcr": 17825792,
+      "dwt_ctrl": 2147483649,
+      "control": 0,
+      "ipsr": 0,
+      "primask": 1,
+      "dbgcr": 3025253376,
+      "ap_unlock": 180,
+      "reserved": 0
+    },
+    "initial_normal_capture": {
+      "source": "diode-guard-cachefix-install-01/cold",
+      "completed": true,
+      "stage": 40,
+      "frames": 1,
+      "receiver_sha256": "85313ae05070d80717c29a8a546bf56976930ac1f47b92e4ae70576ae72c940f",
+      "image_integrity_matches": true,
+      "camera_error": "0x8000",
+      "timing_events_matched": true,
+      "nrst_to_pd0_ms": 16.31663999999944,
+      "rail_validation": {
+        "passed": true,
+        "common_off_s": 18.217472,
+        "common_off_window_s": [
+          2.282498162,
+          20.499970162
+        ],
+        "final": {
+          "3": {
+            "min_v": 3.268,
+            "max_v": 3.309,
+            "median_v": 3.293
+          },
+          "4": {
+            "min_v": 4.827,
+            "max_v": 4.852,
+            "median_v": 4.852
+          },
+          "5": {
+            "min_v": 3.281,
+            "max_v": 3.287,
+            "median_v": 3.281
+          }
+        },
+        "limitation": "No direct core/always-on rail probe; this proves discharge of the three named rails."
+      }
+    },
+    "requested_recovery": {
+      "park_check": {
+        "passed": true,
+        "status": {
+          "magic": 1380405297,
+          "schema": 1,
+          "words": 24,
+          "state": 3,
+          "reason": 1,
+          "pin": 262145,
+          "nominal_hz": 400000000,
+          "settle_cycles": 40000,
+          "begin_cycle": 3,
+          "sample_cycle": 40007,
+          "elapsed_cycles": 40004,
+          "polls": 3595,
+          "idr": 0,
+          "moder": 4294967281,
+          "pupdr": 4,
+          "ahb4enr": 270424,
+          "demcr": 17825792,
+          "dwt_ctrl": 2147483649,
+          "control": 0,
+          "ipsr": 0,
+          "primask": 1,
+          "dbgcr": 3025253376,
+          "ap_unlock": 180,
+          "reserved": 0
+        },
+        "context": {
+          "PC": 873990028,
+          "XPSR": 1090519040,
+          "PRIMASK": 1,
+          "FAULTMASK": 0,
+          "CONTROL": 0
+        },
+        "ccr": 513,
+        "fpccr": 3221225476,
+        "prefix_sha256": "b22939a1b6c2d30a18043c4c7cfc7f6ac63e53ea15acd9368bf2e1039bc73abe",
+        "xspi_sr": 2,
+        "halt_requested": true,
+        "park_context_observed_in_halt_command": true,
+        "persistent_halt_after_disconnect": "not_guaranteed",
+        "post_disconnect_execution": "may resume the exact verified branch-to-self park",
+        "ram_writes": false,
+        "nor_commands": false,
+        "next_step": "Reviewed low-SRAM nor_bench INFO, then separately guarded WRITE"
+      },
+      "rail_validation": {
+        "passed": true,
+        "common_off_s": 18.249087999999997,
+        "common_off_window_s": [
+          16.280930162,
+          34.530018162
+        ],
+        "final": {
+          "3": {
+            "min_v": 3.268,
+            "max_v": 3.309,
+            "median_v": 3.293
+          },
+          "4": {
+            "min_v": 4.811,
+            "max_v": 4.847,
+            "median_v": 4.832
+          },
+          "5": {
+            "min_v": 3.281,
+            "max_v": 3.287,
+            "median_v": 3.287
+          }
+        },
+        "limitation": "No direct core/always-on rail probe; this proves discharge of the three named rails."
+      },
+      "boot_summary": {
+        "references": {
+          "ch3": "auxiliary 3.3 V crossing 2.97 V",
+          "ch4": "target 5 V crossing 4.50 V"
+        },
+        "analog_sample_spacing_us": 32.000000000000774,
+        "digital_sample_spacing_us": 0.16,
+        "cycles": [
+          {
+            "target_5v_4_5v_crossing_s": 34.553474162,
+            "aux_3v3_2_97v_crossing_s": 34.545346162,
+            "nrst_rise_s": 34.54222688,
+            "pd0_rise_s": 34.55832592,
+            "pe0_rise_s": null,
+            "target_5v_to_pd0_ms": 4.8517580000009275,
+            "aux_3v3_to_pd0_ms": 12.979758000000174,
+            "nrst_to_pd0_ms": 16.099040000000286,
+            "preceding_observed_off_s": {
+              "3": 0.0,
+              "4": 19.728671999999996
+            }
+          }
+        ],
+        "limitations": [
+          "No MCU PGOOD or always-on/core rail probe in this channel map.",
+          "Observed off intervals do not alone prove every MCU rail was discharged.",
+          "Off means samples below 0.1 V on the named rail; a single low sample can arm a crossing.",
+          "Analog spacing is measured from the CSV; digital spacing requires capture-config.json.",
+          "Timing is for this image and this board supply setup."
+        ]
+      }
+    },
+    "nor_info": {
+      "magic": 1146048069,
+      "result": 0,
+      "sequence": 3620,
+      "command": 2,
+      "stage": 12,
+      "address": 0,
+      "transfer_count": 3,
+      "polls": 125,
+      "last_sr": 2,
+      "nor_status": 0,
+      "nor_security": 0,
+      "jedec_id": 12746810,
+      "changed_mask": 0,
+      "erased_mask": 0,
+      "completed_mask": 0,
+      "pages_programmed": 0,
+      "current_crc": 0,
+      "input_crc": 0,
+      "final_crc": 0,
+      "expected_current_crc": 0,
+      "expected_input_crc": 0,
+      "flags": 39,
+      "failure_stage": 0,
+      "failure_address": 0,
+      "failure_opcode": 0,
+      "last_opcode": 159,
+      "control": 0,
+      "ipsr": 0,
+      "cpu_ccr": 513,
+      "old_msp": 874020808,
+      "old_msplim": 0,
+      "ahb5enr": 8224,
+      "ahb5rstr": 0,
+      "mux_cr": 2,
+      "original_cr": 268435457,
+      "original_dcr1": 2031616,
+      "original_dcr2": 1,
+      "original_sr": 2,
+      "original_ccr": 16785665,
+      "original_tcr": 8,
+      "original_ir": 11,
+      "original_dlr": 4895,
+      "original_ar": 576,
+      "cfgr1": 858980352,
+      "cfgr2": 1048576,
+      "pll1cfgr1": 4213504,
+      "pll1cfgr2": 0,
+      "pll1cfgr3": 1224736773,
+      "dwt_initial": 1562073950,
+      "dwt_final": 1562105743,
+      "dwt_advance": 3,
+      "cleanup_result": 0,
+      "first_mismatch": 4294967295,
+      "wren_count": 0,
+      "transaction_count": 3,
+      "max_wip_cycles": 0
+    },
+    "actual_flash_rewrite_round_trip": [
+      {
+        "source": "diode-v34c-recovery-write-v34b-01",
+        "request": {
+          "operation": "write",
+          "sequence": 3621,
+          "command": [
+            1313821252,
+            3621,
+            3,
+            65536,
+            0,
+            1465010516,
+            2542772150,
+            2802705398
+          ],
+          "helper_sha256": "2dd98e8facd32426b622cb4dc023f4efac5315a7f5d336379066bda43db06909",
+          "current_sha256": "14b6015e0c5705ce5bde655470977851e32cce01fa0164ccda163b892dca3222",
+          "desired_sha256": "570657ab294bac79e47c90113c45ef4b2e71f986ab3a1f1cd52fc9895b0fa009",
+          "current_source": "tmp\\bringup\\capture-recovery-pe1-v34c-20261017\\staged\\capture_sector_0.bin",
+          "desired_source": "tmp\\bringup\\capture-recovery-pe1-v34b-20261017\\staged\\capture_sector_0.bin"
+        },
+        "status": {
+          "magic": 1146048069,
+          "result": 0,
+          "sequence": 3621,
+          "command": 3,
+          "stage": 12,
+          "address": 0,
+          "transfer_count": 1,
+          "polls": 232425,
+          "last_sr": 2,
+          "nor_status": 0,
+          "nor_security": 0,
+          "jedec_id": 12746810,
+          "changed_mask": 3,
+          "erased_mask": 3,
+          "completed_mask": 3,
+          "pages_programmed": 22,
+          "current_crc": 2542772150,
+          "input_crc": 2802705398,
+          "final_crc": 2802705398,
+          "expected_current_crc": 2542772150,
+          "expected_input_crc": 2802705398,
+          "flags": 47,
+          "failure_stage": 0,
+          "failure_address": 0,
+          "failure_opcode": 0,
+          "last_opcode": 5,
+          "control": 0,
+          "ipsr": 0,
+          "cpu_ccr": 513,
+          "old_msp": 874217400,
+          "old_msplim": 0,
+          "ahb5enr": 8224,
+          "ahb5rstr": 0,
+          "mux_cr": 2,
+          "original_cr": 268435457,
+          "original_dcr1": 2031616,
+          "original_dcr2": 1,
+          "original_sr": 0,
+          "original_ccr": 16785665,
+          "original_tcr": 8,
+          "original_ir": 11,
+          "original_dlr": 4895,
+          "original_ar": 576,
+          "cfgr1": 858980352,
+          "cfgr2": 1048576,
+          "pll1cfgr1": 4213504,
+          "pll1cfgr2": 0,
+          "pll1cfgr3": 1224736773,
+          "dwt_initial": 3270383678,
+          "dwt_final": 3457539531,
+          "dwt_advance": 3,
+          "cleanup_result": 0,
+          "first_mismatch": 4294967295,
+          "wren_count": 24,
+          "transaction_count": 2021,
+          "max_wip_cycles": 8717771
+        },
+        "verification": {
+          "byte_for_byte_match": true,
+          "bytes": 65536,
+          "sha256": "570657ab294bac79e47c90113c45ef4b2e71f986ab3a1f1cd52fc9895b0fa009",
+          "changed_mask": 3,
+          "erased_mask": 3,
+          "completed_mask": 3,
+          "pages_programmed": 22
+        },
+        "independent_readback_sha256": "570657ab294bac79e47c90113c45ef4b2e71f986ab3a1f1cd52fc9895b0fa009",
+        "all_cli_returncodes_zero": true,
+        "reset_command_in_recorded_cli_calls": false,
+        "first_call_utc": "2026-10-17T19:26:30.910382+00:00",
+        "last_call_utc": "2026-10-17T19:26:33.626481+00:00"
+      },
+      {
+        "source": "diode-v34c-recovery-restore-v34c-01",
+        "request": {
+          "operation": "write",
+          "sequence": 3622,
+          "command": [
+            1313821252,
+            3622,
+            3,
+            65536,
+            0,
+            1465010516,
+            2802705398,
+            2542772150
+          ],
+          "helper_sha256": "2dd98e8facd32426b622cb4dc023f4efac5315a7f5d336379066bda43db06909",
+          "current_sha256": "570657ab294bac79e47c90113c45ef4b2e71f986ab3a1f1cd52fc9895b0fa009",
+          "desired_sha256": "14b6015e0c5705ce5bde655470977851e32cce01fa0164ccda163b892dca3222",
+          "current_source": "tmp\\bringup\\capture-recovery-pe1-v34b-20261017\\staged\\capture_sector_0.bin",
+          "desired_source": "tmp\\bringup\\capture-recovery-pe1-v34c-20261017\\staged\\capture_sector_0.bin"
+        },
+        "status": {
+          "magic": 1146048069,
+          "result": 0,
+          "sequence": 3622,
+          "command": 3,
+          "stage": 12,
+          "address": 0,
+          "transfer_count": 1,
+          "polls": 233122,
+          "last_sr": 2,
+          "nor_status": 0,
+          "nor_security": 0,
+          "jedec_id": 12746810,
+          "changed_mask": 3,
+          "erased_mask": 3,
+          "completed_mask": 3,
+          "pages_programmed": 22,
+          "current_crc": 2802705398,
+          "input_crc": 2542772150,
+          "final_crc": 2542772150,
+          "expected_current_crc": 2802705398,
+          "expected_input_crc": 2542772150,
+          "flags": 47,
+          "failure_stage": 0,
+          "failure_address": 0,
+          "failure_opcode": 0,
+          "last_opcode": 5,
+          "control": 0,
+          "ipsr": 0,
+          "cpu_ccr": 513,
+          "old_msp": 874217400,
+          "old_msplim": 0,
+          "ahb5enr": 8224,
+          "ahb5rstr": 0,
+          "mux_cr": 2,
+          "original_cr": 268435457,
+          "original_dcr1": 2031616,
+          "original_dcr2": 1,
+          "original_sr": 0,
+          "original_ccr": 16785665,
+          "original_tcr": 8,
+          "original_ir": 11,
+          "original_dlr": 4895,
+          "original_ar": 0,
+          "cfgr1": 858980352,
+          "cfgr2": 1048576,
+          "pll1cfgr1": 4213504,
+          "pll1cfgr2": 0,
+          "pll1cfgr3": 1224736773,
+          "dwt_initial": 2643097178,
+          "dwt_final": 2830421655,
+          "dwt_advance": 3,
+          "cleanup_result": 0,
+          "first_mismatch": 4294967295,
+          "wren_count": 24,
+          "transaction_count": 2038,
+          "max_wip_cycles": 8888315
+        },
+        "verification": {
+          "byte_for_byte_match": true,
+          "bytes": 65536,
+          "sha256": "14b6015e0c5705ce5bde655470977851e32cce01fa0164ccda163b892dca3222",
+          "changed_mask": 3,
+          "erased_mask": 3,
+          "completed_mask": 3,
+          "pages_programmed": 22
+        },
+        "independent_readback_sha256": "14b6015e0c5705ce5bde655470977851e32cce01fa0164ccda163b892dca3222",
+        "all_cli_returncodes_zero": true,
+        "reset_command_in_recorded_cli_calls": false,
+        "first_call_utc": "2026-10-17T19:26:40.527754+00:00",
+        "last_call_utc": "2026-10-17T19:26:43.208378+00:00"
+      }
+    ],
+    "round_trip_interpretation": "Both operations changed and erased mask 3, programmed 22 pages, issued 24 WREN commands, and independently matched all 65536 desired bytes. This exercised actual flash modification, not a no-op write. Recorded CLI calls contain no reset command; root reports no reboot/power cycle between the two writes. Final flash readback is v34c.",
+    "final_normal_capture": {
+      "status": "passed",
+      "source": "diode-v34c-final-normal-01",
+      "completed": true,
+      "stage": 40,
+      "frames": 1,
+      "receiver_sha256": "85313ae05070d80717c29a8a546bf56976930ac1f47b92e4ae70576ae72c940f",
+      "image_integrity_matches": true,
+      "camera_error": "0x8000",
+      "timing_events_matched": true,
+      "nrst_to_pd0_ms": 16.32048000000097,
+      "first_event50_after_nrst_ms": 24.054559999999725,
+      "event50_meaning": "PA0 rising-edge callback observed via PE0 event marker; this includes logging/interrupt latency and is not by itself qualified exposure timing.",
+      "exposure_qualified_by_timing_script": false,
+      "rail_validation": {
+        "passed": true,
+        "common_off_s": 18.151456,
+        "common_off_window_s": [
+          2.224546162,
+          20.376002162
+        ],
+        "final": {
+          "3": {
+            "min_v": 3.268,
+            "max_v": 3.314,
+            "median_v": 3.293
+          },
+          "4": {
+            "min_v": 4.827,
+            "max_v": 4.852,
+            "median_v": 4.852
+          },
+          "5": {
+            "min_v": 3.276,
+            "max_v": 3.287,
+            "median_v": 3.281
+          }
+        },
+        "limitation": "No direct core/always-on rail probe; this proves discharge of the three named rails."
+      },
+      "visual_check": {
+        "reviewer": "root hardware controller",
+        "reported_result": "Clear recognizable room lights and furniture; not blank.",
+        "image_source": "tmp/bringup/diode-v34c-final-normal-01/ram/frame.png",
+        "image_sha256": "71b07025d333f3f1b3f24fd97b3cf264f9de830279dd61994e1a97e24c83257d",
+        "image_not_copied": true
+      },
+      "guard_status": {
+        "magic": 1380405297,
+        "schema": 1,
+        "words": 24,
+        "state": 2,
+        "reason": 0,
+        "pin": 262145,
+        "nominal_hz": 400000000,
+        "settle_cycles": 40000,
+        "begin_cycle": 3,
+        "sample_cycle": 40005,
+        "elapsed_cycles": 40002,
+        "polls": 3595,
+        "idr": 2,
+        "moder": 4294967281,
+        "pupdr": 4,
+        "ahb4enr": 270424,
+        "demcr": 17825792,
+        "dwt_ctrl": 2147483649,
+        "control": 0,
+        "ipsr": 0,
+        "primask": 1,
+        "dbgcr": 3025253376,
+        "ap_unlock": 180,
+        "reserved": 0
+      }
+    },
+    "immutable_build_manifest_note": "Build manifest describes the pre-test state as untested/pending. Preserve it byte-for-byte; this qualification summary and archived hardware results record the later measured outcome."
+  },
+  "limitations": [
+    "No analog PE1/Vf or input-noise-margin measurement.",
+    "Cold discharge evidence covers the three probed rails, not every internal MCU rail.",
+    "Normal capture retains the previously observed 0x8000 camera startup error; completed capture is not zero-error qualification.",
+    "No raw frames, photos, captures, or CSV exports are copied into this compact archive.",
+    "Guard input behaviour and safe maintenance context are distinct qualification steps.",
+    "Final first-event50 delay is correlation evidence; the timing script does not claim independently qualified exposure timing."
+  ],
+  "final_bench_state": {
+    "qualified_flash_image": "v34c",
+    "verified_sector_sha256": "14b6015e0c5705ce5bde655470977851e32cce01fa0164ccda163b892dca3222",
+    "last_capture_complete": true,
+    "owned_js_session_stopped": {
+      "event": "stopped",
+      "utc": "2026-10-17T19:28:08.118072+00:00",
+      "monotonic_ns": 2137607703000000,
+      "id": "7b3b221d-0fb4-4bde-b145-15ec593413b2",
+      "reason": "stop",
+      "ok": true,
+      "starting_range": 128,
+      "range": 128,
+      "restore_error": null,
+      "stream": null,
+      "statistics": {
+        "received": {
+          "utc": "2026-10-17T19:28:07.899797+00:00",
+          "monotonic_ns": 2137607484000000
+        },
+        "voltage_location": "IN+ relative to IN-",
+        "voltage": {
+          "units": "V",
+          "avg": 4.886054992675781,
+          "min": 4.865089416503906,
+          "max": 4.895729064941406
+        },
+        "current": {
+          "units": "A",
+          "avg": 0.10773684084415436,
+          "min": 0.0911652147769928,
+          "max": 0.13356973975896835
+        },
+        "power": {
+          "units": "W",
+          "avg": 0.5264052493148483,
+          "min": 0.4449753761291504,
+          "max": 0.6510462760925293
+        },
+        "sequence": 1447,
+        "age_s": 0.219
+      },
+      "starting_recovery_settings": {
+        "s/extio/voltage": 0,
+        "s/gpo/0/value": 0,
+        "s/gpo/1/value": 0
+      },
+      "recovery_output": {
+        "scope": "retained_settings_not_measured_pins",
+        "interface": "active_low_diode",
+        "extio_voltage_mv": 0,
+        "gpo0": 0,
+        "gpo1": 0,
+        "asserted": true,
+        "restore_warning": "Restored OUT0=0 is the diode interface's recovery polarity; the next boot may enter recovery. Retained settings are not measured pin levels."
+      },
+      "recovery_restore_errors": []
+    },
+    "route_restore": [
+      {
+        "event": "unused_routes_before",
+        "values": {
+          "s/i/lsb_src": 2,
+          "s/v/lsb_src": 3
+        },
+        "utc": "2026-10-17T19:16:04.476908+00:00",
+        "monotonic_ns": 2136884062000000
+      },
+      {
+        "event": "unused_routes_restored",
+        "values": {
+          "s/i/lsb_src": 2,
+          "s/v/lsb_src": 3
+        },
+        "errors": [],
+        "utc": "2026-10-17T19:28:08.160621+00:00",
+        "monotonic_ns": 2137607750000000
+      }
+    ],
+    "intentional_final_js_state": {
+      "utc": "2026-10-17T19:28:20.425122+00:00",
+      "intent": "Leave normal flash boot selected through tested diode interface; deliberate change from original off/low settings",
+      "before": {
+        "s/i/range/select": 128,
+        "s/extio/voltage": 0,
+        "s/gpo/0/value": 0,
+        "s/gpo/1/value": 0,
+        "s/gpi/0/ctrl": 0,
+        "s/gpi/1/ctrl": 0,
+        "s/i/lsb_src": 2,
+        "s/v/lsb_src": 3
+      },
+      "after": {
+        "s/i/range/select": 128,
+        "s/extio/voltage": 3300,
+        "s/gpo/0/value": 1,
+        "s/gpo/1/value": 0,
+        "s/gpi/0/ctrl": 0,
+        "s/gpi/1/ctrl": 0,
+        "s/i/lsb_src": 2,
+        "s/v/lsb_src": 3
+      },
+      "reopened": {
+        "s/i/range/select": 128,
+        "s/extio/voltage": 3300,
+        "s/gpo/0/value": 1,
+        "s/gpo/1/value": 0,
+        "s/gpi/0/ctrl": 0,
+        "s/gpi/1/ctrl": 0,
+        "s/i/lsb_src": 2,
+        "s/v/lsb_src": 3
+      },
+      "passed": true,
+      "power_changed": false,
+      "limitation": "Retained settings, not an analog pin measurement"
+    },
+    "physical_digital_input_after_session_close": {
+      "passed": true,
+      "ahb4enr": 286811,
+      "ahb4rstr": 0,
+      "moder": 4294967281,
+      "pupdr": 4,
+      "idr": 2,
+      "pe1": 1,
+      "meaning": "Normal-boot selection physically reads high after JS session closed and final retained settings applied",
+      "target_power_unchanged": true,
+      "previous_attempt": "diode-final-pe1-01 mistakenly read RCC+0x258 rather than AHB4ENR+0x25C; stopped on clock assertion before any GPIO access or mutation"
+    },
+    "first_final_pin_read_attempt": {
+      "source": "diode-final-pe1-01",
+      "outcome": "Incorrect RCC address 0x56028258 read; clock assertion stopped the attempt before GPIO reads or mutations. Correct AHB4ENR address 0x5602825C used for the successful second attempt.",
+      "recorded_cli_calls": 1,
+      "register_read_only": true
+    },
+    "power_cycle_since_final_capture": false,
+    "limitations": [
+      "Retained JS settings were re-opened and verified; PE1 high was independently observed through MCU IDR. This is not an analog PE1 voltage/noise-margin measurement.",
+      "Session stop originally restored supply-off/OUT0-low settings. The final 3300 mV/OUT0-high state is a deliberate subsequent normal-boot selection; OUT1, input routes and current range remained unchanged."
+    ]
+  },
+  "offline_regression_report": {
+    "reported_by": "root",
+    "tests_passed": 99,
+    "boot_tests": 58,
+    "capture_tests": 41,
+    "independently_rerun_by_evidence_collector": false
+  }
+}

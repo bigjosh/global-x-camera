@@ -1,0 +1,188 @@
+{
+  "schema": 1,
+  "reviewed_utc": "2026-10-17T19:10:33.464372+00:00",
+  "scope": "Independent offline extraction of existing root-controller captures; no hardware access. This is a failed-boot diagnostic checkpoint, not completed diode/recovery qualification.",
+  "matrix_attempts": [
+    {
+      "name": "pe1-diode-matrix-01",
+      "passed": false,
+      "samples": 0,
+      "core_halt_attempted": false,
+      "error": "ValueError: Shared supply change refused with OUT1 high or another GPIO route active",
+      "restore_errors": []
+    },
+    {
+      "name": "pe1-diode-matrix-02",
+      "passed": false,
+      "samples": 0,
+      "core_halt_attempted": false,
+      "error": "RuntimeError: CLI call 1 failed; inspect its saved log. No automatic reset/retry.",
+      "restore_errors": []
+    }
+  ],
+  "cold_cycle": {
+    "name": "diode-baseline-cold-01",
+    "longest_common_off_3_rails": {
+      "start_s": 2.448578162,
+      "end_s": 20.495042162,
+      "duration_s": 18.046464
+    },
+    "nrst_pulses": [
+      {
+        "fall_s": 0.27506128,
+        "rise_s": 20.50717776,
+        "duration_s": 20.232116480000002
+      }
+    ]
+  },
+  "reset_attempts": [
+    {
+      "name": "diode-powered-release-reset-01",
+      "observed_complete_nrst_pulses": []
+    },
+    {
+      "name": "diode-powered-release-reset-02",
+      "observed_complete_nrst_pulses": []
+    },
+    {
+      "name": "diode-powered-release-reset-03",
+      "observed_complete_nrst_pulses": [
+        {
+          "fall_s": 2.40647504,
+          "rise_s": 2.41719488,
+          "duration_s": 0.010719839999999703
+        }
+      ]
+    }
+  ],
+  "all_five_captures_pd0_pe0_stay_low": true,
+  "final_rail_ranges": [
+    {
+      "name": "diode-powered-static-01",
+      "window_s": [
+        0.013218162,
+        2.013218162
+      ],
+      "rails": {
+        "3": {
+          "min_v": 3.268,
+          "max_v": 3.314,
+          "median_v": 3.293
+        },
+        "4": {
+          "min_v": 4.827,
+          "max_v": 4.873,
+          "median_v": 4.852
+        },
+        "5": {
+          "min_v": 3.281,
+          "max_v": 3.287,
+          "median_v": 3.287
+        }
+      }
+    },
+    {
+      "name": "diode-baseline-cold-01",
+      "window_s": [
+        20.984738162,
+        22.984738162
+      ],
+      "rails": {
+        "3": {
+          "min_v": 3.268,
+          "max_v": 3.314,
+          "median_v": 3.293
+        },
+        "4": {
+          "min_v": 4.827,
+          "max_v": 4.873,
+          "median_v": 4.852
+        },
+        "5": {
+          "min_v": 3.281,
+          "max_v": 3.287,
+          "median_v": 3.281
+        }
+      }
+    },
+    {
+      "name": "diode-powered-release-reset-01",
+      "window_s": [
+        3.335106162,
+        5.335106162
+      ],
+      "rails": {
+        "3": {
+          "min_v": 3.268,
+          "max_v": 3.314,
+          "median_v": 3.293
+        },
+        "4": {
+          "min_v": 4.847,
+          "max_v": 4.873,
+          "median_v": 4.873
+        },
+        "5": {
+          "min_v": 3.281,
+          "max_v": 3.287,
+          "median_v": 3.287
+        }
+      }
+    },
+    {
+      "name": "diode-powered-release-reset-02",
+      "window_s": [
+        3.234498162,
+        5.234466162
+      ],
+      "rails": {
+        "3": {
+          "min_v": 3.268,
+          "max_v": 3.314,
+          "median_v": 3.293
+        },
+        "4": {
+          "min_v": 4.827,
+          "max_v": 4.873,
+          "median_v": 4.852
+        },
+        "5": {
+          "min_v": 3.281,
+          "max_v": 3.287,
+          "median_v": 3.287
+        }
+      }
+    },
+    {
+      "name": "diode-powered-release-reset-03",
+      "window_s": [
+        3.637122162,
+        5.637122162
+      ],
+      "rails": {
+        "3": {
+          "min_v": 3.268,
+          "max_v": 3.314,
+          "median_v": 3.293
+        },
+        "4": {
+          "min_v": 4.827,
+          "max_v": 4.873,
+          "median_v": 4.868
+        },
+        "5": {
+          "min_v": 3.281,
+          "max_v": 3.287,
+          "median_v": 3.287
+        }
+      }
+    }
+  ],
+  "limitations": [
+    "Only probed rails were checked; no conclusion about every MCU/camera supply.",
+    "No PE1 analog or digital measurement exists in these captures; diode orientation, forward drop, output isolation and recovery selection remain unverified.",
+    "Retained JS110 GPIO settings in copied results are not measured voltages.",
+    "NRST timing is a sampled threshold observation; reset commands alone are not evidence of a physical pulse.",
+    "No PD0/PE0 activity does not determine ROM boot mode, prove flash corruption, or establish the cause of failed startup."
+  ]
+}

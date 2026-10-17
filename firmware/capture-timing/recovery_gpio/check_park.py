@@ -26,6 +26,9 @@ APPROVED = {
     '528bd09755a2de84d0eadf497015facebe21da680d502fdbf494bcf7ef4e106f':
         {'bytes': 4400, 'park': 0x3418078C,
          'sector': '570657ab294bac79e47c90113c45ef4b2e71f986ab3a1f1cd52fc9895b0fa009'},
+    'b22939a1b6c2d30a18043c4c7cfc7f6ac63e53ea15acd9368bf2e1039bc73abe':
+        {'bytes': 4432, 'park': 0x3418078C,
+         'sector': '14b6015e0c5705ce5bde655470977851e32cce01fa0164ccda163b892dca3222'},
 }
 
 
@@ -105,12 +108,16 @@ def main():
     sr = word(0x58025020, 'xspi-sr')
     if sr & 0x7F20:  # FLEVEL[14:8] or BUSY[5]. No transaction is initiated.
         raise ValueError('XSPI controller is not idle with empty FIFO')
-    # Recheck the record after halt; no cache helper is required or executed.
-    after = validate_status(struct.unpack('<24I', b.upload(STATUS_ADDRESS, 96, 'recovery-status-halted.bin')))
+    # CLI disconnect can resume this exact branch-to-self park. Recheck its
+    # stable record; no persistent halt or cache helper is assumed here.
+    after = validate_status(struct.unpack('<24I', b.upload(STATUS_ADDRESS, 96, 'recovery-status-rechecked.bin')))
     if after != status:
         raise ValueError('Recovery status changed while validating park')
     result = dict(passed=True, status=status, context=context, ccr=ccr, fpccr=fpccr,
-                  prefix_sha256=sha(code), xspi_sr=sr, core_left_halted=True,
+                  prefix_sha256=sha(code), xspi_sr=sr, halt_requested=True,
+                  park_context_observed_in_halt_command=True,
+                  persistent_halt_after_disconnect='not_guaranteed',
+                  post_disconnect_execution='may resume the exact verified branch-to-self park',
                   ram_writes=False, nor_commands=False,
                   next_step='Reviewed low-SRAM nor_bench INFO, then separately guarded WRITE')
     (a.out/'result.json').write_text(json.dumps(result, indent=2)+'\n')

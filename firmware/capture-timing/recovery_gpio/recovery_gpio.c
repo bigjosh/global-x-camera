@@ -89,7 +89,14 @@ void recovery_gpio_check(void)
     GUARD[G_REASON]=reason;
     GUARD[G_STATE]=reason==NO_REQUEST ? NORMAL : PARKED;
     __DSB();
-    if (reason!=NO_REQUEST) recovery_gpio_park();
+    if (reason!=NO_REQUEST) {
+        /* ROM leaves I-cache enabled. Recovery maintenance loads RAM code, so
+         * disable/invalidate instruction cache using the CMSIS barrier sequence.
+         * Leave D-cache unchanged: an unexpected enabled D-cache must still be
+         * rejected by the host's exact-context guard. Normal boot skips this. */
+        SCB_DisableICache();
+        recovery_gpio_park();
+    }
 }
 
 void recovery_gpio_publish(void)
