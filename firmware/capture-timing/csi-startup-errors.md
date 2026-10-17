@@ -2,6 +2,23 @@
 
 Offline analysis, October 17, 2026. This note records the initial v3/v5 evidence and the controlled tests proposed from it; later experiments can supersede these hypotheses.
 
+## Retrospective check of the original ST-based smoke test
+
+The October 15 RAM smoke test **already observed the same D-PHY control-error class**. Its original local `tmp/bringup/serial.log`, lines 41, 83, 125 and 167, records four completed captures with `Errors pipe=0 global=0 CSI=1 final=0 flags=0x00008000`. The reproduction run's debugger log agrees. This was also recorded in the [bring-up results](../bringup/README.md#observed-result--october-15-2026). These were our adapted capture application using the pinned ST demo middleware/HAL, not a hardware run of the untouched UVC application.
+
+The [smoke-test line-error callback](../bringup/capture_app.c) counts the event and preserves the accumulated error code, but discards the lane argument and has no event timestamp. Thus the historical evidence establishes the same **error class**, not necessarily the same lane or exact startup subphase. The saved image was a fourth-frame snapshot after three continuous settling frames. `final=0` is the difference in callback counts across that final snapshot; it does not say that startup was error-free or certify CRC/ECC monitoring.
+
+In the pinned HAL, both lane-control branches clear their hardware flag through `CSI_FCR1`, accumulate `HAL_DCMIPP_CSI_ERROR_DPHY_CTRL` (`0x8000`), then invoke the line callback. Clearing acknowledges the detected event; it does not perform a link reset or repair. The unmodified demo does not override the weak no-op line callback, so that path does not print an application warning. Our smoke wrapper provides a strong callback and prints the accumulated result. The original HAL's attempted interrupt-disable writes the wrong register, IER0 rather than IER1, as detailed below; do not describe the original smoke test as having successfully masked the lane interrupt. The optimized harness uses the corrected generated HAL copy.
+
+| Sequence element | Original ST-based smoke test | Selected v25 cold capture |
+| --- | --- | --- |
+| Sensor preparation | Two full probe/init passes; approximately 480 ms of requested fixed reset/release waits in total | Preserve natural sensor cold startup during ROM boot; no repeated sensor reset |
+| Receiver versus sensor START | Configure PHY and arm PIPE1 before sensor setup and START | Complete setup/START first; load and arm PIPE0 during the internal sensor startup interval |
+| Saved image | Fourth frame; 640 × 480 Y8 output from RAW8 input | First frame; native 1120 × 1364 RAW10 |
+| Observed error class | `0x8000` | `0x8000`, now specifically traced to lane 1 before exposure |
+
+Both paths use two physical data lanes, the same required sensor polarity mapping, nominal 804 Mbps sensor output with the receiver's 800-Mbps range, and a nominal 20 MHz CSI configuration clock. The questionable PHY E2/E3 and CCFR programming is inherited from ST's pinned HAL. Longer waits and receiver-before-START ordering therefore did not prevent the historical error. This comparison rules out attributing the error class solely to the later aggressive startup optimization; it does not identify the electrical cause.
+
 ## Later v11 cold-boot evidence
 
 `tmp/bringup/capture-opt-v11-cold-01` has two callbacks, but they bracket the image rather than both occurring during it. Relative to externally observed NRST release:
