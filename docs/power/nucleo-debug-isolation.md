@@ -82,6 +82,16 @@ Before calling JS110 on/off a true cold cycle, measure target rail decay with th
 
 ## Further measurement configurations
 
+### Board source using the second USB connector
+
+**October 16 follow-up:** the user has a bench supply but prefers a source accessible on the board. A circuit-supported alternative is **CN8 USB power → CN9 pin 3 (`5V_USB_SNK`) → JS110 IN+ → OUT+ → CN9 pin 2 (target `5V`)**. It requires a second USB cable/source, but no soldering. Leave every CN9 selector jumper absent, keep VIN disconnected, retain the common grounds and ST-LINK USB CN10, and move only the JS110 input-positive lead from CN9 pin 1 to pin 3. Power down for that current-path rewiring. This is an alternative to the independent bench-supply configuration below; its instruction to leave CN8 unplugged does not apply here.
+
+CN8's sink path uses U22 TCPP03-M20 and Q1 through SB12, independently of ST-LINK's U6. The board manual specifies default dead-battery support. [UM3417 §§7.4.1 and 7.10](https://www.st.com/resource/en/user_manual/um3417-stm32n6-nucleo144-board-mb1940-stmicroelectronics.pdf), [schematic sheets 8 and 9](https://www.st.com/resource/en/schematic_pack/mb1940-n657x0q-c02-schematic.pdf)
+
+TCPP03 tables 11/12 specify that with EN low, its consumer gate is enabled and powered from incoming VBUS even without the target supply. This supports keeping CN9 pin 3 powered while JS110 disconnects the target. The first-GPIO payload does not configure PA7 (U22 EN) or I2C. This route is **not yet measured or qualified**: first verify CN9 pin 3 stays near 5 V with the target off and that target rails discharge; then check restoration and autonomous markers. Later firmware that changes USB power-controller state requires reassessment. [TCPP03-M20 datasheet §6.2](https://www.st.com/resource/en/datasheet/tcpp03-m20.pdf#page=11)
+
+In that OFF/dead-battery state, TCPP03's overvoltage protection operates but its overcurrent protection does not. Use a protected 5 V USB source; this does not resolve the board's external-SMPS inrush warning discussed below. The debugger-power-sharing and signal-path limitations also remain. The earlier assertion about no verified convenient **raw ST-LINK VBUS** header still stands; CN9 pin 3 uses a different USB input.
+
 ### Separate 5 V source for repeated boot experiments
 
 **October 16 proposal, pending supply selection and physical wiring:** feed the JS110 from an independent regulated **5.0 V** supply, replacing its connection to protected `5V_STLK`. This removes U6 and ST-LINK's source-enable decision from the target's main supply path. It has not yet been tested on this bench.
