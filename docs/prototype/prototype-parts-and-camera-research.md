@@ -133,6 +133,8 @@ The September study's LTC3621EMS8E-3.3#PBF and BAS116,235 are concrete component
 
 ## NAND and evaluation hardware
 
+**October 17 user selection, D-46:** proceed directly with **AS5F14G04SND-10LIN** for prototype storage bring-up. This supersedes the Flash 5 Click-first carrier recommendation below. The user strongly prefers Arduino headers, then connections nearer ST-LINK. The [wiring proposal](alliance-nand-wiring.md) maps Arduino SPI5 through 3.3/1.8 V translation; wiring and firmware are not yet implemented or tested. Final production qualification remains open.
+
 The production storage part and interface remain unselected. **The October 12 evaluation recommendation became AS5F14G04SND-10LIN**, replacing the older Winbond shortlist preference after its NRND status was identified. This is an evaluation recommendation, not a user-locked production selection. [Review transcript, Message 013](../../research_notes/Global%20X%20Camera%20decision%20review/chat_sources/2026-10-12-13-current-review.md)
 
 The September reports are detailed source records, but their image timing/capacity models use VD55G0 and their stock counts are historical: [quad NAND comparison](../power/quad-nand-comparison.md), [parallel supply options](../power/nand-supply-options.md), [1.8 V architecture](../power/1v8-memory-assessment.md), [microSD alternative](../power/microsd-feasibility.md).
