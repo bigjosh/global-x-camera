@@ -1,0 +1,24 @@
+{
+  "status": "rejected constant-frequency assumption; no hardware failure",
+  "provenance": "Reconstructed calculation from unchanged raw timer and external-event records; the earlier decoder raised before saving JSON.",
+  "assumption": "Apply the event 3-to-40 average clock to the first exposure pulse.",
+  "independent_interval": {
+    "first_event": 3,
+    "last_event": 40,
+    "external_seconds": 0.4742716800000011,
+    "core_cycles": 188240637,
+    "core_hz": 396904653.8895166,
+    "timer_hz": 297678490.41713744,
+    "recorded_core_settings_match": true,
+    "included_in_empirical_envelope": true,
+    "timer_hz_min": 297665737.0354121,
+    "timer_hz_max": 297691244.89173776
+  },
+  "first_pulse_ticks": 3268128,
+  "predicted_first_pulse_us": 10978.717324924504,
+  "external_first_pulse_us": 10984.00000000055,
+  "difference_us": -5.282675076045052,
+  "finding": "Different non-strobe interval rates were observed across startup; the long interval is not used as a constant clock for first exposure.",
+  "resolution": "Use independent near-exposure events 26-to-29 and retain the observed rate envelope with explicit endpoint uncertainty.",
+  "limitation": "Observed empirical envelope, not a universal pointwise frequency bound; no physical cause for rate variation established."
+}

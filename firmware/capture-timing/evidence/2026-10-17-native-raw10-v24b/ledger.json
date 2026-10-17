@@ -1,0 +1,115 @@
+{
+  "schema": 1,
+  "time_unit": "us",
+  "experiments": [
+    {
+      "mode": "cold",
+      "origin": "nrst_release",
+      "build_sha256": "deafa0f588d18e55b8b1ae47a1ff559857db45994e2cdb700afe47132a92124b",
+      "completed": true,
+      "image_integrity_matches": true,
+      "visual_qualification": "pending human/model inspection; statistics alone do not prove a valid image",
+      "exposure_qualified": false,
+      "frame_geometry": [
+        1120,
+        1364
+      ],
+      "frame_bytes": 3055360,
+      "frames": 1,
+      "vsyncs": 1,
+      "rom_to_pd0_us": 16463.52,
+      "phases_us": {
+        "stage1_entry": 16491.04,
+        "stage2_entry": 22375.84,
+        "main_entry": 22381.6,
+        "sensor_ready_observed": 16562.72,
+        "sensor_init_complete": 18174.72,
+        "exposure_configuration_complete": 18654.72,
+        "receiver_configured": 22549.76,
+        "receiver_armed": 22555.04,
+        "sensor_output_setup_complete": null,
+        "start_write_begin": 19323.68,
+        "start_write_end": 19369.92,
+        "sensor_start_return": 24727.04,
+        "first_vsync": 35895.04,
+        "first_frame_complete": 46524.96,
+        "sensor_release_command": null,
+        "stage2_load_begin": 19372.16,
+        "stage2_load_end": 22368.0
+      },
+      "intervals_us": {
+        "sensor_release_to_ready": null,
+        "sensor_ready_to_start_write": 2760.96,
+        "start_write_duration": 46.24,
+        "start_write_end_to_first_strobe": 5297.12,
+        "stage2_load": 2995.84,
+        "first_strobe_end_to_vsync": 243.84,
+        "first_vsync_to_frame_complete": 10629.92
+      },
+      "first_strobe_us": 24667.04,
+      "first_strobe_width_us": 10984.16,
+      "strobe_pulses": [
+        {
+          "ordinal": 1,
+          "rise_us": 24667.04,
+          "fall_us": 35651.2,
+          "width_us": 10984.16,
+          "rise_after_start_write_end_us": 5297.12
+        },
+        {
+          "ordinal": 2,
+          "rise_us": 57995.36,
+          "fall_us": 68979.36,
+          "width_us": 10984.0,
+          "rise_after_start_write_end_us": 38625.44
+        }
+      ],
+      "camera_error": 32768,
+      "error_counts": {
+        "pre_frame": 1,
+        "during_frame": 0,
+        "post_frame": 0,
+        "unclassified": 0
+      },
+      "errors": [
+        {
+          "id": 74,
+          "time_us": 24313.76,
+          "frame_phase": "pre_frame",
+          "optical_phase": "before_first_exposure",
+          "detail_to_event_cycles": 1775,
+          "error": 32768,
+          "csi_sr0": 131072,
+          "csi_sr1": 1981288448,
+          "cmsr2": 0,
+          "ier0_entry": 1596002560,
+          "ier1_entry": 7967,
+          "ier0_callback": 1596002560,
+          "ier1_callback": 3871,
+          "previous_stage": 250
+        }
+      ],
+      "first_frame_status": {
+        "csi_sr0": 131072,
+        "csi_sr1": 3860332544,
+        "applied_coarse_lines": 1428,
+        "line_length": 1236
+      },
+      "clock_readbacks": {
+        "external_hz": 12000000,
+        "system_pll_hz": 804000000,
+        "pixel_hz": 160800000,
+        "sensor_mcu_hz": 160800000,
+        "system_predivider": 2,
+        "system_multiplier": 134,
+        "system_output_divider": 1,
+        "mipi_multiplier": 32,
+        "mipi_output_divider": 1,
+        "configured_frame_lines": 4336
+      },
+      "warnings": [],
+      "experiment_id": "v24b-native-raw10-cold",
+      "note": "Raw capture visual field intentionally unchanged; see separate visual-review.json."
+    }
+  ]
+}

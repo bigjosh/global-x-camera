@@ -1,0 +1,142 @@
+{
+  "schema": 1,
+  "time_unit": "us",
+  "experiments": [
+    {
+      "mode": "cold",
+      "origin": "nrst_release",
+      "build_sha256": "1f2872c92f99e7aba87e5e0dc13e224f4912bd7fc667e53304ec136318dece26",
+      "completed": true,
+      "image_integrity_matches": true,
+      "visual_qualification": "pending human/model inspection; statistics alone do not prove a valid image",
+      "exposure_qualified": false,
+      "frame_geometry": [
+        1120,
+        1364
+      ],
+      "frame_bytes": 3055360,
+      "frames": 1,
+      "vsyncs": 1,
+      "rom_to_pd0_us": 16105.6,
+      "phases_us": {
+        "stage1_entry": 16133.76,
+        "stage2_entry": 21642.88,
+        "main_entry": 21648.64,
+        "sensor_ready_observed": 16205.6,
+        "sensor_init_complete": 17341.92,
+        "exposure_configuration_complete": 17822.08,
+        "receiver_configured": 21831.36,
+        "receiver_armed": 21836.48,
+        "sensor_output_setup_complete": null,
+        "start_write_begin": 18388.64,
+        "start_write_end": 18434.88,
+        "sensor_start_return": 23831.2,
+        "first_vsync": 34960.64,
+        "first_frame_complete": 45589.92,
+        "sensor_release_command": null,
+        "stage2_load_begin": 18437.28,
+        "stage2_load_end": 21634.72
+      },
+      "intervals_us": {
+        "sensor_release_to_ready": null,
+        "sensor_ready_to_start_write": 2183.04,
+        "start_write_duration": 46.24,
+        "start_write_end_to_first_strobe": 5297.28,
+        "stage2_load": 3197.44,
+        "first_strobe_end_to_vsync": 244.48,
+        "first_vsync_to_frame_complete": 10629.28
+      },
+      "first_strobe_us": 23732.16,
+      "first_strobe_width_us": 10984.0,
+      "strobe_pulses": [
+        {
+          "ordinal": 1,
+          "rise_us": 23732.16,
+          "fall_us": 34716.16,
+          "width_us": 10984.0,
+          "rise_after_start_write_end_us": 5297.28
+        },
+        {
+          "ordinal": 2,
+          "rise_us": 57060.48,
+          "fall_us": 68044.48,
+          "width_us": 10984.0,
+          "rise_after_start_write_end_us": 38625.6
+        }
+      ],
+      "camera_error": 32768,
+      "error_counts": {
+        "pre_frame": 1,
+        "during_frame": 0,
+        "post_frame": 0,
+        "unclassified": 0
+      },
+      "errors": [
+        {
+          "id": 74,
+          "time_us": 23380.16,
+          "frame_phase": "pre_frame",
+          "optical_phase": "before_first_exposure",
+          "detail_to_event_cycles": 1812,
+          "error": 32768,
+          "csi_sr0": 131072,
+          "csi_sr1": 1981288448,
+          "cmsr2": 0,
+          "ier0_entry": 1596002560,
+          "ier1_entry": 7967,
+          "ier0_callback": 1596002560,
+          "ier1_callback": 3871,
+          "previous_stage": 250
+        }
+      ],
+      "first_frame_status": {
+        "csi_sr0": 131072,
+        "csi_sr1": 3860332544,
+        "applied_coarse_lines": 1428,
+        "line_length": 1236
+      },
+      "clock_readbacks": {
+        "external_hz": 12000000,
+        "system_pll_hz": 804000000,
+        "pixel_hz": 160800000,
+        "sensor_mcu_hz": 160800000,
+        "system_predivider": 2,
+        "system_multiplier": 134,
+        "system_output_divider": 1,
+        "mipi_multiplier": 32,
+        "mipi_output_divider": 1,
+        "configured_frame_lines": 4336
+      },
+      "warnings": [],
+      "experiment_id": "v29b-native-raw10-tim5-cold-01",
+      "rail_validation": {
+        "passed": true,
+        "common_off_s": 13.363072,
+        "common_off_window_s": [
+          7.187682162,
+          20.550754162
+        ],
+        "final": {
+          "3": {
+            "min_v": 3.268,
+            "max_v": 3.303,
+            "median_v": 3.288
+          },
+          "4": {
+            "min_v": 4.811,
+            "max_v": 4.852,
+            "median_v": 4.832
+          },
+          "5": {
+            "min_v": 3.266,
+            "max_v": 3.281,
+            "median_v": 3.276
+          }
+        },
+        "limitation": "No direct core/always-on rail probe; this proves discharge of the three named rails."
+      },
+      "timer_analysis": "capture/timer-analysis.json",
+      "note": "Raw visual fields unchanged; see visual-review.json."
+    }
+  ]
+}

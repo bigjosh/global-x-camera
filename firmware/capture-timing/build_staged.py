@@ -33,6 +33,9 @@ def main():
     parser.add_argument('--early-sensor', action='store_true', help='Configure/start fixed sensor profile before reading receiver stage2')
     parser.add_argument('--inline-crc', action='store_true', help='Inline the unchanged software CRC byte operation')
     parser.add_argument('--trim-sensor', action='store_true', help='Combine contiguous transfers and defer nonessential diagnostic reads')
+    parser.add_argument('--disable-darkcal', action='store_true', help='Diagnostic only: disable sensor dark calibration and verify register before START')
+    parser.add_argument('--dphy-noncontinuous', action='store_true', help='Diagnostic only: disable continuous sensor MIPI clock and verify before START')
+    parser.add_argument('--sensor-csi-mbps', type=int, choices=[804,1000,1200], default=804)
     parser.add_argument('--sensor-source', type=Path, default=HERE/'stage1_sensor.c', help='Optional frozen early-sensor source')
     parser.add_argument('--prefix-opt', choices=['Os','O2'], default='Os')
     args = parser.parse_args()
@@ -66,9 +69,17 @@ def main():
     assert not args.early_sensor or (args.word_reads and args.skip_sensor_reset and stage2_manifest['parameters'].get('receiver_only'))
     assert not args.inline_crc or 'STAGE1_INLINE_CRC' in (out / 'stage1.c').read_text()
     assert not args.trim_sensor or (args.early_sensor and stage2_manifest['parameters'].get('sensor_late_diagnostics'))
+    assert not args.disable_darkcal or args.early_sensor
+    assert not args.dphy_noncontinuous or (args.early_sensor and args.sensor_csi_mbps==804 and not args.disable_darkcal)
+    if args.sensor_csi_mbps!=804:
+        assert args.early_sensor and not args.disable_darkcal
+        assert stage2_manifest['parameters'].get('csi_phy_bitrate',800)==args.sensor_csi_mbps
     if args.early_sensor:
         source=out/'stage1_sensor.c'
         source.write_bytes(args.sensor_source.read_bytes())
+        assert not args.disable_darkcal or 'STAGE1_DISABLE_DARKCAL' in source.read_text()
+        assert not args.dphy_noncontinuous or 'STAGE1_DPHY_NONCONTINUOUS' in source.read_text()
+        assert args.sensor_csi_mbps==804 or 'STAGE1_CSI_MBPS' in source.read_text()
         sources.append(source)
     gcc = str(TC / 'arm-none-eabi-gcc.exe')
     flags = ['-mcpu=cortex-m55', '-mthumb', '-mcmse', '-mfloat-abi=soft', '-mgeneral-regs-only', '-'+args.prefix_opt, '-g3',
@@ -80,6 +91,8 @@ def main():
     flags.extend([f'-DSTAGE1_WORD_READS={int(args.word_reads)}',f'-DSTAGE1_XSPI_64MHZ={int(args.xspi64)}',f'-DSTAGE1_EARLY_SENSOR={int(args.early_sensor)}'])
     flags.append(f'-DSTAGE1_INLINE_CRC={int(args.inline_crc)}')
     flags.append(f'-DSTAGE1_SENSOR_TRIM={int(args.trim_sensor)}')
+    flags.append(f'-DSTAGE1_DISABLE_DARKCAL={int(args.disable_darkcal)}')
+    flags.extend([f'-DSTAGE1_DPHY_NONCONTINUOUS={int(args.dphy_noncontinuous)}',f'-DSTAGE1_CSI_MBPS={args.sensor_csi_mbps}'])
     flags += [f'-I{x}' for x in includes]
     objects = []
     for source in [s for s in sources if s.suffix!='.ld']:
@@ -122,6 +135,9 @@ def main():
         'word_reads': args.word_reads, 'xspi64': args.xspi64, 'early_sensor': args.early_sensor,
         'inline_crc': args.inline_crc, 'prefix_opt': args.prefix_opt,
         'trim_sensor': args.trim_sensor,
+        'disable_darkcal': args.disable_darkcal,
+        'dphy_noncontinuous': args.dphy_noncontinuous,
+        'sensor_csi_mbps': args.sensor_csi_mbps,
         'sensor_source_path': str(args.sensor_source.resolve()) if args.early_sensor else None,
     }
     (out / 'manifest.json').write_text(json.dumps(manifest, indent=2) + '\n', encoding='utf-8')

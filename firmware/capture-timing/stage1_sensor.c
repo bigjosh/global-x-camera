@@ -9,6 +9,15 @@
 #ifndef STAGE1_SENSOR_TRIM
 #define STAGE1_SENSOR_TRIM 0
 #endif
+#ifndef STAGE1_DISABLE_DARKCAL
+#define STAGE1_DISABLE_DARKCAL 0
+#endif
+#ifndef STAGE1_DPHY_NONCONTINUOUS
+#define STAGE1_DPHY_NONCONTINUOUS 0
+#endif
+#ifndef STAGE1_CSI_MBPS
+#define STAGE1_CSI_MBPS 804
+#endif
 
 #define TRACE ((volatile uint32_t *)0x341F0000U)
 #define EVENTS ((volatile uint32_t *)0x341F0100U)
@@ -206,7 +215,7 @@ int stage1_sensor_start(void)
     TRY(22,write_reg(0x044C,manual,12));
     event(15); event(108);
     TRY(23,write_value(0x030A,8,1)); TRY(24,write_value(0x030C,0x02CA,2));
-    TRY(25,write_value(0x0312,804,2)); TRY(26,write_value(0x030F,0x2A,1));
+    TRY(25,write_value(0x0312,STAGE1_CSI_MBPS,2)); TRY(26,write_value(0x030F,0x2A,1));
     TRY(27,write_value(0x047E,0,1));
 #if STAGE1_SENSOR_TRIM
     static const uint8_t roi[8]={2,0,0x61,4,0,0,0x53,5};
@@ -217,7 +226,35 @@ int stage1_sensor_start(void)
 #endif
     TRY(32,write_value(0x044C,2,1)); TRY(33,write_value(0x0302,0,1));
     TRY(34,write_value(0x0400,0,2)); TRY(35,write_value(0x0430,0,2));
-    event(109); event(24); SENSOR[S_START_BEGIN]=DWT->CYCCNT;
+    event(109);
+#if STAGE1_DISABLE_DARKCAL
+    /* Diagnostic only: compare first-frame latency/quality with automatic
+     * dark calibration disabled. Normal builds retain the sensor default. */
+    event(230);
+    TRY(38,write_value(0x0340,0,1));
+    TRY(39,read_reg(0x0340,1,&value));
+    SENSOR[18]=0xDC000000U | value;
+    if(value!=0) return failure(39,-9);
+    event(231);
+#endif
+#if STAGE1_DPHY_NONCONTINUOUS
+    /* UM2602 section16: standby-only continuous-clock control. Keep bitrate
+     * and image format unchanged for this independent transport experiment. */
+    event(232);
+    TRY(40,write_value(0x0956,0x0C,1));
+    TRY(41,read_reg(0x0956,1,&value));
+    SENSOR[19]=0xD0000000U | value;
+    if(value!=0x0CU) return failure(41,-10);
+    event(233);
+#endif
+#if STAGE1_CSI_MBPS != 804
+    event(234);
+    TRY(42,read_reg(0x0312,2,&value));
+    SENSOR[20]=value;
+    if(value!=STAGE1_CSI_MBPS) return failure(42,-11);
+    event(235);
+#endif
+    event(24); SENSOR[S_START_BEGIN]=DWT->CYCCNT;
     TRY(36,write_value(0x0201,1,1));
     SENSOR[S_START_END]=DWT->CYCCNT; event(25);
     TRACE[40]=SENSOR[S_WRITE_TX]; TRACE[41]=SENSOR[S_WRITE_BYTES];

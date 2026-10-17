@@ -57,6 +57,13 @@ def inspect(bench, manifest, timeout):
             diagnostic = bench.upload(int(manifest[key], 0), count * 4,
                                       key.replace('_address', '') + '.bin')
             summary[key.replace('_address', '_words')] = list(struct.unpack(f'<{count}I', diagnostic))
+    if 'timer_status_address' in manifest:
+        timer_words = manifest.get('timer_status_words')
+        if (manifest['timer_status_address'].lower() != '0x343f7000'
+                or not isinstance(timer_words, int) or not 32 <= timer_words <= 256):
+            raise ValueError('Unexpected timer diagnostic region')
+        diagnostic = bench.upload(0x343F7000, timer_words * 4, 'timer-status.bin')
+        summary['timer_status_words'] = list(struct.unpack(f'<{timer_words}I', diagnostic))
     if summary['completed'] and manifest.get('parameters', {}).get('stage2'):
         prefix = bench.upload(prefix_address, 256, 'prefix-status.bin')
         summary['prefix_status_words'] = list(struct.unpack('<64I', prefix))

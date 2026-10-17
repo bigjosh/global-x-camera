@@ -1,0 +1,143 @@
+{
+  "schema": 1,
+  "time_unit": "us",
+  "experiments": [
+    {
+      "mode": "cold",
+      "origin": "nrst_release",
+      "build_sha256": "fa955221e78c01d02a357342223b191417f3a18a829758f67b9003cde67b07d9",
+      "completed": true,
+      "image_integrity_matches": true,
+      "visual_qualification": "pending human/model inspection; statistics alone do not prove a valid image",
+      "exposure_qualified": false,
+      "frame_geometry": [
+        1120,
+        1364
+      ],
+      "frame_bytes": 1527680,
+      "frames": 1,
+      "vsyncs": 1,
+      "rom_to_pd0_us": 15961.12,
+      "phases_us": {
+        "stage1_entry": 15964.8,
+        "stage2_entry": 23035.36,
+        "main_entry": 23038.56,
+        "sensor_ready_observed": 16034.08,
+        "sensor_init_complete": 19004.48,
+        "exposure_configuration_complete": 19483.68,
+        "receiver_configured": 23125.28,
+        "receiver_armed": 23128.0,
+        "sensor_output_setup_complete": null,
+        "start_write_begin": 20047.84,
+        "start_write_end": 20093.76,
+        "sensor_start_return": 25452.48,
+        "first_vsync": 36618.4,
+        "first_frame_complete": 47248.16,
+        "sensor_release_command": null,
+        "stage2_load_begin": 20095.36,
+        "stage2_load_end": 23029.28
+      },
+      "intervals_us": {
+        "sensor_release_to_ready": null,
+        "sensor_ready_to_start_write": 4013.76,
+        "start_write_duration": 45.92,
+        "start_write_end_to_first_strobe": 5297.92,
+        "stage2_load": 2933.92,
+        "first_strobe_end_to_vsync": 242.72,
+        "first_vsync_to_frame_complete": 10629.76
+      },
+      "first_strobe_us": 25391.68,
+      "first_strobe_width_us": 10984.0,
+      "strobe_pulses": [
+        {
+          "ordinal": 1,
+          "rise_us": 25391.68,
+          "fall_us": 36375.68,
+          "width_us": 10984.0,
+          "rise_after_start_write_end_us": 5297.92
+        },
+        {
+          "ordinal": 2,
+          "rise_us": 58720.0,
+          "fall_us": 69704.0,
+          "width_us": 10984.0,
+          "rise_after_start_write_end_us": 38626.24
+        }
+      ],
+      "camera_error": 32768,
+      "error_counts": {
+        "pre_frame": 1,
+        "during_frame": 0,
+        "post_frame": 0,
+        "unclassified": 0
+      },
+      "errors": [
+        {
+          "id": 74,
+          "time_us": 25030.56,
+          "frame_phase": "pre_frame",
+          "optical_phase": "before_first_exposure",
+          "detail_to_event_cycles": 869,
+          "error": 32768,
+          "csi_sr0": 131072,
+          "csi_sr1": 1981288448,
+          "cmsr2": 0,
+          "ier0_entry": 1596002560,
+          "ier1_entry": 7967,
+          "ier0_callback": 1596002560,
+          "ier1_callback": 3871,
+          "previous_stage": 250
+        }
+      ],
+      "first_frame_status": {
+        "csi_sr0": 131072,
+        "csi_sr1": 3860332544,
+        "applied_coarse_lines": 1428,
+        "line_length": 1236
+      },
+      "clock_readbacks": {
+        "external_hz": 12000000,
+        "system_pll_hz": 804000000,
+        "pixel_hz": 160800000,
+        "sensor_mcu_hz": 160800000,
+        "system_predivider": 2,
+        "system_multiplier": 134,
+        "system_output_divider": 1,
+        "mipi_multiplier": 32,
+        "mipi_output_divider": 1,
+        "configured_frame_lines": 4336
+      },
+      "warnings": [],
+      "experiment_id": "v28-temperature-cold",
+      "capture_dir": "capture-opt-v28-temperature-cycle-01/cold",
+      "build_manifest": "builds/capture-receiver-trim-v23-20261017/manifest.json",
+      "prefix_manifest": "builds/capture-temperature-prestart-v28-20261017/manifest.json",
+      "rail_validation": {
+        "passed": true,
+        "common_off_s": 13.508992000000001,
+        "common_off_window_s": [
+          6.970978162,
+          20.479970162
+        ],
+        "final": {
+          "3": {
+            "min_v": 3.268,
+            "max_v": 3.303,
+            "median_v": 3.288
+          },
+          "4": {
+            "min_v": 4.806,
+            "max_v": 4.852,
+            "median_v": 4.832
+          },
+          "5": {
+            "min_v": 3.271,
+            "max_v": 3.281,
+            "median_v": 3.276
+          }
+        },
+        "limitation": "No direct core/always-on rail probe; this proves discharge of the three named rails."
+      }
+    }
+  ]
+}

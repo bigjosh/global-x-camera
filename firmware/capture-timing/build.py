@@ -51,6 +51,7 @@ def main():
     p.add_argument('--prestart-dwell-us',type=int,default=0,help='Diagnostic dwell after sensor setup, immediately before START write')
     p.add_argument('--i2c-follower',action='store_true',help='Diagnostic I2C_SYNC mode with one trigger after entering STREAMING')
     p.add_argument('--sensor-late-diagnostics',action='store_true',help='Receiver-only: read ROM/orientation/line diagnostics after first frame')
+    p.add_argument('--csi-phy-bitrate',type=int,choices=[800,1000,1200],default=800,help='Receiver D-PHY bitrate table entry; sensor must use corresponding independent profile')
     a=p.parse_args(); out=a.output.resolve(); out.mkdir(parents=True,exist_ok=False)
     assert 0<=a.phy_testclk_us<=1000
     assert a.frame_lines==0 or 1503<=a.frame_lines<=65535
@@ -65,7 +66,7 @@ def main():
     original_harness=harness
     # These tightly scoped transformations let a new experiment reuse a frozen
     # known-good harness instead of unintentionally incorporating source drift.
-    if a.receiver_before_ready and 'BENCH_RECEIVER_EARLY' not in harness:
+    if a.receiver_before_ready and 'BENCH_RECEIVER_EARLY' not in harness and 'static void prepare_receiver(void)' not in harness:
         start=harness.index('  hcam.Instance=DCMIPP;')
         end=harness.index('  event(22);',start)+len('  event(22);')
         block=harness[start:end]
@@ -103,7 +104,7 @@ def main():
   __DSB();
   HAL_PWREx_EnableVddIO2();
   event(149);''',1)
-    if a.receiver_only:
+    if a.receiver_only and 'Receiver-only handoff.' not in harness:
         begin=harness.index('  VD6G_Config_t config =')
         end=harness.index('  uint32_t start=HAL_GetTick();',begin)
         replacement='''  /* Receiver-only handoff. Stage1 has already completed START's I2C write.
@@ -160,7 +161,7 @@ def main():
   uint8_t sync_ack=0xFF; uint32_t sync_wait=HAL_GetTick();
   do { check(0x7C,rd8(&sensor,0x0202,&sync_ack)); if(HAL_GetTick()-sync_wait>500U) fail(0x7C,-100); } while(sync_ack);
 ''',1)
-    if a.sensor_late_diagnostics:
+    if a.sensor_late_diagnostics and 'Read-only checks deferred until the first frame' not in harness:
         marker='  check(0x54,rd16(&sensor,0x0300,&line_length)); TRACE[47]=line_length;'
         assert marker in harness
         harness=harness.replace(marker,marker+'''
@@ -172,6 +173,10 @@ def main():
   uint8_t sensor_orientation=0;
   check(0x7F,rd8(&sensor,0x001A,&sensor_orientation)); early_sensor[17]=sensor_orientation;
 ''',1)
+    if a.csi_phy_bitrate!=800:
+        marker='.PHYBitrate=DCMIPP_CSI_PHY_BT_800'
+        assert harness.count(marker)==1
+        harness=harness.replace(marker,f'.PHYBitrate=DCMIPP_CSI_PHY_BT_{a.csi_phy_bitrate}',1)
     if a.batch_config: assert a.coarse_lines>0 and a.gpio_level==-1,'Batch fixed profile requires explicit coarse exposure and STROBE mode'
     pin=subprocess.check_output(['git','-C',str(VENDOR),'rev-parse','HEAD'],text=True).strip()
     assert pin=='e9441cdbb5072a6d3bcef1a5ca4e4d80f850283a'
@@ -357,6 +362,7 @@ int VD6G_BenchStartPrepared(VD6G_Ctx_t *ctx) {
     manifest['parameters']['skip_sensor_reset']=a.skip_sensor_reset
     manifest['parameters']['receiver_only']=a.receiver_only
     manifest['parameters']['sensor_late_diagnostics']=a.sensor_late_diagnostics
+    manifest['parameters']['csi_phy_bitrate']=a.csi_phy_bitrate
     manifest['parameters']['prestart_dwell_us']=a.prestart_dwell_us
     manifest['parameters']['i2c_follower']=a.i2c_follower
     if a.snapshot:

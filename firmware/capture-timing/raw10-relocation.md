@@ -1,6 +1,6 @@
 # Native RAW10 capture memory plan
 
-October 17, 2026. Offline design and build; hardware validation is separate. `build_raw10.py` creates an isolated build from hash-checked frozen receiver and prefix manifests. It does not modify the shared `capture.c`, `build.py`, original bring-up, or frozen NOR maintenance helpers.
+October 17, 2026. Offline design and build, followed by a successful root-controlled v24b hardware capture. `build_raw10.py` creates an isolated build from hash-checked frozen receiver and prefix manifests. It does not modify the shared `capture.c`, `build.py`, original bring-up, or frozen NOR maintenance helpers.
 
 ## Why relocation is necessary
 
@@ -51,4 +51,6 @@ The receiver caps Pipe0 at 763,840 32-bit words. After the first frame it record
 
 The host manifest declares `pixel_format=raw10_le16`, `bytes_per_pixel=2`, `sample_bits=10`, `sample_alignment=right` and all relocated record addresses. The firmware byte-based FNV checksum remains unchanged, so the host can compare exact bytes before converting samples. The host must verify upper six sample bits are zero, inspect low-bit distribution, preserve exact sample values, and visually confirm the first LED-panel image. A preview scaled by shifting two bits is only a display aid.
 
-No timing or image-validity claim is attached to the v24 build until the root bench controller completes those checks. The earlier RAW8 timing measurements remain explicitly RAW8 diagnostics.
+The initial v24 native build was superseded without execution. The root controller completed these checks on v24b: exact 3,055,360-byte count, intact canary, matching MCU/host checksum, zero invalid upper bits, all low-bit combinations present, and a discernible LED panel. Exposure began at 24.66704 ms after NRST and the first frame completed at 46.52496 ms in that run. The [compact native RAW10 evidence](evidence/2026-10-17-native-raw10-v24b/README.md) preserves the acquisition and the offline correction needed to exclude an initial power-down NRST bounce. One pre-exposure D-PHY sequence error remains documented; this is not an error-free startup claim. Earlier RAW8 measurements remain explicitly RAW8 diagnostics.
+
+The next isolated build, `capture-raw10-trim-os-v25-20261017`, uses the frozen v23 trimmed receiver and v24 size-optimized prefix with the byte-identical v24b memory bootstrap. Its prefix is 4008 raw / 5056 boot bytes and receiver is 11964 bytes; native format and layout remain unchanged. Redundant sensor diagnostics move after the first frame, including the line-length check. Two root-controlled cold captures passed the same buffer, sample, checksum, rail and visual checks: exposure at 23.89520 and 23.32416 ms, complete frames at 45.75312 and 45.18208 ms. The [v25 repeat archive](evidence/2026-10-17-native-raw10-v25/README.md) preserves both results and their remaining pre-exposure D-PHY flag.
