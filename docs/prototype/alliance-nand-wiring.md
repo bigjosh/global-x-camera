@@ -2,7 +2,35 @@
 
 October 17, 2026. **D-46 selects AS5F14G04SND-10LIN for prototype storage bring-up.** The user strongly prefers Arduino headers, then connections nearer ST-LINK. This is a reviewed wiring proposal, not completed assembly or successful NAND communication. Power characterization is deferred; camera firmware and existing instrument/recovery wiring were not changed.
 
-## Wiring proposal
+## Recommended candidate: bit-banged quad SPI on VDDIO5
+
+**October 17 follow-up:** software-generated quad SPI removes the hardware peripheral's pin restrictions. The recommended candidate now uses the six VDDIO5 GPIOs on populated **CN3**, with **SB23 opened** and the isolated bank supplied at 1.8 V through **CN3.31**. It sacrifices the Arduino-header preference but avoids the translator, the VDDIO4 pull-up changes and an unpopulated signal header. This remains a reviewed proposal, not an approved/performed modification or a measured bus-speed result.
+
+| NAND pin | Function | MCU GPIO | Connection |
+|---:|---|---|---|
+| 1 | CS# | PE4 | **CN3.21**, with 10 kΩ pull-up to 1.8 V |
+| 2 | IO1 / SO | PC3 | **CN3.25** |
+| 3 | IO2 / WP# | PC4 | **CN3.13**, with 10 kΩ pull-up to 1.8 V |
+| 4 | GND | — | **CN3.19** |
+| 5 | IO0 / SI | PC2 | **CN3.3** |
+| 6 | CLK | PC0 | **CN3.17** |
+| 7 | IO3 / HOLD# | PC5 | **CN3.15**, with 10 kΩ pull-up to 1.8 V |
+| 8 | VCC | — | **CN12.14**, verified nominal 1.8 V |
+
+Feed **CN3.31 (VDDIO5)** from that same 1.8 V source **only after opening SB23 and verifying isolation from the stock 3.3 V supply with power removed**. Verify the physical bridge identity and delivered-board connections before rework. The reviewed schematic exposes these six signals as header GPIOs without additional onboard pull-ups or peripheral drivers; physical continuity has not been tested. All six belong to VDDIO5. They avoid the current camera, boot NOR, PE1 recovery and PD0/PE0 timing markers. The supply-headroom and decoupling requirements below still apply.
+
+PC2–PC5 are consecutive bits on GPIOC: one masked input-register read obtains all four data bits, and one BSRR write can set/reset the four outputs. PC0 clock is on that same port; PE4 CS is outside the tight transfer loop. Start with conservative single-bit identification/configuration, then use quad payload transfers. Keep other GPIO bits intact.
+
+- Alliance supports single-bit command/address phases followed by quad data: **32h Program Load x4** and **6Bh Read from Cache x4** (eight dummy clocks for the latter). This is not an assumption of all-command QPI operation.
+- Set **B0.QE (bit 0)** using read-modify-write, preserving **ECC_EN (bit 4)**. IO2/IO3 are connected data lines, not hard-wired high. Keep IO3/HOLD# high during the single-bit erase, program-execute, page-read, ID and feature commands as required by the command-table note, even with QE enabled.
+- Switch MCU data pins to inputs before NAND drives quad read data; after CS deassertion, allow output-disable time before driving them again. Respect setup/hold and clock timing at each transition.
+- Initial slow operation can retain **VDDIO5VRSEL=0**: DS14791 specifies 1.71–1.89 V operation in its reduced-performance mode. Do not change HSLV OTP for initial bring-up. Confirm supply-valid handling and actual rail voltage; faster low-voltage pad configuration remains a separate qualification.
+
+**Performance is unmeasured.** Software occupies the CPU during transfers and may cost more time/energy than hardware SPI/DMA. As a calculation only, a 5 MHz quad payload clock carries 2.5 MB/s, so the current 1120 × 1364 image packed to RAW10 (1,909,600 bytes) takes approximately **0.76 s** of payload transfer, plus NAND program waits, commands and metadata. Readback adds another transfer. Saving the current unpacked 16-bit buffer would take approximately 1.22 s at that hypothetical clock. Neither 5 MHz nor these total save times has been demonstrated. Begin slowly, then measure correctness, throughput and energy; keep storage work after the capture-critical startup sequence where possible. Hardware quad SPI remains a production option.
+
+Sources: [UM3417 Rev4, Table 20, CN3 mapping](https://www.st.com/resource/en/user_manual/um3417-stm32n6-nucleo144-board-mb1940-stmicroelectronics.pdf#page=34), [ST's SB23/VDDIO5 guidance](https://community.st.com/stm32-mcus-boards-and-hardware-tools-26/stm32n6-nucleo-board-not-as-1v8-possible-144776), [MB1940 C02 sheets 3/4/6](https://www.st.com/resource/en/schematic_pack/mb1940-n657x0q-c02-schematic.pdf), [DS14791 supply-bank and low-voltage electrical tables](https://www.st.com/resource/en/datasheet/stm32n657x0.pdf), and Alliance §§3, 5, 6.5, 7.2 linked under Evidence.
+
+## Unmodified-board alternative: Arduino SPI5 with translation
 
 Use **SPI5 on Arduino CN14**, with a **TXU0304PWR** level translator in TSSOP-14. The NAND requires 1.8 V; these Arduino signals are 3.3 V. Do not connect the four SPI signals directly. The translator provides three channels toward NAND and one returning to the MCU. Mount the NAND's 8 x 6 mm LGA-8 package on a suitable carrier. Pin numbering is shown from above; when viewing the chip's underside, the arrangement is mirrored. Identify pin 1 using the manufacturer's package drawing and marking.
 
