@@ -1,0 +1,76 @@
+{
+  "experiment": "post-marker-debug size comparison",
+  "no_hardware_access": true,
+  "original_payload_sha256": "14d4c8ff2fc72c9df04dafa4a1a910a5f9fec39f09cc9e2d3e10e91105e34c44",
+  "original_source_sha256": "3a7c12b92d4b4ca4120c931108c23473f80979c78f358543f47d755baf43ae14",
+  "generated_source_sha256": "8a7a4cbc08ad3707a8c24fe19bbeac2aa4f33aff1ca09547d1f1f9154a3a5487",
+  "debug_payload_bytes": 368,
+  "debug_payload_sha256": "8d9102b7ed626a24d067ce79abca7cb545ec17cb48a606cb0e90fc2d97eb46fd",
+  "unchanged_baseline_ranges": [
+    "0x000..0x0d3",
+    "0x0da..0x0ff"
+  ],
+  "changed_baseline_range": "0x0d4..0x0d9 (post-marker idle loop only)",
+  "status_address": "0x34182000",
+  "status_words": [
+    "DBGCR",
+    "AP_UNLOCK",
+    "RDCR (read only)",
+    "magic 0x44424731"
+  ],
+  "variants": [
+    {
+      "image_bytes": 1408,
+      "payload_bytes_including_alignment": 832,
+      "vector_address": "0x34180400",
+      "stack_pointer": "0x34181000",
+      "entry_point": "0x34180441",
+      "checksum": "0x0000896c",
+      "sha256": "3be318547ebf0293f05a1500c704e22d1b53470d2e7cc13d1f2bdc98b5aef5b2",
+      "padding_bytes": 0,
+      "boot_file": "first_gpio_debug_plus_0_boot.bin",
+      "program_file": "first_gpio_debug_plus_0_sector_0.bin",
+      "program_bytes": 65536,
+      "program_sha256": "729350cfdf7924f6a8dca596c7e468fa899d474a99aa6d786a2a1a12e9c3b452"
+    },
+    {
+      "image_bytes": 9600,
+      "payload_bytes_including_alignment": 9024,
+      "vector_address": "0x34180400",
+      "stack_pointer": "0x34181000",
+      "entry_point": "0x34180441",
+      "checksum": "0x0015296c",
+      "sha256": "41b346e1886b56b24d5b7125f723acbb2696b85e0ae3f542b81c6546c28c427e",
+      "padding_bytes": 8192,
+      "boot_file": "first_gpio_debug_plus_8192_boot.bin",
+      "program_file": "first_gpio_debug_plus_8192_sector_0.bin",
+      "program_bytes": 65536,
+      "program_sha256": "df8668adaeb3efa6622eed3301911e79317ca9e7362f2416d0a5415a3366372c"
+    },
+    {
+      "image_bytes": 34176,
+      "payload_bytes_including_alignment": 33600,
+      "vector_address": "0x34180400",
+      "stack_pointer": "0x34181000",
+      "entry_point": "0x34180441",
+      "checksum": "0x0053096c",
+      "sha256": "6acdc76337de760220699aa3b2f99a7cf59567ed27d6a24c9e9d42a07c0c403a",
+      "padding_bytes": 32768,
+      "boot_file": "first_gpio_debug_plus_32768_boot.bin",
+      "program_file": "first_gpio_debug_plus_32768_sector_0.bin",
+      "program_bytes": 65536,
+      "program_sha256": "35701beea3f86ab23100ead074edaaac1c94701500f85a8391b7bd8533811496"
+    }
+  ],
+  "notes": [
+    "Experimental debug authorization persists until power cycle; no OTP writes.",
+    "Use HOTPLUG after markers; reset-mode connection can restart the ROM.",
+    "Compare all size variants against this matched debug baseline.",
+    "No debugger should be connected during the measured autonomous boot.",
+    "Back up/read-verify sector 0 and restore its exact saved bytes afterward."
+  ],
+  "snapshot_path": "D:\\Github\\global-x-camera\\hardware\\local-backups\\nor-before-optimization-20261017\\sector-0-first.bin",
+  "snapshot_sha256": "9fde1c8206eb450b06b74a56cb6e36b220ed2e0d1188fb6a55031171eae3409a",
+  "restoration_file": "restore_original_sector_0.bin",
+  "programming_buffers_preserve_bytes_after_each_image": true
+}

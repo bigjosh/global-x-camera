@@ -1,0 +1,142 @@
+
+D:\Github\global-x-camera\tmp\bringup\debug-awake-payload-size-20261017\first_gpio_debug.elf:     file format elf32-littlearm
+
+
+Disassembly of section .text:
+
+34180440 <Reset_Handler>:
+34180440:	b672      	cpsid	i
+34180442:	4826      	ldr	r0, [pc, #152]	@ (341804dc <boot_idle+0x8>)
+34180444:	f380 880a 	msr	MSPLIM, r0
+34180448:	4825      	ldr	r0, [pc, #148]	@ (341804e0 <boot_idle+0xc>)
+3418044a:	4685      	mov	sp, r0
+3418044c:	4825      	ldr	r0, [pc, #148]	@ (341804e4 <boot_idle+0x10>)
+3418044e:	4926      	ldr	r1, [pc, #152]	@ (341804e8 <boot_idle+0x14>)
+34180450:	6001      	str	r1, [r0, #0]
+34180452:	f3bf 8f4f 	dsb	sy
+34180456:	f3bf 8f6f 	isb	sy
+3418045a:	4824      	ldr	r0, [pc, #144]	@ (341804ec <boot_idle+0x18>)
+3418045c:	2118      	movs	r1, #24
+3418045e:	f8c0 1a5c 	str.w	r1, [r0, #2652]	@ 0xa5c
+34180462:	f8d0 125c 	ldr.w	r1, [r0, #604]	@ 0x25c
+34180466:	f3bf 8f4f 	dsb	sy
+3418046a:	4821      	ldr	r0, [pc, #132]	@ (341804f0 <boot_idle+0x1c>)
+3418046c:	6841      	ldr	r1, [r0, #4]
+3418046e:	f021 0101 	bic.w	r1, r1, #1
+34180472:	6041      	str	r1, [r0, #4]
+34180474:	6881      	ldr	r1, [r0, #8]
+34180476:	f021 0103 	bic.w	r1, r1, #3
+3418047a:	6081      	str	r1, [r0, #8]
+3418047c:	68c1      	ldr	r1, [r0, #12]
+3418047e:	f021 0103 	bic.w	r1, r1, #3
+34180482:	60c1      	str	r1, [r0, #12]
+34180484:	2101      	movs	r1, #1
+34180486:	6181      	str	r1, [r0, #24]
+34180488:	6801      	ldr	r1, [r0, #0]
+3418048a:	f021 0103 	bic.w	r1, r1, #3
+3418048e:	f041 0101 	orr.w	r1, r1, #1
+
+34180492 <pd0_first_edge_store>:
+34180492:	6001      	str	r1, [r0, #0]
+34180494:	f3bf 8f4f 	dsb	sy
+34180498:	4816      	ldr	r0, [pc, #88]	@ (341804f4 <boot_idle+0x20>)
+3418049a:	6841      	ldr	r1, [r0, #4]
+3418049c:	f021 0101 	bic.w	r1, r1, #1
+341804a0:	6041      	str	r1, [r0, #4]
+341804a2:	6881      	ldr	r1, [r0, #8]
+341804a4:	f021 0103 	bic.w	r1, r1, #3
+341804a8:	6081      	str	r1, [r0, #8]
+341804aa:	68c1      	ldr	r1, [r0, #12]
+341804ac:	f021 0103 	bic.w	r1, r1, #3
+341804b0:	60c1      	str	r1, [r0, #12]
+341804b2:	2101      	movs	r1, #1
+341804b4:	6181      	str	r1, [r0, #24]
+341804b6:	6801      	ldr	r1, [r0, #0]
+341804b8:	f021 0103 	bic.w	r1, r1, #3
+341804bc:	f041 0101 	orr.w	r1, r1, #1
+
+341804c0 <pe0_second_edge_store>:
+341804c0:	6001      	str	r1, [r0, #0]
+341804c2:	f3bf 8f4f 	dsb	sy
+341804c6:	480c      	ldr	r0, [pc, #48]	@ (341804f8 <boot_idle+0x24>)
+341804c8:	6801      	ldr	r1, [r0, #0]
+341804ca:	f021 0104 	bic.w	r1, r1, #4
+341804ce:	6001      	str	r1, [r0, #0]
+341804d0:	f3bf 8f4f 	dsb	sy
+
+341804d4 <boot_idle>:
+341804d4:	f000 b814 	b.w	34180500 <Debug_After_Markers>
+341804d8:	bf00      	nop
+341804da:	0000      	.short	0x0000
+341804dc:	34180c00 	.word	0x34180c00
+341804e0:	34181000 	.word	0x34181000
+341804e4:	e000ed08 	.word	0xe000ed08
+341804e8:	34180400 	.word	0x34180400
+341804ec:	56028000 	.word	0x56028000
+341804f0:	56020c00 	.word	0x56020c00
+341804f4:	56021000 	.word	0x56021000
+341804f8:	e000ed10 	.word	0xe000ed10
+
+341804fc <Fault_Handler>:
+341804fc:	f7ff bffe 	b.w	341804fc <Fault_Handler>
+
+34180500 <Debug_After_Markers>:
+34180500:	4824      	ldr	r0, [pc, #144]	@ (34180594 <debug_ready+0x8>)
+34180502:	2102      	movs	r1, #2
+34180504:	f8c0 1a78 	str.w	r1, [r0, #2680]	@ 0xa78
+34180508:	f8d0 1278 	ldr.w	r1, [r0, #632]	@ 0x278
+3418050c:	f3bf 8f4f 	dsb	sy
+34180510:	4821      	ldr	r0, [pc, #132]	@ (34180598 <debug_ready+0xc>)
+34180512:	4922      	ldr	r1, [pc, #136]	@ (3418059c <debug_ready+0x10>)
+34180514:	f8c0 1e8c 	str.w	r1, [r0, #3724]	@ 0xe8c
+34180518:	21b4      	movs	r1, #180	@ 0xb4
+3418051a:	f8c0 1e90 	str.w	r1, [r0, #3728]	@ 0xe90
+3418051e:	f3bf 8f4f 	dsb	sy
+34180522:	f3bf 8f6f 	isb	sy
+34180526:	481b      	ldr	r0, [pc, #108]	@ (34180594 <debug_ready+0x8>)
+34180528:	2101      	movs	r1, #1
+3418052a:	f8c0 1a48 	str.w	r1, [r0, #2632]	@ 0xa48
+3418052e:	f8c0 1a88 	str.w	r1, [r0, #2696]	@ 0xa88
+34180532:	f8d0 1248 	ldr.w	r1, [r0, #584]	@ 0x248
+34180536:	f3bf 8f4f 	dsb	sy
+3418053a:	4819      	ldr	r0, [pc, #100]	@ (341805a0 <debug_ready+0x14>)
+3418053c:	6841      	ldr	r1, [r0, #4]
+3418053e:	f441 1180 	orr.w	r1, r1, #1048576	@ 0x100000
+34180542:	f041 0101 	orr.w	r1, r1, #1
+34180546:	6041      	str	r1, [r0, #4]
+34180548:	f3bf 8f4f 	dsb	sy
+3418054c:	f3bf 8f6f 	isb	sy
+34180550:	4a14      	ldr	r2, [pc, #80]	@ (341805a4 <debug_ready+0x18>)
+34180552:	6841      	ldr	r1, [r0, #4]
+34180554:	6111      	str	r1, [r2, #16]
+34180556:	4810      	ldr	r0, [pc, #64]	@ (34180598 <debug_ready+0xc>)
+34180558:	f8d0 1e8c 	ldr.w	r1, [r0, #3724]	@ 0xe8c
+3418055c:	6011      	str	r1, [r2, #0]
+3418055e:	f8d0 1e90 	ldr.w	r1, [r0, #3728]	@ 0xe90
+34180562:	6051      	str	r1, [r2, #4]
+34180564:	480b      	ldr	r0, [pc, #44]	@ (34180594 <debug_ready+0x8>)
+34180566:	f8d0 144c 	ldr.w	r1, [r0, #1100]	@ 0x44c
+3418056a:	6091      	str	r1, [r2, #8]
+3418056c:	f8d0 1248 	ldr.w	r1, [r0, #584]	@ 0x248
+34180570:	6151      	str	r1, [r2, #20]
+34180572:	f8d0 1288 	ldr.w	r1, [r0, #648]	@ 0x288
+34180576:	6191      	str	r1, [r2, #24]
+34180578:	490b      	ldr	r1, [pc, #44]	@ (341805a8 <debug_ready+0x1c>)
+3418057a:	60d1      	str	r1, [r2, #12]
+3418057c:	f3bf 8f4f 	dsb	sy
+34180580:	480a      	ldr	r0, [pc, #40]	@ (341805ac <debug_ready+0x20>)
+34180582:	6002      	str	r2, [r0, #0]
+34180584:	f3bf 8f4f 	dsb	sy
+34180588:	f3bf 8f6f 	isb	sy
+
+3418058c <debug_ready>:
+3418058c:	bf00      	nop
+3418058e:	f7ff bffd 	b.w	3418058c <debug_ready>
+34180592:	0000      	.short	0x0000
+34180594:	56028000 	.word	0x56028000
+34180598:	56009000 	.word	0x56009000
+3418059c:	b451b400 	.word	0xb451b400
+341805a0:	54001000 	.word	0x54001000
+341805a4:	34182000 	.word	0x34182000
+341805a8:	44424732 	.word	0x44424732
+341805ac:	e000ef68 	.word	0xe000ef68

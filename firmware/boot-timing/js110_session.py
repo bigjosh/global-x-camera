@@ -9,7 +9,7 @@ the repository root, using the same Python as the isolated driver install:
     --log tmp/bringup/js110-session.jsonl
 
 After the response says "ready", replace the control file with a JSON object
-such as {"id": "off-1", "state": "off"}. States are off, auto, query, and stop.
+such as {"id": "off-1", "state": "off"}. States are off, auto, 2A, query, and stop.
 Use a new string/integer id for every request and wait for its response before
 sending another. This is a one-request mailbox, not a queue. A control file
 already present at startup is ignored. UTF-8 with or without a BOM is accepted.
@@ -23,6 +23,20 @@ Sensor statistics arrive at about 2 Hz and may precede the latest command.
 Voltage is measured at JS110 IN+/IN-, not the switched DUT output. Host command
 timestamps are diagnostic; use the Saleae rail waveform for physical timing.
 Driver reference: https://github.com/jetperch/joulescope_driver
+
+Optional --stream-log PATH records full-rate i/v chunk summaries on a separate
+worker: min/mean/max, extrema sample positions, nonfinite counts and gaps. It
+temporarily selects 2 MHz host sampling and enables i/v streams, then restores
+those settings. It retains no raw waveform. Chunk UTC is the driver's estimate;
+receipt/command UTC is host time. Neither replaces external rail timing.
+The legacy stream "complete" flag describes logging only. Separate coverage
+checks require samples from both signals and contiguous native sample ids;
+session success requires both. These checks cover received intervals, not the
+unobserved stream boundaries, and do not establish finite or unclipped readings.
+
+The 2A state selects a fixed measurement range, NOT a 2 A current limit. Inrush
+can exceed the range and clip the reported current. This helper changes no
+source voltage, protection threshold, voltage range, or range-suppression mode.
 """
 
 import argparse
@@ -31,6 +45,7 @@ import json
 import math
 import os
 from pathlib import Path
+import queue
 import sys
 import threading
 import time
@@ -40,6 +55,10 @@ REPO = Path(__file__).resolve().parents[2]
 DEFAULT_DEPS = REPO / "tmp" / "bringup" / "joulescope-deps"
 RANGE_TOPIC = "s/i/range/select"
 STATS_TOPIC = "s/sstats/value"
+STREAM_TOPICS = {"s/i/!data": ("current", "A"),
+                 "s/v/!data": ("voltage", "V")}
+RANGE_STATES = {"off": 0, "auto": 128, "2A": 2}
+SUPPORTED_STATES = [*RANGE_STATES, "query", "stop"]
 
 
 def stamp():
@@ -84,6 +103,187 @@ class Statistics:
         return result
 
 
+class StreamLog:
+    """Log off the USB thread, distinguishing logging from signal coverage."""
+
+    def __init__(self, path):
+        import numpy as np
+        self.np = np
+        path.parent.mkdir(parents=True, exist_ok=True)
+        self.file = path.open("a", encoding="utf-8", buffering=1)
+        self.queue = queue.Queue(maxsize=64)
+        self.lock = threading.Lock()
+        self.error = None
+        self.dropped_chunks = 0
+        self.chunks = 0
+        self.next_samples = {}
+        self.coverage = {
+            signal: {"chunks": 0, "samples": 0, "nonfinite_samples": 0,
+                     "first_sample_id": None, "last_sample_id_end_exclusive": None,
+                     "discontinuities": 0, "missing_native_samples": 0,
+                     "overlap_or_reset_events": 0}
+            for signal, _ in STREAM_TOPICS.values()}
+        self.callback = self.receive
+        self.closed = False
+        self._write({"event": "stream_start", **stamp(), "schema": 1,
+                     "aggregation": "one record per driver chunk, no raw samples retained",
+                     "complete_scope": "logging_only; see coverage checks separately",
+                     "voltage_location": "IN+ relative to IN-",
+                     "requested_output_sample_rate_hz": 2000000,
+                     "sample_id_units": "native sample ticks; advance by decimate_factor",
+                     "utc_time64_units": "2**-30 seconds since 2018-01-01T00:00:00Z",
+                     "limits": {
+                         "range_selection_is_current_limit": False,
+                         "fixed_2A_may_clip_above_range": True,
+                         "abs_ge_2A_count_is_not_a_clipping_detector": True,
+                         "range_suppression_remains_unchanged": True,
+                         "min_max_are_of_delivered_samples_not_analog_peak_guarantees": True}})
+        self.thread = threading.Thread(target=self._worker, name="js110-stream-log", daemon=True)
+        self.thread.start()
+
+    def _write(self, record):
+        self.file.write(json.dumps(record, allow_nan=False) + "\n")
+
+    def receive(self, topic, value):
+        # Copy driver-owned samples before returning; never block for disk/queue.
+        try:
+            if self.closed:
+                return
+            packet = {key: value[key] for key in
+                      ("sample_id", "sample_rate", "decimate_factor", "utc")}
+            packet["time_map"] = dict(value.get("time_map", {}))
+            packet["data"] = value["data"].copy()
+            self.queue.put_nowait((topic, stamp(), packet))
+        except queue.Full:
+            with self.lock:
+                self.dropped_chunks += 1
+        except Exception as exc:
+            with self.lock:
+                self.error = self.error or str(exc)
+
+    def summarize(self, topic, received, value):
+        """Driver sample ids use native ticks, even for decimated samples."""
+        np = self.np
+        suffix = next(key for key in STREAM_TOPICS if topic.endswith("/" + key) or topic == key)
+        signal, units = STREAM_TOPICS[suffix]
+        samples = np.asarray(value["data"])
+        if samples.ndim != 1:
+            raise ValueError("Expected a one-dimensional float stream")
+        sample_id = int(value["sample_id"])
+        rate = int(value["sample_rate"])
+        decimation = int(value["decimate_factor"])
+        if rate <= 0 or decimation <= 0:
+            raise ValueError("Invalid sample rate or decimation")
+        count = int(samples.size)
+        finite_indices = np.flatnonzero(np.isfinite(samples))
+        finite = samples[finite_indices]
+        minimum = maximum = mean = None
+        min_id = max_id = None
+        if finite.size:
+            minimum, maximum = number(finite.min()), number(finite.max())
+            mean = number(finite.mean(dtype=np.float64))
+            min_id = sample_id + int(finite_indices[finite.argmin()]) * decimation
+            max_id = sample_id + int(finite_indices[finite.argmax()]) * decimation
+        next_sample = sample_id + count * decimation
+        previous = self.next_samples.get(signal)
+        self.next_samples[signal] = next_sample
+        utc64 = int(value["utc"])
+        time_map = value.get("time_map", {})
+        result = {"event": "stream_chunk", "received": received,
+                  "signal": signal, "units": units,
+                  "sample_id": sample_id, "sample_id_end_exclusive": next_sample,
+                  "sample_rate_hz": rate, "decimate_factor": decimation,
+                  "effective_sample_rate_hz": rate / decimation,
+                  "duration_s": count * decimation / rate,
+                  "utc_time64": utc64,
+                  "sample_utc": datetime.fromtimestamp(
+                      1514764800 + utc64 / (1 << 30), timezone.utc).isoformat(),
+                  "time_map": {key: (int(time_map[key]) if key != "counter_rate"
+                                      else number(time_map[key]))
+                               for key in ("offset_time", "offset_counter", "counter_rate")
+                               if key in time_map},
+                  "count": count, "finite_count": int(finite.size),
+                  "nonfinite_count": count - int(finite.size),
+                  "min": minimum, "mean": mean, "max": maximum,
+                  "min_sample_id": min_id, "max_sample_id": max_id,
+                  "gap_native_samples": None if previous is None else sample_id - previous}
+        if signal == "current":
+            result["abs_ge_2A_count"] = int(np.count_nonzero(np.abs(finite) >= 2.0))
+        return result
+
+    def _worker(self):
+        try:
+            while True:
+                item = self.queue.get()
+                if item is None:
+                    break
+                if self.error is None:
+                    try:
+                        record = self.summarize(*item)
+                        self._write(record)
+                        with self.lock:
+                            self.chunks += 1
+                            signal = self.coverage[record["signal"]]
+                            signal["chunks"] += 1
+                            signal["samples"] += record["count"]
+                            signal["nonfinite_samples"] += record["nonfinite_count"]
+                            if signal["first_sample_id"] is None:
+                                signal["first_sample_id"] = record["sample_id"]
+                            signal["last_sample_id_end_exclusive"] = record["sample_id_end_exclusive"]
+                            gap = record["gap_native_samples"]
+                            if gap is not None and gap != 0:
+                                signal["discontinuities"] += 1
+                                signal["missing_native_samples"] += max(0, gap)
+                                signal["overlap_or_reset_events"] += int(gap < 0)
+                    except Exception as exc:
+                        with self.lock:
+                            self.error = str(exc)
+            self._write({"event": "stream_stop", **stamp(), **self.status()})
+        except Exception as exc:
+            with self.lock:
+                self.error = str(exc)
+        finally:
+            self.file.close()
+
+    def status(self):
+        with self.lock:
+            signals = {name: dict(values) for name, values in self.coverage.items()}
+            checks = {}
+            for name, values in signals.items():
+                checks[name + "_samples_present"] = values["samples"] > 0
+                checks[name + "_sample_ids_contiguous"] = values["discontinuities"] == 0
+            return {"chunks": self.chunks, "dropped_chunks": self.dropped_chunks,
+                    "error": self.error,
+                    "complete": self.error is None and self.dropped_chunks == 0,
+                    "complete_scope": "logging_only; see coverage checks separately",
+                    "coverage": {
+                        "passed": all(checks.values()), "checks": checks,
+                        "signals": signals,
+                        "scope": "Received sample intervals only; stream boundaries, "
+                                 "nonfinite samples and clipping are not validated."}}
+
+    def check(self):
+        if self.error is not None:
+            raise RuntimeError("Stream recording failed: " + self.error)
+
+    def close(self):
+        if not self.closed:
+            self.closed = True
+            # Subscriptions have already been removed; finish the bounded queue.
+            deadline = time.monotonic() + 5.0
+            while self.thread.is_alive() and time.monotonic() < deadline:
+                try:
+                    self.queue.put(None, timeout=0.1)
+                    break
+                except queue.Full:
+                    continue
+            self.thread.join(timeout=max(0, deadline - time.monotonic()))
+            if self.thread.is_alive():
+                with self.lock:
+                    self.error = self.error or "Stream worker did not finish within 5 seconds"
+        return self.status()
+
+
 class Reporter:
     def __init__(self, response, log):
         self.response = response
@@ -125,6 +325,7 @@ def run_session(args, driver_factory, driver_version):
     stats = Statistics()
     removed = threading.Event()
     stop_id = None
+    stream = None
     exit_code = 0
     deadline = time.monotonic() + args.duration
     for path in (args.response, args.log):
@@ -133,6 +334,8 @@ def run_session(args, driver_factory, driver_version):
     with args.log.open("a", encoding="utf-8", buffering=1) as log:
         report = Reporter(args.response, log)
         try:
+            if getattr(args, "stream_log", None) is not None:
+                stream = StreamLog(args.stream_log)
             with driver_factory() as driver:
                 paths = driver.device_paths()
                 if args.device not in paths:
@@ -140,26 +343,42 @@ def run_session(args, driver_factory, driver_version):
                 with driver.open(args.device, mode="restore", timeout=5.0) as device:
                     starting_range = device.query(RANGE_TOPIC, timeout=5.0)
                     starting_stats = None
+                    starting_stream_settings = {}
+                    stream_subscriptions = []
                     reason = "timeout"
                     try:
                         device.subscribe(STATS_TOPIC, "pub", stats.receive)
-                        # Enable only native sensor statistics, preserving their
-                        # previous setting. No i/v/p stream or range-mode change.
+                        # Without --stream-log, enable only native statistics.
                         starting_stats = device.query("s/sstats/ctrl", timeout=5.0)
                         if not starting_stats:
                             device.publish("s/sstats/ctrl", 1, timeout=5.0)
+                        if stream is not None:
+                            for topic in ("h/fs", "s/i/ctrl", "s/v/ctrl"):
+                                starting_stream_settings[topic] = device.query(topic, timeout=5.0)
+                            for topic in STREAM_TOPICS:
+                                absolute_topic = args.device + "/" + topic
+                                driver.subscribe(absolute_topic, "pub", stream.callback)
+                                stream_subscriptions.append(absolute_topic)
+                            for topic, value in (("h/fs", 2000000), ("s/i/ctrl", 1), ("s/v/ctrl", 1)):
+                                if starting_stream_settings[topic] != value:
+                                    device.publish(topic, value, timeout=5.0)
                         driver.subscribe("@/!remove", "pub",
                                          lambda topic, value: removed.set()
                                          if value == args.device else None)
                         report.emit("ready", response=True, device=args.device,
                                     driver_version=driver_version, open_mode="restore",
+                                    supported_states=SUPPORTED_STATES,
                                     starting_range=starting_range, range=starting_range,
                                     voltage_range=device.query("s/v/range/select", timeout=5.0),
+                                    stream_log=None if stream is None else str(args.stream_log),
+                                    starting_stream_settings=starting_stream_settings,
                                     duration_s=args.duration, statistics=stats.snapshot())
                         last_stats = 0
                         while time.monotonic() < deadline:
                             if removed.is_set():
                                 raise RuntimeError("JS110 disconnected during session")
+                            if stream is not None:
+                                stream.check()
                             snapshot = stats.snapshot()
                             if snapshot and snapshot["sequence"] != last_stats:
                                 last_stats = snapshot["sequence"]
@@ -189,16 +408,18 @@ def run_session(args, driver_factory, driver_version):
                                 continue
                             seen_ids.add(id_key)
                             state = request.get("state")
-                            if state not in ("off", "auto", "query", "stop"):
+                            if state not in (*RANGE_STATES, "query", "stop"):
                                 report.emit("response", response=True, id=request_id,
-                                            ok=False, error="State must be off, auto, query, or stop")
+                                            supported_states=SUPPORTED_STATES,
+                                            ok=False, error="State must be off, auto, 2A, query, or stop")
                                 continue
                             command_start = stamp()
-                            if state in ("off", "auto"):
-                                device.publish(RANGE_TOPIC, state, timeout=5.0)
+                            if state in RANGE_STATES:
+                                device.publish(RANGE_TOPIC, RANGE_STATES[state], timeout=5.0)
                             command_end = stamp()
                             current_range = device.query(RANGE_TOPIC, timeout=5.0)
                             report.emit("response", response=True, id=request_id, state=state,
+                                        supported_states=SUPPORTED_STATES,
                                         ok=True, range=current_range,
                                         command_start=command_start, command_end=command_end,
                                         statistics=stats.snapshot())
@@ -226,19 +447,47 @@ def run_session(args, driver_factory, driver_version):
                         except Exception as exc:
                             restore_error = str(exc)
                             exit_code = 1
+                        cleanup_errors = []
+                        for topic in stream_subscriptions:
+                            try:
+                                driver.unsubscribe(topic, stream.callback, timeout=5.0)
+                            except Exception as exc:
+                                cleanup_errors.append(("stream_unsubscribe_error", topic, str(exc)))
+                                exit_code = 1
+                        for topic in ("s/i/ctrl", "s/v/ctrl", "h/fs"):
+                            if topic in starting_stream_settings:
+                                try:
+                                    device.publish(topic, starting_stream_settings[topic], timeout=5.0)
+                                    if device.query(topic, timeout=5.0) != starting_stream_settings[topic]:
+                                        raise RuntimeError("Restored stream setting does not match starting value")
+                                except Exception as exc:
+                                    cleanup_errors.append(("stream_restore_error", topic, str(exc)))
+                                    exit_code = 1
+                        stream_status = None if stream is None else stream.close()
+                        if stream_status is not None and not (
+                                stream_status["complete"] and stream_status["coverage"]["passed"]):
+                            exit_code = 1
                         if starting_stats is not None:
                             try:
                                 device.publish("s/sstats/ctrl", starting_stats, timeout=5.0)
                             except Exception as exc:
-                                report.emit("statistics_restore_error", error=str(exc))
+                                cleanup_errors.append(("statistics_restore_error", "s/sstats/ctrl", str(exc)))
                                 exit_code = 1
+                        # A full/broken log must not prevent remaining hardware
+                        # restoration attempts. Report only after those attempts.
+                        for event, topic, error in cleanup_errors:
+                            report.emit(event, topic=topic, error=error)
                         report.emit("stopped", response=True, id=stop_id, reason=reason,
                                     ok=exit_code == 0, starting_range=starting_range,
                                     range=restored_range, restore_error=restore_error,
+                                    stream=stream_status,
                                     statistics=stats.snapshot())
         except Exception as exc:
             report.emit("fatal", response=True, ok=False, error=str(exc))
             exit_code = 1
+        finally:
+            if stream is not None:
+                stream.close()
     return exit_code
 
 
@@ -250,13 +499,18 @@ def main():
     parser.add_argument("--control", type=Path, required=True)
     parser.add_argument("--response", type=Path, required=True)
     parser.add_argument("--log", type=Path, required=True)
+    parser.add_argument("--stream-log", type=Path,
+                        help="Optional JSONL full-rate i/v chunk summaries; no raw samples retained.")
     parser.add_argument("--duration", type=float, default=1800,
                         help="Maximum session seconds, >0 and <=1800 (default 1800).")
     args = parser.parse_args()
     if not math.isfinite(args.duration) or not 0 < args.duration <= 1800:
         parser.error("--duration must be >0 and <=1800 seconds")
-    if len({path.resolve() for path in (args.control, args.response, args.log)}) != 3:
-        parser.error("Control, response, and log paths must be distinct")
+    paths = [args.control, args.response, args.log]
+    if args.stream_log is not None:
+        paths.append(args.stream_log)
+    if len({path.resolve() for path in paths}) != len(paths):
+        parser.error("Control, response, log, and stream log paths must be distinct")
     if not args.device.startswith("u/js110/"):
         parser.error("This helper supports JS110 devices only")
     sys.path.insert(0, str(args.deps.resolve()))

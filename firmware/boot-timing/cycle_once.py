@@ -16,6 +16,8 @@ def main():
     p.add_argument('--control', type=Path, required=True)
     p.add_argument('--response', type=Path, required=True)
     p.add_argument('--off-seconds', type=float, default=15)
+    p.add_argument('--on-range', choices=['auto', '2A'], default='auto',
+                   help='Restore auto, or explicitly select the fixed 2 A measurement range.')
     args = p.parse_args()
     if not 1 <= args.off_seconds <= 30:
         p.error('--off-seconds must be between 1 and 30')
@@ -33,18 +35,21 @@ def main():
                     print(json.dumps(result), flush=True)
                     if not result.get('ok'):
                         raise RuntimeError('Joulescope command failed')
-                    return
+                    return result
             except (FileNotFoundError, PermissionError, json.JSONDecodeError):
                 pass
             time.sleep(0.05)
         raise TimeoutError('No matching response from persistent JS110 session')
 
+    state = request('query')
+    if args.on_range == '2A' and '2A' not in state.get('supported_states', []):
+        raise RuntimeError('Session does not advertise fixed 2 A support; power unchanged')
     try:
         request('off')
         time.sleep(args.off_seconds)
         request('query')
     finally:
-        request('auto')
+        request(args.on_range)
     time.sleep(2)
     request('query')
 

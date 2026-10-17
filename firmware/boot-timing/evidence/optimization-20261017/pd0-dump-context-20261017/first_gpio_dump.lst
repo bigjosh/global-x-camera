@@ -1,0 +1,430 @@
+
+D:\Github\global-x-camera\tmp\bringup\pd0-dump-context-20261017\first_gpio_dump.elf:     file format elf32-littlearm
+
+
+Disassembly of section .text:
+
+34180440 <Reset_Handler>:
+34180440:	b672      	cpsid	i
+34180442:	4826      	ldr	r0, [pc, #152]	@ (341804dc <boot_idle+0x8>)
+34180444:	f380 880a 	msr	MSPLIM, r0
+34180448:	4825      	ldr	r0, [pc, #148]	@ (341804e0 <boot_idle+0xc>)
+3418044a:	4685      	mov	sp, r0
+3418044c:	4825      	ldr	r0, [pc, #148]	@ (341804e4 <boot_idle+0x10>)
+3418044e:	4926      	ldr	r1, [pc, #152]	@ (341804e8 <boot_idle+0x14>)
+34180450:	6001      	str	r1, [r0, #0]
+34180452:	f3bf 8f4f 	dsb	sy
+34180456:	f3bf 8f6f 	isb	sy
+3418045a:	4824      	ldr	r0, [pc, #144]	@ (341804ec <boot_idle+0x18>)
+3418045c:	2118      	movs	r1, #24
+3418045e:	f8c0 1a5c 	str.w	r1, [r0, #2652]	@ 0xa5c
+34180462:	f8d0 125c 	ldr.w	r1, [r0, #604]	@ 0x25c
+34180466:	f3bf 8f4f 	dsb	sy
+3418046a:	4821      	ldr	r0, [pc, #132]	@ (341804f0 <boot_idle+0x1c>)
+3418046c:	6841      	ldr	r1, [r0, #4]
+3418046e:	f021 0101 	bic.w	r1, r1, #1
+34180472:	6041      	str	r1, [r0, #4]
+34180474:	6881      	ldr	r1, [r0, #8]
+34180476:	f021 0103 	bic.w	r1, r1, #3
+3418047a:	6081      	str	r1, [r0, #8]
+3418047c:	68c1      	ldr	r1, [r0, #12]
+3418047e:	f021 0103 	bic.w	r1, r1, #3
+34180482:	60c1      	str	r1, [r0, #12]
+34180484:	2101      	movs	r1, #1
+34180486:	6181      	str	r1, [r0, #24]
+34180488:	6801      	ldr	r1, [r0, #0]
+3418048a:	f021 0103 	bic.w	r1, r1, #3
+3418048e:	f041 0101 	orr.w	r1, r1, #1
+
+34180492 <pd0_first_edge_store>:
+34180492:	6001      	str	r1, [r0, #0]
+34180494:	f3bf 8f4f 	dsb	sy
+34180498:	4816      	ldr	r0, [pc, #88]	@ (341804f4 <boot_idle+0x20>)
+3418049a:	6841      	ldr	r1, [r0, #4]
+3418049c:	f021 0101 	bic.w	r1, r1, #1
+341804a0:	6041      	str	r1, [r0, #4]
+341804a2:	6881      	ldr	r1, [r0, #8]
+341804a4:	f021 0103 	bic.w	r1, r1, #3
+341804a8:	6081      	str	r1, [r0, #8]
+341804aa:	68c1      	ldr	r1, [r0, #12]
+341804ac:	f021 0103 	bic.w	r1, r1, #3
+341804b0:	60c1      	str	r1, [r0, #12]
+341804b2:	2101      	movs	r1, #1
+341804b4:	6181      	str	r1, [r0, #24]
+341804b6:	6801      	ldr	r1, [r0, #0]
+341804b8:	f021 0103 	bic.w	r1, r1, #3
+341804bc:	f041 0101 	orr.w	r1, r1, #1
+
+341804c0 <pe0_second_edge_store>:
+341804c0:	6001      	str	r1, [r0, #0]
+341804c2:	f3bf 8f4f 	dsb	sy
+341804c6:	480c      	ldr	r0, [pc, #48]	@ (341804f8 <boot_idle+0x24>)
+341804c8:	6801      	ldr	r1, [r0, #0]
+341804ca:	f021 0104 	bic.w	r1, r1, #4
+341804ce:	6001      	str	r1, [r0, #0]
+341804d0:	f3bf 8f4f 	dsb	sy
+
+341804d4 <boot_idle>:
+341804d4:	f000 b814 	b.w	34180500 <Post_Marker_Entry>
+341804d8:	bf00      	nop
+341804da:	0000      	.short	0x0000
+341804dc:	34180c00 	.word	0x34180c00
+341804e0:	34181000 	.word	0x34181000
+341804e4:	e000ed08 	.word	0xe000ed08
+341804e8:	34180400 	.word	0x34180400
+341804ec:	56028000 	.word	0x56028000
+341804f0:	56020c00 	.word	0x56020c00
+341804f4:	56021000 	.word	0x56021000
+341804f8:	e000ed10 	.word	0xe000ed10
+
+341804fc <Fault_Handler>:
+341804fc:	f7ff bffe 	b.w	341804fc <Fault_Handler>
+
+34180500 <Post_Marker_Entry>:
+34180500:	4b08      	ldr	r3, [pc, #32]	@ (34180524 <Post_Marker_Entry+0x24>)
+34180502:	f8d3 0264 	ldr.w	r0, [r3, #612]	@ 0x264
+34180506:	f04f 31ff 	mov.w	r1, #4294967295
+3418050a:	f04f 32ff 	mov.w	r2, #4294967295
+3418050e:	f010 0f01 	tst.w	r0, #1
+34180512:	d003      	beq.n	3418051c <Post_Marker_Entry+0x1c>
+34180514:	f04f 43a0 	mov.w	r3, #1342177280	@ 0x50000000
+34180518:	6a59      	ldr	r1, [r3, #36]	@ 0x24
+3418051a:	6a9a      	ldr	r2, [r3, #40]	@ 0x28
+3418051c:	f3ef 8314 	mrs	r3, CONTROL
+34180520:	f000 b8fe 	b.w	34180720 <fallback_dump>
+34180524:	56028000 	.word	0x56028000
+
+34180528 <delay_units>:
+34180528:	b500      	push	{lr}
+3418052a:	f241 3288 	movw	r2, #5000	@ 0x1388
+3418052e:	f040 e001 	dls	lr, r0
+34180532:	4613      	mov	r3, r2
+34180534:	3b01      	subs	r3, #1
+34180536:	d1fd      	bne.n	34180534 <delay_units+0xc>
+34180538:	f00f c805 	le	lr, 34180532 <delay_units+0xa>
+3418053c:	f85d fb04 	ldr.w	pc, [sp], #4
+
+34180540 <tx_byte>:
+34180540:	b570      	push	{r4, r5, r6, lr}
+34180542:	4601      	mov	r1, r0
+34180544:	2408      	movs	r4, #8
+34180546:	f44f 3680 	mov.w	r6, #65536	@ 0x10000
+3418054a:	4d0a      	ldr	r5, [pc, #40]	@ (34180574 <tx_byte+0x34>)
+3418054c:	f011 0f01 	tst.w	r1, #1
+34180550:	bf14      	ite	ne
+34180552:	2003      	movne	r0, #3
+34180554:	2001      	moveq	r0, #1
+34180556:	f8c5 6c18 	str.w	r6, [r5, #3096]	@ 0xc18
+3418055a:	f7ff ffe5 	bl	34180528 <delay_units>
+3418055e:	2001      	movs	r0, #1
+34180560:	f8c5 0c18 	str.w	r0, [r5, #3096]	@ 0xc18
+34180564:	f7ff ffe0 	bl	34180528 <delay_units>
+34180568:	3c01      	subs	r4, #1
+3418056a:	fa21 f100 	lsr.w	r1, r1, r0
+3418056e:	d1ed      	bne.n	3418054c <tx_byte+0xc>
+34180570:	bd70      	pop	{r4, r5, r6, pc}
+34180572:	bf00      	nop
+34180574:	56020000 	.word	0x56020000
+
+34180578 <tx_checked>:
+34180578:	2208      	movs	r2, #8
+3418057a:	b510      	push	{r4, lr}
+3418057c:	f042 e001 	dls	lr, r2
+34180580:	680b      	ldr	r3, [r1, #0]
+34180582:	4c06      	ldr	r4, [pc, #24]	@ (3418059c <tx_checked+0x24>)
+34180584:	4043      	eors	r3, r0
+34180586:	f343 0200 	sbfx	r2, r3, #0, #1
+3418058a:	4022      	ands	r2, r4
+3418058c:	ea82 0353 	eor.w	r3, r2, r3, lsr #1
+34180590:	f00f c807 	le	lr, 34180586 <tx_checked+0xe>
+34180594:	e8bd 4010 	ldmia.w	sp!, {r4, lr}
+34180598:	600b      	str	r3, [r1, #0]
+3418059a:	e7d1      	b.n	34180540 <tx_byte>
+3418059c:	edb88320 	.word	0xedb88320
+
+341805a0 <packet>:
+341805a0:	e92d 43f7 	stmdb	sp!, {r0, r1, r2, r4, r5, r6, r7, r8, r9, lr}
+341805a4:	f04f 0901 	mov.w	r9, #1
+341805a8:	461c      	mov	r4, r3
+341805aa:	f04f 33ff 	mov.w	r3, #4294967295
+341805ae:	4688      	mov	r8, r1
+341805b0:	4934      	ldr	r1, [pc, #208]	@ (34180684 <packet+0xe4>)
+341805b2:	4605      	mov	r5, r0
+341805b4:	9301      	str	r3, [sp, #4]
+341805b6:	2008      	movs	r0, #8
+341805b8:	9e0a      	ldr	r6, [sp, #40]	@ 0x28
+341805ba:	f8c1 9c18 	str.w	r9, [r1, #3096]	@ 0xc18
+341805be:	4617      	mov	r7, r2
+341805c0:	f7ff ffb2 	bl	34180528 <delay_units>
+341805c4:	f44f 3380 	mov.w	r3, #65536	@ 0x10000
+341805c8:	200c      	movs	r0, #12
+341805ca:	f8c1 3c18 	str.w	r3, [r1, #3096]	@ 0xc18
+341805ce:	f7ff ffab 	bl	34180528 <delay_units>
+341805d2:	2004      	movs	r0, #4
+341805d4:	f8c1 9c18 	str.w	r9, [r1, #3096]	@ 0xc18
+341805d8:	f7ff ffa6 	bl	34180528 <delay_units>
+341805dc:	eb0d 0100 	add.w	r1, sp, r0
+341805e0:	2042      	movs	r0, #66	@ 0x42
+341805e2:	f7ff ffc9 	bl	34180578 <tx_checked>
+341805e6:	2054      	movs	r0, #84	@ 0x54
+341805e8:	a901      	add	r1, sp, #4
+341805ea:	f7ff ffc5 	bl	34180578 <tx_checked>
+341805ee:	2044      	movs	r0, #68	@ 0x44
+341805f0:	a901      	add	r1, sp, #4
+341805f2:	f7ff ffc1 	bl	34180578 <tx_checked>
+341805f6:	2031      	movs	r0, #49	@ 0x31
+341805f8:	a901      	add	r1, sp, #4
+341805fa:	f7ff ffbd 	bl	34180578 <tx_checked>
+341805fe:	4640      	mov	r0, r8
+34180600:	a901      	add	r1, sp, #4
+34180602:	f7ff ffb9 	bl	34180578 <tx_checked>
+34180606:	7828      	ldrb	r0, [r5, #0]
+34180608:	a901      	add	r1, sp, #4
+3418060a:	f7ff ffb5 	bl	34180578 <tx_checked>
+3418060e:	7868      	ldrb	r0, [r5, #1]
+34180610:	a901      	add	r1, sp, #4
+34180612:	f7ff ffb1 	bl	34180578 <tx_checked>
+34180616:	682b      	ldr	r3, [r5, #0]
+34180618:	444b      	add	r3, r9
+3418061a:	602b      	str	r3, [r5, #0]
+3418061c:	2500      	movs	r5, #0
+3418061e:	fa27 f005 	lsr.w	r0, r7, r5
+34180622:	a901      	add	r1, sp, #4
+34180624:	b2c0      	uxtb	r0, r0
+34180626:	3508      	adds	r5, #8
+34180628:	f7ff ffa6 	bl	34180578 <tx_checked>
+3418062c:	2d20      	cmp	r5, #32
+3418062e:	d1f6      	bne.n	3418061e <packet+0x7e>
+34180630:	b2f0      	uxtb	r0, r6
+34180632:	a901      	add	r1, sp, #4
+34180634:	f7ff ffa0 	bl	34180578 <tx_checked>
+34180638:	2000      	movs	r0, #0
+3418063a:	a901      	add	r1, sp, #4
+3418063c:	f7ff ff9c 	bl	34180578 <tx_checked>
+34180640:	4426      	add	r6, r4
+34180642:	42b4      	cmp	r4, r6
+34180644:	d118      	bne.n	34180678 <packet+0xd8>
+34180646:	9c01      	ldr	r4, [sp, #4]
+34180648:	43e4      	mvns	r4, r4
+3418064a:	b2e0      	uxtb	r0, r4
+3418064c:	f7ff ff78 	bl	34180540 <tx_byte>
+34180650:	f3c4 2007 	ubfx	r0, r4, #8, #8
+34180654:	f7ff ff74 	bl	34180540 <tx_byte>
+34180658:	f3c4 4007 	ubfx	r0, r4, #16, #8
+3418065c:	f7ff ff70 	bl	34180540 <tx_byte>
+34180660:	0e20      	lsrs	r0, r4, #24
+34180662:	f7ff ff6d 	bl	34180540 <tx_byte>
+34180666:	2201      	movs	r2, #1
+34180668:	2008      	movs	r0, #8
+3418066a:	4b06      	ldr	r3, [pc, #24]	@ (34180684 <packet+0xe4>)
+3418066c:	f8c3 2c18 	str.w	r2, [r3, #3096]	@ 0xc18
+34180670:	b003      	add	sp, #12
+34180672:	e8bd 43f0 	ldmia.w	sp!, {r4, r5, r6, r7, r8, r9, lr}
+34180676:	e757      	b.n	34180528 <delay_units>
+34180678:	f814 0b01 	ldrb.w	r0, [r4], #1
+3418067c:	a901      	add	r1, sp, #4
+3418067e:	f7ff ff7b 	bl	34180578 <tx_checked>
+34180682:	e7de      	b.n	34180642 <packet+0xa2>
+34180684:	56020000 	.word	0x56020000
+
+34180688 <checkpoint>:
+34180688:	2300      	movs	r3, #0
+3418068a:	b507      	push	{r0, r1, r2, lr}
+3418068c:	460a      	mov	r2, r1
+3418068e:	9300      	str	r3, [sp, #0]
+34180690:	2101      	movs	r1, #1
+34180692:	f7ff ff85 	bl	341805a0 <packet>
+34180696:	b003      	add	sp, #12
+34180698:	f85d fb04 	ldr.w	pc, [sp], #4
+
+3418069c <readback>:
+3418069c:	2300      	movs	r3, #0
+3418069e:	b530      	push	{r4, r5, lr}
+341806a0:	460c      	mov	r4, r1
+341806a2:	b085      	sub	sp, #20
+341806a4:	460a      	mov	r2, r1
+341806a6:	9300      	str	r3, [sp, #0]
+341806a8:	2103      	movs	r1, #3
+341806aa:	4605      	mov	r5, r0
+341806ac:	f7ff ff78 	bl	341805a0 <packet>
+341806b0:	6823      	ldr	r3, [r4, #0]
+341806b2:	4622      	mov	r2, r4
+341806b4:	9303      	str	r3, [sp, #12]
+341806b6:	2304      	movs	r3, #4
+341806b8:	2105      	movs	r1, #5
+341806ba:	9300      	str	r3, [sp, #0]
+341806bc:	4628      	mov	r0, r5
+341806be:	ab03      	add	r3, sp, #12
+341806c0:	f7ff ff6e 	bl	341805a0 <packet>
+341806c4:	b005      	add	sp, #20
+341806c6:	bd30      	pop	{r4, r5, pc}
+
+341806c8 <trace>:
+341806c8:	e92d 43f0 	stmdb	sp!, {r4, r5, r6, r7, r8, r9, lr}
+341806cc:	2400      	movs	r4, #0
+341806ce:	4605      	mov	r5, r0
+341806d0:	460e      	mov	r6, r1
+341806d2:	4690      	mov	r8, r2
+341806d4:	46a1      	mov	r9, r4
+341806d6:	b093      	sub	sp, #76	@ 0x4c
+341806d8:	eb08 0704 	add.w	r7, r8, r4
+341806dc:	2300      	movs	r3, #0
+341806de:	463a      	mov	r2, r7
+341806e0:	4628      	mov	r0, r5
+341806e2:	2103      	movs	r1, #3
+341806e4:	f8cd 9000 	str.w	r9, [sp]
+341806e8:	f7ff ff5a 	bl	341805a0 <packet>
+341806ec:	f04f 0e10 	mov.w	lr, #16
+341806f0:	aa02      	add	r2, sp, #8
+341806f2:	2000      	movs	r0, #0
+341806f4:	4613      	mov	r3, r2
+341806f6:	f04e e001 	dls	lr, lr
+341806fa:	5839      	ldr	r1, [r7, r0]
+341806fc:	3004      	adds	r0, #4
+341806fe:	f842 1b04 	str.w	r1, [r2], #4
+34180702:	f00f c007 	le	lr, 341806fa <trace+0x32>
+34180706:	9000      	str	r0, [sp, #0]
+34180708:	463a      	mov	r2, r7
+3418070a:	4631      	mov	r1, r6
+3418070c:	4628      	mov	r0, r5
+3418070e:	3440      	adds	r4, #64	@ 0x40
+34180710:	f7ff ff46 	bl	341805a0 <packet>
+34180714:	f5b4 6f00 	cmp.w	r4, #2048	@ 0x800
+34180718:	d1de      	bne.n	341806d8 <trace+0x10>
+3418071a:	b013      	add	sp, #76	@ 0x4c
+3418071c:	e8bd 83f0 	ldmia.w	sp!, {r4, r5, r6, r7, r8, r9, pc}
+
+34180720 <fallback_dump>:
+34180720:	f04f 0800 	mov.w	r8, #0
+34180724:	2410      	movs	r4, #16
+34180726:	2502      	movs	r5, #2
+34180728:	b580      	push	{r7, lr}
+3418072a:	b08e      	sub	sp, #56	@ 0x38
+3418072c:	e9cd 8002 	strd	r8, r0, [sp, #8]
+34180730:	f44f 5000 	mov.w	r0, #8192	@ 0x2000
+34180734:	e9cd 1204 	strd	r1, r2, [sp, #16]
+34180738:	9306      	str	r3, [sp, #24]
+3418073a:	2102      	movs	r1, #2
+3418073c:	f7ff fef4 	bl	34180528 <delay_units>
+34180740:	ab03      	add	r3, sp, #12
+34180742:	9400      	str	r4, [sp, #0]
+34180744:	a802      	add	r0, sp, #8
+34180746:	f04f 42a0 	mov.w	r2, #1342177280	@ 0x50000000
+3418074a:	f7ff ff29 	bl	341805a0 <packet>
+3418074e:	4621      	mov	r1, r4
+34180750:	a802      	add	r0, sp, #8
+34180752:	4a49      	ldr	r2, [pc, #292]	@ (34180878 <fallback_dump+0x158>)
+34180754:	f7ff ffb8 	bl	341806c8 <trace>
+34180758:	4a48      	ldr	r2, [pc, #288]	@ (3418087c <fallback_dump+0x15c>)
+3418075a:	a802      	add	r0, sp, #8
+3418075c:	2111      	movs	r1, #17
+3418075e:	f7ff ffb3 	bl	341806c8 <trace>
+34180762:	4c47      	ldr	r4, [pc, #284]	@ (34180880 <fallback_dump+0x160>)
+34180764:	a802      	add	r0, sp, #8
+34180766:	f44f 7180 	mov.w	r1, #256	@ 0x100
+3418076a:	f7ff ff8d 	bl	34180688 <checkpoint>
+3418076e:	2101      	movs	r1, #1
+34180770:	a802      	add	r0, sp, #8
+34180772:	f7ff ff89 	bl	34180688 <checkpoint>
+34180776:	f8c4 5a78 	str.w	r5, [r4, #2680]	@ 0xa78
+3418077a:	f8d4 3278 	ldr.w	r3, [r4, #632]	@ 0x278
+3418077e:	f3bf 8f4f 	dsb	sy
+34180782:	f3bf 8f6f 	isb	sy
+34180786:	493f      	ldr	r1, [pc, #252]	@ (34180884 <fallback_dump+0x164>)
+34180788:	a802      	add	r0, sp, #8
+3418078a:	f7ff ff87 	bl	3418069c <readback>
+3418078e:	a802      	add	r0, sp, #8
+34180790:	493d      	ldr	r1, [pc, #244]	@ (34180888 <fallback_dump+0x168>)
+34180792:	f7ff ff83 	bl	3418069c <readback>
+34180796:	a802      	add	r0, sp, #8
+34180798:	493c      	ldr	r1, [pc, #240]	@ (3418088c <fallback_dump+0x16c>)
+3418079a:	f7ff ff7f 	bl	3418069c <readback>
+3418079e:	a802      	add	r0, sp, #8
+341807a0:	493b      	ldr	r1, [pc, #236]	@ (34180890 <fallback_dump+0x170>)
+341807a2:	f7ff ff7b 	bl	3418069c <readback>
+341807a6:	4629      	mov	r1, r5
+341807a8:	a802      	add	r0, sp, #8
+341807aa:	f7ff ff6d 	bl	34180688 <checkpoint>
+341807ae:	4d39      	ldr	r5, [pc, #228]	@ (34180894 <fallback_dump+0x174>)
+341807b0:	4b39      	ldr	r3, [pc, #228]	@ (34180898 <fallback_dump+0x178>)
+341807b2:	f8c5 3e8c 	str.w	r3, [r5, #3724]	@ 0xe8c
+341807b6:	f3bf 8f4f 	dsb	sy
+341807ba:	f3bf 8f6f 	isb	sy
+341807be:	4933      	ldr	r1, [pc, #204]	@ (3418088c <fallback_dump+0x16c>)
+341807c0:	a802      	add	r0, sp, #8
+341807c2:	f7ff ff6b 	bl	3418069c <readback>
+341807c6:	2103      	movs	r1, #3
+341807c8:	a802      	add	r0, sp, #8
+341807ca:	f7ff ff5d 	bl	34180688 <checkpoint>
+341807ce:	23b4      	movs	r3, #180	@ 0xb4
+341807d0:	f8c5 3e90 	str.w	r3, [r5, #3728]	@ 0xe90
+341807d4:	f3bf 8f4f 	dsb	sy
+341807d8:	f3bf 8f6f 	isb	sy
+341807dc:	2601      	movs	r6, #1
+341807de:	a802      	add	r0, sp, #8
+341807e0:	492b      	ldr	r1, [pc, #172]	@ (34180890 <fallback_dump+0x170>)
+341807e2:	f7ff ff5b 	bl	3418069c <readback>
+341807e6:	a802      	add	r0, sp, #8
+341807e8:	4926      	ldr	r1, [pc, #152]	@ (34180884 <fallback_dump+0x164>)
+341807ea:	f7ff ff57 	bl	3418069c <readback>
+341807ee:	a802      	add	r0, sp, #8
+341807f0:	4925      	ldr	r1, [pc, #148]	@ (34180888 <fallback_dump+0x168>)
+341807f2:	f7ff ff53 	bl	3418069c <readback>
+341807f6:	2104      	movs	r1, #4
+341807f8:	a802      	add	r0, sp, #8
+341807fa:	f7ff ff45 	bl	34180688 <checkpoint>
+341807fe:	f8c4 6a48 	str.w	r6, [r4, #2632]	@ 0xa48
+34180802:	f8c4 6a88 	str.w	r6, [r4, #2696]	@ 0xa88
+34180806:	f8d4 3248 	ldr.w	r3, [r4, #584]	@ 0x248
+3418080a:	f3bf 8f4f 	dsb	sy
+3418080e:	f3bf 8f6f 	isb	sy
+34180812:	4f22      	ldr	r7, [pc, #136]	@ (3418089c <fallback_dump+0x17c>)
+34180814:	687b      	ldr	r3, [r7, #4]
+34180816:	f443 1380 	orr.w	r3, r3, #1048576	@ 0x100000
+3418081a:	4333      	orrs	r3, r6
+3418081c:	607b      	str	r3, [r7, #4]
+3418081e:	f3bf 8f4f 	dsb	sy
+34180822:	f3bf 8f6f 	isb	sy
+34180826:	2105      	movs	r1, #5
+34180828:	a802      	add	r0, sp, #8
+3418082a:	f7ff ff2d 	bl	34180688 <checkpoint>
+3418082e:	f8d5 3e8c 	ldr.w	r3, [r5, #3724]	@ 0xe8c
+34180832:	4642      	mov	r2, r8
+34180834:	9307      	str	r3, [sp, #28]
+34180836:	f8d5 3e90 	ldr.w	r3, [r5, #3728]	@ 0xe90
+3418083a:	2104      	movs	r1, #4
+3418083c:	9308      	str	r3, [sp, #32]
+3418083e:	f8d4 344c 	ldr.w	r3, [r4, #1100]	@ 0x44c
+34180842:	a802      	add	r0, sp, #8
+34180844:	9309      	str	r3, [sp, #36]	@ 0x24
+34180846:	4b16      	ldr	r3, [pc, #88]	@ (341808a0 <fallback_dump+0x180>)
+34180848:	930a      	str	r3, [sp, #40]	@ 0x28
+3418084a:	687b      	ldr	r3, [r7, #4]
+3418084c:	930b      	str	r3, [sp, #44]	@ 0x2c
+3418084e:	f8d4 3248 	ldr.w	r3, [r4, #584]	@ 0x248
+34180852:	930c      	str	r3, [sp, #48]	@ 0x30
+34180854:	f8d4 3288 	ldr.w	r3, [r4, #648]	@ 0x288
+34180858:	930d      	str	r3, [sp, #52]	@ 0x34
+3418085a:	231c      	movs	r3, #28
+3418085c:	9300      	str	r3, [sp, #0]
+3418085e:	446b      	add	r3, sp
+34180860:	f7ff fe9e 	bl	341805a0 <packet>
+34180864:	f04f 31ff 	mov.w	r1, #4294967295
+34180868:	a802      	add	r0, sp, #8
+3418086a:	f7ff ff0d 	bl	34180688 <checkpoint>
+3418086e:	4b0d      	ldr	r3, [pc, #52]	@ (341808a4 <fallback_dump+0x184>)
+34180870:	f8c3 6c18 	str.w	r6, [r3, #3096]	@ 0xc18
+34180874:	bf00      	nop
+34180876:	e7fd      	b.n	34180874 <fallback_dump+0x154>
+34180878:	341037f0 	.word	0x341037f0
+3418087c:	241077f0 	.word	0x241077f0
+34180880:	56028000 	.word	0x56028000
+34180884:	56009e94 	.word	0x56009e94
+34180888:	56009e40 	.word	0x56009e40
+3418088c:	56009e8c 	.word	0x56009e8c
+34180890:	56009e90 	.word	0x56009e90
+34180894:	56009000 	.word	0x56009000
+34180898:	b451b400 	.word	0xb451b400
+3418089c:	54001000 	.word	0x54001000
+341808a0:	44424733 	.word	0x44424733
+341808a4:	56020000 	.word	0x56020000

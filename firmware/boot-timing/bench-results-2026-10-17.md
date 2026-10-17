@@ -1,8 +1,10 @@
 # CN8-powered autonomous boot and API cycling — October 17, 2026
 
+This records the initial cycling experiment. Later changes to CH5, experimental NOR images and startup analysis are recorded in the [optimization follow-up](optimization-results-2026-10-17.md).
+
 **The bench can now power-cycle the target through the JS110 API and boot the installed NOR image without a debugger command during each cycle.** Three fully recorded repeat cycles passed after an initial stuck reset was released. They reached PD0 **15.20–15.43 ms after NRST rose**, or **22.67–22.90 ms after the target supply crossed 0.5 V**. Both monitored rails were continuously below 0.1 V together for **12.97–13.08 seconds** before each restart.
 
-This validates the current supply route and first-GPIO experiment. It does not measure sensor startup or exposure, prove complete discharge of unprobed rails, or qualify the 50 ms button-to-exposure requirement. Three repeats are not a worst-case bound. The installed image and firmware hashes are unchanged from the [October 16 experiment](bench-results-2026-10-16.md); no NOR, OTP or security setting was changed today.
+This validates the current supply route and first-GPIO experiment. It does not measure sensor startup or exposure, prove complete discharge of unprobed rails, or qualify the 50 ms button-to-exposure requirement. Three repeats are not a worst-case bound. During these initial tests the installed image and firmware hashes were unchanged from the [October 16 experiment](bench-results-2026-10-16.md); these tests changed no NOR, OTP or security setting. Subsequent experimental image programming is documented in the follow-up above.
 
 ## Supply, instruments and probes
 

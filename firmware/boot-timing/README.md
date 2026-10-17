@@ -1,5 +1,7 @@
 # Earliest GPIO boot marker experiment
 
+**October 17 optimization follow-up:** CH5 now measures main VDDIO at CN3 pin 5. Fixed JS110 measurement range did not meaningfully improve startup. The current experimental NOR image includes post-marker diagnostics; the original sector is backed up exactly. See the [ongoing tests and current image state](optimization-results-2026-10-17.md).
+
 This is a small **secure FSBL payload**, independent of the camera bring-up program. It raises **PD0 first**, raises **PE0 immediately afterward**, and leaves both high. **October 17, 2026:** three recorded API-controlled power cycles using CN8 → CN9.3 → JS110 → CN9.2 booted from NOR, with **15.20–15.43 ms from NRST rising to PD0**. The earlier roughly 50 ms reset hold did not recur after a one-time reset-release diagnostic. The slow 5 V ramp makes a late 4.50 V crossing unsuitable as a full-startup reference. See [current results and qualifications](bench-results-2026-10-17.md); the [October 16 results](bench-results-2026-10-16.md) preserve the earlier 62.75–62.91 ms ST-LINK-source measurements.
 
 It uses no HAL, RTOS, C runtime, PLL changes, sensor initialization, image transfer, OTP programming, or external-memory writes. Both marker pins are configured as push-pull, no pull, low-speed outputs; all other pins' settings are preserved. The existing PD0 and PE0 probe connections remain appropriate.

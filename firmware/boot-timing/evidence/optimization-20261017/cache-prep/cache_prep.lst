@@ -1,0 +1,57 @@
+
+D:\Github\global-x-camera\tmp\bringup\cache-prep-20261017\cache_prep.elf:     file format elf32-littlearm
+
+
+Disassembly of section .text:
+
+34190000 <Cache_Prep>:
+34190000:	b672      	cpsid	i
+34190002:	f3ef 800a 	mrs	r0, MSPLIM
+34190006:	2100      	movs	r1, #0
+34190008:	f381 880a 	msr	MSPLIM, r1
+3419000c:	f000 b800 	b.w	34190010 <cache_prep_body>
+
+34190010 <cache_prep_body>:
+34190010:	4a1a      	ldr	r2, [pc, #104]	@ (3419007c <cache_prep_ready+0xa>)
+34190012:	4b1b      	ldr	r3, [pc, #108]	@ (34190080 <cache_prep_ready+0xe>)
+34190014:	6951      	ldr	r1, [r2, #20]
+34190016:	4c1b      	ldr	r4, [pc, #108]	@ (34190084 <cache_prep_ready+0x12>)
+34190018:	f8c3 4400 	str.w	r4, [r3, #1024]	@ 0x400
+3419001c:	f8c3 1404 	str.w	r1, [r3, #1028]	@ 0x404
+34190020:	f8c3 0408 	str.w	r0, [r3, #1032]	@ 0x408
+34190024:	f3ef 800a 	mrs	r0, MSPLIM
+34190028:	f8c3 040c 	str.w	r0, [r3, #1036]	@ 0x40c
+3419002c:	f8c3 1410 	str.w	r1, [r3, #1040]	@ 0x410
+34190030:	f411 3180 	ands.w	r1, r1, #65536	@ 0x10000
+34190034:	d120      	bne.n	34190078 <cache_prep_ready+0x6>
+34190036:	f3bf 8f4f 	dsb	sy
+3419003a:	f3bf 8f6f 	isb	sy
+3419003e:	6950      	ldr	r0, [r2, #20]
+34190040:	f420 3000 	bic.w	r0, r0, #131072	@ 0x20000
+34190044:	6150      	str	r0, [r2, #20]
+34190046:	f8c2 1250 	str.w	r1, [r2, #592]	@ 0x250
+3419004a:	f3bf 8f4f 	dsb	sy
+3419004e:	f3bf 8f6f 	isb	sy
+34190052:	6951      	ldr	r1, [r2, #20]
+34190054:	f8c3 1410 	str.w	r1, [r3, #1040]	@ 0x410
+34190058:	6952      	ldr	r2, [r2, #20]
+3419005a:	490b      	ldr	r1, [pc, #44]	@ (34190088 <cache_prep_ready+0x16>)
+3419005c:	f412 3f00 	tst.w	r2, #131072	@ 0x20000
+34190060:	4a0a      	ldr	r2, [pc, #40]	@ (3419008c <cache_prep_ready+0x1a>)
+34190062:	bf08      	it	eq
+34190064:	460a      	moveq	r2, r1
+34190066:	f8c3 2400 	str.w	r2, [r3, #1024]	@ 0x400
+3419006a:	f3bf 8f4f 	dsb	sy
+3419006e:	f3bf 8f6f 	isb	sy
+
+34190072 <cache_prep_ready>:
+34190072:	bf00      	nop
+34190074:	f7ff bffd 	b.w	34190072 <cache_prep_ready>
+34190078:	4a05      	ldr	r2, [pc, #20]	@ (34190090 <cache_prep_ready+0x1e>)
+3419007a:	e7f4      	b.n	34190066 <cache_prep_body+0x56>
+3419007c:	e000ed00 	.word	0xe000ed00
+34190080:	34190000 	.word	0x34190000
+34190084:	50524550 	.word	0x50524550
+34190088:	43414348 	.word	0x43414348
+3419008c:	4641494c 	.word	0x4641494c
+34190090:	44434143 	.word	0x44434143

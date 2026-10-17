@@ -1,0 +1,91 @@
+{
+  "cycles": [
+    {
+      "cycle": "opt-debug-auto-01",
+      "range": "auto",
+      "analog_spacing_us": 32,
+      "digital_spacing_us": 0.16,
+      "target_5v_0_5_to_4_5_ms": 18.848000000001974,
+      "target_5v_0_5_to_pd0_ms": 23.088558000001314,
+      "target_5v_4_5_to_pd0_ms": 4.240557999999339,
+      "main_vddio_0_33_to_2_97_ms": 9.247999999999479,
+      "main_vddio_2_97_to_nrst_ms": -2.9684020000004807,
+      "main_vddio_2_97_to_pd0_ms": 12.560558000000555,
+      "nrst_to_pd0_ms": 15.528960000001035,
+      "pd0_to_pe0_us": 0.4800000006355276,
+      "reported_current_peak_A": 4.78899621963501,
+      "reported_upstream_min_V": -0.6098235249519348,
+      "settled_current_A": 0.09517758165560647,
+      "source_before_V": 4.9652259564341374,
+      "source_after_V": 4.882040469368835,
+      "levels_bracketing_digital_edges": {
+        "nrst": {
+          "edge_s": 20.47658576,
+          "sample_before_s": 20.476578162,
+          "sample_after_s": 20.476610162,
+          "main_vddio_ch5_before_v": 2.158,
+          "main_vddio_ch5_after_v": 2.209,
+          "aux_3v3_ch3_before_v": 1.077,
+          "aux_3v3_ch3_after_v": 1.057,
+          "target_5v_ch4_before_v": 2.182,
+          "target_5v_ch4_after_v": 2.233
+        },
+        "pd0": {
+          "edge_s": 20.49211472,
+          "sample_before_s": 20.492098162,
+          "sample_after_s": 20.492130162,
+          "main_vddio_ch5_before_v": 3.276,
+          "main_vddio_ch5_after_v": 3.276,
+          "aux_3v3_ch3_before_v": 3.288,
+          "aux_3v3_ch3_after_v": 3.293,
+          "target_5v_ch4_before_v": 4.837,
+          "target_5v_ch4_after_v": 4.837
+        }
+      }
+    },
+    {
+      "cycle": "opt-debug-fixed-01",
+      "range": "2A",
+      "analog_spacing_us": 32,
+      "digital_spacing_us": 0.16,
+      "target_5v_0_5_to_4_5_ms": 18.784000000000134,
+      "target_5v_0_5_to_pd0_ms": 23.019437999998615,
+      "target_5v_4_5_to_pd0_ms": 4.2354379999984815,
+      "main_vddio_0_33_to_2_97_ms": 9.215999999998559,
+      "main_vddio_2_97_to_nrst_ms": -2.936561999998588,
+      "main_vddio_2_97_to_pd0_ms": 12.555437999999697,
+      "nrst_to_pd0_ms": 15.491999999998285,
+      "pd0_to_pe0_us": 0.4800000006355276,
+      "reported_current_peak_A": 2.2110822200775146,
+      "reported_upstream_min_V": -0.6120933890342712,
+      "settled_current_A": 0.09885047195658825,
+      "source_before_V": 4.958508653217093,
+      "source_after_V": 4.8839129529133505,
+      "levels_bracketing_digital_edges": {
+        "nrst": {
+          "edge_s": 20.4719456,
+          "sample_before_s": 20.471938162,
+          "sample_after_s": 20.471970162,
+          "main_vddio_ch5_before_v": 2.147,
+          "main_vddio_ch5_after_v": 2.204,
+          "aux_3v3_ch3_before_v": 1.082,
+          "aux_3v3_ch3_after_v": 1.062,
+          "target_5v_ch4_before_v": 2.166,
+          "target_5v_ch4_after_v": 2.223
+        },
+        "pd0": {
+          "edge_s": 20.4874376,
+          "sample_before_s": 20.487426162,
+          "sample_after_s": 20.487458162,
+          "main_vddio_ch5_before_v": 3.276,
+          "main_vddio_ch5_after_v": 3.271,
+          "aux_3v3_ch3_before_v": 3.288,
+          "aux_3v3_ch3_after_v": 3.288,
+          "target_5v_ch4_before_v": 4.832,
+          "target_5v_ch4_after_v": 4.832
+        }
+      }
+    }
+  ],
+  "conclusion": "Fixed 2 A did not materially shorten the observed target ramp or first-GPIO timing; source disturbance persisted. Current peaks are not directly comparable because fixed 2 A may clip; its recorded peak is consistent with clipping."
+}

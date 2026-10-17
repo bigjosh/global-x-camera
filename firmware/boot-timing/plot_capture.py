@@ -1,4 +1,8 @@
-"""Plot one measured boot from the raw Logic CSV and boot-summary.json."""
+"""Plot one measured boot from the raw Logic CSV and boot-summary.json.
+
+Show CH5 as main VDDIO only when capture-config.json identifies it that way;
+captures without that mapping retain the original two-rail plot.
+"""
 import argparse
 import csv
 import json
@@ -18,6 +22,9 @@ p.add_argument('capture', type=Path)
 p.add_argument('output', type=Path)
 args = p.parse_args()
 data = json.loads((args.capture / 'boot-summary.json').read_text())
+config_path = args.capture / 'capture-config.json'
+config = json.loads(config_path.read_text()) if config_path.exists() else {}
+show_main_vddio = config.get('channel_map', {}).get('5') == 'main-vddio'
 cycle = data['cycles'][0]
 t0 = cycle['target_5v_4_5v_crossing_s']
 t_reset = (cycle['nrst_rise_s'] - t0) * 1000
@@ -25,6 +32,8 @@ t_gpio = cycle['target_5v_to_pd0_ms']
 x_start = min(-3, t_reset - 15)
 x_end = max(25, t_gpio + 10)
 times, rails = [], {3: [], 4: []}
+if show_main_vddio:
+    rails[5] = []
 with (args.capture / 'analog.csv').open(newline='', encoding='utf-8-sig') as f:
     rows = csv.DictReader(f)
     tc, names = columns(rows.fieldnames)
@@ -45,9 +54,12 @@ fig, axes = plt.subplots(3, 1, figsize=(10, 6), sharex=True,
 fig.set_layout_engine('constrained', rect=(0, .09, 1, .91))
 fig.suptitle('Autonomous flash boot: rails, reset and first GPIO', fontsize=17, fontweight='bold')
 axes[0].plot(times, rails[4], color='#c76313', label='Target 5 V')
-axes[0].plot(times, rails[3], color='#008578', label='Auxiliary 3.3 V')
+axes[0].plot(times, rails[3], color='#008578', label='Auxiliary 3.3 V',
+             linestyle='--' if show_main_vddio else '-')
+if show_main_vddio:
+    axes[0].plot(times, rails[5], color='#7b3f95', label='Main VDDIO (CH5)')
 axes[0].set(ylabel='Voltage (V)', ylim=(-.3, 5.5))
-axes[0].legend(loc='lower right', frameon=False, ncol=2)
+axes[0].legend(loc='lower right', frameon=False, ncol=3 if show_main_vddio else 2)
 signals = read_digital(args.capture / 'digital.csv')['channels']
 for ax, ch, title, color in [(axes[1], 0, 'NRST', '#526074'), (axes[2], 1, 'PD0', '#2365b7')]:
     signal = signals[ch]

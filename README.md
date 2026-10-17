@@ -20,6 +20,8 @@ An STM32N6-based, credit-card-size monochrome global-shutter camera project. Thi
 
 ## Current position
 
+**Startup optimization follow-up, October 17:** CH5 now measures main MCU VDDIO. The first marker remains about 23 ms from the measured 5 V rise; fixed JS110 range provided no useful improvement. The tiny original payload already contains no HAL or camera application. Experimental post-marker diagnostics are being tested; exact NOR-sector restoration is preserved. See the [measurements, hypotheses and current firmware state](firmware/boot-timing/optimization-results-2026-10-17.md).
+
 The prototype uses STM32N6, CAM-6G3-073CLR / VD56G3 at 73° diagonal field of view, and four series CR2032 cells through LTC3621. Exposure must start within 50 ms of a button press from fully off. Store at least 200 full-resolution uncompressed RAW10 photos; preserve photos when full. Ignore presses while capturing or saving, with no queued exposure. USB powers a PTP camera interface with explicit per-photo deletion and disables shutter operation; connection or download alone never deletes photos. Full-image readback is configurable; mandatory save/commit checks remain.
 
 The main-path OFF-current target is 0.1 µA at room temperature, with RTC backup separately budgeted. The finished-product thickness target is ≤5 mm; a thicker functional prototype is allowed. These are requirements, not measured results.

@@ -1,0 +1,283 @@
+{
+  "cycle": "opt-debug-fixed-01",
+  "on_state": "2A",
+  "reproduce": "python tmp/bringup/analyze_opt_stream_cycles.py",
+  "input_sha256": {
+    "opt-current-voltage.jsonl": "f0c1b59c446894928d8353a27ab5ff5a8448b79e861beeab287eaf7df60951ee",
+    "opt-debug-fixed-01\\cycle-log.jsonl": "0949f51af53347b36cbd4cb2df2a5c946958a238b7b60c853cc37a622cddde1c",
+    "opt-debug-fixed-01\\analog.csv": "381c7fc74bbdcb56d622cef60e505998111b13ede1d773c9f583bea22d1a04a7",
+    "opt-debug-fixed-01\\digital.csv": "f490d7c03f7b664516813145c5bcda819dd4b209d9a325484c1a1cc97feb9c19"
+  },
+  "on_command": {
+    "event": "response",
+    "utc": "2026-10-17T04:35:05.339931+00:00",
+    "monotonic_ns": 2084025078000000,
+    "id": "715f678e-18ba-4fc1-ab0c-5530a5e0162e",
+    "state": "2A",
+    "supported_states": [
+      "off",
+      "auto",
+      "2A",
+      "query",
+      "stop"
+    ],
+    "ok": true,
+    "range": 2,
+    "command_start": {
+      "utc": "2026-10-17T04:35:05.329406+00:00",
+      "monotonic_ns": 2084025062000000
+    },
+    "command_end": {
+      "utc": "2026-10-17T04:35:05.339931+00:00",
+      "monotonic_ns": 2084025078000000
+    },
+    "statistics": {
+      "received": {
+        "utc": "2026-10-17T04:35:04.908245+00:00",
+        "monotonic_ns": 2084024656000000
+      },
+      "voltage_location": "IN+ relative to IN-",
+      "voltage": {
+        "units": "V",
+        "avg": 4.953361511230469,
+        "min": 4.909355163574219,
+        "max": 4.9865264892578125
+      },
+      "current": {
+        "units": "A",
+        "avg": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "power": {
+        "units": "W",
+        "avg": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "sequence": 236,
+      "age_s": 0.422
+    }
+  },
+  "analysis_window_s_relative_to_on_command": [
+    -0.2,
+    0.5
+  ],
+  "saleae_timing": {
+    "source": "Direct recalculation from saved analog.csv and digital.csv",
+    "analog_spacing_us": 32,
+    "digital_spacing_us": 0.16,
+    "edges_s": {
+      "nrst": 20.4719456,
+      "pd0": 20.4874376,
+      "pe0": 20.48743808
+    },
+    "up_crossings_s": {
+      "3": {
+        "0.33": [
+          20.471810162
+        ],
+        "2.97": [
+          20.474946162
+        ]
+      },
+      "4": {
+        "0.5": [
+          20.464418162
+        ],
+        "4.5": [
+          20.483202162
+        ]
+      },
+      "5": {
+        "0.33": [
+          20.465666162
+        ],
+        "2.97": [
+          20.474882162
+        ]
+      }
+    },
+    "target_5v_0_5_to_4_5_ms": 18.784000000000134,
+    "target_5v_0_5_to_pd0_ms": 23.019437999998615,
+    "target_5v_4_5_to_pd0_ms": 4.2354379999984815,
+    "main_vddio_0_33_to_2_97_ms": 9.215999999998559,
+    "main_vddio_2_97_to_nrst_ms": -2.936561999998588,
+    "main_vddio_2_97_to_pd0_ms": 12.555437999999697,
+    "nrst_to_pd0_ms": 15.491999999998285,
+    "pd0_to_pe0_us": 0.4800000006355276,
+    "levels_bracketing_digital_edges": {
+      "nrst": {
+        "edge_s": 20.4719456,
+        "sample_before_s": 20.471938162,
+        "sample_after_s": 20.471970162,
+        "main_vddio_ch5_before_v": 2.147,
+        "main_vddio_ch5_after_v": 2.204,
+        "aux_3v3_ch3_before_v": 1.082,
+        "aux_3v3_ch3_after_v": 1.062,
+        "target_5v_ch4_before_v": 2.166,
+        "target_5v_ch4_after_v": 2.223
+      },
+      "pd0": {
+        "edge_s": 20.4874376,
+        "sample_before_s": 20.487426162,
+        "sample_after_s": 20.487458162,
+        "main_vddio_ch5_before_v": 3.276,
+        "main_vddio_ch5_after_v": 3.271,
+        "aux_3v3_ch3_before_v": 3.288,
+        "aux_3v3_ch3_after_v": 3.288,
+        "target_5v_ch4_before_v": 4.832,
+        "target_5v_ch4_after_v": 4.832
+      }
+    }
+  },
+  "current_peak": {
+    "value": 2.2110822200775146,
+    "units": "A",
+    "sample_id": 236018798,
+    "estimated_utc": "2026-10-17T04:35:05.338563+00:00",
+    "ms_after_command_start": 9.156942367553711,
+    "containing_chunk": {
+      "event": "stream_chunk",
+      "received": {
+        "utc": "2026-10-17T04:35:05.363656+00:00",
+        "monotonic_ns": 2084025109000000
+      },
+      "signal": "current",
+      "units": "A",
+      "sample_id": 236006946,
+      "sample_id_end_exclusive": 236072340,
+      "sample_rate_hz": 2000000,
+      "decimate_factor": 1,
+      "effective_sample_rate_hz": 2000000.0,
+      "duration_s": 0.032697,
+      "utc_time64": 297906346195021194,
+      "sample_utc": "2026-10-17T04:35:05.332637+00:00",
+      "time_map": {
+        "offset_time": 297906281799460907,
+        "offset_counter": 116060868,
+        "counter_rate": 2000000.0
+      },
+      "count": 65394,
+      "finite_count": 65394,
+      "nonfinite_count": 0,
+      "min": -0.036366719752550125,
+      "mean": 0.05705076896073363,
+      "max": 2.2110822200775146,
+      "min_sample_id": 236018814,
+      "max_sample_id": 236018798,
+      "gap_native_samples": 0,
+      "abs_ge_2A_count": 11
+    }
+  },
+  "upstream_voltage_minimum": {
+    "value": -0.6120933890342712,
+    "units": "V",
+    "sample_id": 236018810,
+    "estimated_utc": "2026-10-17T04:35:05.338569+00:00",
+    "ms_after_command_start": 9.16290283203125,
+    "containing_chunk": {
+      "event": "stream_chunk",
+      "received": {
+        "utc": "2026-10-17T04:35:05.339931+00:00",
+        "monotonic_ns": 2084025078000000
+      },
+      "signal": "voltage",
+      "units": "V",
+      "sample_id": 235957680,
+      "sample_id_end_exclusive": 236023074,
+      "sample_rate_hz": 2000000,
+      "decimate_factor": 1,
+      "effective_sample_rate_hz": 2000000.0,
+      "duration_s": 0.032697,
+      "utc_time64": 297906346168571711,
+      "sample_utc": "2026-10-17T04:35:05.308004+00:00",
+      "time_map": {
+        "offset_time": 297906281799460907,
+        "offset_counter": 116060868,
+        "counter_rate": 2000000.0
+      },
+      "count": 65394,
+      "finite_count": 65394,
+      "nonfinite_count": 0,
+      "min": -0.6120933890342712,
+      "mean": 4.63858187432334,
+      "max": 4.97404670715332,
+      "min_sample_id": 236018810,
+      "max_sample_id": 236017075,
+      "gap_native_samples": 0
+    }
+  },
+  "baseline_upstream_voltage": {
+    "relative_window_s": [
+      -2,
+      -0.1
+    ],
+    "whole_chunks": 57,
+    "finite_samples": 3727458,
+    "weighted_mean": 4.958508653217093,
+    "min": 4.9082207679748535,
+    "max": 4.985395908355713
+  },
+  "settled_upstream_voltage": {
+    "relative_window_s": [
+      0.1,
+      1.5
+    ],
+    "whole_chunks": 42,
+    "finite_samples": 2746548,
+    "weighted_mean": 4.8839129529133505,
+    "min": 4.856013774871826,
+    "max": 4.894601345062256
+  },
+  "settled_current": {
+    "relative_window_s": [
+      0.1,
+      1.5
+    ],
+    "whole_chunks": 42,
+    "finite_samples": 2746548,
+    "weighted_mean": 0.09885047195658825,
+    "min": 0.0739886537194252,
+    "max": 0.13066664338111877
+  },
+  "capture_integrity": {
+    "effective_sample_rates_hz": [
+      2000000.0
+    ],
+    "decimate_factors": [
+      1
+    ],
+    "chunk_duration_s": [
+      0.032697
+    ],
+    "nonfinite_samples_by_signal": {
+      "current": 0,
+      "voltage": 0
+    },
+    "sample_gap_records_in_window": 0,
+    "sample_gap_records_in_session": 0,
+    "abs_ge_2A_samples_in_window": 11,
+    "session_stop": {
+      "event": "stream_stop",
+      "utc": "2026-10-17T04:37:29.413443+00:00",
+      "monotonic_ns": 2084169156000000,
+      "chunks": 16030,
+      "dropped_chunks": 0,
+      "error": null,
+      "complete": true
+    }
+  },
+  "limitations": [
+    "One cycle per range; small differences are not statistical evidence of a speed improvement.",
+    "Analog crossings are sampled at 32 us without interpolation; two-edge intervals have sampling and voltage-threshold uncertainty.",
+    "CH5 is main VDDIO; CH3 is auxiliary 3.3 V. Neither identifies internal POR release, AON/core readiness or ROM entry.",
+    "32.697 ms chunk summaries retain extrema and their sample positions, not complete waveforms.",
+    "Current and voltage chunks have different boundaries; their native sample IDs share the instrument clock.",
+    "Fixed 2 A is a measurement range, not current limiting; its startup peak is consistent with clipping and cannot establish actual inrush.",
+    "Auto range is not an analog-peak guarantee; per-sample range codes and saturation flags were not recorded.",
+    "Negative voltage minima may include ringing or measurement transients; do not assert a physical negative rail without corroboration.",
+    "Low voltage chunk means support a substantial source-path disturbance, but the exact cause is not isolated.",
+    "Driver-estimated UTC and host-command timestamps do not replace external rail/marker timing."
+  ]
+}
