@@ -34,6 +34,25 @@ The guide specifies approximately 100 Ω output impedance and output-low voltage
 at most 0.1 V at 100 µA. These are JS110 specifications; do not substitute JS220
 topics or wiring. [JS110 User's Guide, revision 1.3, §§8.10 and 12](https://download.joulescope.com/docs/JoulescopeUsersGuide/JoulescopeUsersGuide_v1_3.pdf)
 
+### Output levels and PE1 limits
+
+The JS110's specified programmable logic supply spans 1.8 V to USB voltage
+minus 0.2 V (about 4.8 V with a nominal 5 V USB supply). For this interface use
+3.3 V. At a 100 µA load, the guide specifies output high at least Vcco minus
+0.1 V and output low at most 0.1 V; these are comfortably separated at a 3.3 V
+setting. Both output channels share that logic supply.
+
+PE1 is a **TT, 3.3 V-tolerant** STM32 input on the VDD domain, not a 5 V-tolerant
+input. At the bench's 3.3 V VDD, ordinary 0/3.3 V logic levels are compatible.
+DS14791 Rev11 Table25 limits the operating input voltage relative to its I/O
+supply (upper limit supply plus 0.3 V). Table22's -0.3 to 3.6 V absolute input
+rating for the 3.3 V range is a stress limit, with a footnote requiring the main
+supplies in their permitted ranges; it is not a guarantee of powered-off input
+tolerance. A separately powered 3.3 V GPO must therefore not be assumed suitable
+for direct connection throughout target power cycling. This is the reason for
+the sink interface, rather than a mismatch between the powered logic levels.
+[STM32N657 datasheet, Tables18, 22 and 25](https://www.st.com/resource/en/datasheet/stm32n657x0.pdf)
+
 ## Opt-in and shared-supply guards
 
 Start the existing helper with its normal mailbox paths and `--recovery-output`.
