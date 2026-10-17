@@ -1,10 +1,48 @@
-# Sequence clock and data receivers separately
+# Receiver readiness without delaying exposure
 
 Research and bench evidence, October 17, 2026: NUCLEO-N657X0-Q, CAM-6G3-073CLR, VD56G3 revision `0x3110`.
 
+## Current result: use observed Stop to release lane 1
+
+**The preferred v41 sequence raises minimum-exposure receiver margin to 546.08–548.16 µs**, versus the earlier v36 minimum of 51.36 µs, without postponing sensor START or exposure. Two minimum-exposure cold starts returned the first physical image with complete native-frame integrity, zero sampled raw CSI errors through shutdown, and current-run readiness/shutdown proofs. START-return to first STROBE was 5360.64–5361.92 µs. These are externally correlated firmware markers, with the measurement limits below. See the [receiver-readiness evidence](../firmware/capture-timing/evidence/2026-10-17-receiver-ready/README.md) and [implementation](../firmware/capture-timing/ready_phy/README.md).
+
+The sequence uses the PHY's receive/wait-for-Stop control rather than waiting for I²C polling to notice STREAMING:
+
+1. Preserve early sensor START and overlap the receiver-code load with sensor startup.
+2. Enable clock and data modules early. Set PMCR to `3` before releasing PHY digital reset, then immediately write `2`: lane 0 is released, while lane 1 remains in ForceRx/wait-for-Stop.
+3. Require both enabled data lanes to report Stop continuously for 40000 nominal 400 MHz cycles, approximately 100 µs. Recheck Stop, clear only the ForceRx bits, verify the readback and arm capture. No error masks or clears are added.
+4. Perform START-ACK and STREAMING verification after arming. Preserve the v36 idle-checked data shutdown before sensor STOP.
+
+In the first v41 trial, both data Stop flags were initially low after PEN. Both were observed high at START +4931.10 µs, ForceRx release was observed at +5053.22 µs, and capture armed approximately 292 µs before exposure. Clock-active was present before lane 1 release. **Clock-active is corroborating recorded evidence; this firmware does not implement an ACTCLF wait or gate.** Earlier clock-only/PCR3 traces did not expose ACTCLF before data enable, so polling it there would risk deadlock.
+
+This gives a measured state-based boundary: enable the modules in a controlled state, then release lane 1 after observed Stop and the chosen guard. It does **not** establish a datasheet-guaranteed earliest time across temperature, voltage or sensor revisions. STM32 documents ForceRx and StopState, but does not specify whether its Stop indication already incorporates D-PHY initialization timing. The 100 µs software guard is an empirical choice, not a newly inferred STM32 requirement. [Primary-source comparison](../firmware/capture-timing/ready_phy/readiness-sources.md).
+
+A timing discriminator deliberately delayed PHY digital-reset release. Measured PEN moved from START +3718.90–3726.45 µs to +3934.10 µs, a 208–215 µs shift including the slightly larger program load. The first both-Stop observation stayed near START +4931.10–4935.30 µs, moving only 0.86–4.20 µs. First-frame margin remained 548.00 µs and the image/error checks passed. This supports a sensor/START-relative readiness event rather than a fixed receiver-initialization delay. The shifted build is a diagnostic; the preferred v41 image has no added delay.
+
+The preferred sequence completed four cold-start captures: two at minimum exposure and two at the default exposure, all retaining the first physical image with complete frame integrity and no sampled raw CSI errors. At default exposure, START return to first STROBE was 5298.24–5303.36 µs; reset release to first STROBE was 23.804–23.819 ms, and reset release to complete first frame was 45.667–45.682 ms. The default image was visually checked against the illuminated bench scene. These are bench observations with the [existing marker measurement limits](../firmware/capture-timing/exposure-measurement.md).
+
+The final default v41 sector remains installed, SHA-256 `c92ee95920009b188aef53645fce8e9bb6cb8bd34d78cf789d252037be16af2f`. Its exact PE1-low early recovery park passed live code, CPU/cache and XSPI checks, followed by another clean PE1-high cold capture. The JS110 was released with 3300 mV GPIO supply, OUT0 HIGH and automatic current range restored. A separate 3.02-second capture confirmed powered rails and stable reset/markers after release. No jumper or probe changes were required.
+
+## Why the lane distinction matters
+
+| Experiment | Minimum-exposure result |
+| --- | --- |
+| Original v36 ACK+STREAMING, then 100 µs Stop dwell | First frame, no recorded errors; prior smallest margin 51.36 µs |
+| v38 ACK gate, no extra Stop dwell; defer STREAMING read | First frame, no recorded errors; 265.76–279.04 µs margin |
+| v39 early control, release both ForceRx bits immediately | First frame but startup lane 1 ECTRL remains |
+| v39 hold both ForceRx bits through 100 µs Stop dwell | No reported PHY error, but no VSYNC/frame during 2 seconds of continuing sensor exposures |
+| v41 hold only lane 1 through 100 µs Stop dwell | First frame, no recorded errors; 546.08–548.16 µs margin |
+| v42 hold both lanes, release on first observed both-Stop | First frame, no recorded errors; 651.68 µs margin; zero extra dwell remains an experimental discriminator |
+
+The failed both-lane hold crossed the clock lane's Stop-to-non-Stop transition while ForceRx was still asserted. Clock-active never appeared afterward. Releasing both sooner, while clock Stop was still high, worked. Holding only lane 1 also worked, with clock-active present before releasing it. This supports a missed clock-start transition when lane 0 is held too long; it does not establish an undocumented internal mapping between lane 0 ForceRx and the clock receiver.
+
+We prefer v41's larger margin with the 100 µs guard over adopting the fastest single trial. Its successful state history is more useful than choosing a fixed delay such as START +5 ms. First-frame association and raw error history remain mandatory: the failed v39 trial demonstrates that quiet error flags and a completed Stop proof alone do not establish successful reception.
+
+## Previous v36 checkpoint
+
 **The startup error is avoided without measurably delaying exposure. The matching shutdown sequence also avoids the later stop error.** The v35/v36 integration keeps the optimized free-running sensor start, enables the clock receiver early, and enables the data receivers after START acknowledgement and STREAMING. v36 additionally disables the data receivers after capture and pipe shutdown, before stopping the sensor. Raw CSI history and the existing interrupt enables are retained; success does not depend on clearing or masking an error. ([Current evidence](../firmware/capture-timing/evidence/2026-10-17-fast-phy/README.md), [implementation and diagnostics](../firmware/capture-timing/fast_phy/README.md))
 
-## Current sequence and timing
+## Previous v36 sequence and timing
 
 1. Start the sensor as early as before and load the receiver program during sensor startup.
 2. Configure the receiver with `PCR=0x03`: clock receiver enabled, both data receivers disabled, then release PHY digital reset.
@@ -72,4 +110,4 @@ The LP8 can observe nominal 0/1.2 V LP states using its **1.2 V family, approxim
 
 The DS1054Z can inspect LP ramps/skew, but its 50 MHz bandwidth and passive probes cannot qualify the 804 Mb/s eye. The AD3 was unnecessary for these software experiments. ([Rigol specifications](https://www.rigol.com/dam/global/downloads/brochures/en/data-sheet/oscilloscopes/DS1000Z_DataSheet_EN.pdf))
 
-The earlier v30 diagnostic access stall was fixed with reset/clock guards, and that investigation ended by restoring v25. That historical restoration is superseded by the guarded v36 integration above. **The default-exposure v36 sector remains installed** (`40743205503bdb465d0549b7764f1590c48b7aaac621bf096aa4b9618957c1bd`). Its PE1-low recovery park was checked against live code and CPU/cache state, then PE1-high normal boot captured another clean first frame. The JS110 session was released with its original 3300 mV/HIGH recovery output and auto range restored; subsequent measurements confirmed the target rails remained powered. No boot-jumper or probe changes were needed. See the [current evidence record](../firmware/capture-timing/evidence/2026-10-17-fast-phy/README.md). ([Earlier recovery evidence](../firmware/capture-timing/evidence/2026-10-17-v30d-phy-sequence/README.md#recovery-evidence), [historical v25 restoration](../firmware/capture-timing/evidence/2026-10-17-phy-sequence-final-state/README.md))
+The earlier v30 diagnostic access stall was fixed with reset/clock guards, and that investigation ended by restoring v25. That historical restoration is superseded by the guarded v36 integration above. At that previous checkpoint, the default-exposure v36 sector was installed (`40743205503bdb465d0549b7764f1590c48b7aaac621bf096aa4b9618957c1bd`). Its PE1-low recovery park was checked against live code and CPU/cache state, then PE1-high normal boot captured another clean first frame. The JS110 session was released with its original 3300 mV/HIGH recovery output and auto range restored; subsequent measurements confirmed the target rails remained powered. No boot-jumper or probe changes were needed. See the [current evidence record](../firmware/capture-timing/evidence/2026-10-17-fast-phy/README.md). ([Earlier recovery evidence](../firmware/capture-timing/evidence/2026-10-17-v30d-phy-sequence/README.md#recovery-evidence), [historical v25 restoration](../firmware/capture-timing/evidence/2026-10-17-phy-sequence-final-state/README.md))

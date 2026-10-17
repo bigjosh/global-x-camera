@@ -1,0 +1,203 @@
+[
+  {
+    "id": "v38a-recovery-01",
+    "prefix_build": "v38a-ack-stop0-install-01-staged",
+    "result": {
+      "passed": true,
+      "status": {
+        "magic": 1380405297,
+        "schema": 1,
+        "words": 24,
+        "state": 3,
+        "reason": 1,
+        "pin": 262145,
+        "nominal_hz": 400000000,
+        "settle_cycles": 40000,
+        "begin_cycle": 3,
+        "sample_cycle": 40005,
+        "elapsed_cycles": 40002,
+        "polls": 3595,
+        "idr": 0,
+        "moder": 4294967281,
+        "pupdr": 4,
+        "ahb4enr": 270424,
+        "demcr": 17825792,
+        "dwt_ctrl": 2147483649,
+        "control": 0,
+        "ipsr": 0,
+        "primask": 1,
+        "dbgcr": 3025253376,
+        "ap_unlock": 180,
+        "reserved": 0
+      },
+      "context": {
+        "PC": 873990028,
+        "XPSR": 1090519040,
+        "PRIMASK": 1,
+        "FAULTMASK": 0,
+        "CONTROL": 0
+      },
+      "ccr": 513,
+      "fpccr": 3221225476,
+      "prefix_sha256": "1654c04b078259f6e429df5355b0e67efaf105d2a377d8ac76c3f418e1b83694",
+      "xspi_sr": 2,
+      "halt_requested": true,
+      "park_context_observed_in_halt_command": true,
+      "persistent_halt_after_disconnect": "not_guaranteed",
+      "post_disconnect_execution": "may resume the exact verified branch-to-self park",
+      "ram_writes": false,
+      "nor_commands": false,
+      "next_step": "Reviewed low-SRAM nor_bench INFO, then separately guarded WRITE"
+    },
+    "rail_validation": {
+      "generic_inspection_passed": false,
+      "intended_park_rail_evidence_verified": true,
+      "qualification": {
+        "purpose": "PE1-low autonomous early recovery of exact v38a ACK minimum-exposure image",
+        "recovery_park_passed": true,
+        "park_result": "park/result.json",
+        "generic_capture_cycle_exit_code": 1,
+        "generic_inspection_passed": false,
+        "interpretation": "Power cycle and capture completed. The generic first-GPIO analyzer expects its original simple marker pattern, including PE0 high; recovery deliberately parks with PE0 low. Its failing marker/plateau checks are preserved, not reclassified as a passing generic inspection.",
+        "common_rail_off_seconds": 18.128192,
+        "final_aux_3v3_range_v": [
+          3.268,
+          3.314
+        ],
+        "final_target_5v_range_v": [
+          4.811,
+          4.858
+        ],
+        "final_main_vddio_range_v": [
+          3.281,
+          3.287
+        ],
+        "exact_live_prefix_sha256": "1654c04b078259f6e429df5355b0e67efaf105d2a377d8ac76c3f418e1b83694",
+        "verified_park_address": "0x3418078c",
+        "cache_disabled_ccr": "0x201",
+        "followup": "Frozen low-SRAM NOR helper INFO then WRITE installed and fully verified v38b ACK default, with no manual jumper action."
+      },
+      "interpretation": "Generic inspection remains failed; independent exact park and the retained rail subset support the intended recovery check"
+    },
+    "live_prefix_sha256": "1654c04b078259f6e429df5355b0e67efaf105d2a377d8ac76c3f418e1b83694",
+    "independently_matched_prefix_and_park": true
+  },
+  {
+    "id": "v39-recovery-01",
+    "prefix_build": "v39-force-stop100-install-01-staged",
+    "result": {
+      "passed": true,
+      "status": {
+        "magic": 1380405297,
+        "schema": 1,
+        "words": 24,
+        "state": 3,
+        "reason": 1,
+        "pin": 262145,
+        "nominal_hz": 400000000,
+        "settle_cycles": 40000,
+        "begin_cycle": 3,
+        "sample_cycle": 40007,
+        "elapsed_cycles": 40004,
+        "polls": 3595,
+        "idr": 0,
+        "moder": 4294967281,
+        "pupdr": 4,
+        "ahb4enr": 270424,
+        "demcr": 17825792,
+        "dwt_ctrl": 2147483649,
+        "control": 0,
+        "ipsr": 0,
+        "primask": 1,
+        "dbgcr": 3025253376,
+        "ap_unlock": 180,
+        "reserved": 0
+      },
+      "context": {
+        "PC": 873990028,
+        "XPSR": 1090519040,
+        "PRIMASK": 1,
+        "FAULTMASK": 0,
+        "CONTROL": 0
+      },
+      "ccr": 513,
+      "fpccr": 3221225476,
+      "prefix_sha256": "a9a8e95e1415caf85138e893fb1e821ed0297777b669e9c95cf61382224c165b",
+      "xspi_sr": 2,
+      "halt_requested": true,
+      "park_context_observed_in_halt_command": true,
+      "persistent_halt_after_disconnect": "not_guaranteed",
+      "post_disconnect_execution": "may resume the exact verified branch-to-self park",
+      "ram_writes": false,
+      "nor_commands": false,
+      "next_step": "Reviewed low-SRAM nor_bench INFO, then separately guarded WRITE"
+    },
+    "rail_validation": {
+      "generic_inspection_passed": false,
+      "intended_park_rail_evidence_verified": true,
+      "qualification": null,
+      "interpretation": "Generic inspection remains failed; independent exact park and the retained rail subset support the intended recovery check"
+    },
+    "live_prefix_sha256": "a9a8e95e1415caf85138e893fb1e821ed0297777b669e9c95cf61382224c165b",
+    "independently_matched_prefix_and_park": true
+  },
+  {
+    "id": "v41-final-recovery-01",
+    "prefix_build": "v41-default-install-01-staged",
+    "result": {
+      "passed": true,
+      "status": {
+        "magic": 1380405297,
+        "schema": 1,
+        "words": 24,
+        "state": 3,
+        "reason": 1,
+        "pin": 262145,
+        "nominal_hz": 400000000,
+        "settle_cycles": 40000,
+        "begin_cycle": 3,
+        "sample_cycle": 40007,
+        "elapsed_cycles": 40004,
+        "polls": 3595,
+        "idr": 0,
+        "moder": 4294967281,
+        "pupdr": 4,
+        "ahb4enr": 270424,
+        "demcr": 17825792,
+        "dwt_ctrl": 2147483649,
+        "control": 0,
+        "ipsr": 0,
+        "primask": 1,
+        "dbgcr": 3025253376,
+        "ap_unlock": 180,
+        "reserved": 0
+      },
+      "context": {
+        "PC": 873990028,
+        "XPSR": 1090519040,
+        "PRIMASK": 1,
+        "FAULTMASK": 0,
+        "CONTROL": 0
+      },
+      "ccr": 513,
+      "fpccr": 3221225476,
+      "prefix_sha256": "0886559c3e4b5ddd358eb25a4f0c4ad4b40f588839c089a0fe1320675e28abce",
+      "xspi_sr": 2,
+      "halt_requested": true,
+      "park_context_observed_in_halt_command": true,
+      "persistent_halt_after_disconnect": "not_guaranteed",
+      "post_disconnect_execution": "may resume the exact verified branch-to-self park",
+      "ram_writes": false,
+      "nor_commands": false,
+      "next_step": "Reviewed low-SRAM nor_bench INFO, then separately guarded WRITE"
+    },
+    "rail_validation": {
+      "generic_inspection_passed": false,
+      "intended_park_rail_evidence_verified": true,
+      "qualification": null,
+      "interpretation": "Generic inspection remains failed; independent exact park and the retained rail subset support the intended recovery check"
+    },
+    "live_prefix_sha256": "0886559c3e4b5ddd358eb25a4f0c4ad4b40f588839c089a0fe1320675e28abce",
+    "independently_matched_prefix_and_park": true
+  }
+]

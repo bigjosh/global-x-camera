@@ -1,0 +1,33 @@
+CAPTURE_STARTED D:\Github\global-x-camera\tmp\bringup\phy-ready-v41-default-install-01\cold\logic
+CAPTURE_SAVED D:\Github\global-x-camera\tmp\bringup\phy-ready-v41-default-install-01\cold\logic
+{
+  "references": {
+    "ch3": "auxiliary 3.3 V crossing 2.97 V",
+    "ch4": "target 5 V crossing 4.50 V"
+  },
+  "analog_sample_spacing_us": 32.000000000000774,
+  "digital_sample_spacing_us": 0.16,
+  "cycles": [
+    {
+      "target_5v_4_5v_crossing_s": 20.520834162,
+      "aux_3v3_2_97v_crossing_s": 20.512642162,
+      "nrst_rise_s": 20.5095496,
+      "pd0_rise_s": 20.52562416,
+      "pe0_rise_s": 20.52575552,
+      "target_5v_to_pd0_ms": 4.7899979999996845,
+      "aux_3v3_to_pd0_ms": 12.981998000000772,
+      "nrst_to_pd0_ms": 16.07455999999985,
+      "preceding_observed_off_s": {
+        "3": 18.199264000000003,
+        "4": 19.652416
+      }
+    }
+  ],
+  "limitations": [
+    "No MCU PGOOD or always-on/core rail probe in this channel map.",
+    "Observed off intervals do not alone prove every MCU rail was discharged.",
+    "Off means samples below 0.1 V on the named rail; a single low sample can arm a crossing.",
+    "Analog spacing is measured from the CSV; digital spacing requires capture-config.json.",
+    "Timing is for this image and this board supply setup."
+  ]
+}

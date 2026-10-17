@@ -2,6 +2,8 @@
 
 Offline analysis, October 17, 2026. This note records the initial v3/v5 evidence and the controlled tests proposed from it; later experiments can supersede these hypotheses.
 
+The [current v41 readiness sequence](ready_phy/README.md) enables the receiver early, releases lane 0 immediately, and holds only lane 1 in ForceRx until both data Stop flags remain observed for 100 µs. Two minimum-exposure trials returned the first frame with no sampled raw errors and 546.08–548.16 µs arm-to-VSYNC margin. Holding both lanes through that dwell instead never showed clock-active status and received no frame; releasing both earlier worked. Thus zero error flags alone are insufficient, and the effect depends on the clock-start timing. See the [new experiment evidence](evidence/2026-10-17-receiver-ready/README.md) and [source-based limits](ready_phy/readiness-sources.md).
+
 The later [guarded free-running v35/v36 integration](fast_phy/README.md) avoids the startup error by enabling the clock receiver early and the data receivers after sensor START acknowledgement and STREAMING, without a measurable exposure-start penalty. It also avoids the sensor-stop error by disabling idle data receivers before issuing STOP. See the [current report](../../reports/Camera%20lane%20startup%20mismatch.md) and [raw phase evidence](evidence/2026-10-17-fast-phy/README.md). The original smoke-code comparison below remains historical evidence; it is not the current selected sequence. This is measured behavior on the present board, not identification of the exact offending wire transition.
 
 The [public-source review of October 17](../../reports/STM32%20camera%20startup%20error%20reports.md) found an exact `0x8000` ST forum report, relevant startup guidance from an ST employee, and independent acknowledgment of the duplicate E3 write. It found no documented cure or formal benign-startup exception for our exact board/module. The review separates those reports from our already-negative PHY/clock experiments and identifies raw-error history and clock activity during lane-merger setup as the next useful diagnostic checks.
@@ -29,14 +31,14 @@ Both paths use two physical data lanes, the same required sensor polarity mappin
 
 | Event | Time, ms | Status |
 | --- | ---: | --- |
-| Startup lane1 ECTRL |32.30224|SR0=00020000, SR1=76181000|
+| Startup lane 1 ECTRL |32.30224|SR0=00020000, SR1=76181000|
 | First STROBE rise |32.66032|358.08 µs after the startup callback|
 | First STROBE fall |43.64432|10.984 ms pulse|
 | First VSYNC |43.88752|243.20 µs after falling edge|
 | First frame complete |54.51696|Snapshot is frozen|
-| Stop-time lane0 ECTRL |89.58736|SR0=00001100, SR1=66100010|
+| Stop-time lane 0 ECTRL |89.58736|SR0=00001100, SR1=66100010|
 
-The first-frame snapshot reads SR0=00020000 and SR1=E6180000, with no payload CRC/ECC or D-PHY error flag set at that instant. Startup lane1 interrupts have already been disabled by the corrected HAL, so raw status matters. The second callback occurs35.0704 ms after frame completion and cannot itself show corruption of that frozen image. The root bench owner visually confirmed the LED panel. This is evidence of a usable image, not proof that startup lane-state behavior is electrically correct.
+The first-frame snapshot reads SR0=00020000 and SR1=E6180000, with no payload CRC/ECC or D-PHY error flag set at that instant. Startup lane 1 interrupts have already been disabled by the corrected HAL, so raw status matters. The second callback occurs35.0704 ms after frame completion and cannot itself show corruption of that frozen image. The root bench owner visually confirmed the LED panel. This is evidence of a usable image, not proof that startup lane-state behavior is electrically correct.
 
 ## PHY setup issues found in the source
 
@@ -52,14 +54,14 @@ Test changes independently:1 µs pulse, E2/E3 address fix, and CCFR correction. 
 
 The pinned HAL's `0x8000` is `HAL_DCMIPP_CSI_ERROR_DPHY_CTRL`. It combines the two data-lane control errors. The actual lane is given by CSI_SR1: bit 4 is ECTRLDL0F and bit 12 is ECTRLDL1F. RM0486 describes these as an incorrect lane-state sequence. They are distinct from short packet, header ECC, payload CRC, and start-of-transmission synchronization errors. [RM0486 Rev 4, pp2058 and2061](../../datasheets/processor/STM32N6_RM0486_reference_manual.pdf).
 
-The v5 error callback ID is `72 + lane`, where the HAL enum is lane0 = 1 and lane1 = 2. Therefore ID74 denotes **lane 1**. Both recorded v5 errors are lane1 errors, not one error on each lane.
+The v5 error callback ID is `72 + lane`, where the HAL enum is lane 0 = 1 and lane 1 = 2. Therefore ID74 denotes **lane 1**. Both recorded v5 errors are lane 1 errors, not one error on each lane.
 
 | v5 observation | Raw status | Interpretation |
 | --- | --- | --- |
-| First error, approximately 61.881 ms after main entry | SR0 `0x00020000`, SR1 `0x76181000` | VC0 running; lane1 ECTRL set; clock and both data lanes report stop state by the time of the snapshot |
+| First error, approximately 61.881 ms after main entry | SR0 `0x00020000`, SR1 `0x76181000` | VC0 running; lane 1 ECTRL set; clock and both data lanes report stop state by the time of the snapshot |
 | First exposure indication | Approximately 62.243–73.2269 ms | First error precedes the rise by approximately 362 µs |
 | First VSYNC and frame completion | Approximately 73.4696 and84.0979 ms | Complete first snapshot arrives after the first pulse |
-| Second error, approximately 119.1698 ms | SR0 `0x00001100`, SR1 `0x64101000` | SOF0/EOF0 status present, lane1 ECTRL set, all three stop-state flags clear during stopping |
+| Second error, approximately 119.1698 ms | SR0 `0x00001100`, SR1 `0x64101000` | SOF0/EOF0 status present, lane 1 ECTRL set, all three stop-state flags clear during stopping |
 
 These timings come from the root bench owner's v5 capture. The error register is latched; stop-state bits describe the later sampling instant, not the exact invalid transition. The first observation is consistent with a startup lane transition that settles before exposure. It does **not** prove that the transition is harmless or specify its electrical cause.
 

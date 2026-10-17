@@ -23,6 +23,45 @@ FIELDS = ('magic schema words state reason pin nominal_hz settle_cycles '
           'ahb4enr demcr dwt_ctrl control ipsr primask dbgcr ap_unlock reserved').split()
 # An unknown/self-consistent build is insufficient authorization to halt.
 APPROVED = {
+    # v43 lane1/PEN+200us timing discriminator, reviewed complete guard.
+    '7e4d6d6249c501d963c5f9f421a3f50e1573410c869bb27d726b96a6f1acde31':
+        {'bytes': 4436, 'park': 0x3418078C,
+         'sector': '8793d0718f1a0d83833a61e6c32dfc4ae60114c8040da67b1f0dfbee21fdd9ac'},
+    # v41 default exposure, byte-identical lane1 receiver and recovery guard.
+    '0886559c3e4b5ddd358eb25a4f0c4ad4b40f588839c089a0fe1320675e28abce':
+        {'bytes': 4432, 'park': 0x3418078C,
+         'sector': 'c92ee95920009b188aef53645fce8e9bb6cb8bd34d78cf789d252037be16af2f'},
+    # v42 bothForce/STOP0 discriminator, same recovery guard and error policy.
+    '8d21e1c02f56d3255f6d7bf6adeede84682cc04ebbb9dea391185fd1efc182bd':
+        {'bytes': 4432, 'park': 0x3418078C,
+         'sector': '26fc78fec73bdf3831cfdc55c2369b03f7a87ad746bc08c6a60593becc74179c'},
+    # v41 lane1-only ForceRx; complete0x658 guard and park unchanged.
+    '5079100595a19d8fc4a5b949cc231a9bafdab48029e361ac7b47acdf80b323f2':
+        {'bytes': 4432, 'park': 0x3418078C,
+         'sector': '15eb8aceed6834090e5223c7e70dd3b4bb8a2e9278655eda1917f63db6a7bc0f'},
+    # v39 ForceRx retained through100us observed Stop, same complete guard.
+    'a9a8e95e1415caf85138e893fb1e821ed0297777b669e9c95cf61382224c165b':
+        {'bytes': 4432, 'park': 0x3418078C,
+         'sector': 'acf73e0184d2336e3ed7dfb066337a64970a0686921c7d053687afe73ca47328'},
+    # v39 matched EARLY/STOP control, with reviewed0x658 recovery invariant.
+    '97ee75d0fd62ed4ae776fc74cd91b43990d6d2cd28620a90b5bfba23fda4ca03':
+        {'bytes': 4432, 'park': 0x3418078C,
+         'sector': '843e910792e7c0d2c93f16700abdcaeeda8e245402bd913d3b3effa9d923a737'},
+    # v38b: same ACK receiver, default exposure; exact recovery guard unchanged.
+    '24616bf20b08df1032bc976a200ba3f98076f0eead70e8c18c1d04642502483c':
+        {'bytes': 4436, 'park': 0x3418078C,
+         'sector': '439dcafc0fc615a4c0589ef06aa4295c73a879e8e3277bf1a849d12054c0ea81'},
+    # v38a: ACK gate; complete recovery code/literals through0x658 unchanged.
+    '1654c04b078259f6e429df5355b0e67efaf105d2a377d8ac76c3f418e1b83694':
+        {'bytes': 4436, 'park': 0x3418078C,
+         'sector': '72e869b41373774dd7ace8cfbb3e190f230eefc346e3c3332143cbfa658e2260'},
+    # v37: v36 minimum exposure, only continuous STOP dwell changed.
+    '073090134af441dcd2f3f3e6dcc0d417d67cb5ea8d55c7df56b5dacc4299b543':
+        {'bytes': 4432, 'park': 0x3418078C,
+         'sector': 'd11513f667e23603688d82925eb4f312cb5435c79c730fd17c1bc54810f7c206'},
+    '6f9fe85fabf23cecabbb36fdfb8d5f6e3a0fda5f6e9173438984168e8e316801':
+        {'bytes': 4432, 'park': 0x3418078C,
+         'sector': '0e0ded7ec903034aa5d8200f6f838a9026d2e8f1fdc32fac94ab11be4e727266'},
     # v36: reviewed v34c recovery code, STREAMING enable and idle-gated shutdown.
     '976f5d4b0fe93243594e00d046e7ec9503f2b862973e64a226567558d71d1894':
         {'bytes': 4432, 'park': 0x3418078C,

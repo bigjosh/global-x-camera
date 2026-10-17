@@ -1,0 +1,120 @@
+{
+  "source": "tmp/bringup/phy-ready-final-release-01/powered-state.json",
+  "observation": {
+    "passed": true,
+    "checks": {
+      "released_successfully": true,
+      "recovery_normal": true,
+      "target_5v_stable": true,
+      "main_vddio_stable": true,
+      "aux_3v3_stable": true,
+      "reset_released_and_boot_marker_high": true,
+      "no_gpio_marker_transitions": true,
+      "observation_at_least_2s": true
+    },
+    "duration_s": 3.019808,
+    "rails": {
+      "3": {
+        "min_v": 3.268,
+        "max_v": 3.314,
+        "mean_v": 3.2920112959627
+      },
+      "4": {
+        "min_v": 4.811,
+        "max_v": 4.863,
+        "mean_v": 4.845097001165625
+      },
+      "5": {
+        "min_v": 3.281,
+        "max_v": 3.287,
+        "mean_v": 3.2834913637808625
+      }
+    },
+    "marker_levels": {
+      "0": [
+        1.0
+      ],
+      "1": [
+        1.0
+      ],
+      "2": [
+        0.0
+      ]
+    },
+    "session_release": {
+      "event": "stopped",
+      "utc": "2026-10-17T20:44:39.319663+00:00",
+      "monotonic_ns": 2142198890000000,
+      "id": "29459408-ef42-4153-8ab0-0245bd95cab2",
+      "reason": "stop",
+      "ok": true,
+      "starting_range": 128,
+      "range": 128,
+      "restore_error": null,
+      "stream": null,
+      "statistics": {
+        "received": {
+          "utc": "2026-10-17T20:44:38.873018+00:00",
+          "monotonic_ns": 2142198453000000
+        },
+        "voltage_location": "IN+ relative to IN-",
+        "voltage": {
+          "units": "V",
+          "avg": 4.8868560791015625,
+          "min": 4.8662261962890625,
+          "max": 4.895729064941406
+        },
+        "current": {
+          "units": "A",
+          "avg": 0.10756245255470276,
+          "min": 0.0915108248591423,
+          "max": 0.13295365869998932
+        },
+        "power": {
+          "units": "W",
+          "avg": 0.5256390271824785,
+          "min": 0.44603872299194336,
+          "max": 0.6478872299194336
+        },
+        "sequence": 1721,
+        "age_s": 0.437
+      },
+      "starting_recovery_settings": {
+        "s/extio/voltage": 3300,
+        "s/gpo/0/value": 1,
+        "s/gpo/1/value": 0
+      },
+      "recovery_output": {
+        "scope": "retained_settings_not_measured_pins",
+        "interface": "active_low_diode",
+        "extio_voltage_mv": 3300,
+        "gpo0": 1,
+        "gpo1": 0,
+        "asserted": false
+      },
+      "recovery_restore_errors": []
+    },
+    "no_power_or_debug_stimulus_in_verification": true,
+    "files": {
+      "analog.csv": {
+        "sha256": "b0152de6ad5abd9fe7ccde291eb74c6e7b9ac08f1cd79faf1420d787c8267885",
+        "bytes": 4718570
+      },
+      "digital.csv": {
+        "sha256": "5a38494d43676f9776ff3a620d1096e6f3e9fe96487985488bbcc69184dde53a",
+        "bytes": 120
+      },
+      "boot.sal": {
+        "sha256": "cbae7b3eba68bb7fccab699590308a6f1bc6eee200679a201ccde944815b247b",
+        "bytes": 180751
+      },
+      "capture-config.json": {
+        "sha256": "d20b93a5924c86836eaa6d114881f1022f62db67a8fa195846375c227bd5f06c",
+        "bytes": 575
+      }
+    }
+  },
+  "final_capture": "v41-final-normal-02",
+  "installed_program_sha256": "c92ee95920009b188aef53645fce8e9bb6cb8bd34d78cf789d252037be16af2f",
+  "no_additional_hardware_access_by_archiver": true
+}
