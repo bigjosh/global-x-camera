@@ -1,0 +1,1478 @@
+{
+  "schema": 1,
+  "time_unit": "us",
+  "experiments": [
+    {
+      "mode": "cold",
+      "origin": "nrst_release",
+      "build_sha256": "ae3aa0b6a954d1becd867a648daee6dbc0e52c5e8b2f02de40159f759e75868c",
+      "completed": true,
+      "image_integrity_matches": true,
+      "visual_qualification": "pending human/model inspection; statistics alone do not prove a valid image",
+      "exposure_qualified": false,
+      "frame_geometry": [
+        1120,
+        1364
+      ],
+      "frame_bytes": 1527680,
+      "frames": 1,
+      "vsyncs": 1,
+      "rom_to_pd0_us": 15715.36,
+      "phases_us": {
+        "stage1_entry": 15718.72,
+        "stage2_entry": 20702.88,
+        "main_entry": 20706.08,
+        "sensor_ready_observed": 22297.44,
+        "sensor_init_complete": 23981.28,
+        "exposure_configuration_complete": 24490.08,
+        "receiver_configured": 20791.68,
+        "receiver_armed": 20794.72,
+        "sensor_output_setup_complete": null,
+        "start_write_begin": 25201.44,
+        "start_write_end": 25250.24,
+        "sensor_start_return": 30663.68,
+        "first_vsync": 41784.0,
+        "first_frame_complete": 52413.44,
+        "sensor_release_command": 15825.44,
+        "stage2_load_begin": 15828.64,
+        "stage2_load_end": 20696.96
+      },
+      "intervals_us": {
+        "sensor_release_to_ready": 6472.0,
+        "sensor_ready_to_start_write": 2904.0,
+        "start_write_duration": 48.8,
+        "start_write_end_to_first_strobe": 5306.72,
+        "stage2_load": 4868.32,
+        "first_strobe_end_to_vsync": 243.2,
+        "first_vsync_to_frame_complete": 10629.44
+      },
+      "first_strobe_us": 30556.96,
+      "first_strobe_width_us": 10983.84,
+      "strobe_pulses": [
+        {
+          "ordinal": 1,
+          "rise_us": 30556.96,
+          "fall_us": 41540.8,
+          "width_us": 10983.84,
+          "rise_after_start_write_end_us": 5306.72
+        },
+        {
+          "ordinal": 2,
+          "rise_us": 63885.12,
+          "fall_us": 74869.12,
+          "width_us": 10984.0,
+          "rise_after_start_write_end_us": 38634.88
+        }
+      ],
+      "camera_error": 32768,
+      "error_counts": {
+        "pre_frame": 1,
+        "during_frame": 0,
+        "post_frame": 0,
+        "unclassified": 0
+      },
+      "errors": [
+        {
+          "id": 74,
+          "time_us": 30196.16,
+          "frame_phase": "pre_frame",
+          "optical_phase": "before_first_exposure",
+          "detail_to_event_cycles": 873,
+          "error": 32768,
+          "csi_sr0": 131072,
+          "csi_sr1": 1981288448,
+          "cmsr2": 0,
+          "ier0_entry": 1596002560,
+          "ier1_entry": 7967,
+          "ier0_callback": 1596002560,
+          "ier1_callback": 3871,
+          "previous_stage": 25
+        }
+      ],
+      "first_frame_status": {
+        "csi_sr0": 131072,
+        "csi_sr1": 3860332544,
+        "applied_coarse_lines": 1428,
+        "line_length": 1236
+      },
+      "clock_readbacks": {
+        "external_hz": 12000000,
+        "system_pll_hz": 804000000,
+        "pixel_hz": 160800000,
+        "sensor_mcu_hz": 160800000,
+        "system_predivider": 2,
+        "system_multiplier": 134,
+        "system_output_divider": 1,
+        "mipi_multiplier": 32,
+        "mipi_output_divider": 1,
+        "configured_frame_lines": 4336
+      },
+      "warnings": [],
+      "experiment_id": "v17-phye2-cold",
+      "capture_dir": "capture-opt-v17-phye2-cycle-01/cold",
+      "build_manifest": "builds/capture-stage2-phye2-v17-20261017/manifest.json",
+      "prefix_manifest": "builds/capture-staged-phye2-v17-20261017/manifest.json",
+      "rail_validation": {
+        "passed": true,
+        "common_off_s": 13.381599999999999,
+        "final": {
+          "3": {
+            "min_v": 3.268,
+            "max_v": 3.303,
+            "median_v": 3.288
+          },
+          "4": {
+            "min_v": 4.827,
+            "max_v": 4.858,
+            "median_v": 4.852
+          },
+          "5": {
+            "min_v": 3.271,
+            "max_v": 3.281,
+            "median_v": 3.276
+          }
+        },
+        "limitation": "No direct core/always-on rail probe; this proves discharge of the three named rails."
+      }
+    },
+    {
+      "mode": "cold",
+      "origin": "nrst_release",
+      "build_sha256": "bdfbd4059a701feb7d712d50e0c4bf99c3475d51b00c81f05c0b521ec2140a65",
+      "completed": true,
+      "image_integrity_matches": true,
+      "visual_qualification": "pending human/model inspection; statistics alone do not prove a valid image",
+      "exposure_qualified": false,
+      "frame_geometry": [
+        1120,
+        1364
+      ],
+      "frame_bytes": 1527680,
+      "frames": 1,
+      "vsyncs": 1,
+      "rom_to_pd0_us": 15615.68,
+      "phases_us": {
+        "stage1_entry": 15619.04,
+        "stage2_entry": 20612.16,
+        "main_entry": 20615.36,
+        "sensor_ready_observed": 22209.92,
+        "sensor_init_complete": 23893.44,
+        "exposure_configuration_complete": 24403.84,
+        "receiver_configured": 20701.28,
+        "receiver_armed": 20704.16,
+        "sensor_output_setup_complete": null,
+        "start_write_begin": 25116.32,
+        "start_write_end": 25165.12,
+        "sensor_start_return": 30581.44,
+        "first_vsync": 41697.28,
+        "first_frame_complete": 52327.04,
+        "sensor_release_command": 15725.92,
+        "stage2_load_begin": 15728.96,
+        "stage2_load_end": 20606.08
+      },
+      "intervals_us": {
+        "sensor_release_to_ready": 6484.0,
+        "sensor_ready_to_start_write": 2906.4,
+        "start_write_duration": 48.8,
+        "start_write_end_to_first_strobe": 5305.44,
+        "stage2_load": 4877.12,
+        "first_strobe_end_to_vsync": 242.72,
+        "first_vsync_to_frame_complete": 10629.76
+      },
+      "first_strobe_us": 30470.56,
+      "first_strobe_width_us": 10984.0,
+      "strobe_pulses": [
+        {
+          "ordinal": 1,
+          "rise_us": 30470.56,
+          "fall_us": 41454.56,
+          "width_us": 10984.0,
+          "rise_after_start_write_end_us": 5305.44
+        },
+        {
+          "ordinal": 2,
+          "rise_us": 63798.72,
+          "fall_us": 74782.88,
+          "width_us": 10984.16,
+          "rise_after_start_write_end_us": 38633.6
+        }
+      ],
+      "camera_error": 32768,
+      "error_counts": {
+        "pre_frame": 1,
+        "during_frame": 0,
+        "post_frame": 0,
+        "unclassified": 0
+      },
+      "errors": [
+        {
+          "id": 74,
+          "time_us": 30109.92,
+          "frame_phase": "pre_frame",
+          "optical_phase": "before_first_exposure",
+          "detail_to_event_cycles": 877,
+          "error": 32768,
+          "csi_sr0": 131072,
+          "csi_sr1": 1981288448,
+          "cmsr2": 0,
+          "ier0_entry": 1596002560,
+          "ier1_entry": 7967,
+          "ier0_callback": 1596002560,
+          "ier1_callback": 3871,
+          "previous_stage": 25
+        }
+      ],
+      "first_frame_status": {
+        "csi_sr0": 131072,
+        "csi_sr1": 3860332544,
+        "applied_coarse_lines": 1428,
+        "line_length": 1236
+      },
+      "clock_readbacks": {
+        "external_hz": 12000000,
+        "system_pll_hz": 804000000,
+        "pixel_hz": 160800000,
+        "sensor_mcu_hz": 160800000,
+        "system_predivider": 2,
+        "system_multiplier": 134,
+        "system_output_divider": 1,
+        "mipi_multiplier": 32,
+        "mipi_output_divider": 1,
+        "configured_frame_lines": 4336
+      },
+      "warnings": [],
+      "experiment_id": "v17-phyccfr-cold",
+      "capture_dir": "capture-opt-v17-phyccfr-cycle-01/cold",
+      "build_manifest": "builds/capture-stage2-phyccfr-v17-20261017/manifest.json",
+      "prefix_manifest": "builds/capture-staged-phyccfr-v17-20261017/manifest.json",
+      "rail_validation": {
+        "passed": true,
+        "common_off_s": 13.35856,
+        "final": {
+          "3": {
+            "min_v": 3.268,
+            "max_v": 3.303,
+            "median_v": 3.288
+          },
+          "4": {
+            "min_v": 4.832,
+            "max_v": 4.858,
+            "median_v": 4.852
+          },
+          "5": {
+            "min_v": 3.266,
+            "max_v": 3.281,
+            "median_v": 3.276
+          }
+        },
+        "limitation": "No direct core/always-on rail probe; this proves discharge of the three named rails."
+      }
+    },
+    {
+      "mode": "cold",
+      "origin": "nrst_release",
+      "build_sha256": "c282b1e2e1cee3300740ac72c6930a753907df7aa2ca3925ccb79ca9162e2c3b",
+      "completed": true,
+      "image_integrity_matches": true,
+      "visual_qualification": "pending human/model inspection; statistics alone do not prove a valid image",
+      "exposure_qualified": false,
+      "frame_geometry": [
+        1120,
+        1364
+      ],
+      "frame_bytes": 1527680,
+      "frames": 1,
+      "vsyncs": 1,
+      "rom_to_pd0_us": 15907.36,
+      "phases_us": {
+        "stage1_entry": 15910.88,
+        "stage2_entry": 20939.2,
+        "main_entry": 20942.4,
+        "sensor_ready_observed": 21097.6,
+        "sensor_init_complete": 22782.4,
+        "exposure_configuration_complete": 23291.68,
+        "receiver_configured": 21028.0,
+        "receiver_armed": 21030.88,
+        "sensor_output_setup_complete": null,
+        "start_write_begin": 24002.56,
+        "start_write_end": 24051.36,
+        "sensor_start_return": 29465.6,
+        "first_vsync": 40582.24,
+        "first_frame_complete": 51211.68,
+        "sensor_release_command": null,
+        "stage2_load_begin": 15918.24,
+        "stage2_load_end": 20933.12
+      },
+      "intervals_us": {
+        "sensor_release_to_ready": null,
+        "sensor_ready_to_start_write": 2904.96,
+        "start_write_duration": 48.8,
+        "start_write_end_to_first_strobe": 5303.84,
+        "stage2_load": 5014.88,
+        "first_strobe_end_to_vsync": 243.04,
+        "first_vsync_to_frame_complete": 10629.44
+      },
+      "first_strobe_us": 29355.2,
+      "first_strobe_width_us": 10984.0,
+      "strobe_pulses": [
+        {
+          "ordinal": 1,
+          "rise_us": 29355.2,
+          "fall_us": 40339.2,
+          "width_us": 10984.0,
+          "rise_after_start_write_end_us": 5303.84
+        },
+        {
+          "ordinal": 2,
+          "rise_us": 62683.36,
+          "fall_us": 73667.36,
+          "width_us": 10984.0,
+          "rise_after_start_write_end_us": 38632.0
+        }
+      ],
+      "camera_error": 32768,
+      "error_counts": {
+        "pre_frame": 1,
+        "during_frame": 0,
+        "post_frame": 0,
+        "unclassified": 0
+      },
+      "errors": [
+        {
+          "id": 74,
+          "time_us": 28997.12,
+          "frame_phase": "pre_frame",
+          "optical_phase": "before_first_exposure",
+          "detail_to_event_cycles": 873,
+          "error": 32768,
+          "csi_sr0": 131072,
+          "csi_sr1": 1981288448,
+          "cmsr2": 0,
+          "ier0_entry": 1596002560,
+          "ier1_entry": 7967,
+          "ier0_callback": 1596002560,
+          "ier1_callback": 3871,
+          "previous_stage": 25
+        }
+      ],
+      "first_frame_status": {
+        "csi_sr0": 131072,
+        "csi_sr1": 3860332544,
+        "applied_coarse_lines": 1428,
+        "line_length": 1236
+      },
+      "clock_readbacks": {
+        "external_hz": 12000000,
+        "system_pll_hz": 804000000,
+        "pixel_hz": 160800000,
+        "sensor_mcu_hz": 160800000,
+        "system_predivider": 2,
+        "system_multiplier": 134,
+        "system_output_divider": 1,
+        "mipi_multiplier": 32,
+        "mipi_output_divider": 1,
+        "configured_frame_lines": 4336
+      },
+      "warnings": [],
+      "experiment_id": "v18-noreset-cold",
+      "capture_dir": "capture-opt-v18-noreset-cycle-01/cold",
+      "build_manifest": "builds/capture-sweep-v16-20261017/base-stage2/manifest.json",
+      "prefix_manifest": "builds/capture-staged-noreset-v18-20261017/manifest.json",
+      "rail_validation": {
+        "passed": true,
+        "common_off_s": 13.320511999999997,
+        "final": {
+          "3": {
+            "min_v": 3.268,
+            "max_v": 3.303,
+            "median_v": 3.288
+          },
+          "4": {
+            "min_v": 4.811,
+            "max_v": 4.858,
+            "median_v": 4.837
+          },
+          "5": {
+            "min_v": 3.266,
+            "max_v": 3.281,
+            "median_v": 3.271
+          }
+        },
+        "limitation": "No direct core/always-on rail probe; this proves discharge of the three named rails."
+      }
+    },
+    {
+      "mode": "cold",
+      "origin": "nrst_release",
+      "build_sha256": "89ad9988b53999df72c6ae456b9d71bbc65c9a37066aa1c9d56b8273c0779173",
+      "completed": true,
+      "image_integrity_matches": true,
+      "visual_qualification": "pending human/model inspection; statistics alone do not prove a valid image",
+      "exposure_qualified": false,
+      "frame_geometry": [
+        1120,
+        1364
+      ],
+      "frame_bytes": 1527680,
+      "frames": 1,
+      "vsyncs": 1,
+      "rom_to_pd0_us": 19006.08,
+      "phases_us": {
+        "stage1_entry": null,
+        "stage2_entry": null,
+        "main_entry": 19011.84,
+        "sensor_ready_observed": 19169.76,
+        "sensor_init_complete": 20851.84,
+        "exposure_configuration_complete": 21360.96,
+        "receiver_configured": 19100.48,
+        "receiver_armed": 19103.2,
+        "sensor_output_setup_complete": null,
+        "start_write_begin": 22071.36,
+        "start_write_end": 22120.16,
+        "sensor_start_return": 27529.28,
+        "first_vsync": 38655.84,
+        "first_frame_complete": 49285.6,
+        "sensor_release_command": null,
+        "stage2_load_begin": null,
+        "stage2_load_end": null
+      },
+      "intervals_us": {
+        "sensor_release_to_ready": null,
+        "sensor_ready_to_start_write": 2901.6,
+        "start_write_duration": 48.8,
+        "start_write_end_to_first_strobe": 5309.12,
+        "stage2_load": null,
+        "first_strobe_end_to_vsync": 242.72,
+        "first_vsync_to_frame_complete": 10629.76
+      },
+      "first_strobe_us": 27429.28,
+      "first_strobe_width_us": 10983.84,
+      "strobe_pulses": [
+        {
+          "ordinal": 1,
+          "rise_us": 27429.28,
+          "fall_us": 38413.12,
+          "width_us": 10983.84,
+          "rise_after_start_write_end_us": 5309.12
+        },
+        {
+          "ordinal": 2,
+          "rise_us": 60757.44,
+          "fall_us": 71741.44,
+          "width_us": 10984.0,
+          "rise_after_start_write_end_us": 38637.28
+        }
+      ],
+      "camera_error": 32768,
+      "error_counts": {
+        "pre_frame": 1,
+        "during_frame": 0,
+        "post_frame": 1,
+        "unclassified": 0
+      },
+      "errors": [
+        {
+          "id": 74,
+          "time_us": 27069.28,
+          "frame_phase": "pre_frame",
+          "optical_phase": "before_first_exposure",
+          "detail_to_event_cycles": 877,
+          "error": 32768,
+          "csi_sr0": 131072,
+          "csi_sr1": 1981288448,
+          "cmsr2": 0,
+          "ier0_entry": 1596002560,
+          "ier1_entry": 7967,
+          "ier0_callback": 1596002560,
+          "ier1_callback": 3871,
+          "previous_stage": 25
+        },
+        {
+          "id": 73,
+          "time_us": 84356.0,
+          "frame_phase": "post_frame",
+          "optical_phase": "after_first_frame",
+          "detail_to_event_cycles": 861,
+          "error": 32768,
+          "csi_sr0": 4352,
+          "csi_sr1": 1712324624,
+          "cmsr2": 256,
+          "ier0_entry": 1595998208,
+          "ier1_entry": 3871,
+          "ier0_callback": 1595998208,
+          "ier1_callback": 3855,
+          "previous_stage": 51
+        }
+      ],
+      "first_frame_status": {
+        "csi_sr0": 131072,
+        "csi_sr1": 3860332544,
+        "applied_coarse_lines": 1428,
+        "line_length": 1236
+      },
+      "clock_readbacks": {
+        "external_hz": 12000000,
+        "system_pll_hz": 804000000,
+        "pixel_hz": 160800000,
+        "sensor_mcu_hz": 160800000,
+        "system_predivider": 2,
+        "system_multiplier": 134,
+        "system_output_divider": 1,
+        "mipi_multiplier": 32,
+        "mipi_output_divider": 1,
+        "configured_frame_lines": 4336
+      },
+      "warnings": [],
+      "experiment_id": "v18b-mono-cold",
+      "capture_dir": "capture-opt-v18b-mono-cycle-01/cold",
+      "build_manifest": "builds/capture-monolithic-noreset-v18b-20261017/manifest.json",
+      "prefix_manifest": null,
+      "rail_validation": {
+        "passed": true,
+        "common_off_s": 13.355872000000002,
+        "final": {
+          "3": {
+            "min_v": 3.263,
+            "max_v": 3.298,
+            "median_v": 3.288
+          },
+          "4": {
+            "min_v": 4.827,
+            "max_v": 4.858,
+            "median_v": 4.852
+          },
+          "5": {
+            "min_v": 3.266,
+            "max_v": 3.281,
+            "median_v": 3.271
+          }
+        },
+        "limitation": "No direct core/always-on rail probe; this proves discharge of the three named rails."
+      }
+    },
+    {
+      "mode": "cold",
+      "origin": "nrst_release",
+      "build_sha256": "c282b1e2e1cee3300740ac72c6930a753907df7aa2ca3925ccb79ca9162e2c3b",
+      "completed": true,
+      "image_integrity_matches": true,
+      "visual_qualification": "pending human/model inspection; statistics alone do not prove a valid image",
+      "exposure_qualified": false,
+      "frame_geometry": [
+        1120,
+        1364
+      ],
+      "frame_bytes": 1527680,
+      "frames": 1,
+      "vsyncs": 1,
+      "rom_to_pd0_us": 15674.56,
+      "phases_us": {
+        "stage1_entry": 15678.08,
+        "stage2_entry": 21135.2,
+        "main_entry": 21138.4,
+        "sensor_ready_observed": 21293.6,
+        "sensor_init_complete": 22976.96,
+        "exposure_configuration_complete": 23485.76,
+        "receiver_configured": 21224.16,
+        "receiver_armed": 21227.04,
+        "sensor_output_setup_complete": null,
+        "start_write_begin": 24196.96,
+        "start_write_end": 24245.6,
+        "sensor_start_return": 29657.92,
+        "first_vsync": 40778.56,
+        "first_frame_complete": 51408.0,
+        "sensor_release_command": null,
+        "stage2_load_begin": 15685.6,
+        "stage2_load_end": 21129.28
+      },
+      "intervals_us": {
+        "sensor_release_to_ready": null,
+        "sensor_ready_to_start_write": 2903.36,
+        "start_write_duration": 48.64,
+        "start_write_end_to_first_strobe": 5305.92,
+        "stage2_load": 5443.68,
+        "first_strobe_end_to_vsync": 243.04,
+        "first_vsync_to_frame_complete": 10629.44
+      },
+      "first_strobe_us": 29551.52,
+      "first_strobe_width_us": 10984.0,
+      "strobe_pulses": [
+        {
+          "ordinal": 1,
+          "rise_us": 29551.52,
+          "fall_us": 40535.52,
+          "width_us": 10984.0,
+          "rise_after_start_write_end_us": 5305.92
+        },
+        {
+          "ordinal": 2,
+          "rise_us": 62879.84,
+          "fall_us": 73863.84,
+          "width_us": 10984.0,
+          "rise_after_start_write_end_us": 38634.24
+        }
+      ],
+      "camera_error": 32768,
+      "error_counts": {
+        "pre_frame": 1,
+        "during_frame": 0,
+        "post_frame": 0,
+        "unclassified": 0
+      },
+      "errors": [
+        {
+          "id": 74,
+          "time_us": 29192.96,
+          "frame_phase": "pre_frame",
+          "optical_phase": "before_first_exposure",
+          "detail_to_event_cycles": 873,
+          "error": 32768,
+          "csi_sr0": 131072,
+          "csi_sr1": 1981288448,
+          "cmsr2": 0,
+          "ier0_entry": 1596002560,
+          "ier1_entry": 7967,
+          "ier0_callback": 1596002560,
+          "ier1_callback": 3871,
+          "previous_stage": 25
+        }
+      ],
+      "first_frame_status": {
+        "csi_sr0": 131072,
+        "csi_sr1": 3860332544,
+        "applied_coarse_lines": 1428,
+        "line_length": 1236
+      },
+      "clock_readbacks": {
+        "external_hz": 12000000,
+        "system_pll_hz": 804000000,
+        "pixel_hz": 160800000,
+        "sensor_mcu_hz": 160800000,
+        "system_predivider": 2,
+        "system_multiplier": 134,
+        "system_output_divider": 1,
+        "mipi_multiplier": 32,
+        "mipi_output_divider": 1,
+        "configured_frame_lines": 4336
+      },
+      "warnings": [],
+      "experiment_id": "v19-word32-cold",
+      "capture_dir": "capture-opt-v19-word32-cycle-01/cold",
+      "build_manifest": "builds/capture-sweep-v16-20261017/base-stage2/manifest.json",
+      "prefix_manifest": "builds/capture-staged-word32-v19-20261017/manifest.json",
+      "rail_validation": {
+        "passed": true,
+        "common_off_s": 13.280864,
+        "final": {
+          "3": {
+            "min_v": 3.268,
+            "max_v": 3.303,
+            "median_v": 3.288
+          },
+          "4": {
+            "min_v": 4.827,
+            "max_v": 4.852,
+            "median_v": 4.852
+          },
+          "5": {
+            "min_v": 3.266,
+            "max_v": 3.281,
+            "median_v": 3.271
+          }
+        },
+        "limitation": "No direct core/always-on rail probe; this proves discharge of the three named rails."
+      }
+    },
+    {
+      "mode": "cold",
+      "origin": "nrst_release",
+      "build_sha256": "f61faacfdaf20f30a4e45be3df6393cbb287cba7a6c48fe8cd7eabf4744e52ac",
+      "completed": true,
+      "image_integrity_matches": true,
+      "visual_qualification": "pending human/model inspection; statistics alone do not prove a valid image",
+      "exposure_qualified": false,
+      "frame_geometry": [
+        1120,
+        1364
+      ],
+      "frame_bytes": 1527680,
+      "frames": 1,
+      "vsyncs": 1,
+      "rom_to_pd0_us": 16498.24,
+      "phases_us": {
+        "stage1_entry": 16501.92,
+        "stage2_entry": 23807.36,
+        "main_entry": 23810.72,
+        "sensor_ready_observed": 16571.04,
+        "sensor_init_complete": 18179.36,
+        "exposure_configuration_complete": 18658.88,
+        "receiver_configured": 23897.44,
+        "receiver_armed": 23900.16,
+        "sensor_output_setup_complete": null,
+        "start_write_begin": 19326.4,
+        "start_write_end": 19372.32,
+        "sensor_start_return": 24734.24,
+        "first_vsync": 35896.32,
+        "first_frame_complete": 46526.08,
+        "sensor_release_command": null,
+        "stage2_load_begin": 19373.92,
+        "stage2_load_end": 23801.28
+      },
+      "intervals_us": {
+        "sensor_release_to_ready": null,
+        "sensor_ready_to_start_write": 2755.36,
+        "start_write_duration": 45.92,
+        "start_write_end_to_first_strobe": 5297.28,
+        "stage2_load": 4427.36,
+        "first_strobe_end_to_vsync": 242.72,
+        "first_vsync_to_frame_complete": 10629.76
+      },
+      "first_strobe_us": 24669.6,
+      "first_strobe_width_us": 10984.0,
+      "strobe_pulses": [
+        {
+          "ordinal": 1,
+          "rise_us": 24669.6,
+          "fall_us": 35653.6,
+          "width_us": 10984.0,
+          "rise_after_start_write_end_us": 5297.28
+        },
+        {
+          "ordinal": 2,
+          "rise_us": 57997.92,
+          "fall_us": 68981.92,
+          "width_us": 10984.0,
+          "rise_after_start_write_end_us": 38625.6
+        }
+      ],
+      "camera_error": 32768,
+      "error_counts": {
+        "pre_frame": 1,
+        "during_frame": 0,
+        "post_frame": 0,
+        "unclassified": 0
+      },
+      "errors": [
+        {
+          "id": 74,
+          "time_us": 24311.2,
+          "frame_phase": "pre_frame",
+          "optical_phase": "before_first_exposure",
+          "detail_to_event_cycles": 869,
+          "error": 32768,
+          "csi_sr0": 131072,
+          "csi_sr1": 1981288448,
+          "cmsr2": 0,
+          "ier0_entry": 1596002560,
+          "ier1_entry": 7967,
+          "ier0_callback": 1596002560,
+          "ier1_callback": 3871,
+          "previous_stage": 250
+        }
+      ],
+      "first_frame_status": {
+        "csi_sr0": 131072,
+        "csi_sr1": 3860332544,
+        "applied_coarse_lines": 1428,
+        "line_length": 1236
+      },
+      "clock_readbacks": {
+        "external_hz": 12000000,
+        "system_pll_hz": 804000000,
+        "pixel_hz": 160800000,
+        "sensor_mcu_hz": 160800000,
+        "system_predivider": 2,
+        "system_multiplier": 134,
+        "system_output_divider": 1,
+        "mipi_multiplier": 32,
+        "mipi_output_divider": 1,
+        "configured_frame_lines": 4336
+      },
+      "warnings": [],
+      "experiment_id": "v20-early-cold",
+      "capture_dir": "capture-opt-v20-early-cycle-01/cold",
+      "build_manifest": "builds/capture-receiver-v20-20261017/manifest.json",
+      "prefix_manifest": "builds/capture-early-start-v20-20261017/manifest.json",
+      "rail_validation": {
+        "passed": true,
+        "common_off_s": 13.4144,
+        "final": {
+          "3": {
+            "min_v": 3.268,
+            "max_v": 3.303,
+            "median_v": 3.288
+          },
+          "4": {
+            "min_v": 4.806,
+            "max_v": 4.852,
+            "median_v": 4.852
+          },
+          "5": {
+            "min_v": 3.266,
+            "max_v": 3.281,
+            "median_v": 3.276
+          }
+        },
+        "limitation": "No direct core/always-on rail probe; this proves discharge of the three named rails."
+      }
+    },
+    {
+      "mode": "cold",
+      "origin": "nrst_release",
+      "build_sha256": "81081f98fbdbf950628fbb78abdd5bf45f418a554bb3279b84eae11c4753a011",
+      "completed": true,
+      "image_integrity_matches": true,
+      "visual_qualification": "pending human/model inspection; statistics alone do not prove a valid image",
+      "exposure_qualified": false,
+      "frame_geometry": [
+        1120,
+        1364
+      ],
+      "frame_bytes": 1527680,
+      "frames": 1,
+      "vsyncs": 1,
+      "rom_to_pd0_us": 15577.6,
+      "phases_us": {
+        "stage1_entry": 15581.12,
+        "stage2_entry": 20576.96,
+        "main_entry": 20580.16,
+        "sensor_ready_observed": 22170.08,
+        "sensor_init_complete": 23852.32,
+        "exposure_configuration_complete": 24361.92,
+        "receiver_configured": 20665.76,
+        "receiver_armed": 20668.64,
+        "sensor_output_setup_complete": null,
+        "start_write_begin": 30119.04,
+        "start_write_end": 30167.84,
+        "sensor_start_return": 35582.72,
+        "first_vsync": 46699.04,
+        "first_frame_complete": 57328.48,
+        "sensor_release_command": 15687.84,
+        "stage2_load_begin": 15691.04,
+        "stage2_load_end": 20570.88
+      },
+      "intervals_us": {
+        "sensor_release_to_ready": 6482.24,
+        "sensor_ready_to_start_write": 7948.96,
+        "start_write_duration": 48.8,
+        "start_write_end_to_first_strobe": 5304.16,
+        "stage2_load": 4879.84,
+        "first_strobe_end_to_vsync": 243.2,
+        "first_vsync_to_frame_complete": 10629.44
+      },
+      "first_strobe_us": 35472.0,
+      "first_strobe_width_us": 10983.84,
+      "strobe_pulses": [
+        {
+          "ordinal": 1,
+          "rise_us": 35472.0,
+          "fall_us": 46455.84,
+          "width_us": 10983.84,
+          "rise_after_start_write_end_us": 5304.16
+        },
+        {
+          "ordinal": 2,
+          "rise_us": 68800.32,
+          "fall_us": 79784.16,
+          "width_us": 10983.84,
+          "rise_after_start_write_end_us": 38632.48
+        }
+      ],
+      "camera_error": 32768,
+      "error_counts": {
+        "pre_frame": 1,
+        "during_frame": 0,
+        "post_frame": 0,
+        "unclassified": 0
+      },
+      "errors": [
+        {
+          "id": 74,
+          "time_us": 35110.56,
+          "frame_phase": "pre_frame",
+          "optical_phase": "before_first_exposure",
+          "detail_to_event_cycles": 873,
+          "error": 32768,
+          "csi_sr0": 131072,
+          "csi_sr1": 1981288448,
+          "cmsr2": 0,
+          "ier0_entry": 1596002560,
+          "ier1_entry": 7967,
+          "ier0_callback": 1596002560,
+          "ier1_callback": 3871,
+          "previous_stage": 25
+        }
+      ],
+      "first_frame_status": {
+        "csi_sr0": 131072,
+        "csi_sr1": 3860332544,
+        "applied_coarse_lines": 1428,
+        "line_length": 1236
+      },
+      "clock_readbacks": {
+        "external_hz": 12000000,
+        "system_pll_hz": 804000000,
+        "pixel_hz": 160800000,
+        "sensor_mcu_hz": 160800000,
+        "system_predivider": 2,
+        "system_multiplier": 134,
+        "system_output_divider": 1,
+        "mipi_multiplier": 32,
+        "mipi_output_divider": 1,
+        "configured_frame_lines": 4336
+      },
+      "warnings": [],
+      "experiment_id": "v21-dwell5-cold",
+      "capture_dir": "capture-opt-v21-dwell5-cycle-01/cold",
+      "build_manifest": "builds/capture-stage2-dwell5-v21-20261017/manifest.json",
+      "prefix_manifest": "builds/capture-staged-dwell5-v21-20261017/manifest.json",
+      "rail_validation": {
+        "passed": true,
+        "common_off_s": 13.333504000000001,
+        "final": {
+          "3": {
+            "min_v": 3.268,
+            "max_v": 3.303,
+            "median_v": 3.288
+          },
+          "4": {
+            "min_v": 4.832,
+            "max_v": 4.858,
+            "median_v": 4.852
+          },
+          "5": {
+            "min_v": 3.271,
+            "max_v": 3.281,
+            "median_v": 3.276
+          }
+        },
+        "limitation": "No direct core/always-on rail probe; this proves discharge of the three named rails."
+      }
+    },
+    {
+      "mode": "cold",
+      "origin": "nrst_release",
+      "build_sha256": "880c638b045b813e0f8fcc7c63dc105aa81158d3a5dc44b012e4e480d2852b19",
+      "completed": true,
+      "image_integrity_matches": true,
+      "visual_qualification": "pending human/model inspection; statistics alone do not prove a valid image",
+      "exposure_qualified": false,
+      "frame_geometry": [
+        1120,
+        1364
+      ],
+      "frame_bytes": 1527680,
+      "frames": 1,
+      "vsyncs": 1,
+      "rom_to_pd0_us": 15527.84,
+      "phases_us": {
+        "stage1_entry": 15531.2,
+        "stage2_entry": 20587.84,
+        "main_entry": 20591.04,
+        "sensor_ready_observed": 22182.4,
+        "sensor_init_complete": 23867.2,
+        "exposure_configuration_complete": 24543.36,
+        "receiver_configured": 20676.8,
+        "receiver_armed": 20679.68,
+        "sensor_output_setup_complete": null,
+        "start_write_begin": 25255.36,
+        "start_write_end": 25304.16,
+        "sensor_start_return": 30720.8,
+        "first_vsync": 42057.92,
+        "first_frame_complete": 52687.36,
+        "sensor_release_command": 15637.92,
+        "stage2_load_begin": 15641.12,
+        "stage2_load_end": 20581.92
+      },
+      "intervals_us": {
+        "sensor_release_to_ready": 6544.48,
+        "sensor_ready_to_start_write": 3072.96,
+        "start_write_duration": 48.8,
+        "start_write_end_to_first_strobe": 5526.72,
+        "stage2_load": 4940.8,
+        "first_strobe_end_to_vsync": 243.04,
+        "first_vsync_to_frame_complete": 10629.44
+      },
+      "first_strobe_us": 30830.88,
+      "first_strobe_width_us": 10984.0,
+      "strobe_pulses": [
+        {
+          "ordinal": 1,
+          "rise_us": 30830.88,
+          "fall_us": 41814.88,
+          "width_us": 10984.0,
+          "rise_after_start_write_end_us": 5526.72
+        }
+      ],
+      "camera_error": 32768,
+      "error_counts": {
+        "pre_frame": 1,
+        "during_frame": 0,
+        "post_frame": 0,
+        "unclassified": 0
+      },
+      "errors": [
+        {
+          "id": 74,
+          "time_us": 30250.24,
+          "frame_phase": "pre_frame",
+          "optical_phase": "before_first_exposure",
+          "detail_to_event_cycles": 873,
+          "error": 32768,
+          "csi_sr0": 131072,
+          "csi_sr1": 1981288448,
+          "cmsr2": 0,
+          "ier0_entry": 1596002560,
+          "ier1_entry": 7967,
+          "ier0_callback": 1596002560,
+          "ier1_callback": 3871,
+          "previous_stage": 25
+        }
+      ],
+      "first_frame_status": {
+        "csi_sr0": 131072,
+        "csi_sr1": 3860332544,
+        "applied_coarse_lines": 1428,
+        "line_length": 1236
+      },
+      "clock_readbacks": {
+        "external_hz": 12000000,
+        "system_pll_hz": 804000000,
+        "pixel_hz": 160800000,
+        "sensor_mcu_hz": 160800000,
+        "system_predivider": 2,
+        "system_multiplier": 134,
+        "system_output_divider": 1,
+        "mipi_multiplier": 32,
+        "mipi_output_divider": 1,
+        "configured_frame_lines": 4336
+      },
+      "warnings": [],
+      "experiment_id": "v21-follower-cold",
+      "capture_dir": "capture-opt-v21-follower-cycle-01/cold",
+      "build_manifest": "builds/capture-stage2-follower-v21-20261017/manifest.json",
+      "prefix_manifest": "builds/capture-staged-follower-v21-20261017/manifest.json",
+      "rail_validation": {
+        "passed": true,
+        "common_off_s": 13.461056,
+        "final": {
+          "3": {
+            "min_v": 3.268,
+            "max_v": 3.303,
+            "median_v": 3.288
+          },
+          "4": {
+            "min_v": 4.827,
+            "max_v": 4.852,
+            "median_v": 4.852
+          },
+          "5": {
+            "min_v": 3.271,
+            "max_v": 3.281,
+            "median_v": 3.276
+          }
+        },
+        "limitation": "No direct core/always-on rail probe; this proves discharge of the three named rails."
+      }
+    },
+    {
+      "mode": "cold",
+      "origin": "nrst_release",
+      "build_sha256": "f61faacfdaf20f30a4e45be3df6393cbb287cba7a6c48fe8cd7eabf4744e52ac",
+      "completed": true,
+      "image_integrity_matches": true,
+      "visual_qualification": "pending human/model inspection; statistics alone do not prove a valid image",
+      "exposure_qualified": false,
+      "frame_geometry": [
+        1120,
+        1364
+      ],
+      "frame_bytes": 1527680,
+      "frames": 1,
+      "vsyncs": 1,
+      "rom_to_pd0_us": 16332.8,
+      "phases_us": {
+        "stage1_entry": 16336.16,
+        "stage2_entry": 22120.64,
+        "main_entry": 22124.0,
+        "sensor_ready_observed": 16404.8,
+        "sensor_init_complete": 18009.44,
+        "exposure_configuration_complete": 18487.84,
+        "receiver_configured": 22210.72,
+        "receiver_armed": 22213.44,
+        "sensor_output_setup_complete": null,
+        "start_write_begin": 19154.56,
+        "start_write_end": 19200.16,
+        "sensor_start_return": 24588.96,
+        "first_vsync": 35732.64,
+        "first_frame_complete": 46362.4,
+        "sensor_release_command": null,
+        "stage2_load_begin": 19201.76,
+        "stage2_load_end": 22114.88
+      },
+      "intervals_us": {
+        "sensor_release_to_ready": null,
+        "sensor_ready_to_start_write": 2749.76,
+        "start_write_duration": 45.6,
+        "start_write_end_to_first_strobe": 5305.76,
+        "stage2_load": 2913.12,
+        "first_strobe_end_to_vsync": 242.72,
+        "first_vsync_to_frame_complete": 10629.76
+      },
+      "first_strobe_us": 24505.92,
+      "first_strobe_width_us": 10984.0,
+      "strobe_pulses": [
+        {
+          "ordinal": 1,
+          "rise_us": 24505.92,
+          "fall_us": 35489.92,
+          "width_us": 10984.0,
+          "rise_after_start_write_end_us": 5305.76
+        },
+        {
+          "ordinal": 2,
+          "rise_us": 57834.24,
+          "fall_us": 68818.24,
+          "width_us": 10984.0,
+          "rise_after_start_write_end_us": 38634.08
+        }
+      ],
+      "camera_error": 32768,
+      "error_counts": {
+        "pre_frame": 1,
+        "during_frame": 0,
+        "post_frame": 0,
+        "unclassified": 0
+      },
+      "errors": [
+        {
+          "id": 74,
+          "time_us": 24145.44,
+          "frame_phase": "pre_frame",
+          "optical_phase": "before_first_exposure",
+          "detail_to_event_cycles": 873,
+          "error": 32768,
+          "csi_sr0": 131072,
+          "csi_sr1": 1981288448,
+          "cmsr2": 0,
+          "ier0_entry": 1596002560,
+          "ier1_entry": 7967,
+          "ier0_callback": 1596002560,
+          "ier1_callback": 3871,
+          "previous_stage": 250
+        }
+      ],
+      "first_frame_status": {
+        "csi_sr0": 131072,
+        "csi_sr1": 3860332544,
+        "applied_coarse_lines": 1428,
+        "line_length": 1236
+      },
+      "clock_readbacks": {
+        "external_hz": 12000000,
+        "system_pll_hz": 804000000,
+        "pixel_hz": 160800000,
+        "sensor_mcu_hz": 160800000,
+        "system_predivider": 2,
+        "system_multiplier": 134,
+        "system_output_divider": 1,
+        "mipi_multiplier": 32,
+        "mipi_output_divider": 1,
+        "configured_frame_lines": 4336
+      },
+      "warnings": [],
+      "experiment_id": "v22-inline-cold",
+      "capture_dir": "capture-opt-v22-inline-cycle-01/cold",
+      "build_manifest": "builds/capture-receiver-v20-20261017/manifest.json",
+      "prefix_manifest": "builds/capture-early-inline-v22-20261017/manifest.json",
+      "rail_validation": {
+        "passed": true,
+        "common_off_s": 13.438559999999999,
+        "final": {
+          "3": {
+            "min_v": 3.268,
+            "max_v": 3.303,
+            "median_v": 3.288
+          },
+          "4": {
+            "min_v": 4.827,
+            "max_v": 4.852,
+            "median_v": 4.852
+          },
+          "5": {
+            "min_v": 3.266,
+            "max_v": 3.281,
+            "median_v": 3.271
+          }
+        },
+        "limitation": "No direct core/always-on rail probe; this proves discharge of the three named rails."
+      }
+    },
+    {
+      "mode": "cold",
+      "origin": "nrst_release",
+      "build_sha256": "fa955221e78c01d02a357342223b191417f3a18a829758f67b9003cde67b07d9",
+      "completed": true,
+      "image_integrity_matches": true,
+      "visual_qualification": "pending human/model inspection; statistics alone do not prove a valid image",
+      "exposure_qualified": false,
+      "frame_geometry": [
+        1120,
+        1364
+      ],
+      "frame_bytes": 1527680,
+      "frames": 1,
+      "vsyncs": 1,
+      "rom_to_pd0_us": 16303.68,
+      "phases_us": {
+        "stage1_entry": 16307.2,
+        "stage2_entry": 21537.6,
+        "main_entry": 21540.8,
+        "sensor_ready_observed": 16376.0,
+        "sensor_init_complete": 17507.36,
+        "exposure_configuration_complete": 17986.08,
+        "receiver_configured": 21627.68,
+        "receiver_armed": 21630.4,
+        "sensor_output_setup_complete": null,
+        "start_write_begin": 18549.44,
+        "start_write_end": 18595.04,
+        "sensor_start_return": 23951.2,
+        "first_vsync": 35128.48,
+        "first_frame_complete": 45758.24,
+        "sensor_release_command": null,
+        "stage2_load_begin": 18596.64,
+        "stage2_load_end": 21531.84
+      },
+      "intervals_us": {
+        "sensor_release_to_ready": null,
+        "sensor_ready_to_start_write": 2173.44,
+        "start_write_duration": 45.6,
+        "start_write_end_to_first_strobe": 5306.72,
+        "stage2_load": 2935.2,
+        "first_strobe_end_to_vsync": 242.72,
+        "first_vsync_to_frame_complete": 10629.76
+      },
+      "first_strobe_us": 23901.76,
+      "first_strobe_width_us": 10984.0,
+      "strobe_pulses": [
+        {
+          "ordinal": 1,
+          "rise_us": 23901.76,
+          "fall_us": 34885.76,
+          "width_us": 10984.0,
+          "rise_after_start_write_end_us": 5306.72
+        },
+        {
+          "ordinal": 2,
+          "rise_us": 57230.08,
+          "fall_us": 68214.08,
+          "width_us": 10984.0,
+          "rise_after_start_write_end_us": 38635.04
+        }
+      ],
+      "camera_error": 32768,
+      "error_counts": {
+        "pre_frame": 1,
+        "during_frame": 0,
+        "post_frame": 0,
+        "unclassified": 0
+      },
+      "errors": [
+        {
+          "id": 74,
+          "time_us": 23543.52,
+          "frame_phase": "pre_frame",
+          "optical_phase": "before_first_exposure",
+          "detail_to_event_cycles": 871,
+          "error": 32768,
+          "csi_sr0": 131072,
+          "csi_sr1": 1981288448,
+          "cmsr2": 0,
+          "ier0_entry": 1596002560,
+          "ier1_entry": 7967,
+          "ier0_callback": 1596002560,
+          "ier1_callback": 3871,
+          "previous_stage": 250
+        }
+      ],
+      "first_frame_status": {
+        "csi_sr0": 131072,
+        "csi_sr1": 3860332544,
+        "applied_coarse_lines": 1428,
+        "line_length": 1236
+      },
+      "clock_readbacks": {
+        "external_hz": 12000000,
+        "system_pll_hz": 804000000,
+        "pixel_hz": 160800000,
+        "sensor_mcu_hz": 160800000,
+        "system_predivider": 2,
+        "system_multiplier": 134,
+        "system_output_divider": 1,
+        "mipi_multiplier": 32,
+        "mipi_output_divider": 1,
+        "configured_frame_lines": 4336
+      },
+      "warnings": [],
+      "experiment_id": "v23-trim-cold",
+      "capture_dir": "capture-opt-v23-trim-cycle-01/cold",
+      "build_manifest": "builds/capture-receiver-trim-v23-20261017/manifest.json",
+      "prefix_manifest": "builds/capture-early-trim-v23-20261017/manifest.json",
+      "rail_validation": {
+        "passed": true,
+        "common_off_s": 13.503391999999998,
+        "final": {
+          "3": {
+            "min_v": 3.268,
+            "max_v": 3.303,
+            "median_v": 3.288
+          },
+          "4": {
+            "min_v": 4.827,
+            "max_v": 4.852,
+            "median_v": 4.852
+          },
+          "5": {
+            "min_v": 3.266,
+            "max_v": 3.281,
+            "median_v": 3.276
+          }
+        },
+        "limitation": "No direct core/always-on rail probe; this proves discharge of the three named rails."
+      }
+    },
+    {
+      "mode": "cold",
+      "origin": "nrst_release",
+      "build_sha256": "fa955221e78c01d02a357342223b191417f3a18a829758f67b9003cde67b07d9",
+      "completed": true,
+      "image_integrity_matches": true,
+      "visual_qualification": "pending human/model inspection; statistics alone do not prove a valid image",
+      "exposure_qualified": false,
+      "frame_geometry": [
+        1120,
+        1364
+      ],
+      "frame_bytes": 1527680,
+      "frames": 1,
+      "vsyncs": 1,
+      "rom_to_pd0_us": 15712.48,
+      "phases_us": {
+        "stage1_entry": 15716.16,
+        "stage2_entry": 20950.24,
+        "main_entry": 20953.6,
+        "sensor_ready_observed": 15785.28,
+        "sensor_init_complete": 16917.12,
+        "exposure_configuration_complete": 17396.32,
+        "receiver_configured": 21040.48,
+        "receiver_armed": 21043.04,
+        "sensor_output_setup_complete": null,
+        "start_write_begin": 17960.64,
+        "start_write_end": 18006.56,
+        "sensor_start_return": 23370.88,
+        "first_vsync": 34536.96,
+        "first_frame_complete": 45166.72,
+        "sensor_release_command": null,
+        "stage2_load_begin": 18008.16,
+        "stage2_load_end": 20944.32
+      },
+      "intervals_us": {
+        "sensor_release_to_ready": null,
+        "sensor_ready_to_start_write": 2175.36,
+        "start_write_duration": 45.92,
+        "start_write_end_to_first_strobe": 5303.68,
+        "stage2_load": 2936.16,
+        "first_strobe_end_to_vsync": 242.72,
+        "first_vsync_to_frame_complete": 10629.76
+      },
+      "first_strobe_us": 23310.24,
+      "first_strobe_width_us": 10984.0,
+      "strobe_pulses": [
+        {
+          "ordinal": 1,
+          "rise_us": 23310.24,
+          "fall_us": 34294.24,
+          "width_us": 10984.0,
+          "rise_after_start_write_end_us": 5303.68
+        },
+        {
+          "ordinal": 2,
+          "rise_us": 56638.4,
+          "fall_us": 67622.56,
+          "width_us": 10984.16,
+          "rise_after_start_write_end_us": 38631.84
+        }
+      ],
+      "camera_error": 32768,
+      "error_counts": {
+        "pre_frame": 1,
+        "during_frame": 0,
+        "post_frame": 0,
+        "unclassified": 0
+      },
+      "errors": [
+        {
+          "id": 74,
+          "time_us": 22952.48,
+          "frame_phase": "pre_frame",
+          "optical_phase": "before_first_exposure",
+          "detail_to_event_cycles": 871,
+          "error": 32768,
+          "csi_sr0": 131072,
+          "csi_sr1": 1981288448,
+          "cmsr2": 0,
+          "ier0_entry": 1596002560,
+          "ier1_entry": 7967,
+          "ier0_callback": 1596002560,
+          "ier1_callback": 3871,
+          "previous_stage": 250
+        }
+      ],
+      "first_frame_status": {
+        "csi_sr0": 131072,
+        "csi_sr1": 3860332544,
+        "applied_coarse_lines": 1428,
+        "line_length": 1236
+      },
+      "clock_readbacks": {
+        "external_hz": 12000000,
+        "system_pll_hz": 804000000,
+        "pixel_hz": 160800000,
+        "sensor_mcu_hz": 160800000,
+        "system_predivider": 2,
+        "system_multiplier": 134,
+        "system_output_divider": 1,
+        "mipi_multiplier": 32,
+        "mipi_output_divider": 1,
+        "configured_frame_lines": 4336
+      },
+      "warnings": [],
+      "experiment_id": "v24-os-cold",
+      "capture_dir": "capture-opt-v24-os-cycle-01/cold",
+      "build_manifest": "builds/capture-receiver-trim-v23-20261017/manifest.json",
+      "prefix_manifest": "builds/capture-early-trim-os-v24-20261017/manifest.json",
+      "rail_validation": {
+        "passed": true,
+        "common_off_s": 13.395552,
+        "final": {
+          "3": {
+            "min_v": 3.268,
+            "max_v": 3.298,
+            "median_v": 3.288
+          },
+          "4": {
+            "min_v": 4.811,
+            "max_v": 4.852,
+            "median_v": 4.837
+          },
+          "5": {
+            "min_v": 3.271,
+            "max_v": 3.281,
+            "median_v": 3.276
+          }
+        },
+        "limitation": "No direct core/always-on rail probe; this proves discharge of the three named rails."
+      }
+    }
+  ]
+}
