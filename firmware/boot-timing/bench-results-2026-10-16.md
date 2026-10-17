@@ -121,6 +121,16 @@ The board's U6 eFuse is enabled by ST-LINK `T_PWR_EN` after USB enumeration. Its
 
 Until the source behavior is resolved, use observed manual USB power cycles for these boot comparisons. A future automated cycle must verify both actual rail discharge and successful rail restoration; a range setting alone proves neither. No power-path modification is prescribed by this result.
 
+### PWR STATUS turns red when CN9 is opened
+
+The user subsequently reported that opening the target supply at CN9 changes PWR STATUS from green to solid red, and restoring the connection does not restore green. This is a user-observed LED event, without a synchronized trace of the LED or power-switch enable. Keep it distinct from `first-gpio-cycle-02`, where the upstream supply remained present during the off interval and collapsed after reconnection.
+
+ST defines solid red **PWR STATUS LD4** as target power shut off following overcurrent detection. ST-LINK controls the upstream U6 eFuse through `T_PWR_EN`; CN9 is downstream of that switch. [UM3417 Rev4 §§7.4.1 and 7.8](https://www.st.com/resource/en/user_manual/um3417-stm32n6-nucleo144-board-mb1940-stmicroelectronics.pdf)
+
+The persistent indication is consistent with ST-LINK retaining a protection state: replacing the downstream jumper does not reset the still-powered controller. The firmware's exact fault-clear rule is undocumented in the reviewed sources. Opening CN9 reduces steady load, so neither the LED nor this report proves sustained excessive current. A switching transient, contact bounce/reconnection, or protection interpretation remains possible. The TPS259535 auto-retry behavior described above also prevents attributing this to a proven hardware latch-off inside U6.
+
+ST-LINK USB unplug/replug is the recovery already demonstrated on this bench. B2 resets the target, not ST-LINK; recovery through ST-LINK reset JP3 has not been tested. A later passive capture of raw USB `VBUS_STLK`, protected `5V_STLK`, and `T_PWR_EN` would distinguish loss of the USB source from the controller disabling U6. No further hardware or firmware change was made for this finding.
+
 ## Evidence locations and next questions
 
 Large raw recordings remain local under ignored `tmp/bringup/`. The numeric findings, hashes, interpretation and plot above are the durable repository record. The [evidence directory](evidence/) also preserves both successful runs' digital transitions, capture configurations and calculated summaries, plus SHA-256 hashes of their original `.sal` and CSV files. The tracked [NOR manifest](nor-backup-manifest.json) duplicates the local backup's verification metadata without publishing its binary contents.
