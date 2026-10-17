@@ -1,0 +1,215 @@
+{
+  "schema": 1,
+  "date": "2026-10-17",
+  "checkpoint_utc": "2026-10-17T17:12:28.326711+00:00",
+  "scope": "Failed v30b early-receiver trial and repeat, recovery records to checkpoint, and guarded v30d offline build provenance. No successful PHY comparison or restored-board claim.",
+  "board_recovery_and_final_validation": "pending root bench owner",
+  "builds": [
+    {
+      "id": "early-v30b-receiver",
+      "directory": "tmp/bringup/capture-phy-early-v30b-final-20261017/receiver",
+      "hardware_status_at_checkpoint": "programmed and readback verified; capture stalled"
+    },
+    {
+      "id": "early-v30b-staged",
+      "directory": "tmp/bringup/capture-phy-early-v30b-final-20261017/staged",
+      "hardware_status_at_checkpoint": "programmed and readback verified; capture stalled"
+    },
+    {
+      "id": "early-v30d-unflashed-receiver",
+      "directory": "tmp/bringup/capture-phy-early-v30d-guarded-20261017/receiver",
+      "hardware_status_at_checkpoint": "offline candidate; not flashed at checkpoint"
+    },
+    {
+      "id": "early-v30d-unflashed-staged",
+      "directory": "tmp/bringup/capture-phy-early-v30d-guarded-20261017/staged",
+      "hardware_status_at_checkpoint": "offline candidate; not flashed at checkpoint"
+    },
+    {
+      "id": "late-v30d-unflashed-receiver",
+      "directory": "tmp/bringup/capture-phy-late-v30d-guarded-20261017/receiver",
+      "hardware_status_at_checkpoint": "offline candidate; not flashed at checkpoint"
+    },
+    {
+      "id": "late-v30d-unflashed-staged",
+      "directory": "tmp/bringup/capture-phy-late-v30d-guarded-20261017/staged",
+      "hardware_status_at_checkpoint": "offline candidate; not flashed at checkpoint"
+    }
+  ],
+  "captures": [
+    {
+      "id": "early-v30b-failed-cold-01",
+      "directory": "tmp/bringup/phy-v30-early-cycle-01/cold",
+      "logic_directory": "tmp/bringup/phy-v30-early-cycle-01/cold/logic",
+      "receiver_build": "early-v30b-receiver",
+      "prefix_build": "early-v30b-staged",
+      "programming_cycle_directory": "tmp/bringup/phy-v30-early-cycle-01",
+      "outcome": "failed",
+      "outcome_note": "24 externally observed PE0 transitions; no RAM event dump, PHY snapshot or image. Core inaccessible. Probable diagnostic read under peripheral reset is a source-based inference."
+    },
+    {
+      "id": "early-v30b-failed-recovery-cold-02",
+      "directory": "tmp/bringup/phy-v30-recovery-cold-02",
+      "logic_directory": "tmp/bringup/phy-v30-recovery-cold-02",
+      "receiver_build": "early-v30b-receiver",
+      "prefix_build": "early-v30b-staged",
+      "programming_cycle_directory": "tmp/bringup/phy-v30-early-cycle-01",
+      "outcome": "failed",
+      "outcome_note": "24 externally observed PE0 transitions; no RAM event dump, PHY snapshot or image. Core inaccessible. Probable diagnostic read under peripheral reset is a source-based inference."
+    }
+  ],
+  "extra_files": [
+    {
+      "source": "tmp/bringup/phy-v30-after-ap-init.log",
+      "archive": "recovery/phy-v30-after-ap-init.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-after-underreset-core.log",
+      "archive": "recovery/phy-v30-after-underreset-core.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-ap2-init-read.cfg",
+      "archive": "recovery/phy-v30-ap2-init-read.cfg"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-ap2-init-read.log",
+      "archive": "recovery/phy-v30-ap2-init-read.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-ap2-memory-read.cfg",
+      "archive": "recovery/phy-v30-ap2-memory-read.cfg"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-ap2-memory-read.log",
+      "archive": "recovery/phy-v30-ap2-memory-read.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-ap2-postcold-rcc.log",
+      "archive": "recovery/phy-v30-ap2-postcold-rcc.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-ap2-read.cfg",
+      "archive": "recovery/phy-v30-ap2-read.cfg"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-ap2-read.log",
+      "archive": "recovery/phy-v30-ap2-read.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-ap2-state.cfg",
+      "archive": "recovery/phy-v30-ap2-state.cfg"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-ap2-state.log",
+      "archive": "recovery/phy-v30-ap2-state.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-ap2-underreset-init.cfg",
+      "archive": "recovery/phy-v30-ap2-underreset-init.cfg"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-ap2-underreset-init.log",
+      "archive": "recovery/phy-v30-ap2-underreset-init.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-dap-registers-02.log",
+      "archive": "recovery/phy-v30-dap-registers-02.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-dap-registers.cfg",
+      "archive": "recovery/phy-v30-dap-registers.cfg"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-dap-registers.log",
+      "archive": "recovery/phy-v30-dap-registers.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-memap-read.cfg",
+      "archive": "recovery/phy-v30-memap-read.cfg"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-memap-read.log",
+      "archive": "recovery/phy-v30-memap-read.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-open-ap-state.cfg",
+      "archive": "recovery/phy-v30-open-ap-state.cfg"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-open-ap-state.log",
+      "archive": "recovery/phy-v30-open-ap-state.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-prefix-recovery-proof.log",
+      "archive": "recovery/phy-v30-prefix-recovery-proof.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-raw-dap-read.cfg",
+      "archive": "recovery/phy-v30-raw-dap-read.cfg"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-raw-dap-read.log",
+      "archive": "recovery/phy-v30-raw-dap-read.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-recovery-cold-02-cycle.log",
+      "archive": "recovery/phy-v30-recovery-cold-02-cycle.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-reset-probe.cfg",
+      "archive": "recovery/phy-v30-reset-probe.cfg"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-reset-probe.log",
+      "archive": "recovery/phy-v30-reset-probe.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-reset-recovery.log",
+      "archive": "recovery/phy-v30-reset-recovery.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-under-reset-recovery.log",
+      "archive": "recovery/phy-v30-under-reset-recovery.log"
+    },
+    {
+      "source": "tmp/bringup/phy-sequence-before-20261017/powered-state.json",
+      "archive": "before-test/powered-state.json"
+    },
+    {
+      "source": "tmp/bringup/phy-sequence-before-20261017/capture-config.json",
+      "archive": "before-test/capture-config.json"
+    },
+    {
+      "source": "tmp/bringup/phy-sequence-before-20261017/boot-summary.json",
+      "archive": "before-test/boot-summary.json"
+    },
+    {
+      "source": "tmp/bringup/phy-sequence-before-20261017/digital.csv",
+      "archive": "before-test/digital.csv"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-offline-summary.py",
+      "archive": "analysis/phy-v30-offline-summary.py"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-make-archive-config.py",
+      "archive": "analysis/phy-v30-make-archive-config.py"
+    },
+    {
+      "source": "firmware/capture-timing/late_phy/build.py",
+      "archive": "current-host-tools/build.py"
+    },
+    {
+      "source": "firmware/capture-timing/late_phy/transforms.py",
+      "archive": "current-host-tools/transforms.py"
+    },
+    {
+      "source": "firmware/capture-timing/late_phy/summarize.py",
+      "archive": "current-host-tools/summarize.py"
+    },
+    {
+      "source": "firmware/capture-timing/late_phy/README.md",
+      "archive": "current-host-tools/README.md"
+    }
+  ]
+}

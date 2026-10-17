@@ -28,10 +28,41 @@ NAMES = ['magic', 'stage', 'event_count', 'result', 'camera_error',
          'frames', 'vsyncs', 'errors', 'minimum', 'maximum', 'sum', 'fnv1a',
          'frame_address', 'frame_bytes', 'width', 'height', 'entry_cfgr1',
          'entry_cfgr2', 'entry_ccr', 'debug_cr', 'debug_unlock']
+LATE_PHY_ADDRESS = 0x343F8000
+LATE_PHY_WORDS = 32 + 128 * 12
+LATE_PHY_FIELDS = ['id', 'cycles', 'tick_ms', 'sr0', 'sr1', 'ier0', 'ier1',
+                   'prcr', 'pcr', 'cr', 'lmcfgr', 'apb5rstr']
 
 
 def sha(data):
     return hashlib.sha256(data).hexdigest()
+
+
+def late_phy_region(manifest):
+    """Permit only the reviewed v30 snapshot layout, never a manifest RAM range."""
+    expected = dict(late_phy_status_address='0x343f8000', late_phy_status_words=1568,
+                    late_phy_header_words=32, late_phy_record_words=12,
+                    late_phy_max_records=128, late_phy_status_schema=1)
+    for key, value in expected.items():
+        actual = manifest.get(key)
+        if type(actual) is not type(value) or actual != value:
+            raise ValueError(f'Unexpected late-PHY diagnostic layout: {key}')
+    return LATE_PHY_ADDRESS, LATE_PHY_WORDS
+
+
+def decode_late_phy(diagnostic):
+    if len(diagnostic) != LATE_PHY_WORDS * 4:
+        raise ValueError('Incomplete late-PHY diagnostic region')
+    words = struct.unpack(f'<{LATE_PHY_WORDS}I', diagnostic)
+    valid = words[0] == 0x4C505231 and words[2] <= 128 and words[6] in (0, 1)
+    records = []
+    if valid:
+        for offset in range(32, 32 + words[2] * 12, 12):
+            records.append(dict(zip(LATE_PHY_FIELDS, words[offset:offset + 12])))
+    # Keep invalid/uninitialized header evidence too; do not turn it into a
+    # valid empty history or discard diagnostics on a failed capture.
+    return dict(late_phy_status_words=list(words), late_phy_header_valid=valid,
+                late_phy_snapshots=records)
 
 
 def inspect(bench, manifest, timeout):
@@ -39,6 +70,7 @@ def inspect(bench, manifest, timeout):
     event_address = int(manifest.get('event_address', hex(EVENTS)), 0)
     error_address = int(manifest.get('error_address', '0x341f1000'), 0)
     prefix_address = int(manifest.get('prefix_status_address', '0x341f3000'), 0)
+    late_region = late_phy_region(manifest) if 'late_phy_status_address' in manifest else None
     deadline = time.monotonic() + timeout
     for i in range(60):
         raw = bench.upload(trace_address, 256, f'trace-{i:02d}.bin')
@@ -64,6 +96,9 @@ def inspect(bench, manifest, timeout):
             raise ValueError('Unexpected timer diagnostic region')
         diagnostic = bench.upload(0x343F7000, timer_words * 4, 'timer-status.bin')
         summary['timer_status_words'] = list(struct.unpack(f'<{timer_words}I', diagnostic))
+    if late_region:
+        address, count = late_region
+        summary.update(decode_late_phy(bench.upload(address, count * 4, 'late-phy-status.bin')))
     if summary['completed'] and manifest.get('parameters', {}).get('stage2'):
         prefix = bench.upload(prefix_address, 256, 'prefix-status.bin')
         summary['prefix_status_words'] = list(struct.unpack('<64I', prefix))

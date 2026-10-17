@@ -1,0 +1,156 @@
+{
+  "schema": 1,
+  "time_unit": "us",
+  "experiments": [
+    {
+      "experiment_id": "late-v32-second-trigger-cold-01",
+      "outcome": "completed",
+      "outcome_note": "Second requested sensor image received. First exposure produced no receiver VSYNC/frame. Not eligible for first-frame latency or first-frame-success claims. No PHY reset or DCMIPP rearm between requests. Only recorded ECTRL occurs during later sensor stop.",
+      "capture_dir": "tmp/bringup/phy-v32-second-trigger-cycle-01/cold",
+      "receiver_build": "late-v32-receiver",
+      "prefix_build": "late-v32-staged",
+      "summary": {
+        "mode": "cold",
+        "origin": "nrst_release",
+        "build_sha256": "4c49b5c339b8ca81b4af154ff341d91baf1be1363fa2f135b64ca8cfbea09895",
+        "completed": true,
+        "image_integrity_matches": true,
+        "visual_qualification": "pending human/model inspection; statistics alone do not prove a valid image",
+        "exposure_qualified": false,
+        "frame_geometry": [
+          1120,
+          1364
+        ],
+        "frame_bytes": 3055360,
+        "frames": 1,
+        "vsyncs": 1,
+        "rom_to_pd0_us": 16248.96,
+        "phases_us": {
+          "stage1_entry": 16277.28,
+          "stage2_entry": 22324.32,
+          "main_entry": 22355.36,
+          "sensor_ready_observed": 16351.36,
+          "sensor_init_complete": 17487.52,
+          "exposure_configuration_complete": 17967.84,
+          "receiver_configured": 24488.0,
+          "receiver_armed": 24969.6,
+          "sensor_output_setup_complete": null,
+          "start_write_begin": 18861.28,
+          "start_write_end": 18907.52,
+          "sensor_start_return": 24333.28,
+          "first_vsync": 69731.84,
+          "first_frame_complete": 80354.72,
+          "sensor_release_command": null,
+          "stage2_load_begin": 18909.92,
+          "stage2_load_end": 22316.16
+        },
+        "intervals_us": {
+          "sensor_release_to_ready": null,
+          "sensor_ready_to_start_write": 2509.92,
+          "start_write_duration": 46.24,
+          "start_write_end_to_first_strobe": 6257.44,
+          "stage2_load": 3406.24,
+          "first_strobe_end_to_vsync": 33583.2,
+          "first_vsync_to_frame_complete": 10622.88
+        },
+        "first_strobe_us": 25164.96,
+        "first_strobe_width_us": 10983.68,
+        "strobe_pulses": [
+          {
+            "ordinal": 1,
+            "rise_us": 25164.96,
+            "fall_us": 36148.64,
+            "width_us": 10983.68,
+            "rise_after_start_write_end_us": 6257.44
+          },
+          {
+            "ordinal": 2,
+            "rise_us": 58492.96,
+            "fall_us": 69476.96,
+            "width_us": 10984.0,
+            "rise_after_start_write_end_us": 39585.44
+          }
+        ],
+        "camera_error": 32768,
+        "error_counts": {
+          "pre_frame": 0,
+          "during_frame": 0,
+          "post_frame": 1,
+          "unclassified": 0
+        },
+        "errors": [
+          {
+            "id": 74,
+            "time_us": 83275.68,
+            "frame_phase": "post_frame",
+            "optical_phase": "after_first_frame",
+            "detail_to_event_cycles": 1777,
+            "error": 32768,
+            "csi_sr0": 0,
+            "csi_sr1": 1678774272,
+            "cmsr2": 256,
+            "ier0_entry": 1595998208,
+            "ier1_entry": 7967,
+            "ier0_callback": 1595998208,
+            "ier1_callback": 3871,
+            "previous_stage": 31
+          }
+        ],
+        "first_frame_status": {
+          "csi_sr0": 131072,
+          "csi_sr1": 1981284352,
+          "applied_coarse_lines": 1428,
+          "line_length": 1236
+        },
+        "clock_readbacks": {
+          "external_hz": 12000000,
+          "system_pll_hz": 804000000,
+          "pixel_hz": 160800000,
+          "sensor_mcu_hz": 160800000,
+          "system_predivider": 2,
+          "system_multiplier": 134,
+          "system_output_divider": 1,
+          "mipi_multiplier": 32,
+          "mipi_output_divider": 1,
+          "configured_frame_lines": 4336
+        },
+        "warnings": [
+          "First frame-complete phase means first received frame, not first requested sensor image; this diagnostic is ineligible for first-frame latency claims."
+        ],
+        "captured_sensor_frame": 2,
+        "first_frame_latency_eligible": false
+      },
+      "programming_verification": "full byte-for-byte readback matches prefix manifest",
+      "capture_semantics_from_manifest": {
+        "captured_sensor_frame": 2,
+        "first_frame_latency_eligible": false
+      },
+      "rail_validation": {
+        "passed": true,
+        "common_off_s": 13.696767999999999,
+        "common_off_window_s": [
+          6.848738162,
+          20.545506162
+        ],
+        "final": {
+          "3": {
+            "min_v": 3.268,
+            "max_v": 3.303,
+            "median_v": 3.288
+          },
+          "4": {
+            "min_v": 4.811,
+            "max_v": 4.858,
+            "median_v": 4.852
+          },
+          "5": {
+            "min_v": 3.276,
+            "max_v": 3.287,
+            "median_v": 3.281
+          }
+        },
+        "limitation": "No direct core/always-on rail probe; this proves discharge of the three named rails."
+      }
+    }
+  ]
+}

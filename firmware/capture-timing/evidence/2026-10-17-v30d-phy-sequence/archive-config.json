@@ -1,0 +1,313 @@
+{
+  "schema": 1,
+  "date": "2026-10-17",
+  "checkpoint_utc": "2026-10-17T17:16:51.361105+00:00",
+  "scope": "Successful debug recovery and matched v30d continuous-clock comparison. Early capture works with startup warning; late capture times out without a frame. Noncontinuous-clock follow-up and final baseline restoration are outside this checkpoint.",
+  "board_recovery": "Core access and guarded normal-boot programming restored without boot-jumper changes.",
+  "final_baseline_restoration": "pending root bench owner",
+  "builds": [
+    {
+      "id": "early-v30d-receiver",
+      "directory": "tmp/bringup/capture-phy-early-v30d-guarded-20261017/receiver",
+      "hardware_status_at_checkpoint": "programmed and tested; see explicit capture outcome"
+    },
+    {
+      "id": "early-v30d-staged",
+      "directory": "tmp/bringup/capture-phy-early-v30d-guarded-20261017/staged",
+      "hardware_status_at_checkpoint": "programmed and tested; see explicit capture outcome"
+    },
+    {
+      "id": "late-v30d-receiver",
+      "directory": "tmp/bringup/capture-phy-late-v30d-guarded-20261017/receiver",
+      "hardware_status_at_checkpoint": "programmed and tested; see explicit capture outcome"
+    },
+    {
+      "id": "late-v30d-staged",
+      "directory": "tmp/bringup/capture-phy-late-v30d-guarded-20261017/staged",
+      "hardware_status_at_checkpoint": "programmed and tested; see explicit capture outcome"
+    }
+  ],
+  "captures": [
+    {
+      "id": "early-v30d-cold-01",
+      "directory": "tmp/bringup/phy-v30d-early-cold-01",
+      "receiver_build": "early-v30d-receiver",
+      "prefix_build": "early-v30d-staged",
+      "programming_directory": "tmp/bringup/phy-v30d-early-program",
+      "outcome": "completed",
+      "outcome_note": "Valid first frame with startup lane-1 ECTRL; raw lane-1 flag returns after sensor stop.",
+      "visual_review": {
+        "status": "Recognizable detailed bench/workshop scene; valid nonuniform grayscale.",
+        "reviewer": "root bench controller",
+        "provenance": "Root personally inspected frame.png and supplied this assertion to the archiving agent. The scene is no longer the earlier LED-grid framing."
+      }
+    },
+    {
+      "id": "late-v30d-cold-01",
+      "directory": "tmp/bringup/phy-v30d-late-cycle-01/cold",
+      "receiver_build": "late-v30d-receiver",
+      "prefix_build": "late-v30d-staged",
+      "programming_cycle_directory": "tmp/bringup/phy-v30d-late-cycle-01",
+      "outcome": "failed",
+      "outcome_note": "Exposure strobe occurred but no frame arrived before 2 s timeout, stage 0x8000001c. No ECTRL observed; this does not qualify as an error-free capture. ACTCLF remained clear in snapshots after PHY release."
+    }
+  ],
+  "extra_files": [
+    {
+      "source": "tmp/bringup/phy-v30-prefix-recovery-proof/apb5rstr.bin",
+      "archive": "recovery/phy-v30-prefix-recovery-proof/apb5rstr.bin"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-prefix-recovery-proof/calls.jsonl",
+      "archive": "recovery/phy-v30-prefix-recovery-proof/calls.jsonl"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-prefix-recovery-proof/cli-01.log",
+      "archive": "recovery/phy-v30-prefix-recovery-proof/cli-01.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-prefix-recovery-proof/cli-02.log",
+      "archive": "recovery/phy-v30-prefix-recovery-proof/cli-02.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-prefix-recovery-proof/cli-03.log",
+      "archive": "recovery/phy-v30-prefix-recovery-proof/cli-03.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-prefix-recovery-proof/cli-04.log",
+      "archive": "recovery/phy-v30-prefix-recovery-proof/cli-04.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-prefix-recovery-proof/cli-05.log",
+      "archive": "recovery/phy-v30-prefix-recovery-proof/cli-05.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-prefix-recovery-proof/cli-06.log",
+      "archive": "recovery/phy-v30-prefix-recovery-proof/cli-06.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-prefix-recovery-proof/cli-07.log",
+      "archive": "recovery/phy-v30-prefix-recovery-proof/cli-07.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-prefix-recovery-proof/cli-08.log",
+      "archive": "recovery/phy-v30-prefix-recovery-proof/cli-08.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-prefix-recovery-proof/cli-09.log",
+      "archive": "recovery/phy-v30-prefix-recovery-proof/cli-09.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-prefix-recovery-proof/cli-10.log",
+      "archive": "recovery/phy-v30-prefix-recovery-proof/cli-10.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-prefix-recovery-proof/cli-11.log",
+      "archive": "recovery/phy-v30-prefix-recovery-proof/cli-11.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-prefix-recovery-proof/cpu_ccr.bin",
+      "archive": "recovery/phy-v30-prefix-recovery-proof/cpu_ccr.bin"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-prefix-recovery-proof/live-prefix.bin",
+      "archive": "recovery/phy-v30-prefix-recovery-proof/live-prefix.bin"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-prefix-recovery-proof/prefix-status.bin",
+      "archive": "recovery/phy-v30-prefix-recovery-proof/prefix-status.bin"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-prefix-recovery-proof/rcc_cfgr.bin",
+      "archive": "recovery/phy-v30-prefix-recovery-proof/rcc_cfgr.bin"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-prefix-recovery-proof/rcc_pll1.bin",
+      "archive": "recovery/phy-v30-prefix-recovery-proof/rcc_pll1.bin"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-prefix-recovery-proof/sensor-status.bin",
+      "archive": "recovery/phy-v30-prefix-recovery-proof/sensor-status.bin"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-prefix-recovery-proof/trace.bin",
+      "archive": "recovery/phy-v30-prefix-recovery-proof/trace.bin"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-prefix-recovery-proof/xspi.bin",
+      "archive": "recovery/phy-v30-prefix-recovery-proof/xspi.bin"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-prefix-recovery-proof/xspi_ccr.bin",
+      "archive": "recovery/phy-v30-prefix-recovery-proof/xspi_ccr.bin"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-prefix-recovery-proof/xspim.bin",
+      "archive": "recovery/phy-v30-prefix-recovery-proof/xspim.bin"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-prefix-maintenance/cache-after.bin",
+      "archive": "recovery/phy-v30-prefix-maintenance/cache-after.bin"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-prefix-maintenance/cache-before.bin",
+      "archive": "recovery/phy-v30-prefix-maintenance/cache-before.bin"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-prefix-maintenance/calls.jsonl",
+      "archive": "recovery/phy-v30-prefix-maintenance/calls.jsonl"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-prefix-maintenance/clear.bin",
+      "archive": "recovery/phy-v30-prefix-maintenance/clear.bin"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-prefix-maintenance/cli-01.log",
+      "archive": "recovery/phy-v30-prefix-maintenance/cli-01.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-prefix-maintenance/cli-02.log",
+      "archive": "recovery/phy-v30-prefix-maintenance/cli-02.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-prefix-maintenance/cli-03.log",
+      "archive": "recovery/phy-v30-prefix-maintenance/cli-03.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-prefix-maintenance/cli-04.log",
+      "archive": "recovery/phy-v30-prefix-maintenance/cli-04.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-prefix-maintenance/cli-05.log",
+      "archive": "recovery/phy-v30-prefix-maintenance/cli-05.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-prefix-maintenance/cli-06.log",
+      "archive": "recovery/phy-v30-prefix-maintenance/cli-06.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-prefix-maintenance/cli-07.log",
+      "archive": "recovery/phy-v30-prefix-maintenance/cli-07.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-prefix-maintenance/cli-08.log",
+      "archive": "recovery/phy-v30-prefix-maintenance/cli-08.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-prefix-maintenance/cli-09.log",
+      "archive": "recovery/phy-v30-prefix-maintenance/cli-09.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-prefix-maintenance/cli-10.log",
+      "archive": "recovery/phy-v30-prefix-maintenance/cli-10.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-prefix-maintenance/cli-11.log",
+      "archive": "recovery/phy-v30-prefix-maintenance/cli-11.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-prefix-maintenance/fpccr.bin",
+      "archive": "recovery/phy-v30-prefix-maintenance/fpccr.bin"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-prefix-maintenance/live-prefix.bin",
+      "archive": "recovery/phy-v30-prefix-maintenance/live-prefix.bin"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-prefix-maintenance/prefix-status.bin",
+      "archive": "recovery/phy-v30-prefix-maintenance/prefix-status.bin"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-prefix-maintenance/result.json",
+      "archive": "recovery/phy-v30-prefix-maintenance/result.json"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-prefix-maintenance/trace.bin",
+      "archive": "recovery/phy-v30-prefix-maintenance/trace.bin"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-recovery-info/calls.jsonl",
+      "archive": "recovery/phy-v30-recovery-info/calls.jsonl"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-recovery-info/clear-status.bin",
+      "archive": "recovery/phy-v30-recovery-info/clear-status.bin"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-recovery-info/cli-01.log",
+      "archive": "recovery/phy-v30-recovery-info/cli-01.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-recovery-info/cli-02.log",
+      "archive": "recovery/phy-v30-recovery-info/cli-02.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-recovery-info/cli-03.log",
+      "archive": "recovery/phy-v30-recovery-info/cli-03.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-recovery-info/cli-04.log",
+      "archive": "recovery/phy-v30-recovery-info/cli-04.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-recovery-info/command.bin",
+      "archive": "recovery/phy-v30-recovery-info/command.bin"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-recovery-info/request.json",
+      "archive": "recovery/phy-v30-recovery-info/request.json"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-recovery-info/status-00.bin",
+      "archive": "recovery/phy-v30-recovery-info/status-00.bin"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-recovery-info/status.json",
+      "archive": "recovery/phy-v30-recovery-info/status.json"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-ap2-underreset-init.cfg",
+      "archive": "recovery/phy-v30-ap2-underreset-init.cfg"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-ap2-underreset-init.log",
+      "archive": "recovery/phy-v30-ap2-underreset-init.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-after-underreset-core.log",
+      "archive": "recovery/phy-v30-after-underreset-core.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v30-prefix-recovery-proof.log",
+      "archive": "recovery/phy-v30-prefix-recovery-proof.log"
+    },
+    {
+      "source": "tmp/bringup/read-v30-prefix-proof.py",
+      "archive": "recovery/read-v30-prefix-proof.py"
+    },
+    {
+      "source": "tmp/bringup/recover-v30-prefix.py",
+      "archive": "recovery/recover-v30-prefix.py"
+    },
+    {
+      "source": "tmp/bringup/phy-v30d-make-archive-config.py",
+      "archive": "recovery/phy-v30d-make-archive-config.py"
+    },
+    {
+      "source": "firmware/capture-timing/late_phy/build.py",
+      "archive": "current-host-tools/build.py"
+    },
+    {
+      "source": "firmware/capture-timing/late_phy/transforms.py",
+      "archive": "current-host-tools/transforms.py"
+    },
+    {
+      "source": "firmware/capture-timing/late_phy/summarize.py",
+      "archive": "current-host-tools/summarize.py"
+    },
+    {
+      "source": "firmware/capture-timing/late_phy/README.md",
+      "archive": "current-host-tools/README.md"
+    }
+  ]
+}

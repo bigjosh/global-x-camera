@@ -1,0 +1,13 @@
+Traceback (most recent call last):
+  File "D:\Github\global-x-camera\firmware\capture-timing\bench.py", line 228, in <module>
+    main()
+  File "D:\Github\global-x-camera\firmware\capture-timing\bench.py", line 224, in main
+    inspect(bench, manifest, a.timeout)
+  File "D:\Github\global-x-camera\firmware\capture-timing\bench.py", line 76, in inspect
+    raw = bench.upload(trace_address, 256, f'trace-{i:02d}.bin')
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Github\global-x-camera\firmware\boot-timing\nor_bench.py", line 65, in upload
+    self.call('-u', hex(address), str(length), path)
+  File "D:\Github\global-x-camera\firmware\boot-timing\nor_bench.py", line 58, in call
+    raise RuntimeError(f'CLI call {self.calls} failed; inspect its saved log. No automatic reset/retry.')
+RuntimeError: CLI call 1 failed; inspect its saved log. No automatic reset/retry.

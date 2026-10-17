@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "date": "2026-10-17",
+  "checkpoint_utc": "2026-10-17T17:26:24.449505+00:00",
+  "scope": "Late-enable, noncontinuous-clock second-trigger diagnostic. First image missed; second image received without intervening PHY reset or receiver rearm. No first-frame qualification or final baseline restoration claim.",
+  "final_baseline_restoration": "pending root bench owner",
+  "builds": [
+    {
+      "id": "late-v32-receiver",
+      "directory": "tmp/bringup/capture-phy-late-v32-second-trigger-20261017/receiver"
+    },
+    {
+      "id": "late-v32-staged",
+      "directory": "tmp/bringup/capture-phy-late-v32-second-trigger-20261017/staged"
+    }
+  ],
+  "captures": [
+    {
+      "id": "late-v32-second-trigger-cold-01",
+      "directory": "tmp/bringup/phy-v32-second-trigger-cycle-01/cold",
+      "receiver_build": "late-v32-receiver",
+      "prefix_build": "late-v32-staged",
+      "programming_cycle_directory": "tmp/bringup/phy-v32-second-trigger-cycle-01",
+      "outcome": "completed",
+      "outcome_note": "Second requested sensor image received. First exposure produced no receiver VSYNC/frame. Not eligible for first-frame latency or first-frame-success claims. No PHY reset or DCMIPP rearm between requests. Only recorded ECTRL occurs during later sensor stop.",
+      "visual_review": {
+        "status": "Recognizable detailed workshop/bench scene in the SECOND requested image.",
+        "reviewer": "root bench controller",
+        "provenance": "Root personally inspected frame.png and supplied this assertion."
+      }
+    }
+  ],
+  "extra_files": [
+    {
+      "source": "tmp/bringup/phy-v32-make-archive-config.py",
+      "archive": "analysis/phy-v32-make-archive-config.py"
+    },
+    {
+      "source": "firmware/capture-timing/late_phy/build.py",
+      "archive": "current-host-tools/build.py"
+    },
+    {
+      "source": "firmware/capture-timing/late_phy/transforms.py",
+      "archive": "current-host-tools/transforms.py"
+    },
+    {
+      "source": "firmware/capture-timing/late_phy/summarize.py",
+      "archive": "current-host-tools/summarize.py"
+    },
+    {
+      "source": "firmware/capture-timing/late_phy/README.md",
+      "archive": "current-host-tools/README.md"
+    }
+  ]
+}

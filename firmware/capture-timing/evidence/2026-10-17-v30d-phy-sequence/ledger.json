@@ -1,0 +1,250 @@
+{
+  "schema": 1,
+  "time_unit": "us",
+  "experiments": [
+    {
+      "experiment_id": "early-v30d-cold-01",
+      "outcome": "completed",
+      "outcome_note": "Valid first frame with startup lane-1 ECTRL; raw lane-1 flag returns after sensor stop.",
+      "capture_dir": "tmp/bringup/phy-v30d-early-cold-01",
+      "receiver_build": "early-v30d-receiver",
+      "prefix_build": "early-v30d-staged",
+      "summary": {
+        "mode": "cold",
+        "origin": "nrst_release",
+        "build_sha256": "4ddd5a6c5167ebba4064b92a00d54adbacd7e08cdf3695d2d2dc8b81357b9af6",
+        "completed": true,
+        "image_integrity_matches": true,
+        "visual_qualification": "pending human/model inspection; statistics alone do not prove a valid image",
+        "exposure_qualified": false,
+        "frame_geometry": [
+          1120,
+          1364
+        ],
+        "frame_bytes": 3055360,
+        "frames": 1,
+        "vsyncs": 1,
+        "rom_to_pd0_us": 16076.48,
+        "phases_us": {
+          "stage1_entry": 16104.48,
+          "stage2_entry": 21977.76,
+          "main_entry": 22008.8,
+          "sensor_ready_observed": 16178.24,
+          "sensor_init_complete": 17312.96,
+          "exposure_configuration_complete": 17792.48,
+          "receiver_configured": 22212.16,
+          "receiver_armed": 24209.92,
+          "sensor_output_setup_complete": null,
+          "start_write_begin": 18639.68,
+          "start_write_end": 18685.92,
+          "sensor_start_return": 24087.2,
+          "first_vsync": 35628.48,
+          "first_frame_complete": 46257.92,
+          "sensor_release_command": null,
+          "stage2_load_begin": 18688.32,
+          "stage2_load_end": 21969.76
+        },
+        "intervals_us": {
+          "sensor_release_to_ready": null,
+          "sensor_ready_to_start_write": 2461.44,
+          "start_write_duration": 46.24,
+          "start_write_end_to_first_strobe": 5710.08,
+          "stage2_load": 3281.44,
+          "first_strobe_end_to_vsync": 248.64,
+          "first_vsync_to_frame_complete": 10629.44
+        },
+        "first_strobe_us": 24396.0,
+        "first_strobe_width_us": 10983.84,
+        "strobe_pulses": [
+          {
+            "ordinal": 1,
+            "rise_us": 24396.0,
+            "fall_us": 35379.84,
+            "width_us": 10983.84,
+            "rise_after_start_write_end_us": 5710.08
+          }
+        ],
+        "camera_error": 32768,
+        "error_counts": {
+          "pre_frame": 1,
+          "during_frame": 0,
+          "post_frame": 0,
+          "unclassified": 0
+        },
+        "errors": [
+          {
+            "id": 74,
+            "time_us": 23632.8,
+            "frame_phase": "pre_frame",
+            "optical_phase": "before_first_exposure",
+            "detail_to_event_cycles": 1769,
+            "error": 32768,
+            "csi_sr0": 0,
+            "csi_sr1": 1981288448,
+            "cmsr2": 0,
+            "ier0_entry": 1595998208,
+            "ier1_entry": 7967,
+            "ier0_callback": 1595998208,
+            "ier1_callback": 3871,
+            "previous_stage": 21
+          }
+        ],
+        "first_frame_status": {
+          "csi_sr0": 131072,
+          "csi_sr1": 3860332544,
+          "applied_coarse_lines": 1428,
+          "line_length": 1236
+        },
+        "clock_readbacks": {
+          "external_hz": 12000000,
+          "system_pll_hz": 804000000,
+          "pixel_hz": 160800000,
+          "sensor_mcu_hz": 160800000,
+          "system_predivider": 2,
+          "system_multiplier": 134,
+          "system_output_divider": 1,
+          "mipi_multiplier": 32,
+          "mipi_output_divider": 1,
+          "configured_frame_lines": 4336
+        },
+        "warnings": []
+      },
+      "programming_verification": "full byte-for-byte readback matches prefix manifest",
+      "rail_validation": {
+        "passed": true,
+        "common_off_s": 13.585984,
+        "common_off_window_s": [
+          6.936162162,
+          20.522146162
+        ],
+        "final": {
+          "3": {
+            "min_v": 3.268,
+            "max_v": 3.309,
+            "median_v": 3.293
+          },
+          "4": {
+            "min_v": 4.827,
+            "max_v": 4.858,
+            "median_v": 4.852
+          },
+          "5": {
+            "min_v": 3.276,
+            "max_v": 3.287,
+            "median_v": 3.281
+          }
+        },
+        "limitation": "No direct core/always-on rail probe; this proves discharge of the three named rails."
+      }
+    },
+    {
+      "experiment_id": "late-v30d-cold-01",
+      "outcome": "failed",
+      "outcome_note": "Exposure strobe occurred but no frame arrived before 2 s timeout, stage 0x8000001c. No ECTRL observed; this does not qualify as an error-free capture. ACTCLF remained clear in snapshots after PHY release.",
+      "capture_dir": "tmp/bringup/phy-v30d-late-cycle-01/cold",
+      "receiver_build": "late-v30d-receiver",
+      "prefix_build": "late-v30d-staged",
+      "summary": {
+        "mode": "cold",
+        "origin": "nrst_release",
+        "build_sha256": "5882d058f46ec11211cfe39dc1d10319a7eab9ffcd4e6ab2117074b2feefcf22",
+        "completed": false,
+        "image_integrity_matches": false,
+        "visual_qualification": "not recorded",
+        "exposure_qualified": false,
+        "frame_geometry": [
+          0,
+          0
+        ],
+        "frame_bytes": 0,
+        "frames": 0,
+        "vsyncs": 0,
+        "rom_to_pd0_us": 16800.48,
+        "phases_us": {
+          "stage1_entry": 16828.48,
+          "stage2_entry": 22709.44,
+          "main_entry": 22740.32,
+          "sensor_ready_observed": 16902.4,
+          "sensor_init_complete": 18037.6,
+          "exposure_configuration_complete": 18517.28,
+          "receiver_configured": 24930.56,
+          "receiver_armed": 25416.32,
+          "sensor_output_setup_complete": null,
+          "start_write_begin": 19364.8,
+          "start_write_end": 19411.04,
+          "sensor_start_return": 24777.6,
+          "first_vsync": null,
+          "first_frame_complete": null,
+          "sensor_release_command": null,
+          "stage2_load_begin": 19413.44,
+          "stage2_load_end": 22701.28
+        },
+        "intervals_us": {
+          "sensor_release_to_ready": null,
+          "sensor_ready_to_start_write": 2462.4,
+          "start_write_duration": 46.24,
+          "start_write_end_to_first_strobe": 6194.88,
+          "stage2_load": 3287.84,
+          "first_strobe_end_to_vsync": null,
+          "first_vsync_to_frame_complete": null
+        },
+        "first_strobe_us": 25605.92,
+        "first_strobe_width_us": 10983.68,
+        "strobe_pulses": [
+          {
+            "ordinal": 1,
+            "rise_us": 25605.92,
+            "fall_us": 36589.6,
+            "width_us": 10983.68,
+            "rise_after_start_write_end_us": 6194.88
+          }
+        ],
+        "camera_error": 0,
+        "error_counts": {
+          "pre_frame": 0,
+          "during_frame": 0,
+          "post_frame": 0,
+          "unclassified": 0
+        },
+        "errors": [],
+        "first_frame_status": {
+          "csi_sr0": 0,
+          "csi_sr1": 0,
+          "applied_coarse_lines": 0,
+          "line_length": 0
+        },
+        "clock_readbacks": null,
+        "warnings": [
+          "First pulse/VSYNC/frame ordering does not qualify the expected first snapshot."
+        ]
+      },
+      "programming_verification": "full byte-for-byte readback matches prefix manifest",
+      "rail_validation": {
+        "passed": true,
+        "common_off_s": 13.556768,
+        "common_off_window_s": [
+          6.833122162,
+          20.389890162
+        ],
+        "final": {
+          "3": {
+            "min_v": 3.278,
+            "max_v": 3.293,
+            "median_v": 3.288
+          },
+          "4": {
+            "min_v": 4.745,
+            "max_v": 4.806,
+            "median_v": 4.791
+          },
+          "5": {
+            "min_v": 3.281,
+            "max_v": 3.287,
+            "median_v": 3.281
+          }
+        },
+        "limitation": "No direct core/always-on rail probe; this proves discharge of the three named rails."
+      }
+    }
+  ]
+}

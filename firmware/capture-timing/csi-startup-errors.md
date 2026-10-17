@@ -2,6 +2,8 @@
 
 Offline analysis, October 17, 2026. This note records the initial v3/v5 evidence and the controlled tests proposed from it; later experiments can supersede these hypotheses.
 
+The later [lane-startup investigation](../../reports/Camera%20lane%20startup%20mismatch.md) found a working sequencing candidate: enable the clock receiver early, then enable the data receivers after sensor START acknowledgment and STREAMING. Three cold v33 runs received the first image with no observed startup/first-frame CSI errors; the lane-1 control error remained during subsequent sensor stop. This is measured behavior on the present board, not identification of the exact offending wire transition. v25 remains the separately qualified fast-capture baseline.
+
 The [public-source review of October 17](../../reports/STM32%20camera%20startup%20error%20reports.md) found an exact `0x8000` ST forum report, relevant startup guidance from an ST employee, and independent acknowledgment of the duplicate E3 write. It found no documented cure or formal benign-startup exception for our exact board/module. The review separates those reports from our already-negative PHY/clock experiments and identifies raw-error history and clock activity during lane-merger setup as the next useful diagnostic checks.
 
 ## Retrospective check of the original ST-based smoke test

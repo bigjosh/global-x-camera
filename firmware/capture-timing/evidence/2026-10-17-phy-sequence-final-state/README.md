@@ -1,0 +1,9 @@
+# Verified baseline restoration and instrument release
+
+After the [v33 first-frame sequencing trials](../2026-10-17-v33-delayed-data/README.md), the original optimized **v25 baseline was restored exactly**. Its 65,536-byte sector passed full readback verification with SHA-256 `c43721b29f437546d3090632495f4527f4ba34d4af773a23214cdd86a0adb817`.
+
+An independent autonomous cold boot then captured a valid first native RAW10 image: exposure began **23.64432 ms** after NRST and the complete frame arrived at **45.50224 ms**. MCU/host integrity and sample checks pass. The root bench controller personally inspected the result and recognized the detailed workshop/bench scene. The baseline's known startup `0x8000` remains; the experimental v33 data-lane sequencing is preserved in the repository but is not the installed baseline.
+
+JS110 session 2 stopped normally with `ok=true`, no restore error, and the original current range 128 restored. The final external Logic capture verifies all three measured rails and NRST/PD0 remained high through release. A final read-only SWD check reports trace magic `0x43545031`, completed stage 40, one frame, and the expected v25 baseline error history. The root bench owner confirmed no hardware helper or capture remained active; the Logic 2 automation server stays running.
+
+The [ledger](ledger.json), [visual assertion](visual-review.json), programming/readback records, raw capture diagnostics, final SWD proof, final physical-power verification, stopped response and full session-2 log are included. The [archive index](archive-index.json) covers **114 files/references, 2,593,212 bytes**, with all manifest sources recovered exactly through shared historical source objects. Full frame pixels, NOR readback, analog exports and Saleae sessions remain local. This checkpoint establishes the final bench state; it does not select v33 as production firmware or resolve the shutdown lane-state error.

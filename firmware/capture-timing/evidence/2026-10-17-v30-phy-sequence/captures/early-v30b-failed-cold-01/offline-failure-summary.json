@@ -1,0 +1,165 @@
+{
+  "schema": 1,
+  "source": "offline analysis of completed exports; no hardware access",
+  "capture_directory": "tmp/bringup/phy-v30-early-cycle-01/cold",
+  "source_sha256": {
+    "digital.csv": "6b9a5b2b54543d648d46ff3516ba2f0054b74e627e942e75b44ac4a319d8eaf0",
+    "analog.csv": "fc5a9747b7d65fc47f73022d83fa7305becc74f8903de0a137ba35e87843984d",
+    "capture-config.json": "a41b077a3da0943c0a2bc299436c23b34b47b9232758c6baede7483f19f2ff14",
+    "boot-summary.json": "32a1c031fb37ac1b83914600ad7a61c8b6d9587bf63fcff5b8d75a3a5ace53da"
+  },
+  "rail_validation": {
+    "passed": true,
+    "common_off_s": 13.385151999999998,
+    "common_off_window_s": [
+      7.023330162,
+      20.408482162
+    ],
+    "final": {
+      "3": {
+        "min_v": 3.278,
+        "max_v": 3.293,
+        "median_v": 3.293
+      },
+      "4": {
+        "min_v": 4.781,
+        "max_v": 4.827,
+        "median_v": 4.811
+      },
+      "5": {
+        "min_v": 3.281,
+        "max_v": 3.287,
+        "median_v": 3.281
+      }
+    },
+    "limitation": "No direct core/always-on rail probe; this proves discharge of the three named rails."
+  },
+  "nrst_release_s": 20.4206248,
+  "pe0_transitions_after_nrst": 24,
+  "pe0_edges": [
+    {
+      "time_s": 20.43692096,
+      "after_nrst_ms": 16.29615999999956,
+      "level": 1
+    },
+    {
+      "time_s": 20.43692432,
+      "after_nrst_ms": 16.299520000000456,
+      "level": 0
+    },
+    {
+      "time_s": 20.4369264,
+      "after_nrst_ms": 16.301600000002026,
+      "level": 1
+    },
+    {
+      "time_s": 20.43693248,
+      "after_nrst_ms": 16.3076800000006,
+      "level": 0
+    },
+    {
+      "time_s": 20.43693504,
+      "after_nrst_ms": 16.310240000002807,
+      "level": 1
+    },
+    {
+      "time_s": 20.43693616,
+      "after_nrst_ms": 16.311359999999553,
+      "level": 0
+    },
+    {
+      "time_s": 20.43699536,
+      "after_nrst_ms": 16.370560000002143,
+      "level": 1
+    },
+    {
+      "time_s": 20.43708496,
+      "after_nrst_ms": 16.460160000001167,
+      "level": 0
+    },
+    {
+      "time_s": 20.43708608,
+      "after_nrst_ms": 16.461280000001466,
+      "level": 1
+    },
+    {
+      "time_s": 20.43789248,
+      "after_nrst_ms": 17.267679999999785,
+      "level": 0
+    },
+    {
+      "time_s": 20.4378936,
+      "after_nrst_ms": 17.268800000000084,
+      "level": 1
+    },
+    {
+      "time_s": 20.43789472,
+      "after_nrst_ms": 17.269920000000383,
+      "level": 0
+    },
+    {
+      "time_s": 20.43801328,
+      "after_nrst_ms": 17.38848000000104,
+      "level": 1
+    },
+    {
+      "time_s": 20.43813184,
+      "after_nrst_ms": 17.507040000001695,
+      "level": 0
+    },
+    {
+      "time_s": 20.43861264,
+      "after_nrst_ms": 17.987839999999977,
+      "level": 1
+    },
+    {
+      "time_s": 20.43861376,
+      "after_nrst_ms": 17.988960000000276,
+      "level": 0
+    },
+    {
+      "time_s": 20.43945952,
+      "after_nrst_ms": 18.83472000000097,
+      "level": 1
+    },
+    {
+      "time_s": 20.4394608,
+      "after_nrst_ms": 18.836000000000297,
+      "level": 0
+    },
+    {
+      "time_s": 20.43950704,
+      "after_nrst_ms": 18.88223999999994,
+      "level": 1
+    },
+    {
+      "time_s": 20.43950944,
+      "after_nrst_ms": 18.884639999999564,
+      "level": 0
+    },
+    {
+      "time_s": 20.44277456,
+      "after_nrst_ms": 22.14976000000135,
+      "level": 1
+    },
+    {
+      "time_s": 20.44277584,
+      "after_nrst_ms": 22.151040000000677,
+      "level": 0
+    },
+    {
+      "time_s": 20.44277936,
+      "after_nrst_ms": 22.1545600000006,
+      "level": 1
+    },
+    {
+      "time_s": 20.44278272,
+      "after_nrst_ms": 22.157920000001496,
+      "level": 0
+    }
+  ],
+  "captured_image": false,
+  "ram_result_available": false,
+  "inference": "The 24 transitions are consistent with prefix execution through stage2 handoff event207. Event identities were inferred from immutable firmware order, not matched to a RAM event dump.",
+  "limitation": "No validated CSI register snapshot or first-frame evidence was obtained. A diagnostic access stall is a hypothesis, not a proven bus-fault location."
+}

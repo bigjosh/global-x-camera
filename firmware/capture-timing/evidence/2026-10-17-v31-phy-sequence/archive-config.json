@@ -1,0 +1,433 @@
+{
+  "schema": 1,
+  "date": "2026-10-17",
+  "checkpoint_utc": "2026-10-17T17:23:07.853160+00:00",
+  "scope": "Matched v31 noncontinuous-clock early/late receiver-release comparison. Early first frame succeeds with warning; late first frame times out. Second-trigger diagnostic and final restoration are outside this checkpoint.",
+  "ongoing_js110_session": "Session 2 remains active; its log/response are checkpoint snapshots, not final release evidence.",
+  "final_baseline_restoration": "pending root bench owner",
+  "builds": [
+    {
+      "id": "early-v31-receiver",
+      "directory": "tmp/bringup/capture-phy-early-v31-noncontinuous-20261017/receiver",
+      "hardware_status_at_checkpoint": "programmed and tested; see explicit capture outcome"
+    },
+    {
+      "id": "early-v31-staged",
+      "directory": "tmp/bringup/capture-phy-early-v31-noncontinuous-20261017/staged",
+      "hardware_status_at_checkpoint": "programmed and tested; see explicit capture outcome"
+    },
+    {
+      "id": "late-v31-receiver",
+      "directory": "tmp/bringup/capture-phy-late-v31-noncontinuous-20261017/receiver",
+      "hardware_status_at_checkpoint": "programmed and tested; see explicit capture outcome"
+    },
+    {
+      "id": "late-v31-staged",
+      "directory": "tmp/bringup/capture-phy-late-v31-noncontinuous-20261017/staged",
+      "hardware_status_at_checkpoint": "programmed and tested; see explicit capture outcome"
+    }
+  ],
+  "captures": [
+    {
+      "id": "early-v31-cold-01",
+      "directory": "tmp/bringup/phy-v31-early-cold-01",
+      "receiver_build": "early-v31-receiver",
+      "prefix_build": "early-v31-staged",
+      "programming_directory": "tmp/bringup/phy-v31-early-program",
+      "outcome": "completed",
+      "outcome_note": "First frame valid; usual startup lane-1 ECTRL remains.",
+      "visual_review": {
+        "status": "Recognizable detailed workshop/bench scene; valid nonuniform grayscale.",
+        "reviewer": "root bench controller",
+        "provenance": "Root personally inspected frame.png and explicitly supplied this assertion."
+      }
+    },
+    {
+      "id": "late-v31-cold-01",
+      "directory": "tmp/bringup/phy-v31-late-cold-01",
+      "receiver_build": "late-v31-receiver",
+      "prefix_build": "late-v31-staged",
+      "programming_directory": "tmp/bringup/phy-v31-late-program",
+      "outcome": "failed",
+      "outcome_note": "Exposure fired but no frame before 2 s timeout, stage 0x8000001c. No CSI errors observed; no ACTCLF after receiver release. Final SR1=0x76180000 contains clock Stop after the missed frame. This is not a successful capture."
+    }
+  ],
+  "extra_files": [
+    {
+      "source": "tmp/bringup/phy-v30d-late-failure-maintenance/calls.jsonl",
+      "archive": "maintenance/phy-v30d-late-failure-maintenance/calls.jsonl"
+    },
+    {
+      "source": "tmp/bringup/phy-v30d-late-failure-maintenance/capture-trace.bin",
+      "archive": "maintenance/phy-v30d-late-failure-maintenance/capture-trace.bin"
+    },
+    {
+      "source": "tmp/bringup/phy-v30d-late-failure-maintenance/cli-01.log",
+      "archive": "maintenance/phy-v30d-late-failure-maintenance/cli-01.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v30d-late-failure-maintenance/cli-02.log",
+      "archive": "maintenance/phy-v30d-late-failure-maintenance/cli-02.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v30d-late-failure-maintenance/cli-03.log",
+      "archive": "maintenance/phy-v30d-late-failure-maintenance/cli-03.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v30d-late-failure-maintenance/cli-04.log",
+      "archive": "maintenance/phy-v30d-late-failure-maintenance/cli-04.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v30d-late-failure-maintenance/failed-phy-live-code.bin",
+      "archive": "maintenance/phy-v30d-late-failure-maintenance/failed-phy-live-code.bin"
+    },
+    {
+      "source": "tmp/bringup/phy-v30d-late-failure-maintenance/failed-phy-reset.bin",
+      "archive": "maintenance/phy-v30d-late-failure-maintenance/failed-phy-reset.bin"
+    },
+    {
+      "source": "tmp/bringup/phy-v30d-late-failure-maintenance/failed-phy-status.bin",
+      "archive": "maintenance/phy-v30d-late-failure-maintenance/failed-phy-status.bin"
+    },
+    {
+      "source": "tmp/bringup/phy-v30d-late-failure-maintenance-fixed/cache-after.bin",
+      "archive": "maintenance/phy-v30d-late-failure-maintenance-fixed/cache-after.bin"
+    },
+    {
+      "source": "tmp/bringup/phy-v30d-late-failure-maintenance-fixed/cache-before.bin",
+      "archive": "maintenance/phy-v30d-late-failure-maintenance-fixed/cache-before.bin"
+    },
+    {
+      "source": "tmp/bringup/phy-v30d-late-failure-maintenance-fixed/calls.jsonl",
+      "archive": "maintenance/phy-v30d-late-failure-maintenance-fixed/calls.jsonl"
+    },
+    {
+      "source": "tmp/bringup/phy-v30d-late-failure-maintenance-fixed/capture-trace.bin",
+      "archive": "maintenance/phy-v30d-late-failure-maintenance-fixed/capture-trace.bin"
+    },
+    {
+      "source": "tmp/bringup/phy-v30d-late-failure-maintenance-fixed/clear-cache.bin",
+      "archive": "maintenance/phy-v30d-late-failure-maintenance-fixed/clear-cache.bin"
+    },
+    {
+      "source": "tmp/bringup/phy-v30d-late-failure-maintenance-fixed/cli-01.log",
+      "archive": "maintenance/phy-v30d-late-failure-maintenance-fixed/cli-01.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v30d-late-failure-maintenance-fixed/cli-02.log",
+      "archive": "maintenance/phy-v30d-late-failure-maintenance-fixed/cli-02.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v30d-late-failure-maintenance-fixed/cli-03.log",
+      "archive": "maintenance/phy-v30d-late-failure-maintenance-fixed/cli-03.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v30d-late-failure-maintenance-fixed/cli-04.log",
+      "archive": "maintenance/phy-v30d-late-failure-maintenance-fixed/cli-04.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v30d-late-failure-maintenance-fixed/cli-05.log",
+      "archive": "maintenance/phy-v30d-late-failure-maintenance-fixed/cli-05.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v30d-late-failure-maintenance-fixed/cli-06.log",
+      "archive": "maintenance/phy-v30d-late-failure-maintenance-fixed/cli-06.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v30d-late-failure-maintenance-fixed/cli-07.log",
+      "archive": "maintenance/phy-v30d-late-failure-maintenance-fixed/cli-07.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v30d-late-failure-maintenance-fixed/cli-08.log",
+      "archive": "maintenance/phy-v30d-late-failure-maintenance-fixed/cli-08.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v30d-late-failure-maintenance-fixed/cli-09.log",
+      "archive": "maintenance/phy-v30d-late-failure-maintenance-fixed/cli-09.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v30d-late-failure-maintenance-fixed/cli-10.log",
+      "archive": "maintenance/phy-v30d-late-failure-maintenance-fixed/cli-10.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v30d-late-failure-maintenance-fixed/cli-11.log",
+      "archive": "maintenance/phy-v30d-late-failure-maintenance-fixed/cli-11.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v30d-late-failure-maintenance-fixed/cli-12.log",
+      "archive": "maintenance/phy-v30d-late-failure-maintenance-fixed/cli-12.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v30d-late-failure-maintenance-fixed/cli-13.log",
+      "archive": "maintenance/phy-v30d-late-failure-maintenance-fixed/cli-13.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v30d-late-failure-maintenance-fixed/failed-phy-live-code.bin",
+      "archive": "maintenance/phy-v30d-late-failure-maintenance-fixed/failed-phy-live-code.bin"
+    },
+    {
+      "source": "tmp/bringup/phy-v30d-late-failure-maintenance-fixed/failed-phy-reset-halted.bin",
+      "archive": "maintenance/phy-v30d-late-failure-maintenance-fixed/failed-phy-reset-halted.bin"
+    },
+    {
+      "source": "tmp/bringup/phy-v30d-late-failure-maintenance-fixed/failed-phy-reset.bin",
+      "archive": "maintenance/phy-v30d-late-failure-maintenance-fixed/failed-phy-reset.bin"
+    },
+    {
+      "source": "tmp/bringup/phy-v30d-late-failure-maintenance-fixed/failed-phy-status.bin",
+      "archive": "maintenance/phy-v30d-late-failure-maintenance-fixed/failed-phy-status.bin"
+    },
+    {
+      "source": "tmp/bringup/phy-v30d-late-failure-maintenance-fixed/fpccr.bin",
+      "archive": "maintenance/phy-v30d-late-failure-maintenance-fixed/fpccr.bin"
+    },
+    {
+      "source": "tmp/bringup/phy-v30d-late-failure-maintenance-fixed/result.json",
+      "archive": "maintenance/phy-v30d-late-failure-maintenance-fixed/result.json"
+    },
+    {
+      "source": "tmp/bringup/phy-v31-late-maintenance/cache-after.bin",
+      "archive": "maintenance/phy-v31-late-maintenance/cache-after.bin"
+    },
+    {
+      "source": "tmp/bringup/phy-v31-late-maintenance/cache-before.bin",
+      "archive": "maintenance/phy-v31-late-maintenance/cache-before.bin"
+    },
+    {
+      "source": "tmp/bringup/phy-v31-late-maintenance/calls.jsonl",
+      "archive": "maintenance/phy-v31-late-maintenance/calls.jsonl"
+    },
+    {
+      "source": "tmp/bringup/phy-v31-late-maintenance/capture-trace.bin",
+      "archive": "maintenance/phy-v31-late-maintenance/capture-trace.bin"
+    },
+    {
+      "source": "tmp/bringup/phy-v31-late-maintenance/clear-cache.bin",
+      "archive": "maintenance/phy-v31-late-maintenance/clear-cache.bin"
+    },
+    {
+      "source": "tmp/bringup/phy-v31-late-maintenance/cli-01.log",
+      "archive": "maintenance/phy-v31-late-maintenance/cli-01.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v31-late-maintenance/cli-02.log",
+      "archive": "maintenance/phy-v31-late-maintenance/cli-02.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v31-late-maintenance/cli-03.log",
+      "archive": "maintenance/phy-v31-late-maintenance/cli-03.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v31-late-maintenance/cli-04.log",
+      "archive": "maintenance/phy-v31-late-maintenance/cli-04.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v31-late-maintenance/cli-05.log",
+      "archive": "maintenance/phy-v31-late-maintenance/cli-05.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v31-late-maintenance/cli-06.log",
+      "archive": "maintenance/phy-v31-late-maintenance/cli-06.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v31-late-maintenance/cli-07.log",
+      "archive": "maintenance/phy-v31-late-maintenance/cli-07.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v31-late-maintenance/cli-08.log",
+      "archive": "maintenance/phy-v31-late-maintenance/cli-08.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v31-late-maintenance/cli-09.log",
+      "archive": "maintenance/phy-v31-late-maintenance/cli-09.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v31-late-maintenance/cli-10.log",
+      "archive": "maintenance/phy-v31-late-maintenance/cli-10.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v31-late-maintenance/cli-11.log",
+      "archive": "maintenance/phy-v31-late-maintenance/cli-11.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v31-late-maintenance/cli-12.log",
+      "archive": "maintenance/phy-v31-late-maintenance/cli-12.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v31-late-maintenance/cli-13.log",
+      "archive": "maintenance/phy-v31-late-maintenance/cli-13.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v31-late-maintenance/failed-phy-live-code.bin",
+      "archive": "maintenance/phy-v31-late-maintenance/failed-phy-live-code.bin"
+    },
+    {
+      "source": "tmp/bringup/phy-v31-late-maintenance/failed-phy-reset-halted.bin",
+      "archive": "maintenance/phy-v31-late-maintenance/failed-phy-reset-halted.bin"
+    },
+    {
+      "source": "tmp/bringup/phy-v31-late-maintenance/failed-phy-reset.bin",
+      "archive": "maintenance/phy-v31-late-maintenance/failed-phy-reset.bin"
+    },
+    {
+      "source": "tmp/bringup/phy-v31-late-maintenance/failed-phy-status.bin",
+      "archive": "maintenance/phy-v31-late-maintenance/failed-phy-status.bin"
+    },
+    {
+      "source": "tmp/bringup/phy-v31-late-maintenance/fpccr.bin",
+      "archive": "maintenance/phy-v31-late-maintenance/fpccr.bin"
+    },
+    {
+      "source": "tmp/bringup/phy-v31-late-maintenance/result.json",
+      "archive": "maintenance/phy-v31-late-maintenance/result.json"
+    },
+    {
+      "source": "tmp/bringup/phy-v31-late-info/calls.jsonl",
+      "archive": "maintenance/phy-v31-late-info/calls.jsonl"
+    },
+    {
+      "source": "tmp/bringup/phy-v31-late-info/clear-status.bin",
+      "archive": "maintenance/phy-v31-late-info/clear-status.bin"
+    },
+    {
+      "source": "tmp/bringup/phy-v31-late-info/cli-01.log",
+      "archive": "maintenance/phy-v31-late-info/cli-01.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v31-late-info/cli-02.log",
+      "archive": "maintenance/phy-v31-late-info/cli-02.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v31-late-info/cli-03.log",
+      "archive": "maintenance/phy-v31-late-info/cli-03.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v31-late-info/cli-04.log",
+      "archive": "maintenance/phy-v31-late-info/cli-04.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v31-late-info/command.bin",
+      "archive": "maintenance/phy-v31-late-info/command.bin"
+    },
+    {
+      "source": "tmp/bringup/phy-v31-late-info/request.json",
+      "archive": "maintenance/phy-v31-late-info/request.json"
+    },
+    {
+      "source": "tmp/bringup/phy-v31-late-info/status-00.bin",
+      "archive": "maintenance/phy-v31-late-info/status-00.bin"
+    },
+    {
+      "source": "tmp/bringup/phy-v31-late-info/status.json",
+      "archive": "maintenance/phy-v31-late-info/status.json"
+    },
+    {
+      "source": "tmp/bringup/phy-v31-early-info/calls.jsonl",
+      "archive": "maintenance/phy-v31-early-info/calls.jsonl"
+    },
+    {
+      "source": "tmp/bringup/phy-v31-early-info/clear-status.bin",
+      "archive": "maintenance/phy-v31-early-info/clear-status.bin"
+    },
+    {
+      "source": "tmp/bringup/phy-v31-early-info/cli-01.log",
+      "archive": "maintenance/phy-v31-early-info/cli-01.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v31-early-info/cli-02.log",
+      "archive": "maintenance/phy-v31-early-info/cli-02.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v31-early-info/cli-03.log",
+      "archive": "maintenance/phy-v31-early-info/cli-03.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v31-early-info/cli-04.log",
+      "archive": "maintenance/phy-v31-early-info/cli-04.log"
+    },
+    {
+      "source": "tmp/bringup/phy-v31-early-info/command.bin",
+      "archive": "maintenance/phy-v31-early-info/command.bin"
+    },
+    {
+      "source": "tmp/bringup/phy-v31-early-info/request.json",
+      "archive": "maintenance/phy-v31-early-info/request.json"
+    },
+    {
+      "source": "tmp/bringup/phy-v31-early-info/status-00.bin",
+      "archive": "maintenance/phy-v31-early-info/status-00.bin"
+    },
+    {
+      "source": "tmp/bringup/phy-v31-early-info/status.json",
+      "archive": "maintenance/phy-v31-early-info/status.json"
+    },
+    {
+      "source": "tmp/bringup/phy-sequence-session-renewal/powered-state.json",
+      "archive": "session-renewal/powered-state.json"
+    },
+    {
+      "source": "tmp/bringup/phy-sequence-session-renewal/capture-config.json",
+      "archive": "session-renewal/capture-config.json"
+    },
+    {
+      "source": "tmp/bringup/phy-sequence-session-renewal/boot-summary.json",
+      "archive": "session-renewal/boot-summary.json"
+    },
+    {
+      "source": "tmp/bringup/phy-sequence-session-renewal/digital.csv",
+      "archive": "session-renewal/digital.csv"
+    },
+    {
+      "source": "tmp/bringup/phy-sequence-session.jsonl",
+      "archive": "session-renewal/phy-sequence-session.jsonl"
+    },
+    {
+      "source": "tmp/bringup/phy-sequence-response.json",
+      "archive": "session-renewal/phy-sequence-response.json"
+    },
+    {
+      "source": "tmp/bringup/phy-sequence2-session.jsonl",
+      "archive": "session-renewal/phy-sequence2-session.jsonl"
+    },
+    {
+      "source": "tmp/bringup/phy-sequence2-response.json",
+      "archive": "session-renewal/phy-sequence2-response.json"
+    },
+    {
+      "source": "firmware/capture-timing/prepare_maintenance.py",
+      "archive": "reviewed-host-tools/prepare_maintenance.py"
+    },
+    {
+      "source": "firmware/capture-timing/test_maintenance_guards.py",
+      "archive": "reviewed-host-tools/test_maintenance_guards.py"
+    },
+    {
+      "source": "firmware/capture-timing/maintenance-review.md",
+      "archive": "reviewed-host-tools/maintenance-review.md"
+    },
+    {
+      "source": "firmware/capture-timing/late_phy/build.py",
+      "archive": "current-host-tools/build.py"
+    },
+    {
+      "source": "firmware/capture-timing/late_phy/transforms.py",
+      "archive": "current-host-tools/transforms.py"
+    },
+    {
+      "source": "firmware/capture-timing/late_phy/summarize.py",
+      "archive": "current-host-tools/summarize.py"
+    },
+    {
+      "source": "firmware/capture-timing/late_phy/README.md",
+      "archive": "current-host-tools/README.md"
+    },
+    {
+      "source": "tmp/bringup/phy-v31-make-archive-config.py",
+      "archive": "analysis/phy-v31-make-archive-config.py"
+    },
+    {
+      "source": "tmp/bringup/phy-v31-original-guard-rejection.json",
+      "archive": "analysis/phy-v31-original-guard-rejection.json"
+    }
+  ]
+}

@@ -1,0 +1,80 @@
+{
+  "schema": 1,
+  "time_unit": "us",
+  "experiments": [
+    {
+      "experiment_id": "early-v30b-failed-cold-01",
+      "outcome": "failed",
+      "outcome_note": "24 externally observed PE0 transitions; no RAM event dump, PHY snapshot or image. Core inaccessible. Probable diagnostic read under peripheral reset is a source-based inference.",
+      "capture_dir": "tmp/bringup/phy-v30-early-cycle-01/cold",
+      "receiver_build": "early-v30b-receiver",
+      "prefix_build": "early-v30b-staged",
+      "summary": null,
+      "programming_verification": "full byte-for-byte readback matches prefix manifest",
+      "summary_unavailable_reason": "Timing and/or RAM result absent; no timing inferred.",
+      "rail_validation": {
+        "passed": true,
+        "common_off_s": 13.385151999999998,
+        "common_off_window_s": [
+          7.023330162,
+          20.408482162
+        ],
+        "final": {
+          "3": {
+            "min_v": 3.278,
+            "max_v": 3.293,
+            "median_v": 3.293
+          },
+          "4": {
+            "min_v": 4.781,
+            "max_v": 4.827,
+            "median_v": 4.811
+          },
+          "5": {
+            "min_v": 3.281,
+            "max_v": 3.287,
+            "median_v": 3.281
+          }
+        },
+        "limitation": "No direct core/always-on rail probe; this proves discharge of the three named rails."
+      }
+    },
+    {
+      "experiment_id": "early-v30b-failed-recovery-cold-02",
+      "outcome": "failed",
+      "outcome_note": "24 externally observed PE0 transitions; no RAM event dump, PHY snapshot or image. Core inaccessible. Probable diagnostic read under peripheral reset is a source-based inference.",
+      "capture_dir": "tmp/bringup/phy-v30-recovery-cold-02",
+      "receiver_build": "early-v30b-receiver",
+      "prefix_build": "early-v30b-staged",
+      "summary": null,
+      "programming_verification": "full byte-for-byte readback matches prefix manifest",
+      "summary_unavailable_reason": "Timing and/or RAM result absent; no timing inferred.",
+      "rail_validation": {
+        "passed": true,
+        "common_off_s": 13.5256,
+        "common_off_window_s": [
+          16.713538162,
+          30.239138162
+        ],
+        "final": {
+          "3": {
+            "min_v": 3.278,
+            "max_v": 3.293,
+            "median_v": 3.293
+          },
+          "4": {
+            "min_v": 4.791,
+            "max_v": 4.822,
+            "median_v": 4.811
+          },
+          "5": {
+            "min_v": 3.281,
+            "max_v": 3.287,
+            "median_v": 3.281
+          }
+        },
+        "limitation": "No direct core/always-on rail probe; this proves discharge of the three named rails."
+      }
+    }
+  ]
+}

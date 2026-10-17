@@ -1,0 +1,79 @@
+{
+  "schema": 1,
+  "date": "2026-10-17",
+  "checkpoint_utc": "2026-10-17T17:33:54.755785+00:00",
+  "scope": "Exact original v25 baseline restoration, independent autonomous cold capture, clean JS110 release with physical rail verification, and final read-only SWD proof. v33 remains a preserved diagnostic candidate rather than the installed baseline.",
+  "root_assertion": "No live hardware helpers or captures remain; Logic 2 automation server remains running.",
+  "builds": [
+    {
+      "id": "v25-receiver",
+      "directory": "tmp/bringup/capture-raw10-trim-os-v25-20261017/receiver"
+    },
+    {
+      "id": "v25-staged",
+      "directory": "tmp/bringup/capture-raw10-trim-os-v25-20261017/staged"
+    }
+  ],
+  "captures": [
+    {
+      "id": "restored-v25-cold",
+      "directory": "tmp/bringup/phy-sequence-restore-v25/cold",
+      "receiver_build": "v25-receiver",
+      "prefix_build": "v25-staged",
+      "programming_cycle_directory": "tmp/bringup/phy-sequence-restore-v25",
+      "outcome": "completed",
+      "outcome_note": "Original v25 image restored exactly. Autonomous first image intact; baseline startup error 0x8000 remains expected because the v33 change is not installed.",
+      "visual_review": {
+        "status": "Recognizable detailed workshop/bench scene after autonomous baseline cold boot.",
+        "reviewer": "root bench controller",
+        "provenance": "Root personally inspected the restored baseline frame and supplied this assertion."
+      }
+    }
+  ],
+  "extra_files": [
+    {
+      "source": "tmp/bringup/phy-sequence-final-release/boot-summary.json",
+      "archive": "final-state/phy-sequence-final-release/boot-summary.json"
+    },
+    {
+      "source": "tmp/bringup/phy-sequence-final-release/capture-config.json",
+      "archive": "final-state/phy-sequence-final-release/capture-config.json"
+    },
+    {
+      "source": "tmp/bringup/phy-sequence-final-release/digital.csv",
+      "archive": "final-state/phy-sequence-final-release/digital.csv"
+    },
+    {
+      "source": "tmp/bringup/phy-sequence-final-release/powered-state.json",
+      "archive": "final-state/phy-sequence-final-release/powered-state.json"
+    },
+    {
+      "source": "tmp/bringup/phy-sequence-final-swd/calls.jsonl",
+      "archive": "final-state/phy-sequence-final-swd/calls.jsonl"
+    },
+    {
+      "source": "tmp/bringup/phy-sequence-final-swd/cli-01.log",
+      "archive": "final-state/phy-sequence-final-swd/cli-01.log"
+    },
+    {
+      "source": "tmp/bringup/phy-sequence-final-swd/result.json",
+      "archive": "final-state/phy-sequence-final-swd/result.json"
+    },
+    {
+      "source": "tmp/bringup/phy-sequence-final-swd/trace.bin",
+      "archive": "final-state/phy-sequence-final-swd/trace.bin"
+    },
+    {
+      "source": "tmp/bringup/phy-sequence2-session.jsonl",
+      "archive": "final-state/phy-sequence2-session.jsonl"
+    },
+    {
+      "source": "tmp/bringup/phy-sequence2-response.json",
+      "archive": "final-state/phy-sequence2-response.json"
+    },
+    {
+      "source": "tmp/bringup/phy-final-state-make-archive-config.py",
+      "archive": "final-state/phy-final-state-make-archive-config.py"
+    }
+  ]
+}
