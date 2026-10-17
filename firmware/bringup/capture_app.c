@@ -39,6 +39,67 @@ volatile uint32_t g_capture_sum;
 volatile uint32_t g_capture_hash;
 volatile uint32_t g_capture_elapsed_ms;
 
+/* Set to 1 at app_run's debugger breakpoint, after startup clears BSS.
+ * Default zero preserves the camera capture path and leaves these pins alone. */
+volatile uint32_t g_probe_smoke_mode;
+volatile uint32_t g_probe_smoke_done;
+
+__attribute__((noinline)) void probe_smoke_complete(void)
+{
+  while (1) {
+    HAL_Delay(100);
+  }
+}
+
+static void probe_smoke_run(void)
+{
+  GPIO_InitTypeDef gpio = {0};
+  uint32_t i;
+
+  __HAL_RCC_GPIOD_CLK_ENABLE();
+  __HAL_RCC_GPIOE_CLK_ENABLE();
+  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_0, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_0, GPIO_PIN_RESET);
+  gpio.Pin = GPIO_PIN_0;
+  gpio.Mode = GPIO_MODE_OUTPUT_PP;
+  gpio.Pull = GPIO_NOPULL;
+  gpio.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOD, &gpio);  /* CN15 pin 33, Saleae CH1. */
+  HAL_GPIO_Init(GPIOE, &gpio);  /* CN15 pin 29, Saleae CH2. */
+
+  HAL_Delay(100);
+  for (i = 0; i < 4; i++) {
+    HAL_GPIO_WritePin(GPIOD, GPIO_PIN_0, GPIO_PIN_SET);
+    HAL_Delay(50);
+    HAL_GPIO_WritePin(GPIOD, GPIO_PIN_0, GPIO_PIN_RESET);
+    HAL_Delay(50);
+  }
+  HAL_Delay(100);
+  for (i = 0; i < 3; i++) {
+    HAL_GPIO_WritePin(GPIOE, GPIO_PIN_0, GPIO_PIN_SET);
+    HAL_Delay(100);
+    HAL_GPIO_WritePin(GPIOE, GPIO_PIN_0, GPIO_PIN_RESET);
+    HAL_Delay(100);
+  }
+  HAL_Delay(100);
+  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_0, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_0, GPIO_PIN_SET);
+  HAL_Delay(200);
+  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_0, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_0, GPIO_PIN_RESET);
+  HAL_Delay(100);
+  g_probe_smoke_done = 1;
+  probe_smoke_complete();
+}
+
+/* Named breakpoint survives edits above the buffer-frozen success loop. */
+__attribute__((noinline)) void capture_complete(void)
+{
+  while (1) {
+    HAL_Delay(100);
+  }
+}
+
 static void capture_fail(const char *where, int32_t result)
 {
   g_capture_result = result;
@@ -199,6 +260,9 @@ void HAL_DCMIPP_CSI_LineErrorCallback(DCMIPP_HandleTypeDef *handle, uint32_t lan
 
 void app_run(void)
 {
+  if (g_probe_smoke_mode == 1U)
+    probe_smoke_run();
+
   CAM_conf_t config = {
     .capture_width = CAPTURE_WIDTH,
     .capture_height = CAPTURE_HEIGHT,
@@ -288,7 +352,5 @@ void app_run(void)
          (unsigned long)g_dcmipp_error_flags);
   printf("Buffer frozen. Read g_capture_frame from debugger as 640x480 grayscale.\r\n");
   /* Do not touch the frozen buffer while the host retrieves it via ST-LINK. */
-  while (1) {
-    HAL_Delay(100);
-  }
+  capture_complete();
 }

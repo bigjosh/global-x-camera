@@ -12,8 +12,8 @@ monitor reset
 load
 set $sp = *(unsigned int*)0x34180400
 set $pc = Reset_Handler
-# Success loop in the pinned capture_app.c, after diagnostics and buffer freeze.
-break capture_app.c:292
+# Named success loop, after diagnostics and buffer freeze.
+break capture_complete
 break capture_fail
 break assert_failed
 break Default_Handler
