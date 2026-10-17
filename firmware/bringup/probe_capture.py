@@ -107,29 +107,30 @@ def pulse_train_matches(pulses, nominal):
 
 def verify_pattern(digital):
     signals = digital["channels"]
-    errors = []
-    for channel in (0, 1, 2):
-        if channel not in signals:
-            errors.append(f"Required digital channel {channel} was not captured.")
-    if errors:
-        return {"passed": False, "errors": errors}
-    reset = signals[0]
+    reset_errors = []
+    gpio_errors = []
+    reset = signals.get(0)
     lows = []
     falling = None
-    for time, level in reset["edges"]:
-        if level == 0:
-            falling = time
-        elif falling is not None:
-            lows.append([falling, time])
-            falling = None
-    if reset["initial"] != 1 or reset["final"] != 1 or not lows:
-        errors.append("NRST must start high, contain a complete low-to-high reset pulse, and finish high.")
+    if reset is None:
+        reset_errors.append("Required digital channel 0 (NRST) was not captured.")
+    else:
+        for time, level in reset["edges"]:
+            if level == 0:
+                falling = time
+            elif falling is not None:
+                lows.append([falling, time])
+                falling = None
+        if reset["initial"] != 1 or reset["final"] != 1 or not lows:
+            reset_errors.append("NRST must start high, contain a complete low-to-high reset pulse, and finish high.")
     for channel in (1, 2):
-        if signals[channel]["final"] != 0:
-            errors.append(f"Marker channel {channel} did not finish low.")
+        if channel not in signals:
+            gpio_errors.append(f"Required digital marker channel {channel} was not captured.")
+        elif signals[channel]["final"] != 0:
+            gpio_errors.append(f"Marker channel {channel} did not finish low.")
 
-    pd0 = high_pulses(signals[1])
-    pe0 = high_pulses(signals[2])
+    pd0 = high_pulses(signals[1]) if 1 in signals else []
+    pe0 = high_pulses(signals[2]) if 2 in signals else []
     match = None
     # Ignore possible GPIO activity before firmware configures the pins. Match
     # the distinctive complete sequence and reject subsequent extra edges.
@@ -151,14 +152,6 @@ def verify_pattern(digital):
                 continue
             if any(t > p[4][1] + 0.005 for t, _ in signals[1]["edges"] + signals[2]["edges"]):
                 continue
-            if not any(end <= p[0][0] for _, end in lows):
-                continue
-            # GDB may reset the MCU again after the test to return it to ROM.
-            # That cleanup reset is permitted; resets overlapping the marker
-            # sequence would invalidate the observed waveform.
-            pattern_end = max(p[4][1], q[3][1])
-            if any(start < pattern_end and end > p[0][0] for start, end in lows):
-                continue
             if any(p[0][0] <= rise < q[0][0] for rise, _ in pe0):
                 continue
             match = {"pd0_pulses_s": p, "pe0_pulses_s": q,
@@ -168,8 +161,21 @@ def verify_pattern(digital):
         if match:
             break
     if not match:
-        errors.append("Did not find four PD0 50 ms pulses, then three PE0 100 ms pulses, then a joint 200 ms pulse after reset.")
-    return {"passed": not errors, "errors": errors, "reset_low_intervals_s": lows,
+        gpio_errors.append("Did not find four PD0 50 ms pulses, then three PE0 100 ms pulses, then a joint 200 ms pulse.")
+    else:
+        # Verify reset separately: a missing or miswired NRST probe must not
+        # hide a valid GPIO waveform or prevent its analog voltage analysis.
+        if not reset_errors and not any(end <= match["start_s"] for _, end in lows):
+            reset_errors.append("No complete NRST reset pulse preceded the GPIO pattern.")
+        # A cleanup reset after the pattern is permitted. An overlapping reset
+        # fails the reset check even if the GPIO pattern can be recognized.
+        if any(start < match["end_s"] and end > match["start_s"] for start, end in lows):
+            reset_errors.append("An NRST reset pulse overlapped the GPIO pattern.")
+    errors = reset_errors + gpio_errors
+    return {"passed": not errors, "reset_passed": not reset_errors,
+            "gpio_passed": not gpio_errors, "errors": errors,
+            "reset_errors": reset_errors, "gpio_errors": gpio_errors,
+            "reset_low_intervals_s": lows,
             "pd0_complete_high_pulses": len(pd0), "pe0_complete_high_pulses": len(pe0),
             "matched_pattern": match,
             "note": "Pulse widths have broad tolerances. Capture start is not firmware entry or power-on."}

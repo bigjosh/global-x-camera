@@ -141,13 +141,14 @@ Work through (1) external logic timing, (2) synchronized current/energy, then (3
 | Proposed Saleae connection | Nucleo point | Meaning |
 |---|---|---|
 | Ground | CN15 pin 20, or CN5 pin 6 or 7, GND | Common signal reference |
-| Channel 0 | CN5 pin 3, RESET / NRST | MCU reset reference; not power-on or exposure start |
+| Channel 0 | **CN3 pin 14, NRST** (same net as CN5 pin 3) | MCU reset reference; alternate connection requested after CH0 did not show reset |
 | Channel 1 | **CN15 pin 33, PD0** (also Arduino D2, CN13 pin 3) | GPIO wiring-test output; startup-stage instrumentation remains to implement |
 | Channel 2 | **CN15 pin 29, PE0** (also Arduino D4, CN13 pin 5) | GPIO wiring-test output; frame/synchronization instrumentation remains to implement |
 | Channel 3 | **CN3 pin 16, VDD3V3** (same net as CN5 pin 4) | Target auxiliary 3.3 V rail; capture analog voltage as well as logic level |
 | Channel 4 | **CN3 pin 18, 5V** (same net as CN5 pin 5; also CN3 pin 6) | Target input supply downstream of CN9; physical input-power reference |
+| Channel 5, diagnostic | **CN15 pin 8, 5V_STLK** | Upstream source comparison; physical probe signal still unverified |
 
-**October 16 connector preference:** the user prefers CN5/CN15 because they are physically easier to connect. Use CN5 pin 3 for reset and CN15 pins 33/29 for the same PD0/PE0 marker signals previously assigned at CN13; the MCU pin selection is unchanged. CN15 pin 20 provides a convenient ground if the CN5 ground positions are occupied by JS110 leads. The mapping is also independently present in [ST-hosted UM3417 Rev3, Table 13](https://community.st.com/ysqtg83639/attachments/ysqtg83639/stm32-mcu-products-forum/292292/1/um3417-stm32n6-nucleo144-board-mb1940-stmicroelectronics-12.pdf). This records the revised connection plan, not completed physical wiring.
+**October 16 connector preference:** the user prefers accessible CN3/CN15 header connections. The initial reset recommendation was CN5 pin 3; the current table requests its equivalent CN3 pin 14 for the next physical check. CN15 pins 33/29 expose the same PD0/PE0 marker signals previously assigned at CN13; the MCU pin selection is unchanged. CN15 pin 20 provides a convenient ground if the CN5 ground positions are occupied by JS110 leads. The mapping is also independently present in [ST-hosted UM3417 Rev3, Table 13](https://community.st.com/ysqtg83639/attachments/ysqtg83639/stm32-mcu-products-forum/292292/1/um3417-stm32n6-nucleo144-board-mb1940-stmicroelectronics-12.pdf). Actual verification results are recorded below.
 
 The user subsequently requested rail probes and easier alternatives to CN5. **CN3 pins 16 and 18** provide adjacent 3.3 V and target 5 V points; CN3 pin 20 is a nearby ground, although the existing CN15 ground can stay. CN15 pin 8 is instead `5V_STLK`, upstream of the target measurement/switch path, and CN15 pin 7 is `VREFP`; neither substitutes for the chosen rail points. [MB1940 C02 schematic, sheets 6, 9, 10 and 13](https://www.st.com/resource/en/schematic_pack/mb1940-n657x0q-c02-schematic.pdf).
 
@@ -216,3 +217,25 @@ The passive `.sal`, CSV and analysis are local in `tmp/bringup/probe-static-02`.
 The user then confirmed the **JS110 is physically inserted in place of the CN9 jumper**. A fresh passive capture (`tmp/bringup/probe-static-03`) still showed both target rails near zero; ST-Link reported 0.19 V at its separate target-voltage reference and could not identify the MCU. The JS110's displayed input voltage remained approximately zero (about −1.3 mV in the inspected waveform), with its power control enabled. These readings do not identify which connection is responsible and do not prove zero voltage on every MCU rail.
 
 The next requested diagnostic is one added analog probe: **Saleae CH5 to CN15 pin 8, `5V_STLK`**, retaining the existing board-ground connection. This is the source net at CN9 pin 1, after the ST-Link-controlled USB power switch but before the JS110. Compare it with CH4 at CN3 pin 18, the target supply after the JS110. A healthy source with a missing target supply directs attention to the meter path/connections; a missing source directs attention to USB input and its onboard power switch. Do not substitute this upstream point for the target-power reference in later startup measurements. [UM3417, ST morpho pin assignment](https://www.st.com/resource/en/user_manual/dm01122391-.pdf). Physical connection and measurement of CH5 remain pending.
+
+### Powered GPIO test — October 16, 2026
+
+After the user confirmed adding CH5 at CN15 pin 8 and reconnecting USB, target power was restored. ST-Link read **3.28 V** and identified the MCU. The reason the earlier supply was absent is not yet established. The connected LP8 had moved to a user-started Logic instance; its existing live capture was stopped and retained in Session 0. Only the task-launched duplicate Logic process was closed. The connected instance's already-enabled automation control was cycled off/on to recover its port after the duplicate released it; the user instance and its existing capture were preserved.
+
+The passive six-channel recording `tmp/bringup/probe-static-04` measured approximately 3.28 V on CH3 and 4.81 V on CH4. The subsequent coordinated recording `tmp/bringup/probe-smoke-05` ran the SRAM GPIO firmware successfully (`g_probe_smoke_done = 1`), with these independent results:
+
+| Probe | Actual result |
+|---|---|
+| CH1 / PD0 / CN15 pin 33 | **Passed**: four highs of 50.335–50.375 ms, then the joint pulse; stable low/high medians −0.015 V / 3.282 V |
+| CH2 / PE0 / CN15 pin 29 | **Passed**: three highs of 100.624–100.739 ms, then the joint pulse; stable low/high medians −0.022 V / 3.278 V |
+| Joint PD0/PE0 pulse | 201.408 ms on both, with edges aligned within one 160 ns digital sample |
+| CH3 / CN3 pin 16 | Auxiliary 3.3 V rail median **3.283 V** |
+| CH4 / CN3 pin 18 | Target 5 V rail median **4.801 V** |
+| CH0 / intended NRST | **Not verified**: remained near zero (median 0.041 V), despite GDB reporting a successful hardware reset and the firmware executing |
+| CH5 / intended CN15 pin 8 source | **Not verified**: remained near zero (median −0.024 V), despite the powered target |
+
+No stable GPIO samples were outside the test's expected voltage ranges. The checker now reports GPIO and reset success independently, so a missing reset signal does not hide valid marker patterns or their voltage measurements. The overall wiring test correctly remains failed until reset is verified. The source-probe discrepancy needs separate investigation; do not infer the physical supply path from the powered target alone. Rail values were steady-state measurements; **no power-on transition or cold-start latency was captured**.
+
+The normal camera path was then re-tested using the new named `capture_complete` breakpoint: four completed frames/four vsync events, approximately 804 ms for the diagnostic sequence, and zero final-snapshot errors. The earlier CSI control-error flag `0x8000` appeared once as before. The downloaded 307,200-byte frame's host-calculated sum **6,416,255** and FNV-1a **`0x207319e4`** matched firmware; pixel minimum/maximum were 15/155, SHA-256 `2c6ec357cd5631d524ab6e510190b4d39f1a8a46b23032f20af26cb565aaf1d8`. Image data remains local under `tmp/bringup/capture-after-probes`.
+
+Next physical check, requested one item at a time: move **only CH0 to CN3 pin 14 (NRST)**, equivalent to CN5 pin 3, with USB disconnected while moving the lead. Reconnect and repeat the reset/GPIO test; then address the source probe. The debugger server was stopped and the MCU left in development ROM before requesting that move.
