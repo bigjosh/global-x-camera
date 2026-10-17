@@ -1,6 +1,6 @@
 # Global X Camera
 
-An STM32N6-based, credit-card-size monochrome global-shutter camera project. This repository is the durable project record; chat and Page copies are working views. Updated through October 15, 2026.
+An STM32N6-based, credit-card-size monochrome global-shutter camera project. This repository is the durable project record; chat and Page copies are working views. Updated through October 16, 2026.
 
 **Public repository:** [bigjosh/global-x-camera](https://github.com/bigjosh/global-x-camera), created at the user's explicit request on October 13, 2026. The default branch is `main`.
 
@@ -16,6 +16,7 @@ An STM32N6-based, credit-card-size monochrome global-shutter camera project. Thi
 
 8. [50 ms cold-start risk review](docs/decisions/50ms-cold-start-review.md) — sensor revision, MCU boot load, power startup and storage recovery risks; no measured timing compliance yet.
 9. [First camera capture](firmware/bringup/README.md) — working RAM-only Nucleo/VD56G3 test, reproduction scripts, sensor identity and measured results.
+10. [First GPIO boot timing](firmware/boot-timing/bench-results-2026-10-16.md) — two autonomous starts, roughly 63 ms from the 5 V rise, including a roughly 50 ms reset hold whose source remains unresolved.
 
 ## Current position
 
@@ -26,6 +27,8 @@ The main-path OFF-current target is 0.1 µA at room temperature, with RTC backup
 **Hardware bring-up, October 15:** the delivered Nucleo and mounted CAM-6G3-073CLR produced recognizable 640 × 480 monochrome snapshots at 10 ms exposure and unity gain. The sensor reports model `0x5603`, revision `0x3110`, ROM `0x0420`; this revision selects the inspected driver's fast-boot path. The [RAM-only test](firmware/bringup/README.md) retrieves pixels through ST-Link and preserves the code and diagnostics. An earlier startup CSI error remains to investigate; final snapshots reported no new errors. Full-resolution RAW10, cold-start timing, battery operation, NAND and PTP remain unverified. No OTP or external flash was programmed, and no power/debug isolation rework was performed.
 
 The recovered KiCad design still contains the older camera, memories and power circuit. A reviewed reconstruction and clean ERC are not a fabrication release. The [47-item engineering review](docs/DESIGN-REVIEW.md) remains the implementation backlog until findings are closed with evidence. No integrated product firmware or measured full capture/save/shutdown cycle is recorded.
+
+**Autonomous boot, October 16:** the separate [first-GPIO image](firmware/boot-timing/README.md) is now programmed in NOR after a complete backup. Two USB power-ups reached PD0 62.75–62.91 ms after the target 5 V rail first crossed 4.50 V. Approximately 50 ms was spent with NRST held low, whose source remains unresolved; the observed NRST edge to PD0 took 12.92–13.43 ms. No sensor capture occurs in this image, so the 50 ms exposure requirement remains unqualified. The board is currently in normal flash boot (JP1/JP2 pins 1–2).
 
 ## Record structure and precedence
 

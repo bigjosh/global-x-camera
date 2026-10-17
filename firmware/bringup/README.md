@@ -4,6 +4,8 @@ The NUCLEO-N657X0-Q and mounted CAM-6G3-073CLR captured a recognizable monochrom
 
 This is a hardware and image-capture proof. It does not qualify full-resolution RAW10 capture, the 50 ms cold-start target, battery operation, NAND storage, PTP, or the production PNG export path.
 
+**Current bench state, October 16:** the separate [first-GPIO timing image](../boot-timing/README.md) is now in external NOR, with JP1/JP2 both on pins 1–2 for normal flash boot. Return JP2 to pins 2–3 to run this RAM-only camera test again. The timing experiment backed up the original NOR, measured two autonomous starts, and did not change OTP or security settings.
+
 ## Hardware and tools
 
 - NUCLEO-N657X0-Q with the CAM-6G3-073CLR camera mounted.

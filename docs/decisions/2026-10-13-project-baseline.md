@@ -1,6 +1,8 @@
-# Project decisions and discoveries through October 15, 2026
+# Project decisions and discoveries through October 16, 2026
 
-This is the durable decision register for Global X Camera. It consolidates the October 12–15 review and points to the repository's engineering evidence. The repository, rather than a chat or Page, is the project record. Current requirements are implemented in documentation, not yet in a revised circuit or integrated firmware.
+This is the durable decision register for Global X Camera. It consolidates the October 12–16 review and points to the repository's engineering evidence. The repository, rather than a chat or Page, is the project record. Current requirements are implemented in documentation, not yet in a revised circuit or integrated firmware.
+
+**October 16 discovery — autonomous boot timing:** a 256-byte first-GPIO payload, packaged as a 1,280-byte boot image, now runs from the Nucleo's external NOR. Two observed power-ups reached PD0 **62.75–62.91 ms after the first 4.50 V target-rail crossing**. Roughly 50 ms elapsed before the observed NRST rising edge; **12.92–13.43 ms** followed it. Identify the source of the active reset hold before treating this as an MCU limitation. JS110 reconnection also caused the upstream source to collapse; manual USB reconnection recovered it. The original NOR was backed up before programming its first sector; no OTP/security settings changed. See the [full bench record](../../firmware/boot-timing/bench-results-2026-10-16.md). D-04 remains a requirement; no exposure-start compliance is established.
 
 Read this with [spec.md](../../spec.md), [power.md](../../power.md), the [consolidated review](../../reports/Global%20X%20Camera%20decision%20review.md), and the [prototype research record](../prototype/prototype-parts-and-camera-research.md). Historical studies retain their original assumptions; a later explicit decision below takes precedence.
 
