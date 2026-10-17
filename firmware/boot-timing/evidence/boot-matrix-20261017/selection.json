@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "source_root": "tmp/bringup",
+  "captures": [
+    "opt-matrix-baseline-01",
+    "opt-matrix-plus8k-01",
+    "opt-matrix-plus32k-01",
+    "opt-matrix-plus32k-02",
+    "opt-matrix-baseline-02",
+    "opt-matrix-tiny-01",
+    "opt-matrix-tiny-02",
+    "opt-matrix-tiny-03",
+    "opt-matrix-baseline-03"
+  ],
+  "program_trials": [
+    "nor-program-baseline-01",
+    "nor-program-plus8k-01",
+    "nor-program-plus32k-01",
+    "nor-program-baseline-02",
+    "nor-program-tiny-01",
+    "nor-program-baseline-03"
+  ],
+  "guard_trials": [{
+    "name": "nor-guard-final",
+    "before": "tmp/bringup/rom-nor-maintenance-readonly-20261017/following-sector-before.bin"
+  }],
+  "analysis": "tmp/bringup/opt-matrix-analysis.json",
+  "chart_provenance": "firmware/boot-timing/assets/opt-payload-size-matrix.provenance.json",
+  "decoded_rom": [
+    "tmp/bringup/matrix-rom-analysis/baseline-01.json",
+    "tmp/bringup/matrix-rom-analysis/plus8k-01.json",
+    "tmp/bringup/matrix-rom-analysis/plus32k-01.json",
+    "tmp/bringup/matrix-rom-analysis/tiny-01.json",
+    "tmp/bringup/matrix-rom-analysis/baseline-03.json",
+    "tmp/bringup/matrix-rom-analysis/phase-comparison.json"
+  ],
+  "final_state": {
+    "powered": "opt-final-powered-state",
+    "debug": "opt-final-debug-access"
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "references": {
+    "ch3": "auxiliary 3.3 V crossing 2.97 V",
+    "ch4": "target 5 V crossing 4.50 V"
+  },
+  "analog_sample_spacing_us": 32.000000000000774,
+  "digital_sample_spacing_us": 0.16,
+  "cycles": [
+    {
+      "target_5v_4_5v_crossing_s": 20.500674162,
+      "aux_3v3_2_97v_crossing_s": 20.492450162,
+      "nrst_rise_s": 20.48936368,
+      "pd0_rise_s": 20.50432112,
+      "pe0_rise_s": 20.50432128,
+      "target_5v_to_pd0_ms": 3.6469580000009216,
+      "aux_3v3_to_pd0_ms": 11.870957999999376,
+      "nrst_to_pd0_ms": 14.957439999999878,
+      "preceding_observed_off_s": {
+        "3": 20.130944,
+        "4": 13.359360000000002
+      }
+    }
+  ],
+  "limitations": [
+    "No MCU PGOOD or always-on/core rail probe in this channel map.",
+    "Observed off intervals do not alone prove every MCU rail was discharged.",
+    "Off means samples below 0.1 V on the named rail; a single low sample can arm a crossing.",
+    "Analog spacing is measured from the CSV; digital spacing requires capture-config.json.",
+    "Timing is for this image and this board supply setup."
+  ]
+}

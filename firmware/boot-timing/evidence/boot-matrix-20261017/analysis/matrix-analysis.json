@@ -1,0 +1,1745 @@
+{
+  "passed": true,
+  "runs": [
+    {
+      "label": "baseline-1",
+      "added_image_bytes": 0,
+      "folder": "D:\\Github\\global-x-camera\\tmp\\bringup\\opt-matrix-baseline-01",
+      "passed": true,
+      "status": "complete",
+      "metrics": {
+        "target_0_5v_first_to_pd0_ms": 23.22839800000054,
+        "target_0_5v_final_to_pd0_ms": 23.22839800000054,
+        "nrst_to_pd0_ms": 15.67168000000052,
+        "main_vddio_2_97v_first_to_pd0_ms": 12.66839799999886,
+        "main_vddio_2_97v_final_to_pd0_ms": 12.66839799999886,
+        "pd0_to_pe0_us": 0.3199999980552093
+      },
+      "checks": {
+        "cycle_outcome_passed": true,
+        "existing_independent_review_passed": true,
+        "ch5_explicitly_main_vddio": true,
+        "exactly_one_rise_per_reset_and_marker": true,
+        "ordered_markers": true,
+        "no_reset_or_marker_fall_after_rise": true,
+        "all_three_rails_continuously_below_0_1v": true,
+        "reset_and_markers_low_during_off": true,
+        "final_plateau_at_least_0_5s": true,
+        "final_levels_in_range": true,
+        "final_rail_crossings_sustained": true,
+        "analog_continuous_and_rate_matches": true,
+        "digital_rate_available": true,
+        "exports_cover_same_interval": true,
+        "existing_marker_timing_matches_raw": true,
+        "files_unchanged_during_analysis": true
+      },
+      "failed_checks": [],
+      "independent_review_failed_checks": [],
+      "independent_review_sha256": "53164720cc247c49dafd37c60a43df0ea0450993387718ac2d4c782271884ec7",
+      "channel_map": {
+        "0": "NRST",
+        "1": "PD0",
+        "2": "PE0",
+        "3": "auxiliary 3.3 V",
+        "4": "target 5 V",
+        "5": "main-vddio"
+      },
+      "duration_s": 24.695968,
+      "analog_spacing_us": 32.000000000000774,
+      "digital_spacing_us": 0.16,
+      "common_off_below_0_1v": {
+        "start_s": 7.490658162,
+        "end_s": 20.552674162,
+        "duration_s": 13.062016
+      },
+      "off_maxima_v": {
+        "0": -0.005,
+        "1": -0.01,
+        "2": -0.012,
+        "3": -0.003,
+        "4": 0.096,
+        "5": -0.024
+      },
+      "individual_off_below_0_1v": {
+        "3": {
+          "start_s": 0.430402162,
+          "end_s": 20.563586162,
+          "duration_s": 20.133184
+        },
+        "4": {
+          "start_s": 7.490658162,
+          "end_s": 20.552674162,
+          "duration_s": 13.062016
+        },
+        "5": {
+          "start_s": 0.479714162,
+          "end_s": 20.558562162,
+          "duration_s": 20.078848
+        }
+      },
+      "final_levels": {
+        "0": {
+          "min_v": 3.186,
+          "max_v": 3.197,
+          "median_v": 3.192
+        },
+        "1": {
+          "min_v": 3.272,
+          "max_v": 3.282,
+          "median_v": 3.272
+        },
+        "2": {
+          "min_v": 3.278,
+          "max_v": 3.283,
+          "median_v": 3.278
+        },
+        "3": {
+          "min_v": 3.263,
+          "max_v": 3.298,
+          "median_v": 3.288
+        },
+        "4": {
+          "min_v": 4.811,
+          "max_v": 4.858,
+          "median_v": 4.842
+        },
+        "5": {
+          "min_v": 3.271,
+          "max_v": 3.281,
+          "median_v": 3.276
+        }
+      },
+      "crossings": {
+        "target_0_5v": {
+          "threshold_v": 0.5,
+          "up_crossings_s": [
+            20.557410162
+          ],
+          "down_crossings_s": [],
+          "first_up_s": 20.557410162,
+          "final_up_s": 20.557410162,
+          "first_to_pd0_ms": 23.22839800000054,
+          "final_to_pd0_ms": 23.22839800000054,
+          "final_crossing_sustained_to_end": true
+        },
+        "target_4_5v": {
+          "threshold_v": 4.5,
+          "up_crossings_s": [
+            20.576322162
+          ],
+          "down_crossings_s": [],
+          "first_up_s": 20.576322162,
+          "final_up_s": 20.576322162,
+          "first_to_pd0_ms": 4.316398000000277,
+          "final_to_pd0_ms": 4.316398000000277,
+          "final_crossing_sustained_to_end": true
+        },
+        "aux_2_97v": {
+          "threshold_v": 2.97,
+          "up_crossings_s": [
+            20.568034162
+          ],
+          "down_crossings_s": [],
+          "first_up_s": 20.568034162,
+          "final_up_s": 20.568034162,
+          "first_to_pd0_ms": 12.604398000000572,
+          "final_to_pd0_ms": 12.604398000000572,
+          "final_crossing_sustained_to_end": true
+        },
+        "main_vddio_2_97v": {
+          "threshold_v": 2.97,
+          "up_crossings_s": [
+            20.567970162
+          ],
+          "down_crossings_s": [],
+          "first_up_s": 20.567970162,
+          "final_up_s": 20.567970162,
+          "first_to_pd0_ms": 12.66839799999886,
+          "final_to_pd0_ms": 12.66839799999886,
+          "final_crossing_sustained_to_end": true
+        }
+      },
+      "marker_times_s": {
+        "nrst": 20.56496688,
+        "pd0": 20.58063856,
+        "pe0": 20.58063888
+      }
+    },
+    {
+      "label": "plus-8KiB",
+      "added_image_bytes": 8192,
+      "folder": "D:\\Github\\global-x-camera\\tmp\\bringup\\opt-matrix-plus8k-01",
+      "passed": true,
+      "status": "complete",
+      "metrics": {
+        "target_0_5v_first_to_pd0_ms": 25.12871799999772,
+        "target_0_5v_final_to_pd0_ms": 25.12871799999772,
+        "nrst_to_pd0_ms": 17.58255999999747,
+        "main_vddio_2_97v_first_to_pd0_ms": 14.600718000000512,
+        "main_vddio_2_97v_final_to_pd0_ms": 14.600718000000512,
+        "pd0_to_pe0_us": 0.32000000160792297
+      },
+      "checks": {
+        "cycle_outcome_passed": true,
+        "existing_independent_review_passed": true,
+        "ch5_explicitly_main_vddio": true,
+        "exactly_one_rise_per_reset_and_marker": true,
+        "ordered_markers": true,
+        "no_reset_or_marker_fall_after_rise": true,
+        "all_three_rails_continuously_below_0_1v": true,
+        "reset_and_markers_low_during_off": true,
+        "final_plateau_at_least_0_5s": true,
+        "final_levels_in_range": true,
+        "final_rail_crossings_sustained": true,
+        "analog_continuous_and_rate_matches": true,
+        "digital_rate_available": true,
+        "exports_cover_same_interval": true,
+        "existing_marker_timing_matches_raw": true,
+        "files_unchanged_during_analysis": true
+      },
+      "failed_checks": [],
+      "independent_review_failed_checks": [],
+      "independent_review_sha256": "1a35d7191431660d9adc38b332424fa3d5f4934ac01cecdc39519b8d6e0c2366",
+      "channel_map": {
+        "0": "NRST",
+        "1": "PD0",
+        "2": "PE0",
+        "3": "auxiliary 3.3 V",
+        "4": "target 5 V",
+        "5": "main-vddio"
+      },
+      "duration_s": 24.695968,
+      "analog_spacing_us": 32.000000000000774,
+      "digital_spacing_us": 0.16,
+      "common_off_below_0_1v": {
+        "start_s": 7.273282162,
+        "end_s": 20.487970162,
+        "duration_s": 13.214687999999999
+      },
+      "off_maxima_v": {
+        "0": -0.005,
+        "1": -0.01,
+        "2": -0.012,
+        "3": -0.003,
+        "4": 0.096,
+        "5": -0.024
+      },
+      "individual_off_below_0_1v": {
+        "3": {
+          "start_s": 0.369378162,
+          "end_s": 20.498882162,
+          "duration_s": 20.129504
+        },
+        "4": {
+          "start_s": 7.273282162,
+          "end_s": 20.487970162,
+          "duration_s": 13.214687999999999
+        },
+        "5": {
+          "start_s": 0.417410162,
+          "end_s": 20.493858162,
+          "duration_s": 20.076448
+        }
+      },
+      "final_levels": {
+        "0": {
+          "min_v": 3.192,
+          "max_v": 3.202,
+          "median_v": 3.192
+        },
+        "1": {
+          "min_v": 3.272,
+          "max_v": 3.282,
+          "median_v": 3.272
+        },
+        "2": {
+          "min_v": 3.273,
+          "max_v": 3.283,
+          "median_v": 3.278
+        },
+        "3": {
+          "min_v": 3.268,
+          "max_v": 3.303,
+          "median_v": 3.288
+        },
+        "4": {
+          "min_v": 4.827,
+          "max_v": 4.863,
+          "median_v": 4.852
+        },
+        "5": {
+          "min_v": 3.271,
+          "max_v": 3.281,
+          "median_v": 3.276
+        }
+      },
+      "crossings": {
+        "target_0_5v": {
+          "threshold_v": 0.5,
+          "up_crossings_s": [
+            20.492706162
+          ],
+          "down_crossings_s": [],
+          "first_up_s": 20.492706162,
+          "final_up_s": 20.492706162,
+          "first_to_pd0_ms": 25.12871799999772,
+          "final_to_pd0_ms": 25.12871799999772,
+          "final_crossing_sustained_to_end": true
+        },
+        "target_4_5v": {
+          "threshold_v": 4.5,
+          "up_crossings_s": [
+            20.511554162
+          ],
+          "down_crossings_s": [],
+          "first_up_s": 20.511554162,
+          "final_up_s": 20.511554162,
+          "first_to_pd0_ms": 6.280717999999297,
+          "final_to_pd0_ms": 6.280717999999297,
+          "final_crossing_sustained_to_end": true
+        },
+        "aux_2_97v": {
+          "threshold_v": 2.97,
+          "up_crossings_s": [
+            20.503330162
+          ],
+          "down_crossings_s": [],
+          "first_up_s": 20.503330162,
+          "final_up_s": 20.503330162,
+          "first_to_pd0_ms": 14.504717999997752,
+          "final_to_pd0_ms": 14.504717999997752,
+          "final_crossing_sustained_to_end": true
+        },
+        "main_vddio_2_97v": {
+          "threshold_v": 2.97,
+          "up_crossings_s": [
+            20.503234162
+          ],
+          "down_crossings_s": [],
+          "first_up_s": 20.503234162,
+          "final_up_s": 20.503234162,
+          "first_to_pd0_ms": 14.600718000000512,
+          "final_to_pd0_ms": 14.600718000000512,
+          "final_crossing_sustained_to_end": true
+        }
+      },
+      "marker_times_s": {
+        "nrst": 20.50025232,
+        "pd0": 20.51783488,
+        "pe0": 20.5178352
+      }
+    },
+    {
+      "label": "plus-32KiB-1",
+      "added_image_bytes": 32768,
+      "folder": "D:\\Github\\global-x-camera\\tmp\\bringup\\opt-matrix-plus32k-01",
+      "passed": true,
+      "status": "complete",
+      "metrics": {
+        "target_0_5v_first_to_pd0_ms": 31.265678000000463,
+        "target_0_5v_final_to_pd0_ms": 31.265678000000463,
+        "nrst_to_pd0_ms": 23.756320000000386,
+        "main_vddio_2_97v_first_to_pd0_ms": 20.769678000000624,
+        "main_vddio_2_97v_final_to_pd0_ms": 20.769678000000624,
+        "pd0_to_pe0_us": 0.47999999708281393
+      },
+      "checks": {
+        "cycle_outcome_passed": true,
+        "existing_independent_review_passed": true,
+        "ch5_explicitly_main_vddio": true,
+        "exactly_one_rise_per_reset_and_marker": true,
+        "ordered_markers": true,
+        "no_reset_or_marker_fall_after_rise": true,
+        "all_three_rails_continuously_below_0_1v": true,
+        "reset_and_markers_low_during_off": true,
+        "final_plateau_at_least_0_5s": true,
+        "final_levels_in_range": true,
+        "final_rail_crossings_sustained": true,
+        "analog_continuous_and_rate_matches": true,
+        "digital_rate_available": true,
+        "exports_cover_same_interval": true,
+        "existing_marker_timing_matches_raw": true,
+        "files_unchanged_during_analysis": true
+      },
+      "failed_checks": [],
+      "independent_review_failed_checks": [],
+      "independent_review_sha256": "f1ac3fe469cfb7d087fb8aa75deef5240e2938b440db025724754b72a5c3175d",
+      "channel_map": {
+        "0": "NRST",
+        "1": "PD0",
+        "2": "PE0",
+        "3": "auxiliary 3.3 V",
+        "4": "target 5 V",
+        "5": "main-vddio"
+      },
+      "duration_s": 24.494624,
+      "analog_spacing_us": 32.000000000000774,
+      "digital_spacing_us": 0.16,
+      "common_off_below_0_1v": {
+        "start_s": 7.160130162,
+        "end_s": 20.450370162,
+        "duration_s": 13.290239999999999
+      },
+      "off_maxima_v": {
+        "0": -0.005,
+        "1": -0.01,
+        "2": -0.012,
+        "3": -0.003,
+        "4": 0.096,
+        "5": -0.024
+      },
+      "individual_off_below_0_1v": {
+        "3": {
+          "start_s": 0.323970162,
+          "end_s": 20.461314162,
+          "duration_s": 20.137344000000002
+        },
+        "4": {
+          "start_s": 7.160130162,
+          "end_s": 20.450370162,
+          "duration_s": 13.290239999999999
+        },
+        "5": {
+          "start_s": 0.371970162,
+          "end_s": 20.456290162,
+          "duration_s": 20.084319999999998
+        }
+      },
+      "final_levels": {
+        "0": {
+          "min_v": 3.192,
+          "max_v": 3.197,
+          "median_v": 3.192
+        },
+        "1": {
+          "min_v": 3.272,
+          "max_v": 3.277,
+          "median_v": 3.272
+        },
+        "2": {
+          "min_v": 3.273,
+          "max_v": 3.283,
+          "median_v": 3.278
+        },
+        "3": {
+          "min_v": 3.268,
+          "max_v": 3.303,
+          "median_v": 3.288
+        },
+        "4": {
+          "min_v": 4.822,
+          "max_v": 4.858,
+          "median_v": 4.852
+        },
+        "5": {
+          "min_v": 3.271,
+          "max_v": 3.281,
+          "median_v": 3.276
+        }
+      },
+      "crossings": {
+        "target_0_5v": {
+          "threshold_v": 0.5,
+          "up_crossings_s": [
+            20.455138162
+          ],
+          "down_crossings_s": [],
+          "first_up_s": 20.455138162,
+          "final_up_s": 20.455138162,
+          "first_to_pd0_ms": 31.265678000000463,
+          "final_to_pd0_ms": 31.265678000000463,
+          "final_crossing_sustained_to_end": true
+        },
+        "target_4_5v": {
+          "threshold_v": 4.5,
+          "up_crossings_s": [
+            20.473954162,
+            20.474018162
+          ],
+          "down_crossings_s": [
+            20.473986162
+          ],
+          "first_up_s": 20.473954162,
+          "final_up_s": 20.474018162,
+          "first_to_pd0_ms": 12.449678000002962,
+          "final_to_pd0_ms": 12.385678000001121,
+          "final_crossing_sustained_to_end": true
+        },
+        "aux_2_97v": {
+          "threshold_v": 2.97,
+          "up_crossings_s": [
+            20.465730162
+          ],
+          "down_crossings_s": [],
+          "first_up_s": 20.465730162,
+          "final_up_s": 20.465730162,
+          "first_to_pd0_ms": 20.673678000001416,
+          "final_to_pd0_ms": 20.673678000001416,
+          "final_crossing_sustained_to_end": true
+        },
+        "main_vddio_2_97v": {
+          "threshold_v": 2.97,
+          "up_crossings_s": [
+            20.465634162
+          ],
+          "down_crossings_s": [],
+          "first_up_s": 20.465634162,
+          "final_up_s": 20.465634162,
+          "first_to_pd0_ms": 20.769678000000624,
+          "final_to_pd0_ms": 20.769678000000624,
+          "final_crossing_sustained_to_end": true
+        }
+      },
+      "marker_times_s": {
+        "nrst": 20.46264752,
+        "pd0": 20.48640384,
+        "pe0": 20.48640432
+      }
+    },
+    {
+      "label": "plus-32KiB-2",
+      "added_image_bytes": 32768,
+      "folder": "D:\\Github\\global-x-camera\\tmp\\bringup\\opt-matrix-plus32k-02",
+      "passed": true,
+      "status": "complete",
+      "metrics": {
+        "target_0_5v_first_to_pd0_ms": 31.21655800000056,
+        "target_0_5v_final_to_pd0_ms": 31.21655800000056,
+        "nrst_to_pd0_ms": 23.71536000000063,
+        "main_vddio_2_97v_first_to_pd0_ms": 20.72055800000072,
+        "main_vddio_2_97v_final_to_pd0_ms": 20.72055800000072,
+        "pd0_to_pe0_us": 0.4800000006355276
+      },
+      "checks": {
+        "cycle_outcome_passed": true,
+        "existing_independent_review_passed": true,
+        "ch5_explicitly_main_vddio": true,
+        "exactly_one_rise_per_reset_and_marker": true,
+        "ordered_markers": true,
+        "no_reset_or_marker_fall_after_rise": true,
+        "all_three_rails_continuously_below_0_1v": true,
+        "reset_and_markers_low_during_off": true,
+        "final_plateau_at_least_0_5s": true,
+        "final_levels_in_range": true,
+        "final_rail_crossings_sustained": true,
+        "analog_continuous_and_rate_matches": true,
+        "digital_rate_available": true,
+        "exports_cover_same_interval": true,
+        "existing_marker_timing_matches_raw": true,
+        "files_unchanged_during_analysis": true
+      },
+      "failed_checks": [],
+      "independent_review_failed_checks": [],
+      "independent_review_sha256": "02e8011a02b02b4e71d605b24ba81374ee2fc94851f2932ae108dc96bfd122d7",
+      "channel_map": {
+        "0": "NRST",
+        "1": "PD0",
+        "2": "PE0",
+        "3": "auxiliary 3.3 V",
+        "4": "target 5 V",
+        "5": "main-vddio"
+      },
+      "duration_s": 24.595296,
+      "analog_spacing_us": 32.000000000000774,
+      "digital_spacing_us": 0.16,
+      "common_off_below_0_1v": {
+        "start_s": 7.247074162,
+        "end_s": 20.419202162,
+        "duration_s": 13.172128
+      },
+      "off_maxima_v": {
+        "0": -0.005,
+        "1": -0.01,
+        "2": -0.012,
+        "3": -0.003,
+        "4": 0.096,
+        "5": -0.024
+      },
+      "individual_off_below_0_1v": {
+        "3": {
+          "start_s": 0.403010162,
+          "end_s": 20.430146162,
+          "duration_s": 20.027136
+        },
+        "4": {
+          "start_s": 7.247074162,
+          "end_s": 20.419202162,
+          "duration_s": 13.172128
+        },
+        "5": {
+          "start_s": 0.451394162,
+          "end_s": 20.425122162,
+          "duration_s": 19.973728
+        }
+      },
+      "final_levels": {
+        "0": {
+          "min_v": 3.192,
+          "max_v": 3.202,
+          "median_v": 3.197
+        },
+        "1": {
+          "min_v": 3.272,
+          "max_v": 3.282,
+          "median_v": 3.277
+        },
+        "2": {
+          "min_v": 3.273,
+          "max_v": 3.283,
+          "median_v": 3.278
+        },
+        "3": {
+          "min_v": 3.268,
+          "max_v": 3.303,
+          "median_v": 3.288
+        },
+        "4": {
+          "min_v": 4.811,
+          "max_v": 4.863,
+          "median_v": 4.852
+        },
+        "5": {
+          "min_v": 3.266,
+          "max_v": 3.281,
+          "median_v": 3.271
+        }
+      },
+      "crossings": {
+        "target_0_5v": {
+          "threshold_v": 0.5,
+          "up_crossings_s": [
+            20.423970162
+          ],
+          "down_crossings_s": [],
+          "first_up_s": 20.423970162,
+          "final_up_s": 20.423970162,
+          "first_to_pd0_ms": 31.21655800000056,
+          "final_to_pd0_ms": 31.21655800000056,
+          "final_crossing_sustained_to_end": true
+        },
+        "target_4_5v": {
+          "threshold_v": 4.5,
+          "up_crossings_s": [
+            20.442786162
+          ],
+          "down_crossings_s": [],
+          "first_up_s": 20.442786162,
+          "final_up_s": 20.442786162,
+          "first_to_pd0_ms": 12.400557999999506,
+          "final_to_pd0_ms": 12.400557999999506,
+          "final_crossing_sustained_to_end": true
+        },
+        "aux_2_97v": {
+          "threshold_v": 2.97,
+          "up_crossings_s": [
+            20.434530162
+          ],
+          "down_crossings_s": [],
+          "first_up_s": 20.434530162,
+          "final_up_s": 20.434530162,
+          "first_to_pd0_ms": 20.65655799999888,
+          "final_to_pd0_ms": 20.65655799999888,
+          "final_crossing_sustained_to_end": true
+        },
+        "main_vddio_2_97v": {
+          "threshold_v": 2.97,
+          "up_crossings_s": [
+            20.434466162
+          ],
+          "down_crossings_s": [],
+          "first_up_s": 20.434466162,
+          "final_up_s": 20.434466162,
+          "first_to_pd0_ms": 20.72055800000072,
+          "final_to_pd0_ms": 20.72055800000072,
+          "final_crossing_sustained_to_end": true
+        }
+      },
+      "marker_times_s": {
+        "nrst": 20.43147136,
+        "pd0": 20.45518672,
+        "pe0": 20.4551872
+      }
+    },
+    {
+      "label": "baseline-2",
+      "added_image_bytes": 0,
+      "folder": "D:\\Github\\global-x-camera\\tmp\\bringup\\opt-matrix-baseline-02",
+      "passed": true,
+      "status": "complete",
+      "metrics": {
+        "target_0_5v_first_to_pd0_ms": 22.56311800000077,
+        "target_0_5v_final_to_pd0_ms": 22.56311800000077,
+        "nrst_to_pd0_ms": 15.063200000000165,
+        "main_vddio_2_97v_first_to_pd0_ms": 12.067118000000931,
+        "main_vddio_2_97v_final_to_pd0_ms": 12.067118000000931,
+        "pd0_to_pe0_us": 0.47999999708281393
+      },
+      "checks": {
+        "cycle_outcome_passed": true,
+        "existing_independent_review_passed": true,
+        "ch5_explicitly_main_vddio": true,
+        "exactly_one_rise_per_reset_and_marker": true,
+        "ordered_markers": true,
+        "no_reset_or_marker_fall_after_rise": true,
+        "all_three_rails_continuously_below_0_1v": true,
+        "reset_and_markers_low_during_off": true,
+        "final_plateau_at_least_0_5s": true,
+        "final_levels_in_range": true,
+        "final_rail_crossings_sustained": true,
+        "analog_continuous_and_rate_matches": true,
+        "digital_rate_available": true,
+        "exports_cover_same_interval": true,
+        "existing_marker_timing_matches_raw": true,
+        "files_unchanged_during_analysis": true
+      },
+      "failed_checks": [],
+      "independent_review_failed_checks": [],
+      "independent_review_sha256": "e2107fc455397f0ba0e5e3635db580ada94e3b060405341eb238ee78033929c8",
+      "channel_map": {
+        "0": "NRST",
+        "1": "PD0",
+        "2": "PE0",
+        "3": "auxiliary 3.3 V",
+        "4": "target 5 V",
+        "5": "main-vddio"
+      },
+      "duration_s": 24.695968,
+      "analog_spacing_us": 32.000000000000774,
+      "digital_spacing_us": 0.16,
+      "common_off_below_0_1v": {
+        "start_s": 7.271746162,
+        "end_s": 20.554786162,
+        "duration_s": 13.28304
+      },
+      "off_maxima_v": {
+        "0": -0.005,
+        "1": -0.01,
+        "2": -0.012,
+        "3": -0.003,
+        "4": 0.096,
+        "5": -0.024
+      },
+      "individual_off_below_0_1v": {
+        "3": {
+          "start_s": 0.440578162,
+          "end_s": 20.565698162,
+          "duration_s": 20.12512
+        },
+        "4": {
+          "start_s": 7.271746162,
+          "end_s": 20.554786162,
+          "duration_s": 13.28304
+        },
+        "5": {
+          "start_s": 0.488674162,
+          "end_s": 20.560674162,
+          "duration_s": 20.072000000000003
+        }
+      },
+      "final_levels": {
+        "0": {
+          "min_v": 3.192,
+          "max_v": 3.197,
+          "median_v": 3.192
+        },
+        "1": {
+          "min_v": 3.267,
+          "max_v": 3.277,
+          "median_v": 3.272
+        },
+        "2": {
+          "min_v": 3.273,
+          "max_v": 3.283,
+          "median_v": 3.278
+        },
+        "3": {
+          "min_v": 3.263,
+          "max_v": 3.303,
+          "median_v": 3.288
+        },
+        "4": {
+          "min_v": 4.827,
+          "max_v": 4.858,
+          "median_v": 4.852
+        },
+        "5": {
+          "min_v": 3.271,
+          "max_v": 3.281,
+          "median_v": 3.276
+        }
+      },
+      "crossings": {
+        "target_0_5v": {
+          "threshold_v": 0.5,
+          "up_crossings_s": [
+            20.559522162
+          ],
+          "down_crossings_s": [],
+          "first_up_s": 20.559522162,
+          "final_up_s": 20.559522162,
+          "first_to_pd0_ms": 22.56311800000077,
+          "final_to_pd0_ms": 22.56311800000077,
+          "final_crossing_sustained_to_end": true
+        },
+        "target_4_5v": {
+          "threshold_v": 4.5,
+          "up_crossings_s": [
+            20.578338162
+          ],
+          "down_crossings_s": [],
+          "first_up_s": 20.578338162,
+          "final_up_s": 20.578338162,
+          "first_to_pd0_ms": 3.747117999999716,
+          "final_to_pd0_ms": 3.747117999999716,
+          "final_crossing_sustained_to_end": true
+        },
+        "aux_2_97v": {
+          "threshold_v": 2.97,
+          "up_crossings_s": [
+            20.570082162
+          ],
+          "down_crossings_s": [],
+          "first_up_s": 20.570082162,
+          "final_up_s": 20.570082162,
+          "first_to_pd0_ms": 12.003118000002644,
+          "final_to_pd0_ms": 12.003118000002644,
+          "final_crossing_sustained_to_end": true
+        },
+        "main_vddio_2_97v": {
+          "threshold_v": 2.97,
+          "up_crossings_s": [
+            20.570018162
+          ],
+          "down_crossings_s": [],
+          "first_up_s": 20.570018162,
+          "final_up_s": 20.570018162,
+          "first_to_pd0_ms": 12.067118000000931,
+          "final_to_pd0_ms": 12.067118000000931,
+          "final_crossing_sustained_to_end": true
+        }
+      },
+      "marker_times_s": {
+        "nrst": 20.56702208,
+        "pd0": 20.58208528,
+        "pe0": 20.58208576
+      }
+    },
+    {
+      "label": "tiny-1",
+      "added_image_bytes": -64,
+      "folder": "D:\\Github\\global-x-camera\\tmp\\bringup\\opt-matrix-tiny-01",
+      "passed": true,
+      "status": "complete",
+      "metrics": {
+        "target_0_5v_first_to_pd0_ms": 22.56679799999972,
+        "target_0_5v_final_to_pd0_ms": 22.56679799999972,
+        "nrst_to_pd0_ms": 15.095840000000749,
+        "main_vddio_2_97v_first_to_pd0_ms": 12.070797999999883,
+        "main_vddio_2_97v_final_to_pd0_ms": 12.070797999999883,
+        "pd0_to_pe0_us": 0.15999999902760464
+      },
+      "checks": {
+        "cycle_outcome_passed": true,
+        "existing_independent_review_passed": true,
+        "ch5_explicitly_main_vddio": true,
+        "exactly_one_rise_per_reset_and_marker": true,
+        "ordered_markers": true,
+        "no_reset_or_marker_fall_after_rise": true,
+        "all_three_rails_continuously_below_0_1v": true,
+        "reset_and_markers_low_during_off": true,
+        "final_plateau_at_least_0_5s": true,
+        "final_levels_in_range": true,
+        "final_rail_crossings_sustained": true,
+        "analog_continuous_and_rate_matches": true,
+        "digital_rate_available": true,
+        "exports_cover_same_interval": true,
+        "existing_marker_timing_matches_raw": true,
+        "files_unchanged_during_analysis": true
+      },
+      "failed_checks": [],
+      "independent_review_failed_checks": [],
+      "independent_review_sha256": "028efdf596a9fbce0a2e2d86e78d8467bc6f662a578290d83894035379cf689a",
+      "channel_map": {
+        "0": "NRST",
+        "1": "PD0",
+        "2": "PE0",
+        "3": "auxiliary 3.3 V",
+        "4": "target 5 V",
+        "5": "main-vddio"
+      },
+      "duration_s": 24.695968,
+      "analog_spacing_us": 32.000000000000774,
+      "digital_spacing_us": 0.16,
+      "common_off_below_0_1v": {
+        "start_s": 7.244354162,
+        "end_s": 20.556642162,
+        "duration_s": 13.312287999999999
+      },
+      "off_maxima_v": {
+        "0": -0.005,
+        "1": -0.01,
+        "2": -0.012,
+        "3": -0.003,
+        "4": 0.096,
+        "5": -0.024
+      },
+      "individual_off_below_0_1v": {
+        "3": {
+          "start_s": 0.435938162,
+          "end_s": 20.567554162,
+          "duration_s": 20.131616
+        },
+        "4": {
+          "start_s": 7.244354162,
+          "end_s": 20.556642162,
+          "duration_s": 13.312287999999999
+        },
+        "5": {
+          "start_s": 0.485090162,
+          "end_s": 20.562530162,
+          "duration_s": 20.077440000000003
+        }
+      },
+      "final_levels": {
+        "0": {
+          "min_v": 3.186,
+          "max_v": 3.197,
+          "median_v": 3.192
+        },
+        "1": {
+          "min_v": 3.267,
+          "max_v": 3.277,
+          "median_v": 3.272
+        },
+        "2": {
+          "min_v": 3.273,
+          "max_v": 3.283,
+          "median_v": 3.278
+        },
+        "3": {
+          "min_v": 3.268,
+          "max_v": 3.303,
+          "median_v": 3.288
+        },
+        "4": {
+          "min_v": 4.811,
+          "max_v": 4.863,
+          "median_v": 4.847
+        },
+        "5": {
+          "min_v": 3.266,
+          "max_v": 3.281,
+          "median_v": 3.271
+        }
+      },
+      "crossings": {
+        "target_0_5v": {
+          "threshold_v": 0.5,
+          "up_crossings_s": [
+            20.561378162
+          ],
+          "down_crossings_s": [],
+          "first_up_s": 20.561378162,
+          "final_up_s": 20.561378162,
+          "first_to_pd0_ms": 22.56679799999972,
+          "final_to_pd0_ms": 22.56679799999972,
+          "final_crossing_sustained_to_end": true
+        },
+        "target_4_5v": {
+          "threshold_v": 4.5,
+          "up_crossings_s": [
+            20.580194162
+          ],
+          "down_crossings_s": [],
+          "first_up_s": 20.580194162,
+          "final_up_s": 20.580194162,
+          "first_to_pd0_ms": 3.7507979999986674,
+          "final_to_pd0_ms": 3.7507979999986674,
+          "final_crossing_sustained_to_end": true
+        },
+        "aux_2_97v": {
+          "threshold_v": 2.97,
+          "up_crossings_s": [
+            20.571938162
+          ],
+          "down_crossings_s": [],
+          "first_up_s": 20.571938162,
+          "final_up_s": 20.571938162,
+          "first_to_pd0_ms": 12.006798000001595,
+          "final_to_pd0_ms": 12.006798000001595,
+          "final_crossing_sustained_to_end": true
+        },
+        "main_vddio_2_97v": {
+          "threshold_v": 2.97,
+          "up_crossings_s": [
+            20.571874162
+          ],
+          "down_crossings_s": [],
+          "first_up_s": 20.571874162,
+          "final_up_s": 20.571874162,
+          "first_to_pd0_ms": 12.070797999999883,
+          "final_to_pd0_ms": 12.070797999999883,
+          "final_crossing_sustained_to_end": true
+        }
+      },
+      "marker_times_s": {
+        "nrst": 20.56884912,
+        "pd0": 20.58394496,
+        "pe0": 20.58394512
+      }
+    },
+    {
+      "label": "tiny-2",
+      "added_image_bytes": -64,
+      "folder": "D:\\Github\\global-x-camera\\tmp\\bringup\\opt-matrix-tiny-02",
+      "passed": true,
+      "status": "complete",
+      "metrics": {
+        "target_0_5v_first_to_pd0_ms": 22.62423800000235,
+        "target_0_5v_final_to_pd0_ms": 22.62423800000235,
+        "nrst_to_pd0_ms": 15.164640000001839,
+        "main_vddio_2_97v_first_to_pd0_ms": 12.128238000002511,
+        "main_vddio_2_97v_final_to_pd0_ms": 12.128238000002511,
+        "pd0_to_pe0_us": 0.15999999902760464
+      },
+      "checks": {
+        "cycle_outcome_passed": true,
+        "existing_independent_review_passed": true,
+        "ch5_explicitly_main_vddio": true,
+        "exactly_one_rise_per_reset_and_marker": true,
+        "ordered_markers": true,
+        "no_reset_or_marker_fall_after_rise": true,
+        "all_three_rails_continuously_below_0_1v": true,
+        "reset_and_markers_low_during_off": true,
+        "final_plateau_at_least_0_5s": true,
+        "final_levels_in_range": true,
+        "final_rail_crossings_sustained": true,
+        "analog_continuous_and_rate_matches": true,
+        "digital_rate_available": true,
+        "exports_cover_same_interval": true,
+        "existing_marker_timing_matches_raw": true,
+        "files_unchanged_during_analysis": true
+      },
+      "failed_checks": [],
+      "independent_review_failed_checks": [],
+      "independent_review_sha256": "aa9f696df5e21e07e86460c905301b316bfdda677542a5c56a0d67f37434fe4b",
+      "channel_map": {
+        "0": "NRST",
+        "1": "PD0",
+        "2": "PE0",
+        "3": "auxiliary 3.3 V",
+        "4": "target 5 V",
+        "5": "main-vddio"
+      },
+      "duration_s": 24.595296,
+      "analog_spacing_us": 32.000000000000774,
+      "digital_spacing_us": 0.16,
+      "common_off_below_0_1v": {
+        "start_s": 7.102242162,
+        "end_s": 20.396546162,
+        "duration_s": 13.294304
+      },
+      "off_maxima_v": {
+        "0": -0.005,
+        "1": -0.01,
+        "2": -0.012,
+        "3": -0.003,
+        "4": 0.096,
+        "5": -0.024
+      },
+      "individual_off_below_0_1v": {
+        "3": {
+          "start_s": 0.369090162,
+          "end_s": 20.407458162,
+          "duration_s": 20.038368000000002
+        },
+        "4": {
+          "start_s": 7.102242162,
+          "end_s": 20.396546162,
+          "duration_s": 13.294304
+        },
+        "5": {
+          "start_s": 0.417410162,
+          "end_s": 20.402466162,
+          "duration_s": 19.985056
+        }
+      },
+      "final_levels": {
+        "0": {
+          "min_v": 3.186,
+          "max_v": 3.197,
+          "median_v": 3.192
+        },
+        "1": {
+          "min_v": 3.267,
+          "max_v": 3.277,
+          "median_v": 3.272
+        },
+        "2": {
+          "min_v": 3.278,
+          "max_v": 3.283,
+          "median_v": 3.278
+        },
+        "3": {
+          "min_v": 3.263,
+          "max_v": 3.303,
+          "median_v": 3.288
+        },
+        "4": {
+          "min_v": 4.827,
+          "max_v": 4.852,
+          "median_v": 4.852
+        },
+        "5": {
+          "min_v": 3.266,
+          "max_v": 3.281,
+          "median_v": 3.271
+        }
+      },
+      "crossings": {
+        "target_0_5v": {
+          "threshold_v": 0.5,
+          "up_crossings_s": [
+            20.401314162
+          ],
+          "down_crossings_s": [],
+          "first_up_s": 20.401314162,
+          "final_up_s": 20.401314162,
+          "first_to_pd0_ms": 22.62423800000235,
+          "final_to_pd0_ms": 22.62423800000235,
+          "final_crossing_sustained_to_end": true
+        },
+        "target_4_5v": {
+          "threshold_v": 4.5,
+          "up_crossings_s": [
+            20.420130162
+          ],
+          "down_crossings_s": [],
+          "first_up_s": 20.420130162,
+          "final_up_s": 20.420130162,
+          "first_to_pd0_ms": 3.808238000001296,
+          "final_to_pd0_ms": 3.808238000001296,
+          "final_crossing_sustained_to_end": true
+        },
+        "aux_2_97v": {
+          "threshold_v": 2.97,
+          "up_crossings_s": [
+            20.411874162
+          ],
+          "down_crossings_s": [],
+          "first_up_s": 20.411874162,
+          "final_up_s": 20.411874162,
+          "first_to_pd0_ms": 12.064238000000671,
+          "final_to_pd0_ms": 12.064238000000671,
+          "final_crossing_sustained_to_end": true
+        },
+        "main_vddio_2_97v": {
+          "threshold_v": 2.97,
+          "up_crossings_s": [
+            20.411810162
+          ],
+          "down_crossings_s": [],
+          "first_up_s": 20.411810162,
+          "final_up_s": 20.411810162,
+          "first_to_pd0_ms": 12.128238000002511,
+          "final_to_pd0_ms": 12.128238000002511,
+          "final_crossing_sustained_to_end": true
+        }
+      },
+      "marker_times_s": {
+        "nrst": 20.40877376,
+        "pd0": 20.4239384,
+        "pe0": 20.42393856
+      }
+    },
+    {
+      "label": "tiny-3",
+      "added_image_bytes": -64,
+      "folder": "D:\\Github\\global-x-camera\\tmp\\bringup\\opt-matrix-tiny-03",
+      "passed": true,
+      "status": "complete",
+      "metrics": {
+        "target_0_5v_first_to_pd0_ms": 22.398958000000135,
+        "target_0_5v_final_to_pd0_ms": 22.398958000000135,
+        "nrst_to_pd0_ms": 14.957439999999878,
+        "main_vddio_2_97v_first_to_pd0_ms": 11.934958000001217,
+        "main_vddio_2_97v_final_to_pd0_ms": 11.934958000001217,
+        "pd0_to_pe0_us": 0.15999999902760464
+      },
+      "checks": {
+        "cycle_outcome_passed": true,
+        "existing_independent_review_passed": true,
+        "ch5_explicitly_main_vddio": true,
+        "exactly_one_rise_per_reset_and_marker": true,
+        "ordered_markers": true,
+        "no_reset_or_marker_fall_after_rise": true,
+        "all_three_rails_continuously_below_0_1v": true,
+        "reset_and_markers_low_during_off": true,
+        "final_plateau_at_least_0_5s": true,
+        "final_levels_in_range": true,
+        "final_rail_crossings_sustained": true,
+        "analog_continuous_and_rate_matches": true,
+        "digital_rate_available": true,
+        "exports_cover_same_interval": true,
+        "existing_marker_timing_matches_raw": true,
+        "files_unchanged_during_analysis": true
+      },
+      "failed_checks": [],
+      "independent_review_failed_checks": [],
+      "independent_review_sha256": "2dc36a43360aad9e34f99e6acaa381bd794d63769c8bd99019dc130ecc9eb394",
+      "channel_map": {
+        "0": "NRST",
+        "1": "PD0",
+        "2": "PE0",
+        "3": "auxiliary 3.3 V",
+        "4": "target 5 V",
+        "5": "main-vddio"
+      },
+      "duration_s": 24.595296,
+      "analog_spacing_us": 32.000000000000774,
+      "digital_spacing_us": 0.16,
+      "common_off_below_0_1v": {
+        "start_s": 7.117794162,
+        "end_s": 20.477154162,
+        "duration_s": 13.359360000000002
+      },
+      "off_maxima_v": {
+        "0": -0.01,
+        "1": -0.01,
+        "2": -0.012,
+        "3": -0.003,
+        "4": 0.096,
+        "5": -0.024
+      },
+      "individual_off_below_0_1v": {
+        "3": {
+          "start_s": 0.357122162,
+          "end_s": 20.488066162,
+          "duration_s": 20.130944
+        },
+        "4": {
+          "start_s": 7.117794162,
+          "end_s": 20.477154162,
+          "duration_s": 13.359360000000002
+        },
+        "5": {
+          "start_s": 0.404994162,
+          "end_s": 20.483042162,
+          "duration_s": 20.078048
+        }
+      },
+      "final_levels": {
+        "0": {
+          "min_v": 3.186,
+          "max_v": 3.197,
+          "median_v": 3.192
+        },
+        "1": {
+          "min_v": 3.267,
+          "max_v": 3.277,
+          "median_v": 3.272
+        },
+        "2": {
+          "min_v": 3.273,
+          "max_v": 3.283,
+          "median_v": 3.278
+        },
+        "3": {
+          "min_v": 3.268,
+          "max_v": 3.303,
+          "median_v": 3.288
+        },
+        "4": {
+          "min_v": 4.811,
+          "max_v": 4.858,
+          "median_v": 4.852
+        },
+        "5": {
+          "min_v": 3.266,
+          "max_v": 3.281,
+          "median_v": 3.271
+        }
+      },
+      "crossings": {
+        "target_0_5v": {
+          "threshold_v": 0.5,
+          "up_crossings_s": [
+            20.481922162
+          ],
+          "down_crossings_s": [],
+          "first_up_s": 20.481922162,
+          "final_up_s": 20.481922162,
+          "first_to_pd0_ms": 22.398958000000135,
+          "final_to_pd0_ms": 22.398958000000135,
+          "final_crossing_sustained_to_end": true
+        },
+        "target_4_5v": {
+          "threshold_v": 4.5,
+          "up_crossings_s": [
+            20.500674162,
+            20.500738162
+          ],
+          "down_crossings_s": [
+            20.500706162
+          ],
+          "first_up_s": 20.500674162,
+          "final_up_s": 20.500738162,
+          "first_to_pd0_ms": 3.6469580000009216,
+          "final_to_pd0_ms": 3.5829579999990813,
+          "final_crossing_sustained_to_end": true
+        },
+        "aux_2_97v": {
+          "threshold_v": 2.97,
+          "up_crossings_s": [
+            20.492450162
+          ],
+          "down_crossings_s": [],
+          "first_up_s": 20.492450162,
+          "final_up_s": 20.492450162,
+          "first_to_pd0_ms": 11.870957999999376,
+          "final_to_pd0_ms": 11.870957999999376,
+          "final_crossing_sustained_to_end": true
+        },
+        "main_vddio_2_97v": {
+          "threshold_v": 2.97,
+          "up_crossings_s": [
+            20.492386162
+          ],
+          "down_crossings_s": [],
+          "first_up_s": 20.492386162,
+          "final_up_s": 20.492386162,
+          "first_to_pd0_ms": 11.934958000001217,
+          "final_to_pd0_ms": 11.934958000001217,
+          "final_crossing_sustained_to_end": true
+        }
+      },
+      "marker_times_s": {
+        "nrst": 20.48936368,
+        "pd0": 20.50432112,
+        "pe0": 20.50432128
+      }
+    },
+    {
+      "label": "baseline-3",
+      "added_image_bytes": 0,
+      "folder": "D:\\Github\\global-x-camera\\tmp\\bringup\\opt-matrix-baseline-03",
+      "passed": true,
+      "status": "complete",
+      "metrics": {
+        "target_0_5v_first_to_pd0_ms": 22.759117999999745,
+        "target_0_5v_final_to_pd0_ms": 22.759117999999745,
+        "nrst_to_pd0_ms": 15.308160000000015,
+        "main_vddio_2_97v_first_to_pd0_ms": 12.327118000001747,
+        "main_vddio_2_97v_final_to_pd0_ms": 12.327118000001747,
+        "pd0_to_pe0_us": 0.4800000006355276
+      },
+      "checks": {
+        "cycle_outcome_passed": true,
+        "existing_independent_review_passed": true,
+        "ch5_explicitly_main_vddio": true,
+        "exactly_one_rise_per_reset_and_marker": true,
+        "ordered_markers": true,
+        "no_reset_or_marker_fall_after_rise": true,
+        "all_three_rails_continuously_below_0_1v": true,
+        "reset_and_markers_low_during_off": true,
+        "final_plateau_at_least_0_5s": true,
+        "final_levels_in_range": true,
+        "final_rail_crossings_sustained": true,
+        "analog_continuous_and_rate_matches": true,
+        "digital_rate_available": true,
+        "exports_cover_same_interval": true,
+        "existing_marker_timing_matches_raw": true,
+        "files_unchanged_during_analysis": true
+      },
+      "failed_checks": [],
+      "independent_review_failed_checks": [],
+      "independent_review_sha256": "5d2a595f789b95186404e12617f8dbfec12e3726ae28808cb7c4847a0bbe4f39",
+      "channel_map": {
+        "0": "NRST",
+        "1": "PD0",
+        "2": "PE0",
+        "3": "auxiliary 3.3 V",
+        "4": "target 5 V",
+        "5": "main-vddio"
+      },
+      "duration_s": 24.595296,
+      "analog_spacing_us": 32.000000000000774,
+      "digital_spacing_us": 0.16,
+      "common_off_below_0_1v": {
+        "start_s": 7.139266162,
+        "end_s": 20.444546162,
+        "duration_s": 13.305280000000002
+      },
+      "off_maxima_v": {
+        "0": -0.005,
+        "1": -0.01,
+        "2": -0.012,
+        "3": -0.003,
+        "4": 0.096,
+        "5": -0.024
+      },
+      "individual_off_below_0_1v": {
+        "3": {
+          "start_s": 0.416578162,
+          "end_s": 20.455458162,
+          "duration_s": 20.03888
+        },
+        "4": {
+          "start_s": 7.139266162,
+          "end_s": 20.444546162,
+          "duration_s": 13.305280000000002
+        },
+        "5": {
+          "start_s": 0.464418162,
+          "end_s": 20.450434162,
+          "duration_s": 19.986016
+        }
+      },
+      "final_levels": {
+        "0": {
+          "min_v": 3.186,
+          "max_v": 3.197,
+          "median_v": 3.192
+        },
+        "1": {
+          "min_v": 3.267,
+          "max_v": 3.277,
+          "median_v": 3.272
+        },
+        "2": {
+          "min_v": 3.273,
+          "max_v": 3.283,
+          "median_v": 3.278
+        },
+        "3": {
+          "min_v": 3.263,
+          "max_v": 3.303,
+          "median_v": 3.288
+        },
+        "4": {
+          "min_v": 4.811,
+          "max_v": 4.852,
+          "median_v": 4.847
+        },
+        "5": {
+          "min_v": 3.266,
+          "max_v": 3.281,
+          "median_v": 3.271
+        }
+      },
+      "crossings": {
+        "target_0_5v": {
+          "threshold_v": 0.5,
+          "up_crossings_s": [
+            20.449314162
+          ],
+          "down_crossings_s": [],
+          "first_up_s": 20.449314162,
+          "final_up_s": 20.449314162,
+          "first_to_pd0_ms": 22.759117999999745,
+          "final_to_pd0_ms": 22.759117999999745,
+          "final_crossing_sustained_to_end": true
+        },
+        "target_4_5v": {
+          "threshold_v": 4.5,
+          "up_crossings_s": [
+            20.468098162
+          ],
+          "down_crossings_s": [],
+          "first_up_s": 20.468098162,
+          "final_up_s": 20.468098162,
+          "first_to_pd0_ms": 3.975117999999611,
+          "final_to_pd0_ms": 3.975117999999611,
+          "final_crossing_sustained_to_end": true
+        },
+        "aux_2_97v": {
+          "threshold_v": 2.97,
+          "up_crossings_s": [
+            20.459842162
+          ],
+          "down_crossings_s": [],
+          "first_up_s": 20.459842162,
+          "final_up_s": 20.459842162,
+          "first_to_pd0_ms": 12.231117999998986,
+          "final_to_pd0_ms": 12.231117999998986,
+          "final_crossing_sustained_to_end": true
+        },
+        "main_vddio_2_97v": {
+          "threshold_v": 2.97,
+          "up_crossings_s": [
+            20.459746162
+          ],
+          "down_crossings_s": [],
+          "first_up_s": 20.459746162,
+          "final_up_s": 20.459746162,
+          "first_to_pd0_ms": 12.327118000001747,
+          "final_to_pd0_ms": 12.327118000001747,
+          "final_crossing_sustained_to_end": true
+        }
+      },
+      "marker_times_s": {
+        "nrst": 20.45676512,
+        "pd0": 20.47207328,
+        "pe0": 20.47207376
+      }
+    }
+  ],
+  "group_statistics": {
+    "0": {
+      "labels": [
+        "baseline-1",
+        "baseline-2",
+        "baseline-3"
+      ],
+      "metrics": {
+        "nrst_to_pd0_ms": {
+          "n": 3,
+          "mean": 15.347680000000233,
+          "median": 15.308160000000015,
+          "min": 15.063200000000165,
+          "max": 15.67168000000052,
+          "range": 0.6084800000003554,
+          "sample_stdev": 0.3061590279578917
+        },
+        "target_0_5v_final_to_pd0_ms": {
+          "n": 3,
+          "mean": 22.850211333333686,
+          "median": 22.759117999999745,
+          "min": 22.56311800000077,
+          "max": 23.22839800000054,
+          "range": 0.6652799999997683,
+          "sample_stdev": 0.3418667373894967
+        },
+        "main_vddio_2_97v_final_to_pd0_ms": {
+          "n": 3,
+          "mean": 12.354211333333845,
+          "median": 12.327118000001747,
+          "min": 12.067118000000931,
+          "max": 12.66839799999886,
+          "range": 0.6012799999979279,
+          "sample_stdev": 0.3015542175673559
+        }
+      },
+      "mean_minus_baseline_ms": {
+        "nrst_to_pd0_ms": 0.0,
+        "target_0_5v_final_to_pd0_ms": 0.0,
+        "main_vddio_2_97v_final_to_pd0_ms": 0.0
+      }
+    },
+    "8192": {
+      "labels": [
+        "plus-8KiB"
+      ],
+      "metrics": {
+        "nrst_to_pd0_ms": {
+          "n": 1,
+          "mean": 17.58255999999747,
+          "median": 17.58255999999747,
+          "min": 17.58255999999747,
+          "max": 17.58255999999747,
+          "range": 0.0,
+          "sample_stdev": null
+        },
+        "target_0_5v_final_to_pd0_ms": {
+          "n": 1,
+          "mean": 25.12871799999772,
+          "median": 25.12871799999772,
+          "min": 25.12871799999772,
+          "max": 25.12871799999772,
+          "range": 0.0,
+          "sample_stdev": null
+        },
+        "main_vddio_2_97v_final_to_pd0_ms": {
+          "n": 1,
+          "mean": 14.600718000000512,
+          "median": 14.600718000000512,
+          "min": 14.600718000000512,
+          "max": 14.600718000000512,
+          "range": 0.0,
+          "sample_stdev": null
+        }
+      },
+      "mean_minus_baseline_ms": {
+        "nrst_to_pd0_ms": 2.234879999997238,
+        "target_0_5v_final_to_pd0_ms": 2.2785066666640326,
+        "main_vddio_2_97v_final_to_pd0_ms": 2.246506666666667
+      }
+    },
+    "32768": {
+      "labels": [
+        "plus-32KiB-1",
+        "plus-32KiB-2"
+      ],
+      "metrics": {
+        "nrst_to_pd0_ms": {
+          "n": 2,
+          "mean": 23.735840000000508,
+          "median": 23.735840000000508,
+          "min": 23.71536000000063,
+          "max": 23.756320000000386,
+          "range": 0.04095999999975675,
+          "sample_stdev": 0.02896309375722898
+        },
+        "target_0_5v_final_to_pd0_ms": {
+          "n": 2,
+          "mean": 31.24111800000051,
+          "median": 31.24111800000051,
+          "min": 31.21655800000056,
+          "max": 31.265678000000463,
+          "range": 0.049119999999902575,
+          "sample_stdev": 0.034733085091814324
+        },
+        "main_vddio_2_97v_final_to_pd0_ms": {
+          "n": 2,
+          "mean": 20.745118000000673,
+          "median": 20.745118000000673,
+          "min": 20.72055800000072,
+          "max": 20.769678000000624,
+          "range": 0.049119999999902575,
+          "sample_stdev": 0.034733085091814324
+        }
+      },
+      "mean_minus_baseline_ms": {
+        "nrst_to_pd0_ms": 8.388160000000275,
+        "target_0_5v_final_to_pd0_ms": 8.390906666666826,
+        "main_vddio_2_97v_final_to_pd0_ms": 8.390906666666828
+      }
+    },
+    "tiny": {
+      "labels": [
+        "tiny-1",
+        "tiny-2",
+        "tiny-3"
+      ],
+      "metrics": {
+        "nrst_to_pd0_ms": {
+          "n": 3,
+          "mean": 15.072640000000822,
+          "median": 15.095840000000749,
+          "min": 14.957439999999878,
+          "max": 15.164640000001839,
+          "range": 0.20720000000196137,
+          "sample_stdev": 0.10553028001574077
+        },
+        "target_0_5v_final_to_pd0_ms": {
+          "n": 3,
+          "mean": 22.529998000000734,
+          "median": 22.56679799999972,
+          "min": 22.398958000000135,
+          "max": 22.62423800000235,
+          "range": 0.22528000000221482,
+          "sample_stdev": 0.11706173414140716
+        },
+        "main_vddio_2_97v_final_to_pd0_ms": {
+          "n": 3,
+          "mean": 12.04466466666787,
+          "median": 12.070797999999883,
+          "min": 11.934958000001217,
+          "max": 12.128238000002511,
+          "range": 0.19328000000129464,
+          "sample_stdev": 0.09925473758671002
+        }
+      },
+      "mean_minus_baseline_ms": {
+        "nrst_to_pd0_ms": -0.27503999999941087,
+        "target_0_5v_final_to_pd0_ms": -0.3202133333329513,
+        "main_vddio_2_97v_final_to_pd0_ms": -0.30954666666597497
+      }
+    }
+  },
+  "fits": [
+    {
+      "metric": "nrst_to_pd0_ms",
+      "labels": [
+        "baseline-1",
+        "plus-8KiB",
+        "plus-32KiB-1",
+        "plus-32KiB-2",
+        "baseline-2",
+        "baseline-3"
+      ],
+      "status": "descriptive_fit",
+      "intercept_ms": 15.375954871794525,
+      "slope_ms_per_kib": 0.2616882051282228,
+      "expected_spi_1bit_ms_per_kib": 0.256,
+      "effective_bytes_per_second": 3913053.7025857065,
+      "maximum_absolute_residual_ms": 0.31275487179435935,
+      "baseline_spread_ms": 0.6084800000003554,
+      "delta_from_mean_baseline_ms": {
+        "baseline-1": 0.3240000000002876,
+        "plus-8KiB": 2.234879999997238,
+        "plus-32KiB-1": 8.408640000000153,
+        "plus-32KiB-2": 8.367680000000396,
+        "baseline-2": -0.2844800000000678,
+        "baseline-3": -0.03952000000021805
+      }
+    },
+    {
+      "metric": "target_0_5v_final_to_pd0_ms",
+      "labels": [
+        "baseline-1",
+        "plus-8KiB",
+        "plus-32KiB-1",
+        "plus-32KiB-2",
+        "baseline-2",
+        "baseline-3"
+      ],
+      "status": "descriptive_fit",
+      "intercept_ms": 22.887294410256214,
+      "slope_ms_per_kib": 0.2616364102564238,
+      "expected_spi_1bit_ms_per_kib": 0.256,
+      "effective_bytes_per_second": 3913828.3505587056,
+      "maximum_absolute_residual_ms": 0.34110358974432486,
+      "baseline_spread_ms": 0.6652799999997683,
+      "delta_from_mean_baseline_ms": {
+        "baseline-1": 0.37818666666685274,
+        "plus-8KiB": 2.2785066666640326,
+        "plus-32KiB-1": 8.415466666666777,
+        "plus-32KiB-2": 8.366346666666875,
+        "baseline-2": -0.28709333333291553,
+        "baseline-3": -0.09109333333394076
+      }
+    },
+    {
+      "metric": "main_vddio_2_97v_final_to_pd0_ms",
+      "labels": [
+        "baseline-1",
+        "plus-8KiB",
+        "plus-32KiB-1",
+        "plus-32KiB-2",
+        "baseline-2",
+        "baseline-3"
+      ],
+      "status": "descriptive_fit",
+      "intercept_ms": 12.384730307692811,
+      "slope_ms_per_kib": 0.2617389743589795,
+      "expected_spi_1bit_ms_per_kib": 0.256,
+      "effective_bytes_per_second": 3912294.6917166654,
+      "maximum_absolute_residual_ms": 0.31761230769187954,
+      "baseline_spread_ms": 0.6012799999979279,
+      "delta_from_mean_baseline_ms": {
+        "baseline-1": 0.31418666666501416,
+        "plus-8KiB": 2.246506666666667,
+        "plus-32KiB-1": 8.415466666666779,
+        "plus-32KiB-2": 8.366346666666876,
+        "baseline-2": -0.28709333333291376,
+        "baseline-3": -0.027093333332098624
+      }
+    }
+  ],
+  "expected_spi_hz_assumption": 32000000,
+  "expected_8192_byte_increment_ms": 2.048,
+  "expected_32768_byte_increment_ms": 8.192,
+  "limitations": [
+    "Bench thresholds are sampled crossings, not MCU PGOOD or the exact instant of power application.",
+    "Final crossing means the last upward crossing after sustained off, with no later downward crossing.",
+    "First and final crossings are both reported; repeated crossings can shift the chosen reference.",
+    "CH3/4/5 discharge does not establish the state of unprobed core or backup rails.",
+    "Passing waveforms do not establish flash contents, boot mode, or absence of debugger intervention.",
+    "Added byte counts and identical pre-marker code must be verified against build/programming evidence.",
+    "Expected 32 MHz single-bit transfer time is a hypothesis, not a measured bus clock.",
+    "Fits are descriptive, have no confidence interval, and must be compared with baseline drift and sampling resolution.",
+    "Tiny-code runs are excluded from size fits because instructions and payload size both differ.",
+    "Presence of boot.sal is checked, not its application-level integrity."
+  ]
+}

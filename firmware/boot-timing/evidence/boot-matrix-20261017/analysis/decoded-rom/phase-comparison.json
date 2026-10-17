@@ -1,0 +1,589 @@
+{
+  "structural_checks_passed": true,
+  "runs": [
+    {
+      "label": "baseline-01",
+      "decoded_json": "D:\\Github\\global-x-camera\\tmp\\bringup\\matrix-rom-analysis\\baseline-01.json",
+      "decoded_sha256": "157ed43f8e2849b25bcd82ace65b4fbcd3e094db33ab9e9cc043dc0365fcdc31",
+      "structural_checks_passed": true,
+      "checks": {
+        "no_rejected_candidates": true,
+        "raw_buffers_match_decoder_hashes": true,
+        "timestamps_increase_within_each_buffer": true,
+        "one_DWNLDMGR_FoundPaddingHeader": true,
+        "nocache_event_after_padding": true,
+        "one_SECBOOT_AuthImageEntryPoint": true,
+        "one_SECBOOT_AuthDecisionIsJumpToImage": true,
+        "one_SECBOOT_AuthImageLength": true,
+        "one_0x00002900": true,
+        "one_0x00000152": true,
+        "one_OSPI_TryingSingleMode": true,
+        "one_0x2a000004": true,
+        "secure_nocache_event_after_unknown_0x2a000004": true
+      },
+      "record_count": 65,
+      "record_counts_by_buffer": {
+        "secure-trace.bin": 60,
+        "nonsecure-trace.bin": 5
+      },
+      "raw_buffers": [
+        {
+          "path": "tmp\\bringup\\opt-matrix-baseline-01\\rom-read\\secure-trace.bin",
+          "bytes": 2048,
+          "sha256": "c7bcc0df4a5dc7ebb8c140b852c446817b947131a06a4a629b2ce93628888f88",
+          "record_count": 60
+        },
+        {
+          "path": "tmp\\bringup\\opt-matrix-baseline-01\\rom-read\\nonsecure-trace.bin",
+          "bytes": 2048,
+          "sha256": "4b0f243079b53e9e6d7fb36ff4dcca0443beb2e7f2ec0a3a2aef97e2f9391485",
+          "record_count": 5
+        }
+      ],
+      "reference": {
+        "path": "tmp\\boot-rom-reference\\rom_trace_parser.c",
+        "sha256": "94fe2deed5d6cc7b2f7f34622d4b7295f00b4a026f43d6297c19730aedbc0db0",
+        "url": "https://raw.githubusercontent.com/stm32-hotspot/STM32N6-Boot-ROM-Traces/4fb875d59aafa08edd8293912e7d2cbddf533ed0/Template_BootRom_traces/FSBL/Src/rom_trace_parser.c"
+      },
+      "auth_image_length": 896,
+      "auth_entry_address": "0x34180441",
+      "phase_spans_raw_ticks": {
+        "trying_single_mode_to_padding_header": 241,
+        "nonsecure_padding_to_secure_nocache_timestamp_difference": 476,
+        "secure_unknown_0x2a000004_to_next_nocache": 1140,
+        "auth_entry_event_to_jump_decision": 12,
+        "unknown_0x2900_to_unknown_0x152": 5020
+      },
+      "unknown_0x152_arguments": [
+        "0x00001388"
+      ],
+      "phase_buffer_scope": {
+        "trying_single_mode_to_padding_header": "nonsecure only",
+        "nonsecure_padding_to_secure_nocache_timestamp_difference": "cross-buffer; shared timebase assumed",
+        "secure_unknown_0x2a000004_to_next_nocache": "secure only; start semantics unknown",
+        "auth_entry_event_to_jump_decision": "secure only",
+        "unknown_0x2900_to_unknown_0x152": "secure only; both event semantics unknown"
+      },
+      "event_boundaries": {
+        "padding_header": {
+          "offset": 88,
+          "timestamp_raw": 11559,
+          "code": "0x1d000011",
+          "event": "DWNLDMGR_FoundPaddingHeader",
+          "buffer": "nonsecure-trace.bin"
+        },
+        "next_nocache": {
+          "offset": 720,
+          "timestamp_raw": 12035,
+          "code": "0x00000074",
+          "event": "BOOTCORE_NoDataCacheBitValue",
+          "buffer": "secure-trace.bin"
+        },
+        "secure_unknown_start": {
+          "offset": 700,
+          "timestamp_raw": 10895,
+          "code": "0x2a000004",
+          "event": "UNKNOWN",
+          "buffer": "secure-trace.bin"
+        },
+        "secure_next_nocache": {
+          "offset": 720,
+          "timestamp_raw": 12035,
+          "code": "0x00000074",
+          "event": "BOOTCORE_NoDataCacheBitValue",
+          "buffer": "secure-trace.bin"
+        },
+        "auth_entry": {
+          "offset": 900,
+          "timestamp_raw": 12249,
+          "code": "0x2c000208",
+          "event": "SECBOOT_AuthImageEntryPoint",
+          "buffer": "secure-trace.bin"
+        },
+        "jump_decision": {
+          "offset": 924,
+          "timestamp_raw": 12261,
+          "code": "0x2c004008",
+          "event": "SECBOOT_AuthDecisionIsJumpToImage",
+          "buffer": "secure-trace.bin"
+        }
+      },
+      "phase_delta_from_baseline_01_raw_ticks": {
+        "trying_single_mode_to_padding_header": 0,
+        "nonsecure_padding_to_secure_nocache_timestamp_difference": 0,
+        "secure_unknown_0x2a000004_to_next_nocache": 0,
+        "auth_entry_event_to_jump_decision": 0,
+        "unknown_0x2900_to_unknown_0x152": 0
+      }
+    },
+    {
+      "label": "plus8k-01",
+      "decoded_json": "D:\\Github\\global-x-camera\\tmp\\bringup\\matrix-rom-analysis\\plus8k-01.json",
+      "decoded_sha256": "6f6dea202479e819b8dc97f96d370c64cca2f1602c3a294c05f8240427975233",
+      "structural_checks_passed": true,
+      "checks": {
+        "no_rejected_candidates": true,
+        "raw_buffers_match_decoder_hashes": true,
+        "timestamps_increase_within_each_buffer": true,
+        "one_DWNLDMGR_FoundPaddingHeader": true,
+        "nocache_event_after_padding": true,
+        "one_SECBOOT_AuthImageEntryPoint": true,
+        "one_SECBOOT_AuthDecisionIsJumpToImage": true,
+        "one_SECBOOT_AuthImageLength": true,
+        "one_0x00002900": true,
+        "one_0x00000152": true,
+        "one_OSPI_TryingSingleMode": true,
+        "one_0x2a000004": true,
+        "secure_nocache_event_after_unknown_0x2a000004": true
+      },
+      "record_count": 65,
+      "record_counts_by_buffer": {
+        "secure-trace.bin": 60,
+        "nonsecure-trace.bin": 5
+      },
+      "raw_buffers": [
+        {
+          "path": "tmp\\bringup\\opt-matrix-plus8k-01\\rom-read\\secure-trace.bin",
+          "bytes": 2048,
+          "sha256": "1030a18b730f66ebcac0893872ce4903ba86e92cbe7cc1afae2d610fec4e1a04",
+          "record_count": 60
+        },
+        {
+          "path": "tmp\\bringup\\opt-matrix-plus8k-01\\rom-read\\nonsecure-trace.bin",
+          "bytes": 2048,
+          "sha256": "93b8a86cea35d0d63a69c86458ef1a00b344aec997a39cd138302e412a029ca0",
+          "record_count": 5
+        }
+      ],
+      "reference": {
+        "path": "tmp\\boot-rom-reference\\rom_trace_parser.c",
+        "sha256": "94fe2deed5d6cc7b2f7f34622d4b7295f00b4a026f43d6297c19730aedbc0db0",
+        "url": "https://raw.githubusercontent.com/stm32-hotspot/STM32N6-Boot-ROM-Traces/4fb875d59aafa08edd8293912e7d2cbddf533ed0/Template_BootRom_traces/FSBL/Src/rom_trace_parser.c"
+      },
+      "auth_image_length": 9088,
+      "auth_entry_address": "0x34180441",
+      "phase_spans_raw_ticks": {
+        "trying_single_mode_to_padding_header": 241,
+        "nonsecure_padding_to_secure_nocache_timestamp_difference": 2529,
+        "secure_unknown_0x2a000004_to_next_nocache": 3191,
+        "auth_entry_event_to_jump_decision": 73,
+        "unknown_0x2900_to_unknown_0x152": 5020
+      },
+      "unknown_0x152_arguments": [
+        "0x00001388"
+      ],
+      "phase_buffer_scope": {
+        "trying_single_mode_to_padding_header": "nonsecure only",
+        "nonsecure_padding_to_secure_nocache_timestamp_difference": "cross-buffer; shared timebase assumed",
+        "secure_unknown_0x2a000004_to_next_nocache": "secure only; start semantics unknown",
+        "auth_entry_event_to_jump_decision": "secure only",
+        "unknown_0x2900_to_unknown_0x152": "secure only; both event semantics unknown"
+      },
+      "event_boundaries": {
+        "padding_header": {
+          "offset": 88,
+          "timestamp_raw": 11326,
+          "code": "0x1d000011",
+          "event": "DWNLDMGR_FoundPaddingHeader",
+          "buffer": "nonsecure-trace.bin"
+        },
+        "next_nocache": {
+          "offset": 720,
+          "timestamp_raw": 13855,
+          "code": "0x00000074",
+          "event": "BOOTCORE_NoDataCacheBitValue",
+          "buffer": "secure-trace.bin"
+        },
+        "secure_unknown_start": {
+          "offset": 700,
+          "timestamp_raw": 10664,
+          "code": "0x2a000004",
+          "event": "UNKNOWN",
+          "buffer": "secure-trace.bin"
+        },
+        "secure_next_nocache": {
+          "offset": 720,
+          "timestamp_raw": 13855,
+          "code": "0x00000074",
+          "event": "BOOTCORE_NoDataCacheBitValue",
+          "buffer": "secure-trace.bin"
+        },
+        "auth_entry": {
+          "offset": 900,
+          "timestamp_raw": 14065,
+          "code": "0x2c000208",
+          "event": "SECBOOT_AuthImageEntryPoint",
+          "buffer": "secure-trace.bin"
+        },
+        "jump_decision": {
+          "offset": 924,
+          "timestamp_raw": 14138,
+          "code": "0x2c004008",
+          "event": "SECBOOT_AuthDecisionIsJumpToImage",
+          "buffer": "secure-trace.bin"
+        }
+      },
+      "phase_delta_from_baseline_01_raw_ticks": {
+        "trying_single_mode_to_padding_header": 0,
+        "nonsecure_padding_to_secure_nocache_timestamp_difference": 2053,
+        "secure_unknown_0x2a000004_to_next_nocache": 2051,
+        "auth_entry_event_to_jump_decision": 61,
+        "unknown_0x2900_to_unknown_0x152": 0
+      }
+    },
+    {
+      "label": "plus32k-01",
+      "decoded_json": "D:\\Github\\global-x-camera\\tmp\\bringup\\matrix-rom-analysis\\plus32k-01.json",
+      "decoded_sha256": "a0565292b290f172a26f0e1d2dd29dc16ccf76c43dea43e340031d669ec90264",
+      "structural_checks_passed": true,
+      "checks": {
+        "no_rejected_candidates": true,
+        "raw_buffers_match_decoder_hashes": true,
+        "timestamps_increase_within_each_buffer": true,
+        "one_DWNLDMGR_FoundPaddingHeader": true,
+        "nocache_event_after_padding": true,
+        "one_SECBOOT_AuthImageEntryPoint": true,
+        "one_SECBOOT_AuthDecisionIsJumpToImage": true,
+        "one_SECBOOT_AuthImageLength": true,
+        "one_0x00002900": true,
+        "one_0x00000152": true,
+        "one_OSPI_TryingSingleMode": true,
+        "one_0x2a000004": true,
+        "secure_nocache_event_after_unknown_0x2a000004": true
+      },
+      "record_count": 65,
+      "record_counts_by_buffer": {
+        "secure-trace.bin": 60,
+        "nonsecure-trace.bin": 5
+      },
+      "raw_buffers": [
+        {
+          "path": "tmp\\bringup\\opt-matrix-plus32k-01\\rom-read\\secure-trace.bin",
+          "bytes": 2048,
+          "sha256": "9b2d724e75b54ba47fcdccb34a6c94bb22d3ba09183d8bada868dbfc8ea93d58",
+          "record_count": 60
+        },
+        {
+          "path": "tmp\\bringup\\opt-matrix-plus32k-01\\rom-read\\nonsecure-trace.bin",
+          "bytes": 2048,
+          "sha256": "03139038535c2bce5a49300aeb5c2505f6b2a6ced05b537f6d3ce9a21ca81103",
+          "record_count": 5
+        }
+      ],
+      "reference": {
+        "path": "tmp\\boot-rom-reference\\rom_trace_parser.c",
+        "sha256": "94fe2deed5d6cc7b2f7f34622d4b7295f00b4a026f43d6297c19730aedbc0db0",
+        "url": "https://raw.githubusercontent.com/stm32-hotspot/STM32N6-Boot-ROM-Traces/4fb875d59aafa08edd8293912e7d2cbddf533ed0/Template_BootRom_traces/FSBL/Src/rom_trace_parser.c"
+      },
+      "auth_image_length": 33664,
+      "auth_entry_address": "0x34180441",
+      "phase_spans_raw_ticks": {
+        "trying_single_mode_to_padding_header": 241,
+        "nonsecure_padding_to_secure_nocache_timestamp_difference": 8667,
+        "secure_unknown_0x2a000004_to_next_nocache": 9333,
+        "auth_entry_event_to_jump_decision": 260,
+        "unknown_0x2900_to_unknown_0x152": 5020
+      },
+      "unknown_0x152_arguments": [
+        "0x00001388"
+      ],
+      "phase_buffer_scope": {
+        "trying_single_mode_to_padding_header": "nonsecure only",
+        "nonsecure_padding_to_secure_nocache_timestamp_difference": "cross-buffer; shared timebase assumed",
+        "secure_unknown_0x2a000004_to_next_nocache": "secure only; start semantics unknown",
+        "auth_entry_event_to_jump_decision": "secure only",
+        "unknown_0x2900_to_unknown_0x152": "secure only; both event semantics unknown"
+      },
+      "event_boundaries": {
+        "padding_header": {
+          "offset": 88,
+          "timestamp_raw": 11083,
+          "code": "0x1d000011",
+          "event": "DWNLDMGR_FoundPaddingHeader",
+          "buffer": "nonsecure-trace.bin"
+        },
+        "next_nocache": {
+          "offset": 720,
+          "timestamp_raw": 19750,
+          "code": "0x00000074",
+          "event": "BOOTCORE_NoDataCacheBitValue",
+          "buffer": "secure-trace.bin"
+        },
+        "secure_unknown_start": {
+          "offset": 700,
+          "timestamp_raw": 10417,
+          "code": "0x2a000004",
+          "event": "UNKNOWN",
+          "buffer": "secure-trace.bin"
+        },
+        "secure_next_nocache": {
+          "offset": 720,
+          "timestamp_raw": 19750,
+          "code": "0x00000074",
+          "event": "BOOTCORE_NoDataCacheBitValue",
+          "buffer": "secure-trace.bin"
+        },
+        "auth_entry": {
+          "offset": 900,
+          "timestamp_raw": 19968,
+          "code": "0x2c000208",
+          "event": "SECBOOT_AuthImageEntryPoint",
+          "buffer": "secure-trace.bin"
+        },
+        "jump_decision": {
+          "offset": 924,
+          "timestamp_raw": 20228,
+          "code": "0x2c004008",
+          "event": "SECBOOT_AuthDecisionIsJumpToImage",
+          "buffer": "secure-trace.bin"
+        }
+      },
+      "phase_delta_from_baseline_01_raw_ticks": {
+        "trying_single_mode_to_padding_header": 0,
+        "nonsecure_padding_to_secure_nocache_timestamp_difference": 8191,
+        "secure_unknown_0x2a000004_to_next_nocache": 8193,
+        "auth_entry_event_to_jump_decision": 248,
+        "unknown_0x2900_to_unknown_0x152": 0
+      }
+    },
+    {
+      "label": "tiny-01",
+      "decoded_json": "D:\\Github\\global-x-camera\\tmp\\bringup\\matrix-rom-analysis\\tiny-01.json",
+      "decoded_sha256": "93d80982deb9c119eb04a86f9335a56d617d9310b9ba56fa9505d1d68905e520",
+      "structural_checks_passed": true,
+      "checks": {
+        "no_rejected_candidates": true,
+        "raw_buffers_match_decoder_hashes": true,
+        "timestamps_increase_within_each_buffer": true,
+        "one_DWNLDMGR_FoundPaddingHeader": true,
+        "nocache_event_after_padding": true,
+        "one_SECBOOT_AuthImageEntryPoint": true,
+        "one_SECBOOT_AuthDecisionIsJumpToImage": true,
+        "one_SECBOOT_AuthImageLength": true,
+        "one_0x00002900": true,
+        "one_0x00000152": true,
+        "one_OSPI_TryingSingleMode": true,
+        "one_0x2a000004": true,
+        "secure_nocache_event_after_unknown_0x2a000004": true
+      },
+      "record_count": 65,
+      "record_counts_by_buffer": {
+        "secure-trace.bin": 60,
+        "nonsecure-trace.bin": 5
+      },
+      "raw_buffers": [
+        {
+          "path": "tmp\\bringup\\opt-matrix-tiny-01\\rom-read\\secure-trace.bin",
+          "bytes": 2048,
+          "sha256": "8a378b182d8acc75b209ea525c5984471de8736ed8681c95e8f0dcaaa15d6879",
+          "record_count": 60
+        },
+        {
+          "path": "tmp\\bringup\\opt-matrix-tiny-01\\rom-read\\nonsecure-trace.bin",
+          "bytes": 2048,
+          "sha256": "153a538d091109d51e4eb36db221fb112d56cb438ea2a29cb70353fb4c29e977",
+          "record_count": 5
+        }
+      ],
+      "reference": {
+        "path": "tmp\\boot-rom-reference\\rom_trace_parser.c",
+        "sha256": "94fe2deed5d6cc7b2f7f34622d4b7295f00b4a026f43d6297c19730aedbc0db0",
+        "url": "https://raw.githubusercontent.com/stm32-hotspot/STM32N6-Boot-ROM-Traces/4fb875d59aafa08edd8293912e7d2cbddf533ed0/Template_BootRom_traces/FSBL/Src/rom_trace_parser.c"
+      },
+      "auth_image_length": 832,
+      "auth_entry_address": "0x34180441",
+      "phase_spans_raw_ticks": {
+        "trying_single_mode_to_padding_header": 242,
+        "nonsecure_padding_to_secure_nocache_timestamp_difference": 458,
+        "secure_unknown_0x2a000004_to_next_nocache": 1127,
+        "auth_entry_event_to_jump_decision": 11,
+        "unknown_0x2900_to_unknown_0x152": 5020
+      },
+      "unknown_0x152_arguments": [
+        "0x00001388"
+      ],
+      "phase_buffer_scope": {
+        "trying_single_mode_to_padding_header": "nonsecure only",
+        "nonsecure_padding_to_secure_nocache_timestamp_difference": "cross-buffer; shared timebase assumed",
+        "secure_unknown_0x2a000004_to_next_nocache": "secure only; start semantics unknown",
+        "auth_entry_event_to_jump_decision": "secure only",
+        "unknown_0x2900_to_unknown_0x152": "secure only; both event semantics unknown"
+      },
+      "event_boundaries": {
+        "padding_header": {
+          "offset": 88,
+          "timestamp_raw": 10964,
+          "code": "0x1d000011",
+          "event": "DWNLDMGR_FoundPaddingHeader",
+          "buffer": "nonsecure-trace.bin"
+        },
+        "next_nocache": {
+          "offset": 720,
+          "timestamp_raw": 11422,
+          "code": "0x00000074",
+          "event": "BOOTCORE_NoDataCacheBitValue",
+          "buffer": "secure-trace.bin"
+        },
+        "secure_unknown_start": {
+          "offset": 700,
+          "timestamp_raw": 10295,
+          "code": "0x2a000004",
+          "event": "UNKNOWN",
+          "buffer": "secure-trace.bin"
+        },
+        "secure_next_nocache": {
+          "offset": 720,
+          "timestamp_raw": 11422,
+          "code": "0x00000074",
+          "event": "BOOTCORE_NoDataCacheBitValue",
+          "buffer": "secure-trace.bin"
+        },
+        "auth_entry": {
+          "offset": 900,
+          "timestamp_raw": 11643,
+          "code": "0x2c000208",
+          "event": "SECBOOT_AuthImageEntryPoint",
+          "buffer": "secure-trace.bin"
+        },
+        "jump_decision": {
+          "offset": 924,
+          "timestamp_raw": 11654,
+          "code": "0x2c004008",
+          "event": "SECBOOT_AuthDecisionIsJumpToImage",
+          "buffer": "secure-trace.bin"
+        }
+      },
+      "phase_delta_from_baseline_01_raw_ticks": {
+        "trying_single_mode_to_padding_header": 1,
+        "nonsecure_padding_to_secure_nocache_timestamp_difference": -18,
+        "secure_unknown_0x2a000004_to_next_nocache": -13,
+        "auth_entry_event_to_jump_decision": -1,
+        "unknown_0x2900_to_unknown_0x152": 0
+      }
+    },
+    {
+      "label": "baseline-03",
+      "decoded_json": "D:\\Github\\global-x-camera\\tmp\\bringup\\matrix-rom-analysis\\baseline-03.json",
+      "decoded_sha256": "655cbb01ac75c1b4b50d4d5e8dc1c46ce92054545513c63331bb2f927e1bd7ba",
+      "structural_checks_passed": true,
+      "checks": {
+        "no_rejected_candidates": true,
+        "raw_buffers_match_decoder_hashes": true,
+        "timestamps_increase_within_each_buffer": true,
+        "one_DWNLDMGR_FoundPaddingHeader": true,
+        "nocache_event_after_padding": true,
+        "one_SECBOOT_AuthImageEntryPoint": true,
+        "one_SECBOOT_AuthDecisionIsJumpToImage": true,
+        "one_SECBOOT_AuthImageLength": true,
+        "one_0x00002900": true,
+        "one_0x00000152": true,
+        "one_OSPI_TryingSingleMode": true,
+        "one_0x2a000004": true,
+        "secure_nocache_event_after_unknown_0x2a000004": true
+      },
+      "record_count": 65,
+      "record_counts_by_buffer": {
+        "secure-trace.bin": 60,
+        "nonsecure-trace.bin": 5
+      },
+      "raw_buffers": [
+        {
+          "path": "tmp\\bringup\\opt-matrix-baseline-03\\rom-read\\secure-trace.bin",
+          "bytes": 2048,
+          "sha256": "0548e00c89d617b35c7875a814cf762c8a3a9274d0984c1abcc67f36d73f6a25",
+          "record_count": 60
+        },
+        {
+          "path": "tmp\\bringup\\opt-matrix-baseline-03\\rom-read\\nonsecure-trace.bin",
+          "bytes": 2048,
+          "sha256": "9b6d94d74dd82768222f5ca58881b46b2b9aff614f761d00371fc3c8928d9c0a",
+          "record_count": 5
+        }
+      ],
+      "reference": {
+        "path": "tmp\\boot-rom-reference\\rom_trace_parser.c",
+        "sha256": "94fe2deed5d6cc7b2f7f34622d4b7295f00b4a026f43d6297c19730aedbc0db0",
+        "url": "https://raw.githubusercontent.com/stm32-hotspot/STM32N6-Boot-ROM-Traces/4fb875d59aafa08edd8293912e7d2cbddf533ed0/Template_BootRom_traces/FSBL/Src/rom_trace_parser.c"
+      },
+      "auth_image_length": 896,
+      "auth_entry_address": "0x34180441",
+      "phase_spans_raw_ticks": {
+        "trying_single_mode_to_padding_header": 242,
+        "nonsecure_padding_to_secure_nocache_timestamp_difference": 478,
+        "secure_unknown_0x2a000004_to_next_nocache": 1139,
+        "auth_entry_event_to_jump_decision": 12,
+        "unknown_0x2900_to_unknown_0x152": 5020
+      },
+      "unknown_0x152_arguments": [
+        "0x00001388"
+      ],
+      "phase_buffer_scope": {
+        "trying_single_mode_to_padding_header": "nonsecure only",
+        "nonsecure_padding_to_secure_nocache_timestamp_difference": "cross-buffer; shared timebase assumed",
+        "secure_unknown_0x2a000004_to_next_nocache": "secure only; start semantics unknown",
+        "auth_entry_event_to_jump_decision": "secure only",
+        "unknown_0x2900_to_unknown_0x152": "secure only; both event semantics unknown"
+      },
+      "event_boundaries": {
+        "padding_header": {
+          "offset": 88,
+          "timestamp_raw": 11170,
+          "code": "0x1d000011",
+          "event": "DWNLDMGR_FoundPaddingHeader",
+          "buffer": "nonsecure-trace.bin"
+        },
+        "next_nocache": {
+          "offset": 720,
+          "timestamp_raw": 11648,
+          "code": "0x00000074",
+          "event": "BOOTCORE_NoDataCacheBitValue",
+          "buffer": "secure-trace.bin"
+        },
+        "secure_unknown_start": {
+          "offset": 700,
+          "timestamp_raw": 10509,
+          "code": "0x2a000004",
+          "event": "UNKNOWN",
+          "buffer": "secure-trace.bin"
+        },
+        "secure_next_nocache": {
+          "offset": 720,
+          "timestamp_raw": 11648,
+          "code": "0x00000074",
+          "event": "BOOTCORE_NoDataCacheBitValue",
+          "buffer": "secure-trace.bin"
+        },
+        "auth_entry": {
+          "offset": 900,
+          "timestamp_raw": 11864,
+          "code": "0x2c000208",
+          "event": "SECBOOT_AuthImageEntryPoint",
+          "buffer": "secure-trace.bin"
+        },
+        "jump_decision": {
+          "offset": 924,
+          "timestamp_raw": 11876,
+          "code": "0x2c004008",
+          "event": "SECBOOT_AuthDecisionIsJumpToImage",
+          "buffer": "secure-trace.bin"
+        }
+      },
+      "phase_delta_from_baseline_01_raw_ticks": {
+        "trying_single_mode_to_padding_header": 1,
+        "nonsecure_padding_to_secure_nocache_timestamp_difference": 2,
+        "secure_unknown_0x2a000004_to_next_nocache": -1,
+        "auth_entry_event_to_jump_decision": 0,
+        "unknown_0x2900_to_unknown_0x152": 0
+      }
+    }
+  ],
+  "limitations": [
+    "Values are raw ROM timer ticks, not external NRST or rail timestamps; phase_buffer_scope identifies each boundary source.",
+    "The nonsecure-padding to secure-nocache subtraction additionally assumes a shared timebase across the two buffers.",
+    "Microsecond comparisons require the stated timer-rate/continuity assumption; they are not a new clock measurement.",
+    "Known events identify interval boundaries, not a complete semantic breakdown of the intervening ROM instructions.",
+    "The 0x2900 and 0x152 event names remain unknown; their spacing and argument are numeric observations only.",
+    "No rejected records and matching hashes do not by themselves prove a complete trace.",
+    "Only variants with saved ROM buffers are included; absent repeat buffers are not synthesized."
+  ]
+}
