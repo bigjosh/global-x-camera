@@ -1,0 +1,81 @@
+[
+  {
+    "id": "v36-recovery-check-01",
+    "prefix_build": "v36-shutdown-staged",
+    "result": {
+      "passed": true,
+      "status": {
+        "magic": 1380405297,
+        "schema": 1,
+        "words": 24,
+        "state": 3,
+        "reason": 1,
+        "pin": 262145,
+        "nominal_hz": 400000000,
+        "settle_cycles": 40000,
+        "begin_cycle": 3,
+        "sample_cycle": 40007,
+        "elapsed_cycles": 40004,
+        "polls": 3595,
+        "idr": 0,
+        "moder": 4294967281,
+        "pupdr": 4,
+        "ahb4enr": 270424,
+        "demcr": 17825792,
+        "dwt_ctrl": 2147483649,
+        "control": 0,
+        "ipsr": 0,
+        "primask": 1,
+        "dbgcr": 3025253376,
+        "ap_unlock": 180,
+        "reserved": 0
+      },
+      "context": {
+        "PC": 873990028,
+        "XPSR": 1090519040,
+        "PRIMASK": 1,
+        "FAULTMASK": 0,
+        "CONTROL": 0
+      },
+      "ccr": 513,
+      "fpccr": 3221225476,
+      "prefix_sha256": "976f5d4b0fe93243594e00d046e7ec9503f2b862973e64a226567558d71d1894",
+      "xspi_sr": 2,
+      "halt_requested": true,
+      "park_context_observed_in_halt_command": true,
+      "persistent_halt_after_disconnect": "not_guaranteed",
+      "post_disconnect_execution": "may resume the exact verified branch-to-self park",
+      "ram_writes": false,
+      "nor_commands": false,
+      "next_step": "Reviewed low-SRAM nor_bench INFO, then separately guarded WRITE"
+    },
+    "rail_validation": {
+      "passed": true,
+      "common_off_s": 18.36432,
+      "common_off_window_s": [
+        18.922018162,
+        37.286338162
+      ],
+      "final": {
+        "3": {
+          "min_v": 3.268,
+          "max_v": 3.309,
+          "median_v": 3.288
+        },
+        "4": {
+          "min_v": 4.811,
+          "max_v": 4.852,
+          "median_v": 4.837
+        },
+        "5": {
+          "min_v": 3.276,
+          "max_v": 3.287,
+          "median_v": 3.281
+        }
+      },
+      "limitation": "No direct core/always-on rail probe; this proves discharge of the three named rails."
+    },
+    "live_prefix_sha256": "976f5d4b0fe93243594e00d046e7ec9503f2b862973e64a226567558d71d1894",
+    "independently_matched_prefix_and_park": true
+  }
+]

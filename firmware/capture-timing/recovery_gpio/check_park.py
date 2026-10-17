@@ -23,6 +23,37 @@ FIELDS = ('magic schema words state reason pin nominal_hz settle_cycles '
           'ahb4enr demcr dwt_ctrl control ipsr primask dbgcr ap_unlock reserved').split()
 # An unknown/self-consistent build is insufficient authorization to halt.
 APPROVED = {
+    # v36: reviewed v34c recovery code, STREAMING enable and idle-gated shutdown.
+    '976f5d4b0fe93243594e00d046e7ec9503f2b862973e64a226567558d71d1894':
+        {'bytes': 4432, 'park': 0x3418078C,
+         'sector': '40743205503bdb465d0549b7764f1590c48b7aaac621bf096aa4b9618957c1bd'},
+    '4ca979732ed3bb956522d53c25a16c30343bb1c600f16404cec4fa23ef52460f':
+        {'bytes': 4432, 'park': 0x3418078C,
+         'sector': '7c99395b5a23e063e3c6e7b6ce06b9abf041f3736a004dcd4fc6bf275dcccc6b'},
+    # v35 matched early control, five coarse lines; only exposure bytes differ.
+    '078727c2406d1e3b5b0dd5a580cdab51c6979762644e6e208088c6963d9707c0':
+        {'bytes': 4432, 'park': 0x3418078C,
+         'sector': '288e3d5b93d05d5e58a2d3f25e80c27e9badaacf08d5886769316a331b0b3bd7'},
+    # v35 STREAMING, supported CCA coarse exposure 5 lines.
+    'd35be46b35bebc67ac29dca60b0e39c54912c07eb646d1a3365a662ea228a535':
+        {'bytes': 4432, 'park': 0x3418078C,
+         'sector': 'b58dcb8d957ea26f6daa0467688b45aac74429b9a864ba0af866e3ce6b7cbc88'},
+    # v35 STREAMING, supported CCA coarse exposure 21 lines.
+    '4642c9a43fc156b3bb2f87e0275e1328f0dbae70c6d7328ded382e2554fb7e0f':
+        {'bytes': 4432, 'park': 0x3418078C,
+         'sector': '578f86548711ee4725430ca4807d7bdfbb07a15cf520eba9d46d041c547fa4cb'},
+    # v35 STREAMING, supported CCA coarse exposure 40 lines.
+    '95e975d362cce315d240f3c76c93002abd8456d1209f8846ac45881fc52b7274':
+        {'bytes': 4432, 'park': 0x3418078C,
+         'sector': '24079baafe08013bd6c4b5a8d092d2c3f4d61e9d5a5dfd4a9399ee3cd5632008'},
+    # v35 matched early/STREAMING data-lane experiments. The first 0x830
+    # prefix bytes, including the complete recovery branch, match v34c.
+    '999494ada3b856acee37b24e09150e16c14717325d7840ca0b3f81b2e4b9f327':
+        {'bytes': 4432, 'park': 0x3418078C,
+         'sector': 'de30f24ffbc992a485f5e250c8fc25bc214d309082eb1a83b82e5c845daf6cdb'},
+    '36c59eaff9d950b021eabed9ff132c114902830faa2dc7a21979715d246d633e':
+        {'bytes': 4432, 'park': 0x3418078C,
+         'sector': '6a4e45dd95c1b226499fe980065736254d812dbdf62e6e87c9abeecca7188764'},
     '528bd09755a2de84d0eadf497015facebe21da680d502fdbf494bcf7ef4e106f':
         {'bytes': 4400, 'park': 0x3418078C,
          'sector': '570657ab294bac79e47c90113c45ef4b2e71f986ab3a1f1cd52fc9895b0fa009'},

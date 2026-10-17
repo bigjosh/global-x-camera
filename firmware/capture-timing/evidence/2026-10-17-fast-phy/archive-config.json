@@ -1,0 +1,315 @@
+{
+  "schema": 1,
+  "date": "2026-10-17",
+  "checkpoint": "Completed hardware checkpoint: 14 capture runs, a separate v36 cold recovery-park verification, final normal-boot confirmation and measured powered state after releasing the instrument session. No in-flight or proposed experiment is assigned a result.",
+  "scope": "Fast free-running receiver startup and shutdown: v34c baselines, matched v35 early/STREAMING data lanes, shortest-exposure controls, v36 orderly data-lane shutdown, recovery and final bench state. Compact evidence without frame pixels.",
+  "builds": [
+    {
+      "id": "v34c-receiver",
+      "directory": "tmp/bringup/capture-recovery-pe1-v34c-20261017/receiver"
+    },
+    {
+      "id": "v34c-staged",
+      "directory": "tmp/bringup/capture-recovery-pe1-v34c-20261017/staged"
+    },
+    {
+      "id": "v35-early-receiver",
+      "directory": "tmp/bringup/capture-phy-fast-v35-early-20261017/receiver"
+    },
+    {
+      "id": "v35-early-staged",
+      "directory": "tmp/bringup/capture-phy-fast-v35-early-20261017/staged"
+    },
+    {
+      "id": "v35-streaming-receiver",
+      "directory": "tmp/bringup/capture-phy-fast-v35-streaming-20261017/receiver"
+    },
+    {
+      "id": "v35-streaming-staged",
+      "directory": "tmp/bringup/capture-phy-fast-v35-streaming-20261017/staged"
+    },
+    {
+      "id": "v35-streaming-coarse5-receiver",
+      "directory": "tmp/bringup/capture-phy-fast-v35-streaming-coarse5-20261017/receiver"
+    },
+    {
+      "id": "v35-streaming-coarse5-staged",
+      "directory": "tmp/bringup/capture-phy-fast-v35-streaming-coarse5-20261017/staged"
+    },
+    {
+      "id": "v35-streaming-coarse21-receiver",
+      "directory": "tmp/bringup/capture-phy-fast-v35-streaming-coarse21-20261017/receiver"
+    },
+    {
+      "id": "v35-streaming-coarse21-staged",
+      "directory": "tmp/bringup/capture-phy-fast-v35-streaming-coarse21-20261017/staged"
+    },
+    {
+      "id": "v35-streaming-coarse40-receiver",
+      "directory": "tmp/bringup/capture-phy-fast-v35-streaming-coarse40-20261017/receiver"
+    },
+    {
+      "id": "v35-streaming-coarse40-staged",
+      "directory": "tmp/bringup/capture-phy-fast-v35-streaming-coarse40-20261017/staged"
+    },
+    {
+      "id": "v35-early-coarse5-receiver",
+      "directory": "tmp/bringup/capture-phy-fast-v35-early-coarse5-20261017/receiver"
+    },
+    {
+      "id": "v35-early-coarse5-staged",
+      "directory": "tmp/bringup/capture-phy-fast-v35-early-coarse5-20261017/staged"
+    },
+    {
+      "id": "v36-shutdown-receiver",
+      "directory": "tmp/bringup/capture-phy-fast-v36-shutdown-20261017/receiver"
+    },
+    {
+      "id": "v36-shutdown-staged",
+      "directory": "tmp/bringup/capture-phy-fast-v36-shutdown-20261017/staged"
+    },
+    {
+      "id": "v36-shutdown-coarse5-receiver",
+      "directory": "tmp/bringup/capture-phy-fast-v36-shutdown-coarse5-20261017/receiver"
+    },
+    {
+      "id": "v36-shutdown-coarse5-staged",
+      "directory": "tmp/bringup/capture-phy-fast-v36-shutdown-coarse5-20261017/staged"
+    }
+  ],
+  "captures": [
+    {
+      "id": "v34c-baseline-01",
+      "directory": "tmp/bringup/phy-fast-v34c-baseline-01",
+      "receiver_build": "v34c-receiver",
+      "prefix_build": "v34c-staged",
+      "outcome": "completed",
+      "programming_directory": "tmp/bringup/diode-v34c-recovery-restore-v34c-01"
+    },
+    {
+      "id": "v34c-baseline-02",
+      "directory": "tmp/bringup/phy-fast-v34c-baseline-02",
+      "receiver_build": "v34c-receiver",
+      "prefix_build": "v34c-staged",
+      "outcome": "completed",
+      "programming_directory": "tmp/bringup/diode-v34c-recovery-restore-v34c-01"
+    },
+    {
+      "id": "v35-early-install-01",
+      "directory": "tmp/bringup/phy-fast-v35-early-install-01/cold",
+      "fast_directory": "tmp/bringup/phy-fast-v35-early-install-01/fast",
+      "receiver_build": "v35-early-receiver",
+      "prefix_build": "v35-early-staged",
+      "outcome": "completed",
+      "programming_cycle_directory": "tmp/bringup/phy-fast-v35-early-install-01"
+    },
+    {
+      "id": "v35-streaming-install-01",
+      "directory": "tmp/bringup/phy-fast-v35-streaming-install-01/cold",
+      "fast_directory": "tmp/bringup/phy-fast-v35-streaming-install-01/fast",
+      "receiver_build": "v35-streaming-receiver",
+      "prefix_build": "v35-streaming-staged",
+      "outcome": "completed",
+      "programming_cycle_directory": "tmp/bringup/phy-fast-v35-streaming-install-01",
+      "visual_review": {
+        "status": "recognizable workshop lights and furniture; detailed image with no obvious corruption",
+        "reviewer": "root agent",
+        "provenance": "Root message during this archive task: directly viewed cold/ram/full-frame.png after the completed streaming install run."
+      }
+    },
+    {
+      "id": "v35-streaming-cold-02",
+      "directory": "tmp/bringup/phy-fast-v35-streaming-cold-02",
+      "fast_directory": "tmp/bringup/phy-fast-v35-streaming-cold-02/fast",
+      "receiver_build": "v35-streaming-receiver",
+      "prefix_build": "v35-streaming-staged",
+      "outcome": "completed",
+      "programming_cycle_directory": "tmp/bringup/phy-fast-v35-streaming-install-01"
+    },
+    {
+      "id": "v35-coarse5-install-01",
+      "directory": "tmp/bringup/phy-fast-v35-coarse5-install-01/cold",
+      "fast_directory": "tmp/bringup/phy-fast-v35-coarse5-install-01/fast",
+      "receiver_build": "v35-streaming-coarse5-receiver",
+      "prefix_build": "v35-streaming-coarse5-staged",
+      "outcome": "completed",
+      "programming_cycle_directory": "tmp/bringup/phy-fast-v35-coarse5-install-01",
+      "visual_review": {
+        "status": "Dark short-exposure image; recognizable bright lamps and window in correct scene locations; not blank and no obvious frame corruption",
+        "reviewer": "root agent",
+        "provenance": "Root message during this archive task: directly viewed the completed coarse5 frame.png."
+      }
+    },
+    {
+      "id": "v35-coarse21-install-01",
+      "directory": "tmp/bringup/phy-fast-v35-coarse21-install-01/cold",
+      "fast_directory": "tmp/bringup/phy-fast-v35-coarse21-install-01/fast",
+      "receiver_build": "v35-streaming-coarse21-receiver",
+      "prefix_build": "v35-streaming-coarse21-staged",
+      "outcome": "completed",
+      "programming_cycle_directory": "tmp/bringup/phy-fast-v35-coarse21-install-01"
+    },
+    {
+      "id": "v35-coarse40-install-01",
+      "directory": "tmp/bringup/phy-fast-v35-coarse40-install-01/cold",
+      "fast_directory": "tmp/bringup/phy-fast-v35-coarse40-install-01/fast",
+      "receiver_build": "v35-streaming-coarse40-receiver",
+      "prefix_build": "v35-streaming-coarse40-staged",
+      "outcome": "completed",
+      "programming_cycle_directory": "tmp/bringup/phy-fast-v35-coarse40-install-01"
+    },
+    {
+      "id": "v35-early-coarse5-install-01",
+      "directory": "tmp/bringup/phy-fast-v35-early-coarse5-install-01/cold",
+      "fast_directory": "tmp/bringup/phy-fast-v35-early-coarse5-install-01/fast",
+      "receiver_build": "v35-early-coarse5-receiver",
+      "prefix_build": "v35-early-coarse5-staged",
+      "outcome": "completed",
+      "programming_cycle_directory": "tmp/bringup/phy-fast-v35-early-coarse5-install-01"
+    },
+    {
+      "id": "v36-shutdown-install-01",
+      "directory": "tmp/bringup/phy-fast-v36-shutdown-install-01/cold",
+      "fast_directory": "tmp/bringup/phy-fast-v36-shutdown-install-01/fast",
+      "receiver_build": "v36-shutdown-receiver",
+      "prefix_build": "v36-shutdown-staged",
+      "outcome": "completed",
+      "programming_cycle_directory": "tmp/bringup/phy-fast-v36-shutdown-install-01",
+      "visual_review": {
+        "status": "Recognizable detailed workshop, lamps/panel, furniture and textures; no obvious corruption",
+        "reviewer": "root agent",
+        "provenance": "Root message during this archive task: directly viewed the completed v36 default frame.png."
+      }
+    },
+    {
+      "id": "v36-shutdown-coarse5-install-01",
+      "directory": "tmp/bringup/phy-fast-v36-coarse5-install-01/cold",
+      "fast_directory": "tmp/bringup/phy-fast-v36-coarse5-install-01/fast",
+      "receiver_build": "v36-shutdown-coarse5-receiver",
+      "prefix_build": "v36-shutdown-coarse5-staged",
+      "outcome": "completed",
+      "programming_cycle_directory": "tmp/bringup/phy-fast-v36-coarse5-install-01",
+      "visual_review": {
+        "status": "Expected dark short-exposure image with identifiable lamps/window at matching scene positions; not blank and no obvious corruption",
+        "reviewer": "root agent",
+        "provenance": "Root message during this archive task: directly viewed the completed v36 coarse5 shortframe.png."
+      }
+    },
+    {
+      "id": "v36-coarse5-cold-02",
+      "directory": "tmp/bringup/phy-fast-v36-coarse5-cold-02",
+      "fast_directory": "tmp/bringup/phy-fast-v36-coarse5-cold-02/fast",
+      "receiver_build": "v36-shutdown-coarse5-receiver",
+      "prefix_build": "v36-shutdown-coarse5-staged",
+      "outcome": "completed",
+      "programming_cycle_directory": "tmp/bringup/phy-fast-v36-coarse5-install-01"
+    },
+    {
+      "id": "v36-default-restore-02",
+      "directory": "tmp/bringup/phy-fast-v36-default-restore-02/cold",
+      "fast_directory": "tmp/bringup/phy-fast-v36-default-restore-02/fast",
+      "receiver_build": "v36-shutdown-receiver",
+      "prefix_build": "v36-shutdown-staged",
+      "outcome": "completed",
+      "programming_cycle_directory": "tmp/bringup/phy-fast-v36-default-restore-02"
+    },
+    {
+      "id": "v36-final-normal-03",
+      "directory": "tmp/bringup/phy-fast-v36-final-normal-03",
+      "fast_directory": "tmp/bringup/phy-fast-v36-final-normal-03/fast",
+      "receiver_build": "v36-shutdown-receiver",
+      "prefix_build": "v36-shutdown-staged",
+      "outcome": "completed",
+      "normal_guard_directory": "tmp/bringup/phy-fast-v36-final-normal-03/normal-guard",
+      "programming_cycle_directory": "tmp/bringup/phy-fast-v36-default-restore-02",
+      "visual_review": {
+        "status": "Recognizable detailed workshop scene, lamps, furniture and textures; no obvious corruption",
+        "reviewer": "root agent",
+        "provenance": "Root message at final checkpoint: directly viewed final normal frame."
+      }
+    }
+  ],
+  "recovery_checks": [
+    {
+      "id": "v36-recovery-check-01",
+      "directory": "tmp/bringup/phy-fast-v36-recovery-check-01",
+      "prefix_build": "v36-shutdown-staged"
+    }
+  ],
+  "final_state_directory": "tmp/bringup/phy-fast-final-release-01",
+  "final_capture": "v36-final-normal-03",
+  "final_prefix_build": "v36-shutdown-staged",
+  "validation_report": {
+    "reporter": "root agent",
+    "source_unchanged_since_tests": true,
+    "suites": [
+      {
+        "command": "python -m unittest discover -s firmware/boot-timing/tests -p test_*.py",
+        "passed": 58
+      },
+      {
+        "command": "python -m unittest discover -s firmware/capture-timing -p test_*.py",
+        "passed": 41
+      },
+      {
+        "command": "python firmware/capture-timing/fast_phy/test_fast_phy.py",
+        "passed": 18
+      }
+    ],
+    "discovery_note": "An initial boot-test discovery command targeted the wrong directory and found zero tests. The corrected command above ran and passed all 58 boot tests; the zero-test invocation was not a test failure."
+  },
+  "extra_files": [
+    {
+      "source": "firmware/capture-timing/summarize.py",
+      "archive": "summarize.py"
+    },
+    {
+      "source": "tmp/bringup/read_fast_phy.py",
+      "archive": "read_fast_phy.py"
+    },
+    {
+      "source": "tmp/bringup/fast_mailbox.py",
+      "archive": "fast_mailbox.py"
+    },
+    {
+      "source": "firmware/capture-timing/fast_phy/build.py",
+      "archive": "final-fast-phy-generator/build.py"
+    },
+    {
+      "source": "firmware/capture-timing/fast_phy/inspect.py",
+      "archive": "final-fast-phy-generator/inspect.py"
+    },
+    {
+      "source": "firmware/capture-timing/fast_phy/receiver_helpers.inc",
+      "archive": "final-fast-phy-generator/receiver_helpers.inc"
+    },
+    {
+      "source": "firmware/capture-timing/fast_phy/test_fast_phy.py",
+      "archive": "final-fast-phy-generator/test_fast_phy.py"
+    },
+    {
+      "source": "tmp/bringup/phy-fast-session-01/session.jsonl",
+      "archive": "held-session/session.jsonl"
+    },
+    {
+      "source": "tmp/bringup/phy-fast-final-release-01/logic/boot-summary.json",
+      "archive": "final-release/logic/boot-summary.json"
+    },
+    {
+      "source": "tmp/bringup/phy-fast-final-release-01/logic/capture-config.json",
+      "archive": "final-release/logic/capture-config.json"
+    },
+    {
+      "source": "tmp/bringup/phy-fast-final-release-01/logic/digital.csv",
+      "archive": "final-release/logic/digital.csv"
+    },
+    {
+      "source": "tmp/bringup/phy-fast-final-release-01/powered-state.json",
+      "archive": "final-release/powered-state.json"
+    },
+    {
+      "source": "tmp/bringup/phy-fast-final-release-01/session-stop.json",
+      "archive": "final-release/session-stop.json"
+    }
+  ]
+}
