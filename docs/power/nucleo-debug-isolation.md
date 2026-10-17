@@ -112,6 +112,26 @@ Before calling JS110 on/off a true cold cycle, measure target rail decay with th
 
 ## Further measurement configurations
 
+### CN8 bypass audit — October 17
+
+**CN8 is qualified for our timing experiments, not as an electrically isolated source for precision DUT energy measurements.** Removing every CN9 shunt does not disconnect the other USB circuits. This read-only audit supplements the earlier CN8 recommendation; no wiring, firmware or instrument state was changed.
+
+The official [MB1940 C02 schematic, sheet 8](https://www.st.com/resource/en/schematic_pack/mb1940-n657x0q-c02-schematic.pdf) identifies these connections outside the JS110's current path:
+
+| Connection | Measurement implication |
+|---|---|
+| CN8 VBUS → R157 → Q2 → SB1 → target `5V` | Separate USB source/provider power branch bypassing CN9. Normally disabled; actual gate state and leakage have not been measured. |
+| VBUS → R80 140 kΩ → PA11 sense node; R81 10 kΩ to ground | Nominal 33.3 µA divider current and 0.333 V at PA11 for 5 V input. This is primarily current to ground, not a measured 33.3 µA feed into the MCU. Unpowered-pin injection remains unquantified. |
+| CN8 D+/D− → U20 → MCU USB pins | Filter/protection remains connected; external data-line bias depends on the host/charger. |
+| CN8 CC pins → U22 → MCU | Mode-dependent signal connection. |
+| VBUS → U22 bias/sensing; VBUS → R76/Q3 indicator drive | Upstream consumption omitted by JS. The indicator LED's collector current is supplied by measured target VDD3V3. These loads are not themselves proof of MCU back-power. |
+
+[TCPP03-M20 Tables 11–12](https://www.st.com/resource/en/datasheet/tcpp03-m20.pdf#page=11) specify provider gate OFF, CC switches OFF and IANA OFF in the EN-low reset state, while the consumer gate is self-biased from VBUS. The v41 source inspection found no PA7/EN configuration or TCPP03 programming; the expected state is therefore the default, not a demonstrated conducting Q2 bypass. Future USB-controller firmware can change that assumption. OFF switches do not establish zero leakage. U22's open-drain FLGn uses a target-powered pull-up, so its assertion loads the measured rail rather than actively supplying it from VBUS.
+
+**Recommendation for the next precision power configuration:** unplug CN8 and move JS110 IN+ from CN9.3 to the independent regulated 5.0 V supply. Keep OUT+ on CN9.2, common ground and every CN9 shunt absent. This removes the CN8 influences without board rework. It does not resolve the separate D2/debugger/interface issue. This change is proposed, not performed.
+
+The prior observed rail discharge and autonomous captures remain valid observations; they do not bound residual current or prove complete power accounting. Opening SB1 alone would only address the provider branch. A data-disconnected USB cable alone would only address D+/D−. Neither is complete CN8 isolation.
+
 ### Board source using the second USB connector
 
 **October 16 follow-up:** the user has a bench supply but prefers a source accessible on the board. A circuit-supported alternative is **CN8 USB power → CN9 pin 3 (`5V_USB_SNK`) → JS110 IN+ → OUT+ → CN9 pin 2 (target `5V`)**. It requires a second USB cable/source, but no soldering. Leave every CN9 selector jumper absent, keep VIN disconnected, retain the common grounds and ST-LINK USB CN10, and move only the JS110 input-positive lead from CN9 pin 1 to pin 3. Power down for that current-path rewiring. This is an alternative to the independent bench-supply configuration below; its instruction to leave CN8 unplugged does not apply here.
