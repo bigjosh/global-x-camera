@@ -4,6 +4,8 @@ October 18, 2026, latest steering. **D-46 retains AS5F14G04SND-10LIN for prototy
 
 ## Current direction: hardware quad SPI
 
+**October 18 alternative-part research:** the [faster-storage comparison](../../reports/Faster%20camera%20storage%20alternatives.md) recommends evaluating native-3.3 V **MX35LF4GE4AD-Z4I** for simpler CN16 hardware-quad wiring and faster programming; larger Micron/GigaDevice serial parts and genuine-cache parallel Macronix parts are also compared. None is yet qualified against the combined retention/reuse requirement. This is a recommendation, not a replacement decision: **D-46's Alliance selection remains in force**, and no hardware change or purchase was made.
+
 The STM32 XSPI peripheral supports four-bit payload transfers and DMA. Moving from Arduino back to the earlier CN3 pins alone would **not** provide that hardware interface. The separate XSPIM port 1 interface is available at the normally unpopulated **CN16** header:
 
 | Function | MCU / AF | CN16 pin |
