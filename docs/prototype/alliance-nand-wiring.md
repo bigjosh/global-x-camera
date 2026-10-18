@@ -30,6 +30,29 @@ PC2–PC5 are consecutive bits on GPIOC: one masked input-register read obtains 
 
 Sources: [UM3417 Rev4, Table 20, CN3 mapping](https://www.st.com/resource/en/user_manual/um3417-stm32n6-nucleo144-board-mb1940-stmicroelectronics.pdf#page=34), [ST's SB23/VDDIO5 guidance](https://community.st.com/stm32-mcus-boards-and-hardware-tools-26/stm32n6-nucleo-board-not-as-1v8-possible-144776), [MB1940 C02 sheets 3/4/6](https://www.st.com/resource/en/schematic_pack/mb1940-n657x0q-c02-schematic.pdf), [DS14791 supply-bank and low-voltage electrical tables](https://www.st.com/resource/en/datasheet/stm32n657x0.pdf), and Alliance §§3, 5, 6.5, 7.2 linked under Evidence.
 
+## Estimated time and energy penalty
+
+October 17 follow-up: these are conditional calculations, not measured interface clocks or measured storage energy. The exact 4 Gbit part has **2048 data bytes per page**, not 4096. The current 1,909,600-byte packed frame occupies 933 data pages. Alliance Table 16-5 specifies 600 µs typical / 700 µs maximum page programming and 70 µs typical page reads (no maximum stated). Consequently, serial page programming adds **0.5598 s typical**, or 0.6531 s using the stated maximum, regardless of bus width. Full readback adds 0.06531 s of typical internal reads as well as another payload transfer.
+
+| Assumed interface | Payload transfer | Transfer + typical programming | Including full readback, typical array times |
+|---|---:|---:|---:|
+| Bit-banged quad, 2 MHz | 1.910 s | 2.469 s | 4.444 s |
+| Bit-banged quad, 5 MHz | 0.764 s | 1.324 s | 2.153 s |
+| Bit-banged quad, 10 MHz | 0.382 s | 0.942 s | 1.389 s |
+| Hardware SPI, 25 MHz | 0.611 s | 1.171 s | 1.847 s |
+| Hardware SPI, 50 MHz | 0.306 s | 0.865 s | 1.236 s |
+| Hardware quad SPI, 50 MHz | 0.076 s | 0.636 s | 0.778 s |
+
+Model: `transfer = payload_bytes * 8 / (clock_hz * data_width)`; `write = transfer + pages * tPROG`; `write_and_readback = 2 * transfer + pages * (tPROG + tRD)`. Assume pre-erased slots, no cache-program/plane overlap, and equal sustained input/output clocks. Excludes command/status transactions, inter-page software/DMA gaps, packing/checksums, spare transfers, metadata/journal commits, retries, erase and acquisition. Partial final-page padding is negligible at this precision. These are not whole-operation upper bounds. Retaining the 16-bit buffer increases payload transfer by 60%, with 1492 data-page programs instead of 933.
+
+At the hypothetical 5 MHz bit-banged rate, the write penalty is **0.687 s versus 50 MHz hardware quad**, **0.458 s versus 50 MHz hardware SPI**, or **0.153 s versus 25 MHz hardware SPI**. Full readback approximately doubles those interface-time penalties. The flash's common programming delay explains why 10× slower payload loading produces about 2.1× total modeled save time, not 10×.
+
+For an equal-power illustration, `extra_energy = powered_system_watts * extra_seconds`. Against hardware quad at 50 MHz, 5 MHz bit-banging adds **69 mJ at 100 mW**, **137 mJ at 200 mW**, or **344 mJ at 500 mW**. Readback approximately doubles these numbers under the same assumptions. The 100/200/500 mW values are scenarios, not qualified product-power figures. Historical bench snapshots were around 0.5 W through the JS110 path, but those are different workloads and include unresolved debugger/bypass paths; they do not establish actual NAND-cycle or battery energy.
+
+Actual interface energy is better modeled as `P_bitbang * t_bitbang - P_hardware * t_hardware`, plus any differences in other phases and regulator losses. Bit-banging occupies the CPU during payload transfer; hardware with DMA can permit CPU sleep or useful work. **Both approaches can sleep between NAND busy-status checks**, so the common 0.56 s programming interval must not automatically be charged as extra CPU work for bit-banging. Turn off unneeded camera/receiver activity after capture in either design. Additional NAND program energy is common to both routes; NAND I/O current versus clock and real GPIO-loop CPU power still need measurement.
+
+Recommendation remains appropriate for functional prototype bring-up, but not a claim of battery efficiency. Before committing to board rework, a guarded GPIO throughput experiment can establish software clock rates without NAND attached; actual read performance and complete energy require the connected device and a qualified power boundary. Preserve the camera/recovery prefix and shared-bench ownership rules. No hardware experiment was performed for these estimates.
+
 ## Unmodified-board alternative: Arduino SPI5 with translation
 
 Use **SPI5 on Arduino CN14**, with a **TXU0304PWR** level translator in TSSOP-14. The NAND requires 1.8 V; these Arduino signals are 3.3 V. Do not connect the four SPI signals directly. The translator provides three channels toward NAND and one returning to the MCU. Mount the NAND's 8 x 6 mm LGA-8 package on a suitable carrier. Pin numbering is shown from above; when viewing the chip's underside, the arrangement is mirrored. Identify pin 1 using the manufacturer's package drawing and marking.
