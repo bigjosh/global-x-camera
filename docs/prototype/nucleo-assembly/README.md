@@ -5,6 +5,7 @@ These figures locate the parts and connector pins used by the consolidated Nucle
 - `rework-overview.png` / `.svg`: top and bottom locations for D2, R23, R88, R89, SB24, and U24.
 - `rework-details.png` / `.svg`: close-ups of the six parts. SB24 is on the bottom; all five other parts are on the top.
 - `header-connections.png` / `.svg`: exact connector-pad locations for the 5 V input, 1.8 V feed and Arduino NAND signals.
+- `power-wiring.png` / `.svg`: conceptual electrical connections, including the user-confirmed DC1863A at 5 V. Regenerate with `tools/build_nucleo_power_wiring.py` from the repository root; requires Pillow.
 - `mb1940-c02-assembly.pdf`: source assembly pages 16-17 extracted from the official C02 schematic pack, retaining ST's drawing titles and revision information.
 - `locations.json`: physical coordinates, PDF annotation coordinates, exact ODB++ pad records and source hashes.
 - `build_diagrams.py`: regenerates the PNG/SVG diagrams from the two local input files; requires Python, PyMuPDF, Matplotlib and NumPy. Run from any directory with `python build_diagrams.py` using its full path.

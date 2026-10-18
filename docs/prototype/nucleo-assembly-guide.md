@@ -92,7 +92,13 @@ Use **regulated 5.0 V at CN9 pin 2**, not the VIN pin. Retain the Nucleo's main,
 
 CN9 pins 2/4/6 are the common target 5 V bus. Pins 1/3/5 are different upstream sources; do not bridge them together. CN8 must stay unplugged in this configuration because its USB paths bypass the measurement boundary, and simultaneous USB/battery source selection is not yet implemented. The LTC's shutdown function is not a qualified reverse-blocking power mux.
 
-**Regulator hardware check:** the exact received LTC board has not yet been confirmed. If it is **DC1863A**, its adjustable LTC3621 supports 5 V: with power off, use **JP7 for 5 V**, leave other output-voltage selections open, select **JP2/BM** and initially **JP1/ON** for bench bring-up. Verify 5.0 V with a meter before connecting the Nucleo. The specified 5 V operating row requires at least 5.2 V input. The fixed **LTC3621-3.3** cannot be changed to 5 V by moving a jumper or changing a divider. For another module, use its actual schematic rather than these jumper numbers.
+**Regulator confirmed by the user, October 18: DC1863A.** Its adjustable LTC3621 supports the selected 5 V directly. With power off:
+
+- Fit the output-selection shunt at **JP7 / 5 V**; leave the other output-voltage selections open.
+- Select **JP2 / BM** for Burst Mode.
+- Initially select **JP1 / ON** to hold RUN enabled during bench bring-up.
+
+Verify 5.0 V with a meter before connecting the Nucleo. The specified 5 V operating row requires at least 5.2 V input. Later, external button/GPIO RUN control requires removing JP1's forced ON/OFF connection and verifying the RUN node before attaching that circuit. The old fixed-3.3 V chip study does not describe this adjustable evaluation board.
 
 Initially validate through the LTC from a current-limited bench source, then the four-cell pack. Regulator current capability does not establish coin-cell pulse capability. Measure rail sag and complete capture/save duration before treating the battery configuration as qualified. Measuring after LTC captures target-side energy; battery energy and main-path OFF leakage must be measured upstream of LTC.
 
