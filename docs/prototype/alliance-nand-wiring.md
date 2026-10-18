@@ -1,8 +1,30 @@
 # Alliance NAND wiring for the Nucleo prototype
 
-October 18, 2026. **D-46 selects AS5F14G04SND-10LIN for prototype storage bring-up; the October 18 follow-up selects bit-banged quad SPI on the 1.8 V VDDIO5 bank.** The user accepted populated CN3 as the practical alternative to the preferred Arduino headers. This is the selected wiring plan, not completed assembly or successful NAND communication. Power characterization is deferred; camera firmware and existing instrument/recovery wiring were not changed by this documentation work.
+October 18, 2026, latest steering. **D-46 retains AS5F14G04SND-10LIN for prototype storage bring-up. The user now prioritizes hardware quad-SPI performance over Arduino-header convenience.** Both earlier CN3/VDDIO5 and Arduino/VDDIO4 proposals are bit-banged and are superseded as the implementation direction. Their historical checklists below are not current modification instructions. Hardware XSPI pins are verified, but the Alliance's 1.8 V electrical interface and final assembly plan remain open. No physical rework, NAND communication or firmware change has been reported in these documentation turns.
 
-## October 18 follow-up: Arduino-header alternative
+## Current direction: hardware quad SPI
+
+The STM32 XSPI peripheral supports four-bit payload transfers and DMA. Moving from Arduino back to the earlier CN3 pins alone would **not** provide that hardware interface. The separate XSPIM port 1 interface is available at the normally unpopulated **CN16** header:
+
+| Function | MCU / AF | CN16 pin |
+|---|---|---:|
+| NCS1 | PO0 / AF9 | 5 |
+| CLK | PO4 / AF9 | 13 |
+| IO0 | PP0 / AF9 | 3 |
+| IO1 | PP1 / AF9 | 2 |
+| IO2 | PP2 / AF9 | 4 |
+| IO3 | PP3 / AF9 | 6 |
+| GND | — | 1 or 16 |
+
+**These pins are stock 3.3 V VDDIO2, not direct connections to the 1.8 V Alliance NAND.** Neither SB23 nor SB24 changes this bank. MB1940 sheet 4 ties its four VDDIO2 pins to main VDDIO without an independently documented isolation jumper; a native-1.8 V conversion would need layout-specific PCB rework, not the previous simple bank-feed recipe. Do not make the earlier SB23/SB24/R88/R89 changes for this interface. If any earlier rework has already been performed, first record and reconcile the actual board state; never close a 3.3 V bridge while an external 1.8 V feed remains attached.
+
+The preferred separate-bus direction is CN16 plus suitable high-speed bidirectional translation, keeping NAND wiring off the boot NOR bus. Translator selection is **not yet qualified**. TI **TXB0606** is a concrete six-channel auto-direction candidate explicitly intended for QSPI/OSPI and offered in TSSOP-16. It is not a drop-in approval: verify NAND output-drive compatibility, VOH/VIH margins, translator delay plus NAND clock-to-data delay, load and sample timing. Its external pull-up constraints differ from the earlier 10 kΩ wiring. A generic I2C shifter, the earlier TXU0304 single-SPI translator, or the translator's headline data rate does not establish a working fast quad link. No 50 MHz assembled link is claimed.
+
+An alternative avoiding translation is to share the already-1.8 V **XSPIM port 2 / VDDIO3** boot-NOR bus. The clock/data nets are PN6/PN2/PN3/PN4/PN5 at existing 0 Ω links **R116/R108/R101/R120/R109**, with separate **PN12/NCS2 at CN16.31**. All are AF9. This would need five fine solder taps with the original NOR links retained, plus NAND CS pulled high to 1.8 V during boot. It requires very short stubs, cold-boot requalification, and software running entirely from SRAM while selecting/configuring NAND; restore NOR settings before later NOR access. Use single-memory indirect transactions with software-selected CS2, not simultaneous dual-memory or automatic contiguous-memory extension. Added loading or a wiring fault could prevent ROM boot before the PE1 recovery guard executes. This is an alternative requiring deliberate physical selection, not an issued solder recipe.
+
+Sources: [UM3417 CN16 pin table](https://www.st.com/resource/en/user_manual/um3417-stm32n6-nucleo144-board-mb1940-stmicroelectronics.pdf), [DS14791 XSPI features, supply banks and AF9 tables](https://www.st.com/resource/en/datasheet/stm32n657x0.pdf), [MB1940 sheets 2/3/4/6](https://www.st.com/resource/en/schematic_pack/mb1940-n657x0q-c02-schematic.pdf), [TI TXB0606 product](https://www.ti.com/product/TXB0606) and [datasheet electrical/application limits](https://www.ti.com/lit/gpn/TXB0606).
+
+## Superseded: Arduino-header bit-bang alternative
 
 After receiving the VDDIO5 checklist, the user again requested Arduino-header connections for physical convenience. **None of the six VDDIO5 signals appears on the Arduino headers.** A different routing can put all six NAND signals and ground on Arduino: use **VDDIO4 at 1.8 V for four data signals and clock**, plus a main-VDD GPIO configured as **open-drain CS# with an external pull-up only to 1.8 V**. This is a reviewed alternative/recommendation in response to that request; no physical rework or communication has been reported. The earlier VDDIO5 plan is retained below. Do not combine their bank-feed/bridge instructions.
 
@@ -27,7 +49,7 @@ Tradeoff: this achieves the user's physical header preference with two additiona
 
 Sources: [UM3417 Arduino pin assignments and SB2–SB5 routing footnote](https://www.st.com/resource/en/user_manual/um3417-stm32n6-nucleo144-board-mb1940-stmicroelectronics.pdf), [MB1940 sheets 3/4/10](https://www.st.com/resource/en/schematic_pack/mb1940-n657x0q-c02-schematic.pdf), [ST bank-isolation guidance](https://community.st.com/stm32-mcus-boards-and-hardware-tools-26/stm32n6-nucleo-board-not-as-1v8-possible-144776), and [ST AN4899 §4.3.2, open-drain outputs and different supply voltages](https://www.st.com/resource/en/application_note/an4899-stm32-microcontroller-gpio-hardware-settings-and-lowpower-consumption-stmicroelectronics.pdf).
 
-## Earlier selected interface: bit-banged quad SPI on VDDIO5
+## Superseded: bit-banged quad SPI on VDDIO5
 
 **Proposed October 17, selected by the user October 18:** software-generated quad SPI removes the hardware peripheral's pin restrictions. Use the six VDDIO5 GPIOs on populated **CN3**, with **SB23 opened** and the isolated bank supplied at 1.8 V through **CN3.31**. This sacrifices the Arduino-header preference but avoids the translator, the VDDIO4 pull-up changes and an unpopulated signal header. Physical modification, communication and bus-speed qualification are still pending.
 
