@@ -4,7 +4,7 @@
 
 The plan is electrically sensible. The two costs are slower software-driven transfers and the remaining overhead of an evaluation board. Remove the large unnecessary loads as described below, retain convenient debugging during bring-up, then qualify complete-cycle energy. Four CR2032 cells' ability to supply startup and save pulses is still unmeasured.
 
-**Scope:** MB1940 **N657X0Q-C02**. Locations come from ST's assembly, pick-and-place and connectivity files, not estimated positions on a photograph. Match the board revision and reference designators before rework. No changes in this guide have yet been performed or bench-qualified. The installed guarded v41 firmware captures into RAM; NAND saving and final power-off still need implementation.
+**Scope:** MB1940 **N657X0Q-C02**. Locations come from ST's assembly, pick-and-place and connectivity files, not estimated positions on a photograph. Match the board revision and reference designators before rework. **User-reported progress, October 18: R23 and D2 removed.** No other removal or NAND wiring is yet reported, and this changed configuration has not been bench-qualified. The installed guarded v41 firmware captures into RAM; NAND saving and final power-off still need implementation.
 
 ## At the bench
 
@@ -33,6 +33,8 @@ Have a compatible NAND carrier, three 10 kΩ resistors, one 100 nF capacitor, ap
 Keep **all CN9 shunts absent**. Leave **CN8 unplugged** during LTC/battery capture operation. CN10 can remain connected to the PC for separately powered debugging after D2 is open. Do not change JP3 or remove SWD/reset links in this first stage: we need the working recovery/programming path.
 
 **D2 is supply separation, not full electrical isolation.** Debugger data, reset and sense connections remain. A powered debugger or recovery lead may contribute current across that boundary. Do not interpret a later Joulescope reading as qualified battery energy or 100 nA OFF current until those paths are isolated or measured. The [debugger audit](../power/nucleo-debug-isolation.md) retains that separate qualification task.
+
+**Temporary USB-only functional operation:** after D2/R23 removal, CN8 can still power the target with CN10 unplugged. Disconnect LTC/external target power. Use either the existing CN9.3 → JS110 → CN9.2 route with all CN9 shunts absent, or, without that JS path, the normal CN9 **3–4** source-selection shunt. Do not fit the shunt across the JS measurement path. D2 removes the main debugger supply feed, but zero debugger leakage has not been established. The F723's connected reset and sense pins are FT types, so an ordinary upper-diode clamp must not be assumed. Check actual debugger rail voltage, target reset release and autonomous capture before accepting this new configuration. See the [specific audit](../power/nucleo-debug-isolation.md#d2-and-r23-removed-cn8-only-functional-operation--october-18). LD1 is intentionally dark after R23 removal. This USB configuration is distinct from step 4's LTC-powered setup.
 
 ## 2. Convert the NAND GPIO bank to 1.8 V
 

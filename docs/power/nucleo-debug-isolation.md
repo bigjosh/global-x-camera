@@ -1,8 +1,18 @@
 # Nucleo debugger isolation and power measurement
 
+## D2 and R23 removed: CN8-only functional operation — October 18
+
+The user reports **D2 and R23 physically removed**. Only these two changes are confirmed; other assembly-guide rework remains pending. No instrument or firmware action was performed for this follow-up.
+
+CN8 can still supply the MCU/camera with CN10 unplugged. Use either the established CN9.3 → JS110 → CN9.2 path with every CN9 shunt absent, or the normal CN9 **3–4** selection without the JS path. Disconnect LTC/external target power in this USB-only configuration. Removing D2 opens the direct target-5V-to-U10 debugger supply route; removing R23 only disables LD1.
+
+The remaining interface does not establish zero debugger leakage, but the specific connected pins must be distinguished from generic clamped inputs. The visually verified C02 sheet13 connects target reset through R75 (0 Ω) to debugger **PA6**, target VDDIO through R65/R70 (10 kΩ/10 kΩ) to **PA0**, and target 5 V through R73/R74 (5.1 kΩ/10 kΩ) to **PB1**. DS11853 Table10 classifies **all three as FT**, including the two ADC-capable sensing pins. Nominal sense levels are 1.65 V and 3.31 V. Table13's FT absolute maximum is VDD + 4.0 V; normal 3.3 V signals do not by themselves exceed it when debugger VDD is zero. Table14 notes that positive injection does not occur below the specified FT maximum. It is therefore unjustified to predict inevitable upper-diode backfeeding or target-NRST clamping from these connections alone. [F723 datasheet, Tables10/13/14](https://www.st.com/resource/en/datasheet/stm32f723ie.pdf).
+
+This supports a functional power-up, not a complete off-state leakage specification or measured reliability claim. Confirm **3V3_STLK remains near zero**, DUT NRST releases, and the guarded flash image captures autonomously in the modified configuration. Residual signal behavior and the passive divider loads remain relevant to energy measurements. Keep CN10 independently powered when convenient debug/recovery access is wanted; D2 removal prevents its main consumption being drawn through the target's old diode branch. Historical statements below about D2 still supplying ST-LINK describe the board before this reported removal.
+
 ## Selected assembly path — October 18
 
-The user has selected LTC3621 at **5.0 V**, retaining the Nucleo's downstream converters, and Alliance NAND on Arduino-header bit-banged GPIOs. Follow the [consolidated assembly guide](../prototype/nucleo-assembly-guide.md) and its verified ST assembly-location diagrams. Remove/open **D2** to break target-to-debugger supply, remove **R23** to disconnect LD1, keep all CN9 shunts absent, and feed target CN9.2 from LTC through the JS110 if desired. This replaces the CN8/CN9.3 bench source; keep CN8 unplugged during this configuration. No rework is yet reported as performed.
+The user has selected LTC3621 at **5.0 V**, retaining the Nucleo's downstream converters, and Alliance NAND on Arduino-header bit-banged GPIOs. Follow the [consolidated assembly guide](../prototype/nucleo-assembly-guide.md) and its verified ST assembly-location diagrams. **D2 and R23 are now reported removed**, breaking the main target-to-debugger supply and disconnecting LD1. For the planned LTC configuration, keep all CN9 shunts absent and feed CN9.2 from LTC through the JS110 if desired. That replaces the CN8/CN9.3 source; keep CN8 unplugged while using LTC. The USB-only configuration above remains a separate functional-testing option.
 
 The guide separately identifies **U24** removal for Ethernet load elimination. Leave the unused U14 converter's supply links alone: its EN pull-down already disables it with R22 absent. The NAND conversion removes SB24/R88/R89 and uses 1.8 V VDDIO4. These are not direct-3.3 V changes to the main supply tree.
 
