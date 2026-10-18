@@ -2,7 +2,32 @@
 
 October 18, 2026. **D-46 selects AS5F14G04SND-10LIN for prototype storage bring-up; the October 18 follow-up selects bit-banged quad SPI on the 1.8 V VDDIO5 bank.** The user accepted populated CN3 as the practical alternative to the preferred Arduino headers. This is the selected wiring plan, not completed assembly or successful NAND communication. Power characterization is deferred; camera firmware and existing instrument/recovery wiring were not changed by this documentation work.
 
-## Selected interface: bit-banged quad SPI on VDDIO5
+## October 18 follow-up: Arduino-header alternative
+
+After receiving the VDDIO5 checklist, the user again requested Arduino-header connections for physical convenience. **None of the six VDDIO5 signals appears on the Arduino headers.** A different routing can put all six NAND signals and ground on Arduino: use **VDDIO4 at 1.8 V for four data signals and clock**, plus a main-VDD GPIO configured as **open-drain CS# with an external pull-up only to 1.8 V**. This is a reviewed alternative/recommendation in response to that request; no physical rework or communication has been reported. The earlier VDDIO5 plan is retained below. Do not combine their bank-feed/bridge instructions.
+
+| NAND pin | Function | Arduino marking | Header / MCU |
+|---:|---|---|---|
+| 1 | CS# | D10 | CN14.3 / PA3, open-drain only, 10 kΩ to 1.8 V |
+| 2 | IO1 | A4 | CN4.5 / PC12 |
+| 3 | IO2 / WP# | D14 / SDA | CN14.9 / PC1, 10 kΩ to 1.8 V |
+| 4 | GND | GND | CN14.7 |
+| 5 | IO0 | A1 | CN4.2 / PC10 |
+| 6 | CLK | D15 / SCL | CN14.10 / PH9 |
+| 7 | IO3 / HOLD# | A5 | CN4.6 / PH2, 10 kΩ to 1.8 V |
+| 8 | VCC | — | CN12.14, nominal 1.8 V; verify before attaching NAND |
+
+Arduino routing conditions: keep **SB2/SB4 open and SB3/SB5 closed**, the manual's default analog-header digital routing, so A4/A5 expose PC12/PH2 independently of D14/D15. Preserve the stock A1 digital link. Check continuity to the named MCU nets/header equivalents if the delivered board differs; A4 and D14 must not be shorted, nor A5 and D15. Analog amplifier/divider branches on A1/A4/A5 are still loads to include in signal testing; their amplifier output pins are not extra independently available Arduino GPIOs.
+
+Board rework for this alternative is **remove SB24's 0 Ω link, remove R88 and R89 (the PH9/PC1 pull-ups to 3.3 V), and feed CN3.10/VDDIO4 from CN12.14**. The R88/R89 removal is essential before applying 1.8 V or attaching NAND. Leave SB23 in its stock state if the earlier modification has not been made. If VDDIO5 was already modified, record that state first; never restore a 3.3 V bridge while its external 1.8 V feed remains connected. Apply the same all-sources-off procedure, isolation checks and initial 1.71–1.89 V bank measurement as the earlier checklist, using **CN3.10** as the bank test point. The supply is still obtained from CN12, even though all six bus signals and ground are Arduino-accessible. NAND decoupling remains 100 nF plus approximately 1 µF locally.
+
+CS firmware must preload the released state, configure PA3 open-drain with internal pull-up/pull-down disabled before enabling output, and never drive it push-pull high. The external 1.8 V pull-up provides the high level; PA3 only sinks current for selection. Allow the pull-up's measured rise time before starting another transaction. A 1.8 V high need not meet the 3.3 V GPIO input-high specification because CS is output-only: do not use its input readback as a readiness test. Its enabled input buffer can still draw additional current at this intermediate voltage; characterize that rather than assuming zero leakage. Initial VDDIO4VRSEL=0 conservative-speed operation needs no HSLV OTP change.
+
+Tradeoff: this achieves the user's physical header preference with two additional resistor removals compared with the VDDIO5 plan. Quad data spans GPIOC and GPIOH and is not contiguous, so each nibble requires more register accesses/packing than the PC2–PC5 route; the earlier timing scenarios are not measured predictions for this mapping. The camera/recovery/marker signals remain separate. Recommendation favors this option if Arduino access outweighs the extra rework; throughput and energy remain to test.
+
+Sources: [UM3417 Arduino pin assignments and SB2–SB5 routing footnote](https://www.st.com/resource/en/user_manual/um3417-stm32n6-nucleo144-board-mb1940-stmicroelectronics.pdf), [MB1940 sheets 3/4/10](https://www.st.com/resource/en/schematic_pack/mb1940-n657x0q-c02-schematic.pdf), [ST bank-isolation guidance](https://community.st.com/stm32-mcus-boards-and-hardware-tools-26/stm32n6-nucleo-board-not-as-1v8-possible-144776), and [ST AN4899 §4.3.2, open-drain outputs and different supply voltages](https://www.st.com/resource/en/application_note/an4899-stm32-microcontroller-gpio-hardware-settings-and-lowpower-consumption-stmicroelectronics.pdf).
+
+## Earlier selected interface: bit-banged quad SPI on VDDIO5
 
 **Proposed October 17, selected by the user October 18:** software-generated quad SPI removes the hardware peripheral's pin restrictions. Use the six VDDIO5 GPIOs on populated **CN3**, with **SB23 opened** and the isolated bank supplied at 1.8 V through **CN3.31**. This sacrifices the Arduino-header preference but avoids the translator, the VDDIO4 pull-up changes and an unpopulated signal header. Physical modification, communication and bus-speed qualification are still pending.
 
