@@ -1,10 +1,22 @@
 # Alliance NAND wiring for the Nucleo prototype
 
-October 17, 2026. **D-46 selects AS5F14G04SND-10LIN for prototype storage bring-up.** The user strongly prefers Arduino headers, then connections nearer ST-LINK. This is a reviewed wiring proposal, not completed assembly or successful NAND communication. Power characterization is deferred; camera firmware and existing instrument/recovery wiring were not changed.
+October 18, 2026. **D-46 selects AS5F14G04SND-10LIN for prototype storage bring-up; the October 18 follow-up selects bit-banged quad SPI on the 1.8 V VDDIO5 bank.** The user accepted populated CN3 as the practical alternative to the preferred Arduino headers. This is the selected wiring plan, not completed assembly or successful NAND communication. Power characterization is deferred; camera firmware and existing instrument/recovery wiring were not changed by this documentation work.
 
-## Recommended candidate: bit-banged quad SPI on VDDIO5
+## Selected interface: bit-banged quad SPI on VDDIO5
 
-**October 17 follow-up:** software-generated quad SPI removes the hardware peripheral's pin restrictions. The recommended candidate now uses the six VDDIO5 GPIOs on populated **CN3**, with **SB23 opened** and the isolated bank supplied at 1.8 V through **CN3.31**. It sacrifices the Arduino-header preference but avoids the translator, the VDDIO4 pull-up changes and an unpopulated signal header. This remains a reviewed proposal, not an approved/performed modification or a measured bus-speed result.
+**Proposed October 17, selected by the user October 18:** software-generated quad SPI removes the hardware peripheral's pin restrictions. Use the six VDDIO5 GPIOs on populated **CN3**, with **SB23 opened** and the isolated bank supplied at 1.8 V through **CN3.31**. This sacrifices the Arduino-header preference but avoids the translator, the VDDIO4 pull-up changes and an unpopulated signal header. Physical modification, communication and bus-speed qualification are still pending.
+
+### Assembly checklist
+
+1. **Remove all board power before soldering.** Disconnect USB at CN8 and CN10, and temporarily disconnect the JS110 OUT0 recovery lead at the board so it cannot feed the unpowered MCU. Wait for the target rails to discharge. Keep the known-good CN9/BOOT jumper arrangement for reassembly.
+2. **Open SB23 by removing its fitted 0 Ω link.** UM3417 defines closed SB links as 0 Ω resistors; do not cut an arbitrary PCB trace. Identify the SB23 marking on the actual board. With power removed, its bank-side pad must trace to CN3.31 and its former supply side to CN3.5 (main VDDIO). Verify no solder bridge remains and that these rails are no longer directly shorted; in-circuit semiconductor/capacitor paths need not read infinite resistance. SB24 stays fitted. The physical SB23 location has not been independently identified in a placement drawing, so no board-side/direction landmark is claimed.
+3. **Add the bank supply wire: CN12.14 → CN3.31.** CN12.14 is the existing nominal 1.8 V supply measurement node. Leave R104 fitted. CN12.13/14 are both sides of a current-measurement pair, not power and ground. The new wire must be installed only after SB23 is open.
+4. **Check the rails before attaching NAND.** Restore the normal power connections and measure CN3.31 relative to CN3.19: nominal 1.8 V, within **1.71–1.89 V** for the initial MCU low-speed configuration. CN3.5 should remain approximately 3.3 V. If the bank reads 3.3 V, disconnect power and resolve the bridge/wiring before connecting NAND. Power down again before the remaining assembly.
+5. **Mount the LGA-8 NAND on a suitable carrier and connect the eight pins in the table below.** Use the package pin-1 marking and manufacturer's top-view drawing; underside pad order is mirrored. All listed CN3 connections are on its odd-numbered row; count from the marked pin 1, with numbers increasing by two along that row.
+6. **Fit local passives at the NAND:** 100 nF ceramic plus approximately 1 µF between VCC pin 8 and GND pin 4, and three 10 kΩ pull-ups from CS# pin 1, IO2 pin 3 and IO3 pin 7 to the same 1.8 V rail. IO2/IO3 remain connected to their MCU pins; the resistors do not replace those wires. Keep clock/data wires and ground return short. A 22–47 Ω clock series resistor near CN3.17 is an optional signal-integrity provision.
+7. **Restore the recovery connection and bench wiring, then report assembly complete for the API smoke test.** The installed camera image has no NAND driver yet. First test is identity/configuration and rail checks, followed by bounded scratch-block program/readback with factory bad-block markers preserved. No OTP programming is needed for initial conservative-speed operation.
+
+Nucleo PCB rework is limited to SB23 plus the 1.8 V feed; the pull-ups and capacitors belong on the NAND carrier. Existing camera, BOOT, CN9 supply route, and other probes retain their functions. Additional NAND load and shared 1.8 V rail stability remain to be measured during operation.
 
 | NAND pin | Function | MCU GPIO | Connection |
 |---:|---|---|---|
@@ -15,7 +27,7 @@ October 17, 2026. **D-46 selects AS5F14G04SND-10LIN for prototype storage bring-
 | 5 | IO0 / SI | PC2 | **CN3.3** |
 | 6 | CLK | PC0 | **CN3.17** |
 | 7 | IO3 / HOLD# | PC5 | **CN3.15**, with 10 kΩ pull-up to 1.8 V |
-| 8 | VCC | — | **CN12.14**, verified nominal 1.8 V |
+| 8 | VCC | — | **CN12.14**, nominal 1.8 V; verify before attaching NAND |
 
 Feed **CN3.31 (VDDIO5)** from that same 1.8 V source **only after opening SB23 and verifying isolation from the stock 3.3 V supply with power removed**. Verify the physical bridge identity and delivered-board connections before rework. The reviewed schematic exposes these six signals as header GPIOs without additional onboard pull-ups or peripheral drivers; physical continuity has not been tested. All six belong to VDDIO5. They avoid the current camera, boot NOR, PE1 recovery and PD0/PE0 timing markers. The supply-headroom and decoupling requirements below still apply.
 
@@ -51,7 +63,7 @@ For an equal-power illustration, `extra_energy = powered_system_watts * extra_se
 
 Actual interface energy is better modeled as `P_bitbang * t_bitbang - P_hardware * t_hardware`, plus any differences in other phases and regulator losses. Bit-banging occupies the CPU during payload transfer; hardware with DMA can permit CPU sleep or useful work. **Both approaches can sleep between NAND busy-status checks**, so the common 0.56 s programming interval must not automatically be charged as extra CPU work for bit-banging. Turn off unneeded camera/receiver activity after capture in either design. Additional NAND program energy is common to both routes; NAND I/O current versus clock and real GPIO-loop CPU power still need measurement.
 
-Recommendation remains appropriate for functional prototype bring-up, but not a claim of battery efficiency. Before committing to board rework, a guarded GPIO throughput experiment can establish software clock rates without NAND attached; actual read performance and complete energy require the connected device and a qualified power boundary. Preserve the camera/recovery prefix and shared-bench ownership rules. No hardware experiment was performed for these estimates.
+The user selected this route on October 18 for functional prototype bring-up; this does not establish battery efficiency. A guarded GPIO throughput experiment can establish software clock rates without NAND attached; actual read performance and complete energy require the connected device and a qualified power boundary. Preserve the camera/recovery prefix and shared-bench ownership rules. No hardware experiment was performed for these estimates.
 
 ## Unmodified-board alternative: Arduino SPI5 with translation
 
@@ -100,7 +112,7 @@ Add 100 nF at each translator supply pin to ground. OE is active high. Firmware 
 - Preserve the qualified boot/recovery prefix. The first storage experiment can write the already captured frame; subsequent allocation timing must honor the existing capture-integrity policy.
 - Read JEDEC identity/configuration before erasing. Use an explicit scratch block, preserving factory bad-block markers. Validate program status, ECC and full readback before storing camera objects.
 - **This is single-bit SPI, not hardware quad-SPI.** Arduino pins do not expose XSPIM. A later quad path is available through unpopulated CN16: CS PO0/.5, CLK PO4/.13, IO0 PP0/.3, IO1 PP1/.2, IO2 PP2/.4, IO3 PP3/.6, AF9. These are also 3.3 V on the stock board (VDDIO2). Changing headers does not remove translation. TXU0304 does not implement bidirectional quad data; that interface needs a separate design. The PN/1.8 V bank is already used by boot NOR.
-- SPI5 is proposed for header convenience, not final save-speed/energy qualification. The NAND choice is approved; the interface remains a proposal.
+- SPI5 is retained as an unmodified-board alternative for header convenience, not the selected interface or final save-speed/energy qualification. The October 18 selection is the VDDIO5 bit-banged quad route above.
 
 ## Alternative: a native 1.8 V GPIO bank
 
