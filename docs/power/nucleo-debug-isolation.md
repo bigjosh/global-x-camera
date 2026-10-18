@@ -1,5 +1,13 @@
 # Nucleo debugger isolation and power measurement
 
+## Selected assembly path — October 18
+
+The user has selected LTC3621 at **5.0 V**, retaining the Nucleo's downstream converters, and Alliance NAND on Arduino-header bit-banged GPIOs. Follow the [consolidated assembly guide](../prototype/nucleo-assembly-guide.md) and its verified ST assembly-location diagrams. Remove/open **D2** to break target-to-debugger supply, remove **R23** to disconnect LD1, keep all CN9 shunts absent, and feed target CN9.2 from LTC through the JS110 if desired. This replaces the CN8/CN9.3 bench source; keep CN8 unplugged during this configuration. No rework is yet reported as performed.
+
+The guide separately identifies **U24** removal for Ethernet load elimination. Leave the unused U14 converter's supply links alone: its EN pull-down already disables it with R22 absent. The NAND conversion removes SB24/R88/R89 and uses 1.8 V VDDIO4. These are not direct-3.3 V changes to the main supply tree.
+
+Retain separately powered CN10 and the qualified PE1 recovery path during development. **This does not qualify complete debugger isolation:** R65/R70 draw approximately 165 µA from powered target 3.3 V and R73/R74 draw approximately 331 µA from target 5 V; SWD, reset and other interfaces remain. Full OFF-state/backfeed qualification and standalone energy measurement remain separate work. The current RAM-only firmware behavior below is unchanged.
+
 ## Current firmware readiness for power characterization — October 17
 
 The installed guarded v41 default-exposure image boots from NOR and acquires its first image autonomously. It does not require a host debugger command to start capture. The [qualified sequencing report](../../reports/Camera%20lane%20startup%20mismatch.md) identifies the exact installed image and its normal/recovery tests. Removing CN10 has not yet been tested with this exact image; autonomous cold captures so far retained the physical debugger USB connection without issuing debugger commands during capture.
