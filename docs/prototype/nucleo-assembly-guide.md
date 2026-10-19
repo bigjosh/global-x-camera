@@ -36,6 +36,18 @@ Keep **all CN9 shunts absent**. Leave **CN8 unplugged** during LTC/battery captu
 
 **Temporary USB-only functional operation:** after D2/R23 removal, CN8 can still power the target with CN10 unplugged. Disconnect LTC/external target power. Use either the existing CN9.3 → JS110 → CN9.2 route with all CN9 shunts absent, or, without that JS path, the normal CN9 **3–4** source-selection shunt. Do not fit the shunt across the JS measurement path. D2 removes the main debugger supply feed, but the unpowered debugger remains connected through signals and sense dividers. Its FT inputs lack the ordinary upper protection diode; that does not establish a powered-off leakage limit or qualify power transitions. **Keep CN10 independently powered for development; CN10-unplugged use remains an unqualified test configuration.** Qualification requires interface-current/loading checks as well as debugger rail voltage, target reset release and autonomous capture. See the [specific audit](../power/nucleo-debug-isolation.md#d2-and-r23-removed-cn8-only-functional-operation--october-18). LD1 is intentionally dark after R23 removal. This USB configuration is distinct from step 4's LTC-powered setup.
 
+### MCU-controlled LEDs retained after rework
+
+The three dedicated user LEDs remain available to the STM32N657 after D2/R23 removal:
+
+| Board LED | Color | MCU GPIO | Drive |
+|---|---|---|---|
+| LD5 | Red | PG10 | LOW on, HIGH off |
+| LD6 | Green | PG0 | LOW on, HIGH off |
+| LD7 | Blue | PG8 | LOW on, HIGH off |
+
+These pins do not overlap the selected Arduino NAND connections or the converted VDDIO4 bank. They are target-controlled and do not require debugger firmware. R23 removal affects only the separate LD1 power indicator. There is also a green Arduino LED, LD3, connected to PB15/D13. The dedicated LD5/LD6/LD7 group is convenient for firmware status; this hardware inventory does not change the agreed yellow/green/red product indication policy or implement it in the current diagnostic firmware. Verified against [UM3417 Rev4 §7.8](https://www.st.com/resource/en/user_manual/um3417-stm32n6-nucleo144-board-mb1940-stmicroelectronics.pdf), C02 schematic sheets10/12, and the local ST BSP definitions on October18; no hardware test was performed.
+
 ## 2. Convert the NAND GPIO bank to 1.8 V
 
 | Part | Action | Purpose |
