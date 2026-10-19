@@ -1,0 +1,104 @@
+# Capture phase LEDs and completion sleep
+
+The v44 builder adds the user's October 18 phase indications to the exact,
+qualified default-exposure v41 capture image. It does not change sensor or
+receiver sequencing. These source files and the builder operate offline;
+programming and hardware qualification belong to the guarded bench workflow.
+
+**October 18 status:** this exact v44 image was programmed with full 64 KiB
+readback verification, and the user subsequently reported that the LEDs were
+working. Instrumented capture, CPU-sleep, timing and PE1 recovery qualification
+remain incomplete for v44; see the [preserved evidence](../evidence/2026-10-18-phase-leds/README.md).
+The user is continuing physical board modifications, so recheck wiring and
+bench ownership before any further hardware operation.
+
+| Phase | LED | Transition |
+| --- | --- | --- |
+| Application boot | LD5 red, PG10 low | First operation in `stage1_main`, before the recovery-input setup |
+| Image acquisition | LD7 blue, PG8 low | First rising sensor STROBE, after the existing event 50 marker |
+| Captured in RAM | All off | First complete frame callback, after the existing event 30 marker |
+| NAND writing | LD6 green, PG0 low | Helper reserved for the future NAND write implementation; currently never called |
+| Successful completion | All off | Existing event 40, then shallow CPU WFI sleep |
+| Fatal capture failure | Solid red | Existing awake, debuggable error path |
+
+ROM code runs before application firmware, so red cannot cover the ROM's boot
+interval. The red GPIO is initialized without a GPIO-bank reset, with all three
+output latches high before output mode; only PG0, PG8 and PG10 are changed.
+Repeated STROBE pulses do not turn blue back on after the first frame.
+
+Normal completion still stops the capture pipeline, verifies it idle, disables
+data lanes, requests sensor STOP, calculates the frame checksum and rejects raw
+CSI error history before sleeping. Sleep disables SysTick and all NVIC enables,
+clears pending IRQs, leaves `SLEEPDEEP` and `SLEEPONEXIT` clear, and preserves RAM,
+debug clocks and ordinary recovery. This is **CPU-only sleep**, not the eventual
+lowest-power camera shutdown or LTC RUN release. The sensor rail remains on.
+
+The PE1 recovery source and 100 microsecond settle policy remain byte-for-byte
+identical to v41. The new prefix binary has its own exact host allowlist entry,
+but still needs a successful hardware recovery check. No stage-one LED proof accesses expanded SRAM before
+`raw10_memory_init` returns.
+
+Build a new output directory:
+
+```powershell
+& 'C:/Users/joshd/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe' `
+  firmware/capture-timing/status_leds/build.py `
+  --base tmp/bringup/capture-phy-ready-v41-force-lane1-stop100-default-20261017 `
+  --output tmp/bringup/capture-status-leds-v44-default-20261018
+```
+
+The builder verifies the exact v41 sector, receiver, prefix and every manifest
+source hash. Output includes copied frozen sources, ELF/disassembly, manifests,
+the boot image and the complete first 64 KiB sector. Every output is initially
+marked hardware-untested. It will not overwrite an existing output directory.
+
+The first completed offline build has:
+
+- Sector: `a325b36ed6d3f893ebe0d1153f476fd06fc51c648a1fe55aac15d353c959b4d8`.
+- Prefix: 4652 bytes, `875d665e050aa2c20e59843c382130d2029035a478230a39f15892ce543c90c6`.
+- Receiver: 14344 bytes, `478680d7ca87b19a0bcbab208535b36ab1fd985e141ce69a86b3602963a621ac`.
+- Recovery park: `0x3418078c`, `fee7` (branch to itself).
+- Failure park: `0x34301546`, `fee7`.
+- Completion loop: `0x343022d8`, `30bf fde7` (WFI, branch back to WFI).
+
+## Proof buffer and offline validation
+
+The 32-word LED proof occupies `0x343f89c0` through `0x343f8a3f`, immediately
+after the existing ForceRx proof. Its field names are in each output manifest.
+It records ODR/IDR and DWT timestamps for red, blue, off and sleep preparation,
+GPIO configuration, interrupt state and any fatal-error transition. The red
+timestamp is a **post-SRAM-initialization snapshot**, not initial red assertion.
+
+After the root bench controller has read exactly 128 bytes from that address:
+
+```powershell
+& 'C:/Users/joshd/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe' `
+  firmware/capture-timing/status_leds/inspect.py `
+  --input path/to/led-proof.bin `
+  --manifest tmp/bringup/capture-status-leds-v44-default-20261018/staged/manifest.json `
+  --capture-result path/to/capture-result.json `
+  --out path/to/led-proof.json
+```
+
+The capture result is optional. When present, validation also requires an intact,
+error-free frame from this receiver, first-STROBE/frame association, and LED
+timestamps consistent with the preserved event markers. Frozen-source checks
+reject changed recovery code or LED proof access before memory initialization.
+Validation rejects incorrect LED levels, green in any snapshot, incorrect order,
+enabled/pending interrupts, deep sleep or a recorded fatal error.
+
+Snapshots do not prove continuous electrical levels or LED brightness. The
+`sleep_state` means **prepared**, and the decoder deliberately reports
+`cpu_sleep_observed: false`. A live read of DHCSR `S_SLEEP` or reviewed CPU
+context at the WFI loop must establish actual sleeping independently.
+
+Run the negative tests:
+
+```powershell
+& 'C:/Users/joshd/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe' `
+  -m unittest discover -s firmware/capture-timing/status_leds -p test_status_leds.py -v
+```
+
+The eight tests cover wrong-pin/active-green evidence, later-frame substitution,
+incorrect timing association, wrong firmware identity, interrupt/sleep/error
+regressions, early-memory ordering, and fail-closed frozen-source hooks.

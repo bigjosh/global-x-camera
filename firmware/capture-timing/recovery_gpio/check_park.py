@@ -23,6 +23,11 @@ FIELDS = ('magic schema words state reason pin nominal_hz settle_cycles '
           'ahb4enr demcr dwt_ctrl control ipsr primask dbgcr ap_unlock reserved').split()
 # An unknown/self-consistent build is insufficient authorization to halt.
 APPROVED = {
+    # v44 phase LEDs: reviewed masked GPIO setup before the unchanged guard.
+    # Exact binary approval enables validation; it is not hardware qualification.
+    '875d665e050aa2c20e59843c382130d2029035a478230a39f15892ce543c90c6':
+        {'bytes': 4652, 'park': 0x3418078C,
+         'sector': 'a325b36ed6d3f893ebe0d1153f476fd06fc51c648a1fe55aac15d353c959b4d8'},
     # v43 lane1/PEN+200us timing discriminator, reviewed complete guard.
     '7e4d6d6249c501d963c5f9f421a3f50e1573410c869bb27d726b96a6f1acde31':
         {'bytes': 4436, 'park': 0x3418078C,

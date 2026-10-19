@@ -1,0 +1,51 @@
+{
+  "schema": 1,
+  "date_local": "2026-10-18",
+  "installed_sector_sha256": "a325b36ed6d3f893ebe0d1153f476fd06fc51c648a1fe55aac15d353c959b4d8",
+  "full_sector_program_readback_verified": true,
+  "preflight_capture": {
+    "firmware": "v41",
+    "completed": true,
+    "image_integrity_matches": true,
+    "recorded_camera_errors": 0
+  },
+  "instrumented_v44_attempts": {
+    "first_reset": "Exact v44 prefix; terminal prefix result 17, sensor phase 2/result -3; red GPIO state recorded; no frame",
+    "second_reset": "PO5 low independently read back after a failed write command; then MCU NRST; later AP1 inaccessible",
+    "ap0_reset_pulse_connected": true,
+    "later_ap1_connected": false,
+    "later_ap0_read": "No debug probe detected; cause not established",
+    "complete_capture_qualified": false,
+    "cpu_sleep_measured": false,
+    "true_cold_start_measured": false,
+    "recovery_gpio_park_qualified": false,
+    "failure_cause": "unknown; no attribution to sleep, firmware, or hardware wiring proven"
+  },
+  "user_visual_report": {
+    "reported": true,
+    "quotation": "LEDs working great. I will continue with board modifications now.",
+    "source": "User message relayed by the owning bench agent",
+    "instrumented_capture_or_sleep_evidence": false
+  },
+  "user_reported_power_route": "CN8 directly powers target through CN9 jumper; JS110 not in series",
+  "recovery_interface_observation": "OUT0 low retained setting did not produce an observed PE1 low",
+  "saleae_observation": "Digital all low, analog near zero; physical probe/ground validity unresolved",
+  "remaining_qualification": [
+    "Complete v44 frame with checksum and phase proof",
+    "Independent CPU sleep observation",
+    "Measured true cold-start timing",
+    "GPIO-selected recovery and guarded maintenance on the current wiring"
+  ],
+  "bench_shutdown": {
+    "js110_closed_cleanly": true,
+    "js110_closed_utc": "2026-10-19T00:56:12.177760+00:00",
+    "range_restored_to_starting_128": true,
+    "retained_extio_mv": 3300,
+    "retained_out0": 1,
+    "retained_out1": 0,
+    "restoration_errors": [],
+    "physical_output_voltage_verified": false,
+    "no_remaining_helper_or_programmer_processes": "Reported by owning bench agent",
+    "logic_backend_left_open": true
+  }
+}
