@@ -5,10 +5,14 @@ The PDF is rendered, never reinterpreted as a photograph. Labels and callouts
 are drawn in the PDF's native page coordinates using ODB++/pick-place data.
 """
 from pathlib import Path
+import argparse
 import json
 import sys
 
 ROOT=Path(__file__).resolve().parent
+parser=argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--only',choices=('rework-overview','rework-details','header-connections'),help='Write only the selected figure; preserve the other outputs.')
+ARGS=parser.parse_args()
 # Optional local tool dependencies used during initial generation.
 local=ROOT.parents[2]/'tmp/hardware-review/nucleo-modifications/python-deps'
 if local.exists(): sys.path.insert(0,str(local))
@@ -49,6 +53,9 @@ def footer(fig,text):
     fig.text(.035,.018,text,fontsize=9,color='#536773',va='bottom')
 
 def save(fig,name):
+    if ARGS.only and ARGS.only!=name:
+        plt.close(fig)
+        return
     fig.savefig(ROOT/f'{name}.png',dpi=180,facecolor='white')
     fig.savefig(ROOT/f'{name}.svg',facecolor='white')
     svg=ROOT/f'{name}.svg'
@@ -106,14 +113,14 @@ ax=fig.add_subplot(gs[0,1]);background(ax,0,(560,75,765,170));ax.set_title('CN12
 callout(ax,'CN12','14: existing 1.8 V',(580,85),'#7b3d99',r=9,pin=14,fs=10)
 ax=fig.add_subplot(gs[1,0]);background(ax,0,(100,300,190,440));ax.set_title('CN3: feed isolated VDDIO4',fontweight='bold')
 callout(ax,'CN3','10: isolated bank supply',(105,425),'#7b3d99',r=9,pin=10,fs=9)
-ax=fig.add_subplot(gs[1,1]);background(ax,0,(610,300,710,570));ax.set_title('CN14: NAND CS, clock, IO2 and ground',fontweight='bold')
-for pin,label,color,where in [(10,'10 / D15: CLK',BLUE,(612,310)),(9,'9 / D14: IO2',BLUE,(612,368)),(7,'7: GND','#222222',(612,430)),(3,'3 / D10: CS#',BLUE,(612,548))]:
+ax=fig.add_subplot(gs[1,1]);background(ax,0,(560,300,765,570));ax.set_title('CN14: NAND power, ground and signals',fontweight='bold')
+for pin,label,color,where in [(10,'10 / D15: CLK',BLUE,(570,310)),(9,'9 / D14: IO2',BLUE,(680,345)),(8,'8 / AREF: 1.8 V','#7b3d99',(570,383)),(7,'7: GND','#222222',(680,425)),(3,'3 / D10: CS#',BLUE,(570,548))]:
     callout(ax,'CN14',label,where,color,r=9,pin=pin,fs=9)
 ax=fig.add_subplot(gs[2,0]);background(ax,0,(170,610,260,775));ax.set_title('CN4: NAND IO0, IO1 and IO3',fontweight='bold')
 for pin,label,where in [(2,'2 / A1: IO0',(172,623)),(5,'5 / A4: IO1',(220,722)),(6,'6 / A5: IO3',(172,766))]:
     callout(ax,'CN4',label,where,BLUE,r=9,pin=pin,fs=9)
 ax=fig.add_subplot(gs[2,1]);ax.axis('off')
 ax.text(0,1,'Connections to make',fontsize=15,fontweight='bold',va='top')
-ax.text(0,.87,'CN12.14  ->  CN3.10 and NAND VCC\n\nNAND VSS  ->  CN14.7 (GND)\n\nLTC 5 V  ->  CN9.2\nLTC GND  ->  common board ground\n\nNAND pinout and pullups: see the build guide.\n\nThe 1.8 V jumper is fitted only after SB24\nis open and R88 / R89 have been removed.',fontsize=11,va='top',linespacing=1.55)
+ax.text(0,.87,'CN12.14  ->  CN3.10  ->  CN14.8 (AREF)\nCN14.8  ->  NAND pin 8 / VCC\nNAND VSS  ->  CN14.7 (GND)\n\nR125 must remain unfitted.\nLabel AREF as 1.8 V; verify before NAND hookup.\n\nLTC 5 V  ->  CN9.2; GND  ->  board ground\n\nFit the 1.8 V jumpers only after SB24 is open\nand R88 / R89 have been removed.\nNAND pinout and pullups: see the build guide.',fontsize=10.5,va='top',linespacing=1.4)
 footer(fig,'Exact pin coordinates come from ST ODB++ pad records, cross-checked against the assembly drawing.\nCN12.13 and CN12.14 are both sides of a current-sense link; neither is ground. The pin labels above are physical connector pin numbers.')
 save(fig,'header-connections')

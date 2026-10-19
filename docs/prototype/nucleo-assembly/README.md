@@ -4,13 +4,15 @@ These figures locate the parts and connector pins used by the consolidated Nucle
 
 - `rework-overview.png` / `.svg`: top and bottom locations for D2, R23, R88, R89, SB24, and U24.
 - `rework-details.png` / `.svg`: close-ups of the six parts. SB24 is on the bottom; all five other parts are on the top.
-- `header-connections.png` / `.svg`: exact connector-pad locations for the 5 V input, 1.8 V feed and Arduino NAND signals.
+- `header-connections.png` / `.svg`: exact connector-pad locations for the 5 V input, 1.8 V feed and all Arduino NAND connections, including repurposed AREF/CN14.8 for VCC.
 - `power-wiring.png` / `.svg`: conceptual electrical connections, including the user-confirmed DC1863A at 5 V. Regenerate with `tools/build_nucleo_power_wiring.py` from the repository root; requires Pillow.
 - `mb1940-c02-assembly.pdf`: source assembly pages 16-17 extracted from the official C02 schematic pack, retaining ST's drawing titles and revision information.
 - `locations.json`: physical coordinates, PDF annotation coordinates, exact ODB++ pad records and source hashes.
-- `build_diagrams.py`: regenerates the PNG/SVG diagrams from the two local input files; requires Python, PyMuPDF, Matplotlib and NumPy. Run from any directory with `python build_diagrams.py` using its full path.
+- `build_diagrams.py`: regenerates the PNG/SVG diagrams from the two local input files; requires Python, PyMuPDF, Matplotlib and NumPy. Run from any directory with `python build_diagrams.py` using its full path; use `--only header-connections` to update just the header figure.
 
 The guide, not a diagram alone, determines the rework order and electrical prerequisites. The diagrams separate the basic five-part work from U24 Ethernet removal. **R32/R33 and the U14 regulator circuit are not modification targets.** The generic manufacturing pick-and-place file includes unfitted parts and must not be used as proof of C02 population; use the C02 BOM, schematic and actual board inspection.
+
+**Canonical NAND power route, selected October 18:** CN12.14 → CN3.10/VDDIO4 → CN14.8/AREF → NAND pin 8/VCC. The first two arrows are board supply jumpers; the last is the NAND supply lead. Keep R104 fitted and R125 absent, and verify 1.71–1.89 V at CN14.8 before attaching NAND. Label AREF 1.8 V. NAND ground remains CN14.7. The figures describe the selected plan, not completed physical work.
 
 ## Sources and coordinate verification
 

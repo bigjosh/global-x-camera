@@ -12,7 +12,7 @@ Follow these stages in order:
 
 1. Remove the debugger's target-supply path and the target power LED.
 2. Convert VDDIO4 to 1.8 V; verify its voltage before attaching NAND.
-3. Wire the NAND on the Arduino headers.
+3. Feed Arduino AREF/CN14.8 from CN3.10, then wire the NAND entirely on the Arduino headers.
 4. Feed the target from the meter-verified 5 V LTC output.
 5. Remove the unused Ethernet PHY, then repeat the camera test.
 6. Implement and test NAND storage and the final RUN/HOLD/shutdown cycle.
@@ -87,13 +87,13 @@ The Alliance chip is a bare **8 × 6 mm LGA-8**, not an Arduino module. Use a co
 | 5 | IO0 | **A1 / CN4.2 / PC10** | — |
 | 6 | SCLK | **D15 / SCL / CN14.10 / PH9** | — |
 | 7 | IO3 / HOLD# | **A5 / CN4.6 / PH2** | 10 kΩ to NAND 1.8 V |
-| 8 | VCC | **CN12.14**, nominal 1.8 V | 100 nF + approximately 1 µF to pin 4, close to chip |
+| 8 | VCC | **AREF / CN14.8**, repurposed as 1.8 V | Feed from CN3.10; 100 nF + approximately 1 µF to pin 4, close to chip |
 
-All six bus signals and ground use Arduino headers. The 1.8 V supply and bank-feed jumper are the exceptions: there is no stock Arduino 1.8 V power pin. Keep connections short, with a close ground return. Do not tie IO2/IO3 directly high; they become data lines in quad transfers.
+All eight NAND connections now use Arduino headers, including VCC through the repurposed AREF contact. The board's stock Arduino headers have no 1.8 V power output; the two supply jumpers below provide it. Keep connections short, with a close ground return. Do not tie IO2/IO3 directly high; they become data lines in quad transfers.
 
-**Optional Arduino-side NAND power tap, October 18:** to keep the NAND connector wiring on the Arduino headers, use **CN14 pin 8 (AREF)** as a repurposed 1.8 V contact. On C02, **R125 is not fitted**, isolating this contact from VREFP; confirm it remains absent and keep it absent. After completing step 2 and verifying CN3.10 is 1.8 V, add a short wire **CN3.10 → CN14.8**, then connect **NAND pin 8/VCC → CN14.8**. Retain the existing **CN12.14 → CN3.10** bank-feed wire. NAND ground stays **CN14.7** and local decoupling stays at the chip. This extends the regulator rail; it does not power the NAND from a GPIO. Check CN14.8 measures 1.71–1.89 V before attaching NAND, and label the repurposed AREF contact **1.8 V**. Do not attach an external analog reference there.
+**Canonical NAND power route, selected October 18:** retain **CN12.14 → CN3.10 (VDDIO4)**, add **CN3.10 → CN14.8 (AREF)**, and connect **NAND pin 8/VCC → CN14.8**. On C02, **R125 is not fitted**, isolating AREF from VREFP; confirm it remains absent and keep it absent. Install the AREF jumper with power disconnected after completing step 2. NAND ground stays **CN14.7** and local decoupling stays at the chip. This extends the regulator rail; it does not power the NAND from a GPIO. Check CN14.8 measures **1.71–1.89 V** before attaching NAND, and label the repurposed AREF contact **1.8 V**. Do not attach an external analog reference there.
 
-This is an offered wiring convenience, not a report that the user has made the change; the baseline table/diagram above still shows direct CN12.14 power. **CN5.1 is not a free NC contact on C02**: fitted R1 (1 kΩ) connects it to 5V_VIN. CN5.2/IOREF and CN5.4 remain 3.3 V after the bank4 conversion. These connections and R125's unfitted status were checked against C02 schematic sheet 10 and the C02 BOM; see the [ST schematic](https://www.st.com/resource/en/schematic_pack/mb1940-n657x0q-c02-schematic.pdf#page=10) and [BOM](https://www.st.com/resource/en/bill_of_materials/mb1940-bom.zip). No bench operation or additional physical modification was performed for this clarification.
+This selected route supersedes the direct CN12.14-to-NAND wire; physical completion has not yet been reported. **CN5.1 is not a free NC contact on C02**: fitted R1 (1 kΩ) connects it to 5V_VIN. CN5.2/IOREF and CN5.4 remain 3.3 V after the bank4 conversion. These connections and R125's unfitted status were checked against C02 schematic sheet 10 and the C02 BOM; see the [ST schematic](https://www.st.com/resource/en/schematic_pack/mb1940-n657x0q-c02-schematic.pdf#page=10) and [BOM](https://www.st.com/resource/en/bill_of_materials/mb1940-bom.zip). No bench operation or physical modification was performed to update this plan.
 
 **CS must never drive 3.3 V into NAND.** Firmware preloads PA3's released state, disables internal pulls and enables open-drain output. The external 1.8 V resistor provides HIGH. Do not use PA3 input readback as a guaranteed high indication: its input thresholds still belong to the 3.3 V domain.
 
@@ -150,7 +150,7 @@ See the [diagram provenance and original coordinates](nucleo-assembly/README.md)
 
 ## Bring-up acceptance checks
 
-1. Inspect each removed component for an open connection and solder bridges. Check 5 V/1.8 V to ground before power; confirm all CN9 shunts remain out.
+1. Inspect each removed component for an open connection and solder bridges. Confirm R125 remains absent, the two 1.8 V jumpers follow CN12.14 → CN3.10 → CN14.8, and the NAND VCC wire ends at CN14.8. Check 5 V/1.8 V to ground before power; confirm all CN9 shunts remain out. Verify 1.71–1.89 V at CN14.8 before attaching NAND.
 2. Verify rail startup and a camera RAM capture using the existing guarded image, preserving the PE1 recovery guard. Repeat after each optional load trim. Successful meter readings alone do not qualify capture or cold boot.
 3. In new firmware, enable the VDDIO4 monitor, wait for valid supply and release its isolation before bus use. Start with **VDDIO4VRSEL = 0** conservative 1.8 V operation; no HSLV OTP programming is needed for this first test.
 4. Wait for the NAND's specified power-on interval and check OIP/ready before operations. Read identity/features/status at a slow software clock, keeping IO3/HOLD# high during single-bit commands. Preserve factory bad markers. Only then use a designated scratch block for erase/program/readback/ECC checks and characterize quad transfers. Keep ECC enabled; handle IO direction turnaround and CS rise time explicitly.
