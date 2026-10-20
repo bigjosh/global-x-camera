@@ -56,6 +56,24 @@ class CompactTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     cycle_plot.export(self.raw,self.path)
 
+    def test_unqualified_plateau_flags_survive_compact_export(self):
+        old=self.analysis['cycles'][0]
+        window=dict(name='unverified current signature',**old['window'],
+                    terminal_state_qualified=False,terminal_evidence=old['terminal_evidence'])
+        analysis=cycle_energy.analyze(self.raw,dict(criteria=CRITERIA,cycles=[window]),
+                                      allow_unqualified_plateau=True)
+        self.path.write_text(json.dumps(analysis))
+        compact=cycle_plot.export(self.raw,self.path)
+        metadata=compact['cycle_analysis']
+        self.assertFalse(metadata['terminal_state_qualified'])
+        # This is also the metadata consumed by plot's ambiguity annotation.
+        self.assertFalse(metadata['completion_boundary_qualified'])
+        self.assertFalse(metadata['onset_to_plateau_energy_is_complete_cycle'])
+        self.assertIn('not firmware completion, SBF or file verification',
+                      metadata['terminal_state_qualification'])
+        self.assertAlmostEqual(compact['exact_segment_integrals_j']['onset_to_plateau_energy_j'],
+                               old['onset_to_plateau_energy_j'],places=12)
+
     def test_signed_power_is_preserved_and_partial_bin_boundaries_fail(self):
         class Fake:
             rate=1000

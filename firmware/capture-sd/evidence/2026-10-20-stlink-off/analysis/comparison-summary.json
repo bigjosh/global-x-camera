@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "scope": "CN10 unplugged: measured current/power signatures only. No SBF, firmware completion, image capture or saved-file verification. No valid Saleae reset/rail evidence.",
+  "native_sample_rate_hz": 2000000,
+  "recording_finalized": true,
+  "cycle_windows_all_finite": true,
+  "unqualified_plateau_mode_enabled": true,
+  "cycles": [
+    {
+      "name": "CN10 unplugged cycle 1 (unverified plateau)",
+      "onset_to_plateau_s": 2.9769435,
+      "onset_to_plateau_energy_j": 1.4220638733792943,
+      "pretrigger_energy_j": 0.0,
+      "separate_one_second_plateau_energy_j": 0.04026203120632283,
+      "plateau_mean_current_ma": 8.227119770041224,
+      "plateau_mean_power_mw": 40.250314100868636,
+      "peak_current_a": 7.727181434631348,
+      "minimum_source_voltage_v": 1.986903190612793,
+      "completion_boundary_qualified": false
+    },
+    {
+      "name": "CN10 unplugged cycle 2 (unverified plateau)",
+      "onset_to_plateau_s": 3.103637,
+      "onset_to_plateau_energy_j": 1.4975336816028588,
+      "pretrigger_energy_j": 0.0,
+      "separate_one_second_plateau_energy_j": 0.04026228775131702,
+      "plateau_mean_current_ma": 8.227457400848227,
+      "plateau_mean_power_mw": 40.25077117034826,
+      "peak_current_a": 7.751937389373779,
+      "minimum_source_voltage_v": 1.9891730546951294,
+      "completion_boundary_qualified": false
+    }
+  ],
+  "prior_cn10_connected": {
+    "cycles": 3,
+    "energy_j_range": [
+      1.4098410906889047,
+      1.423818548507724
+    ],
+    "duration_s_range": [
+      2.9628615,
+      2.9825315
+    ],
+    "plateau_mean_current_ma_range": [
+      8.103175721250397,
+      8.212158422688894
+    ],
+    "scope": "Earlier qualified v59/SBF cycles; not controlled simultaneous electrical isolation comparison."
+  },
+  "limitations": [
+    "Familiar waveform shape does not prove capture, file commit or Standby entry.",
+    "Plateau boundary may include analog settling; no exact WFI or reset-release timing.",
+    "CN10 removal does not prove zero current through unpowered debugger data/sense paths.",
+    "The JS110 branch excludes remaining CN8 bypass paths; not isolated MCU or battery energy.",
+    "Scene, image size, card behavior, temperature and instrument suppression may differ from prior runs.",
+    "Only two new cycles; user card inspection remains pending."
+  ]
+}

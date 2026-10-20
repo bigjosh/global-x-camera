@@ -111,6 +111,44 @@ class RawCycleTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "qualification"):
                 cycle_energy.analyze_cycle(archive, self.window, CRITERIA)
 
+    def test_explicit_unqualified_mode_preserves_numeric_checks_without_completion_claim(self):
+        record(self.root/"raw")
+        with cycle_energy.Archive(self.root/"raw") as archive:
+            qualified=cycle_energy.analyze_cycle(archive,self.window,CRITERIA)
+            window=dict(self.window,terminal_state_qualified=False)
+            # The same evidence/window remains rejected by the default API.
+            with self.assertRaisesRegex(ValueError,"qualification"):
+                cycle_energy.analyze_cycle(archive,window,CRITERIA)
+            result=cycle_energy.analyze_cycle(archive,window,CRITERIA,
+                                             allow_unqualified_plateau=True)
+            self.assertEqual(result["boundaries"],qualified["boundaries"])
+            self.assertEqual(result["onset_to_plateau_energy_j"],qualified["onset_to_plateau_energy_j"])
+            self.assertFalse(result["terminal_state_qualified"])
+            self.assertFalse(result["completion_boundary_qualified"])
+            self.assertFalse(result["onset_to_plateau_energy_is_complete_cycle"])
+            self.assertIn("not firmware completion, SBF or file verification",result["terminal_state_qualification"])
+            for bad in ({k:v for k,v in window.items() if k!="terminal_state_qualified"},
+                        dict(window,terminal_state_qualified=None),
+                        dict(window,terminal_evidence=str(self.root/"absent.json"))):
+                with self.assertRaisesRegex(ValueError,"qualification"):
+                    cycle_energy.analyze_cycle(archive,bad,CRITERIA,allow_unqualified_plateau=True)
+            with self.assertRaisesRegex(ValueError,"measurement-validity"):
+                cycle_energy.analyze_cycle(archive,window,dict(CRITERIA,current_valid_abs_max_a=.5),
+                                           allow_unqualified_plateau=True)
+        report=cycle_energy.analyze(self.root/"raw",dict(criteria=CRITERIA,cycles=[window]),
+                                    allow_unqualified_plateau=True)
+        self.assertTrue(report["unqualified_plateau_mode_enabled"])
+        self.assertFalse(report["cycles"][0]["terminal_state_qualified"])
+
+    def test_unqualified_opt_in_never_hides_nonfinite_samples(self):
+        current=waveform()
+        current[1700]=np.nan
+        record(self.root/"raw",current)
+        with cycle_energy.Archive(self.root/"raw") as archive:
+            with self.assertRaisesRegex(ValueError,"Nonfinite"):
+                cycle_energy.analyze_cycle(archive,dict(self.window,terminal_state_qualified=False),
+                                           CRITERIA,allow_unqualified_plateau=True)
+
     def test_gap_and_byte_budget_invalidate_whole_recording(self):
         for name, kwargs in (("gap", dict(gap=True)), ("budget", dict(max_bytes=100))):
             result = record(self.root/name, **kwargs)

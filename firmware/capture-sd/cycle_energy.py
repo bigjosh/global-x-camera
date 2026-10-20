@@ -1,8 +1,10 @@
 """Integrate complete-cycle JS110 raw recordings on their native sample clock.
 
 Offline only. Explicit cycle windows can share one recording. Each starts in
-an observed off-current baseline and ends in a sustained, independently
-qualified terminal plateau. No host UTC/command-to-sample alignment is used.
+an observed off-current baseline and ends in a sustained plateau. Independent
+terminal qualification is required by default; an explicit opt-in permits
+signature-only results with completion claims marked false. No host
+UTC/command-to-sample alignment is used.
 """
 import argparse
 import hashlib
@@ -111,8 +113,10 @@ class Archive:
         return s["data"][(start-s["start"])//d:(end-s["start"])//d]
 
 
-def analyze_cycle(archive, window, criteria):
-    """Require explicit thresholds; plateau identity remains external evidence."""
+def analyze_cycle(archive, window, criteria, *, allow_unqualified_plateau=False):
+    """Require explicit thresholds; unqualified levels need a separate opt-in."""
+    if type(allow_unqualified_plateau) is not bool:
+        raise ValueError("Unqualified plateau opt-in must be an explicit Boolean")
     start, end = window["start_sample_id"], window["end_sample_id"]
     current = archive.get("current", start, end)
     voltage = archive.get("voltage", start, end)
@@ -186,7 +190,9 @@ def analyze_cycle(archive, window, criteria):
         raise ValueError("No distinguishable activity before the terminal plateau")
     # Do not infer sleep/shutdown from low current alone.
     evidence = Path(window["terminal_evidence"])
-    if not evidence.is_file() or not window.get("terminal_state_qualified") is True:
+    qualified = window.get("terminal_state_qualified")
+    if not evidence.is_file() or (qualified is not True and not (
+            allow_unqualified_plateau and qualified is False)):
         raise ValueError("Fresh external terminal-state qualification is required")
     evidence_hash = sha_file(evidence)
     settle_end = plateau_start + plateau_n
@@ -202,7 +208,12 @@ def analyze_cycle(archive, window, criteria):
     return {
         "name": window.get("name"),
         "terminal_evidence": str(evidence), "terminal_evidence_sha256": evidence_hash,
-        "terminal_state_qualification": "caller attestation; analyzer does not interpret firmware proof",
+        "terminal_state_qualified": qualified,
+        **({} if qualified else dict(completion_boundary_qualified=False,
+                                     onset_to_plateau_energy_is_complete_cycle=False)),
+        "terminal_state_qualification": (
+            "caller attestation; analyzer does not interpret firmware proof" if qualified else
+            "Unqualified current plateau only; evidence records context, not firmware completion, SBF or file verification."),
         "window": {"start_sample_id": start, "end_sample_id": end},
         "boundaries": {"current_onset_sample_id": sid(onset),
                        "first_activity_above_off_threshold_sample_id": sid(first_activity),
@@ -232,15 +243,19 @@ def analyze_cycle(archive, window, criteria):
             "Pretrigger includes measured startup charge only if activity begins inside its window.",
             "Subthreshold charge before pretrigger is not proven absent; whole-window energy is also reported.",
             "Plateau classification and firmware completion require the external qualification.",
+            *([] if qualified else [
+                "Explicit unqualified-plateau mode: energy/time describe the observed signature only; do not label them a verified complete capture/save cycle or Standby entry."]),
             "Baseline subtraction assumes stationary background; raw energy is the primary result.",
             "No analog calibration, saturation detection, suppression interpolation, or CN8 bypass correction is inferred.",
         ],
     }
 
 
-def analyze(directory, spec):
+def analyze(directory, spec, *, allow_unqualified_plateau=False):
     with Archive(directory) as archive:
-        cycles = [analyze_cycle(archive, window, spec["criteria"]) for window in spec["cycles"]]
+        cycles = [analyze_cycle(archive, window, spec["criteria"],
+                               allow_unqualified_plateau=allow_unqualified_plateau)
+                  for window in spec["cycles"]]
         spans = sorted((v["window"]["start_sample_id"], v["window"]["end_sample_id"]) for v in cycles)
         if any(a[1] > b[0] for a, b in zip(spans, spans[1:])):
             raise ValueError("Repeated cycle windows overlap")
@@ -249,7 +264,9 @@ def analyze(directory, spec):
                 "sample_rate_hz": archive.rate, "decimate_factor": archive.decimation,
                 "starting_measurement_settings": archive.manifest.get("starting_measurement_settings"),
                 "range_commands": archive.manifest.get("range_commands"),
-                "uses_host_utc_alignment": False, "cycles": cycles}
+                "uses_host_utc_alignment": False,
+                "unqualified_plateau_mode_enabled": allow_unqualified_plateau,
+                "cycles": cycles}
 
 
 def main():
@@ -257,13 +274,16 @@ def main():
     parser.add_argument("--recording", type=Path, required=True)
     parser.add_argument("--spec", type=Path, required=True)
     parser.add_argument("--out", type=Path, required=True)
+    parser.add_argument("--allow-unqualified-plateau", action="store_true",
+                        help="Opt in to signature-only results for explicitly unqualified windows; never establishes completion or Standby")
     args = parser.parse_args()
     spec = json.loads(args.spec.read_text())
     for window in spec["cycles"]:
         path = Path(window["terminal_evidence"])
         if not path.is_absolute():
             window["terminal_evidence"] = str(args.spec.parent / path)
-    result = analyze(args.recording, spec)
+    result = analyze(args.recording, spec,
+                     allow_unqualified_plateau=args.allow_unqualified_plateau)
     args.out.write_text(json.dumps(result, indent=2, allow_nan=False) + "\n")
 
 

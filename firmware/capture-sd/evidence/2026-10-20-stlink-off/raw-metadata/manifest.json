@@ -1,0 +1,173 @@
+{
+  "schema": 1,
+  "dtype": "<f4",
+  "sample_ids": "native ticks, shared current/voltage/power timeline",
+  "finalized": true,
+  "status": {
+    "chunks": 7533,
+    "dropped_chunks": 0,
+    "error": null,
+    "complete": true,
+    "complete_scope": "logging_only; see coverage checks separately",
+    "coverage": {
+      "passed": true,
+      "checks": {
+        "current_samples_present": true,
+        "current_sample_ids_contiguous": true,
+        "voltage_samples_present": true,
+        "voltage_sample_ids_contiguous": true,
+        "power_samples_present": true,
+        "power_sample_ids_contiguous": true
+      },
+      "signals": {
+        "current": {
+          "chunks": 2511,
+          "samples": 164204334,
+          "nonfinite_samples": 71,
+          "first_sample_id": 0,
+          "last_sample_id_end_exclusive": 164204334,
+          "discontinuities": 0,
+          "missing_native_samples": 0,
+          "overlap_or_reset_events": 0
+        },
+        "voltage": {
+          "chunks": 2511,
+          "samples": 164204334,
+          "nonfinite_samples": 0,
+          "first_sample_id": 16128,
+          "last_sample_id_end_exclusive": 164220462,
+          "discontinuities": 0,
+          "missing_native_samples": 0,
+          "overlap_or_reset_events": 0
+        },
+        "power": {
+          "chunks": 2511,
+          "samples": 164204334,
+          "nonfinite_samples": 0,
+          "first_sample_id": 16128,
+          "last_sample_id_end_exclusive": 164220462,
+          "discontinuities": 0,
+          "missing_native_samples": 0,
+          "overlap_or_reset_events": 0
+        }
+      },
+      "scope": "Received sample intervals only; stream boundaries, nonfinite samples and clipping are not validated."
+    }
+  },
+  "starting_measurement_settings": {
+    "s/i/range/select": 128,
+    "s/v/range/select": 0,
+    "s/i/range/mode": 2,
+    "s/i/range/pre": 1,
+    "s/i/range/win": 2,
+    "s/i/range/win_sz": 10,
+    "s/i/range/post": 1,
+    "s/i/lsb_src": 2,
+    "s/v/lsb_src": 3
+  },
+  "range_commands": [
+    {
+      "state": "off",
+      "retained_range": 0,
+      "command_start": {
+        "utc": "2026-10-20T19:27:23.688374+00:00",
+        "monotonic_ns": 89854484000000
+      },
+      "command_end": {
+        "utc": "2026-10-20T19:27:23.698047+00:00",
+        "monotonic_ns": 89854500000000
+      },
+      "scope": "host diagnostics only; not physical sample boundaries"
+    },
+    {
+      "state": "auto",
+      "retained_range": 128,
+      "command_start": {
+        "utc": "2026-10-20T19:27:38.813239+00:00",
+        "monotonic_ns": 89869609000000
+      },
+      "command_end": {
+        "utc": "2026-10-20T19:27:38.826627+00:00",
+        "monotonic_ns": 89869625000000
+      },
+      "scope": "host diagnostics only; not physical sample boundaries"
+    },
+    {
+      "state": "auto",
+      "retained_range": 128,
+      "command_start": {
+        "utc": "2026-10-20T19:27:43.866586+00:00",
+        "monotonic_ns": 89874671000000
+      },
+      "command_end": {
+        "utc": "2026-10-20T19:27:43.866586+00:00",
+        "monotonic_ns": 89874671000000
+      },
+      "scope": "host diagnostics only; not physical sample boundaries"
+    },
+    {
+      "state": "off",
+      "retained_range": 0,
+      "command_start": {
+        "utc": "2026-10-20T19:27:59.378108+00:00",
+        "monotonic_ns": 89890187000000
+      },
+      "command_end": {
+        "utc": "2026-10-20T19:27:59.387928+00:00",
+        "monotonic_ns": 89890187000000
+      },
+      "scope": "host diagnostics only; not physical sample boundaries"
+    },
+    {
+      "state": "auto",
+      "retained_range": 128,
+      "command_start": {
+        "utc": "2026-10-20T19:28:14.503563+00:00",
+        "monotonic_ns": 89905312000000
+      },
+      "command_end": {
+        "utc": "2026-10-20T19:28:14.513022+00:00",
+        "monotonic_ns": 89905312000000
+      },
+      "scope": "host diagnostics only; not physical sample boundaries"
+    },
+    {
+      "state": "auto",
+      "retained_range": 128,
+      "command_start": {
+        "utc": "2026-10-20T19:28:19.653497+00:00",
+        "monotonic_ns": 89910453000000
+      },
+      "command_end": {
+        "utc": "2026-10-20T19:28:19.653497+00:00",
+        "monotonic_ns": 89910453000000
+      },
+      "scope": "host diagnostics only; not physical sample boundaries"
+    }
+  ],
+  "files": {
+    "current": {
+      "path": "current.f32",
+      "bytes": 656817336,
+      "sha256": "5ee72ddb1aa2731304a492f23633f15d10d3ee191ab35bf386bd9492330dcfe2"
+    },
+    "voltage": {
+      "path": "voltage.f32",
+      "bytes": 656817336,
+      "sha256": "d3a93fb1b9a116f39739984d15988e00a03dd35d49e7521149c3800a51a16c1c"
+    },
+    "power": {
+      "path": "power.f32",
+      "bytes": 656817336,
+      "sha256": "85b581359291c9570d5ae788ddf783f4fc18308561b18bff54a33cd5e62ad004"
+    }
+  },
+  "chunks_sha256": "ffacf34c18971963491e79b812cc418fedaa7b23f448e119de1796385075d7bb",
+  "measurement_boundary": "JS110 input, not isolated DUT energy",
+  "limits": [
+    "IN+ voltage does not observe the switched target rail.",
+    "No GPIO marker is captured or configured.",
+    "Range, suppression, clipping and analog accuracy need separate qualification.",
+    "Logging completion alone does not qualify a power or sleep transition."
+  ]
+}

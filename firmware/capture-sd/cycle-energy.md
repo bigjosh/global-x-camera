@@ -87,6 +87,16 @@ detected plateau therefore cannot bound complete-cycle energy. Use a uniquely
 qualified terminal transition, or retain the result as a current-level
 comparison with `completion_boundary_qualified: false`.
 
+When the debugger is disconnected and terminal verification is unavailable,
+`--allow-unqualified-plateau` permits **signature-only** analysis of windows
+explicitly marked `"terminal_state_qualified": false`. A context/evidence file
+is still required and hashed. All raw-integrity, finite-data, baseline, onset,
+measurement-limit and sustained-plateau checks remain active. Results explicitly
+set terminal/completion qualification and complete-cycle-energy claims to false;
+the mode does not infer SBF, a saved file, or Standby from a familiar current
+trace. Without this opt-in the same window is rejected. Keep this analysis
+separate from earlier verified cycles and from any later card inspection.
+
 ## What the result establishes
 
 The primary result integrates driver's synchronized power samples through the
