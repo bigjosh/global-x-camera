@@ -87,7 +87,7 @@ class SdDriverTests(unittest.TestCase):
                            check=True)
             completed = subprocess.run([str(executable)], text=True, capture_output=True)
             self.assertEqual(completed.returncode, 0, completed.stdout+completed.stderr)
-            self.assertIn('13 protocol cases passed', completed.stdout)
+            self.assertIn('15 protocol cases passed', completed.stdout)
 
 
 if __name__ == '__main__':

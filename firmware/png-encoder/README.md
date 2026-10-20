@@ -15,7 +15,7 @@ See [PNG sample scaling](https://www.w3.org/TR/png-3/#sBIT).
 ## API and bounds
 
 Include `png16.h` and compile **only `png16.c` and `png16_miniz.c`**. The latter
-includes the pinned upstream checksum/compressor sources under one consistent
+includes the pinned, locally patched checksum/compressor sources under one consistent
 configuration. Do not separately compile the vendor C files.
 
 ```c
@@ -51,25 +51,38 @@ uses a 5,576-byte local stack frame on the tested Cortex-M55 `-Os` build, plus
 callers. The old capture application's 4 KiB stack reservation is insufficient.
 The encode workspace must not be placed on the stack.
 
-Compile with function/data sections and link with `--gc-sections`. The standalone
-Cortex-M55 `-Os` link probe measured **11,066 bytes text**, zero global data/BSS,
-including minimal `memcpy`/`memset`. That is a size probe, not a runnable image.
-The integration must supply its normal memory routines and verify its own map.
+Compile with function/data sections and link with `--gc-sections`. The MCU
+save-module builder uses `-Os -mno-unaligned-access`: the latter preserves
+byte-safe code generation even if a caller enables alignment traps. The
+integration must supply its normal memory routines and verify its own map.
+The complete reviewed v8b save module is 27,420 bytes of loaded code/data,
+including the filesystem, card driver and encoder; its map is the relevant
+integration budget rather than the earlier standalone encoder size probe.
 
 ## Three comparison modes
 
 | Mode | PNG row filter | DEFLATE |
 | --- | --- | --- |
-| `PNG16_STORED_NONE` | None | Stored blocks, baseline |
-| `PNG16_FAST_NONE` | None | One-probe greedy LZ/Huffman |
+| `PNG16_STORED_NONE` | None | Direct stored blocks; one block per row |
+| `PNG16_FAST_NONE` | None | Dedicated one-probe greedy fast LZ/Huffman |
 | `PNG16_FAST_SUB` | Sub, bytewise with two bytes per pixel | Same fast compressor |
 
-Each mode is lossless and deterministic. The stored mode still uses the
-streaming compressor machinery; it is a functional no-compression baseline,
-not a claim of the fastest possible stored-block writer. Fast modes may choose
+Each mode is lossless and deterministic. Stored mode writes byte-aligned
+[DEFLATE stored blocks](https://www.rfc-editor.org/rfc/rfc1951.html#section-3.2.4)
+directly, bypassing miniz's dictionary/hash/literal machinery. Each row is one
+block (at most 2,241 data bytes), with its own IDAT chunk; a single
+[zlib header and Adler-32 footer](https://www.rfc-editor.org/rfc/rfc1950.html#section-2.2)
+wrap the complete stream. CRC-32 still covers each PNG chunk. The exact encoded
+size is `88 + height * (18 + 2 * width)` bytes: **3,080,000 bytes** for 1120×1364.
+This adds 19,152 bytes versus the earlier miniz stored output for that frame
+size, while removing unnecessary per-byte LZ processing. The 32 KiB SD sink
+buffer remains the integrator's responsibility. Fast modes may choose
 dynamic, fixed or stored blocks. All modes emit one zlib stream divided into
-bounded IDAT chunks. Unaligned vendor loads are disabled for the first MCU build;
-the fastest host-specific miniz path is therefore not assumed.
+bounded IDAT chunks. The dedicated fast matcher is enabled with local
+byte-pointer traversal and forced-inline little-endian byte reads; it does not
+depend on undefined misaligned pointer dereferences. This matcher trades
+compression ratio for CPU time. Its encoded bytes differ from the previous
+general match loop while every reconstructed sensor sample remains identical.
 
 Select a default using **measured total capture/save cost on the MCU**, not
 host timings or compression ratio alone. Record conversion/compression cycles,
@@ -93,17 +106,30 @@ chunks, inflate with Python zlib, reverse filtering and decode with Pillow.
 They compare every 16-bit output and reconstructed 10-bit sample, exercise all
 1024 values, full-size noise, odd widths/padding, unaligned input, dirty workspace,
 callback failures, invalid inputs/aliases, canaries, and supplier hashes.
+Stored-block tests independently inspect every BFINAL/BTYPE, LEN/NLEN, payload,
+and Adler footer, including aggregate streams crossing 64 KiB and maximum frames.
+Six SHA-256 fixtures protect the intended dedicated fast-matcher output and
+also decode every pixel. Boundary cases cover 1–4-byte tails, 4 KiB lookahead and
+32 KiB dictionary crossings. A standalone Clang ASan/UBSan test adds 432 C
+stress cases and asserts that instrumentation has not disabled the fast path.
 Host benchmarks verify round trips and report size/host wall time; they never
 access the MCU or card. Outputs are JSON summaries, with no PNG/pixel data.
 
 ## Dependency provenance
 
-The vendor directory contains unmodified files from
+The vendor directory starts from
 [miniz 3.1.0](https://github.com/richgel999/miniz/tree/174573d60290f447c13a2b1b3405de2b96e27d6c),
 commit `174573d60290f447c13a2b1b3405de2b96e27d6c`. `UPSTREAM.json` records each
-HTTPS source URL, byte count and SHA-256; the upstream license is retained.
-`miniz_export.h` is the sole local vendor-directory shim, replacing CMake's
-generated static-link visibility header. No upstream source was patched.
+original HTTPS source URL, byte count and SHA-256; those original records and
+the upstream [license](vendor/miniz/LICENSE) are unchanged.
+[LOCAL_PATCHES.json](vendor/miniz/LOCAL_PATCHES.json) separately records the
+before/after hashes of three patched vendor files and the
+[exact patch](vendor/miniz/fast-loop-byte-safe.patch). The changes replace
+misaligned typed-pointer traversal with byte pointers, use defined bytewise
+word reads, store exactly two distance bytes in a three-byte LZ token, and keep
+the safe path exercised under UBSan. The otherwise unused common LE-read macros
+also retain their bytewise fallback. `miniz_export.h` remains a local static-link
+visibility shim. No attribution or license terms were removed.
 
 The low-level tdefl API is configured with `TDEFL_LESS_MEMORY=1`; heap, archive,
 stdio, time, inflate and zlib-compatible convenience APIs are disabled.

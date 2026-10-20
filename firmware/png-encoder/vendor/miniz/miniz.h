@@ -199,7 +199,7 @@
 
 /* Using unaligned loads and stores causes errors when using UBSan */
 #if defined(__has_feature)
-#if __has_feature(undefined_behavior_sanitizer)
+#if __has_feature(undefined_behavior_sanitizer) && !defined(MINIZ_UNALIGNED_USE_MEMCPY)
 #define MINIZ_USE_UNALIGNED_LOADS_AND_STORES 0
 #endif
 #endif

@@ -251,8 +251,17 @@ static int transfer(sd_card_t *c, uint32_t lba, uint8_t *buffer,
          * Do not read an inactive FIFO merely because RXFIFOE has deasserted. */
         if ((sta&SDMMC_STA_DATAEND) && !(sta&SDMMC_STA_DPSMACT)) break;
         if (writing) {
-            if ((sta&SDMMC_STA_TXFIFOHE) && total-words>=16UL) {
-                for (uint32_t n=0;n<16;++n) {
+            if ((sta&SDMMC_STA_TXFIFOHE) && words<total) {
+                /* N6 has a 256-word FIFO. HALF-empty is a refill trigger,
+                 * not permission to stop once half+1 full: BUSSPEED=0 waits
+                 * for a full FIFO (or all DLEN bytes) before sending. A
+                 * 16-word refill stalled at 144 words on multi-block writes.
+                 * RM0486 pp1396-1398: fill until full or the last word.
+                 * Bound one refill even if hardware drains concurrently. */
+                for (uint32_t n=0;n<256UL && words<total;++n) {
+                    uint32_t fifo_sta=X->STA;
+                    if ((fifo_sta&(SDMMC_STA_TXFIFOF|DATA_ERRORS)) ||
+                        !(fifo_sta&SDMMC_STA_DPSMACT)) break;
                     X->FIFO=load_word(buffer+4UL*words);
                     words++;
                 }
@@ -395,7 +404,7 @@ int sd_init(sd_card_t *c, uint32_t max_hz)
     __DSB();
     c->controller_owned=1;
     X->MASK=0; X->POWER=0; X->DCTRL=0; X->IDMACTRL=0; X->CMD=0;
-    X->CLKCR=750UL;
+    X->CLKCR=750UL|SDMMC_CLKCR_HWFC_EN;
     C->AFR[0]=(C->AFR[0]&~(0xFFFUL<<8))|(0xBBBUL<<8);
     C->MODER=(C->MODER&~C_MASK)|(2UL<<4)|(2UL<<6)|(2UL<<8);
     if ((C->MODER&C_MASK)!=((2UL<<4)|(2UL<<6)|(2UL<<8)) ||
@@ -405,7 +414,7 @@ int sd_init(sd_card_t *c, uint32_t max_hz)
     X->POWER=SDMMC_POWER_PWRCTRL;
     c->clock_hz=100000UL;
     if ((result=delay_us(c,10000)) || (result=identify(c))) return result;
-    X->CLKCR=HCLK_HZ/(2*max_hz);
+    X->CLKCR=(HCLK_HZ/(2*max_hz))|SDMMC_CLKCR_HWFC_EN;
     c->clock_hz=max_hz;
     if ((result=delay_us(c,1000)) || (result=ready(c))) return result;
     c->initialized=1;

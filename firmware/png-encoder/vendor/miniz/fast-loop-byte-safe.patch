@@ -1,0 +1,131 @@
+--- a/miniz.h
++++ b/miniz.h
+@@ -199,7 +199,7 @@
+ 
+ /* Using unaligned loads and stores causes errors when using UBSan */
+ #if defined(__has_feature)
+-#if __has_feature(undefined_behavior_sanitizer)
++#if __has_feature(undefined_behavior_sanitizer) && !defined(MINIZ_UNALIGNED_USE_MEMCPY)
+ #define MINIZ_USE_UNALIGNED_LOADS_AND_STORES 0
+ #endif
+ #endif
+--- a/miniz_common.h
++++ b/miniz_common.h
+@@ -62,7 +62,7 @@
+ #define MZ_CLEAR_ARR(obj) memset((obj), 0, sizeof(obj))
+ #define MZ_CLEAR_PTR(obj) memset((obj), 0, sizeof(*obj))
+ 
+-#if MINIZ_USE_UNALIGNED_LOADS_AND_STORES && MINIZ_LITTLE_ENDIAN
++#if MINIZ_USE_UNALIGNED_LOADS_AND_STORES && MINIZ_LITTLE_ENDIAN && !defined(MINIZ_UNALIGNED_USE_MEMCPY)
+ #define MZ_READ_LE16(p) *((const mz_uint16 *)(p))
+ #define MZ_READ_LE32(p) *((const mz_uint32 *)(p))
+ #else
+--- a/miniz_tdef.c
++++ b/miniz_tdef.c
+@@ -757,17 +757,13 @@
+ 
+ #if MINIZ_USE_UNALIGNED_LOADS_AND_STORES
+ #ifdef MINIZ_UNALIGNED_USE_MEMCPY
+-    static mz_uint16 TDEFL_READ_UNALIGNED_WORD(const mz_uint8 *p)
+-    {
+-        mz_uint16 ret;
+-        memcpy(&ret, p, sizeof(mz_uint16));
+-        return ret;
+-    }
+-    static mz_uint16 TDEFL_READ_UNALIGNED_WORD2(const mz_uint16 *p)
+-    {
+-        mz_uint16 ret;
+-        memcpy(&ret, p, sizeof(mz_uint16));
+-        return ret;
++    static MZ_FORCEINLINE mz_uint16 TDEFL_READ_UNALIGNED_WORD(const mz_uint8 *p)
++    {
++        return (mz_uint16)((mz_uint16)p[0] | ((mz_uint16)p[1] << 8));
++    }
++    static MZ_FORCEINLINE mz_uint16 TDEFL_READ_UNALIGNED_WORD2(const mz_uint8 *p)
++    {
++        return (mz_uint16)((mz_uint16)p[0] | ((mz_uint16)p[1] << 8));
+     }
+ #else
+ #define TDEFL_READ_UNALIGNED_WORD(p) *(const mz_uint16 *)(p)
+@@ -777,7 +773,7 @@
+     {
+         mz_uint dist, pos = lookahead_pos & TDEFL_LZ_DICT_SIZE_MASK, match_len = *pMatch_len, probe_pos = pos, next_probe_pos, probe_len;
+         mz_uint num_probes_left = d->m_max_probes[match_len >= 32];
+-        const mz_uint16 *s = (const mz_uint16 *)(d->m_dict + pos), *p, *q;
++        const mz_uint8 *s = d->m_dict + pos, *p, *q;
+         mz_uint16 c01 = TDEFL_READ_UNALIGNED_WORD(&d->m_dict[pos + match_len - 1]), s01 = TDEFL_READ_UNALIGNED_WORD2(s);
+         MZ_ASSERT(max_match_len <= TDEFL_MAX_MATCH_LEN);
+         if (max_match_len <= match_len)
+@@ -801,22 +797,22 @@
+             }
+             if (!dist)
+                 break;
+-            q = (const mz_uint16 *)(d->m_dict + probe_pos);
++            q = d->m_dict + probe_pos;
+             if (TDEFL_READ_UNALIGNED_WORD2(q) != s01)
+                 continue;
+             p = s;
+             probe_len = 32;
+             do
+             {
+-            } while ((TDEFL_READ_UNALIGNED_WORD2(++p) == TDEFL_READ_UNALIGNED_WORD2(++q)) && (TDEFL_READ_UNALIGNED_WORD2(++p) == TDEFL_READ_UNALIGNED_WORD2(++q)) &&
+-                     (TDEFL_READ_UNALIGNED_WORD2(++p) == TDEFL_READ_UNALIGNED_WORD2(++q)) && (TDEFL_READ_UNALIGNED_WORD2(++p) == TDEFL_READ_UNALIGNED_WORD2(++q)) && (--probe_len > 0));
++            } while ((TDEFL_READ_UNALIGNED_WORD2(p += 2) == TDEFL_READ_UNALIGNED_WORD2(q += 2)) && (TDEFL_READ_UNALIGNED_WORD2(p += 2) == TDEFL_READ_UNALIGNED_WORD2(q += 2)) &&
++                     (TDEFL_READ_UNALIGNED_WORD2(p += 2) == TDEFL_READ_UNALIGNED_WORD2(q += 2)) && (TDEFL_READ_UNALIGNED_WORD2(p += 2) == TDEFL_READ_UNALIGNED_WORD2(q += 2)) && (--probe_len > 0));
+             if (!probe_len)
+             {
+                 *pMatch_dist = dist;
+                 *pMatch_len = MZ_MIN(max_match_len, (mz_uint)TDEFL_MAX_MATCH_LEN);
+                 break;
+             }
+-            else if ((probe_len = ((mz_uint)(p - s) * 2) + (mz_uint)(*(const mz_uint8 *)p == *(const mz_uint8 *)q)) > match_len)
++            else if ((probe_len = ((mz_uint)(p - s)) + (mz_uint)(*(const mz_uint8 *)p == *(const mz_uint8 *)q)) > match_len)
+             {
+                 *pMatch_dist = dist;
+                 if ((*pMatch_len = match_len = MZ_MIN(max_match_len, probe_len)) == max_match_len)
+@@ -873,11 +869,10 @@
+ 
+ #if MINIZ_USE_UNALIGNED_LOADS_AND_STORES && MINIZ_LITTLE_ENDIAN
+ #ifdef MINIZ_UNALIGNED_USE_MEMCPY
+-    static mz_uint32 TDEFL_READ_UNALIGNED_WORD32(const mz_uint8 *p)
+-    {
+-        mz_uint32 ret;
+-        memcpy(&ret, p, sizeof(mz_uint32));
+-        return ret;
++    static MZ_FORCEINLINE mz_uint32 TDEFL_READ_UNALIGNED_WORD32(const mz_uint8 *p)
++    {
++        return (mz_uint32)p[0] | ((mz_uint32)p[1] << 8) |
++               ((mz_uint32)p[2] << 16) | ((mz_uint32)p[3] << 24);
+     }
+ #else
+ #define TDEFL_READ_UNALIGNED_WORD32(p) *(const mz_uint32 *)(p)
+@@ -923,14 +918,14 @@
+ 
+                 if (((cur_match_dist = (mz_uint16)(lookahead_pos - probe_pos)) <= dict_size) && ((TDEFL_READ_UNALIGNED_WORD32(d->m_dict + (probe_pos &= TDEFL_LZ_DICT_SIZE_MASK)) & 0xFFFFFF) == first_trigram))
+                 {
+-                    const mz_uint16 *p = (const mz_uint16 *)pCur_dict;
+-                    const mz_uint16 *q = (const mz_uint16 *)(d->m_dict + probe_pos);
++                    const mz_uint8 *p = pCur_dict;
++                    const mz_uint8 *q = d->m_dict + probe_pos;
+                     mz_uint32 probe_len = 32;
+                     do
+                     {
+-                    } while ((TDEFL_READ_UNALIGNED_WORD2(++p) == TDEFL_READ_UNALIGNED_WORD2(++q)) && (TDEFL_READ_UNALIGNED_WORD2(++p) == TDEFL_READ_UNALIGNED_WORD2(++q)) &&
+-                             (TDEFL_READ_UNALIGNED_WORD2(++p) == TDEFL_READ_UNALIGNED_WORD2(++q)) && (TDEFL_READ_UNALIGNED_WORD2(++p) == TDEFL_READ_UNALIGNED_WORD2(++q)) && (--probe_len > 0));
+-                    cur_match_len = ((mz_uint)(p - (const mz_uint16 *)pCur_dict) * 2) + (mz_uint)(*(const mz_uint8 *)p == *(const mz_uint8 *)q);
++                    } while ((TDEFL_READ_UNALIGNED_WORD2(p += 2) == TDEFL_READ_UNALIGNED_WORD2(q += 2)) && (TDEFL_READ_UNALIGNED_WORD2(p += 2) == TDEFL_READ_UNALIGNED_WORD2(q += 2)) &&
++                             (TDEFL_READ_UNALIGNED_WORD2(p += 2) == TDEFL_READ_UNALIGNED_WORD2(q += 2)) && (TDEFL_READ_UNALIGNED_WORD2(p += 2) == TDEFL_READ_UNALIGNED_WORD2(q += 2)) && (--probe_len > 0));
++                    cur_match_len = ((mz_uint)(p - pCur_dict)) + (mz_uint)(*(const mz_uint8 *)p == *(const mz_uint8 *)q);
+                     if (!probe_len)
+                         cur_match_len = cur_match_dist ? TDEFL_MAX_MATCH_LEN : 0;
+ 
+@@ -952,7 +947,8 @@
+ 
+                         pLZ_code_buf[0] = (mz_uint8)(cur_match_len - TDEFL_MIN_MATCH_LEN);
+ #ifdef MINIZ_UNALIGNED_USE_MEMCPY
+-                        memcpy(&pLZ_code_buf[1], &cur_match_dist, sizeof(cur_match_dist));
++                        pLZ_code_buf[1] = (mz_uint8)cur_match_dist;
++                        pLZ_code_buf[2] = (mz_uint8)(cur_match_dist >> 8);
+ #else
+                         *(mz_uint16 *)(&pLZ_code_buf[1]) = (mz_uint16)cur_match_dist;
+ #endif

@@ -13,6 +13,7 @@
 #define SAVE_HEIGHT 1364U
 #define SAVE_CLOCK_HZ 400000000U
 #define SAVE_BUFFER_BYTES 32768U
+#define SAVE_READ_BUFFER_BYTES (256U * 1024U)
 #define SAVE_MAX_PNG_BYTES 3100000U
 enum { SAVE_OP_SAVE=1, SAVE_OP_FORMAT=2, SAVE_OP_READ=3, SAVE_OP_MOUNT=4 };
 /* All words little endian. Name is a zero-terminated 12-character IMGnnnnn.PNG
@@ -36,6 +37,13 @@ enum {
     P_WIDTH,P_HEIGHT,P_FRAME_BYTES,P_MEDIA_IDLE,
     P_CARD_ERROR,P_FS_RESULT,P_FS_STAGE,P_PNG_RESULT,
     P_CARD_SIZE,P_FS_SIZE,P_NONCE,P_INITIAL_MSPLIM,
-    P_TERMINAL=63,P_NAME=64
+    P_TERMINAL=63,P_NAME=64,
+    /* Optional v6 extension; words 64..67 remain the 16-byte filename.
+     * P_TOTAL retains the original pre-cleanup comparison interval.
+     * COMPLETE includes cleanup, the uncached SAVE validation, and snapshots;
+     * it ends just before the final report bookkeeping/terminal publication. */
+    P_CACHE_ENABLED=68,P_INITIAL_MPU_CTRL,P_FINAL_CCR,
+    P_CLEANUP_LO,P_CLEANUP_HI,P_POSTCLEAN_VALIDATE_LO,P_POSTCLEAN_VALIDATE_HI,
+    P_COMPLETE_LO,P_COMPLETE_HI,P_POSTCLEAN_FNV,P_POSTCLEAN_VALIDATED
 };
 #endif

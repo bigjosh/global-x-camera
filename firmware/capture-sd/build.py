@@ -46,6 +46,25 @@ def check_recovery_identity(folder, prefix, original):
     return sorted(literals)
 
 
+def completion_metadata(manifest, awake, module_enabled):
+    """Replace inherited LED/sleep descriptions with this variant's behavior."""
+    manifest["completion_policy"] = (
+        "awake diagnostic park" if awake else "CPU WFI; not regulator-off")
+    led = manifest["status_leds"]
+    led["green_start"] = (
+        "save loader after complete-frame validation and sensor STOP; SD write phase"
+        if module_enabled else "reserved helper; no storage write caller")
+    led["completion"] = (
+        "all off; " + ("awake NOP/branch park" if awake else "ordinary CPU WFI") +
+        (" after successful SD save, sync, card-ready check and module return"
+         if module_enabled else " after complete-frame validation and sensor STOP"))
+    led["sleep"] = (
+        "not entered; awake diagnostic completion, no regulator or rail shutdown"
+        if awake else
+        "CPU-only ordinary sleep; no deep sleep, regulator hold release or rail shutdown")
+    led["sleep_state"] = 2 if awake else 1
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--base", type=Path, required=True)
@@ -72,6 +91,8 @@ def main():
             text = replace(text, '"wfi\\n"', '"nop\\n"')
             text = replace(text, "STATUS_LED_PROOF[LED_P_SLEEP_STATE] = 1U;",
                            "STATUS_LED_PROOF[LED_P_SLEEP_STATE] = 2U;")
+            text = replace(text, "/* Prepared; CPU context proves WFI. */",
+                           "/* Prepared for the awake diagnostic completion park. */")
             raw = text.encode()
         if src.name == "capture.c" and a.module:
             text = raw.decode("utf-8")
@@ -87,6 +108,7 @@ def main():
             raw = text.encode()
         dst.write_bytes(raw); sources.append(dst)
     module = None
+    md = None
     if a.module:
         md = json.loads((a.module / "manifest.json").read_text())
         for path, expected in md["sources"].items():
@@ -122,13 +144,29 @@ def main():
     sp, entry = struct.unpack_from("<II", raw)
     assert sp == 0x343B0000 and 0x34300000 <= entry - 1 < 0x34300000 + len(raw)
     manifest = copy.deepcopy(rm)
+    receiver_unchanged = sha(raw) == BASE_RECEIVER
+    capture_sd = dict(
+        enabled=bool(module), awake_completion=a.awake,
+        module_offset=MODULE_OFFSET if module else None,
+        module_bytes=len(module) if module else 0,
+        module_sha256=sha(module) if module else None,
+        module_data_cache_enabled=bool(md and md.get("data_cache_enabled", False)),
+        module_load_phase="after completed capture and sensor STOP" if module else None)
     manifest.update(raw_bytes=len(raw), raw_sha256=sha(raw), size=size, entry_point=hex(entry),
                     hardware_status="untested", compile_flags=flags,
                     failure_park_address=hex(symbol(rdir, "fast_failure_idle")),
                     sleep_idle_address=hex(symbol(rdir, "status_led_sleep_idle")),
-                    capture_sd=dict(enabled=bool(module), awake_completion=a.awake,
-                                    module_offset=MODULE_OFFSET if module else None))
-    manifest["completion_policy"]="awake diagnostic park" if a.awake else "CPU WFI; not regulator-off"
+                    capture_source_path=str(rdir / "capture.c"),
+                    base_receiver_sha256=BASE_RECEIVER,
+                    base_receiver_manifest_sha256=sha((base / "receiver/manifest.json").read_bytes()),
+                    receiver_byte_identical_to_v45b=receiver_unchanged,
+                    capture_sd=copy.deepcopy(capture_sd))
+    manifest["parameters"]["first_frame_qualification"] = (
+        "pending hardware qualification of this exact capture/storage variant")
+    manifest.setdefault("generator_inputs", {})[str(HERE.relative_to(ROOT) / "build.py")] = sha(
+        Path(__file__).read_bytes())
+    completion_metadata(manifest, a.awake, bool(module))
+    receiver_led_metadata = copy.deepcopy(manifest["status_leds"])
     write_manifest(rdir, manifest, sources)
     psources = []
     for path in pm["sources"]:
@@ -165,11 +203,40 @@ def main():
                     stage2_crc32=hex(zlib.crc32(raw)), compile_flags=pflags,
                     stage2_build_manifest=str(rdir / "manifest.json"),
                     stage2_manifest_sha256=sha((rdir / "manifest.json").read_bytes()),
-                    program_sha256=sha(sector), receiver_byte_identical_to_v44=False,
-                    capture_sd=dict(enabled=bool(module), awake_completion=a.awake,
+                    program_sha256=sha(sector),
+                    receiver_byte_identical_to_v44=receiver_unchanged,
+                    receiver_byte_identical_to_v45b=receiver_unchanged,
+                    base_receiver_sha256=BASE_RECEIVER,
+                    status_leds=receiver_led_metadata,
+                    capture_sd=dict(capture_sd,
                                     unchanged_prefix_leading_bytes=first_difference,
-                                    checked_recovery_literal_offsets=recovery_literals,
-                                    module_sha256=sha(module) if module else None))
+                                    checked_recovery_literal_offsets=recovery_literals))
+    completion_metadata(manifest, a.awake, bool(module))
+    manifest["recovery_gpio"].update(
+        receiver_unchanged=receiver_unchanged,
+        receiver_comparison="exact v45b receiver binary",
+        clock_qualification=(
+            "Unchanged v45b 40000-cycle observation deadline at nominal 400 MHz; "
+            "not a total boot-latency or all-state recovery guarantee"),
+        external_drive=(
+            "PE1 diode interface remains supported; no connected external drive assumed. "
+            "Current bench recovery uses ST-LINK VCP on PE6."),
+        source_compatibility=(
+            "Early PE1/PE6 guard, park and referenced literals match v45b; "
+            "later receiver length/CRC constants can change"))
+    manifest["recovery_vcp"].update(
+        pattern=(
+            "Three complete bounded LOW pulses separated by bounded HIGH intervals; "
+            "pulse detector, not UART byte decoding"),
+        recommended_request_byte="0xc0",
+        reference_waveforms=(
+            "1 Mbaud 8N1: 0xC0 gives nominal 7 us LOW/3 us HIGH; "
+            "0x00 gives 9 us LOW/1 us HIGH with less sampling margin"),
+        qualification=(
+            "Early guard matches v45b, which reached verified cold/warm recovery parks; "
+            "later warm requests also failed. This exact integrated image is untested."))
+    manifest.setdefault("generator_inputs", {})[str(HERE.relative_to(ROOT) / "build.py")] = sha(
+        Path(__file__).read_bytes())
     write_manifest(pdir, manifest, psources)
     print(json.dumps(dict(out=str(out), receiver_bytes=len(raw), prefix_sha256=sha(prefix),
                           sector_sha256=sha(sector), unchanged_prefix_bytes=first_difference)))

@@ -4,7 +4,9 @@
 
 typedef struct {
     tdefl_compressor compressor;
-    uint8_t row[1U + 2U * PNG16_MAX_WIDTH];
+    /* Stored mode prepends a five-byte DEFLATE block header in this same row
+     * buffer. Fast modes still render at offset zero and use miniz unchanged. */
+    uint8_t row[5U + 1U + 2U * PNG16_MAX_WIDTH];
     png16_write_fn write;
     void *user;
     png16_stats stats;
@@ -103,10 +105,13 @@ png16_result png16_encode(
     e->stats=(png16_stats){0};
     if (stats) *stats=e->stats;
 
-    int flags=TDEFL_WRITE_ZLIB_HEADER | TDEFL_GREEDY_PARSING_FLAG;
-    flags|=mode==PNG16_STORED_NONE ? TDEFL_FORCE_ALL_RAW_BLOCKS : 1;
-    if (tdefl_init(&e->compressor,compressed_output,e,flags)!=TDEFL_STATUS_OKAY)
-        return PNG16_COMPRESS_FAILED;
+    const int stored=mode==PNG16_STORED_NONE;
+    uint32_t adler=1;
+    if (!stored) {
+        const int flags=TDEFL_WRITE_ZLIB_HEADER | TDEFL_GREEDY_PARSING_FLAG | 1;
+        if (tdefl_init(&e->compressor,compressed_output,e,flags)!=TDEFL_STATUS_OKAY)
+            return PNG16_COMPRESS_FAILED;
+    }
     static const uint8_t signature[8]={137,80,78,71,13,10,26,10};
     uint8_t ihdr[13]={0}, significant=10;
     be32(ihdr,width); be32(ihdr+4,height);
@@ -115,26 +120,50 @@ png16_result png16_encode(
         !chunk(e,"IHDR",ihdr,sizeof(ihdr)) ||
         !chunk(e,"sBIT",&significant,1))
         goto done;
+    if (stored) {
+        /* RFC 1950: DEFLATE, 32 KiB window, no dictionary, fastest level.
+         * 0x7801 is a multiple of 31. All following blocks are byte-aligned. */
+        static const uint8_t zlib_header[2]={0x78,0x01};
+        if (!chunk(e,"IDAT",zlib_header,sizeof(zlib_header))) goto done;
+        ++e->stats.idat_chunks;
+    }
     for (uint32_t y=0;y<height;++y) {
         const uint8_t *p=input+(size_t)y*stride;
+        uint8_t *row=e->row+(stored ? 5U : 0U);
         uint8_t prev_hi=0,prev_lo=0;
-        e->row[0]=mode==PNG16_FAST_SUB ? 1U : 0U;
+        row[0]=mode==PNG16_FAST_SUB ? 1U : 0U;
         for (uint32_t x=0;x<width;++x) {
             uint32_t v=(uint32_t)p[2*x]|((uint32_t)p[2*x+1]<<8);
             if (v>1023U) { e->error=PNG16_BAD_SAMPLE; goto done; }
             uint8_t hi=(uint8_t)(v>>2),lo=(uint8_t)(v<<6);
-            e->row[2*x+1]=mode==PNG16_FAST_SUB ? (uint8_t)(hi-prev_hi) : hi;
-            e->row[2*x+2]=mode==PNG16_FAST_SUB ? (uint8_t)(lo-prev_lo) : lo;
+            row[2*x+1]=mode==PNG16_FAST_SUB ? (uint8_t)(hi-prev_hi) : hi;
+            row[2*x+2]=mode==PNG16_FAST_SUB ? (uint8_t)(lo-prev_lo) : lo;
             prev_hi=hi; prev_lo=lo;
         }
-        if (tdefl_compress_buffer(&e->compressor,e->row,row_bytes+1,
-                                 TDEFL_NO_FLUSH)!=TDEFL_STATUS_OKAY) {
+        if (stored) {
+            /* RFC 1951 stored block: BFINAL/BTYPE=00 + zero alignment bits,
+             * then little-endian LEN/NLEN. Maximum row is only 2241 bytes.
+             * Direct emission avoids miniz's per-byte LZ/hash/literal path. */
+            uint32_t n=(uint32_t)row_bytes+1U, complement=n^0xFFFFU;
+            e->row[0]=(uint8_t)(y+1U==height);
+            e->row[1]=(uint8_t)n; e->row[2]=(uint8_t)(n>>8);
+            e->row[3]=(uint8_t)complement; e->row[4]=(uint8_t)(complement>>8);
+            adler=(uint32_t)mz_adler32(adler,row,n);
+            if (!chunk(e,"IDAT",e->row,n+5U)) goto done;
+            ++e->stats.idat_chunks;
+        } else if (tdefl_compress_buffer(&e->compressor,row,row_bytes+1,
+                                        TDEFL_NO_FLUSH)!=TDEFL_STATUS_OKAY) {
             if (e->error==PNG16_OK) e->error=PNG16_COMPRESS_FAILED;
             goto done;
         }
         ++e->stats.rows_encoded;
     }
-    if (tdefl_compress_buffer(&e->compressor,NULL,0,TDEFL_FINISH)!=TDEFL_STATUS_DONE) {
+    if (stored) {
+        uint8_t footer[4];
+        be32(footer,adler);
+        if (!chunk(e,"IDAT",footer,sizeof(footer))) goto done;
+        ++e->stats.idat_chunks;
+    } else if (tdefl_compress_buffer(&e->compressor,NULL,0,TDEFL_FINISH)!=TDEFL_STATUS_DONE) {
         if (e->error==PNG16_OK) e->error=PNG16_COMPRESS_FAILED;
         goto done;
     }

@@ -62,7 +62,7 @@ typedef struct mz_dummy_time_t_tag
 #define MZ_CLEAR_ARR(obj) memset((obj), 0, sizeof(obj))
 #define MZ_CLEAR_PTR(obj) memset((obj), 0, sizeof(*obj))
 
-#if MINIZ_USE_UNALIGNED_LOADS_AND_STORES && MINIZ_LITTLE_ENDIAN
+#if MINIZ_USE_UNALIGNED_LOADS_AND_STORES && MINIZ_LITTLE_ENDIAN && !defined(MINIZ_UNALIGNED_USE_MEMCPY)
 #define MZ_READ_LE16(p) *((const mz_uint16 *)(p))
 #define MZ_READ_LE32(p) *((const mz_uint32 *)(p))
 #else

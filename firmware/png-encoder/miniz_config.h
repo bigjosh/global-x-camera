@@ -11,7 +11,8 @@
 #define MINIZ_NO_MALLOC
 #define TDEFL_LESS_MEMORY 1
 /* Cortex-M55 memory may have stricter alignment than a desktop. */
-#define MINIZ_USE_UNALIGNED_LOADS_AND_STORES 0
+#define MINIZ_USE_UNALIGNED_LOADS_AND_STORES 1
+#define MINIZ_UNALIGNED_USE_MEMCPY
 #define MINIZ_LITTLE_ENDIAN 1
 #ifndef NDEBUG
 #define NDEBUG

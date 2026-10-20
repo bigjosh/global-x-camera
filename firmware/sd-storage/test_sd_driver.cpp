@@ -16,6 +16,8 @@ static std::vector<uint32_t> commands, arguments, output;
 static uint32_t words, expected_words, current_lba, operation, stop_count, fifo_resets;
 static uint32_t data_error_at, busy_polls, command_error, late_card_error;
 static uint32_t abort_tail_end;
+static uint32_t tx_sent, tx_start_words, tx_max_occupancy;
+static bool tx_started;
 static bool waiting_for_stop, permanent_busy, abort_pending;
 
 static uint32_t data_word(uint32_t lba, uint32_t index)
@@ -42,6 +44,7 @@ static void command_write(uint32_t value)
         assert(value&SDMMC_CMD_CMDTRANS);
         assert(!(value&SDMMC_CMD_CMDSTOP));
         operation=index; words=0; expected_words=test_sd.DLEN.value/4;
+        tx_sent=0; tx_started=false; tx_start_words=0; tx_max_occupancy=0;
         current_lba=test_sd.ARG.value;
         waiting_for_stop=index==18 || index==25;
     } else if (index==12) {
@@ -83,10 +86,27 @@ MockReg::operator uint32_t() const
                 return state;
             }
             if (words>=data_error_at) return state|SDMMC_STA_DCRCFAIL|SDMMC_STA_DPSMACT;
-            if (words==expected_words) return state|SDMMC_STA_DATAEND;
-            state|=SDMMC_STA_DPSMACT;
-            if (operation==24 || operation==25) state|=SDMMC_STA_TXFIFOHE;
-            else if (expected_words-words>=16) state|=SDMMC_STA_RXFIFOHF;
+            if (operation==24 || operation==25) {
+                /* RM0486: 256-word FIFO, half-empty at <=128 occupied.
+                 * BUSSPEED=0 does not launch before FIFO full or all DLEN
+                 * bytes are queued. Drain only after that startup event. */
+                if (!tx_started && (words-tx_sent==256 || words==expected_words)) {
+                    tx_started=true; tx_start_words=words;
+                }
+                if (tx_started && tx_sent<words) {
+                    uint32_t drain=words-tx_sent;
+                    if (drain>16) drain=16;
+                    tx_sent+=drain;
+                }
+                if (tx_sent==expected_words) return state|SDMMC_STA_DATAEND;
+                state|=SDMMC_STA_DPSMACT;
+                if (words-tx_sent<=128) state|=SDMMC_STA_TXFIFOHE;
+                if (words-tx_sent==256) state|=SDMMC_STA_TXFIFOF;
+            } else {
+                if (words==expected_words) return state|SDMMC_STA_DATAEND;
+                state|=SDMMC_STA_DPSMACT;
+                if (expected_words-words>=128) state|=SDMMC_STA_RXFIFOHF;
+            }
         }
         return state;
     }
@@ -110,7 +130,9 @@ MockReg& MockReg::operator=(uint32_t input)
     } else if (this==&test_sd.FIFO) {
         assert(operation==24 || operation==25);
         assert(words<expected_words);
+        assert(words-tx_sent<256);
         output.push_back(input); ++words;
+        if (words-tx_sent>tx_max_occupancy) tx_max_occupancy=words-tx_sent;
     } else if (this==&test_sd.DCTRL && (input&SDMMC_DCTRL_FIFORST)) {
         assert(uint32_t(test_sd.STA)&SDMMC_STA_DPSMACT);
         assert(!test_sd.IDMACTRL.value);
@@ -136,6 +158,7 @@ static sd_card_t reset_model()
     data_error_at=0xFFFFFFFFU; busy_polls=0; command_error=0xFFFFFFFFU;
     late_card_error=0; waiting_for_stop=false; permanent_busy=false;
     abort_pending=false; abort_tail_end=0;
+    tx_sent=0; tx_started=false; tx_start_words=0; tx_max_occupancy=0;
     test_gpio_c.IDR.value=1U<<4;
     sd_card_t card{};
     card.initialized=1; card.controller_owned=1; card.media_idle=1;
@@ -163,12 +186,15 @@ int main()
       assert(number_of(25)==1 && stop_count==1 && c.written_sectors==2);
       assert(fifo_resets==0);
       assert(output.size()==256 && c.media_idle);
+      assert(tx_started && tx_start_words==256 && tx_sent==256);
+      assert(tx_max_occupancy==256);
       for(uint32_t i=0;i<256;++i) assert(output[i]==load_word(unaligned+i*4));
       assert(sd_hook_calls>hook_before && sd_hook_calls-hook_before<32);
     }
     { auto c=reset_model();
       assert(sd_write_blocks(&c,10,unaligned,1)==SD_OK);
       assert(number_of(24)==1 && stop_count==0 && c.written_sectors==1);
+      assert(tx_started && tx_start_words==128 && tx_sent==128);
     }
     { auto c=reset_model();
       assert(sd_read_blocks(&c,19,unaligned,2)==SD_OK);
@@ -226,5 +252,25 @@ int main()
       auto d=reset_model(); d.initialized=0;
       assert(sd_read_blocks(&d,0,unaligned,1)==SD_ERR_STATE);
     }
-    std::puts("13 protocol cases passed");
+    { auto c=reset_model();
+      (void)c;
+      test_sd.DLEN.value=4096;
+      command_write(25|SDMMC_CMD_CPSMEN|SDMMC_CMD_CMDTRANS);
+      /* Reproduce the original 16-word/HALF-empty policy, independently of
+       * production transfer(): exactly144 words queued, none transmitted. */
+      for(unsigned poll=0;poll<100;++poll) {
+          if (uint32_t(test_sd.STA)&SDMMC_STA_TXFIFOHE)
+              for(unsigned n=0;n<16;++n) test_sd.FIFO=0x11223344;
+      }
+      uint32_t sta=test_sd.STA;
+      assert(words==144 && tx_sent==0 && !tx_started);
+      assert((sta&SDMMC_STA_DPSMACT) && !(sta&SDMMC_STA_TXFIFOHE));
+      assert(!(sta&(SDMMC_STA_TXFIFOF|SDMMC_STA_DATAEND)));
+    }
+    { auto c=reset_model();
+      assert(sd_write_blocks(&c,10,unaligned,8)==SD_OK);
+      assert(c.written_sectors==8 && tx_sent==1024 && tx_start_words==256);
+      assert(tx_max_occupancy==256 && c.media_idle && stop_count==1);
+    }
+    std::puts("15 protocol cases passed");
 }

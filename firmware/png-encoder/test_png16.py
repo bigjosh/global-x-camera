@@ -196,7 +196,90 @@ class EncoderTests(unittest.TestCase):
         plain = self.check_roundtrip(samples, 1120, 128, 0)
         for mode in (1, 2):
             compressed = self.check_roundtrip(samples, 1120, 128, mode)
-            self.assertLess(len(compressed), len(plain)//4)
+            # The dedicated fast matcher trades ratio for CPU time; it does
+            # not promise the old general matcher's <25% ratio on this ramp.
+            self.assertLess(len(compressed), len(plain))
+
+    def test_fast_tails_and_dictionary_boundaries(self):
+        rng = random.Random(0x8B)
+        cases = [(1, n) for n in range(1, 9)]
+        cases += [(1023, 16), (1023, 17), (1024, 16), (1024, 17),
+                  (1120, 14), (1120, 15), (1120, 29), (1120, 30)]
+        tails = set()
+        for width, height in cases:
+            tails.add(((2*width+1)*height-1) % 4 + 1)
+            for pattern in ("repeat", "noise"):
+                samples = ([i % 31 for i in range(width*height)] if pattern == "repeat"
+                           else [rng.randrange(1024) for _ in range(width*height)])
+                for mode in (1, 2):
+                    with self.subTest(width=width, height=height, pattern=pattern, mode=mode):
+                        self.check_roundtrip(samples, width, height, mode,
+                                             stride=width*2+1, unaligned=True)
+        self.assertEqual(tails, {1, 2, 3, 4})
+
+    def test_stored_blocks_lengths_final_bit_and_adler(self):
+        # Total deflate payload crosses 64 KiB between heights29/30 while each
+        # row remains its own bounded stored block. Include smallest/max frame.
+        for width,height in ((1,1),(3,2),(1120,29),(1120,30),(1120,1364)):
+            with self.subTest(width=width,height=height):
+                samples=[(i*127+(i//width)*43)%1024 for i in range(width*height)]
+                result,encoded,stats=self.encode(samples,width,height,0)
+                self.assertEqual(result,0)
+                _,_,pixels,filters,chunks,stream=parse_png(encoded)
+                self.assertEqual(pixels,[v<<6 for v in samples])
+                self.assertEqual(filters,[0]*height)
+                self.assertEqual(stream[:2],b"\x78\x01")
+                self.assertEqual(int.from_bytes(stream[:2],"big")%31,0)
+                position,plain=2,bytearray()
+                for row in range(height):
+                    self.assertEqual(stream[position],int(row+1==height))
+                    length,inverse=struct.unpack_from("<HH",stream,position+1)
+                    self.assertEqual(length,width*2+1)
+                    self.assertEqual(inverse,length^0xffff)
+                    position+=5
+                    block=stream[position:position+length]
+                    self.assertEqual(block[0],0)
+                    self.assertEqual(block[1:],struct.pack(
+                        ">"+"H"*width,*[v<<6 for v in samples[row*width:(row+1)*width]]))
+                    plain.extend(block)
+                    position+=length
+                self.assertEqual(position+4,len(stream))
+                self.assertEqual(int.from_bytes(stream[position:],"big"),zlib.adler32(plain))
+                self.assertEqual(stats.idat_chunks,height+2)
+                self.assertEqual(len(encoded),88+height*(18+width*2))
+                self.assertLessEqual(len(encoded),3100000)
+                self.assertTrue(all(len(data)<=16384 for name,data in chunks if name==b"IDAT"))
+
+    def test_fast_matcher_output_golden_hashes(self):
+        # Reviewed byte-safe dedicated fast matcher (v8b). Full independent
+        # decoding accompanies every hash; no Python RNG version is involved.
+        expected={
+            (3,5,1):"cfdc7ac1c63f8dc181ed69880fcf4015935f6a1bc7b0d8ef51abd4aef7fc177f",
+            (3,5,2):"077ecf95bc2c95f28ddd52c6704c5b82e67b91918a56a8a994af00be07f5bf48",
+            (1120,64,1):"f39968975137d96798bc4ae857ac9bb0295463b546575e6a165e63780d92ac27",
+            (1120,64,2):"8183bb1cd38ec0c30ea8a755f596d04339574965a65aef35b80930aca47b2207",
+            (1120,1364,1):"501ddb88bd081bb21a8ddcc9afa7236c9bfc5ecd795b8412b08c292190127949",
+            (1120,1364,2):"0f17b06324e64a58ed7f4edc94241d6417d3c080e32b159d047403a1eb4c60d3",
+        }
+        for (width,height,mode),wanted in expected.items():
+            with self.subTest(width=width,height=height,mode=mode):
+                samples=[(i*127+(i//width)*43)%1024 for i in range(width*height)]
+                result,encoded,_=self.encode(samples,width,height,mode)
+                self.assertEqual(result,0)
+                self.assertEqual(parse_png(encoded)[2], [v << 6 for v in samples])
+                self.assertEqual(hashlib.sha256(encoded).hexdigest(),wanted)
+
+    def test_stored_final_block_and_footer_callback_failures(self):
+        samples=[i%1024 for i in range(1120*3)]
+        result,_,stats=self.encode(samples,1120,3,0)
+        self.assertEqual(result,0)
+        # Include final row's CRC, zlib footer, and IEND callback boundaries.
+        for accepted in range(stats.callback_calls-9,stats.callback_calls):
+            with self.subTest(accepted=accepted):
+                result,partial,failed=self.encode(samples,1120,3,0,fail_after=accepted)
+                self.assertEqual(result,-4)
+                self.assertEqual(failed.callback_calls,accepted+1)
+                self.assertFalse(partial.endswith(b"\x00\x00\x00\x00IEND\xaeB`\x82"))
 
     def test_reused_dirty_workspace_does_not_change_output(self):
         samples = [(i*127) % 1024 for i in range(181*61)]
@@ -255,14 +338,42 @@ class EncoderTests(unittest.TestCase):
         self.assertLessEqual(self.lib.png16_workspace_size(), 192*1024)
         self.assertLessEqual(self.lib.png16_workspace_alignment(), 8)
 
-    def test_pinned_upstream_files_match_recorded_downloads(self):
+    def test_supplier_and_local_patch_provenance(self):
         root = HERE / "vendor/miniz"
         info = json.loads((root / "UPSTREAM.json").read_text())
         self.assertEqual(info["commit"], "174573d60290f447c13a2b1b3405de2b96e27d6c")
+        patches = json.loads((root / "LOCAL_PATCHES.json").read_text())
+        self.assertEqual(patches["upstream_commit"], info["commit"])
+        patch_data = (root / patches["patch_file"]).read_bytes()
+        self.assertEqual(hashlib.sha256(patch_data).hexdigest(), patches["patch_sha256"])
+        changed = {record["file"]:record for record in patches["patches"]}
+        self.assertEqual(set(changed), {"miniz.h", "miniz_common.h", "miniz_tdef.c"})
         for record in info["files"]:
             data = (root / record["file"]).read_bytes()
-            self.assertEqual(len(data), record["bytes"])
-            self.assertEqual(hashlib.sha256(data).hexdigest(), record["sha256"])
+            if record["file"] in changed:
+                patch = changed[record["file"]]
+                self.assertEqual(patch["upstream_sha256"], record["sha256"])
+                self.assertEqual(len(data), patch["patched_bytes"])
+                self.assertEqual(hashlib.sha256(data).hexdigest(), patch["patched_sha256"])
+            else:
+                self.assertEqual(len(data), record["bytes"])
+                self.assertEqual(hashlib.sha256(data).hexdigest(), record["sha256"])
+
+    def test_native_address_and_undefined_behavior_sanitizers(self):
+        compiler = shutil.which("clang")
+        if not compiler:
+            self.skipTest("Clang is required for ASan/UBSan qualification")
+        with tempfile.TemporaryDirectory(prefix="png16-sanitizers-") as folder:
+            exe = Path(folder) / ("stress.exe" if hasattr(C, "windll") else "stress")
+            subprocess.run([
+                compiler, "-O2", "-g", "-std=c11", "-Wall", "-Wextra", "-Werror",
+                "-fsanitize=address,undefined", "-fno-sanitize-recover=all",
+                "-I", str(HERE), str(HERE / "test_sanitizer.c"),
+                str(HERE / "png16.c"), str(HERE / "png16_miniz.c"),
+                "-o", str(exe),
+            ], check=True, capture_output=True)
+            result = subprocess.run([str(exe)], check=True, capture_output=True, text=True)
+            self.assertIn("432 ASan/UBSan encode cases passed", result.stdout)
 
 
 if __name__ == "__main__":

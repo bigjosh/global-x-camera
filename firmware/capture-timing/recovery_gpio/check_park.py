@@ -30,6 +30,11 @@ VCP_FIELDS = (
     'reserved30 reserved31').split()
 # An unknown/self-consistent build is insufficient authorization to halt.
 APPROVED = {
+    # v50 capture/PNG/SD awake integration; reviewed exact v8b storage module.
+    # Early guard and all referenced literals match the v45b/v46 baseline.
+    '8a65df7b36a0c9a0c80e25c4a1000d4bae914ce9d3a46e5ff83e5454cdf109f7':
+        {'bytes': 5140, 'park': 0x3418078C, 'vcp': True,
+         'sector': '9ffc2c1cbaacf9f60258343ac6a061b35fb62f8b62b42c1a5b50ccc5f432f5cd'},
     # v46 offline-reviewed awake completion: two receiver bytes differ from v45b;
     # the entire early recovery branch is byte-identical. Not hardware-qualified.
     'da664e5425574d6130e995513a70169b7a3dd7397ed8c86a8acf5ce651ab8ea7':

@@ -43,6 +43,9 @@ mount_hi validate_lo validate_hi stack_used stack_canary rows idat_chunks
 callbacks buffer_flushes png_bytes_lo png_bytes_hi fnv_before fnv_after width
 height frame_bytes media_idle card_error fs_result fs_stage png_result card_size
 fs_size nonce initial_msplim""".split()
+CACHE_FIELDS="""cache_enabled initial_mpu_ctrl final_ccr cleanup_lo cleanup_hi
+postclean_validate_lo postclean_validate_hi complete_lo complete_hi postclean_fnv
+postclean_validated""".split()
 CARD_QWORDS="sector_count read_sectors written_sectors read_cycles write_cycles ready_cycles".split()
 CARD_WORDS="""initialized controller_owned media_idle clock_hz ocr rca cid0 cid1
 cid2 cid3 csd0 csd1 csd2 csd3 error error_stage error_command error_sta stage
@@ -97,6 +100,15 @@ def validate_layout(manifest,code,expected_sha):
         raise ValueError("Module BSS/buffer overlaps code, stack, or diagnostics")
     if start%4 or end%8 or buffer%32:
         raise ValueError("Unaligned BSS or buffer")
+    if ("read_buffer_address" in manifest)!=("read_buffer_bytes" in manifest):
+        raise ValueError("READ buffer address and size must be specified together")
+    read_address,read_bytes=module_buffer(manifest,OPERATIONS["read"])
+    if (read_bytes not in (32768,262144) or read_address%32
+            or not start<=read_address<read_address+read_bytes<=end):
+        raise ValueError("READ buffer exceeds the module BSS")
+    if "read_buffer_address" in manifest and not (
+            read_address+read_bytes<=buffer or buffer+32768<=read_address):
+        raise ValueError("Separate READ scratch overlaps SAVE output buffer")
     if not entry&1 or not LOAD<=entry-1<LOAD+len(code) or park%2:
         raise ValueError("Invalid bench entry or park")
     offset=park-LOAD
@@ -119,29 +131,40 @@ def checked_build(build,expected_sha):
     return manifest,code
 
 
+def module_buffer(manifest,operation):
+    """Old modules expose their 32 KiB SAVE buffer for READ as well."""
+    prefix="read_buffer" if (operation==OPERATIONS["read"] and
+                            "read_buffer_address" in manifest) else "buffer"
+    return number(manifest[prefix+"_address"]),number(manifest.get(prefix+"_bytes",32768))
+
+
 def decode_report(raw):
     if len(raw)!=512:
         raise ValueError("Incomplete module report")
     words=struct.unpack("<128I",raw)
     result=dict(zip(FIELDS,words))
+    result.update(zip(CACHE_FIELDS,words[68:79]))
     result["result_signed"]=signed(result["result"])
     result["png_result_signed"]=signed(result["png_result"])
     result["terminal"]=words[63]
     result["name"]=raw[256:272].split(b"\0",1)[0].decode("ascii",errors="replace")
-    for field in ("total","encode","callback","finish","init","mount","validate","png_bytes"):
+    for field in ("total","encode","callback","finish","init","mount","validate","png_bytes",
+                  "cleanup","postclean_validate","complete"):
         result[field]=result[field+"_lo"] | result[field+"_hi"]<<32
-    for field in ("total","encode","callback","finish","init","mount","validate"):
+    for field in ("total","encode","callback","finish","init","mount","validate",
+                  "cleanup","postclean_validate","complete"):
         result[field+"_ms"]=result[field]*1000/400000000
     result["raw_words"]=list(words)
     return result
 
 
 def validate_success(report,manifest,request=None,allow_auto=False):
+    buffer_address,buffer_bytes=module_buffer(manifest,report["operation"])
     exact={"magic":0x53564431,"schema":1,"words":128,"state":2,"result":0,
            "terminal":0x444F4E45,"cpu_hz":400000000,"media_idle":1,
            "card_error":0,"fs_result":0,"width":1120,"height":1364,
-           "frame_bytes":FRAME_BYTES,"buffer_bytes":32768,
-           "buffer_address":number(manifest["buffer_address"]),
+           "frame_bytes":FRAME_BYTES,"buffer_bytes":buffer_bytes,
+           "buffer_address":buffer_address,
            "stack_canary":0x5354414B,"initial_msplim":0x343A0000}
     for key,want in exact.items():
         if report.get(key)!=want:
@@ -149,7 +172,7 @@ def validate_success(report,manifest,request=None,allow_auto=False):
     auto=allow_auto and report["nonce"]==0 and report["operation"]==OPERATIONS["save"]
     if (report["operation"] not in OPERATIONS.values() or report["mode"] not in MODES.values()
             or (not auto and not 0<report["nonce"]<2**32) or report["stack_used"]>65536
-            or report["ccr"]&0x30000 or report["read_bytes"]>32768):
+            or report["ccr"]&0x30000 or report["read_bytes"]>buffer_bytes):
         raise ValueError("Invalid terminal storage context")
     if request:
         for key in ("operation","mode","nonce"):
@@ -161,6 +184,15 @@ def validate_success(report,manifest,request=None,allow_auto=False):
         if (report["fnv_before"]!=report["fnv_after"] or report["rows"]!=1364
                 or report["png_result"] or not 0<report["png_bytes"]<=3100000):
             raise ValueError("Completed PNG/frame-integrity proof is missing")
+    if manifest.get("cache_report_extension")==1:
+        if (report["cache_enabled"]!=int(manifest["data_cache_enabled"])
+                or report["final_ccr"]&0x30000 or report["complete"]<report["total"]
+                or (report["cache_enabled"] and report["initial_mpu_ctrl"]&1)):
+            raise ValueError("Cache ownership/cleanup proof is missing")
+        if report["operation"]==OPERATIONS["save"] and (
+                report["postclean_validated"]!=1 or
+                report["postclean_fnv"]!=report["fnv_before"]):
+            raise ValueError("Fresh uncached frame-integrity proof is missing")
 
 
 def decode_card(raw):
@@ -294,11 +326,28 @@ def maintenance_park_proof(bench):
     return dict(frame=frame,cache_status=list(status),cache_sha256=sha(cache),context=context)
 
 
-def preflight(bench,manifest,code):
+def preflight(bench,manifest,code,prior_manifest=None,prior_code=None):
     """No halt/write before terminal evidence; no retry path for an SD error."""
     loader=struct.unpack("<16I",bench.upload(LOADER,64,"prior-loader.bin"))
     raw=bench.upload(REPORT,512,"prior-report.bin")
     prior=decode_report(raw)
+    if (prior_manifest is None)!=(prior_code is None):
+        raise ValueError("Prior module manifest and code must be supplied together")
+    if prior_manifest is not None:
+        proof=exact_storage_proof(bench,prior_manifest,prior_code,loader,raw,"prior")
+        offset=number(prior_manifest["park_address"])-LOAD
+        if (not 0<=offset<len(code)-1 or
+                (code[offset:offset+2]!=b"\xfe\xe7" and
+                 code[offset:offset+4]!=b"\xff\xf7\xfe\xbf")):
+            raise ValueError("Replacement must preserve the prior safe park during RAM upload")
+        if proof["automatic_save"]:
+            context=maintenance_park_proof(bench)
+        else:
+            context=dict(frame=frame_proof(bench),context=context_proof(
+                bench,{number(prior_manifest["park_address"])},"preflight"))
+        return dict(path="explicit_verified_module_switch",**proof,**context,
+                    prior_module_sha256=sha(prior_code),
+                    module_already_identical=prior_code==code)
     if validate_storage_activity(loader,prior):
         proof=exact_storage_proof(bench,manifest,code,loader,raw,"prior")
         if proof["automatic_save"]:
@@ -310,12 +359,14 @@ def preflight(bench,manifest,code):
                 module_already_identical=False)
 
 
-def make_request(operation,mode,sd_hz,offset,length,name,nonce):
+def make_request(operation,mode,sd_hz,offset,length,name,nonce,read_limit=32768):
     if operation not in OPERATIONS.values() or mode not in MODES.values():
         raise ValueError("Unsupported operation/mode")
     if sd_hz not in (100000,12500000,25000000) or not 0<nonce<2**32:
         raise ValueError("Unsupported clock or invalid nonce")
-    if not 0<=offset<=0xffffffff or not 0<=length<=32768:
+    if read_limit not in (32768,262144):
+        raise ValueError("Unsupported READ buffer size")
+    if not 0<=offset<=0xffffffff or not 0<=length<=read_limit:
         raise ValueError("Read chunk exceeds bounded ABI")
     if operation==OPERATIONS["read"]:
         if not re.fullmatch(r"IMG[0-9]{5}\.(PNG|TMP)",name) or not length:
@@ -330,7 +381,8 @@ def make_request(operation,mode,sd_hz,offset,length,name,nonce):
 
 
 def run_request(build,out,expected_sha,operation,mode,sd_hz=25000000,
-                offset=0,length=0,name="",format_card=False,timeout=180):
+                offset=0,length=0,name="",format_card=False,timeout=180,
+                prior_build=None,prior_sha256=None):
     """Execute one bounded request; READ writes only its returned chunk to data.bin."""
     if operation==OPERATIONS["format"] and not format_card:
         raise ValueError("Destructive FORMAT requires explicit --format-card")
@@ -338,16 +390,23 @@ def run_request(build,out,expected_sha,operation,mode,sd_hz=25000000,
         raise ValueError("--format-card is only valid for FORMAT")
     if not 1<=timeout<=1800:
         raise ValueError("Timeout must be 1..1800 seconds")
+    if (prior_build is None)!=(prior_sha256 is None):
+        raise ValueError("--prior-build and --prior-sha256 must be supplied together")
     manifest,code=checked_build(build.resolve(),expected_sha)
+    prior_manifest,prior_code=(checked_build(prior_build.resolve(),prior_sha256)
+                              if prior_build is not None else (None,None))
     command,request=make_request(operation,mode,sd_hz,offset,length,name,
-                                 secrets.randbelow(0xffffffff)+1)
+                                 secrets.randbelow(0xffffffff)+1,
+                                 module_buffer(manifest,OPERATIONS["read"])[1])
     bench=Bench(out)
     frozen=bench.output/"frozen-save.bin"
     frozen.write_bytes(code)
     json_file(bench.output/"manifest.json",manifest)
+    if prior_manifest is not None:
+        json_file(bench.output/"prior-manifest.json",prior_manifest)
     json_file(bench.output/"request.json",dict(request,reviewed_sha256=expected_sha,
               format_explicit=format_card,reset_permitted=False,power_control_permitted=False))
-    proof=preflight(bench,manifest,code)
+    proof=preflight(bench,manifest,code,prior_manifest,prior_code)
     json_file(bench.output/"preflight.json",proof)
     if not proof["module_already_identical"]:
         bench.call("-halt","-w",frozen,hex(LOAD),"-v",
@@ -359,11 +418,24 @@ def run_request(build,out,expected_sha,operation,mode,sd_hz=25000000,
     command_path.write_bytes(command)
     clear=bench.output/"clear-report.bin"
     clear.write_bytes(bytes(512))
+    if prior_manifest is not None and proof["loader_words"][0]==0x534C4431:
+        # The prior loader was proved completed before any RAM write. Its CRC
+        # belongs to the old module, so retain it in preflight.json and retire
+        # that stale proof before this new, explicit bench request.
+        clear_loader=bench.output/"clear-completed-loader.bin"
+        clear_loader.write_bytes(bytes(64))
+        bench.call("-halt","-w",clear_loader,hex(LOADER),"-v",
+                   success="Download verified successfully")
+        if bench.upload(LOADER,64,"cleared-loader.bin")!=bytes(64):
+            raise ValueError("Old completed loader proof was not cleared; nothing executed")
     bench.call("-halt","-w",clear,hex(REPORT),"-v","-w",command_path,hex(REQUEST),"-v",
                success="Download verified successfully")
     if bench.upload(REQUEST,64,"request-readback.bin")!=command:
         raise ValueError("Request readback mismatch; nothing executed")
-    context_proof(bench,{CACHE+0x72,CACHE+0x74,number(manifest["park_address"])},"ready")
+    ready_parks={CACHE+0x72,CACHE+0x74,number(manifest["park_address"])}
+    if prior_manifest is not None:
+        ready_parks.add(number(prior_manifest["park_address"]))
+    context_proof(bench,ready_parks,"ready")
     timing={"scope":"Host command/status brackets, not electrical synchronization",
             "run_before":host_stamp(),"polls":[]}
     json_file(bench.output/"host-timing.json",timing)
@@ -395,7 +467,9 @@ def run_request(build,out,expected_sha,operation,mode,sd_hz=25000000,
     card,fs=snapshots(bench,report,"result")
     result=dict(report=report,card=card,filesystem=fs,request=request,
                 module_sha256=expected_sha,reset_sent=False,power_changed=False,
-                nor_commands_sent=False,host_timing=timing)
+                nor_commands_sent=False,host_timing=timing,
+                cache_report_extension=manifest.get("cache_report_extension",0),
+                data_cache_enabled=manifest.get("data_cache_enabled",False))
     timing["target"]=dict(total_cycles=report["total"],cpu_hz=report["cpu_hz"],
                           mode=report["mode"],frame_fnv_before=report["fnv_before"],
                           frame_fnv_after=report["fnv_after"])
@@ -407,7 +481,7 @@ def run_request(build,out,expected_sha,operation,mode,sd_hz=25000000,
     result["final_context"]=context_proof(bench,{number(manifest["park_address"])},"final")
     if operation==OPERATIONS["read"]:
         count=report["read_bytes"]
-        data=bench.upload(number(manifest["buffer_address"]),count,"data.bin") if count else b""
+        data=bench.upload(report["buffer_address"],count,"data.bin") if count else b""
         if not count:
             (bench.output/"data.bin").write_bytes(b"")
         result["readback"]=dict(bytes=count,sha256=sha(data),offset=offset,name=name)
@@ -418,6 +492,7 @@ def run_request(build,out,expected_sha,operation,mode,sd_hz=25000000,
 def self_test():
     """Pure host guards; no Bench instance, debugger, or instrument access."""
     import unittest
+    from unittest.mock import patch
 
     class Guards(unittest.TestCase):
         def test_request_roundtrip(self):
@@ -433,6 +508,18 @@ def self_test():
                          (3,0,25000000,0,20,"IMG00001.PNG",0)):
                 with self.assertRaises(ValueError):
                     make_request(*args)
+
+        def test_large_read_requires_explicit_module_limit(self):
+            raw,_=make_request(3,1,25000000,0,262144,"IMG00001.PNG",9,262144)
+            self.assertEqual(struct.unpack("<16I",raw)[5],262144)
+            for length,limit in ((262145,262144),(32769,32768),(1,999999)):
+                with self.assertRaises(ValueError):
+                    make_request(3,1,25000000,0,length,"IMG00001.PNG",9,limit)
+            old={"buffer_address":hex(LOAD+4096),"buffer_bytes":32768}
+            new=dict(old,read_buffer_address=hex(LOAD+65536),read_buffer_bytes=262144)
+            self.assertEqual(module_buffer(old,3),(LOAD+4096,32768))
+            self.assertEqual(module_buffer(new,3),(LOAD+65536,262144))
+            self.assertEqual(module_buffer(new,1),(LOAD+4096,32768))
 
         def test_exact_context(self):
             context=dict(PC=CACHE+0x72,CONTROL=0,PRIMASK=1,FAULTMASK=0,XPSR=0x01000000)
@@ -460,6 +547,27 @@ def self_test():
                     validate_success(dict(report,**{key:value}),manifest)
             with self.assertRaises(ValueError):
                 validate_success(report,manifest,dict(operation=4,mode=1,nonce=78,length=0))
+            extended=dict(manifest,cache_report_extension=1,data_cache_enabled=True)
+            cached=dict(report,cache_enabled=1,initial_mpu_ctrl=4,final_ccr=0x201,
+                        complete=100,total=90)
+            validate_success(cached,extended)
+            for key,value in (("cache_enabled",0),("initial_mpu_ctrl",5),
+                              ("final_ccr",0x10000),("complete",89)):
+                with self.assertRaises(ValueError):
+                    validate_success(dict(cached,**{key:value}),extended)
+            read_manifest=dict(extended,read_buffer_address=hex(LOAD+65536),
+                               read_buffer_bytes=262144)
+            large=dict(cached,operation=3,buffer_address=LOAD+65536,
+                       buffer_bytes=262144,read_bytes=262144)
+            validate_success(large,read_manifest)
+            with self.assertRaises(ValueError):
+                validate_success(dict(large,read_bytes=262145),read_manifest)
+            saved=dict(cached,operation=1,fnv_before=123,fnv_after=123,rows=1364,
+                       png_bytes=99,postclean_fnv=123,postclean_validated=1)
+            validate_success(saved,extended)
+            for key,value in (("postclean_fnv",124),("postclean_validated",0)):
+                with self.assertRaises(ValueError):
+                    validate_success(dict(saved,**{key:value}),extended)
 
         def test_failed_or_active_prior_operation_never_halts(self):
             class ReadOnlyPrior:
@@ -483,6 +591,48 @@ def self_test():
                 with self.assertRaises(ValueError):
                     preflight(fake,{},b"")
                 self.assertEqual(fake.reads,2)
+                fake=ReadOnlyPrior(struct.pack("<128I",*words))
+                with self.assertRaises(ValueError):
+                    preflight(fake,{},b"",{"park_address":hex(LOAD)},b"\xfe\xe7")
+                self.assertEqual(fake.reads,2)
+
+        def test_module_switch_proves_old_code_and_preserves_park(self):
+            class Prior:
+                def upload(self,address,length,name):
+                    return bytes(length)
+            old={"park_address":hex(LOAD)}
+            proof=dict(automatic_save=False,loader_words=[0]*16)
+            with patch(__name__+".exact_storage_proof",return_value=proof) as exact, \
+                 patch(__name__+".frame_proof",return_value={}) as frame, \
+                 patch(__name__+".context_proof",return_value={}) as context:
+                new=b"\xfe\xe7\x01\x02"
+                result=preflight(Prior(),{},new,old,b"\xfe\xe7\x00\x00")
+                self.assertFalse(result["module_already_identical"])
+                self.assertEqual(exact.call_args.args[1:3],(old,b"\xfe\xe7\x00\x00"))
+                frame.assert_called_once()
+                self.assertEqual(context.call_args.args[1],{LOAD})
+                with self.assertRaisesRegex(ValueError,"preserve the prior safe park"):
+                    preflight(Prior(),{},b"\x00\x00\x00\x00",old,b"\xfe\xe7\x00\x00")
+            with self.assertRaisesRegex(ValueError,"supplied together"):
+                preflight(Prior(),{},b"",old,None)
+
+        def test_module_switch_requires_pair_and_both_reviewed_builds(self):
+            for prior_build,prior_sha in ((Path("old"),None),(None,"0"*64)):
+                with self.assertRaisesRegex(ValueError,"supplied together"):
+                    run_request(Path("new"),Path("unused"),"0"*64,4,1,
+                                prior_build=prior_build,prior_sha256=prior_sha)
+            with patch(__name__+".checked_build",side_effect=ValueError("bad hash")), \
+                 patch(__name__+".Bench") as never:
+                with self.assertRaisesRegex(ValueError,"bad hash"):
+                    run_request(Path("new"),Path("unused"),"0"*64,4,1,
+                                prior_build=Path("old"),prior_sha256="1"*64)
+                never.assert_not_called()
+            with patch(__name__+".checked_build",side_effect=[({},b""),ValueError("bad old hash")]), \
+                 patch(__name__+".Bench") as never:
+                with self.assertRaisesRegex(ValueError,"bad old hash"):
+                    run_request(Path("new"),Path("unused"),"0"*64,4,1,
+                                prior_build=Path("old"),prior_sha256="1"*64)
+                never.assert_not_called()
 
         def test_loader_activity_refuses_even_before_module_magic(self):
             report=decode_report(bytes(512))
@@ -518,6 +668,15 @@ def self_test():
                     validate_layout(dict(manifest,**{key:value}),code,sha(code))
             with self.assertRaises(ValueError):
                 validate_layout(manifest,code,"0"*64)
+            extended=dict(manifest,bss_end=hex(LOAD+400000),
+                          read_buffer_address=hex(LOAD+65536),read_buffer_bytes=262144)
+            validate_layout(extended,code,sha(code))
+            for key,value in (("read_buffer_bytes",262145),
+                              ("read_buffer_address",hex(LOAD+4096)),
+                              ("read_buffer_address",hex(LOAD+400000)),
+                              ("read_buffer_address",hex(LOAD+65537))):
+                with self.assertRaises(ValueError):
+                    validate_layout(dict(extended,**{key:value}),code,sha(code))
 
     result=unittest.TextTestRunner(verbosity=2).run(unittest.defaultTestLoader.loadTestsFromTestCase(Guards))
     if not result.wasSuccessful():
@@ -533,6 +692,8 @@ def main():
     parser.add_argument("--build",type=Path,required=True)
     parser.add_argument("--out",type=Path,required=True)
     parser.add_argument("--expected-sha256",required=True)
+    parser.add_argument("--prior-build",type=Path)
+    parser.add_argument("--prior-sha256")
     parser.add_argument("--mode",choices=MODES,default="fast-none")
     parser.add_argument("--sd-clock-hz",type=int,choices=(100000,12500000,25000000),default=25000000)
     parser.add_argument("--format-card",action="store_true")
@@ -546,7 +707,7 @@ def main():
         parser.error("Use --execute only after exclusive bench ownership is established")
     result=run_request(args.build,args.out,args.expected_sha256,OPERATIONS[args.operation],
                        MODES[args.mode],args.sd_clock_hz,args.offset,args.length,args.name,
-                       args.format_card,args.timeout)
+                       args.format_card,args.timeout,args.prior_build,args.prior_sha256)
     print(json.dumps(result,indent=2))
 
 

@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "upstream_commit": "174573d60290f447c13a2b1b3405de2b96e27d6c",
+  "date": "2026-10-20",
+  "license": "LICENSE (upstream copyright and permission unchanged)",
+  "patch_file": "fast-loop-byte-safe.patch",
+  "patch_sha256": "f427e0395d4520142e0d7edc4c43d0970cace6ccb315f010bdfac9ed6b3fb7e0",
+  "patches": [
+    {
+      "file": "miniz.h",
+      "upstream_sha256": "232abb0b807fd4962a8e61822459dd49baecb61d0e557f23497732978640f6a7",
+      "patched_sha256": "30f83949009c1fed9e26b8065499dade93ee0773b32763d20d98caca435b0714",
+      "patched_bytes": 27794
+    },
+    {
+      "file": "miniz_common.h",
+      "upstream_sha256": "6320fa10a5d21db9f78594d92745bc27593c1e6bed657104c22da0a9bd687b49",
+      "patched_sha256": "1e96b8732af958856eafcb29b074a7709616c6a031daab45b08d338900fad83a",
+      "patched_bytes": 2759
+    },
+    {
+      "file": "miniz_tdef.c",
+      "upstream_sha256": "30aa8bf68ebcd6d15f03e1db3c7e72d70a038d4a44e74e69193185ea9187ecd0",
+      "patched_sha256": "e534a11368f819a314002d11ac4c6619a74d02cb043a82c2a2d69e0fe44bd060",
+      "patched_bytes": 75396
+    }
+  ],
+  "purpose": [
+    "Enable the dedicated one-probe fast matcher without undefined unaligned C accesses.",
+    "Use byte pointers with two-byte strides and forced-inline bytewise little-endian reads.",
+    "Store exactly two distance bytes in the three-byte LZ token.",
+    "Keep the safe path active under UBSan; unused common LE macros remain bytewise."
+  ],
+  "configuration": "../../miniz_config.h selects this path; capture-sd builder retains -Os and adds -mno-unaligned-access.",
+  "default_upstream_record": "UPSTREAM.json retains original downloaded hashes; it is not rewritten to label patched files upstream.",
+  "reviewed_binary_sha256": "91e1edfa43f95a9608b94457cfbf900c6f51d5ecd10d2b3b7667c84d40cd3844"
+}

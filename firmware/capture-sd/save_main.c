@@ -6,10 +6,18 @@
 #include "photo_fs.h"
 #include "png16.h"
 
+#ifndef SAVE_DATA_CACHE
+#define SAVE_DATA_CACHE 0
+#endif
 static sd_card_t card;
-static png16_workspace workspace;
+/* Encoding and host READ never run together. Keep SAVE buffering identical
+ * while making guarded readback practical without another 256 KiB allocation. */
+static union {
+    png16_workspace png;
+    uint8_t read[SAVE_READ_BUFFER_BYTES];
+} scratch __attribute__((aligned(32)));
 static uint8_t output_buffer[SAVE_BUFFER_BYTES] __attribute__((aligned(32)));
-static uint32_t buffered, last_cycle;
+static uint32_t buffered, last_cycle, frame_checked;
 static uint64_t elapsed, callback_cycles;
 static volatile uint32_t *const report=(volatile uint32_t *)SAVE_REPORT_ADDRESS;
 
@@ -89,6 +97,7 @@ static int save_image(png16_mode mode)
     if(!frame_valid()) return -201;
     report[P_FNV_BEFORE]=frame_fnv();
     if(report[P_FNV_BEFORE]!=((volatile uint32_t *)0x343F0000U)[11]) return -202;
+    frame_checked=1;
     pair(P_VALIDATE_LO,clock_now()-start);
     report[P_STAGE]=4;
     int result=photo_fs_open(SAVE_MAX_PNG_BYTES);
@@ -98,7 +107,7 @@ static int save_image(png16_mode mode)
     png16_stats stats={0};
     start=clock_now();
     int png_result=png16_encode((const void *)SAVE_FRAME_ADDRESS,SAVE_FRAME_BYTES,
-        SAVE_WIDTH,SAVE_HEIGHT,SAVE_WIDTH*2U,mode,workspace.bytes,sizeof(workspace),
+        SAVE_WIDTH,SAVE_HEIGHT,SAVE_WIDTH*2U,mode,scratch.png.bytes,sizeof(scratch.png),
         append_png,0,&stats);
     pair(P_ENCODE_LO,clock_now()-start);
     pair(P_CALLBACK_LO,callback_cycles);
@@ -121,14 +130,15 @@ int save_main(uint32_t raw_op, uint32_t mode)
 {
     uint32_t bench=raw_op>>31, op=raw_op&0x7FFFFFFFU;
     const volatile save_request_t *request=(void *)SAVE_REQUEST_ADDRESS;
-    uint32_t hz=25000000U;
+    uint32_t hz=25000000U, cache_owned=0;
     for(unsigned i=0;i<128;i++) report[i]=0;
     report[P_MAGIC]=SAVE_REPORT_MAGIC; report[P_SCHEMA]=1; report[P_WORDS]=128;
     report[P_STATE]=1; report[P_OP]=op; report[P_MODE]=mode;
     report[P_CPU_HZ]=SAVE_CLOCK_HZ; report[P_CCR]=SCB->CCR;
     report[P_INITIAL_MSPLIM]=__get_MSPLIM();
-    report[P_BUFFER_ADDRESS]=(uint32_t)output_buffer;
-    report[P_BUFFER_BYTES]=sizeof(output_buffer);
+    report[P_BUFFER_ADDRESS]=(uint32_t)(op==SAVE_OP_READ ? scratch.read : output_buffer);
+    report[P_BUFFER_BYTES]=op==SAVE_OP_READ ? sizeof(scratch.read) : sizeof(output_buffer);
+    report[P_INITIAL_MPU_CTRL]=MPU->CTRL;
     report[P_CARD_SIZE]=sizeof(card); report[P_FS_SIZE]=sizeof(photo_fs_report_t);
     report[P_WIDTH]=SAVE_WIDTH; report[P_HEIGHT]=SAVE_HEIGHT;
     report[P_FRAME_BYTES]=SAVE_FRAME_BYTES;
@@ -143,6 +153,17 @@ int save_main(uint32_t raw_op, uint32_t mode)
     } else if(op!=SAVE_OP_SAVE) goto done;
     if(mode>PNG16_FAST_SUB || op<SAVE_OP_SAVE || op>SAVE_OP_MOUNT) goto done;
     if(op==SAVE_OP_SAVE && !frame_valid()) { result=-201; goto done; }
+    /* This experiment uses the Arm default SRAM/device memory attributes.
+     * Do not silently replace an inherited MPU configuration. The report and
+     * request nonce above were published while D-cache was still disabled. */
+    if(SAVE_DATA_CACHE && (MPU->CTRL&MPU_CTRL_ENABLE_Msk)) goto done;
+    __DSB();
+    if(SAVE_DATA_CACHE) {
+        /* CMSIS invalidates all D-cache lines before enabling the cache. */
+        SCB_EnableDCache();
+        cache_owned=1;
+        report[P_CACHE_ENABLED]=1;
+    }
     /* The caller copied and CRC-checked code with D-cache disabled. */
     SCB_InvalidateICache(); SCB_EnableICache();
     status_led_set(STATUS_LED_NAND_WRITE);
@@ -161,8 +182,8 @@ int save_main(uint32_t raw_op, uint32_t mode)
         for(unsigned i=0;i<16;i++) name[i]=request->name[i];
         name[15]=0;
         uint32_t got=0;
-        if(request->length>sizeof(output_buffer)) result=-204;
-        else result=photo_fs_readback(name,request->offset,output_buffer,request->length,&got);
+        if(request->length>sizeof(scratch.read)) result=-204;
+        else result=photo_fs_readback(name,request->offset,scratch.read,request->length,&got);
         report[P_READ_BYTES]=got;
     }
 done:
@@ -180,10 +201,29 @@ done:
     volatile uint32_t *stack=(void *)0x343A0000U;
     while(untouched<16384U && stack[untouched]==0x5354414BU) untouched++;
     report[P_STACK_USED]=65536U-untouched*4U;
+    /* Progress above may be cached. Terminal is always zero until the entire
+     * owned cache has been cleaned/invalidated and disabled. No DMA uses this
+     * workspace; the camera has already stopped and SD accesses are CPU-polled.
+     * An invalid caller that entered with D-cache on is rejected, never adopted. */
+    uint64_t cleanup_start=clock_now();
+    if(cache_owned) SCB_DisableDCache();
+    pair(P_CLEANUP_LO,clock_now()-cleanup_start);
+    if(op==SAVE_OP_SAVE && frame_checked) {
+        uint64_t validate_start=clock_now();
+        uint32_t value=frame_fnv();
+        report[P_POSTCLEAN_FNV]=value;
+        report[P_POSTCLEAN_VALIDATED]=1;
+        pair(P_POSTCLEAN_VALIDATE_LO,clock_now()-validate_start);
+        if(value!=report[P_FNV_BEFORE] && !result) result=-202;
+    }
     snapshot();
+    report[P_RESULT]=(uint32_t)result; report[P_STATE]=result ? 3U : 2U;
     status_led_set(result ? STATUS_LED_ERROR : STATUS_LED_OFF);
     SCB_DisableICache();
     __DSB(); __ISB();
+    report[P_FINAL_CCR]=SCB->CCR;
+    pair(P_COMPLETE_LO,clock_now());
+    __DSB();
     report[P_TERMINAL]=0x444F4E45U;
     __DSB();
     return result;
