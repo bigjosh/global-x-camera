@@ -1,0 +1,55 @@
+{
+  "scope": "Compact signal measurements; firmware selection is established by separate park records",
+  "digital_sample_rate_hz": 6250000,
+  "channel_map": {
+    "0": "NRST",
+    "6": "PE6 / VCP TX"
+  },
+  "analog": {
+    "Channel 0": {
+      "min": -0.072,
+      "max": 3.192,
+      "avg": 3.00124193838479,
+      "samples": 55572
+    },
+    "Channel 6": {
+      "min": -0.064,
+      "max": 3.338,
+      "avg": 2.715098070971068,
+      "samples": 55572
+    }
+  },
+  "nrst_low_intervals": {
+    "count": 8,
+    "min_us": 0.16000000002680537,
+    "max_us": 102175.84000000001,
+    "mean_us": 12776.779999999986
+  },
+  "longest_nrst_low": {
+    "start_s": 0.66278128,
+    "end_s": 0.76495712,
+    "level": 0
+  },
+  "pe6_low_pulses": {
+    "count": 32768,
+    "min_us": 8.959999999946788,
+    "max_us": 9.120000000084616,
+    "mean_us": 9.003725585937495
+  },
+  "pe6_interior_high_intervals": {
+    "count": 32767,
+    "min_us": 0.9599999999387876,
+    "max_us": 103.83999999996618,
+    "mean_us": 1.1089059114352875
+  },
+  "first_pe6_low_s": 0.61259744,
+  "last_pe6_low_end_s": 0.94396704,
+  "pe6_low_pulses_starting_after_longest_nrst_low": 17714,
+  "pe6_burst_tail_after_longest_nrst_low_s": 0.17900991999999993,
+  "raw_tool_limitations": [
+    "No firmware detector or cold-boot test.",
+    "Host stimulus times are not hardware timestamps.",
+    "UART BREAK API success does not prove a LOW level."
+  ],
+  "limitation_correction": "The raw generic statement \"No firmware detector or cold-boot test.\" is stale here: v45b was installed for these runs. The cold-c0 run explicitly power-cycled the target. Use the archived exact park results for firmware selection; host times are not analyzer timestamps, and API success alone does not prove an electrical level."
+}

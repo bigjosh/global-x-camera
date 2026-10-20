@@ -4,6 +4,34 @@ This directory records the October 17, 2026 work on NUCLEO-N657X0-Q with CAM-6G3
 
 Start with [the last instrument-qualified lane-sequencing result](../../reports/Camera%20lane%20startup%20mismatch.md): guarded v41 releases lane 0 early and holds only lane 1 in ForceRx until observed data Stop plus a 100 µs guard. It avoids startup and sensor-stop CSI errors while preserving exposure timing and the first physical image; minimum-exposure arm-to-VSYNC margin increased from 51.36 µs to 546.08–548.16 µs. The [earlier optimization results](optimization-results-2026-10-17.md) established native RAW10 exposure in **23.324–24.013 ms** before this integration. Supporting details are in [the experiment ledger](experiments.md), [exposure measurement method](exposure-measurement.md), and [native RAW10 memory layout](raw10-relocation.md). Exact build manifests, source snapshots, digital traces, numeric results and separate visual-review assertions are in [evidence](evidence). Original images, analog traces, Saleae recordings and NOR backups remain local under `tmp/bringup` and `hardware/local-backups`.
 
+## October 20 checkpoint — VCP recovery installed; SD read smoke passed
+
+The [v45b PE6 recovery update](recovery_vcp/README.md) is installed and fully
+readback-verified. Repeated `0xC0` bytes at 1 Mbaud selected the exact early
+debug park after a cold power cycle and after warm reset; read-only NOR INFO
+also passed from recovery. Initial warm attempts failed, so recovery is
+verified in these observed states, not guaranteed for every state. The v44
+receiver is unchanged. Normal capture/sleep and total startup timing have not
+been requalified. The guard keeps its 100 us deadline but increases ROM load
+size by 480 bytes.
+
+The native one-bit [SD smoke helper v3](../sd-smoke/README.md) passed two reads
+at 100 kHz and a subsequent six-read check across 100 kHz, 12.5 MHz and 25 MHz.
+The data matched byte-for-byte with no data CRC errors. Three early CMD8
+timeouts persisted through the first wiring correction; a second correction
+allowed card identification. V3 fixes v2's false completion timeout by requiring
+DATAEND, idle state, all 128 words and no errors, without requiring DBCKEND.
+The card reports 62,723,719,168 bytes (62.723719168 GB), which has not been
+validated as usable capacity. No SD writes or erases were attempted, and write
+throughput, complete-save performance and energy remain unmeasured.
+
+The target remains powered at the helper's verified awake park, `0x341E05E4`.
+The JS110 helper closed cleanly with its starting range 128 restored; VCP BREAK
+is released and COM8 closed. CH0/NRST and CH6/PE6 are the only confirmed probes;
+CH1–5 have no newly confirmed locations. No further probe move is needed for the
+completed smoke test. Re-enter verified prefix recovery before another helper.
+The October 18 stopped-bench/supply checkpoint below is historical.
+
 ## October 18 checkpoint — v44 installed, LEDs confirmed by user
 
 The [v44 phase-LED/shallow-sleep update](status_leds/README.md) is **programmed**, with complete 65,536-byte NOR readback matching SHA-256 a325b36ed6d3f893ebe0d1153f476fd06fc51c648a1fe55aac15d353c959b4d8. Local proof: tmp/bringup/status-leds-v44-program-20261018/write/verified.json. The user subsequently reported **“LEDs working great”** and is continuing board modifications. This is visual user confirmation, not an instrumented capture, sleep or recovery qualification. V41 remains the last instrument-qualified capture/recovery image.

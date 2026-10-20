@@ -40,6 +40,48 @@ class RecoveryParkTests(unittest.TestCase):
         s[checks.FIELDS.index('sample_cycle')] = (0xFFFFFF00+40000) & 0xFFFFFFFF
         checks.validate_status(s)
 
+    def vcp_pair(self):
+        s = self.status()
+        s[checks.FIELDS.index('reserved')] = 2
+        s[checks.FIELDS.index('idr')] = 0x42
+        s[checks.FIELDS.index('pupdr')] = 0x1004
+        guard = checks.validate_status(s, vcp=True)
+        v = dict.fromkeys(checks.VCP_FIELDS, 0)
+        v.update(magic=0x56504331, schema=1, words=32, pin=0x40006,
+                 nominal_hz=400000000, window_cycles=40000, baud=1000000,
+                 min_low=2400, max_low=5200, min_high=100, max_high=1600,
+                 required=3, first_cycle=1000, last_cycle=guard['sample_cycle'],
+                 edges=6, good_pulses=3, max_train=3, last_low=3600,
+                 last_high=400, request=1, request_cycle=13000,
+                 initial_level=1, final_level=1, source_bits=2, polls=guard['polls'])
+        return s, guard, v
+
+    def test_vcp_park_requires_correlated_pulse_evidence(self):
+        _, guard, v = self.vcp_pair()
+        checks.validate_vcp_status([v[k] for k in checks.VCP_FIELDS], guard)
+        for key, value in [('magic', 0), ('required', 2), ('source_bits', 1),
+                           ('request', 0), ('max_train', 2), ('edges', 5),
+                           ('request_cycle', 40200), ('request_cycle', 999),
+                           ('request_cycle', 8399),
+                           ('first_cycle', 50000), ('reserved26', 1),
+                           ('last_cycle', 40201), ('final_level', 0),
+                           ('good_pulses', 4)]:
+            with self.subTest(key=key), self.assertRaises(ValueError):
+                bad = dict(v, **{key: value})
+                checks.validate_vcp_status([bad[k] for k in checks.VCP_FIELDS], guard)
+
+    def test_vcp_input_and_source_bits_must_agree(self):
+        s, _, _ = self.vcp_pair()
+        for key, value in [('reserved', 0), ('reserved', 1), ('reserved', 4),
+                           ('moder', 0x1000), ('pupdr', 4), ('idr', 0x40)]:
+            with self.subTest(key=key), self.assertRaises(ValueError):
+                bad = s.copy()
+                bad[checks.FIELDS.index(key)] = value
+                checks.validate_status(bad, vcp=True)
+        # Old allowlisted builds cannot select a VCP park by invented status.
+        with self.assertRaises(ValueError):
+            checks.validate_status(s)
+
     def test_exact_idle_context(self):
         c = dict(PC=0x3418078C, CONTROL=0, PRIMASK=1, FAULTMASK=0, XPSR=0x01000000)
         checks.validate_context(c, c['PC'], 0, 0)

@@ -1,5 +1,13 @@
 # Early GPIO recovery guard
 
+**Current board, October 20:** the installed [v45b prefix](../recovery_vcp/README.md)
+retains this PE1 behavior and adds a PE6 pulse detector controlled by ST-LINK
+VCP. The external PE1 diode wire is currently disconnected. Repeated `0xC0`
+at 1 Mbaud selected the exact early park during observed cold and warm tests.
+Use the extended `check_park.py` for the exact v45b code and correlated pulse
+proof; an earlier reset request alone does not authorize maintenance. The
+historical diode qualification below remains valid evidence for that wiring.
+
 This offline builder adds a small recovery guard to the exact tested v25 prefix.
 It copies the receiver unchanged. It does not program the board or operate any
 instrument. The user connected a diode sink on October 17. The powered pin matrix

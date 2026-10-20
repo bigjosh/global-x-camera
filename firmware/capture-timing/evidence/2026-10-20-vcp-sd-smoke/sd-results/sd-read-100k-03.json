@@ -1,0 +1,63 @@
+{
+  "run": "sd-read-100k-03",
+  "sequence_context": "After wiring correction; JS110 target power cycle and VCP recovery",
+  "result": 11,
+  "fail_stage": 4,
+  "fail_command": 8,
+  "fail_sta": 4,
+  "nominal_sd_clock_hz": 100000,
+  "reads_completed": 0,
+  "commands": [
+    {
+      "stage": 4,
+      "command": 0,
+      "argument": 0,
+      "sta": 128,
+      "respcmd": 0,
+      "resp1": 0,
+      "resp2": 0,
+      "resp3": 0,
+      "resp4": 0,
+      "cycles": 216193,
+      "gpioc_idr": 28,
+      "gpioe_idr": 82
+    },
+    {
+      "stage": 4,
+      "command": 8,
+      "argument": 426,
+      "sta": 4,
+      "respcmd": 0,
+      "resp1": 0,
+      "resp2": 0,
+      "resp3": 0,
+      "resp4": 0,
+      "cycles": 503357,
+      "gpioc_idr": 28,
+      "gpioe_idr": 82
+    }
+  ],
+  "gpio_readback": {
+    "afr0": 768768,
+    "moder": 4294966959,
+    "cmd_dat0_idr": 24,
+    "dat3_idr": 82
+  },
+  "read_smoke_pass": false,
+  "park_verification": {
+    "context": {
+      "PC": 874382816,
+      "XPSR": 553648128,
+      "PRIMASK": 1,
+      "FAULTMASK": 0,
+      "CONTROL": 0
+    },
+    "instruction": "fee7",
+    "xspi_sr": 2,
+    "ahb5enr": 8224,
+    "ahb5rstr": 0,
+    "persistent_halt_after_disconnect": "not guaranteed; resumes safe exact park"
+  },
+  "card_data_obtained": false,
+  "card_write_or_erase_attempted": false
+}

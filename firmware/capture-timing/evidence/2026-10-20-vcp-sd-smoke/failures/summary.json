@@ -1,0 +1,50 @@
+[
+  {
+    "attempt": "normal-inspect-01",
+    "stimulus": "normal cold boot, no recovery stimulus",
+    "observation": "AP1 access unavailable; no verified recovery park",
+    "errors": [
+      "Error: Unable to get core ID",
+      "Error: Cannot identify the device",
+      "Error: Unable to get core ID",
+      "Error: No STM32 target found! If your product embeds Debug Authentication, please perform a discovery using Debug Authentication"
+    ],
+    "cause": "unestablished"
+  },
+  {
+    "attempt": "recovery-park-01",
+    "stimulus": "first warm 1 Mbaud 0x00 request",
+    "observation": "AP1 access unavailable; no verified recovery park",
+    "errors": [
+      "Error: Unable to get core ID",
+      "Error: Cannot connect to access port 1!  If you are trying to connect to a device with TrustZone enabled please try to connect with HotPlug mode.  If you are trying to connect to a device which supports Debug Authentication with certificate or password, please open your device using it.",
+      "Error: Unable to get core ID",
+      "Error: Cannot connect to access port 1!  If you are trying to connect to a device with TrustZone enabled please try to connect with HotPlug mode.  If you are trying to connect to a device which supports Debug Authentication with certificate or password, please open your device using it."
+    ],
+    "cause": "unestablished"
+  },
+  {
+    "attempt": "recovery-park-02",
+    "stimulus": "second warm 1 Mbaud 0x00 request",
+    "observation": "AP1 access unavailable; no verified recovery park",
+    "errors": [
+      "Error: Unable to get core ID",
+      "Error: Cannot connect to access port 1!  If you are trying to connect to a device with TrustZone enabled please try to connect with HotPlug mode.  If you are trying to connect to a device which supports Debug Authentication with certificate or password, please open your device using it.",
+      "Error: Unable to get core ID",
+      "Error: Cannot connect to access port 1!  If you are trying to connect to a device with TrustZone enabled please try to connect with HotPlug mode.  If you are trying to connect to a device which supports Debug Authentication with certificate or password, please open your device using it."
+    ],
+    "cause": "unestablished"
+  },
+  {
+    "attempt": "recovery-park-c0-01",
+    "stimulus": "first warm 1 Mbaud 0xC0 request",
+    "observation": "AP1 access unavailable; no verified recovery park",
+    "errors": [
+      "Error: Unable to get core ID",
+      "Error: Cannot connect to access port 1!  If you are trying to connect to a device with TrustZone enabled please try to connect with HotPlug mode.  If you are trying to connect to a device which supports Debug Authentication with certificate or password, please open your device using it.",
+      "Error: Unable to get core ID",
+      "Error: Cannot connect to access port 1!  If you are trying to connect to a device with TrustZone enabled please try to connect with HotPlug mode.  If you are trying to connect to a device which supports Debug Authentication with certificate or password, please open your device using it."
+    ],
+    "cause": "unestablished"
+  }
+]

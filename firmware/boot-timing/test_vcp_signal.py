@@ -69,11 +69,11 @@ def main():
                         default="passive")
     parser.add_argument("--probes-confirmed", action="store_true")
     parser.add_argument("--baud", type=int, choices=(115200, 1000000), default=115200)
+    parser.add_argument("--byte", type=lambda x: int(x, 0), choices=(0, 0xC0),
+                        default=0, help="UART test byte; 0xC0 widens the HIGH gap.")
     args = parser.parse_args()
     if not args.probes_confirmed:
         parser.error("Confirm the stated physical probe map before running.")
-    if args.mode == "reset-bytes" and args.baud != 115200:
-        parser.error("reset-bytes timing is defined for the 115200-baud burst only.")
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=False)
     sys.path[:0] = [str(ROOT / "tmp/bringup/saleae-deps"),
@@ -98,7 +98,7 @@ def main():
         if not any(d.device_id == SALEAE and not d.is_simulation
                    for d in manager.get_devices()):
             raise RuntimeError("Expected physical Saleae not found.")
-        config = dict(mode=args.mode, baud=args.baud, stlink_serial=SERIAL,
+        config = dict(mode=args.mode, baud=args.baud, byte=args.byte, stlink_serial=SERIAL,
                       saleae=SALEAE, channel_map={"0": "NRST", "6": "PE6 / VCP TX"},
                       digital_sample_rate=6250000, analog_sample_rate=31250,
                       digital_threshold_family_volts=3.3,
@@ -135,7 +135,9 @@ def main():
                         uart.break_condition = False
                         event("break_api_released")
                     elif args.mode == "reset-bytes":
-                        payload = bytes(4096)
+                        # Keep transmission active beyond the 50 ms lead-in,
+                        # 100 ms reset, ROM boot and early observation window.
+                        payload = bytes([args.byte]) * (32768 if args.baud == 1000000 else 4096)
                         result = {}
 
                         def writer():
@@ -167,7 +169,7 @@ def main():
                                 thread.join(timeout=2)
                     else:
                         # A bounded payload; do not depend on host scheduling per byte.
-                        payload = bytes(4096)
+                        payload = bytes([args.byte]) * 4096
                         event("write_begin", bytes=len(payload))
                         count = uart.write(payload)
                         if count != len(payload):

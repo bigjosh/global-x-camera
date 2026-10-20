@@ -1,0 +1,78 @@
+{
+  "run": "sd-read-25m-01",
+  "helper_sha256": "790b240b4246d61daf6361da67cb2bca6084d666897902e0bfd1dc9555c03db6",
+  "reported_capacity_bytes": 62723719168,
+  "reported_product_name": "SDU1 ",
+  "read_smoke_pass": true,
+  "host_data_verified": true,
+  "device_reported_pass": true,
+  "status": {
+    "result": 0,
+    "stage": 9,
+    "request_max_hz": 25000000,
+    "kernel_hz": 150000000,
+    "current_sd_hz": 25000000,
+    "clkcr": 3,
+    "read_count": 6,
+    "read_words": 128,
+    "read_sta": 256,
+    "read_match_mask": 60,
+    "card_status": 2304,
+    "fail_stage": 0,
+    "fail_command": 0,
+    "fail_sta": 0,
+    "cleanup": 3
+  },
+  "buffers": [
+    {
+      "name": "100k_lba0",
+      "crc32": "7d5b648c",
+      "same_as_slow_read": null
+    },
+    {
+      "name": "100k_lba1",
+      "crc32": "b2aa7578",
+      "same_as_slow_read": null
+    },
+    {
+      "name": "12m5_lba0",
+      "crc32": "7d5b648c",
+      "same_as_slow_read": true
+    },
+    {
+      "name": "12m5_lba1",
+      "crc32": "b2aa7578",
+      "same_as_slow_read": true
+    },
+    {
+      "name": "25m_lba0",
+      "crc32": "7d5b648c",
+      "same_as_slow_read": true
+    },
+    {
+      "name": "25m_lba1",
+      "crc32": "b2aa7578",
+      "same_as_slow_read": true
+    }
+  ],
+  "park_verification": {
+    "context": {
+      "PC": 874382820,
+      "XPSR": 553648128,
+      "PRIMASK": 1,
+      "FAULTMASK": 0,
+      "CONTROL": 0
+    },
+    "instruction": "fee7",
+    "xspi_sr": 2,
+    "ahb5enr": 8224,
+    "ahb5rstr": 0,
+    "persistent_halt_after_disconnect": "not guaranteed; resumes safe exact park"
+  },
+  "sd_writes_or_erases": false,
+  "limitations": [
+    "Two sectors only; no capacity verification or sustained test.",
+    "No write throughput or energy result.",
+    "No raw card bytes, CID serial, or raw SD records archived."
+  ]
+}

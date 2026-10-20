@@ -21,8 +21,20 @@ STATUS_ADDRESS = 0x341F7000
 FIELDS = ('magic schema words state reason pin nominal_hz settle_cycles '
           'begin_cycle sample_cycle elapsed_cycles polls idr moder pupdr '
           'ahb4enr demcr dwt_ctrl control ipsr primask dbgcr ap_unlock reserved').split()
+VCP_ADDRESS = 0x341F7080
+VCP_FIELDS = (
+    'magic schema words pin nominal_hz window_cycles baud min_low max_low '
+    'min_high max_high required first_cycle last_cycle edges good_pulses '
+    'bad_pulses max_train last_low last_high request request_cycle initial_level '
+    'final_level source_bits polls reserved26 reserved27 reserved28 reserved29 '
+    'reserved30 reserved31').split()
 # An unknown/self-consistent build is insufficient authorization to halt.
 APPROVED = {
+    # v45b additive PE6 pulse detector; independently reviewed offline.
+    # Exact binary approval is not hardware qualification.
+    'a8aebf4ed32d735d6352e9d5267759ed7b2c6733ac1a87bd4a0926a51c17e08a':
+        {'bytes': 5140, 'park': 0x3418078C, 'vcp': True,
+         'sector': '2323caa6b0ef142a6f46adbfdb078f9070877f7665f97337145de75eec60b3d2'},
     # v44 phase LEDs: reviewed masked GPIO setup before the unchanged guard.
     # Exact binary approval enables validation; it is not hardware qualification.
     '875d665e050aa2c20e59843c382130d2029035a478230a39f15892ce543c90c6':
@@ -125,13 +137,24 @@ def checked_build(build):
                     pin='PE1', active_low=True, internal_pull='up')
     if any(spec.get(k) != v for k, v in expected.items()):
         raise ValueError('Recovery layout differs from reviewed schema')
+    if approved.get('vcp'):
+        vcp = manifest.get('recovery_vcp', {})
+        expected_vcp = dict(
+            schema=1, pin='PE6', internal_pull='up',
+            status_address=hex(VCP_ADDRESS), status_words=32, status_fields=VCP_FIELDS,
+            published_status_address='0x343f7080', baud=1000000,
+            min_low_cycles=2400, max_low_cycles=5200,
+            min_high_cycles=100, max_high_cycles=1600, required_pulses=3,
+            window_cycles=40000, nominal_clock_hz=400000000)
+        if any(vcp.get(k) != v for k, v in expected_vcp.items()):
+            raise ValueError('VCP layout differs from reviewed schema')
     offset = approved['park']-PREFIX_ADDRESS
     if code[offset:offset+2] != bytes.fromhex('fee7'):
         raise ValueError('Recovery park instruction differs')
     return code, approved
 
 
-def validate_status(words):
+def validate_status(words, vcp=False):
     if len(words) != len(FIELDS):
         raise ValueError('Incomplete recovery status')
     s = dict(zip(FIELDS, words))
@@ -140,12 +163,50 @@ def validate_status(words):
                     control=0, ipsr=0, primask=1, dbgcr=0xB451B400, ap_unlock=0xB4)
     if any(s[k] != v for k, v in expected.items()):
         raise ValueError('Not a requested early recovery park')
-    if (s['idr'] & 2 or s['moder'] & 12 or s['pupdr'] & 12 != 4 or
+    if (s['moder'] & 12 or s['pupdr'] & 12 != 4 or
             s['elapsed_cycles'] < 40000 or not 0 <= s['polls'] < 100000 or
             (s['sample_cycle']-s['begin_cycle']) & 0xFFFFFFFF != s['elapsed_cycles'] or
             not s['ahb4enr'] & (1 << 4) or not s['demcr'] & (1 << 24) or
             not s['dwt_ctrl'] & 1 or s['dwt_ctrl'] & (1 << 25)):
         raise ValueError('Pin, settling, or timer evidence is inconsistent')
+    if vcp:
+        if (s['reserved'] not in (1, 2, 3) or
+                bool(s['reserved'] & 1) != (not bool(s['idr'] & 2)) or
+                s['moder'] & 0x3000 or s['pupdr'] & 0x3000 != 0x1000):
+            raise ValueError('PE1/PE6 source or GPIO configuration is inconsistent')
+    elif s['idr'] & 2:
+        raise ValueError('PE1 did not request recovery')
+    return s
+
+
+def validate_vcp_status(words, guard):
+    if len(words) != len(VCP_FIELDS):
+        raise ValueError('Incomplete VCP proof')
+    s = dict(zip(VCP_FIELDS, words))
+    expected = dict(magic=0x56504331, schema=1, words=32, pin=0x40006,
+                    nominal_hz=400000000, window_cycles=40000, baud=1000000,
+                    min_low=2400, max_low=5200, min_high=100, max_high=1600,
+                    required=3, last_cycle=guard['sample_cycle'],
+                    source_bits=guard['reserved'], polls=guard['polls'],
+                    final_level=int(bool(guard['idr'] & 64)))
+    if (any(s[k] != v for k, v in expected.items()) or
+            any(s[f'reserved{i}'] for i in range(26, 32)) or
+            s['initial_level'] not in (0, 1) or
+            s['request'] != int(bool(guard['reserved'] & 2)) or
+            s['good_pulses'] + s['bad_pulses'] > s['edges'] // 2 or
+            s['max_train'] > s['good_pulses'] or
+            s['edges'] > s['polls']):
+        raise ValueError('VCP proof disagrees with the requested park')
+    first = (s['first_cycle'] - guard['begin_cycle']) & 0xFFFFFFFF
+    if first > guard['elapsed_cycles']:
+        raise ValueError('VCP observation starts outside the guard interval')
+    if s['request']:
+        request = (s['request_cycle'] - guard['begin_cycle']) & 0xFFFFFFFF
+        if (s['max_train'] < 3 or s['good_pulses'] < 3 or s['edges'] < 6 or
+                not first < request < 40000 or request - first < 7400):
+            raise ValueError('No qualified pulse train within the startup deadline')
+    elif s['request_cycle'] or s['max_train'] >= 3:
+        raise ValueError('VCP request flag disagrees with pulse evidence')
     return s
 
 
@@ -170,7 +231,11 @@ def main():
     a = p.parse_args()
     code, approved = checked_build(a.build)
     b = Bench(a.out)
-    status = validate_status(struct.unpack('<24I', b.upload(STATUS_ADDRESS, 96, 'recovery-status.bin')))
+    is_vcp = approved.get('vcp', False)
+    status = validate_status(struct.unpack('<24I', b.upload(
+        STATUS_ADDRESS, 96, 'recovery-status.bin')), vcp=is_vcp)
+    vcp_status = validate_vcp_status(struct.unpack('<32I', b.upload(
+        VCP_ADDRESS, 128, 'vcp-status.bin')), status) if is_vcp else None
     if b.upload(PREFIX_ADDRESS, len(code), 'live-prefix.bin') != code:
         raise ValueError('Live prefix differs; no halt or maintenance authorized')
     context = registers(b.call('-halt', '-coreReg'))
@@ -185,16 +250,23 @@ def main():
         raise ValueError('XSPI controller is not idle with empty FIFO')
     # CLI disconnect can resume this exact branch-to-self park. Recheck its
     # stable record; no persistent halt or cache helper is assumed here.
-    after = validate_status(struct.unpack('<24I', b.upload(STATUS_ADDRESS, 96, 'recovery-status-rechecked.bin')))
+    after = validate_status(struct.unpack('<24I', b.upload(
+        STATUS_ADDRESS, 96, 'recovery-status-rechecked.bin')), vcp=is_vcp)
     if after != status:
         raise ValueError('Recovery status changed while validating park')
+    if is_vcp:
+        vcp_after = validate_vcp_status(struct.unpack('<32I', b.upload(
+            VCP_ADDRESS, 128, 'vcp-status-rechecked.bin')), after)
+        if vcp_after != vcp_status:
+            raise ValueError('VCP proof changed while validating park')
     result = dict(passed=True, status=status, context=context, ccr=ccr, fpccr=fpccr,
                   prefix_sha256=sha(code), xspi_sr=sr, halt_requested=True,
                   park_context_observed_in_halt_command=True,
                   persistent_halt_after_disconnect='not_guaranteed',
                   post_disconnect_execution='may resume the exact verified branch-to-self park',
                   ram_writes=False, nor_commands=False,
-                  next_step='Reviewed low-SRAM nor_bench INFO, then separately guarded WRITE')
+                  next_step='Reviewed low-SRAM nor_bench INFO, then separately guarded WRITE',
+                  vcp_status=vcp_status)
     (a.out/'result.json').write_text(json.dumps(result, indent=2)+'\n')
     print(json.dumps(result))
 

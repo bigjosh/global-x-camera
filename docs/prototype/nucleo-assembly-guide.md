@@ -8,6 +8,10 @@ The plan is electrically sensible. The two costs are slower software-driven tran
 
 ## At the bench
 
+**October 20 checkpoint:** v45b now adds [ST-LINK-controlled PE6 recovery](../../firmware/capture-timing/recovery_vcp/README.md), with full NOR readback verified and observed cold/warm recovery success. The old PE1 recovery wire is disconnected. GPIO banks remain at 3.3 V; the 1.8 V NAND conversion below has not been performed. After three early CMD8 timeouts and a second user wiring correction, the [read-only SD smoke helper v3](../../firmware/sd-smoke/README.md) passed two reads at 100 kHz and six more reads across 100 kHz, 12.5 MHz and 25 MHz. The data matched byte-for-byte, with no data CRC errors. The card reports 62,723,719,168 bytes; capacity, write speed, complete-save throughput and energy remain unvalidated. V3 corrected a software completion check: DATAEND plus idle, 128 words and no errors, without requiring DBCKEND. No SD write or erase was attempted, and the NAND selection remains pending comparison.
+
+The target is powered and awake at the v3 helper park, `0x341E05E4`. The JS110 helper closed cleanly with its starting range 128 restored; VCP BREAK is released and COM8 closed. Only Saleae CH0/NRST and CH6/PE6 are confirmed; CH1â€“5 were not moved or reverified, and no further probe move is needed for this smoke test. Reset/re-enter verified prefix recovery before loading another helper. The installed camera receiver remains byte-identical to v44; normal v45b capture/sleep and energy are unqualified. Older bench-state statements below are historical.
+
 **October 19 clarification:** the user confirms the GPIO banks are still at 3.3 V and will try the existing SD breakout without socket rework. The [current one-bit SDMMC2 experiment](sd-breakout-benchmark.md) uses CN3 for CLK/CMD/DAT0 and unused-DAT3 pull-up, plus CN5.4 for 3.3 V. It replaces the briefly proposed four-bit/socket-wire and Arduino SPI5 partial direct-plug experiments; no Nucleo voltage conversion is needed. This does not yet change the selected NAND assembly plan, and no SD result has been measured.
 
 Follow these stages in order:
@@ -19,9 +23,9 @@ Follow these stages in order:
 5. Remove the unused Ethernet PHY, then repeat the camera test.
 6. Implement and test NAND storage and the final RUN/HOLD/shutdown cycle.
 
-Keep the existing camera connection, boot jumpers, boot NOR, PE1 recovery circuit and timing probes. **Before soldering, disconnect CN8, CN10, LTC power and the JS110 OUT0 recovery lead; verify the rails have discharged.** Reconnect the recovery lead after rework. Its diode remains PE1 anode → OUT0 cathode, with OUT0 HIGH for normal boot and LOW for recovery.
+Keep the existing camera connection, boot jumpers, boot NOR, PE1 recovery circuit and timing probes. **Before soldering, disconnect CN8, CN10, LTC power and the JS110 OUT0 recovery lead; verify the rails have discharged.** Reconnect the recovery lead after rework. Its diode remains PE1 anode â†’ OUT0 cathode, with OUT0 HIGH for normal boot and LOW for recovery.
 
-Have a compatible NAND carrier, three 10 kΩ resistors, one 100 nF capacitor, approximately 1 µF of local bypass capacitance, and short hookup wires ready. No level translator is needed for this pin mapping.
+Have a compatible NAND carrier, three 10 kÎ© resistors, one 100 nF capacitor, approximately 1 ÂµF of local bypass capacitance, and short hookup wires ready. No level translator is needed for this pin mapping.
 
 ![Electrical connection overview](nucleo-assembly/power-wiring.png)
 
@@ -30,13 +34,13 @@ Have a compatible NAND carrier, three 10 kΩ resistors, one 100 nF capacitor, ap
 | Part | Action | Purpose |
 |---|---|---|
 | **D2**, BAT20JFILM, top | Remove, or lift one end and secure it clear of its pad. Leave an **open circuit**. | Stops target 5 V feeding U10 and ST-LINK. D1 still lets CN10 power the debugger independently. |
-| **R23**, 820 Ω, top | Remove. | Disconnects LD1, the always-on target-power LED. The camera's status LEDs are separate. |
+| **R23**, 820 Î©, top | Remove. | Disconnects LD1, the always-on target-power LED. The camera's status LEDs are separate. |
 
 Keep **all CN9 shunts absent**. Leave **CN8 unplugged** during LTC/battery capture operation. CN10 can remain connected to the PC for separately powered debugging after D2 is open. Do not change JP3 or remove SWD/reset links in this first stage: we need the working recovery/programming path.
 
 **D2 is supply separation, not full electrical isolation.** Debugger data, reset and sense connections remain. A powered debugger or recovery lead may contribute current across that boundary. Do not interpret a later Joulescope reading as qualified battery energy or 100 nA OFF current until those paths are isolated or measured. The [debugger audit](../power/nucleo-debug-isolation.md) retains that separate qualification task.
 
-**Temporary USB-only functional operation:** after D2/R23 removal, CN8 can still power the target with CN10 unplugged. Disconnect LTC/external target power. Use either the existing CN9.3 → JS110 → CN9.2 route with all CN9 shunts absent, or, without that JS path, the normal CN9 **3–4** source-selection shunt. Do not fit the shunt across the JS measurement path. D2 removes the main debugger supply feed, but the unpowered debugger remains connected through signals and sense dividers. Its FT inputs lack the ordinary upper protection diode; that does not establish a powered-off leakage limit or qualify power transitions. **Keep CN10 independently powered for development; CN10-unplugged use remains an unqualified test configuration.** Qualification requires interface-current/loading checks as well as debugger rail voltage, target reset release and autonomous capture. See the [specific audit](../power/nucleo-debug-isolation.md#d2-and-r23-removed-cn8-only-functional-operation--october-18). LD1 is intentionally dark after R23 removal. This USB configuration is distinct from step 4's LTC-powered setup.
+**Temporary USB-only functional operation:** after D2/R23 removal, CN8 can still power the target with CN10 unplugged. Disconnect LTC/external target power. Use either the existing CN9.3 â†’ JS110 â†’ CN9.2 route with all CN9 shunts absent, or, without that JS path, the normal CN9 **3â€“4** source-selection shunt. Do not fit the shunt across the JS measurement path. D2 removes the main debugger supply feed, but the unpowered debugger remains connected through signals and sense dividers. Its FT inputs lack the ordinary upper protection diode; that does not establish a powered-off leakage limit or qualify power transitions. **Keep CN10 independently powered for development; CN10-unplugged use remains an unqualified test configuration.** Qualification requires interface-current/loading checks as well as debugger rail voltage, target reset release and autonomous capture. See the [specific audit](../power/nucleo-debug-isolation.md#d2-and-r23-removed-cn8-only-functional-operation--october-18). LD1 is intentionally dark after R23 removal. This USB configuration is distinct from step 4's LTC-powered setup.
 
 ### MCU-controlled LEDs retained after rework
 
@@ -48,7 +52,7 @@ The three dedicated user LEDs remain available to the STM32N657 after D2/R23 rem
 | LD6 | Green | PG0 | LOW on, HIGH off |
 | LD7 | Blue | PG8 | LOW on, HIGH off |
 
-These pins do not overlap the selected Arduino NAND connections or the converted VDDIO4 bank. They are target-controlled and do not require debugger firmware. R23 removal affects only the separate LD1 power indicator. There is also a green Arduino LED, LD3, connected through SB18/Q4 to **D13/PE15** on C02. UM3417 §7.8 calls that pin PB15, but its own Table18 and the C02 schematic sheet10 identify D13 as PE15; use the schematic mapping. The dedicated LD5/LD6/LD7 group is selected for the prototype phase indication below. Verified against [UM3417 Rev4 §7.8 and Table18](https://www.st.com/resource/en/user_manual/um3417-stm32n6-nucleo144-board-mb1940-stmicroelectronics.pdf), [C02 schematic sheets10/12](https://www.st.com/resource/en/schematic_pack/mb1940-n657x0q-c02-schematic.pdf), and the local ST BSP definitions on October18; no hardware test was performed.
+These pins do not overlap the selected Arduino NAND connections or the converted VDDIO4 bank. They are target-controlled and do not require debugger firmware. R23 removal affects only the separate LD1 power indicator. There is also a green Arduino LED, LD3, connected through SB18/Q4 to **D13/PE15** on C02. UM3417 Â§7.8 calls that pin PB15, but its own Table18 and the C02 schematic sheet10 identify D13 as PE15; use the schematic mapping. The dedicated LD5/LD6/LD7 group is selected for the prototype phase indication below. Verified against [UM3417 Rev4 Â§7.8 and Table18](https://www.st.com/resource/en/user_manual/um3417-stm32n6-nucleo144-board-mb1940-stmicroelectronics.pdf), [C02 schematic sheets10/12](https://www.st.com/resource/en/schematic_pack/mb1940-n657x0q-c02-schematic.pdf), and the local ST BSP definitions on October18; no hardware test was performed.
 
 **D-48 phase indication, requested October 18:** red from the earliest custom-boot code to first exposure; blue from the first sensor STROBE rising edge through the complete frame arriving in RAM; green only during actual future NAND writing; all three off at sleep/shutdown. The preceding ROM interval cannot be indicated by custom firmware. There is no green in the RAM-only build, and no 250 ms success pulse. This replaces the older yellow/green normal sequence for the current prototype; product fault blink counts remain unchanged.
 
@@ -58,11 +62,11 @@ V44 implements an all-off shallow WFI completion path, with RAM/debug retention 
 
 | Part | Action | Purpose |
 |---|---|---|
-| **SB24**, 0 Ω, **bottom** | Remove/open. | Disconnects VDDIO4 from the board's main 3.3 V supply. |
-| **R88**, 1.5 kΩ, top | Remove. | Removes PH9/SCL's pull-up to 3.3 V. |
-| **R89**, 1.5 kΩ, top | Remove. | Removes PC1/SDA's pull-up to 3.3 V. |
+| **SB24**, 0 Î©, **bottom** | Remove/open. | Disconnects VDDIO4 from the board's main 3.3 V supply. |
+| **R88**, 1.5 kÎ©, top | Remove. | Removes PH9/SCL's pull-up to 3.3 V. |
+| **R89**, 1.5 kÎ©, top | Remove. | Removes PC1/SDA's pull-up to 3.3 V. |
 
-Only after all three are open, wire **CN12 pin 14 → CN3 pin 10 (VDDIO4)**. Retain **R104**, the existing 1.8 V current-path link. **CN12 pin 13 is not ground**; pins 13/14 are a supply measurement pair.
+Only after all three are open, wire **CN12 pin 14 â†’ CN3 pin 10 (VDDIO4)**. Retain **R104**, the existing 1.8 V current-path link. **CN12 pin 13 is not ground**; pins 13/14 are a supply measurement pair.
 
 Keep **SB23** in its original state. The old VDDIO5 plan is not part of this build. If that earlier rework was already made, reconcile it before continuing; never close a 3.3 V bridge onto an attached 1.8 V feed.
 
@@ -71,31 +75,31 @@ Preserve **SB8, SB3 and SB5**; keep **SB2 and SB4 open**, the default Arduino ro
 Before connecting NAND:
 
 - With power off, check that VDDIO4/CN3.10 is no longer directly shorted to main VDDIO/CN3.5. Semiconductor paths can remain; an infinite resistance is not required.
-- Temporarily power the board using the meter-verified **5 V hookup in step 4**, without reinstalling CN9 shunts. Measure **1.71–1.89 V at CN3.10** and approximately **3.3 V at CN3.5**. Then switch everything off again before connecting NAND.
-- This changes the **entire bank**: PC1, PC6–PC12, PH2 and PH9. Do not connect a 3.3 V Arduino shield to those pins afterward.
+- Temporarily power the board using the meter-verified **5 V hookup in step 4**, without reinstalling CN9 shunts. Measure **1.71â€“1.89 V at CN3.10** and approximately **3.3 V at CN3.5**. Then switch everything off again before connecting NAND.
+- This changes the **entire bank**: PC1, PC6â€“PC12, PH2 and PH9. Do not connect a 3.3 V Arduino shield to those pins afterward.
 
-The selected five bus pins belong to this bank. PA3/CS remains in the main 3.3 V bank and is handled by open-drain drive below. Camera I²C, camera reset, boot NOR, PE1 recovery and PD0/PE0 timing markers are not converted.
+The selected five bus pins belong to this bank. PA3/CS remains in the main 3.3 V bank and is handled by open-drain drive below. Camera IÂ²C, camera reset, boot NOR, PE1 recovery and PD0/PE0 timing markers are not converted.
 
 ## 3. Connect the NAND
 
-The Alliance chip is a bare **8 × 6 mm LGA-8**, not an Arduino module. Use a correctly matched carrier or a secure breakout assembly. A generic SOIC-8 adapter does not match its footprint. Check pin 1 against the package drawing; bottom-pad views are mirrored relative to the top-view pinout.
+The Alliance chip is a bare **8 Ã— 6 mm LGA-8**, not an Arduino module. Use a correctly matched carrier or a secure breakout assembly. A generic SOIC-8 adapter does not match its footprint. Check pin 1 against the package drawing; bottom-pad views are mirrored relative to the top-view pinout.
 
 | NAND pin | Signal | Nucleo connection | Extra component |
 |---:|---|---|---|
-| 1 | CS# | **D10 / CN14.3 / PA3** | 10 kΩ to NAND 1.8 V; GPIO **open-drain only** |
-| 2 | IO1 | **A4 / CN4.5 / PC12** | — |
-| 3 | IO2 / WP# | **D14 / SDA / CN14.9 / PC1** | 10 kΩ to NAND 1.8 V |
+| 1 | CS# | **D10 / CN14.3 / PA3** | 10 kÎ© to NAND 1.8 V; GPIO **open-drain only** |
+| 2 | IO1 | **A4 / CN4.5 / PC12** | â€” |
+| 3 | IO2 / WP# | **D14 / SDA / CN14.9 / PC1** | 10 kÎ© to NAND 1.8 V |
 | 4 | GND | **CN14.7**, Arduino GND | Common ground with LTC and board |
-| 5 | IO0 | **A1 / CN4.2 / PC10** | — |
-| 6 | SCLK | **D15 / SCL / CN14.10 / PH9** | — |
-| 7 | IO3 / HOLD# | **A5 / CN4.6 / PH2** | 10 kΩ to NAND 1.8 V |
-| 8 | VCC | **AREF / CN14.8**, repurposed as 1.8 V | Feed from CN3.10; 100 nF + approximately 1 µF to pin 4, close to chip |
+| 5 | IO0 | **A1 / CN4.2 / PC10** | â€” |
+| 6 | SCLK | **D15 / SCL / CN14.10 / PH9** | â€” |
+| 7 | IO3 / HOLD# | **A5 / CN4.6 / PH2** | 10 kÎ© to NAND 1.8 V |
+| 8 | VCC | **AREF / CN14.8**, repurposed as 1.8 V | Feed from CN3.10; 100 nF + approximately 1 ÂµF to pin 4, close to chip |
 
 All eight NAND connections now use Arduino headers, including VCC through the repurposed AREF contact. The board's stock Arduino headers have no 1.8 V power output; the two supply jumpers below provide it. Keep connections short, with a close ground return. Do not tie IO2/IO3 directly high; they become data lines in quad transfers.
 
-**Canonical NAND power route, selected October 18:** retain **CN12.14 → CN3.10 (VDDIO4)**, add **CN3.10 → CN14.8 (AREF)**, and connect **NAND pin 8/VCC → CN14.8**. On C02, **R125 is not fitted**, isolating AREF from VREFP; confirm it remains absent and keep it absent. Install the AREF jumper with power disconnected after completing step 2. NAND ground stays **CN14.7** and local decoupling stays at the chip. This extends the regulator rail; it does not power the NAND from a GPIO. Check CN14.8 measures **1.71–1.89 V** before attaching NAND, and label the repurposed AREF contact **1.8 V**. Do not attach an external analog reference there.
+**Canonical NAND power route, selected October 18:** retain **CN12.14 â†’ CN3.10 (VDDIO4)**, add **CN3.10 â†’ CN14.8 (AREF)**, and connect **NAND pin 8/VCC â†’ CN14.8**. On C02, **R125 is not fitted**, isolating AREF from VREFP; confirm it remains absent and keep it absent. Install the AREF jumper with power disconnected after completing step 2. NAND ground stays **CN14.7** and local decoupling stays at the chip. This extends the regulator rail; it does not power the NAND from a GPIO. Check CN14.8 measures **1.71â€“1.89 V** before attaching NAND, and label the repurposed AREF contact **1.8 V**. Do not attach an external analog reference there.
 
-This selected route supersedes the direct CN12.14-to-NAND wire; physical completion has not yet been reported. **CN5.1 is not a free NC contact on C02**: fitted R1 (1 kΩ) connects it to 5V_VIN. CN5.2/IOREF and CN5.4 remain 3.3 V after the bank4 conversion. These connections and R125's unfitted status were checked against C02 schematic sheet 10 and the C02 BOM; see the [ST schematic](https://www.st.com/resource/en/schematic_pack/mb1940-n657x0q-c02-schematic.pdf#page=10) and [BOM](https://www.st.com/resource/en/bill_of_materials/mb1940-bom.zip). No bench operation or physical modification was performed to update this plan.
+This selected route supersedes the direct CN12.14-to-NAND wire; physical completion has not yet been reported. **CN5.1 is not a free NC contact on C02**: fitted R1 (1 kÎ©) connects it to 5V_VIN. CN5.2/IOREF and CN5.4 remain 3.3 V after the bank4 conversion. These connections and R125's unfitted status were checked against C02 schematic sheet 10 and the C02 BOM; see the [ST schematic](https://www.st.com/resource/en/schematic_pack/mb1940-n657x0q-c02-schematic.pdf#page=10) and [BOM](https://www.st.com/resource/en/bill_of_materials/mb1940-bom.zip). No bench operation or physical modification was performed to update this plan.
 
 **CS must never drive 3.3 V into NAND.** Firmware preloads PA3's released state, disables internal pulls and enables open-drain output. The external 1.8 V resistor provides HIGH. Do not use PA3 input readback as a guaranteed high indication: its input thresholds still belong to the 3.3 V domain.
 
@@ -107,9 +111,9 @@ Use **regulated 5.0 V at CN9 pin 2**, not the VIN pin. Retain the Nucleo's main,
 
 | Connection | Wiring |
 |---|---|
-| With JS110 | LTC 5 V output → **JS110 IN+**; **OUT+ → CN9.2** |
-| Without JS110 | LTC 5 V output → **CN9.2** |
-| Ground | LTC ground → board GND, for example **CN14.7**; retain the JS110's common-ground/voltage-sense arrangement |
+| With JS110 | LTC 5 V output â†’ **JS110 IN+**; **OUT+ â†’ CN9.2** |
+| Without JS110 | LTC 5 V output â†’ **CN9.2** |
+| Ground | LTC ground â†’ board GND, for example **CN14.7**; retain the JS110's common-ground/voltage-sense arrangement |
 | Old source | Remove JS110 IN+'s old connection to **CN9.3** and unplug **CN8** |
 | CN9 selection | **No shunts fitted** across any source pair |
 | Debugger | CN10 may independently power ST-LINK after D2 is open |
@@ -136,7 +140,7 @@ Do **not** merely remove L5. L5 supplies the analog PHY branch, while U24's VDDI
 
 **Leave U14 and its R32/R33 supply links alone.** U14 is the unused internal-SMPS input converter, but C02 leaves its enable link R22 absent. The ST1S31's internal enable pull-down therefore already disables it. Its standby current is small; it is not an active converter wasting its running current. Removing R32/R33 would also leave capacitive input coupling through C26, so that is not a clean cutoff or worthwhile first-stage modification. The official C02 BOM confirms R10/R20/R22 not fitted. Leave the working external core supply and its selection links unchanged. Grounding the unused MCU PMU supply node is a separate ST startup recommendation requiring its own validation; this guide does not add that wire.
 
-Some small board overhead remains deliberately: ADC buffers may serve exposure/battery measurements, and the USB controller will serve retrieval. Firmware must hold USB power-provider control disabled, keep unused LEDs off, disable unused peripherals, and stop camera/CSI activity after acquisition. This is a reduced-overhead development board, not a claim that every non-capture microamp has been removed. Debugger sense dividers alone load the powered target by about 165 µA from 3.3 V and 331 µA from 5 V; signal injection and OFF-state behavior still require separate checks.
+Some small board overhead remains deliberately: ADC buffers may serve exposure/battery measurements, and the USB controller will serve retrieval. Firmware must hold USB power-provider control disabled, keep unused LEDs off, disable unused peripherals, and stop camera/CSI activity after acquisition. This is a reduced-overhead development board, not a claim that every non-capture microamp has been removed. Debugger sense dividers alone load the powered target by about 165 ÂµA from 3.3 V and 331 ÂµA from 5 V; signal injection and OFF-state behavior still require separate checks.
 
 ## Component locations
 
@@ -152,7 +156,7 @@ See the [diagram provenance and original coordinates](nucleo-assembly/README.md)
 
 ## Bring-up acceptance checks
 
-1. Inspect each removed component for an open connection and solder bridges. Confirm R125 remains absent, the two 1.8 V jumpers follow CN12.14 → CN3.10 → CN14.8, and the NAND VCC wire ends at CN14.8. Check 5 V/1.8 V to ground before power; confirm all CN9 shunts remain out. Verify 1.71–1.89 V at CN14.8 before attaching NAND.
+1. Inspect each removed component for an open connection and solder bridges. Confirm R125 remains absent, the two 1.8 V jumpers follow CN12.14 â†’ CN3.10 â†’ CN14.8, and the NAND VCC wire ends at CN14.8. Check 5 V/1.8 V to ground before power; confirm all CN9 shunts remain out. Verify 1.71â€“1.89 V at CN14.8 before attaching NAND.
 2. Verify rail startup and a camera RAM capture using the existing guarded image, preserving the PE1 recovery guard. Repeat after each optional load trim. Successful meter readings alone do not qualify capture or cold boot.
 3. In new firmware, enable the VDDIO4 monitor, wait for valid supply and release its isolation before bus use. Start with **VDDIO4VRSEL = 0** conservative 1.8 V operation; no HSLV OTP programming is needed for this first test.
 4. Wait for the NAND's specified power-on interval and check OIP/ready before operations. Read identity/features/status at a slow software clock, keeping IO3/HOLD# high during single-bit commands. Preserve factory bad markers. Only then use a designated scratch block for erase/program/readback/ECC checks and characterize quad transfers. Keep ECC enabled; handle IO direction turnaround and CS rise time explicitly.
@@ -169,4 +173,4 @@ RTC, exposure potentiometer, product fault indications and USB source arbitratio
 - [Alliance serial NAND family datasheet](https://www.alliancememory.com/wp-content/uploads/AllianceMemory_AS5F_QSPI_NAND_Flash_3V-1Gb-8Gb_1p8V-2Gb-4Gb-8Gb_Ver3.2_Jan2026-revised.pdf), exact non-C AS5F14G04SND device.
 - [DC1863A manual](https://www.analog.com/media/en/technical-documentation/user-guides/dc1863af.pdf) and [LTC3621 datasheet](https://www.analog.com/media/en/technical-documentation/data-sheets/ltc3621-3621-2.pdf).
 - [LAN8742A datasheet](https://www.microchip.com/content/dam/mchp/documents/OTH/ProductDocuments/DataSheets/DS_LAN8742_00001989A.pdf), supplies, reset straps and power-down behavior.
-- [ST1S31 datasheet](https://www.st.com/resource/en/datasheet/st1s31.pdf), §4.5: the internal EN pull-down disables the converter when EN floats.
+- [ST1S31 datasheet](https://www.st.com/resource/en/datasheet/st1s31.pdf), Â§4.5: the internal EN pull-down disables the converter when EN floats.
