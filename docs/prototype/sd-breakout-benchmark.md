@@ -4,6 +4,8 @@
 
 The user confirms the configurable GPIO banks are **still at 3.3 V**; the planned NAND voltage conversion has not been applied. D2 and R23 were previously reported removed. This selects the SD comparison interface, not a final replacement of the NAND storage architecture. No SD driver has been installed and no card measurements have been made.
 
+**Subsequent October 19 bench update:** the user reports these SD connections attached, ST-LINK USB connected, and target power through JS110. The JS110 recovery-output wire no longer reaches; the user prefers replacing it with ST-LINK-controlled recovery. Actual rails, source routing and probes still need rechecking. The [proposed VCP recovery detector](../../firmware/capture-timing/recovery_gpio/README.md#october-19-proposed-st-link-vcp-recovery) is not installed, so do not assume the current PE1 guard can be selected remotely.
+
 ## Current connection plan
 
 Use short jumper wires to **CN3's odd-numbered row** for CLK/CMD/DAT0, the unused DAT3 bias connection and ground, plus Arduino **CN5.4 / 3V3** for power. Count CN3 from its marked pin 1 in steps of two. CLK/CMD/DAT0 use **AF11**; PE4 stays a **GPIO input with pull-up**, not an AF data output or a driven chip select. These pins belong to **VDDIO5**, which must remain at **3.3 V** with stock **SB23 fitted**. Do not apply the historical 1.8 V VDDIO5 NAND conversion. No Nucleo soldering, bank change or AREF jumper is needed.

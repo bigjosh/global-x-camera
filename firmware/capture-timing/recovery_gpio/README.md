@@ -98,6 +98,58 @@ verify the exact live prefix bytes, exact park PC/instruction, CPU context,
 caches and idle XSPI state before using the reviewed NOR helper. A status word
 or an asserted input alone does not prove safe maintenance.
 
+## October 19 proposed ST-LINK VCP recovery
+
+The user reports target power restored through JS110, ST-LINK USB connected and
+the SD breakout wired, but the OUT0 recovery wire no longer reaches. They
+specifically prefer an ST-LINK-controlled signal. This is a proposed replacement
+control route; **the installed v44 guard still checks PE1**. No new firmware,
+serial stimulus, target reset or instrument operation was performed for this
+review.
+
+The MB1940 C02 schematic and ODB connectivity establish this existing route:
+
+```text
+PC virtual COM port → ST-LINK PG14 / STLK_VCP_TX
+                    → R24 (33 ohms) → target PE6 / USART2_RX
+```
+
+PE6 is also available at CN15 pin 2 through SB34. No added jumper or diode is
+needed for a boot-prefix detector on PE6: it would use the already-connected
+receive signal, not connect PE6 to PE1. It does not conflict with the selected
+SDMMC2 lines.
+
+Recommendation: retain the qualified PE1 guard and add an independently tested
+VCP recovery request path. A host-sent repeating UART pattern could be detected
+early, potentially within the existing nominal 100-microsecond guard interval.
+Idle-high/no request should continue normal capture. Repeated zero bytes at
+115200 baud are a candidate stimulus, not a qualified protocol: at 8N1 each byte
+occupies about 86.8 microseconds, but USB/bridge gaps and boot alignment must be
+measured. A single GPIO sample is not sufficient. Either validate bounded
+activity detection or decode a defined request, documenting any additional
+normal-boot latency and accidental-trigger behavior. Keep this VCP reserved from
+unrelated host traffic during selection. Preserve the existing cache/context/
+idle-XSPI maintenance checks.
+
+Do not assume host RTS/DTR changes drive a usable output. This V3EC board exposes
+debug, reset and VCP signals, not the GPIO bridge of a standalone V3SET/MODS.
+ST reports that ST-LINK firmware ignores `SET_CONTROL_LINE_STATE`; that is
+separate from UART `SEND_BREAK`, whose support on the installed version remains
+unverified. A sustained TX-low BREAK would simplify selection if actual hardware
+tests prove it works, but a successful serial API call alone is not evidence of
+that waveform. NRST cannot substitute as a boot-sampled low input while the CPU
+is held in reset.
+
+This route retains an independently powered debugger-to-target UART connection.
+It does not establish powered-off isolation or zero backfeed. Qualify target
+power-off behavior, actual normal/recovery selections, unchanged capture and
+maintenance access before retiring the external recovery method. No new wiring
+instruction or automatic fallback is implied by this proposal.
+
+Sources: [MB1940 C02 schematic, sheets 3/13/14](https://www.st.com/resource/en/schematic_pack/mb1940-n657x0q-c02-schematic.pdf),
+[ST TN1235 overview](https://www.st.com/resource/en/technical_note/tn1235-overview-of-stlink-derivatives-stmicroelectronics.pdf),
+and [ST employee explanation of VCP control-line handling](https://community.st.com/stm32-mcus-boards-and-hardware-tools-26/stlink-v3mods-rts-cts-rts-dtr-156036).
+
 ## Build and provenance
 
 ```powershell
