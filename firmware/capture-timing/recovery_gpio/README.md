@@ -100,6 +100,19 @@ or an asserted input alone does not prove safe maintenance.
 
 ## October 19 proposed ST-LINK VCP recovery
 
+**Subsequent hardware test:** ordinary UART zero bytes reached PE6 without
+disturbing reset, but UART BREAK held **NRST low while PE6 stayed high** on
+V3J15M6. The longest observed within-burst HIGH gaps were 85.76 microseconds
+at 115200 baud and 104.64 microseconds at 1 Mbaud, so the latter can defeat a
+100-microsecond activity window. Opening/configuring VCP first also mattered:
+PE6 was initially low before the port was opened. See the
+[measured results](../evidence/2026-10-19-vcp-recovery/README.md).
+The proposal below remains unimplemented; this experiment changed no firmware.
+The user accepts resetting and retrying a missed request, allowing the nominal
+100-microsecond budget to remain the implementation target. A follow-up capture
+confirmed UART data continues during and after BREAK-controlled NRST; exact
+firmware pattern recognition and park verification still need implementation.
+
 The user reports target power restored through JS110, ST-LINK USB connected and
 the SD breakout wired, but the OUT0 recovery wire no longer reaches. They
 specifically prefer an ST-LINK-controlled signal. This is a proposed replacement
@@ -134,11 +147,10 @@ idle-XSPI maintenance checks.
 Do not assume host RTS/DTR changes drive a usable output. This V3EC board exposes
 debug, reset and VCP signals, not the GPIO bridge of a standalone V3SET/MODS.
 ST reports that ST-LINK firmware ignores `SET_CONTROL_LINE_STATE`; that is
-separate from UART `SEND_BREAK`, whose support on the installed version remains
-unverified. A sustained TX-low BREAK would simplify selection if actual hardware
-tests prove it works, but a successful serial API call alone is not evidence of
-that waveform. NRST cannot substitute as a boot-sampled low input while the CPU
-is held in reset.
+separate from UART `SEND_BREAK`, which the subsequent experiment found asserts
+NRST rather than TX on this unit. A successful serial API call alone is not
+evidence of the requested waveform. NRST cannot substitute as a boot-sampled
+low input while the CPU is held in reset.
 
 This route retains an independently powered debugger-to-target UART connection.
 It does not establish powered-off isolation or zero backfeed. Qualify target
