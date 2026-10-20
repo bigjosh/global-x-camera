@@ -8,6 +8,8 @@ The plan is electrically sensible. The two costs are slower software-driven tran
 
 ## At the bench
 
+**October 19 clarification:** the user confirms the GPIO banks are still at 3.3 V. Before continuing the 1.8 V NAND conversion below, the user proposed an [SD breakout comparison experiment](sd-breakout-benchmark.md). It uses hardware SPI5 on the Arduino header with four direct contacts and two short wires; no Nucleo voltage conversion is needed. This does not yet change the selected NAND assembly plan, and no SD result has been measured.
+
 Follow these stages in order:
 
 1. Remove the debugger's target-supply path and the target power LED.
