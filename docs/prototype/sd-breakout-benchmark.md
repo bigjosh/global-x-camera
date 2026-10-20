@@ -1,21 +1,19 @@
-# SD breakout comparison: four-bit hardware SDMMC2
+# SD breakout comparison: one-bit hardware SDMMC2
 
-**Selected October 19, 2026:** use the STM32's **SDMMC2 peripheral in native four-bit SD mode**, with hardware CRC and internal DMA available. This is the SD-card interface corresponding to the user's request for hardware "QSPI"; SD cards do not implement the quad-SPI NAND command protocol. **This replaces the earlier Arduino SPI5/four-direct-pin/two-wire plan.** Do not combine those connections with this plan.
+**Current choice, October 19, 2026:** the user will connect the existing seven-pin breakout without adding socket wires and asks to maximize one-bit throughput. Use **native one-bit SDMMC2**, with hardware CRC, flow control and internal DMA available. The passive breakout's SPI-labelled SCK/DI/DO connections also carry native SD CLK/CMD/DAT0. **This replaces both the proposed four-bit socket-wire modification and the earlier Arduino SPI5 partial direct-plug plan.** Four-bit SD remains a possible later comparison with an appropriate carrier; no extra socket contacts are required for this one-bit experiment.
 
 The user confirms the configurable GPIO banks are **still at 3.3 V**; the planned NAND voltage conversion has not been applied. D2 and R23 were previously reported removed. This selects the SD comparison interface, not a final replacement of the NAND storage architecture. No SD driver has been installed and no card measurements have been made.
 
 ## Current connection plan
 
-Use short jumper wires to **CN3's odd-numbered row** for all six signals and ground, plus Arduino **CN5.4 / 3V3** for power. Count CN3 from its marked pin 1 in steps of two. All six signals use **AF11** and belong to **VDDIO5**, which must remain at **3.3 V** with stock **SB23 fitted**. Do not apply the historical 1.8 V VDDIO5 NAND conversion. No Nucleo soldering, bank change or AREF jumper is needed.
+Use short jumper wires to **CN3's odd-numbered row** for CLK/CMD/DAT0, the unused DAT3 bias connection and ground, plus Arduino **CN5.4 / 3V3** for power. Count CN3 from its marked pin 1 in steps of two. CLK/CMD/DAT0 use **AF11**; PE4 stays a **GPIO input with pull-up**, not an AF data output or a driven chip select. These pins belong to **VDDIO5**, which must remain at **3.3 V** with stock **SB23 fitted**. Do not apply the historical 1.8 V VDDIO5 NAND conversion. No Nucleo soldering, bank change or AREF jumper is needed.
 
 | SD breakout connection | Native SD function | Nucleo connection | MCU |
 |---|---|---|---|
 | **SCK** header pad | Clock | **CN3 pin 3** | PC2 / SDMMC2_CK |
 | **DI** header pad | Command/response | **CN3 pin 25** | PC3 / SDMMC2_CMD |
 | **DO** header pad | Data bit 0 | **CN3 pin 13** | PC4 / SDMMC2_D0 |
-| **Added wire: microSD socket contact 8** | Data bit 1 | **CN3 pin 15** | PC5 / SDMMC2_D1 |
-| **Added wire: microSD socket contact 1** | Data bit 2 | **CN3 pin 17** | PC0 / SDMMC2_D2 |
-| **CS** header pad | Data bit 3 | **CN3 pin 21** | PE4 / SDMMC2_D3 |
+| **CS** header pad | Unused DAT3; bias HIGH | **CN3 pin 21** | PE4, input with internal pull-up |
 | **VCC** header pad | 3.3 V power | **CN5 pin 4 / 3V3** | Supply, not a GPIO |
 | **GND** header pad | Ground | **CN3 pin 19** | Ground |
 | **CD** header pad | Mechanical card detect | **Leave disconnected** | Unneeded initially |
@@ -26,21 +24,21 @@ Breakout/socket                 Nucleo
 SCK   (CLK) ------------------- CN3.3   PC2
 DI    (CMD) ------------------- CN3.25  PC3
 DO    (DAT0) ------------------ CN3.13  PC4
-socket contact 8 (DAT1) ------- CN3.15  PC5  [additional solder wire]
-socket contact 1 (DAT2) ------- CN3.17  PC0  [additional solder wire]
-CS    (DAT3) ------------------ CN3.21  PE4
+CS    (unused DAT3) ----------- CN3.21  PE4  [input with pull-up]
 GND -------------------------- CN3.19
 VCC -------------------------- CN5.4   3V3
 CD    unconnected
 ```
 
-**CS is now a bidirectional data line, not a GPIO chip select.** DI/CMD and all four DAT lines must support both directions. Do not hold CS/DAT3 HIGH with a push-pull GPIO or initialize this wiring with the earlier SPI driver. CLK is the only host-only signal.
+**CS is not a chip select in native SD mode.** Leave PE4 as an input with pull-up; the card also has a DAT3 startup pull-up. DI/CMD and DO/DAT0 are bidirectional. Do not initialize this wiring with the earlier SPI driver or select four-bit width. **No wires go to CN3.15 or CN3.17 and no fine socket soldering is needed.** CD remains unconnected. Do not disable the card's DAT3 pull-up in this experiment.
 
-There is no complete Arduino-only four-bit SD mapping: SDMMC2 DAT1 is available on PC5 or PG8, neither on Arduino; PG8 also drives the blue phase LED. SDMMC1 DAT1 is PC9, also absent from Arduino, and the natural SDMMC1 group overlaps the camera controls. The selected CN3 route avoids the camera, boot NOR, PE1 recovery, PD0/PE0 timing markers and PG0/PG8/PG10 phase LEDs. C02 ODB connectivity shows each of the six selected nets connects only the MCU and its CN3 contact.
+The CN3 route avoids the camera, boot NOR, PE1 recovery, PD0/PE0 timing markers and PG0/PG8/PG10 phase LEDs. C02 ODB connectivity shows the selected signal nets connect only the MCU and their CN3 contacts. This is the cleanest reviewed routing for qualifying the highest practical one-bit clock, not evidence of a measured performance win over SPI.
 
-## Two additional contacts on the breakout
+A hardware **one-bit Arduino alternative exists**: SDMMC1 AF10 with CK=PC12/A4/CN4.5, CMD=PH2/A5/CN4.6 and DAT0=PE15/D13/CN14.6. Unlike the CN3 pins, these have analog-divider branches or the D13 LED transistor-gate load. They do not establish a lower working speed, but CN3 avoids those additional loads and is preferred for this throughput experiment. An all-Arduino **four-bit** route is unavailable because the required DAT1 pins are not exposed there.
 
-The photo's seven pads are `CD DO GND SCK VCC DI CS`. **That header alone cannot carry four-bit SD**, because it lacks DAT1 and DAT2. The photo resembles SparkFun's passive microSD Transflash breakout, but does not establish the exact board/socket revision or expose enough of the solder-contact row to mark the two physical pads safely.
+## Breakout limits and later four-bit option
+
+The photo's seven pads are `CD DO GND SCK VCC DI CS`. They provide every actively used signal for native **one-bit** SD. The header cannot carry four-bit SD because it lacks DAT1 and DAT2. The photo resembles SparkFun's passive microSD Transflash breakout, but does not establish the exact board/socket revision. Verify continuity/bidirectional direct connections if identification fails; the plan assumes a passive socket adapter, not a module with fixed-direction SPI level shifters.
 
 In the matching published SparkFun schematic and board files:
 
@@ -49,17 +47,15 @@ In the matching published SparkFun schematic and board files:
 - Neither contact is connected to a PCB net or tied to ground.
 - Header **CS goes to socket contact 2 / DAT3**. Header **CD goes to the mechanical detect switch**; CD is not an extra data line.
 
-Thus two fine wires from the actual DAT1/DAT2 solder pads can make that design usable. **Contact numbers here are the standard microSD electrical numbering, not an instruction to count visible solder joints from the left or right.** Socket mounting orientation, shield tabs and detect contacts must be checked on the user's board. Confirm the pads from its actual connector layout/continuity with power and card removed before soldering. No trace cut is indicated by the reference SparkFun design. Physical DAT1/DAT2 solder locations on the user's module remain to be identified from a clear socket-tail/backside view or continuity evidence.
-
-If those contacts are inaccessible, use a passive breakout exposing **CLK, CMD and DAT0-DAT3**, such as [Adafruit 4682](https://www.adafruit.com/product/4682). The same Nucleo table applies by native signal name. This is a fallback, not a purchase or a claim that the existing module is unusable.
+**Do not add those socket wires for the current test.** If a four-bit comparison is wanted later, a breakout exposing all native signals, such as [Adafruit 4682](https://www.adafruit.com/product/4682), avoids socket rework. Then add DAT1 to **CN3.15 / PC5**, DAT2 to **CN3.17 / PC0**, and configure PE4/DAT3 as AF11 along with the other lines after proper bus-width negotiation. The current one-bit setup must not request that width.
 
 ## Supply, pull-ups and initial firmware setup
 
-Use **3.3 V power and signaling**. Keep the socket's approximately **100 nF plus 10 microfarads** local decoupling. Check actual voltage and card-write droop; spare regulator current and the particular card's peak current are not yet measured. Keep the six signal wires short, with a nearby ground return. A 22-33 ohm series resistor at the MCU end of CLK is an optional provision for ringing; bus speed will be raised only after reliable reads.
+Use **3.3 V power and signaling**. Provide approximately **100 nF plus 10 microfarads** local decoupling across VCC/GND near the socket; the matching passive breakout does not include these capacitors. Check actual voltage and card-write droop; spare regulator current and the particular card's peak current are not yet measured. Keep CLK/CMD/DAT0 leads short, preferably around 5 cm where practical, with a nearby ground return rather than a large loop. This is a bench-layout recommendation, not a certified length limit. A 22-33 ohm series resistor at the MCU end of CLK is an optional provision for ringing; bus speed will be raised only after reliable reads.
 
-For the initial bench test, retain the internal-pull-up approach, now on **CMD and all four DAT lines**. STM32's specified 30-50 kilohm pull-ups fall within the cited card-interface 10-100 kilohm range. Configure them as digital inputs with pull-ups early, establish a non-floating clock, allow settling, then select AF11 with pulls retained. Start native identification at **100 kHz** and initially one-bit width, then negotiate four-bit operation with the card before changing host width. Hardware actively drives data during transfers; the weak pull-ups do not generate the high-speed data edges.
+For the initial bench test, retain the internal-pull-up approach on **PC3/CMD, PC4/DAT0 and PE4/unused DAT3**. STM32's specified 30-50 kilohm pull-ups fall within the cited card-interface 10-100 kilohm range. Configure them as digital inputs with pull-ups early, establish a non-floating clock, allow settling, then select AF11 for PC2/PC3/PC4 with CMD/DAT0 pulls retained. Keep PE4 in input/pull-up mode. Start native identification at **100 kHz** and retain **one-bit width** throughout data transfers. Hardware actively drives data during transfers; the weak pull-ups do not generate the high-speed data edges.
 
-This is an experimental convenience, not a reset-time guarantee: GPIO pull-ups are disabled in reset analog mode, and the card's own startup pull-up covers **DAT3 only**, not CMD/DAT0/DAT1/DAT2. **Five external 10 kilohm pull-ups**, one from each CMD/DAT0-DAT3 line to card 3.3 V, are the more robust option for defined levels before firmware and during reset. No external resistor is mandated for this initial experiment, but startup/readback qualification must include that limitation. Do not copy the superseded PA3 push-pull-CS setup into this native-SD driver. Avoid disabling the card's own DAT3 pull-up in the initial experiment.
+This is an experimental convenience, not a reset-time guarantee: GPIO pull-ups are disabled in reset analog mode, and the card's own startup pull-up covers **DAT3 only**. The matching breakout also leaves unused DAT1/DAT2 unconnected, so the MCU cannot pull those card contacts high. Complete interface references recommend pull-ups on CMD and all DAT lines, including unused ones; this existing SPI carrier does not implement that complete bias network. We will try it unchanged for the requested functional/performance bench test, with actual initialization, readback and current checks, rather than claiming full electrical qualification. Adding unused-line pull-ups later would require access to the hidden contacts or a different carrier. Do not silently enable four-bit mode or declare the unchanged board production-qualified. Do not copy the superseded PA3 push-pull-CS setup into this native-SD driver.
 
 Do not request the UHS **1.8 V signaling switch**: this bench wiring stays at 3.3 V. Candidate operating points are 25 MHz default speed and, only after supported card mode selection and link/readback qualification, 50 MHz High Speed. Jumper wiring does not establish either clock as reliable. If the card was previously put into SPI mode, power-cycle the card before native-SD initialization; resetting only the MCU is insufficient.
 
@@ -67,16 +63,16 @@ Disconnect board power and the external recovery drive while soldering. Remove a
 
 ## What the comparison can establish
 
-The selected test now uses four-bit **hardware SDMMC2**, not bit-banging or SPI5. Firmware, DMA/cache handling, card status/completion checks and verified clock rates remain to implement.
+The selected test uses one-bit **hardware SDMMC2**, not bit-banging or SPI5. Hardware CRC, internal DMA and busy handling avoid software protocol work and provide a native SD timing path. At equal clock the raw payload bandwidth is still one bit per cycle, like SPI. Which implementation achieves higher total throughput must be measured; no new performance result is claimed. Firmware, DMA/cache handling, card status/completion checks and verified clock rates remain to implement.
 
 The current captured image is **1120 x 1364**, or **1,909,600 bytes packed RAW10**. It occupies 3,730 SD sectors when padded to 512-byte boundaries (1,909,760 bytes), or 933 Alliance data pages. The existing 16-bit RAM buffer is 3,055,360 bytes; saving that buffer instead adds 60% to the payload and is not a fair comparison with packed-RAW10 NAND estimates. The specification's 1124-pixel-wide image is a separate 1,916,420-byte workload.
 
 | Conditional model for current packed image | Time |
 |---|---:|
-| **Selected four-bit SD payload alone at 25 MHz** | **0.153 s** |
-| **Selected four-bit SD payload alone at 50 MHz** | **0.076 s** |
-| Superseded single-bit SPI payload alone at 25 MHz | 0.611 s |
-| Superseded single-bit SPI payload alone at 50 MHz | 0.306 s |
+| **Selected one-bit SD payload alone at 25 MHz** | **0.611 s** |
+| **Selected one-bit SD payload alone at 50 MHz** | **0.306 s** |
+| Future four-bit SD payload alone at 25 MHz | 0.153 s |
+| Future four-bit SD payload alone at 50 MHz | 0.076 s |
 | Selected bit-banged quad NAND, hypothetical 5 MHz, including typical array program time | 1.324 s |
 | Hardware quad NAND at hypothetical 50 MHz, including typical array program time | 0.636 s |
 
@@ -86,15 +82,15 @@ The first useful test sequence is:
 
 1. Read card identity/capacity and verify non-destructive reads. Record actual interface clock and card identity.
 2. Write an image-sized pseudorandom payload to a **new test file**, or an **explicitly authorized disposable sector range**. Do not format, overwrite unknown files or treat apparently empty sectors as safe without allocation knowledge. No destructive test is authorized yet.
-3. Measure initialization, payload transfer, intermediate/final busy waits, status/synchronization completion and checksum readback separately. Use multi-block transfers and include the file/allocation work when testing a filesystem. DMA completion alone is not durable completion; honor the card's enabled cache and completion requirements.
+3. Measure initialization, payload transfer, intermediate/final busy waits, status/synchronization completion and checksum readback separately. Use native SD multi-block transfers with IDMA and chunk preparation overlapped where useful. Include file/allocation work when testing a filesystem. Native SD uses its command/response and stop procedure; do not reuse SPI data/stop tokens. DMA completion alone is not durable completion; honor the card's enabled cache and completion requirements.
 4. Repeat 20-50 operations for a preliminary median/range. Measure genuine cold card starts once autonomous power cycling has been reverified, then check saved data after a fresh power cycle. Keep initialization off the capture-critical path where possible so storage does not delay exposure.
 5. Measure complete-cycle energy and current peaks only after the JS110 measurement boundary is restored and checked. The prior debugger/CN8 bypass audit remains relevant. Timing results can be useful before precision energy is available.
 
-This quick experiment cannot qualify ten-year unpowered retention, the accepted reuse requirement or preservation of older photos through interrupted SD-controller updates. Those remain part/card-specific qualification work if SD is adopted. A one-bit native identification/read check is a useful bring-up stage; it is not the final four-bit performance comparison.
+This quick experiment cannot qualify ten-year unpowered retention, the accepted reuse requirement or preservation of older photos through interrupted SD-controller updates. Those remain part/card-specific qualification work if SD is adopted. One-bit throughput is the current test objective; four-bit results would require a separate future comparison.
 
 ## Follow-up: throughput loss and buffering with the existing SPI breakout
 
-October 19 question, not a wiring-selection change: what does retaining single-bit SPI cost, and can double buffering hide it? At equal clock, SPI has one quarter the four-bit SD payload bandwidth: **3.125 versus 12.5 MB/s at 25 MHz**, or **6.25 versus 25 MB/s at 50 MHz**. MB/s here uses decimal bytes. For the current packed image, padded to 3,730 sectors, transfer-only penalties are **458 ms at 25 MHz** and **229 ms at 50 MHz**. These are differences in bus occupancy, not predictions of complete-save latency. The 50 MHz SPI case requires card High Speed support/selection and independent signal-timing qualification; faster write payload clocks need not imply equally fast status/readback clocks.
+Historical October 19 comparison preceding the current one-bit SDMMC2 choice: what does single-bit SPI cost, and can double buffering hide it? At equal clock, SPI and one-bit SD have one quarter the four-bit SD payload bandwidth: **3.125 versus 12.5 MB/s at 25 MHz**, or **6.25 versus 25 MB/s at 50 MHz**. MB/s here uses decimal bytes. For the current packed image, padded to 3,730 sectors, transfer-only penalties are **458 ms at 25 MHz** and **229 ms at 50 MHz**. These are differences in bus occupancy, not predictions of complete-save latency. The 50 MHz SPI case requires card High Speed support/selection and independent signal-timing qualification; faster write payload clocks need not imply equally fast status/readback clocks.
 
 There are two distinct buffering layers:
 
@@ -113,5 +109,6 @@ For an efficient test, prepare large sector-aligned chunks (for example two 32 K
 - [STM32 RM0486](https://www.st.com/resource/en/reference_manual/rm0486-stm32n647657xx-armbased-32bit-mcus-stmicroelectronics.pdf), sections15.3.1/15.3.12 and GPIO reset values; [Nexperia AN10911](https://assets.nexperia.com/documents/application-note/AN10911.pdf), pages5/18, SD DAT3/CS mapping and card-internal power-up pull-up.
 - [SparkFun microSD Transflash breakout](https://www.sparkfun.com/sparkfun-microsd-transflash-breakout.html), its [schematic source](https://github.com/sparkfun/microSD_Transflash_Breakout/blob/master/Hardware/SparkFun_microSD_Breakout.sch) and [board source](https://github.com/sparkfun/microSD_Transflash_Breakout/blob/master/Hardware/SparkFun_microSD_Breakout.brd), U1 socket pad connectivity. These are matching design references, not proof of the user's module's identity.
 - [ATP microSD datasheet, Table4-4](https://advdownload.advantech.com/productfile/PIS/96FMSD-8G-CM-AT/file/96FMSD-8G-CM-AT_datasheet20200330122023.pdf), CMD/DAT pull-up range; [SD Association specification index](https://www.sdcard.org/downloads/pls/) for the governing protocol.
+- [ST EMIF06-MSD02N16 datasheet, section2.3](https://www.st.com/resource/en/datasheet/emif06-msd02n16.pdf), page5: CMD and all DAT lines require pull-ups in four-bit, one-bit and SPI modes. This documents the unchanged carrier's unused-DAT bias limitation in either one-bit interface.
 - SD Association Physical Layer Simplified Specification: [official v5.10](https://www.sdcard.org/cms/wp-content/themes/sdcard-org/dl.php?f=Part1_Physical_Layer_Simplified_Specification_Ver5.10.pdf), section7.2.4, multi-block SPI response/busy handling; [SDA-authored v2.00, mirrored PDF](https://chlazza.nfshost.com/docs/Simplified_Physical_Layer_Spec.pdf), sections7.2.4/7.2.13-15, CMD25, mode switching and lack of SPI Speed Class guarantee. The mirrored v2 PDF was read successfully; direct current SDA downloads returned empty files, so they are not archived as valid local references.
 - [Existing Alliance timing calculations](alliance-nand-wiring.md#estimated-time-and-energy-penalty), [storage architecture comparison](../../reports/Camera%20storage%20architecture%20alternatives.md), and [debugger/power audit](../power/nucleo-debug-isolation.md).

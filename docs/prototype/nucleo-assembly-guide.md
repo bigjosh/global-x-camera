@@ -8,7 +8,7 @@ The plan is electrically sensible. The two costs are slower software-driven tran
 
 ## At the bench
 
-**October 19 clarification:** the user confirms the GPIO banks are still at 3.3 V. Before continuing the 1.8 V NAND conversion below, the user selected a [four-bit SDMMC2 comparison experiment](sd-breakout-benchmark.md). Its six bus signals use CN3 at 3.3 V, with two extra DAT1/DAT2 connections required on the pictured SD breakout. It replaces the briefly proposed Arduino SPI5 partial direct-plug experiment; no Nucleo voltage conversion is needed. This does not yet change the selected NAND assembly plan, and no SD result has been measured.
+**October 19 clarification:** the user confirms the GPIO banks are still at 3.3 V and will try the existing SD breakout without socket rework. The [current one-bit SDMMC2 experiment](sd-breakout-benchmark.md) uses CN3 for CLK/CMD/DAT0 and unused-DAT3 pull-up, plus CN5.4 for 3.3 V. It replaces the briefly proposed four-bit/socket-wire and Arduino SPI5 partial direct-plug experiments; no Nucleo voltage conversion is needed. This does not yet change the selected NAND assembly plan, and no SD result has been measured.
 
 Follow these stages in order:
 
