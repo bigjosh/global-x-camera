@@ -5,8 +5,12 @@ immutable cache helper must be unchanged at its reserved address. This does not
 return to the application. Run the frozen NOR helper's INFO before any WRITE.
 An explicit failed-PHY build permits only separately reviewed PHY terminal
 failures, with an exact binary/PC allowlist and live reset/no-DMA evidence.
+For raw10, recognized storage-loader/module records must prove completed success
+before any halt. Supply --save-build and --save-sha256 to bind that proof to the
+exact live module; event40 alone is insufficient after integrated SD saving.
 """
 import argparse
+import importlib.util
 import json
 from pathlib import Path
 import re
@@ -156,13 +160,48 @@ def read_failed_phy_proof(bench, trace, manifest, code, approved):
                 diagnostic_status_words=list(status), no_dma_reset_proven=True)
 
 
+def save_guard_module():
+    """Load the shared RAM-save proof decoder without invoking its CLI."""
+    path = REPO / 'firmware/capture-sd/bench.py'
+    spec = importlib.util.spec_from_file_location('capture_sd_maintenance_guards', path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def read_storage_proof(bench, checked_save=None):
+    """Read-only gate: event40 alone does not prove SD/NOR storage is idle."""
+    guard = save_guard_module()
+    loader = struct.unpack('<16I', bench.upload(guard.LOADER, 64, 'storage-loader.bin'))
+    raw = bench.upload(guard.REPORT, 512, 'storage-report.bin')
+    report = guard.decode_report(raw)
+    if not guard.validate_storage_activity(loader, report):
+        return dict(recognized=False, legacy_completed_capture=True)
+    if checked_save is None:
+        raise ValueError('Recognized storage proof requires --save-build and --save-sha256 before any halt')
+    manifest, code = checked_save
+    proof = guard.exact_storage_proof(bench, manifest, code, loader, raw, 'storage')
+    return dict(recognized=True, **proof)
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--out', type=Path, required=True)
     p.add_argument('--layout', choices=('raw8', 'raw10'), default='raw8')
     p.add_argument('--failed-phy-build', type=Path,
                    help='Explicit reviewed receiver failure only; never prefix failures')
+    p.add_argument('--save-build', type=Path,
+                   help='Exact storage-module build for recognized post-capture storage proof')
+    p.add_argument('--save-sha256',
+                   help='Explicit reviewed storage-module SHA-256; required with --save-build')
     a = p.parse_args()
+    if bool(a.save_build) != bool(a.save_sha256):
+        p.error('--save-build and --save-sha256 must be supplied together')
+    if a.save_build and a.layout != 'raw10':
+        p.error('Storage-module proof requires --layout raw10')
+    checked_save = None
+    if a.save_build:
+        checked_save = save_guard_module().checked_build(a.save_build.resolve(), a.save_sha256)
     failed_phy = None
     if a.failed_phy_build:
         if a.layout != 'raw10':
@@ -183,6 +222,9 @@ def main():
         failure_proof = read_failed_phy_proof(b, trace, *failed_phy)
     elif trace[0] != 0x43545031 or trace[1] != 40:
         raise ValueError('Require a completed capture; no interruption of active operations')
+    # The integrated receiver publishes loader ACTIVE before event40. Recognized
+    # partial/error/nonidle storage records must never reach the first halt.
+    storage_proof = read_storage_proof(b, checked_save) if a.layout == 'raw10' else None
     context = registers(b.call('-halt', '-coreReg'))
     validate_context(context, failed_phy[2] if failed_phy else None)
     if failed_phy:
@@ -218,6 +260,8 @@ def main():
                   cache_helper_sha256=cache_sha)
     if failure_proof:
         result['failed_phy_recovery'] = failure_proof
+    if storage_proof is not None:
+        result['storage_proof'] = storage_proof
     (b.output / 'result.json').write_text(json.dumps(result, indent=2) + '\n', encoding='utf-8')
     print(json.dumps(result, indent=2))
 

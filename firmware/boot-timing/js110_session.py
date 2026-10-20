@@ -34,6 +34,12 @@ checks require samples from both signals and contiguous native sample ids;
 session success requires both. These checks cover received intervals, not the
 unobserved stream boundaries, and do not establish finite or unclipped readings.
 
+Optional --power-stream-log PATH selects a new schema with i/v/p summaries and
+float64 sample sums. Power comes from the driver's s/p/!data stream, not the
+product of separate current/voltage means. This option preserves and restores
+the additional s/p/ctrl setting. It is mutually exclusive with --stream-log.
+Use capture-sd/energy.py for offline interval integration and coverage checks.
+
 The 2A state selects a fixed measurement range, NOT a 2 A current limit. Inrush
 can exceed the range and clip the reported current. This helper changes no
 source voltage, protection threshold, voltage range, or range-suppression mode.
@@ -224,9 +230,13 @@ class Statistics:
 class StreamLog:
     """Log off the USB thread, distinguishing logging from signal coverage."""
 
-    def __init__(self, path):
+    def __init__(self, path, include_power=False):
         import numpy as np
         self.np = np
+        self.include_power = include_power
+        self.topics = dict(STREAM_TOPICS)
+        if include_power:
+            self.topics["s/p/!data"] = ("power", "W")
         path.parent.mkdir(parents=True, exist_ok=True)
         self.file = path.open("a", encoding="utf-8", buffering=1)
         self.queue = queue.Queue(maxsize=64)
@@ -240,10 +250,10 @@ class StreamLog:
                      "first_sample_id": None, "last_sample_id_end_exclusive": None,
                      "discontinuities": 0, "missing_native_samples": 0,
                      "overlap_or_reset_events": 0}
-            for signal, _ in STREAM_TOPICS.values()}
+            for signal, _ in self.topics.values()}
         self.callback = self.receive
         self.closed = False
-        self._write({"event": "stream_start", **stamp(), "schema": 1,
+        self._write({"event": "stream_start", **stamp(), "schema": 2 if include_power else 1,
                      "aggregation": "one record per driver chunk, no raw samples retained",
                      "complete_scope": "logging_only; see coverage checks separately",
                      "voltage_location": "IN+ relative to IN-",
@@ -282,8 +292,8 @@ class StreamLog:
     def summarize(self, topic, received, value):
         """Driver sample ids use native ticks, even for decimated samples."""
         np = self.np
-        suffix = next(key for key in STREAM_TOPICS if topic.endswith("/" + key) or topic == key)
-        signal, units = STREAM_TOPICS[suffix]
+        suffix = next(key for key in self.topics if topic.endswith("/" + key) or topic == key)
+        signal, units = self.topics[suffix]
         samples = np.asarray(value["data"])
         if samples.ndim != 1:
             raise ValueError("Expected a one-dimensional float stream")
@@ -327,6 +337,9 @@ class StreamLog:
                   "gap_native_samples": None if previous is None else sample_id - previous}
         if signal == "current":
             result["abs_ge_2A_count"] = int(np.count_nonzero(np.abs(finite) >= 2.0))
+        if self.include_power:
+            result["sum"] = number(finite.sum(dtype=np.float64)) if finite.size else None
+            result["sum_scope"] = "finite delivered samples; invalid for total energy if any are nonfinite"
         return result
 
     def _worker(self):
@@ -454,8 +467,14 @@ def run_session(args, driver_factory, driver_version):
     with args.log.open("a", encoding="utf-8", buffering=1) as log:
         report = Reporter(args.response, log)
         try:
-            if getattr(args, "stream_log", None) is not None:
-                stream = StreamLog(args.stream_log)
+            stream_path = getattr(args, "stream_log", None)
+            power_path = getattr(args, "power_stream_log", None)
+            if stream_path is not None and power_path is not None:
+                raise ValueError("Select only one stream log")
+            if power_path is not None:
+                stream = StreamLog(power_path, include_power=True)
+            elif stream_path is not None:
+                stream = StreamLog(stream_path)
             with driver_factory() as driver:
                 paths = driver.device_paths()
                 if args.device not in paths:
@@ -476,13 +495,16 @@ def run_session(args, driver_factory, driver_version):
                         if not starting_stats:
                             device.publish("s/sstats/ctrl", 1, timeout=5.0)
                         if stream is not None:
-                            for topic in ("h/fs", "s/i/ctrl", "s/v/ctrl"):
+                            stream_controls = ["s/i/ctrl", "s/v/ctrl"]
+                            if stream.include_power:
+                                stream_controls.append("s/p/ctrl")
+                            for topic in ("h/fs", *stream_controls):
                                 starting_stream_settings[topic] = device.query(topic, timeout=5.0)
-                            for topic in STREAM_TOPICS:
+                            for topic in stream.topics:
                                 absolute_topic = args.device + "/" + topic
                                 driver.subscribe(absolute_topic, "pub", stream.callback)
                                 stream_subscriptions.append(absolute_topic)
-                            for topic, value in (("h/fs", 2000000), ("s/i/ctrl", 1), ("s/v/ctrl", 1)):
+                            for topic, value in [("h/fs", 2000000), *[(t, 1) for t in stream_controls]]:
                                 if starting_stream_settings[topic] != value:
                                     device.publish(topic, value, timeout=5.0)
                         driver.subscribe("@/!remove", "pub",
@@ -493,7 +515,7 @@ def run_session(args, driver_factory, driver_version):
                                     supported_states=supported_states,
                                     starting_range=starting_range, range=starting_range,
                                     voltage_range=device.query("s/v/range/select", timeout=5.0),
-                                    stream_log=None if stream is None else str(args.stream_log),
+                                    stream_log=None if stream is None else str(power_path or stream_path),
                                     starting_stream_settings=starting_stream_settings,
                                     duration_s=args.duration, statistics=stats.snapshot(),
                                     **({} if recovery is None else {
@@ -597,7 +619,7 @@ def run_session(args, driver_factory, driver_version):
                             except Exception as exc:
                                 cleanup_errors.append(("stream_unsubscribe_error", topic, str(exc)))
                                 exit_code = 1
-                        for topic in ("s/i/ctrl", "s/v/ctrl", "h/fs"):
+                        for topic in ("s/i/ctrl", "s/v/ctrl", "s/p/ctrl", "h/fs"):
                             if topic in starting_stream_settings:
                                 try:
                                     device.publish(topic, starting_stream_settings[topic], timeout=5.0)
@@ -648,8 +670,11 @@ def main():
     parser.add_argument("--control", type=Path, required=True)
     parser.add_argument("--response", type=Path, required=True)
     parser.add_argument("--log", type=Path, required=True)
-    parser.add_argument("--stream-log", type=Path,
+    streams = parser.add_mutually_exclusive_group()
+    streams.add_argument("--stream-log", type=Path,
                         help="Optional JSONL full-rate i/v chunk summaries; no raw samples retained.")
+    streams.add_argument("--power-stream-log", type=Path,
+                         help="Optional schema2 i/v/p summaries and sums for offline energy bounds.")
     parser.add_argument("--recovery-output", action="store_true",
                         help="Own OUT0 for recovery; release initially and restore on exit. "
                              "If shared I/O voltage starts off, other rear GPIO pins must be disconnected.")
@@ -666,6 +691,8 @@ def main():
     paths = [args.control, args.response, args.log]
     if args.stream_log is not None:
         paths.append(args.stream_log)
+    if args.power_stream_log is not None:
+        paths.append(args.power_stream_log)
     if len({path.resolve() for path in paths}) != len(paths):
         parser.error("Control, response, log, and stream log paths must be distinct")
     if not args.device.startswith("u/js110/"):

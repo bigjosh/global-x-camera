@@ -1,6 +1,6 @@
 # Global X Camera
 
-An STM32N6-based, credit-card-size monochrome global-shutter camera project. This repository is the durable project record; chat and Page copies are working views. Updated through October 17, 2026.
+An STM32N6-based, credit-card-size monochrome global-shutter camera project. This repository is the durable project record; chat and Page copies are working views. Latest checkpoint: October 20, 2026.
 
 **Public repository:** [bigjosh/global-x-camera](https://github.com/bigjosh/global-x-camera), created at the user's explicit request on October 13, 2026. The default branch is `main`.
 
@@ -19,6 +19,8 @@ An STM32N6-based, credit-card-size monochrome global-shutter camera project. Thi
 10. [Automated power cycling and first GPIO](firmware/boot-timing/bench-results-2026-10-17.md) — three recorded CN8-powered autonomous starts, 15.20–15.43 ms from NRST rising to the first GPIO; includes the earlier source/reset problem and measurement limits.
 
 ## Current position
+
+**Latest, October 20:** the user authorized a working SD prototype: capture → grayscale PNG16 (`sample << 6`) → FAT32, followed by compression/time/energy tuning, with power-loss protection unqualified. The [implementation](firmware/capture-sd/README.md) builds and passes offline tests, but no physical SD save has run. V45b remains installed; current debug recovery is blocked pending a BOOT1 development-mode jumper change. See the [complete checkpoint and decisions](docs/decisions/capture-png-sd-2026-10-20.md) before operating the bench. The older checkpoints below describe their dated experiments, not the current programmed image or bench state.
 
 **Startup optimization follow-up, October 17:** CH5 now measures main MCU VDDIO. The first marker remains about 23 ms from the measured 5 V rise; fixed JS110 range provided no useful improvement. The tiny original payload already contains no HAL or camera application. Experimental post-marker diagnostics are being tested; exact NOR-sector restoration is preserved. See the [measurements, hypotheses and current firmware state](firmware/boot-timing/optimization-results-2026-10-17.md).
 

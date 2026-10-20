@@ -4,6 +4,7 @@ from pathlib import Path
 import struct
 import tempfile
 import unittest
+import zlib
 from unittest.mock import Mock, patch
 
 import bench
@@ -174,6 +175,125 @@ class MaintenanceGuardsTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'no longer live'):
             maintenance.read_failed_phy_proof(fake, trace, manifest, code, approved)
         self.assertEqual(fake.upload.call_count, 2)
+        fake.call.assert_not_called()
+
+
+class StorageMaintenanceGuardsTest(unittest.TestCase):
+    @staticmethod
+    def successful_storage():
+        guard = maintenance.save_guard_module()
+        code = b'\xfe\xe7' + bytes(126)
+        manifest = dict(buffer_address='0x34330000', park_address='0x34320000')
+        words = [0] * 128
+        values = dict(magic=0x53564431, schema=1, words=128, state=2, operation=1,
+                      mode=1, cpu_hz=400000000, media_idle=1, width=1120, height=1364,
+                      frame_bytes=3055360, buffer_bytes=32768, buffer_address=0x34330000,
+                      stack_canary=0x5354414B, initial_msplim=0x343A0000,
+                      card_size=200, fs_size=80, rows=1364, png_bytes_lo=42,
+                      fnv_before=1234, fnv_after=1234)
+        for key, value in values.items():
+            words[guard.FIELDS.index(key)] = value
+        words[63] = 0x444F4E45
+        report = bytearray(struct.pack('<128I', *words))
+        report[256:269] = b'IMG00001.PNG\0'
+        loader = [0] * 16
+        loader[0] = 0x534C4431
+        loader[7:12] = [zlib.crc32(code), len(code), 50, 0, 100]
+        card = bytearray(200)
+        struct.pack_into('<I', card, 56, 1)
+        fs = bytearray(80)
+        struct.pack_into('<9I', fs, 0, 3, 11, 0, 42, 3100000, 1, 32768, 5, 1)
+        fs[48:61] = b'IMG00001.PNG\0'
+        return guard, code, manifest, loader, bytes(report), bytes(card), bytes(fs)
+
+    def test_legacy_unrecognized_storage_proofs_remain_read_only(self):
+        fake = Mock()
+        fake.upload.side_effect = [bytes(64), bytes(512)]
+        self.assertEqual(maintenance.read_storage_proof(fake),
+                         dict(recognized=False, legacy_completed_capture=True))
+        fake.call.assert_not_called()
+
+    def test_active_loader_after_event40_never_reaches_halt(self):
+        trace = [0] * 64
+        trace[:2] = [0x43545031, 40]
+        loader = [0] * 16
+        loader[0] = 0x534C4431
+        fake = Mock()
+        fake.upload.side_effect = [struct.pack('<64I', *trace),
+                                   struct.pack('<16I', *loader), bytes(512)]
+        with patch.object(maintenance, 'Bench', return_value=fake), patch('sys.argv',
+                ['prepare_maintenance.py', '--out', 'unused', '--layout', 'raw10']):
+            with self.assertRaisesRegex(ValueError, 'loader is active'):
+                maintenance.main()
+        fake.call.assert_not_called()
+
+    def test_active_error_or_nonidle_module_never_reaches_halt(self):
+        guard, code, manifest, loader, raw, card, fs = self.successful_storage()
+        for field, value in [('state', 1), ('state', 3), ('result', 1),
+                             ('media_idle', 0), ('card_error', 1), ('fs_result', 1)]:
+            report = bytearray(raw)
+            struct.pack_into('<I', report, guard.FIELDS.index(field) * 4, value)
+            fake = Mock()
+            fake.upload.side_effect = [struct.pack('<16I', *loader), bytes(report)]
+            with self.subTest(field=field), self.assertRaises(ValueError):
+                maintenance.read_storage_proof(fake, (manifest, code))
+            fake.call.assert_not_called()
+
+    def test_successful_auto_save_requires_explicit_exact_build(self):
+        guard, code, manifest, loader, raw, card, fs = self.successful_storage()
+        fake = Mock()
+        fake.upload.side_effect = [struct.pack('<16I', *loader), raw]
+        with self.assertRaisesRegex(ValueError, '--save-build'):
+            maintenance.read_storage_proof(fake)
+        fake.call.assert_not_called()
+        fake.upload.side_effect = [struct.pack('<16I', *loader), raw, code, card, fs]
+        result = maintenance.read_storage_proof(fake, (manifest, code))
+        self.assertTrue(result['recognized'])
+        self.assertTrue(result['automatic_save'])
+        self.assertEqual(result['module_sha256'], guard.sha(code))
+        fake.call.assert_not_called()
+
+    def test_wrong_code_loader_crc_or_incomplete_fs_fails_without_halt(self):
+        guard, code, manifest, loader, raw, card, fs = self.successful_storage()
+        for kind in ('code', 'crc', 'return', 'fs', 'card'):
+            changed_loader = loader.copy()
+            changed_code, changed_card, changed_fs = code, card, fs
+            if kind == 'code':
+                changed_code = bytes(len(code))
+            elif kind == 'crc':
+                changed_loader[7] ^= 1
+            elif kind == 'return':
+                changed_loader[11] = 0
+            elif kind == 'fs':
+                changed_fs = fs[:32] + bytes(4) + fs[36:]
+            elif kind == 'card':
+                changed_card = card[:52] + struct.pack('<I', 1) + card[56:]
+            fake = Mock()
+            fake.upload.side_effect = [struct.pack('<16I', *changed_loader),
+                                       raw, changed_code, changed_card, changed_fs]
+            with self.subTest(kind=kind), self.assertRaises(ValueError):
+                maintenance.read_storage_proof(fake, (manifest, code))
+            fake.call.assert_not_called()
+
+    def test_auto_nonce_is_never_accepted_as_a_bench_request(self):
+        guard, code, manifest, loader, raw, card, fs = self.successful_storage()
+        report = guard.decode_report(raw)
+        with self.assertRaisesRegex(ValueError, 'terminal storage context'):
+            guard.validate_success(report, manifest)
+        guard.validate_success(report, manifest, allow_auto=True)
+
+    def test_auto_save_preflight_must_use_maintenance_park_path(self):
+        guard, code, manifest, loader, raw, card, fs = self.successful_storage()
+        fake = Mock()
+        fake.upload.side_effect = [struct.pack('<16I', *loader), raw, code, card, fs]
+        with patch.object(guard, 'maintenance_park_proof', return_value={
+                'frame': {'verified': True}, 'context': {'exact_cache_park': True}}) as cache_check, \
+                patch.object(guard, 'context_proof') as direct_park:
+            proof = guard.preflight(fake, manifest, code)
+        self.assertEqual(proof['path'], 'automatic_save_maintenance')
+        self.assertTrue(proof['module_already_identical'])
+        cache_check.assert_called_once_with(fake)
+        direct_park.assert_not_called()
         fake.call.assert_not_called()
 
 

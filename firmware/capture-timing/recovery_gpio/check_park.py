@@ -30,6 +30,11 @@ VCP_FIELDS = (
     'reserved30 reserved31').split()
 # An unknown/self-consistent build is insufficient authorization to halt.
 APPROVED = {
+    # v46 offline-reviewed awake completion: two receiver bytes differ from v45b;
+    # the entire early recovery branch is byte-identical. Not hardware-qualified.
+    'da664e5425574d6130e995513a70169b7a3dd7397ed8c86a8acf5ce651ab8ea7':
+        {'bytes': 5140, 'park': 0x3418078C, 'vcp': True,
+         'sector': '3f64bb86b73c44ba403a2a150f058eb0daf661c4b1ac41e6ca4634073bdd7cae'},
     # v45b additive PE6 pulse detector; independently reviewed offline.
     # Exact binary approval is not hardware qualification.
     'a8aebf4ed32d735d6352e9d5267759ed7b2c6733ac1a87bd4a0926a51c17e08a':

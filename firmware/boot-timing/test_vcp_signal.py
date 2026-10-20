@@ -69,8 +69,10 @@ def main():
                         default="passive")
     parser.add_argument("--probes-confirmed", action="store_true")
     parser.add_argument("--baud", type=int, choices=(115200, 1000000), default=115200)
-    parser.add_argument("--byte", type=lambda x: int(x, 0), choices=(0, 0xC0),
+    parser.add_argument("--byte", type=lambda x: int(x, 0), choices=(0, 0x80, 0xC0),
                         default=0, help="UART test byte; 0xC0 widens the HIGH gap.")
+    parser.add_argument("--reset-lead-ms", type=int, choices=range(0, 101), default=50,
+                        help="Bounded burst-to-reset delay for safe-state recovery retries.")
     args = parser.parse_args()
     if not args.probes_confirmed:
         parser.error("Confirm the stated physical probe map before running.")
@@ -98,7 +100,8 @@ def main():
         if not any(d.device_id == SALEAE and not d.is_simulation
                    for d in manager.get_devices()):
             raise RuntimeError("Expected physical Saleae not found.")
-        config = dict(mode=args.mode, baud=args.baud, byte=args.byte, stlink_serial=SERIAL,
+        config = dict(mode=args.mode, baud=args.baud, byte=args.byte,
+                      reset_lead_ms=args.reset_lead_ms, stlink_serial=SERIAL,
                       saleae=SALEAE, channel_map={"0": "NRST", "6": "PE6 / VCP TX"},
                       digital_sample_rate=6250000, analog_sample_rate=31250,
                       digital_threshold_family_volts=3.3,
@@ -150,7 +153,7 @@ def main():
                         event("write_begin", bytes=len(payload))
                         thread.start()
                         try:
-                            time.sleep(.05)
+                            time.sleep(args.reset_lead_ms / 1000)
                             uart.break_condition = True
                             event("break_api_asserted")
                             time.sleep(.1)

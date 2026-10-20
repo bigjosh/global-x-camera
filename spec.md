@@ -2,10 +2,12 @@
 
 **Project:** Global X Camera  
 **Project URL:** https://www.flux.ai/bigjosh/global-x-camera  
-**Updated:** 2026-10-18; recovered-design descriptions originated 2026-09-05.
+**Updated:** 2026-10-20; recovered-design descriptions originated 2026-09-05.
 **Design state:** Prototype selections below are locked. The recovered KiCad schematic still contains the earlier VD55G0 camera and TPS62132/AO3401A power circuit, including known review findings; it has not yet been revised or qualified for this prototype. D-35 selects a self-assembled Nucleo-based first prototype; a custom camera PCB and its manufacturer remain later work.
 
 Current decisions and their remaining implementation boundaries are indexed in the [project decision register](docs/decisions/2026-10-13-project-baseline.md). This specification defines the current requirements; explicitly historical circuit descriptions preserve the unchanged CAD evidence.
+
+**Latest prototype storage direction, October 20 (D-49):** implement capture directly to **16-bit grayscale PNG on FAT32 SD**, preserving RAW10 as `sample << 6`, and choose compression by measured total save time and energy. Development formatting is authorized; normal capture must not autoformat or overwrite photos. Power-loss protection is explicitly unqualified for this prototype. The existing seven-pin breakout uses native one-bit SDMMC2 at 3.3 V. This is the active bring-up path; the older NAND-specific layout, retention and durability policies below are not established properties of an SD card. See the [implementation record and current hardware blocker](docs/decisions/capture-png-sd-2026-10-20.md). No physical SD write/save has yet been demonstrated.
 
 **Prototype-work status, October 18:** the board is in hand and capture has been demonstrated. The user now selects the existing Alliance NAND on Arduino headers with bit-banging allowed (D-46), and **5.0 V from LTC3621**, retaining downstream regulation while excluding unnecessary capture loads (D-47). The [consolidated assembly guide](docs/prototype/nucleo-assembly-guide.md) supersedes the earlier pause and competing wiring proposals. Physical rework, NAND communication and the integrated battery-powered capture/save/shutdown cycle have not yet been demonstrated. D-43 still defers USB implementation details to firmware bring-up.
 
