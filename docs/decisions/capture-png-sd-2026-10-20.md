@@ -133,3 +133,39 @@ Local detailed recovery evidence remains under
 `tmp/bringup/vcp-install-20261019/sd-capture-baseline-cold-01/` and
 `sd-baseline-recovery-01/`. No camera imagery or SD contents are published by
 this checkpoint.
+
+## Additional UART retries at user request
+
+On October 20 at 05:44–05:45 UTC, the user requested a few more UART recovery
+attempts before changing BOOT1. After checking shared-bench ownership, four
+additional warm attempts used 32,768 repetitions of `0xC0` at 1 Mbaud, 8N1.
+Each UART burst spanned a nominal 100 ms BREAK-controlled reset, with varied
+lead time to shift the UART gaps relative to startup. Saleae captured PE6
+and NRST, and `check_park.py` attempted exact recovery verification afterward.
+
+| Attempt | Requested UART lead before BREAK | Measured principal NRST LOW interval | UART continues after reset release | AP1 result |
+| --- | ---: | ---: | ---: | --- |
+| 1 | 7 ms | 101.393 ms | 223 ms | Cannot connect |
+| 2 | 23 ms | 101.308 ms | 208 ms | Cannot connect |
+| 3 | 61 ms | 103.594 ms | 167 ms | Cannot connect |
+| 4 | 89 ms | 102.463 ms | 140 ms | Cannot connect |
+
+Every capture contains the expected 32,768 LOW pulses, each 6.88–7.04 µs
+long, with median HIGH intervals of 3.04 µs. Interior HIGH gaps occasionally
+reach 107–114 µs; an individual 100 µs detector-window miss remains possible.
+The changed timing and correct waveforms do not establish the cause of the
+repeated failures. ST-LINK reported 3.27 V and failed to obtain the core ID
+on every attempt, before the first SRAM read. There was no
+`DEV_USB_COMM_ERR`; no WinUSB transport recovery was indicated.
+
+Full local captures and stimulus logs are under
+`tmp/bringup/vcp-retry-20261020-01-signal/` through `-04-signal/`;
+matching `-01-park/` through `-04-park/` folders hold the failed CLI logs.
+The [compact evidence record](../../firmware/capture-sd/evidence/2026-10-20-uart-retries/results.json)
+preserves measurements, source hashes and CLI outcomes.
+
+No halt or memory write was reached. No NOR programming, SD write/format,
+or JS110 power switching occurred. COM8 is closed, BREAK released, and both
+observed lines ended HIGH. The installed image remains v45b; its contents
+could not be reread. The previously requested **JP2/BOOT1 pins 2–3** move
+remains pending so ROM development mode can bypass the inaccessible image.

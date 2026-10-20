@@ -1,0 +1,205 @@
+{
+  "date_utc": "2026-10-20",
+  "purpose": "Four additional warm UART recovery retries requested by user before BOOT1 change",
+  "signal": {
+    "baud": 1000000,
+    "framing": "8N1",
+    "byte": "0xC0",
+    "byte_count": 32768,
+    "reset": "VCP BREAK drives NRST"
+  },
+  "limits": [
+    "No core/SRAM access; cause unknown",
+    "No DUT supply rail capture",
+    "An individual 100 us detector-window miss remains possible"
+  ],
+  "end_state": {
+    "com8": "closed",
+    "break": "released",
+    "nor_or_sd_writes": false,
+    "js110_power_changes": false,
+    "pending_user_action": "JP2/BOOT1 pins 2-3"
+  },
+  "runs": [
+    {
+      "attempt": 1,
+      "requested_uart_lead_ms": 7,
+      "principal_nrst_low_ms": 101.3928,
+      "uart_after_principal_reset_release_ms": 223.05888,
+      "pe6_low_pulses": 32768,
+      "pe6_low_us": {
+        "min": 6.88,
+        "max": 7.04
+      },
+      "pe6_interior_high_us": {
+        "median": 3.04,
+        "max": 106.56
+      },
+      "final_observed_levels": {
+        "nrst": 1,
+        "pe6": 1
+      },
+      "analog_summary": {
+        "Channel 0": {
+          "min": -0.041,
+          "max": 3.197,
+          "avg": 3.0025101669889587,
+          "samples": 55572
+        },
+        "Channel 6": {
+          "min": 0.114,
+          "max": 3.298,
+          "avg": 2.8405403260642657,
+          "samples": 55572
+        }
+      },
+      "recovery_check": "AP1 connection failed before SRAM upload; no park verified",
+      "cli_log": "      -------------------------------------------------------------------\n                       STM32CubeProgrammer v2.23.0                  \n      -------------------------------------------------------------------\n\nST-LINK SN  : 002100203335511035383531\nST-LINK FW  : V3J15M6\nBoard       : NUCLEO-N657X0-Q\nVoltage     : 3.27V\nError: Unable to get core ID\nError: Cannot connect to access port 1!  If you are trying to connect to a device with TrustZone enabled please try to connect with HotPlug mode.  If you are trying to connect to a device which supports Debug Authentication with certificate or password, please open your device using it.\n2nd connect tentative with frequency (8MHz)\nST-LINK SN  : 002100203335511035383531\nST-LINK FW  : V3J15M6\nBoard       : NUCLEO-N657X0-Q\nVoltage     : 3.27V\nError: Unable to get core ID\nError: Cannot connect to access port 1!  If you are trying to connect to a device with TrustZone enabled please try to connect with HotPlug mode.  If you are trying to connect to a device which supports Debug Authentication with certificate or password, please open your device using it.\n",
+      "local_source_sha256": {
+        "tmp/bringup/vcp-retry-20261020-01-signal/config.json": "f536e632dd59d712c3258a88a31a8b42f858beeaacf0e6655542597175ec8c98",
+        "tmp/bringup/vcp-retry-20261020-01-signal/events.json": "a5b0060cff47905848a325adb75507e307929c6dd1ac98596d633f1fd118357f",
+        "tmp/bringup/vcp-retry-20261020-01-signal/signal-summary.json": "c158d02f1f32476034515e8aba8ffdc952a14cca900113495e1dcfa0381a50a6",
+        "tmp/bringup/vcp-retry-20261020-01-signal/digital.csv": "db21d9455380b6d30cbfd4aecffd8fd355b7c93f23b36885970460f813766390",
+        "tmp/bringup/vcp-retry-20261020-01-signal/analog.csv": "81b17ceeabf690041265bf2456f6fabb675a7ff35ecb0087cd389c096f3d3581",
+        "tmp/bringup/vcp-retry-20261020-01-signal/signal.sal": "f5d958d423b0a500fa252b93b3b88c9ab100a020ce0bd6e845a7947bd537793c",
+        "tmp/bringup/vcp-retry-20261020-01-park/cli-01.log": "ceebdfaaf12c808e3e2a46ff6b86a34be26c1290d9651053b8ebd760c529b0e7",
+        "tmp/bringup/vcp-retry-20261020-01-park/calls.jsonl": "723ae5f35c9510e7600cd143fca40ec65f7d27b24921eb8effcd7f86d22c9b09"
+      }
+    },
+    {
+      "attempt": 2,
+      "requested_uart_lead_ms": 23,
+      "principal_nrst_low_ms": 101.30848,
+      "uart_after_principal_reset_release_ms": 207.61824,
+      "pe6_low_pulses": 32768,
+      "pe6_low_us": {
+        "min": 6.88,
+        "max": 7.04
+      },
+      "pe6_interior_high_us": {
+        "median": 3.04,
+        "max": 110.88
+      },
+      "final_observed_levels": {
+        "nrst": 1,
+        "pe6": 1
+      },
+      "analog_summary": {
+        "Channel 0": {
+          "min": -0.036,
+          "max": 3.197,
+          "avg": 3.0022620564303804,
+          "samples": 55572
+        },
+        "Channel 6": {
+          "min": 0.109,
+          "max": 3.328,
+          "avg": 2.8378484308643137,
+          "samples": 55572
+        }
+      },
+      "recovery_check": "AP1 connection failed before SRAM upload; no park verified",
+      "cli_log": "      -------------------------------------------------------------------\n                       STM32CubeProgrammer v2.23.0                  \n      -------------------------------------------------------------------\n\nST-LINK SN  : 002100203335511035383531\nST-LINK FW  : V3J15M6\nBoard       : NUCLEO-N657X0-Q\nVoltage     : 3.27V\nError: Unable to get core ID\nError: Cannot connect to access port 1!  If you are trying to connect to a device with TrustZone enabled please try to connect with HotPlug mode.  If you are trying to connect to a device which supports Debug Authentication with certificate or password, please open your device using it.\n2nd connect tentative with frequency (8MHz)\nST-LINK SN  : 002100203335511035383531\nST-LINK FW  : V3J15M6\nBoard       : NUCLEO-N657X0-Q\nVoltage     : 3.27V\nError: Unable to get core ID\nError: Cannot connect to access port 1!  If you are trying to connect to a device with TrustZone enabled please try to connect with HotPlug mode.  If you are trying to connect to a device which supports Debug Authentication with certificate or password, please open your device using it.\n",
+      "local_source_sha256": {
+        "tmp/bringup/vcp-retry-20261020-02-signal/config.json": "41cb3095aa5dd90bea0af4af377594a4c0556fad9e1938bcfc30f8ec26b5bbb8",
+        "tmp/bringup/vcp-retry-20261020-02-signal/events.json": "4fe77e3577d41972e980c0317734c033f7ea611d5466a4458bcaae48b734ad0b",
+        "tmp/bringup/vcp-retry-20261020-02-signal/signal-summary.json": "c68d7496531e6a30c0315aaae263ddef2632cbb81fc6f58a735bb4a26b3a57d9",
+        "tmp/bringup/vcp-retry-20261020-02-signal/digital.csv": "db3de021630dbee47f605f9cd30d77a8b3ac84d26fef9e9904a7fc45d84d47da",
+        "tmp/bringup/vcp-retry-20261020-02-signal/analog.csv": "665033bf2dba9a34709bc02275698c74ec1e846f593410c94ca1dc681c4c6328",
+        "tmp/bringup/vcp-retry-20261020-02-signal/signal.sal": "31c1ef085ae248e15b8c0367f06c25ca1cb6e42193c8e103c87e80e24ae4e10b",
+        "tmp/bringup/vcp-retry-20261020-02-park/cli-01.log": "ceebdfaaf12c808e3e2a46ff6b86a34be26c1290d9651053b8ebd760c529b0e7",
+        "tmp/bringup/vcp-retry-20261020-02-park/calls.jsonl": "30c0f52996edea79ae1b6c820b7feb3307bfef4590a845b4490a246931ad6b37"
+      }
+    },
+    {
+      "attempt": 3,
+      "requested_uart_lead_ms": 61,
+      "principal_nrst_low_ms": 103.59376,
+      "uart_after_principal_reset_release_ms": 167.14064,
+      "pe6_low_pulses": 32768,
+      "pe6_low_us": {
+        "min": 6.88,
+        "max": 7.04
+      },
+      "pe6_interior_high_us": {
+        "median": 3.04,
+        "max": 113.6
+      },
+      "final_observed_levels": {
+        "nrst": 1,
+        "pe6": 1
+      },
+      "analog_summary": {
+        "Channel 0": {
+          "min": -0.041,
+          "max": 3.192,
+          "avg": 2.9977182394006383,
+          "samples": 55572
+        },
+        "Channel 6": {
+          "min": 0.109,
+          "max": 3.333,
+          "avg": 2.8377453573740716,
+          "samples": 55572
+        }
+      },
+      "recovery_check": "AP1 connection failed before SRAM upload; no park verified",
+      "cli_log": "      -------------------------------------------------------------------\n                       STM32CubeProgrammer v2.23.0                  \n      -------------------------------------------------------------------\n\nST-LINK SN  : 002100203335511035383531\nST-LINK FW  : V3J15M6\nBoard       : NUCLEO-N657X0-Q\nVoltage     : 3.27V\nError: Unable to get core ID\nError: Cannot connect to access port 1!  If you are trying to connect to a device with TrustZone enabled please try to connect with HotPlug mode.  If you are trying to connect to a device which supports Debug Authentication with certificate or password, please open your device using it.\n2nd connect tentative with frequency (8MHz)\nST-LINK SN  : 002100203335511035383531\nST-LINK FW  : V3J15M6\nBoard       : NUCLEO-N657X0-Q\nVoltage     : 3.27V\nError: Unable to get core ID\nError: Cannot connect to access port 1!  If you are trying to connect to a device with TrustZone enabled please try to connect with HotPlug mode.  If you are trying to connect to a device which supports Debug Authentication with certificate or password, please open your device using it.\n",
+      "local_source_sha256": {
+        "tmp/bringup/vcp-retry-20261020-03-signal/config.json": "812ac1fc99916dd51d97314c1401094526fe046630352bebe4e19bb3fa086dd8",
+        "tmp/bringup/vcp-retry-20261020-03-signal/events.json": "9403639556a5afdd2b8beb460694734943963dbc3756e906874c3d6a3b9a3b72",
+        "tmp/bringup/vcp-retry-20261020-03-signal/signal-summary.json": "735e0d0948739c258e927d8ac5ebed7a02315b8d17b531ba2569ba138d2ea5bc",
+        "tmp/bringup/vcp-retry-20261020-03-signal/digital.csv": "69266998727f57dc083953bb5a5a731c6eaa5bbeb386058f00dd73f07f0fabbd",
+        "tmp/bringup/vcp-retry-20261020-03-signal/analog.csv": "35f21753187cf094a79ba6d30e04a07e59da9e49ae745fd51d13d1481c5b8c23",
+        "tmp/bringup/vcp-retry-20261020-03-signal/signal.sal": "6331b0b44f20b4a80defe0994deb65a2eaff4b1a3e526e29d1b907d36f118e4e",
+        "tmp/bringup/vcp-retry-20261020-03-park/cli-01.log": "ceebdfaaf12c808e3e2a46ff6b86a34be26c1290d9651053b8ebd760c529b0e7",
+        "tmp/bringup/vcp-retry-20261020-03-park/calls.jsonl": "b9f634ef4cfc1c046d5e2f7bd83b6cd926fb0fb5d54a866d22804c15d27d8a43"
+      }
+    },
+    {
+      "attempt": 4,
+      "requested_uart_lead_ms": 89,
+      "principal_nrst_low_ms": 102.46256,
+      "uart_after_principal_reset_release_ms": 139.648,
+      "pe6_low_pulses": 32768,
+      "pe6_low_us": {
+        "min": 6.88,
+        "max": 7.04
+      },
+      "pe6_interior_high_us": {
+        "median": 3.04,
+        "max": 108.64
+      },
+      "final_observed_levels": {
+        "nrst": 1,
+        "pe6": 1
+      },
+      "analog_summary": {
+        "Channel 0": {
+          "min": -0.041,
+          "max": 3.192,
+          "avg": 2.99934790901886,
+          "samples": 55572
+        },
+        "Channel 6": {
+          "min": 0.104,
+          "max": 3.338,
+          "avg": 2.8382444576405494,
+          "samples": 55572
+        }
+      },
+      "recovery_check": "AP1 connection failed before SRAM upload; no park verified",
+      "cli_log": "      -------------------------------------------------------------------\n                       STM32CubeProgrammer v2.23.0                  \n      -------------------------------------------------------------------\n\nST-LINK SN  : 002100203335511035383531\nST-LINK FW  : V3J15M6\nBoard       : NUCLEO-N657X0-Q\nVoltage     : 3.27V\nError: Unable to get core ID\nError: Cannot connect to access port 1!  If you are trying to connect to a device with TrustZone enabled please try to connect with HotPlug mode.  If you are trying to connect to a device which supports Debug Authentication with certificate or password, please open your device using it.\n2nd connect tentative with frequency (8MHz)\nST-LINK SN  : 002100203335511035383531\nST-LINK FW  : V3J15M6\nBoard       : NUCLEO-N657X0-Q\nVoltage     : 3.27V\nError: Unable to get core ID\nError: Cannot connect to access port 1!  If you are trying to connect to a device with TrustZone enabled please try to connect with HotPlug mode.  If you are trying to connect to a device which supports Debug Authentication with certificate or password, please open your device using it.\n",
+      "local_source_sha256": {
+        "tmp/bringup/vcp-retry-20261020-04-signal/config.json": "01603863dd688adf0c374ab48997c59c2ea7270edd3c40555b28209fd3329812",
+        "tmp/bringup/vcp-retry-20261020-04-signal/events.json": "30642805da318520f0f3ef4cbc5ec0fb9695aa2009e3c965c8741b6d7063258e",
+        "tmp/bringup/vcp-retry-20261020-04-signal/signal-summary.json": "4c06ec56023a3c3dbc7d51763ee41a24ac65ada999738087b85c812bcb76218a",
+        "tmp/bringup/vcp-retry-20261020-04-signal/digital.csv": "722f0548631066ac97c2da3b3a54a8d43b989d4c34f1125a2a249e9b108cec31",
+        "tmp/bringup/vcp-retry-20261020-04-signal/analog.csv": "de130755da0a23a7005b4be1d43a9e65a956813205d77c6d9ba6a68acf8c9601",
+        "tmp/bringup/vcp-retry-20261020-04-signal/signal.sal": "55e65aa424c1dae3983c98213282fa7d2325e54fe30ed0976635d1925c4b9031",
+        "tmp/bringup/vcp-retry-20261020-04-park/cli-01.log": "ceebdfaaf12c808e3e2a46ff6b86a34be26c1290d9651053b8ebd760c529b0e7",
+        "tmp/bringup/vcp-retry-20261020-04-park/calls.jsonl": "f3dd90a0770cc074189831fcfc195130657a37b97dfbfad9fdd4b88cdeb0d1a2"
+      }
+    }
+  ]
+}
