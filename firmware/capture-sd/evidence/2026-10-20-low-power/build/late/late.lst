@@ -1,0 +1,1284 @@
+
+D:\Github\global-x-camera\tmp\bringup\capture-sleep-20261020\v59-standby\late\late.elf:     file format elf32-littlearm
+
+
+Disassembly of section .text:
+
+343c0000 <late_completion_entry>:
+343c0000:	f000 b8e6 	b.w	343c01d0 <status_led_complete_sleep>
+
+343c0004 <publish>:
+343c0004:	2200      	movs	r2, #0
+343c0006:	4b13      	ldr	r3, [pc, #76]	@ (343c0054 <publish+0x50>)
+343c0008:	b530      	push	{r4, r5, lr}
+343c000a:	f8c3 2cfc 	str.w	r2, [r3, #3324]	@ 0xcfc
+343c000e:	f8c3 0c10 	str.w	r0, [r3, #3088]	@ 0xc10
+343c0012:	f103 4399 	add.w	r3, r3, #1283457024	@ 0x4c800000
+343c0016:	f503 03ba 	add.w	r3, r3, #6094848	@ 0x5d0000
+343c001a:	4a0f      	ldr	r2, [pc, #60]	@ (343c0058 <publish+0x54>)
+343c001c:	4c0f      	ldr	r4, [pc, #60]	@ (343c005c <publish+0x58>)
+343c001e:	4810      	ldr	r0, [pc, #64]	@ (343c0060 <publish+0x5c>)
+343c0020:	f603 53c5 	addw	r3, r3, #3525	@ 0xdc5
+343c0024:	2504      	movs	r5, #4
+343c0026:	f045 e001 	dls	lr, r5
+343c002a:	6811      	ldr	r1, [r2, #0]
+343c002c:	b2cd      	uxtb	r5, r1
+343c002e:	406b      	eors	r3, r5
+343c0030:	4363      	muls	r3, r4
+343c0032:	0a09      	lsrs	r1, r1, #8
+343c0034:	f00f c007 	le	lr, 343c002c <publish+0x28>
+343c0038:	3204      	adds	r2, #4
+343c003a:	4282      	cmp	r2, r0
+343c003c:	d1f2      	bne.n	343c0024 <publish+0x20>
+343c003e:	4a05      	ldr	r2, [pc, #20]	@ (343c0054 <publish+0x50>)
+343c0040:	f8c2 3cf8 	str.w	r3, [r2, #3320]	@ 0xcf8
+343c0044:	f3bf 8f5f 	dmb	sy
+343c0048:	4b06      	ldr	r3, [pc, #24]	@ (343c0064 <publish+0x60>)
+343c004a:	f8c2 3cfc 	str.w	r3, [r2, #3324]	@ 0xcfc
+343c004e:	f3bf 8f4f 	dsb	sy
+343c0052:	bd30      	pop	{r4, r5, pc}
+343c0054:	343f9000 	.word	0x343f9000
+343c0058:	343f9c04 	.word	0x343f9c04
+343c005c:	01000193 	.word	0x01000193
+343c0060:	343f9cf8 	.word	0x343f9cf8
+343c0064:	4c50454e 	.word	0x4c50454e
+
+343c0068 <finish>:
+343c0068:	4603      	mov	r3, r0
+343c006a:	4a0a      	ldr	r2, [pc, #40]	@ (343c0094 <finish+0x2c>)
+343c006c:	6119      	str	r1, [r3, #16]
+343c006e:	6852      	ldr	r2, [r2, #4]
+343c0070:	2900      	cmp	r1, #0
+343c0072:	619a      	str	r2, [r3, #24]
+343c0074:	bf14      	ite	ne
+343c0076:	2203      	movne	r2, #3
+343c0078:	2202      	moveq	r2, #2
+343c007a:	4608      	mov	r0, r1
+343c007c:	609a      	str	r2, [r3, #8]
+343c007e:	f3bf 8f4f 	dsb	sy
+343c0082:	4a05      	ldr	r2, [pc, #20]	@ (343c0098 <finish+0x30>)
+343c0084:	bf18      	it	ne
+343c0086:	2200      	movne	r2, #0
+343c0088:	f8c3 20fc 	str.w	r2, [r3, #252]	@ 0xfc
+343c008c:	f3bf 8f4f 	dsb	sy
+343c0090:	4770      	bx	lr
+343c0092:	bf00      	nop
+343c0094:	e0001000 	.word	0xe0001000
+343c0098:	50444f4e 	.word	0x50444f4e
+
+343c009c <off_state>:
+343c009c:	f246 0206 	movw	r2, #24582	@ 0x6006
+343c00a0:	4b3d      	ldr	r3, [pc, #244]	@ (343c0198 <off_state+0xfc>)
+343c00a2:	b510      	push	{r4, lr}
+343c00a4:	f8d3 025c 	ldr.w	r0, [r3, #604]	@ 0x25c
+343c00a8:	ea00 0102 	and.w	r1, r0, r2
+343c00ac:	4382      	bics	r2, r0
+343c00ae:	d171      	bne.n	343c0194 <off_state+0xf8>
+343c00b0:	f8d3 221c 	ldr.w	r2, [r3, #540]	@ 0x21c
+343c00b4:	4011      	ands	r1, r2
+343c00b6:	d16d      	bne.n	343c0194 <off_state+0xf8>
+343c00b8:	f8d3 0278 	ldr.w	r0, [r3, #632]	@ 0x278
+343c00bc:	f010 0002 	ands.w	r0, r0, #2
+343c00c0:	d067      	beq.n	343c0192 <off_state+0xf6>
+343c00c2:	f8d3 227c 	ldr.w	r2, [r3, #636]	@ 0x27c
+343c00c6:	4608      	mov	r0, r1
+343c00c8:	f012 0244 	ands.w	r2, r2, #68	@ 0x44
+343c00cc:	d161      	bne.n	343c0192 <off_state+0xf6>
+343c00ce:	f8d3 123c 	ldr.w	r1, [r3, #572]	@ 0x23c
+343c00d2:	4610      	mov	r0, r2
+343c00d4:	f001 0144 	and.w	r1, r1, #68	@ 0x44
+343c00d8:	2944      	cmp	r1, #68	@ 0x44
+343c00da:	d15a      	bne.n	343c0192 <off_state+0xf6>
+343c00dc:	f8d3 1240 	ldr.w	r1, [r3, #576]	@ 0x240
+343c00e0:	f411 3140 	ands.w	r1, r1, #196608	@ 0x30000
+343c00e4:	d155      	bne.n	343c0192 <off_state+0xf6>
+343c00e6:	f8d3 2264 	ldr.w	r2, [r3, #612]	@ 0x264
+343c00ea:	4608      	mov	r0, r1
+343c00ec:	f412 0280 	ands.w	r2, r2, #4194304	@ 0x400000
+343c00f0:	d14f      	bne.n	343c0192 <off_state+0xf6>
+343c00f2:	f8d3 0224 	ldr.w	r0, [r3, #548]	@ 0x224
+343c00f6:	f410 0080 	ands.w	r0, r0, #4194304	@ 0x400000
+343c00fa:	d04a      	beq.n	343c0192 <off_state+0xf6>
+343c00fc:	4610      	mov	r0, r2
+343c00fe:	f242 02a0 	movw	r2, #8352	@ 0x20a0
+343c0102:	f8d3 1260 	ldr.w	r1, [r3, #608]	@ 0x260
+343c0106:	4211      	tst	r1, r2
+343c0108:	d143      	bne.n	343c0192 <off_state+0xf6>
+343c010a:	f8d3 3220 	ldr.w	r3, [r3, #544]	@ 0x220
+343c010e:	069b      	lsls	r3, r3, #26
+343c0110:	d540      	bpl.n	343c0194 <off_state+0xf8>
+343c0112:	4a22      	ldr	r2, [pc, #136]	@ (343c019c <off_state+0x100>)
+343c0114:	6813      	ldr	r3, [r2, #0]
+343c0116:	f403 6340 	and.w	r3, r3, #3072	@ 0xc00
+343c011a:	f5b3 6f80 	cmp.w	r3, #1024	@ 0x400
+343c011e:	d139      	bne.n	343c0194 <off_state+0xf8>
+343c0120:	6850      	ldr	r0, [r2, #4]
+343c0122:	f010 0020 	ands.w	r0, r0, #32
+343c0126:	d135      	bne.n	343c0194 <off_state+0xf8>
+343c0128:	6953      	ldr	r3, [r2, #20]
+343c012a:	f013 0320 	ands.w	r3, r3, #32
+343c012e:	d130      	bne.n	343c0192 <off_state+0xf6>
+343c0130:	6912      	ldr	r2, [r2, #16]
+343c0132:	4618      	mov	r0, r3
+343c0134:	f012 0220 	ands.w	r2, r2, #32
+343c0138:	d12b      	bne.n	343c0192 <off_state+0xf6>
+343c013a:	f241 04d4 	movw	r4, #4308	@ 0x10d4
+343c013e:	4918      	ldr	r1, [pc, #96]	@ (343c01a0 <off_state+0x104>)
+343c0140:	4610      	mov	r0, r2
+343c0142:	680b      	ldr	r3, [r1, #0]
+343c0144:	f423 6370 	bic.w	r3, r3, #3840	@ 0xf00
+343c0148:	f023 0303 	bic.w	r3, r3, #3
+343c014c:	049b      	lsls	r3, r3, #18
+343c014e:	0c9b      	lsrs	r3, r3, #18
+343c0150:	42a3      	cmp	r3, r4
+343c0152:	d11e      	bne.n	343c0192 <off_state+0xf6>
+343c0154:	684b      	ldr	r3, [r1, #4]
+343c0156:	f013 034e 	ands.w	r3, r3, #78	@ 0x4e
+343c015a:	d11a      	bne.n	343c0192 <off_state+0xf6>
+343c015c:	694a      	ldr	r2, [r1, #20]
+343c015e:	4618      	mov	r0, r3
+343c0160:	f002 0246 	and.w	r2, r2, #70	@ 0x46
+343c0164:	2a02      	cmp	r2, #2
+343c0166:	d114      	bne.n	343c0192 <off_state+0xf6>
+343c0168:	6908      	ldr	r0, [r1, #16]
+343c016a:	f010 0002 	ands.w	r0, r0, #2
+343c016e:	d010      	beq.n	343c0192 <off_state+0xf6>
+343c0170:	f5a1 5140 	sub.w	r1, r1, #12288	@ 0x3000
+343c0174:	680a      	ldr	r2, [r1, #0]
+343c0176:	4618      	mov	r0, r3
+343c0178:	f402 0270 	and.w	r2, r2, #15728640	@ 0xf00000
+343c017c:	f5b2 0f70 	cmp.w	r2, #15728640	@ 0xf00000
+343c0180:	d107      	bne.n	343c0192 <off_state+0xf6>
+343c0182:	68cb      	ldr	r3, [r1, #12]
+343c0184:	f413 0f70 	tst.w	r3, #15728640	@ 0xf00000
+343c0188:	d104      	bne.n	343c0194 <off_state+0xf8>
+343c018a:	4b06      	ldr	r3, [pc, #24]	@ (343c01a4 <off_state+0x108>)
+343c018c:	6918      	ldr	r0, [r3, #16]
+343c018e:	f3c0 1000 	ubfx	r0, r0, #4, #1
+343c0192:	bd10      	pop	{r4, pc}
+343c0194:	2000      	movs	r0, #0
+343c0196:	e7fc      	b.n	343c0192 <off_state+0xf6>
+343c0198:	56028000 	.word	0x56028000
+343c019c:	56023800 	.word	0x56023800
+343c01a0:	56023400 	.word	0x56023400
+343c01a4:	56020800 	.word	0x56020800
+
+343c01a8 <refused>:
+343c01a8:	b508      	push	{r3, lr}
+343c01aa:	4b06      	ldr	r3, [pc, #24]	@ (343c01c4 <low_power_failure_idle+0x4>)
+343c01ac:	4a06      	ldr	r2, [pc, #24]	@ (343c01c8 <low_power_failure_idle+0x8>)
+343c01ae:	f8c3 0c14 	str.w	r0, [r3, #3092]	@ 0xc14
+343c01b2:	4b06      	ldr	r3, [pc, #24]	@ (343c01cc <low_power_failure_idle+0xc>)
+343c01b4:	619a      	str	r2, [r3, #24]
+343c01b6:	f3bf 8f4f 	dsb	sy
+343c01ba:	20ff      	movs	r0, #255	@ 0xff
+343c01bc:	f7ff ff22 	bl	343c0004 <publish>
+
+343c01c0 <low_power_failure_idle>:
+343c01c0:	e7fe      	b.n	343c01c0 <low_power_failure_idle>
+343c01c2:	bf00      	nop
+343c01c4:	343f9000 	.word	0x343f9000
+343c01c8:	04000101 	.word	0x04000101
+343c01cc:	56021800 	.word	0x56021800
+
+343c01d0 <status_led_complete_sleep>:
+343c01d0:	b580      	push	{r7, lr}
+343c01d2:	f04f 0e40 	mov.w	lr, #64	@ 0x40
+343c01d6:	2000      	movs	r0, #0
+343c01d8:	f04e e001 	dls	lr, lr
+343c01dc:	4a98      	ldr	r2, [pc, #608]	@ (343c0440 <status_led_complete_sleep+0x270>)
+343c01de:	f842 0b04 	str.w	r0, [r2], #4
+343c01e2:	f00f c005 	le	lr, 343c01de <status_led_complete_sleep+0xe>
+343c01e6:	2101      	movs	r1, #1
+343c01e8:	4b96      	ldr	r3, [pc, #600]	@ (343c0444 <status_led_complete_sleep+0x274>)
+343c01ea:	2403      	movs	r4, #3
+343c01ec:	f8c3 1c04 	str.w	r1, [r3, #3076]	@ 0xc04
+343c01f0:	2140      	movs	r1, #64	@ 0x40
+343c01f2:	f8c3 1c08 	str.w	r1, [r3, #3080]	@ 0xc08
+343c01f6:	f8c3 4c0c 	str.w	r4, [r3, #3084]	@ 0xc0c
+343c01fa:	240a      	movs	r4, #10
+343c01fc:	f8c3 4c10 	str.w	r4, [r3, #3088]	@ 0xc10
+343c0200:	4c91      	ldr	r4, [pc, #580]	@ (343c0448 <status_led_complete_sleep+0x278>)
+343c0202:	6864      	ldr	r4, [r4, #4]
+343c0204:	f8c3 4c18 	str.w	r4, [r3, #3096]	@ 0xc18
+343c0208:	f8c3 0c24 	str.w	r0, [r3, #3108]	@ 0xc24
+343c020c:	488f      	ldr	r0, [pc, #572]	@ (343c044c <status_led_complete_sleep+0x27c>)
+343c020e:	f8c3 0c98 	str.w	r0, [r3, #3224]	@ 0xc98
+343c0212:	f3bf 8f5f 	dmb	sy
+343c0216:	f100 5051 	add.w	r0, r0, #876609536	@ 0x34400000
+343c021a:	f500 1063 	add.w	r0, r0, #3719168	@ 0x38c000
+343c021e:	f600 1031 	addw	r0, r0, #2353	@ 0x931
+343c0222:	f8c3 0c00 	str.w	r0, [r3, #3072]	@ 0xc00
+343c0226:	2300      	movs	r3, #0
+343c0228:	f041 e001 	dls	lr, r1
+343c022c:	461c      	mov	r4, r3
+343c022e:	4888      	ldr	r0, [pc, #544]	@ (343c0450 <status_led_complete_sleep+0x280>)
+343c0230:	f840 4023 	str.w	r4, [r0, r3, lsl #2]
+343c0234:	3301      	adds	r3, #1
+343c0236:	f00f c805 	le	lr, 343c0230 <status_led_complete_sleep+0x60>
+343c023a:	b672      	cpsid	i
+343c023c:	4b85      	ldr	r3, [pc, #532]	@ (343c0454 <status_led_complete_sleep+0x284>)
+343c023e:	695b      	ldr	r3, [r3, #20]
+343c0240:	f413 3f40 	tst.w	r3, #196608	@ 0x30000
+343c0244:	f040 8436 	bne.w	343c0ab4 <status_led_complete_sleep+0x8e4>
+343c0248:	f3ef 8314 	mrs	r3, CONTROL
+343c024c:	f033 030c 	bics.w	r3, r3, #12
+343c0250:	f040 8430 	bne.w	343c0ab4 <status_led_complete_sleep+0x8e4>
+343c0254:	f3ef 8305 	mrs	r3, IPSR
+343c0258:	2b00      	cmp	r3, #0
+343c025a:	f040 842b 	bne.w	343c0ab4 <status_led_complete_sleep+0x8e4>
+343c025e:	f3ef 8310 	mrs	r3, PRIMASK
+343c0262:	2b01      	cmp	r3, #1
+343c0264:	f040 8426 	bne.w	343c0ab4 <status_led_complete_sleep+0x8e4>
+343c0268:	f3ef 8313 	mrs	r3, FAULTMASK
+343c026c:	2b00      	cmp	r3, #0
+343c026e:	f040 8421 	bne.w	343c0ab4 <status_led_complete_sleep+0x8e4>
+343c0272:	4b79      	ldr	r3, [pc, #484]	@ (343c0458 <status_led_complete_sleep+0x288>)
+343c0274:	6b5b      	ldr	r3, [r3, #52]	@ 0x34
+343c0276:	07db      	lsls	r3, r3, #31
+343c0278:	f100 841c 	bmi.w	343c0ab4 <status_led_complete_sleep+0x8e4>
+343c027c:	4b77      	ldr	r3, [pc, #476]	@ (343c045c <status_led_complete_sleep+0x28c>)
+343c027e:	4978      	ldr	r1, [pc, #480]	@ (343c0460 <status_led_complete_sleep+0x290>)
+343c0280:	6818      	ldr	r0, [r3, #0]
+343c0282:	4288      	cmp	r0, r1
+343c0284:	f040 80fa 	bne.w	343c047c <status_led_complete_sleep+0x2ac>
+343c0288:	6859      	ldr	r1, [r3, #4]
+343c028a:	2901      	cmp	r1, #1
+343c028c:	f040 80f6 	bne.w	343c047c <status_led_complete_sleep+0x2ac>
+343c0290:	6899      	ldr	r1, [r3, #8]
+343c0292:	2980      	cmp	r1, #128	@ 0x80
+343c0294:	f040 80f2 	bne.w	343c047c <status_led_complete_sleep+0x2ac>
+343c0298:	f8d3 00fc 	ldr.w	r0, [r3, #252]	@ 0xfc
+343c029c:	4971      	ldr	r1, [pc, #452]	@ (343c0464 <status_led_complete_sleep+0x294>)
+343c029e:	4288      	cmp	r0, r1
+343c02a0:	f040 80ec 	bne.w	343c047c <status_led_complete_sleep+0x2ac>
+343c02a4:	68d9      	ldr	r1, [r3, #12]
+343c02a6:	2902      	cmp	r1, #2
+343c02a8:	f040 80e8 	bne.w	343c047c <status_led_complete_sleep+0x2ac>
+343c02ac:	6919      	ldr	r1, [r3, #16]
+343c02ae:	2901      	cmp	r1, #1
+343c02b0:	f040 80e4 	bne.w	343c047c <status_led_complete_sleep+0x2ac>
+343c02b4:	6959      	ldr	r1, [r3, #20]
+343c02b6:	2901      	cmp	r1, #1
+343c02b8:	f040 80e0 	bne.w	343c047c <status_led_complete_sleep+0x2ac>
+343c02bc:	f8d3 10c8 	ldr.w	r1, [r3, #200]	@ 0xc8
+343c02c0:	2900      	cmp	r1, #0
+343c02c2:	f040 80db 	bne.w	343c047c <status_led_complete_sleep+0x2ac>
+343c02c6:	6999      	ldr	r1, [r3, #24]
+343c02c8:	2900      	cmp	r1, #0
+343c02ca:	f040 80d7 	bne.w	343c047c <status_led_complete_sleep+0x2ac>
+343c02ce:	69d9      	ldr	r1, [r3, #28]
+343c02d0:	2908      	cmp	r1, #8
+343c02d2:	f040 80d3 	bne.w	343c047c <status_led_complete_sleep+0x2ac>
+343c02d6:	f8d3 10ac 	ldr.w	r1, [r3, #172]	@ 0xac
+343c02da:	2901      	cmp	r1, #1
+343c02dc:	f040 80ce 	bne.w	343c047c <status_led_complete_sleep+0x2ac>
+343c02e0:	f8d3 10b0 	ldr.w	r1, [r3, #176]	@ 0xb0
+343c02e4:	2900      	cmp	r1, #0
+343c02e6:	f040 80c9 	bne.w	343c047c <status_led_complete_sleep+0x2ac>
+343c02ea:	f8d3 30b4 	ldr.w	r3, [r3, #180]	@ 0xb4
+343c02ee:	2b00      	cmp	r3, #0
+343c02f0:	f040 80c4 	bne.w	343c047c <status_led_complete_sleep+0x2ac>
+343c02f4:	4b59      	ldr	r3, [pc, #356]	@ (343c045c <status_led_complete_sleep+0x28c>)
+343c02f6:	f8d3 10bc 	ldr.w	r1, [r3, #188]	@ 0xbc
+343c02fa:	2900      	cmp	r1, #0
+343c02fc:	f040 80be 	bne.w	343c047c <status_led_complete_sleep+0x2ac>
+343c0300:	f8d3 1118 	ldr.w	r1, [r3, #280]	@ 0x118
+343c0304:	f411 3f40 	tst.w	r1, #196608	@ 0x30000
+343c0308:	f040 80b8 	bne.w	343c047c <status_led_complete_sleep+0x2ac>
+343c030c:	f8d3 1138 	ldr.w	r1, [r3, #312]	@ 0x138
+343c0310:	2901      	cmp	r1, #1
+343c0312:	f040 80b3 	bne.w	343c047c <status_led_complete_sleep+0x2ac>
+343c0316:	f8d3 0098 	ldr.w	r0, [r3, #152]	@ 0x98
+343c031a:	f8d3 109c 	ldr.w	r1, [r3, #156]	@ 0x9c
+343c031e:	4288      	cmp	r0, r1
+343c0320:	f040 80ac 	bne.w	343c047c <status_led_complete_sleep+0x2ac>
+343c0324:	f8d3 0098 	ldr.w	r0, [r3, #152]	@ 0x98
+343c0328:	f8d3 1134 	ldr.w	r1, [r3, #308]	@ 0x134
+343c032c:	4288      	cmp	r0, r1
+343c032e:	f040 80a5 	bne.w	343c047c <status_led_complete_sleep+0x2ac>
+343c0332:	f8d3 10a0 	ldr.w	r1, [r3, #160]	@ 0xa0
+343c0336:	f5b1 6f8c 	cmp.w	r1, #1120	@ 0x460
+343c033a:	f040 809f 	bne.w	343c047c <status_led_complete_sleep+0x2ac>
+343c033e:	f240 5154 	movw	r1, #1364	@ 0x554
+343c0342:	f8d3 00a4 	ldr.w	r0, [r3, #164]	@ 0xa4
+343c0346:	4288      	cmp	r0, r1
+343c0348:	f040 8098 	bne.w	343c047c <status_led_complete_sleep+0x2ac>
+343c034c:	f8d3 00a8 	ldr.w	r0, [r3, #168]	@ 0xa8
+343c0350:	4945      	ldr	r1, [pc, #276]	@ (343c0468 <status_led_complete_sleep+0x298>)
+343c0352:	4288      	cmp	r0, r1
+343c0354:	f040 8092 	bne.w	343c047c <status_led_complete_sleep+0x2ac>
+343c0358:	f8d3 10c0 	ldr.w	r1, [r3, #192]	@ 0xc0
+343c035c:	29c8      	cmp	r1, #200	@ 0xc8
+343c035e:	f040 808d 	bne.w	343c047c <status_led_complete_sleep+0x2ac>
+343c0362:	f8d3 30c4 	ldr.w	r3, [r3, #196]	@ 0xc4
+343c0366:	2b50      	cmp	r3, #80	@ 0x50
+343c0368:	f040 8088 	bne.w	343c047c <status_led_complete_sleep+0x2ac>
+343c036c:	4b35      	ldr	r3, [pc, #212]	@ (343c0444 <status_led_complete_sleep+0x274>)
+343c036e:	493f      	ldr	r1, [pc, #252]	@ (343c046c <status_led_complete_sleep+0x29c>)
+343c0370:	f8d3 0e00 	ldr.w	r0, [r3, #3584]	@ 0xe00
+343c0374:	4288      	cmp	r0, r1
+343c0376:	f040 80ce 	bne.w	343c0516 <status_led_complete_sleep+0x346>
+343c037a:	f8d3 0e1c 	ldr.w	r0, [r3, #3612]	@ 0xe1c
+343c037e:	493c      	ldr	r1, [pc, #240]	@ (343c0470 <status_led_complete_sleep+0x2a0>)
+343c0380:	4288      	cmp	r0, r1
+343c0382:	f040 80c8 	bne.w	343c0516 <status_led_complete_sleep+0x346>
+343c0386:	f646 311c 	movw	r1, #27420	@ 0x6b1c
+343c038a:	f8d3 0e20 	ldr.w	r0, [r3, #3616]	@ 0xe20
+343c038e:	4288      	cmp	r0, r1
+343c0390:	f040 80c1 	bne.w	343c0516 <status_led_complete_sleep+0x346>
+343c0394:	f8d3 1e28 	ldr.w	r1, [r3, #3624]	@ 0xe28
+343c0398:	2900      	cmp	r1, #0
+343c039a:	f040 80bc 	bne.w	343c0516 <status_led_complete_sleep+0x346>
+343c039e:	f8d3 3e2c 	ldr.w	r3, [r3, #3628]	@ 0xe2c
+343c03a2:	2b00      	cmp	r3, #0
+343c03a4:	f000 80b7 	beq.w	343c0516 <status_led_complete_sleep+0x346>
+343c03a8:	4b32      	ldr	r3, [pc, #200]	@ (343c0474 <status_led_complete_sleep+0x2a4>)
+343c03aa:	6b19      	ldr	r1, [r3, #48]	@ 0x30
+343c03ac:	2900      	cmp	r1, #0
+343c03ae:	f040 80b4 	bne.w	343c051a <status_led_complete_sleep+0x34a>
+343c03b2:	6b59      	ldr	r1, [r3, #52]	@ 0x34
+343c03b4:	2900      	cmp	r1, #0
+343c03b6:	f040 80b0 	bne.w	343c051a <status_led_complete_sleep+0x34a>
+343c03ba:	f8d3 10c4 	ldr.w	r1, [r3, #196]	@ 0xc4
+343c03be:	2900      	cmp	r1, #0
+343c03c0:	f040 80ab 	bne.w	343c051a <status_led_complete_sleep+0x34a>
+343c03c4:	6b99      	ldr	r1, [r3, #56]	@ 0x38
+343c03c6:	2901      	cmp	r1, #1
+343c03c8:	f040 80a7 	bne.w	343c051a <status_led_complete_sleep+0x34a>
+343c03cc:	6e9b      	ldr	r3, [r3, #104]	@ 0x68
+343c03ce:	2b00      	cmp	r3, #0
+343c03d0:	f040 80a3 	bne.w	343c051a <status_led_complete_sleep+0x34a>
+343c03d4:	4b27      	ldr	r3, [pc, #156]	@ (343c0474 <status_led_complete_sleep+0x2a4>)
+343c03d6:	f8d3 1098 	ldr.w	r1, [r3, #152]	@ 0x98
+343c03da:	2900      	cmp	r1, #0
+343c03dc:	f040 809d 	bne.w	343c051a <status_led_complete_sleep+0x34a>
+343c03e0:	6f99      	ldr	r1, [r3, #120]	@ 0x78
+343c03e2:	2909      	cmp	r1, #9
+343c03e4:	f040 8099 	bne.w	343c051a <status_led_complete_sleep+0x34a>
+343c03e8:	f8d3 3090 	ldr.w	r3, [r3, #144]	@ 0x90
+343c03ec:	f403 53f8 	and.w	r3, r3, #7936	@ 0x1f00
+343c03f0:	f5b3 6f10 	cmp.w	r3, #2304	@ 0x900
+343c03f4:	f040 8091 	bne.w	343c051a <status_led_complete_sleep+0x34a>
+343c03f8:	4b1f      	ldr	r3, [pc, #124]	@ (343c0478 <status_led_complete_sleep+0x2a8>)
+343c03fa:	6819      	ldr	r1, [r3, #0]
+343c03fc:	2903      	cmp	r1, #3
+343c03fe:	d11c      	bne.n	343c043a <status_led_complete_sleep+0x26a>
+343c0400:	6859      	ldr	r1, [r3, #4]
+343c0402:	290b      	cmp	r1, #11
+343c0404:	d119      	bne.n	343c043a <status_led_complete_sleep+0x26a>
+343c0406:	6899      	ldr	r1, [r3, #8]
+343c0408:	b9b9      	cbnz	r1, 343c043a <status_led_complete_sleep+0x26a>
+343c040a:	6a19      	ldr	r1, [r3, #32]
+343c040c:	2901      	cmp	r1, #1
+343c040e:	d114      	bne.n	343c043a <status_led_complete_sleep+0x26a>
+343c0410:	68d9      	ldr	r1, [r3, #12]
+343c0412:	b191      	cbz	r1, 343c043a <status_led_complete_sleep+0x26a>
+343c0414:	68d8      	ldr	r0, [r3, #12]
+343c0416:	f5a3 6380 	sub.w	r3, r3, #1024	@ 0x400
+343c041a:	f8d3 1090 	ldr.w	r1, [r3, #144]	@ 0x90
+343c041e:	4288      	cmp	r0, r1
+343c0420:	d10b      	bne.n	343c043a <status_led_complete_sleep+0x26a>
+343c0422:	f8d3 3094 	ldr.w	r3, [r3, #148]	@ 0x94
+343c0426:	b943      	cbnz	r3, 343c043a <status_led_complete_sleep+0x26a>
+343c0428:	4b13      	ldr	r3, [pc, #76]	@ (343c0478 <status_led_complete_sleep+0x2a8>)
+343c042a:	e9d3 450a 	ldrd	r4, r5, [r3, #40]	@ 0x28
+343c042e:	e953 0180 	ldrd	r0, r1, [r3, #-512]	@ 0x200
+343c0432:	428d      	cmp	r5, r1
+343c0434:	bf08      	it	eq
+343c0436:	4284      	cmpeq	r4, r0
+343c0438:	d071      	beq.n	343c051e <status_led_complete_sleep+0x34e>
+343c043a:	2406      	movs	r4, #6
+343c043c:	e01f      	b.n	343c047e <status_led_complete_sleep+0x2ae>
+343c043e:	bf00      	nop
+343c0440:	343f9c00 	.word	0x343f9c00
+343c0444:	343f9000 	.word	0x343f9000
+343c0448:	e0001000 	.word	0xe0001000
+343c044c:	17d78400 	.word	0x17d78400
+343c0450:	343f9d00 	.word	0x343f9d00
+343c0454:	e000ed00 	.word	0xe000ed00
+343c0458:	e000ef00 	.word	0xe000ef00
+343c045c:	343fa000 	.word	0x343fa000
+343c0460:	53564431 	.word	0x53564431
+343c0464:	444f4e45 	.word	0x444f4e45
+343c0468:	002e9f00 	.word	0x002e9f00
+343c046c:	534c4431 	.word	0x534c4431
+343c0470:	d7418a3a 	.word	0xd7418a3a
+343c0474:	343fa200 	.word	0x343fa200
+343c0478:	343fa400 	.word	0x343fa400
+343c047c:	2403      	movs	r4, #3
+343c047e:	4d86      	ldr	r5, [pc, #536]	@ (343c0698 <status_led_complete_sleep+0x4c8>)
+343c0480:	f8d5 1d00 	ldr.w	r1, [r5, #3328]	@ 0xd00
+343c0484:	2900      	cmp	r1, #0
+343c0486:	d14c      	bne.n	343c0522 <status_led_complete_sleep+0x352>
+343c0488:	4b84      	ldr	r3, [pc, #528]	@ (343c069c <status_led_complete_sleep+0x4cc>)
+343c048a:	1a9b      	subs	r3, r3, r2
+343c048c:	ea4f 0e93 	mov.w	lr, r3, lsr #2
+343c0490:	f10e 0e01 	add.w	lr, lr, #1
+343c0494:	f04e e001 	dls	lr, lr
+343c0498:	f842 1b04 	str.w	r1, [r2], #4
+343c049c:	f00f c005 	le	lr, 343c0498 <status_led_complete_sleep+0x2c8>
+343c04a0:	4b7f      	ldr	r3, [pc, #508]	@ (343c06a0 <status_led_complete_sleep+0x4d0>)
+343c04a2:	f8c5 3d00 	str.w	r3, [r5, #3328]	@ 0xd00
+343c04a6:	2301      	movs	r3, #1
+343c04a8:	f8c5 3d04 	str.w	r3, [r5, #3332]	@ 0xd04
+343c04ac:	f8c5 3d08 	str.w	r3, [r5, #3336]	@ 0xd08
+343c04b0:	f8c5 3d0c 	str.w	r3, [r5, #3340]	@ 0xd0c
+343c04b4:	4b7b      	ldr	r3, [pc, #492]	@ (343c06a4 <status_led_complete_sleep+0x4d4>)
+343c04b6:	685b      	ldr	r3, [r3, #4]
+343c04b8:	f8c5 3d14 	str.w	r3, [r5, #3348]	@ 0xd14
+343c04bc:	4b7a      	ldr	r3, [pc, #488]	@ (343c06a8 <status_led_complete_sleep+0x4d8>)
+343c04be:	695b      	ldr	r3, [r3, #20]
+343c04c0:	f8c5 3d1c 	str.w	r3, [r5, #3356]	@ 0xd1c
+343c04c4:	f3ef 8314 	mrs	r3, CONTROL
+343c04c8:	f8c5 3d20 	str.w	r3, [r5, #3360]	@ 0xd20
+343c04cc:	f3ef 8305 	mrs	r3, IPSR
+343c04d0:	f8c5 3d24 	str.w	r3, [r5, #3364]	@ 0xd24
+343c04d4:	f3ef 8310 	mrs	r3, PRIMASK
+343c04d8:	f8c5 3d28 	str.w	r3, [r5, #3368]	@ 0xd28
+343c04dc:	4b73      	ldr	r3, [pc, #460]	@ (343c06ac <status_led_complete_sleep+0x4dc>)
+343c04de:	6b5b      	ldr	r3, [r3, #52]	@ 0x34
+343c04e0:	f8c5 3df0 	str.w	r3, [r5, #3568]	@ 0xdf0
+343c04e4:	4b72      	ldr	r3, [pc, #456]	@ (343c06b0 <status_led_complete_sleep+0x4e0>)
+343c04e6:	f8d3 30fc 	ldr.w	r3, [r3, #252]	@ 0xfc
+343c04ea:	f8c5 3d98 	str.w	r3, [r5, #3480]	@ 0xd98
+343c04ee:	f8d5 3e2c 	ldr.w	r3, [r5, #3628]	@ 0xe2c
+343c04f2:	f8c5 3d9c 	str.w	r3, [r5, #3484]	@ 0xd9c
+343c04f6:	4b6f      	ldr	r3, [pc, #444]	@ (343c06b4 <status_led_complete_sleep+0x4e4>)
+343c04f8:	6b9b      	ldr	r3, [r3, #56]	@ 0x38
+343c04fa:	f8c5 3da0 	str.w	r3, [r5, #3488]	@ 0xda0
+343c04fe:	4b6e      	ldr	r3, [pc, #440]	@ (343c06b8 <status_led_complete_sleep+0x4e8>)
+343c0500:	6a1b      	ldr	r3, [r3, #32]
+343c0502:	f8c5 3da4 	str.w	r3, [r5, #3492]	@ 0xda4
+343c0506:	2c00      	cmp	r4, #0
+343c0508:	d045      	beq.n	343c0596 <status_led_complete_sleep+0x3c6>
+343c050a:	4621      	mov	r1, r4
+343c050c:	486b      	ldr	r0, [pc, #428]	@ (343c06bc <status_led_complete_sleep+0x4ec>)
+343c050e:	f7ff fdab 	bl	343c0068 <finish>
+343c0512:	4604      	mov	r4, r0
+343c0514:	e028      	b.n	343c0568 <status_led_complete_sleep+0x398>
+343c0516:	2404      	movs	r4, #4
+343c0518:	e7b1      	b.n	343c047e <status_led_complete_sleep+0x2ae>
+343c051a:	2405      	movs	r4, #5
+343c051c:	e7af      	b.n	343c047e <status_led_complete_sleep+0x2ae>
+343c051e:	2400      	movs	r4, #0
+343c0520:	e7ad      	b.n	343c047e <status_led_complete_sleep+0x2ae>
+343c0522:	f8d5 2d00 	ldr.w	r2, [r5, #3328]	@ 0xd00
+343c0526:	4b5e      	ldr	r3, [pc, #376]	@ (343c06a0 <status_led_complete_sleep+0x4d0>)
+343c0528:	429a      	cmp	r2, r3
+343c052a:	f040 82c5 	bne.w	343c0ab8 <status_led_complete_sleep+0x8e8>
+343c052e:	f8d5 3d04 	ldr.w	r3, [r5, #3332]	@ 0xd04
+343c0532:	2b01      	cmp	r3, #1
+343c0534:	f040 82c0 	bne.w	343c0ab8 <status_led_complete_sleep+0x8e8>
+343c0538:	f8d5 3d08 	ldr.w	r3, [r5, #3336]	@ 0xd08
+343c053c:	2b02      	cmp	r3, #2
+343c053e:	f040 82bb 	bne.w	343c0ab8 <status_led_complete_sleep+0x8e8>
+343c0542:	f8d5 3d10 	ldr.w	r3, [r5, #3344]	@ 0xd10
+343c0546:	2b00      	cmp	r3, #0
+343c0548:	f040 82b6 	bne.w	343c0ab8 <status_led_complete_sleep+0x8e8>
+343c054c:	f8d5 2dfc 	ldr.w	r2, [r5, #3580]	@ 0xdfc
+343c0550:	4b5b      	ldr	r3, [pc, #364]	@ (343c06c0 <status_led_complete_sleep+0x4f0>)
+343c0552:	429a      	cmp	r2, r3
+343c0554:	f040 82b0 	bne.w	343c0ab8 <status_led_complete_sleep+0x8e8>
+343c0558:	b934      	cbnz	r4, 343c0568 <status_led_complete_sleep+0x398>
+343c055a:	f8d5 2d9c 	ldr.w	r2, [r5, #3484]	@ 0xd9c
+343c055e:	f8d5 3e2c 	ldr.w	r3, [r5, #3628]	@ 0xe2c
+343c0562:	429a      	cmp	r2, r3
+343c0564:	d00b      	beq.n	343c057e <status_led_complete_sleep+0x3ae>
+343c0566:	240d      	movs	r4, #13
+343c0568:	4b4b      	ldr	r3, [pc, #300]	@ (343c0698 <status_led_complete_sleep+0x4c8>)
+343c056a:	f8c3 4c28 	str.w	r4, [r3, #3112]	@ 0xc28
+343c056e:	f8d3 4c28 	ldr.w	r4, [r3, #3112]	@ 0xc28
+343c0572:	2c00      	cmp	r4, #0
+343c0574:	f000 82a2 	beq.w	343c0abc <status_led_complete_sleep+0x8ec>
+343c0578:	2001      	movs	r0, #1
+343c057a:	f7ff fe15 	bl	343c01a8 <refused>
+343c057e:	f7ff fd8d 	bl	343c009c <off_state>
+343c0582:	2800      	cmp	r0, #0
+343c0584:	d0ef      	beq.n	343c0566 <status_led_complete_sleep+0x396>
+343c0586:	f8d5 3df4 	ldr.w	r3, [r5, #3572]	@ 0xdf4
+343c058a:	3301      	adds	r3, #1
+343c058c:	f8c5 3df4 	str.w	r3, [r5, #3572]	@ 0xdf4
+343c0590:	f3bf 8f4f 	dsb	sy
+343c0594:	e7e8      	b.n	343c0568 <status_led_complete_sleep+0x398>
+343c0596:	4b4b      	ldr	r3, [pc, #300]	@ (343c06c4 <status_led_complete_sleep+0x4f4>)
+343c0598:	4a4b      	ldr	r2, [pc, #300]	@ (343c06c8 <status_led_complete_sleep+0x4f8>)
+343c059a:	f8d3 1900 	ldr.w	r1, [r3, #2304]	@ 0x900
+343c059e:	4291      	cmp	r1, r2
+343c05a0:	d10e      	bne.n	343c05c0 <status_led_complete_sleep+0x3f0>
+343c05a2:	f8d3 2904 	ldr.w	r2, [r3, #2308]	@ 0x904
+343c05a6:	2a01      	cmp	r2, #1
+343c05a8:	d10a      	bne.n	343c05c0 <status_led_complete_sleep+0x3f0>
+343c05aa:	f8d3 2908 	ldr.w	r2, [r3, #2312]	@ 0x908
+343c05ae:	2a04      	cmp	r2, #4
+343c05b0:	d106      	bne.n	343c05c0 <status_led_complete_sleep+0x3f0>
+343c05b2:	f8d3 2930 	ldr.w	r2, [r3, #2352]	@ 0x930
+343c05b6:	2a03      	cmp	r2, #3
+343c05b8:	d102      	bne.n	343c05c0 <status_led_complete_sleep+0x3f0>
+343c05ba:	f8d3 393c 	ldr.w	r3, [r3, #2364]	@ 0x93c
+343c05be:	b10b      	cbz	r3, 343c05c4 <status_led_complete_sleep+0x3f4>
+343c05c0:	2109      	movs	r1, #9
+343c05c2:	e7a3      	b.n	343c050c <status_led_complete_sleep+0x33c>
+343c05c4:	2302      	movs	r3, #2
+343c05c6:	f8c5 3d0c 	str.w	r3, [r5, #3340]	@ 0xd0c
+343c05ca:	4b40      	ldr	r3, [pc, #256]	@ (343c06cc <status_led_complete_sleep+0x4fc>)
+343c05cc:	f8d3 2278 	ldr.w	r2, [r3, #632]	@ 0x278
+343c05d0:	f8c5 2d2c 	str.w	r2, [r5, #3372]	@ 0xd2c
+343c05d4:	f8d3 227c 	ldr.w	r2, [r3, #636]	@ 0x27c
+343c05d8:	f8c5 2d30 	str.w	r2, [r5, #3376]	@ 0xd30
+343c05dc:	f8d3 223c 	ldr.w	r2, [r3, #572]	@ 0x23c
+343c05e0:	f8c5 2d34 	str.w	r2, [r5, #3380]	@ 0xd34
+343c05e4:	f8d3 2240 	ldr.w	r2, [r3, #576]	@ 0x240
+343c05e8:	f8c5 2d38 	str.w	r2, [r5, #3384]	@ 0xd38
+343c05ec:	f8d3 2264 	ldr.w	r2, [r3, #612]	@ 0x264
+343c05f0:	f8c5 2d3c 	str.w	r2, [r5, #3388]	@ 0xd3c
+343c05f4:	f8d3 2224 	ldr.w	r2, [r3, #548]	@ 0x224
+343c05f8:	f8c5 2d40 	str.w	r2, [r5, #3392]	@ 0xd40
+343c05fc:	f8d3 2260 	ldr.w	r2, [r3, #608]	@ 0x260
+343c0600:	f8c5 2d44 	str.w	r2, [r5, #3396]	@ 0xd44
+343c0604:	f8d3 2220 	ldr.w	r2, [r3, #544]	@ 0x220
+343c0608:	f8c5 2d48 	str.w	r2, [r5, #3400]	@ 0xd48
+343c060c:	f8d3 225c 	ldr.w	r2, [r3, #604]	@ 0x25c
+343c0610:	f8c5 2d4c 	str.w	r2, [r5, #3404]	@ 0xd4c
+343c0614:	f8d3 321c 	ldr.w	r3, [r3, #540]	@ 0x21c
+343c0618:	f8c5 3d50 	str.w	r3, [r5, #3408]	@ 0xd50
+343c061c:	f8d5 3d2c 	ldr.w	r3, [r5, #3372]	@ 0xd2c
+343c0620:	079f      	lsls	r7, r3, #30
+343c0622:	d537      	bpl.n	343c0694 <status_led_complete_sleep+0x4c4>
+343c0624:	f8d5 3d30 	ldr.w	r3, [r5, #3376]	@ 0xd30
+343c0628:	f003 0344 	and.w	r3, r3, #68	@ 0x44
+343c062c:	2b44      	cmp	r3, #68	@ 0x44
+343c062e:	d131      	bne.n	343c0694 <status_led_complete_sleep+0x4c4>
+343c0630:	f8d5 3d34 	ldr.w	r3, [r5, #3380]	@ 0xd34
+343c0634:	f013 0f44 	tst.w	r3, #68	@ 0x44
+343c0638:	d12c      	bne.n	343c0694 <status_led_complete_sleep+0x4c4>
+343c063a:	4b17      	ldr	r3, [pc, #92]	@ (343c0698 <status_led_complete_sleep+0x4c8>)
+343c063c:	f8d3 2d38 	ldr.w	r2, [r3, #3384]	@ 0xd38
+343c0640:	f402 3240 	and.w	r2, r2, #196608	@ 0x30000
+343c0644:	f5b2 3f40 	cmp.w	r2, #196608	@ 0x30000
+343c0648:	d124      	bne.n	343c0694 <status_led_complete_sleep+0x4c4>
+343c064a:	f8d3 2d3c 	ldr.w	r2, [r3, #3388]	@ 0xd3c
+343c064e:	0256      	lsls	r6, r2, #9
+343c0650:	d520      	bpl.n	343c0694 <status_led_complete_sleep+0x4c4>
+343c0652:	f8d3 2d40 	ldr.w	r2, [r3, #3392]	@ 0xd40
+343c0656:	0255      	lsls	r5, r2, #9
+343c0658:	d41c      	bmi.n	343c0694 <status_led_complete_sleep+0x4c4>
+343c065a:	f242 0220 	movw	r2, #8224	@ 0x2020
+343c065e:	f8d3 1d44 	ldr.w	r1, [r3, #3396]	@ 0xd44
+343c0662:	ea01 0002 	and.w	r0, r1, r2
+343c0666:	438a      	bics	r2, r1
+343c0668:	d114      	bne.n	343c0694 <status_led_complete_sleep+0x4c4>
+343c066a:	f8d3 1d44 	ldr.w	r1, [r3, #3396]	@ 0xd44
+343c066e:	4a18      	ldr	r2, [pc, #96]	@ (343c06d0 <status_led_complete_sleep+0x500>)
+343c0670:	4211      	tst	r1, r2
+343c0672:	d10f      	bne.n	343c0694 <status_led_complete_sleep+0x4c4>
+343c0674:	f8d3 2d48 	ldr.w	r2, [r3, #3400]	@ 0xd48
+343c0678:	4202      	tst	r2, r0
+343c067a:	d10b      	bne.n	343c0694 <status_led_complete_sleep+0x4c4>
+343c067c:	f246 0206 	movw	r2, #24582	@ 0x6006
+343c0680:	f8d3 1d4c 	ldr.w	r1, [r3, #3404]	@ 0xd4c
+343c0684:	ea01 0002 	and.w	r0, r1, r2
+343c0688:	438a      	bics	r2, r1
+343c068a:	d103      	bne.n	343c0694 <status_led_complete_sleep+0x4c4>
+343c068c:	f8d3 2d50 	ldr.w	r2, [r3, #3408]	@ 0xd50
+343c0690:	4202      	tst	r2, r0
+343c0692:	d01f      	beq.n	343c06d4 <status_led_complete_sleep+0x504>
+343c0694:	2108      	movs	r1, #8
+343c0696:	e739      	b.n	343c050c <status_led_complete_sleep+0x33c>
+343c0698:	343f9000 	.word	0x343f9000
+343c069c:	343f9dfc 	.word	0x343f9dfc
+343c06a0:	504c5031 	.word	0x504c5031
+343c06a4:	e0001000 	.word	0xe0001000
+343c06a8:	e000ed00 	.word	0xe000ed00
+343c06ac:	e000ef00 	.word	0xe000ef00
+343c06b0:	343fa000 	.word	0x343fa000
+343c06b4:	343fa200 	.word	0x343fa200
+343c06b8:	343fa400 	.word	0x343fa400
+343c06bc:	343f9d00 	.word	0x343f9d00
+343c06c0:	50444f4e 	.word	0x50444f4e
+343c06c4:	343f8000 	.word	0x343f8000
+343c06c8:	46534431 	.word	0x46534431
+343c06cc:	56028000 	.word	0x56028000
+343c06d0:	00021080 	.word	0x00021080
+343c06d4:	2203      	movs	r2, #3
+343c06d6:	f8c3 2d0c 	str.w	r2, [r3, #3340]	@ 0xd0c
+343c06da:	4a88      	ldr	r2, [pc, #544]	@ (343c08fc <status_led_complete_sleep+0x72c>)
+343c06dc:	f8d2 1090 	ldr.w	r1, [r2, #144]	@ 0x90
+343c06e0:	f8c3 1d54 	str.w	r1, [r3, #3412]	@ 0xd54
+343c06e4:	f8d2 1094 	ldr.w	r1, [r2, #148]	@ 0x94
+343c06e8:	f8c3 1d58 	str.w	r1, [r3, #3416]	@ 0xd58
+343c06ec:	6811      	ldr	r1, [r2, #0]
+343c06ee:	f8c3 1d5c 	str.w	r1, [r3, #3420]	@ 0xd5c
+343c06f2:	6852      	ldr	r2, [r2, #4]
+343c06f4:	f8c3 2d60 	str.w	r2, [r3, #3424]	@ 0xd60
+343c06f8:	4a81      	ldr	r2, [pc, #516]	@ (343c0900 <status_led_complete_sleep+0x730>)
+343c06fa:	6812      	ldr	r2, [r2, #0]
+343c06fc:	f8c3 2d64 	str.w	r2, [r3, #3428]	@ 0xd64
+343c0700:	4a80      	ldr	r2, [pc, #512]	@ (343c0904 <status_led_complete_sleep+0x734>)
+343c0702:	f8d2 13f4 	ldr.w	r1, [r2, #1012]	@ 0x3f4
+343c0706:	f8c3 1d68 	str.w	r1, [r3, #3432]	@ 0xd68
+343c070a:	f8d2 1500 	ldr.w	r1, [r2, #1280]	@ 0x500
+343c070e:	f8c3 1d6c 	str.w	r1, [r3, #3436]	@ 0xd6c
+343c0712:	f8d2 2404 	ldr.w	r2, [r2, #1028]	@ 0x404
+343c0716:	f8c3 2d70 	str.w	r2, [r3, #3440]	@ 0xd70
+343c071a:	4a7b      	ldr	r2, [pc, #492]	@ (343c0908 <status_led_complete_sleep+0x738>)
+343c071c:	6991      	ldr	r1, [r2, #24]
+343c071e:	f8c3 1d74 	str.w	r1, [r3, #3444]	@ 0xd74
+343c0722:	6812      	ldr	r2, [r2, #0]
+343c0724:	f8c3 2d78 	str.w	r2, [r3, #3448]	@ 0xd78
+343c0728:	4a78      	ldr	r2, [pc, #480]	@ (343c090c <status_led_complete_sleep+0x73c>)
+343c072a:	6a11      	ldr	r1, [r2, #32]
+343c072c:	f8c3 1d7c 	str.w	r1, [r3, #3452]	@ 0xd7c
+343c0730:	6812      	ldr	r2, [r2, #0]
+343c0732:	f8c3 2d80 	str.w	r2, [r3, #3456]	@ 0xd80
+343c0736:	4a76      	ldr	r2, [pc, #472]	@ (343c0910 <status_led_complete_sleep+0x740>)
+343c0738:	6911      	ldr	r1, [r2, #16]
+343c073a:	f8c3 1d84 	str.w	r1, [r3, #3460]	@ 0xd84
+343c073e:	6952      	ldr	r2, [r2, #20]
+343c0740:	f8c3 2d88 	str.w	r2, [r3, #3464]	@ 0xd88
+343c0744:	4a73      	ldr	r2, [pc, #460]	@ (343c0914 <status_led_complete_sleep+0x744>)
+343c0746:	6911      	ldr	r1, [r2, #16]
+343c0748:	f8c3 1d8c 	str.w	r1, [r3, #3468]	@ 0xd8c
+343c074c:	6812      	ldr	r2, [r2, #0]
+343c074e:	f8c3 2d90 	str.w	r2, [r3, #3472]	@ 0xd90
+343c0752:	4a71      	ldr	r2, [pc, #452]	@ (343c0918 <status_led_complete_sleep+0x748>)
+343c0754:	6912      	ldr	r2, [r2, #16]
+343c0756:	f8c3 2d94 	str.w	r2, [r3, #3476]	@ 0xd94
+343c075a:	f8d3 2d54 	ldr.w	r2, [r3, #3412]	@ 0xd54
+343c075e:	f412 1ff0 	tst.w	r2, #1966080	@ 0x1e0000
+343c0762:	f47f af2d 	bne.w	343c05c0 <status_led_complete_sleep+0x3f0>
+343c0766:	f8d3 3d68 	ldr.w	r3, [r3, #3432]	@ 0xd68
+343c076a:	f003 3380 	and.w	r3, r3, #2155905152	@ 0x80808080
+343c076e:	f023 0380 	bic.w	r3, r3, #128	@ 0x80
+343c0772:	2b00      	cmp	r3, #0
+343c0774:	f47f af24 	bne.w	343c05c0 <status_led_complete_sleep+0x3f0>
+343c0778:	4b68      	ldr	r3, [pc, #416]	@ (343c091c <status_led_complete_sleep+0x74c>)
+343c077a:	f8d3 2d6c 	ldr.w	r2, [r3, #3436]	@ 0xd6c
+343c077e:	0710      	lsls	r0, r2, #28
+343c0780:	f53f af1e 	bmi.w	343c05c0 <status_led_complete_sleep+0x3f0>
+343c0784:	f8d3 2d70 	ldr.w	r2, [r3, #3440]	@ 0xd70
+343c0788:	2a00      	cmp	r2, #0
+343c078a:	f6ff af19 	blt.w	343c05c0 <status_led_complete_sleep+0x3f0>
+343c078e:	4a5d      	ldr	r2, [pc, #372]	@ (343c0904 <status_led_complete_sleep+0x734>)
+343c0790:	f8d2 1900 	ldr.w	r1, [r2, #2304]	@ 0x900
+343c0794:	0709      	lsls	r1, r1, #28
+343c0796:	f53f af13 	bmi.w	343c05c0 <status_led_complete_sleep+0x3f0>
+343c079a:	f8d2 1d00 	ldr.w	r1, [r2, #3328]	@ 0xd00
+343c079e:	070f      	lsls	r7, r1, #28
+343c07a0:	f53f af0e 	bmi.w	343c05c0 <status_led_complete_sleep+0x3f0>
+343c07a4:	f8d2 1804 	ldr.w	r1, [r2, #2052]	@ 0x804
+343c07a8:	2900      	cmp	r1, #0
+343c07aa:	f6ff af09 	blt.w	343c05c0 <status_led_complete_sleep+0x3f0>
+343c07ae:	f8d2 2c04 	ldr.w	r2, [r2, #3076]	@ 0xc04
+343c07b2:	2a00      	cmp	r2, #0
+343c07b4:	f6ff af04 	blt.w	343c05c0 <status_led_complete_sleep+0x3f0>
+343c07b8:	f8d3 2d60 	ldr.w	r2, [r3, #3424]	@ 0xd60
+343c07bc:	2a03      	cmp	r2, #3
+343c07be:	f47f aeff 	bne.w	343c05c0 <status_led_complete_sleep+0x3f0>
+343c07c2:	f8d3 2d64 	ldr.w	r2, [r3, #3428]	@ 0xd64
+343c07c6:	0796      	lsls	r6, r2, #30
+343c07c8:	f57f aefa 	bpl.w	343c05c0 <status_led_complete_sleep+0x3f0>
+343c07cc:	f8d3 2d74 	ldr.w	r2, [r3, #3444]	@ 0xd74
+343c07d0:	0415      	lsls	r5, r2, #16
+343c07d2:	d501      	bpl.n	343c07d8 <status_led_complete_sleep+0x608>
+343c07d4:	210a      	movs	r1, #10
+343c07d6:	e699      	b.n	343c050c <status_led_complete_sleep+0x33c>
+343c07d8:	f8d3 2d7c 	ldr.w	r2, [r3, #3452]	@ 0xd7c
+343c07dc:	f647 7320 	movw	r3, #32544	@ 0x7f20
+343c07e0:	421a      	tst	r2, r3
+343c07e2:	d122      	bne.n	343c082a <status_led_complete_sleep+0x65a>
+343c07e4:	4a4d      	ldr	r2, [pc, #308]	@ (343c091c <status_led_complete_sleep+0x74c>)
+343c07e6:	4b4e      	ldr	r3, [pc, #312]	@ (343c0920 <status_led_complete_sleep+0x750>)
+343c07e8:	f8d2 1d80 	ldr.w	r1, [r2, #3456]	@ 0xd80
+343c07ec:	4299      	cmp	r1, r3
+343c07ee:	d11c      	bne.n	343c082a <status_led_complete_sleep+0x65a>
+343c07f0:	4b46      	ldr	r3, [pc, #280]	@ (343c090c <status_led_complete_sleep+0x73c>)
+343c07f2:	6899      	ldr	r1, [r3, #8]
+343c07f4:	f5b1 1ff8 	cmp.w	r1, #2031616	@ 0x1f0000
+343c07f8:	d117      	bne.n	343c082a <status_led_complete_sleep+0x65a>
+343c07fa:	68d9      	ldr	r1, [r3, #12]
+343c07fc:	2901      	cmp	r1, #1
+343c07fe:	d114      	bne.n	343c082a <status_led_complete_sleep+0x65a>
+343c0800:	f8d3 0100 	ldr.w	r0, [r3, #256]	@ 0x100
+343c0804:	f101 7180 	add.w	r1, r1, #16777216	@ 0x1000000
+343c0808:	f501 5104 	add.w	r1, r1, #8448	@ 0x2100
+343c080c:	4288      	cmp	r0, r1
+343c080e:	d10c      	bne.n	343c082a <status_led_complete_sleep+0x65a>
+343c0810:	f8d3 1108 	ldr.w	r1, [r3, #264]	@ 0x108
+343c0814:	2908      	cmp	r1, #8
+343c0816:	d108      	bne.n	343c082a <status_led_complete_sleep+0x65a>
+343c0818:	f8d3 3110 	ldr.w	r3, [r3, #272]	@ 0x110
+343c081c:	2b0b      	cmp	r3, #11
+343c081e:	d104      	bne.n	343c082a <status_led_complete_sleep+0x65a>
+343c0820:	4b40      	ldr	r3, [pc, #256]	@ (343c0924 <status_led_complete_sleep+0x754>)
+343c0822:	f8d3 3400 	ldr.w	r3, [r3, #1024]	@ 0x400
+343c0826:	2b02      	cmp	r3, #2
+343c0828:	d001      	beq.n	343c082e <status_led_complete_sleep+0x65e>
+343c082a:	210b      	movs	r1, #11
+343c082c:	e66e      	b.n	343c050c <status_led_complete_sleep+0x33c>
+343c082e:	4938      	ldr	r1, [pc, #224]	@ (343c0910 <status_led_complete_sleep+0x740>)
+343c0830:	680b      	ldr	r3, [r1, #0]
+343c0832:	f403 6340 	and.w	r3, r3, #3072	@ 0xc00
+343c0836:	f5b3 6f80 	cmp.w	r3, #1024	@ 0x400
+343c083a:	d125      	bne.n	343c0888 <status_led_complete_sleep+0x6b8>
+343c083c:	684b      	ldr	r3, [r1, #4]
+343c083e:	0698      	lsls	r0, r3, #26
+343c0840:	d422      	bmi.n	343c0888 <status_led_complete_sleep+0x6b8>
+343c0842:	f8d2 3d90 	ldr.w	r3, [r2, #3472]	@ 0xd90
+343c0846:	f242 02a8 	movw	r2, #8360	@ 0x20a8
+343c084a:	f423 6370 	bic.w	r3, r3, #3840	@ 0xf00
+343c084e:	f023 0303 	bic.w	r3, r3, #3
+343c0852:	049b      	lsls	r3, r3, #18
+343c0854:	0c9b      	lsrs	r3, r3, #18
+343c0856:	4293      	cmp	r3, r2
+343c0858:	d116      	bne.n	343c0888 <status_led_complete_sleep+0x6b8>
+343c085a:	482e      	ldr	r0, [pc, #184]	@ (343c0914 <status_led_complete_sleep+0x744>)
+343c085c:	6842      	ldr	r2, [r0, #4]
+343c085e:	f012 024e 	ands.w	r2, r2, #78	@ 0x4e
+343c0862:	d111      	bne.n	343c0888 <status_led_complete_sleep+0x6b8>
+343c0864:	6a01      	ldr	r1, [r0, #32]
+343c0866:	4b30      	ldr	r3, [pc, #192]	@ (343c0928 <status_led_complete_sleep+0x758>)
+343c0868:	400b      	ands	r3, r1
+343c086a:	4930      	ldr	r1, [pc, #192]	@ (343c092c <status_led_complete_sleep+0x75c>)
+343c086c:	428b      	cmp	r3, r1
+343c086e:	d10b      	bne.n	343c0888 <status_led_complete_sleep+0x6b8>
+343c0870:	4d2f      	ldr	r5, [pc, #188]	@ (343c0930 <status_led_complete_sleep+0x760>)
+343c0872:	682b      	ldr	r3, [r5, #0]
+343c0874:	f403 0370 	and.w	r3, r3, #15728640	@ 0xf00000
+343c0878:	f5b3 0f20 	cmp.w	r3, #10485760	@ 0xa00000
+343c087c:	d104      	bne.n	343c0888 <status_led_complete_sleep+0x6b8>
+343c087e:	4b27      	ldr	r3, [pc, #156]	@ (343c091c <status_led_complete_sleep+0x74c>)
+343c0880:	f8d3 1d94 	ldr.w	r1, [r3, #3476]	@ 0xd94
+343c0884:	06c9      	lsls	r1, r1, #27
+343c0886:	d401      	bmi.n	343c088c <status_led_complete_sleep+0x6bc>
+343c0888:	210c      	movs	r1, #12
+343c088a:	e63f      	b.n	343c050c <status_led_complete_sleep+0x33c>
+343c088c:	2104      	movs	r1, #4
+343c088e:	f8c3 1d0c 	str.w	r1, [r3, #3340]	@ 0xd0c
+343c0892:	2101      	movs	r1, #1
+343c0894:	f8c3 1df8 	str.w	r1, [r3, #3576]	@ 0xdf8
+343c0898:	f3bf 8f4f 	dsb	sy
+343c089c:	4917      	ldr	r1, [pc, #92]	@ (343c08fc <status_led_complete_sleep+0x72c>)
+343c089e:	4e19      	ldr	r6, [pc, #100]	@ (343c0904 <status_led_complete_sleep+0x734>)
+343c08a0:	f8c1 2080 	str.w	r2, [r1, #128]	@ 0x80
+343c08a4:	f8c1 2084 	str.w	r2, [r1, #132]	@ 0x84
+343c08a8:	f8c6 23f0 	str.w	r2, [r6, #1008]	@ 0x3f0
+343c08ac:	f8c6 25f4 	str.w	r2, [r6, #1524]	@ 0x5f4
+343c08b0:	f8c6 29f4 	str.w	r2, [r6, #2548]	@ 0x9f4
+343c08b4:	f8c6 2df4 	str.w	r2, [r6, #3572]	@ 0xdf4
+343c08b8:	680e      	ldr	r6, [r1, #0]
+343c08ba:	f026 0601 	bic.w	r6, r6, #1
+343c08be:	600e      	str	r6, [r1, #0]
+343c08c0:	4e0f      	ldr	r6, [pc, #60]	@ (343c0900 <status_led_complete_sleep+0x730>)
+343c08c2:	6837      	ldr	r7, [r6, #0]
+343c08c4:	f027 0702 	bic.w	r7, r7, #2
+343c08c8:	6037      	str	r7, [r6, #0]
+343c08ca:	604a      	str	r2, [r1, #4]
+343c08cc:	f3bf 8f4f 	dsb	sy
+343c08d0:	680a      	ldr	r2, [r1, #0]
+343c08d2:	f8c3 2db0 	str.w	r2, [r3, #3504]	@ 0xdb0
+343c08d6:	6832      	ldr	r2, [r6, #0]
+343c08d8:	f8c3 2dac 	str.w	r2, [r3, #3500]	@ 0xdac
+343c08dc:	684a      	ldr	r2, [r1, #4]
+343c08de:	f8c3 2da8 	str.w	r2, [r3, #3496]	@ 0xda8
+343c08e2:	f8d3 2db0 	ldr.w	r2, [r3, #3504]	@ 0xdb0
+343c08e6:	07d2      	lsls	r2, r2, #31
+343c08e8:	d406      	bmi.n	343c08f8 <status_led_complete_sleep+0x728>
+343c08ea:	f8d3 2dac 	ldr.w	r2, [r3, #3500]	@ 0xdac
+343c08ee:	0797      	lsls	r7, r2, #30
+343c08f0:	d402      	bmi.n	343c08f8 <status_led_complete_sleep+0x728>
+343c08f2:	f8d3 2da8 	ldr.w	r2, [r3, #3496]	@ 0xda8
+343c08f6:	b1ea      	cbz	r2, 343c0934 <status_led_complete_sleep+0x764>
+343c08f8:	210d      	movs	r1, #13
+343c08fa:	e607      	b.n	343c050c <status_led_complete_sleep+0x33c>
+343c08fc:	58006000 	.word	0x58006000
+343c0900:	58007000 	.word	0x58007000
+343c0904:	58002000 	.word	0x58002000
+343c0908:	50005800 	.word	0x50005800
+343c090c:	58025000 	.word	0x58025000
+343c0910:	56023800 	.word	0x56023800
+343c0914:	56023400 	.word	0x56023400
+343c0918:	56020800 	.word	0x56020800
+343c091c:	343f9000 	.word	0x343f9000
+343c0920:	10000001 	.word	0x10000001
+343c0924:	5802b000 	.word	0x5802b000
+343c0928:	0f00fff0 	.word	0x0f00fff0
+343c092c:	09009990 	.word	0x09009990
+343c0930:	56020400 	.word	0x56020400
+343c0934:	f44f 1100 	mov.w	r1, #2097152	@ 0x200000
+343c0938:	4ab5      	ldr	r2, [pc, #724]	@ (343c0c10 <status_led_complete_sleep+0xa40>)
+343c093a:	6191      	str	r1, [r2, #24]
+343c093c:	6891      	ldr	r1, [r2, #8]
+343c093e:	f421 6140 	bic.w	r1, r1, #3072	@ 0xc00
+343c0942:	6091      	str	r1, [r2, #8]
+343c0944:	f3bf 8f4f 	dsb	sy
+343c0948:	6912      	ldr	r2, [r2, #16]
+343c094a:	f8c3 2dbc 	str.w	r2, [r3, #3516]	@ 0xdbc
+343c094e:	f8d3 2dbc 	ldr.w	r2, [r3, #3516]	@ 0xdbc
+343c0952:	0696      	lsls	r6, r2, #26
+343c0954:	d4d0      	bmi.n	343c08f8 <status_led_complete_sleep+0x728>
+343c0956:	2144      	movs	r1, #68	@ 0x44
+343c0958:	4fae      	ldr	r7, [pc, #696]	@ (343c0c14 <status_led_complete_sleep+0xa44>)
+343c095a:	f8c7 1a3c 	str.w	r1, [r7, #2620]	@ 0xa3c
+343c095e:	f3bf 8f4f 	dsb	sy
+343c0962:	4aad      	ldr	r2, [pc, #692]	@ (343c0c18 <status_led_complete_sleep+0xa48>)
+343c0964:	f8c2 127c 	str.w	r1, [r2, #636]	@ 0x27c
+343c0968:	f8c2 12bc 	str.w	r1, [r2, #700]	@ 0x2bc
+343c096c:	f44f 3140 	mov.w	r1, #196608	@ 0x30000
+343c0970:	f8c2 1240 	str.w	r1, [r2, #576]	@ 0x240
+343c0974:	f3bf 8f4f 	dsb	sy
+343c0978:	2105      	movs	r1, #5
+343c097a:	f8c3 1d0c 	str.w	r1, [r3, #3340]	@ 0xd0c
+343c097e:	49a7      	ldr	r1, [pc, #668]	@ (343c0c1c <status_led_complete_sleep+0xa4c>)
+343c0980:	680e      	ldr	r6, [r1, #0]
+343c0982:	f026 0601 	bic.w	r6, r6, #1
+343c0986:	600e      	str	r6, [r1, #0]
+343c0988:	f3bf 8f4f 	dsb	sy
+343c098c:	6809      	ldr	r1, [r1, #0]
+343c098e:	f8c3 1db4 	str.w	r1, [r3, #3508]	@ 0xdb4
+343c0992:	f8d3 1db4 	ldr.w	r1, [r3, #3508]	@ 0xdb4
+343c0996:	07c9      	lsls	r1, r1, #31
+343c0998:	d4ae      	bmi.n	343c08f8 <status_led_complete_sleep+0x728>
+343c099a:	6829      	ldr	r1, [r5, #0]
+343c099c:	f441 0170 	orr.w	r1, r1, #15728640	@ 0xf00000
+343c09a0:	6029      	str	r1, [r5, #0]
+343c09a2:	68e9      	ldr	r1, [r5, #12]
+343c09a4:	f421 0170 	bic.w	r1, r1, #15728640	@ 0xf00000
+343c09a8:	60e9      	str	r1, [r5, #12]
+343c09aa:	f44f 0180 	mov.w	r1, #4194304	@ 0x400000
+343c09ae:	f8c7 1a24 	str.w	r1, [r7, #2596]	@ 0xa24
+343c09b2:	f3bf 8f4f 	dsb	sy
+343c09b6:	f8c2 1264 	str.w	r1, [r2, #612]	@ 0x264
+343c09ba:	f8c2 12a4 	str.w	r1, [r2, #676]	@ 0x2a4
+343c09be:	f3bf 8f4f 	dsb	sy
+343c09c2:	2206      	movs	r2, #6
+343c09c4:	f8c3 2d0c 	str.w	r2, [r3, #3340]	@ 0xd0c
+343c09c8:	2302      	movs	r3, #2
+343c09ca:	6183      	str	r3, [r0, #24]
+343c09cc:	6803      	ldr	r3, [r0, #0]
+343c09ce:	f023 030c 	bic.w	r3, r3, #12
+343c09d2:	f043 0304 	orr.w	r3, r3, #4
+343c09d6:	6003      	str	r3, [r0, #0]
+343c09d8:	f3bf 8f4f 	dsb	sy
+343c09dc:	6903      	ldr	r3, [r0, #16]
+343c09de:	079e      	lsls	r6, r3, #30
+343c09e0:	d58a      	bpl.n	343c08f8 <status_led_complete_sleep+0x728>
+343c09e2:	4b8f      	ldr	r3, [pc, #572]	@ (343c0c20 <status_led_complete_sleep+0xa50>)
+343c09e4:	681a      	ldr	r2, [r3, #0]
+343c09e6:	f022 0201 	bic.w	r2, r2, #1
+343c09ea:	601a      	str	r2, [r3, #0]
+343c09ec:	f3bf 8f4f 	dsb	sy
+343c09f0:	681a      	ldr	r2, [r3, #0]
+343c09f2:	4b8c      	ldr	r3, [pc, #560]	@ (343c0c24 <status_led_complete_sleep+0xa54>)
+343c09f4:	f8c3 2db8 	str.w	r2, [r3, #3512]	@ 0xdb8
+343c09f8:	f8d3 2db8 	ldr.w	r2, [r3, #3512]	@ 0xdb8
+343c09fc:	07d5      	lsls	r5, r2, #31
+343c09fe:	f53f af7b 	bmi.w	343c08f8 <status_led_complete_sleep+0x728>
+343c0a02:	f44f 0288 	mov.w	r2, #4456448	@ 0x440000
+343c0a06:	4988      	ldr	r1, [pc, #544]	@ (343c0c28 <status_led_complete_sleep+0xa58>)
+343c0a08:	4888      	ldr	r0, [pc, #544]	@ (343c0c2c <status_led_complete_sleep+0xa5c>)
+343c0a0a:	618a      	str	r2, [r1, #24]
+343c0a0c:	680a      	ldr	r2, [r1, #0]
+343c0a0e:	4002      	ands	r2, r0
+343c0a10:	f442 5286 	orr.w	r2, r2, #4288	@ 0x10c0
+343c0a14:	f042 0214 	orr.w	r2, r2, #20
+343c0a18:	600a      	str	r2, [r1, #0]
+343c0a1a:	68ca      	ldr	r2, [r1, #12]
+343c0a1c:	4002      	ands	r2, r0
+343c0a1e:	60ca      	str	r2, [r1, #12]
+343c0a20:	688a      	ldr	r2, [r1, #8]
+343c0a22:	4002      	ands	r2, r0
+343c0a24:	2020      	movs	r0, #32
+343c0a26:	608a      	str	r2, [r1, #8]
+343c0a28:	4a7a      	ldr	r2, [pc, #488]	@ (343c0c14 <status_led_complete_sleep+0xa44>)
+343c0a2a:	f8c2 0a20 	str.w	r0, [r2, #2592]	@ 0xa20
+343c0a2e:	f3bf 8f4f 	dsb	sy
+343c0a32:	f242 0520 	movw	r5, #8224	@ 0x2020
+343c0a36:	4878      	ldr	r0, [pc, #480]	@ (343c0c18 <status_led_complete_sleep+0xa48>)
+343c0a38:	f8c0 5260 	str.w	r5, [r0, #608]	@ 0x260
+343c0a3c:	f8c0 52a0 	str.w	r5, [r0, #672]	@ 0x2a0
+343c0a40:	f3bf 8f4f 	dsb	sy
+343c0a44:	2007      	movs	r0, #7
+343c0a46:	f8c3 0d0c 	str.w	r0, [r3, #3340]	@ 0xd0c
+343c0a4a:	6808      	ldr	r0, [r1, #0]
+343c0a4c:	f8c3 0dc0 	str.w	r0, [r3, #3520]	@ 0xdc0
+343c0a50:	6909      	ldr	r1, [r1, #16]
+343c0a52:	f8c3 1dc4 	str.w	r1, [r3, #3524]	@ 0xdc4
+343c0a56:	496e      	ldr	r1, [pc, #440]	@ (343c0c10 <status_led_complete_sleep+0xa40>)
+343c0a58:	6809      	ldr	r1, [r1, #0]
+343c0a5a:	f8c3 1de8 	str.w	r1, [r3, #3560]	@ 0xde8
+343c0a5e:	4974      	ldr	r1, [pc, #464]	@ (343c0c30 <status_led_complete_sleep+0xa60>)
+343c0a60:	6809      	ldr	r1, [r1, #0]
+343c0a62:	f8c3 1dec 	str.w	r1, [r3, #3564]	@ 0xdec
+343c0a66:	f8d2 127c 	ldr.w	r1, [r2, #636]	@ 0x27c
+343c0a6a:	f8c3 1dc8 	str.w	r1, [r3, #3528]	@ 0xdc8
+343c0a6e:	f8d2 123c 	ldr.w	r1, [r2, #572]	@ 0x23c
+343c0a72:	f8c3 1dcc 	str.w	r1, [r3, #3532]	@ 0xdcc
+343c0a76:	f8d2 1240 	ldr.w	r1, [r2, #576]	@ 0x240
+343c0a7a:	f8c3 1dd0 	str.w	r1, [r3, #3536]	@ 0xdd0
+343c0a7e:	f8d2 1264 	ldr.w	r1, [r2, #612]	@ 0x264
+343c0a82:	f8c3 1dd4 	str.w	r1, [r3, #3540]	@ 0xdd4
+343c0a86:	f8d2 1224 	ldr.w	r1, [r2, #548]	@ 0x224
+343c0a8a:	f8c3 1dd8 	str.w	r1, [r3, #3544]	@ 0xdd8
+343c0a8e:	f8d2 1260 	ldr.w	r1, [r2, #608]	@ 0x260
+343c0a92:	f8c3 1ddc 	str.w	r1, [r3, #3548]	@ 0xddc
+343c0a96:	f8d2 1220 	ldr.w	r1, [r2, #544]	@ 0x220
+343c0a9a:	f8c3 1de0 	str.w	r1, [r3, #3552]	@ 0xde0
+343c0a9e:	f8d2 2278 	ldr.w	r2, [r2, #632]	@ 0x278
+343c0aa2:	f8c3 2de4 	str.w	r2, [r3, #3556]	@ 0xde4
+343c0aa6:	f7ff faf9 	bl	343c009c <off_state>
+343c0aaa:	2800      	cmp	r0, #0
+343c0aac:	bf14      	ite	ne
+343c0aae:	4621      	movne	r1, r4
+343c0ab0:	210d      	moveq	r1, #13
+343c0ab2:	e52b      	b.n	343c050c <status_led_complete_sleep+0x33c>
+343c0ab4:	2402      	movs	r4, #2
+343c0ab6:	e557      	b.n	343c0568 <status_led_complete_sleep+0x398>
+343c0ab8:	2407      	movs	r4, #7
+343c0aba:	e555      	b.n	343c0568 <status_led_complete_sleep+0x398>
+343c0abc:	2014      	movs	r0, #20
+343c0abe:	f7ff faa1 	bl	343c0004 <publish>
+343c0ac2:	f240 5201 	movw	r2, #1281	@ 0x501
+343c0ac6:	4b5b      	ldr	r3, [pc, #364]	@ (343c0c34 <status_led_complete_sleep+0xa64>)
+343c0ac8:	619a      	str	r2, [r3, #24]
+343c0aca:	f3bf 8f4f 	dsb	sy
+343c0ace:	b672      	cpsid	i
+343c0ad0:	f04f 23e0 	mov.w	r3, #3758153728	@ 0xe000e000
+343c0ad4:	611c      	str	r4, [r3, #16]
+343c0ad6:	619c      	str	r4, [r3, #24]
+343c0ad8:	685b      	ldr	r3, [r3, #4]
+343c0ada:	4621      	mov	r1, r4
+343c0adc:	f003 030f 	and.w	r3, r3, #15
+343c0ae0:	3301      	adds	r3, #1
+343c0ae2:	f04f 30ff 	mov.w	r0, #4294967295
+343c0ae6:	f043 e001 	dls	lr, r3
+343c0aea:	008a      	lsls	r2, r1, #2
+343c0aec:	f102 4260 	add.w	r2, r2, #3758096384	@ 0xe0000000
+343c0af0:	f502 4261 	add.w	r2, r2, #57600	@ 0xe100
+343c0af4:	f8c2 0080 	str.w	r0, [r2, #128]	@ 0x80
+343c0af8:	3101      	adds	r1, #1
+343c0afa:	f8c2 0180 	str.w	r0, [r2, #384]	@ 0x180
+343c0afe:	f00f c00d 	le	lr, 343c0aea <status_led_complete_sleep+0x91a>
+343c0b02:	f04f 6120 	mov.w	r1, #167772160	@ 0xa000000
+343c0b06:	4a4c      	ldr	r2, [pc, #304]	@ (343c0c38 <status_led_complete_sleep+0xa68>)
+343c0b08:	6051      	str	r1, [r2, #4]
+343c0b0a:	f3bf 8f4f 	dsb	sy
+343c0b0e:	f3bf 8f6f 	isb	sy
+343c0b12:	2200      	movs	r2, #0
+343c0b14:	4293      	cmp	r3, r2
+343c0b16:	469e      	mov	lr, r3
+343c0b18:	bf14      	ite	ne
+343c0b1a:	469e      	movne	lr, r3
+343c0b1c:	f04f 0e01 	moveq.w	lr, #1
+343c0b20:	4611      	mov	r1, r2
+343c0b22:	f04e e001 	dls	lr, lr
+343c0b26:	008b      	lsls	r3, r1, #2
+343c0b28:	f103 4360 	add.w	r3, r3, #3758096384	@ 0xe0000000
+343c0b2c:	f503 4361 	add.w	r3, r3, #57600	@ 0xe100
+343c0b30:	6818      	ldr	r0, [r3, #0]
+343c0b32:	f8d3 3100 	ldr.w	r3, [r3, #256]	@ 0x100
+343c0b36:	4304      	orrs	r4, r0
+343c0b38:	431a      	orrs	r2, r3
+343c0b3a:	3101      	adds	r1, #1
+343c0b3c:	f00f c80d 	le	lr, 343c0b26 <status_led_complete_sleep+0x956>
+343c0b40:	f04f 21e0 	mov.w	r1, #3758153728	@ 0xe000e000
+343c0b44:	4b37      	ldr	r3, [pc, #220]	@ (343c0c24 <status_led_complete_sleep+0xa54>)
+343c0b46:	f8c3 4c38 	str.w	r4, [r3, #3128]	@ 0xc38
+343c0b4a:	f8c3 2c3c 	str.w	r2, [r3, #3132]	@ 0xc3c
+343c0b4e:	6909      	ldr	r1, [r1, #16]
+343c0b50:	f8c3 1c34 	str.w	r1, [r3, #3124]	@ 0xc34
+343c0b54:	f3ef 8110 	mrs	r1, PRIMASK
+343c0b58:	f8c3 1c30 	str.w	r1, [r3, #3120]	@ 0xc30
+343c0b5c:	4936      	ldr	r1, [pc, #216]	@ (343c0c38 <status_led_complete_sleep+0xa68>)
+343c0b5e:	4322      	orrs	r2, r4
+343c0b60:	6848      	ldr	r0, [r1, #4]
+343c0b62:	f8c3 0c40 	str.w	r0, [r3, #3136]	@ 0xc40
+343c0b66:	d001      	beq.n	343c0b6c <status_led_complete_sleep+0x99c>
+343c0b68:	2009      	movs	r0, #9
+343c0b6a:	e506      	b.n	343c057a <status_led_complete_sleep+0x3aa>
+343c0b6c:	2002      	movs	r0, #2
+343c0b6e:	4a29      	ldr	r2, [pc, #164]	@ (343c0c14 <status_led_complete_sleep+0xa44>)
+343c0b70:	f8c2 0a78 	str.w	r0, [r2, #2680]	@ 0xa78
+343c0b74:	f8d2 0278 	ldr.w	r0, [r2, #632]	@ 0x278
+343c0b78:	f8c3 0c64 	str.w	r0, [r3, #3172]	@ 0xc64
+343c0b7c:	f8d3 0c64 	ldr.w	r0, [r3, #3172]	@ 0xc64
+343c0b80:	0780      	lsls	r0, r0, #30
+343c0b82:	d401      	bmi.n	343c0b88 <status_led_complete_sleep+0x9b8>
+343c0b84:	2003      	movs	r0, #3
+343c0b86:	e4f8      	b.n	343c057a <status_led_complete_sleep+0x3aa>
+343c0b88:	f44f 2080 	mov.w	r0, #262144	@ 0x40000
+343c0b8c:	f8c2 0a5c 	str.w	r0, [r2, #2652]	@ 0xa5c
+343c0b90:	f8d2 025c 	ldr.w	r0, [r2, #604]	@ 0x25c
+343c0b94:	f8c3 0c68 	str.w	r0, [r3, #3176]	@ 0xc68
+343c0b98:	f8d3 0c68 	ldr.w	r0, [r3, #3176]	@ 0xc68
+343c0b9c:	0347      	lsls	r7, r0, #13
+343c0b9e:	d503      	bpl.n	343c0ba8 <status_led_complete_sleep+0x9d8>
+343c0ba0:	f8d2 021c 	ldr.w	r0, [r2, #540]	@ 0x21c
+343c0ba4:	0346      	lsls	r6, r0, #13
+343c0ba6:	d501      	bpl.n	343c0bac <status_led_complete_sleep+0x9dc>
+343c0ba8:	2002      	movs	r0, #2
+343c0baa:	e4e6      	b.n	343c057a <status_led_complete_sleep+0x3aa>
+343c0bac:	4823      	ldr	r0, [pc, #140]	@ (343c0c3c <status_led_complete_sleep+0xa6c>)
+343c0bae:	6b04      	ldr	r4, [r0, #48]	@ 0x30
+343c0bb0:	f8c3 4c48 	str.w	r4, [r3, #3144]	@ 0xc48
+343c0bb4:	6800      	ldr	r0, [r0, #0]
+343c0bb6:	f8c3 0c50 	str.w	r0, [r3, #3152]	@ 0xc50
+343c0bba:	6b50      	ldr	r0, [r2, #52]	@ 0x34
+343c0bbc:	f8c3 0c6c 	str.w	r0, [r3, #3180]	@ 0xc6c
+343c0bc0:	6948      	ldr	r0, [r1, #20]
+343c0bc2:	f8c3 0c44 	str.w	r0, [r3, #3140]	@ 0xc44
+343c0bc6:	f3ef 8005 	mrs	r0, IPSR
+343c0bca:	b918      	cbnz	r0, 343c0bd4 <status_led_complete_sleep+0xa04>
+343c0bcc:	6949      	ldr	r1, [r1, #20]
+343c0bce:	f411 3f40 	tst.w	r1, #196608	@ 0x30000
+343c0bd2:	d001      	beq.n	343c0bd8 <status_led_complete_sleep+0xa08>
+343c0bd4:	200c      	movs	r0, #12
+343c0bd6:	e4d0      	b.n	343c057a <status_led_complete_sleep+0x3aa>
+343c0bd8:	f8d2 1248 	ldr.w	r1, [r2, #584]	@ 0x248
+343c0bdc:	07cd      	lsls	r5, r1, #31
+343c0bde:	d503      	bpl.n	343c0be8 <status_led_complete_sleep+0xa18>
+343c0be0:	f8d2 2208 	ldr.w	r2, [r2, #520]	@ 0x208
+343c0be4:	07d4      	lsls	r4, r2, #31
+343c0be6:	d501      	bpl.n	343c0bec <status_led_complete_sleep+0xa1c>
+343c0be8:	2007      	movs	r0, #7
+343c0bea:	e4c6      	b.n	343c057a <status_led_complete_sleep+0x3aa>
+343c0bec:	4a14      	ldr	r2, [pc, #80]	@ (343c0c40 <status_led_complete_sleep+0xa70>)
+343c0bee:	6851      	ldr	r1, [r2, #4]
+343c0bf0:	f8c3 1c70 	str.w	r1, [r3, #3184]	@ 0xc70
+343c0bf4:	6851      	ldr	r1, [r2, #4]
+343c0bf6:	f021 0107 	bic.w	r1, r1, #7
+343c0bfa:	6051      	str	r1, [r2, #4]
+343c0bfc:	6852      	ldr	r2, [r2, #4]
+343c0bfe:	f8c3 2c74 	str.w	r2, [r3, #3188]	@ 0xc74
+343c0c02:	f8d3 3c74 	ldr.w	r3, [r3, #3188]	@ 0xc74
+343c0c06:	0758      	lsls	r0, r3, #29
+343c0c08:	d01c      	beq.n	343c0c44 <status_led_complete_sleep+0xa74>
+343c0c0a:	2008      	movs	r0, #8
+343c0c0c:	e4b5      	b.n	343c057a <status_led_complete_sleep+0x3aa>
+343c0c0e:	bf00      	nop
+343c0c10:	56023800 	.word	0x56023800
+343c0c14:	56028000 	.word	0x56028000
+343c0c18:	56029000 	.word	0x56029000
+343c0c1c:	50005800 	.word	0x50005800
+343c0c20:	58025000 	.word	0x58025000
+343c0c24:	343f9000 	.word	0x343f9000
+343c0c28:	56023400 	.word	0x56023400
+343c0c2c:	ffffcf03 	.word	0xffffcf03
+343c0c30:	56020400 	.word	0x56020400
+343c0c34:	56021800 	.word	0x56021800
+343c0c38:	e000ed00 	.word	0xe000ed00
+343c0c3c:	56024800 	.word	0x56024800
+343c0c40:	54001000 	.word	0x54001000
+343c0c44:	4d91      	ldr	r5, [pc, #580]	@ (343c0e8c <low_power_return_idle+0x4>)
+343c0c46:	4a92      	ldr	r2, [pc, #584]	@ (343c0e90 <low_power_return_idle+0x8>)
+343c0c48:	692b      	ldr	r3, [r5, #16]
+343c0c4a:	f023 0316 	bic.w	r3, r3, #22
+343c0c4e:	612b      	str	r3, [r5, #16]
+343c0c50:	4b90      	ldr	r3, [pc, #576]	@ (343c0e94 <low_power_return_idle+0xc>)
+343c0c52:	f8d3 194c 	ldr.w	r1, [r3, #2380]	@ 0x94c
+343c0c56:	f001 5180 	and.w	r1, r1, #268435456	@ 0x10000000
+343c0c5a:	f8c2 1c78 	str.w	r1, [r2, #3192]	@ 0xc78
+343c0c5e:	f8d3 18cc 	ldr.w	r1, [r3, #2252]	@ 0x8cc
+343c0c62:	f001 5180 	and.w	r1, r1, #268435456	@ 0x10000000
+343c0c66:	f8c2 1c7c 	str.w	r1, [r2, #3196]	@ 0xc7c
+343c0c6a:	f8d2 1c78 	ldr.w	r1, [r2, #3192]	@ 0xc78
+343c0c6e:	b111      	cbz	r1, 343c0c76 <status_led_complete_sleep+0xaa6>
+343c0c70:	f8d2 1c7c 	ldr.w	r1, [r2, #3196]	@ 0xc7c
+343c0c74:	b909      	cbnz	r1, 343c0c7a <status_led_complete_sleep+0xaaa>
+343c0c76:	2004      	movs	r0, #4
+343c0c78:	e47f      	b.n	343c057a <status_led_complete_sleep+0x3aa>
+343c0c7a:	f8d3 31f0 	ldr.w	r3, [r3, #496]	@ 0x1f0
+343c0c7e:	f8c2 3c80 	str.w	r3, [r2, #3200]	@ 0xc80
+343c0c82:	f8d2 3c80 	ldr.w	r3, [r2, #3200]	@ 0xc80
+343c0c86:	0519      	lsls	r1, r3, #20
+343c0c88:	d501      	bpl.n	343c0c8e <status_led_complete_sleep+0xabe>
+343c0c8a:	2005      	movs	r0, #5
+343c0c8c:	e475      	b.n	343c057a <status_led_complete_sleep+0x3aa>
+343c0c8e:	f8d2 1c80 	ldr.w	r1, [r2, #3200]	@ 0xc80
+343c0c92:	f011 0101 	ands.w	r1, r1, #1
+343c0c96:	d001      	beq.n	343c0c9c <status_led_complete_sleep+0xacc>
+343c0c98:	2006      	movs	r0, #6
+343c0c9a:	e46e      	b.n	343c057a <status_led_complete_sleep+0x3aa>
+343c0c9c:	4b7e      	ldr	r3, [pc, #504]	@ (343c0e98 <low_power_return_idle+0x10>)
+343c0c9e:	2403      	movs	r4, #3
+343c0ca0:	f8c3 1080 	str.w	r1, [r3, #128]	@ 0x80
+343c0ca4:	f8c3 1090 	str.w	r1, [r3, #144]	@ 0x90
+343c0ca8:	f8c3 10a0 	str.w	r1, [r3, #160]	@ 0xa0
+343c0cac:	f8c3 1084 	str.w	r1, [r3, #132]	@ 0x84
+343c0cb0:	f8c3 1094 	str.w	r1, [r3, #148]	@ 0x94
+343c0cb4:	f8c3 10a4 	str.w	r1, [r3, #164]	@ 0xa4
+343c0cb8:	6019      	str	r1, [r3, #0]
+343c0cba:	6219      	str	r1, [r3, #32]
+343c0cbc:	6419      	str	r1, [r3, #64]	@ 0x40
+343c0cbe:	6059      	str	r1, [r3, #4]
+343c0cc0:	6259      	str	r1, [r3, #36]	@ 0x24
+343c0cc2:	6459      	str	r1, [r3, #68]	@ 0x44
+343c0cc4:	68d9      	ldr	r1, [r3, #12]
+343c0cc6:	60d9      	str	r1, [r3, #12]
+343c0cc8:	6ad9      	ldr	r1, [r3, #44]	@ 0x2c
+343c0cca:	62d9      	str	r1, [r3, #44]	@ 0x2c
+343c0ccc:	6cd9      	ldr	r1, [r3, #76]	@ 0x4c
+343c0cce:	64d9      	str	r1, [r3, #76]	@ 0x4c
+343c0cd0:	6919      	ldr	r1, [r3, #16]
+343c0cd2:	6119      	str	r1, [r3, #16]
+343c0cd4:	6b19      	ldr	r1, [r3, #48]	@ 0x30
+343c0cd6:	6319      	str	r1, [r3, #48]	@ 0x30
+343c0cd8:	6d19      	ldr	r1, [r3, #80]	@ 0x50
+343c0cda:	6519      	str	r1, [r3, #80]	@ 0x50
+343c0cdc:	496f      	ldr	r1, [pc, #444]	@ (343c0e9c <low_power_return_idle+0x14>)
+343c0cde:	6d88      	ldr	r0, [r1, #88]	@ 0x58
+343c0ce0:	f020 000f 	bic.w	r0, r0, #15
+343c0ce4:	6588      	str	r0, [r1, #88]	@ 0x58
+343c0ce6:	200f      	movs	r0, #15
+343c0ce8:	6508      	str	r0, [r1, #80]	@ 0x50
+343c0cea:	486d      	ldr	r0, [pc, #436]	@ (343c0ea0 <low_power_return_idle+0x18>)
+343c0cec:	6084      	str	r4, [r0, #8]
+343c0cee:	6b08      	ldr	r0, [r1, #48]	@ 0x30
+343c0cf0:	68ce      	ldr	r6, [r1, #12]
+343c0cf2:	f020 1001 	bic.w	r0, r0, #65537	@ 0x10001
+343c0cf6:	f040 0401 	orr.w	r4, r0, #1
+343c0cfa:	f026 0611 	bic.w	r6, r6, #17
+343c0cfe:	f040 0003 	orr.w	r0, r0, #3
+343c0d02:	60ce      	str	r6, [r1, #12]
+343c0d04:	6308      	str	r0, [r1, #48]	@ 0x30
+343c0d06:	6928      	ldr	r0, [r5, #16]
+343c0d08:	f040 0004 	orr.w	r0, r0, #4
+343c0d0c:	6128      	str	r0, [r5, #16]
+343c0d0e:	f3bf 8f4f 	dsb	sy
+343c0d12:	f3bf 8f6f 	isb	sy
+343c0d16:	f8d3 0080 	ldr.w	r0, [r3, #128]	@ 0x80
+343c0d1a:	f8d3 6090 	ldr.w	r6, [r3, #144]	@ 0x90
+343c0d1e:	f8d3 50a0 	ldr.w	r5, [r3, #160]	@ 0xa0
+343c0d22:	4330      	orrs	r0, r6
+343c0d24:	4328      	orrs	r0, r5
+343c0d26:	f8c2 0c84 	str.w	r0, [r2, #3204]	@ 0xc84
+343c0d2a:	f8d3 0084 	ldr.w	r0, [r3, #132]	@ 0x84
+343c0d2e:	f8d3 6094 	ldr.w	r6, [r3, #148]	@ 0x94
+343c0d32:	f8d3 50a4 	ldr.w	r5, [r3, #164]	@ 0xa4
+343c0d36:	4330      	orrs	r0, r6
+343c0d38:	4328      	orrs	r0, r5
+343c0d3a:	f8c2 0c88 	str.w	r0, [r2, #3208]	@ 0xc88
+343c0d3e:	68d8      	ldr	r0, [r3, #12]
+343c0d40:	6ade      	ldr	r6, [r3, #44]	@ 0x2c
+343c0d42:	6cdd      	ldr	r5, [r3, #76]	@ 0x4c
+343c0d44:	4330      	orrs	r0, r6
+343c0d46:	4328      	orrs	r0, r5
+343c0d48:	f8c2 0c8c 	str.w	r0, [r2, #3212]	@ 0xc8c
+343c0d4c:	6918      	ldr	r0, [r3, #16]
+343c0d4e:	6b1e      	ldr	r6, [r3, #48]	@ 0x30
+343c0d50:	6d1d      	ldr	r5, [r3, #80]	@ 0x50
+343c0d52:	ea40 0306 	orr.w	r3, r0, r6
+343c0d56:	432b      	orrs	r3, r5
+343c0d58:	f8c2 3c90 	str.w	r3, [r2, #3216]	@ 0xc90
+343c0d5c:	f8d2 3c84 	ldr.w	r3, [r2, #3204]	@ 0xc84
+343c0d60:	2b00      	cmp	r3, #0
+343c0d62:	f47f af01 	bne.w	343c0b68 <status_led_complete_sleep+0x998>
+343c0d66:	f8d2 3c88 	ldr.w	r3, [r2, #3208]	@ 0xc88
+343c0d6a:	2b00      	cmp	r3, #0
+343c0d6c:	f47f aefc 	bne.w	343c0b68 <status_led_complete_sleep+0x998>
+343c0d70:	f8d2 3c8c 	ldr.w	r3, [r2, #3212]	@ 0xc8c
+343c0d74:	2b00      	cmp	r3, #0
+343c0d76:	f47f aef7 	bne.w	343c0b68 <status_led_complete_sleep+0x998>
+343c0d7a:	f8d2 3c90 	ldr.w	r3, [r2, #3216]	@ 0xc90
+343c0d7e:	2b00      	cmp	r3, #0
+343c0d80:	f47f aef2 	bne.w	343c0b68 <status_led_complete_sleep+0x998>
+343c0d84:	6d8b      	ldr	r3, [r1, #88]	@ 0x58
+343c0d86:	071b      	lsls	r3, r3, #28
+343c0d88:	f47f aeee 	bne.w	343c0b68 <status_led_complete_sleep+0x998>
+343c0d8c:	6d4b      	ldr	r3, [r1, #84]	@ 0x54
+343c0d8e:	2b00      	cmp	r3, #0
+343c0d90:	f47f aeea 	bne.w	343c0b68 <status_led_complete_sleep+0x998>
+343c0d94:	6b0b      	ldr	r3, [r1, #48]	@ 0x30
+343c0d96:	460e      	mov	r6, r1
+343c0d98:	405c      	eors	r4, r3
+343c0d9a:	f014 1f01 	tst.w	r4, #65537	@ 0x10001
+343c0d9e:	d105      	bne.n	343c0dac <status_led_complete_sleep+0xbdc>
+343c0da0:	f501 5160 	add.w	r1, r1, #14336	@ 0x3800
+343c0da4:	688a      	ldr	r2, [r1, #8]
+343c0da6:	f012 0203 	ands.w	r2, r2, #3
+343c0daa:	d002      	beq.n	343c0db2 <status_led_complete_sleep+0xbe2>
+343c0dac:	200a      	movs	r0, #10
+343c0dae:	f7ff bbe4 	b.w	343c057a <status_led_complete_sleep+0x3aa>
+343c0db2:	6b33      	ldr	r3, [r6, #48]	@ 0x30
+343c0db4:	4c36      	ldr	r4, [pc, #216]	@ (343c0e90 <low_power_return_idle+0x8>)
+343c0db6:	4d35      	ldr	r5, [pc, #212]	@ (343c0e8c <low_power_return_idle+0x4>)
+343c0db8:	f8c4 3c4c 	str.w	r3, [r4, #3148]	@ 0xc4c
+343c0dbc:	68f3      	ldr	r3, [r6, #12]
+343c0dbe:	f8df 80f0 	ldr.w	r8, [pc, #240]	@ 343c0eb0 <low_power_return_idle+0x28>
+343c0dc2:	f8c4 3c54 	str.w	r3, [r4, #3156]	@ 0xc54
+343c0dc6:	6db3      	ldr	r3, [r6, #88]	@ 0x58
+343c0dc8:	4f36      	ldr	r7, [pc, #216]	@ (343c0ea4 <low_power_return_idle+0x1c>)
+343c0dca:	f8c4 3c58 	str.w	r3, [r4, #3160]	@ 0xc58
+343c0dce:	6d73      	ldr	r3, [r6, #84]	@ 0x54
+343c0dd0:	f8c4 3c5c 	str.w	r3, [r4, #3164]	@ 0xc5c
+343c0dd4:	688b      	ldr	r3, [r1, #8]
+343c0dd6:	f8c4 3c60 	str.w	r3, [r4, #3168]	@ 0xc60
+343c0dda:	692b      	ldr	r3, [r5, #16]
+343c0ddc:	f8c4 3c2c 	str.w	r3, [r4, #3116]	@ 0xc2c
+343c0de0:	4b31      	ldr	r3, [pc, #196]	@ (343c0ea8 <low_power_return_idle+0x20>)
+343c0de2:	f8c3 29cc 	str.w	r2, [r3, #2508]	@ 0x9cc
+343c0de6:	f8d8 2004 	ldr.w	r2, [r8, #4]
+343c0dea:	f8c3 29f4 	str.w	r2, [r3, #2548]	@ 0x9f4
+343c0dee:	697a      	ldr	r2, [r7, #20]
+343c0df0:	f8c3 29f8 	str.w	r2, [r3, #2552]	@ 0x9f8
+343c0df4:	693a      	ldr	r2, [r7, #16]
+343c0df6:	f8c3 29fc 	str.w	r2, [r3, #2556]	@ 0x9fc
+343c0dfa:	f3bf 8f5f 	dmb	sy
+343c0dfe:	692a      	ldr	r2, [r5, #16]
+343c0e00:	f8c3 2a10 	str.w	r2, [r3, #2576]	@ 0xa10
+343c0e04:	f3ef 8210 	mrs	r2, PRIMASK
+343c0e08:	f8c3 2a14 	str.w	r2, [r3, #2580]	@ 0xa14
+343c0e0c:	f04f 22e0 	mov.w	r2, #3758153728	@ 0xe000e000
+343c0e10:	6912      	ldr	r2, [r2, #16]
+343c0e12:	201e      	movs	r0, #30
+343c0e14:	f8c3 2a18 	str.w	r2, [r3, #2584]	@ 0xa18
+343c0e18:	686a      	ldr	r2, [r5, #4]
+343c0e1a:	f8c3 2a1c 	str.w	r2, [r3, #2588]	@ 0xa1c
+343c0e1e:	f8d4 2c38 	ldr.w	r2, [r4, #3128]	@ 0xc38
+343c0e22:	f8c3 2a24 	str.w	r2, [r3, #2596]	@ 0xa24
+343c0e26:	f8d4 2c3c 	ldr.w	r2, [r4, #3132]	@ 0xc3c
+343c0e2a:	f8c3 2a28 	str.w	r2, [r3, #2600]	@ 0xa28
+343c0e2e:	f240 1203 	movw	r2, #259	@ 0x103
+343c0e32:	f8c3 2a20 	str.w	r2, [r3, #2592]	@ 0xa20
+343c0e36:	697b      	ldr	r3, [r7, #20]
+343c0e38:	f8c4 3c94 	str.w	r3, [r4, #3220]	@ 0xc94
+343c0e3c:	f7ff f8e2 	bl	343c0004 <publish>
+343c0e40:	f8d8 3004 	ldr.w	r3, [r8, #4]
+343c0e44:	2028      	movs	r0, #40	@ 0x28
+343c0e46:	f8c4 3c1c 	str.w	r3, [r4, #3100]	@ 0xc1c
+343c0e4a:	f7ff f8db 	bl	343c0004 <publish>
+343c0e4e:	f3bf 8f4f 	dsb	sy
+343c0e52:	f3bf 8f6f 	isb	sy
+
+343c0e56 <status_led_sleep_idle>:
+343c0e56:	bf30      	wfi
+343c0e58:	f8d8 3004 	ldr.w	r3, [r8, #4]
+343c0e5c:	f8c4 3c20 	str.w	r3, [r4, #3104]	@ 0xc20
+343c0e60:	6b33      	ldr	r3, [r6, #48]	@ 0x30
+343c0e62:	f8c4 3c9c 	str.w	r3, [r4, #3228]	@ 0xc9c
+343c0e66:	692b      	ldr	r3, [r5, #16]
+343c0e68:	f8c4 3ca0 	str.w	r3, [r4, #3232]	@ 0xca0
+343c0e6c:	692b      	ldr	r3, [r5, #16]
+343c0e6e:	f023 0304 	bic.w	r3, r3, #4
+343c0e72:	612b      	str	r3, [r5, #16]
+343c0e74:	230b      	movs	r3, #11
+343c0e76:	f8c4 3c14 	str.w	r3, [r4, #3092]	@ 0xc14
+343c0e7a:	4b0c      	ldr	r3, [pc, #48]	@ (343c0eac <low_power_return_idle+0x24>)
+343c0e7c:	61bb      	str	r3, [r7, #24]
+343c0e7e:	f3bf 8f4f 	dsb	sy
+343c0e82:	2032      	movs	r0, #50	@ 0x32
+343c0e84:	f7ff f8be 	bl	343c0004 <publish>
+
+343c0e88 <low_power_return_idle>:
+343c0e88:	e7fe      	b.n	343c0e88 <low_power_return_idle>
+343c0e8a:	bf00      	nop
+343c0e8c:	e000ed00 	.word	0xe000ed00
+343c0e90:	343f9000 	.word	0x343f9000
+343c0e94:	56009000 	.word	0x56009000
+343c0e98:	56025000 	.word	0x56025000
+343c0e9c:	56024800 	.word	0x56024800
+343c0ea0:	56029000 	.word	0x56029000
+343c0ea4:	56021800 	.word	0x56021800
+343c0ea8:	343f8000 	.word	0x343f8000
+343c0eac:	04000101 	.word	0x04000101
+343c0eb0:	e0001000 	.word	0xe0001000

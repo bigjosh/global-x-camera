@@ -1,0 +1,147 @@
+{
+  "schema": 1,
+  "source_summary_path": "tmp/bringup/capture-sleep-20261020/v59-cold-1/signal-summary.json",
+  "source_summary_sha256": "7000292a936530d8ea98b5adbc0066efb42eda6e6a6e2a653e89d52276c27267",
+  "analog": {
+    "Channel 0": {
+      "min": -0.046,
+      "max": 3.192,
+      "avg": 0.8828912959363098,
+      "samples": 656406
+    },
+    "Channel 6": {
+      "min": 3.191,
+      "max": 3.272,
+      "avg": 3.26170169990069,
+      "samples": 656406
+    }
+  },
+  "digital": {
+    "Channel 0": {
+      "interval_count": 85,
+      "levels": {
+        "0": {
+          "count": 42,
+          "min_s": 1.5999999997129422e-07,
+          "max_s": 15.13433648,
+          "median_s": 1.6000000002680537e-07,
+          "total_s": 15.134724640000002
+        },
+        "1": {
+          "count": 43,
+          "min_s": 1.5999999997129422e-07,
+          "max_s": 5.497159122000001,
+          "median_s": 2.0479999999989396e-05,
+          "total_s": 5.87026608
+        }
+      },
+      "first_intervals": [
+        {
+          "start_s": 6.6162e-05,
+          "end_s": 0.37232976,
+          "level": 1
+        },
+        {
+          "start_s": 0.37232976,
+          "end_s": 0.37232992,
+          "level": 0
+        },
+        {
+          "start_s": 0.37232992,
+          "end_s": 0.3723504,
+          "level": 1
+        },
+        {
+          "start_s": 0.3723504,
+          "end_s": 0.37235056,
+          "level": 0
+        }
+      ],
+      "last_intervals": [
+        {
+          "start_s": 0.3735584,
+          "end_s": 15.50789488,
+          "level": 0
+        },
+        {
+          "start_s": 15.50789488,
+          "end_s": 15.50789536,
+          "level": 1
+        },
+        {
+          "start_s": 15.50789536,
+          "end_s": 15.50789776,
+          "level": 0
+        },
+        {
+          "start_s": 15.50789776,
+          "end_s": 21.005056882,
+          "level": 1
+        }
+      ]
+    },
+    "Channel 6": {
+      "interval_count": 1,
+      "levels": {
+        "1": {
+          "count": 1,
+          "min_s": 21.004990720000002,
+          "max_s": 21.004990720000002,
+          "median_s": 21.004990720000002,
+          "total_s": 21.004990720000002
+        }
+      },
+      "first_intervals": [
+        {
+          "start_s": 6.6162e-05,
+          "end_s": 21.005056882,
+          "level": 1
+        }
+      ],
+      "last_intervals": [
+        {
+          "start_s": 6.6162e-05,
+          "end_s": 21.005056882,
+          "level": 1
+        }
+      ]
+    }
+  },
+  "source_limitations": [
+    "No firmware detector or cold-boot test.",
+    "Host stimulus times are not hardware timestamps.",
+    "UART BREAK API success does not prove a LOW level."
+  ],
+  "interpretation": [
+    "Interval statistics summarize the exported logic threshold states; they do not prove every transition is a physical reset.",
+    "Power-cycle traces include threshold chatter near low rails; physical causation is not established.",
+    "The exact firmware recovery park and fresh SBF result establish recovery and Standby history; this waveform summary alone does not.",
+    "Raw waveforms remain local. This compact summary cannot recreate the waveform or replay the edge detector."
+  ],
+  "local_primary_files": [
+    {
+      "path": "tmp/bringup/capture-sleep-20261020/v59-cold-1/analog.csv",
+      "bytes": 17226881,
+      "sha256": "c18cea28e8ac63a22228d031c25c1968b2251f7fc980f95f4a96672568dee9f8",
+      "archived": false
+    },
+    {
+      "path": "tmp/bringup/capture-sleep-20261020/v59-cold-1/digital.csv",
+      "bytes": 1496,
+      "sha256": "0df239df4027f2e149b1cadf85460e9bb11fe3fbe0a816719aaf7e74a8dae029",
+      "archived": false
+    },
+    {
+      "path": "tmp/bringup/capture-sleep-20261020/v59-cold-1/power-cycle.sal",
+      "bytes": 485424,
+      "sha256": "47e8dd04ee474098028f7e68bfa21eb4b528a60896f15beb587a489aafcc903f",
+      "archived": false
+    },
+    {
+      "path": "tmp/bringup/capture-sleep-20261020/v59-cold-1/signal-summary.json",
+      "bytes": 9206,
+      "sha256": "7000292a936530d8ea98b5adbc0066efb42eda6e6a6e2a653e89d52276c27267",
+      "archived": false
+    }
+  ]
+}

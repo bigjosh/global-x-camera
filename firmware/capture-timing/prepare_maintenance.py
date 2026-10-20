@@ -172,6 +172,7 @@ def save_guard_module():
 def read_storage_proof(bench, checked_save=None):
     """Read-only gate: event40 alone does not prove SD/NOR storage is idle."""
     guard = save_guard_module()
+    guard.reject_low_power_completion(bench)
     loader = struct.unpack('<16I', bench.upload(guard.LOADER, 64, 'storage-loader.bin'))
     raw = bench.upload(guard.REPORT, 512, 'storage-report.bin')
     report = guard.decode_report(raw)
@@ -181,6 +182,9 @@ def read_storage_proof(bench, checked_save=None):
         raise ValueError('Recognized storage proof requires --save-build and --save-sha256 before any halt')
     manifest, code = checked_save
     proof = guard.exact_storage_proof(bench, manifest, code, loader, raw, 'storage')
+    # Completion-enabled firmware announces LPL ownership before SAVE starts.
+    # Recheck after DONE so a host read spanning the save cannot miss ownership.
+    guard.reject_low_power_completion(bench, 'post-save-')
     return dict(recognized=True, **proof)
 
 

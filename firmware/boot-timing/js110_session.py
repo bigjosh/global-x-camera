@@ -40,6 +40,13 @@ product of separate current/voltage means. This option preserves and restores
 the additional s/p/ctrl setting. It is mutually exclusive with --stream-log.
 Use capture-sd/energy.py for offline interval integration and coverage checks.
 
+Optional --cycle-raw-dir DIR retains exact full-rate i/v/p float32 samples and
+their native sample IDs, using the same single device owner and restore path.
+It requires a new directory and is mutually exclusive with the summary flags.
+At 2 MHz it writes about 24 MB/s; --raw-max-mib bounds total sample-file bytes.
+Exceeding that budget fails the recording and follows normal settings cleanup.
+Use capture-sd/cycle_energy.py offline. This adds no power cycles or GPIO access.
+
 The 2A state selects a fixed measurement range, NOT a 2 A current limit. Inrush
 can exceed the range and clip the reported current. This helper changes no
 source voltage, protection threshold, voltage range, or range-suppression mode.
@@ -469,9 +476,14 @@ def run_session(args, driver_factory, driver_version):
         try:
             stream_path = getattr(args, "stream_log", None)
             power_path = getattr(args, "power_stream_log", None)
-            if stream_path is not None and power_path is not None:
+            raw_path = getattr(args, "cycle_raw_dir", None)
+            if sum(p is not None for p in (stream_path, power_path, raw_path)) > 1:
                 raise ValueError("Select only one stream log")
-            if power_path is not None:
+            if raw_path is not None:
+                from js110_raw import make_raw_stream
+                stream = make_raw_stream(StreamLog, raw_path,
+                    max_bytes=getattr(args, "raw_max_mib", 4096) * 1024**2)
+            elif power_path is not None:
                 stream = StreamLog(power_path, include_power=True)
             elif stream_path is not None:
                 stream = StreamLog(stream_path)
@@ -487,6 +499,8 @@ def run_session(args, driver_factory, driver_version):
                     stream_subscriptions = []
                     reason = "timeout"
                     try:
+                        raw_settings = (stream.snapshot_measurement_settings(device)
+                                        if raw_path is not None else None)
                         if recovery is not None:
                             recovery.start()
                         device.subscribe(STATS_TOPIC, "pub", stats.receive)
@@ -515,8 +529,10 @@ def run_session(args, driver_factory, driver_version):
                                     supported_states=supported_states,
                                     starting_range=starting_range, range=starting_range,
                                     voltage_range=device.query("s/v/range/select", timeout=5.0),
-                                    stream_log=None if stream is None else str(power_path or stream_path),
+                                    stream_log=None if stream is None else str(raw_path or power_path or stream_path),
                                     starting_stream_settings=starting_stream_settings,
+                                    **({} if raw_settings is None else {
+                                        "starting_raw_measurement_settings": raw_settings}),
                                     duration_s=args.duration, statistics=stats.snapshot(),
                                     **({} if recovery is None else {
                                         "starting_recovery_settings": recovery.starting,
@@ -575,6 +591,9 @@ def run_session(args, driver_factory, driver_version):
                                 recovery.set_asserted(request["asserted"])
                             command_end = stamp()
                             current_range = device.query(RANGE_TOPIC, timeout=5.0)
+                            if raw_path is not None and state in RANGE_STATES:
+                                stream.note_range_command(state, current_range,
+                                                          command_start, command_end)
                             report.emit("response", response=True, id=request_id, state=state,
                                         supported_states=supported_states,
                                         ok=True, range=current_range,
@@ -675,6 +694,10 @@ def main():
                         help="Optional JSONL full-rate i/v chunk summaries; no raw samples retained.")
     streams.add_argument("--power-stream-log", type=Path,
                          help="Optional schema2 i/v/p summaries and sums for offline energy bounds.")
+    streams.add_argument("--cycle-raw-dir", type=Path,
+                         help="New directory for native-rate raw i/v/p samples and summary index.")
+    parser.add_argument("--raw-max-mib", type=int, default=4096,
+                        help="Raw sample byte budget in MiB (default 4096; about 179 s at 2 MHz).")
     parser.add_argument("--recovery-output", action="store_true",
                         help="Own OUT0 for recovery; release initially and restore on exit. "
                              "If shared I/O voltage starts off, other rear GPIO pins must be disconnected.")
@@ -688,11 +711,18 @@ def main():
     args.recovery_interface = args.recovery_interface or "nmos"
     if not math.isfinite(args.duration) or not 0 < args.duration <= 1800:
         parser.error("--duration must be >0 and <=1800 seconds")
+    if not 1 <= args.raw_max_mib <= 16384:
+        parser.error("--raw-max-mib must be between 1 and 16384")
     paths = [args.control, args.response, args.log]
     if args.stream_log is not None:
         paths.append(args.stream_log)
     if args.power_stream_log is not None:
         paths.append(args.power_stream_log)
+    if args.cycle_raw_dir is not None:
+        paths.append(args.cycle_raw_dir)
+        raw_root = args.cycle_raw_dir.resolve()
+        if any(p.resolve().is_relative_to(raw_root) for p in paths[:-1]):
+            parser.error("Control, response and session logs must be outside the new raw directory")
     if len({path.resolve() for path in paths}) != len(paths):
         parser.error("Control, response, log, and stream log paths must be distinct")
     if not args.device.startswith("u/js110/"):

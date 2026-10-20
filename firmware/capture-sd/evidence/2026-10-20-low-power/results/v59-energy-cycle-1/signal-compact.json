@@ -1,0 +1,147 @@
+{
+  "schema": 1,
+  "source_summary_path": "tmp/bringup/capture-sleep-20261020/v59-energy-cycle-1/signal-summary.json",
+  "source_summary_sha256": "26a9faf66422ae2d4d1e784cc6cb734fa367ac10b581a76e403784f552b88509",
+  "analog": {
+    "Channel 0": {
+      "min": -0.046,
+      "max": 3.192,
+      "avg": 0.8782474845431163,
+      "samples": 653261
+    },
+    "Channel 6": {
+      "min": 3.247,
+      "max": 3.277,
+      "avg": 3.2612212301392614,
+      "samples": 653261
+    }
+  },
+  "digital": {
+    "Channel 0": {
+      "interval_count": 149,
+      "levels": {
+        "0": {
+          "count": 74,
+          "min_s": 1.5999999997129422e-07,
+          "max_s": 15.089843519999999,
+          "median_s": 3.199999999980996e-07,
+          "total_s": 15.090322879999999
+        },
+        "1": {
+          "count": 75,
+          "min_s": 1.5999999997129422e-07,
+          "max_s": 5.423696,
+          "median_s": 1.1200000000211041e-06,
+          "total_s": 5.814017998
+        }
+      },
+      "first_intervals": [
+        {
+          "start_s": 6.6162e-05,
+          "end_s": 0.38971888,
+          "level": 1
+        },
+        {
+          "start_s": 0.38971888,
+          "end_s": 0.38971904,
+          "level": 0
+        },
+        {
+          "start_s": 0.38971904,
+          "end_s": 0.38979536,
+          "level": 1
+        },
+        {
+          "start_s": 0.38979536,
+          "end_s": 0.38979552,
+          "level": 0
+        }
+      ],
+      "last_intervals": [
+        {
+          "start_s": 0.39077824,
+          "end_s": 0.39086736,
+          "level": 0
+        },
+        {
+          "start_s": 0.39086736,
+          "end_s": 0.39086752,
+          "level": 1
+        },
+        {
+          "start_s": 0.39086752,
+          "end_s": 15.48071104,
+          "level": 0
+        },
+        {
+          "start_s": 15.48071104,
+          "end_s": 20.90440704,
+          "level": 1
+        }
+      ]
+    },
+    "Channel 6": {
+      "interval_count": 1,
+      "levels": {
+        "1": {
+          "count": 1,
+          "min_s": 20.904340878,
+          "max_s": 20.904340878,
+          "median_s": 20.904340878,
+          "total_s": 20.904340878
+        }
+      },
+      "first_intervals": [
+        {
+          "start_s": 6.6162e-05,
+          "end_s": 20.90440704,
+          "level": 1
+        }
+      ],
+      "last_intervals": [
+        {
+          "start_s": 6.6162e-05,
+          "end_s": 20.90440704,
+          "level": 1
+        }
+      ]
+    }
+  },
+  "source_limitations": [
+    "No firmware detector or cold-boot test.",
+    "Host stimulus times are not hardware timestamps.",
+    "UART BREAK API success does not prove a LOW level."
+  ],
+  "interpretation": [
+    "Interval statistics summarize the exported logic threshold states; they do not prove every transition is a physical reset.",
+    "Power-cycle traces include threshold chatter near low rails; physical causation is not established.",
+    "The exact firmware recovery park and fresh SBF result establish recovery and Standby history; this waveform summary alone does not.",
+    "Raw waveforms remain local. This compact summary cannot recreate the waveform or replay the edge detector."
+  ],
+  "local_primary_files": [
+    {
+      "path": "tmp/bringup/capture-sleep-20261020/v59-energy-cycle-1/analog.csv",
+      "bytes": 17143720,
+      "sha256": "b0acbd9734e0b21ca2f2b6f42a2078ca0948ef8065555a92890d1638693cbb79",
+      "archived": false
+    },
+    {
+      "path": "tmp/bringup/capture-sleep-20261020/v59-energy-cycle-1/digital.csv",
+      "bytes": 2582,
+      "sha256": "e0366df43d70065e706ff36ed38bad1a401325caf373a77566c6d1f10edd90b9",
+      "archived": false
+    },
+    {
+      "path": "tmp/bringup/capture-sleep-20261020/v59-energy-cycle-1/power-cycle.sal",
+      "bytes": 526367,
+      "sha256": "0e5d5883e974ec36a8ee4bd5984d57f1daca14f760e03c291b358428fc6d13ea",
+      "archived": false
+    },
+    {
+      "path": "tmp/bringup/capture-sleep-20261020/v59-energy-cycle-1/signal-summary.json",
+      "bytes": 15644,
+      "sha256": "26a9faf66422ae2d4d1e784cc6cb734fa367ac10b581a76e403784f552b88509",
+      "archived": false
+    }
+  ]
+}

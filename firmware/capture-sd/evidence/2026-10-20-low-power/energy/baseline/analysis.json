@@ -1,0 +1,91 @@
+{
+  "schema": 1,
+  "recording": "D:\\Github\\global-x-camera\\tmp\\bringup\\capture-sleep-20261020\\baseline-energy\\raw",
+  "manifest_sha256": "1dd272e270afe04b2085efaf4cf1dea64c8991467c136a85c6802e2b1295af02",
+  "sample_rate_hz": 2000000,
+  "decimate_factor": 1,
+  "uses_host_utc_alignment": false,
+  "cycles": [
+    {
+      "name": "v50 awake-level onset (not completion)",
+      "terminal_evidence": "D:\\Github\\global-x-camera\\tmp\\bringup\\capture-sleep-20261020\\v50-baseline-proof\\verified.json",
+      "terminal_evidence_sha256": "9a70601bf6ad7799745578457e29c5e0a1086efad6f3c7f2ec16166b27354e4a",
+      "terminal_state_qualification": "caller attestation; analyzer does not interpret firmware proof",
+      "window": {
+        "start_sample_id": 30000000,
+        "end_sample_id": 90000000
+      },
+      "boundaries": {
+        "current_onset_sample_id": 57466341,
+        "first_activity_above_off_threshold_sample_id": 57466341,
+        "integration_start_sample_id": 57266341,
+        "terminal_plateau_start_sample_id": 62514000,
+        "integration_end_sample_id": 64514000,
+        "sample_interval_s": 5e-07,
+        "plateau_boundary_bin_s": 0.001
+      },
+      "onset_to_plateau_s": 2.5238294999999997,
+      "integration_duration_s": 3.6238295,
+      "pretrigger_energy_j": 0.0,
+      "onset_to_plateau_energy_j": 1.2390715368978893,
+      "plateau_confirmation_energy_j": 0.3931178235641718,
+      "pretrigger_through_confirmed_plateau_energy_j": 1.632189360462061,
+      "whole_window_energy_j": 6.608339791220686,
+      "baseline_power_w": 0.0,
+      "conditional_baseline_subtracted_energy_j": 1.632189360462061,
+      "peak_current_a": 7.702425956726074,
+      "minimum_source_voltage_v": 1.9619345664978027,
+      "plateau": {
+        "observed_s": 13.742999999999999,
+        "mean_current_a": 0.08003436993547329,
+        "mean_power_w": 0.3906911339825946,
+        "bin_mean_span_a": 0.008987565357238048,
+        "peak_abs_current_a": 0.10508792847394943
+      },
+      "criteria": {
+        "bin_s": 0.001,
+        "off_baseline_s": 0.5,
+        "off_abs_max_a": 0.0001,
+        "onset_a": 0.12,
+        "pretrigger_s": 0.1,
+        "plateau_min_s": 1.0,
+        "plateau_mean_min_a": 0.075,
+        "plateau_mean_max_a": 0.09,
+        "plateau_peak_abs_max_a": 0.11,
+        "plateau_mean_span_a": 0.012,
+        "current_valid_abs_max_a": 9.5
+      },
+      "limits": [
+        "Boundaries are measured-current thresholds, not physical target-rail edges.",
+        "Pretrigger includes measured startup charge only if activity begins inside its window.",
+        "Subthreshold charge before pretrigger is not proven absent; whole-window energy is also reported.",
+        "Plateau classification and firmware completion require the external qualification.",
+        "Baseline subtraction assumes stationary background; raw energy is the primary result.",
+        "No analog calibration, saturation detection, suppression interpolation, or CN8 bypass correction is inferred.",
+        "The 80mA level can begin during final uncached frame validation before SAVE return; this plateau boundary is not a complete-cycle endpoint."
+      ],
+      "completion_boundary_qualified": false,
+      "onset_to_plateau_energy_is_complete_cycle": false
+    }
+  ],
+  "scope": "v50 awake current-level comparison only. The observed80mA level may begin before uncached final validation and SAVE return;1.239J is not a complete-cycle energy measurement.",
+  "current_limit_source": "JS110 manufacturer comparison: 10 A pulse, 3 A sustained; 9.5 A software rejection threshold is not an ADC clipping detector.",
+  "current_limit_source_url": "https://www.joulescope.com/pages/joulescope-comparison",
+  "suppression_limit": "This session predates the raw recorder's explicit suppression-setting snapshot. Auto range was used; finite samples do not exclude substitution near switches.",
+  "startup_first_100ms": {
+    "delivered_current_above_3a_duration_us": 108.5,
+    "source_voltage_below_4v_duration_us": 66.5,
+    "source_voltage_below_4_5v_duration_us": 80.0,
+    "first_1ms_energy_j": 0.0023705144764659927,
+    "first_10ms_energy_j": 0.0050747560593253005,
+    "first_100ms_energy_j": 0.055213178050867284
+  },
+  "completion_timing_evidence": {
+    "begin_cycles": 195939536,
+    "total_cycles": 801085251,
+    "complete_cycles": 953563439,
+    "post_total_cycles": 152478188,
+    "post_total_duration_s": 0.38119547,
+    "scope": "Module-local duration evidence; no JS-native physical entry synchronization is inferred."
+  }
+}

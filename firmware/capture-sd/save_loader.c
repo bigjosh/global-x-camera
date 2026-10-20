@@ -55,8 +55,10 @@ int photo_save_load(void)
         if(++polls>10000000U) return -108;
         if((uint32_t)(DWT->CYCCNT-started)>40000000U) return -108;
     }
-    proof[6]=x->SR;
-    if(x->SR&XSPI_SR_FLEVEL) return -109;
+    uint32_t terminal=x->SR;
+    proof[6]=terminal;
+    if((terminal&(XSPI_SR_BUSY|XSPI_SR_FLEVEL|XSPI_SR_TEF)) ||
+       !(terminal&XSPI_SR_TCF)) return -109;
     x->FCR=XSPI_FCR_CTCF|XSPI_FCR_CTEF;
     proof[7]=crc^0xFFFFFFFFU; proof[8]=count; proof[9]=DWT->CYCCNT;
     if(proof[7]!=SAVE_CRC32) return -110;

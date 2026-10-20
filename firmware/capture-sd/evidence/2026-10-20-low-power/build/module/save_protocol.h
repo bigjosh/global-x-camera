@@ -1,0 +1,49 @@
+#ifndef SAVE_PROTOCOL_H
+#define SAVE_PROTOCOL_H
+#include <stdint.h>
+#define SAVE_REQUEST_ADDRESS 0x343F9F00U
+#define SAVE_REPORT_ADDRESS 0x343FA000U
+#define SAVE_CARD_ADDRESS 0x343FA200U
+#define SAVE_FS_ADDRESS 0x343FA400U
+#define SAVE_REQUEST_MAGIC 0x53525131U
+#define SAVE_REPORT_MAGIC 0x53564431U
+#define SAVE_FRAME_ADDRESS 0x34000000U
+#define SAVE_FRAME_BYTES 3055360U
+#define SAVE_WIDTH 1120U
+#define SAVE_HEIGHT 1364U
+#define SAVE_CLOCK_HZ 400000000U
+#define SAVE_BUFFER_BYTES 32768U
+#define SAVE_READ_BUFFER_BYTES (256U * 1024U)
+#define SAVE_MAX_PNG_BYTES 3100000U
+enum { SAVE_OP_SAVE=1, SAVE_OP_FORMAT=2, SAVE_OP_READ=3, SAVE_OP_MOUNT=4 };
+/* All words little endian. Name is a zero-terminated 12-character IMGnnnnn.PNG
+ * or TMP. Bench entry ORs bit31 into op; normal firmware never uses requests. */
+typedef struct {
+    uint32_t magic, operation, mode, sd_clock_hz, offset, length;
+    char name[16];
+    uint32_t nonce, reserved[5];
+} save_request_t;
+_Static_assert(sizeof(save_request_t)==64, "Request ABI");
+enum {
+    P_MAGIC,P_SCHEMA,P_WORDS,P_STATE,P_OP,P_MODE,P_RESULT,P_STAGE,
+    P_BEGIN,P_END,P_CPU_HZ,P_BUFFER_ADDRESS,P_BUFFER_BYTES,P_READ_BYTES,
+    P_SD_HZ,P_CCR,
+    P_TOTAL_LO,P_TOTAL_HI,P_ENCODE_LO,P_ENCODE_HI,
+    P_CALLBACK_LO,P_CALLBACK_HI,P_FINISH_LO,P_FINISH_HI,
+    P_INIT_LO,P_INIT_HI,P_MOUNT_LO,P_MOUNT_HI,
+    P_VALIDATE_LO,P_VALIDATE_HI,P_STACK_USED,P_STACK_CANARY,
+    P_ROWS,P_IDAT_CHUNKS,P_CALLBACKS,P_BUFFER_FLUSHES,
+    P_PNG_BYTES_LO,P_PNG_BYTES_HI,P_FNV_BEFORE,P_FNV_AFTER,
+    P_WIDTH,P_HEIGHT,P_FRAME_BYTES,P_MEDIA_IDLE,
+    P_CARD_ERROR,P_FS_RESULT,P_FS_STAGE,P_PNG_RESULT,
+    P_CARD_SIZE,P_FS_SIZE,P_NONCE,P_INITIAL_MSPLIM,
+    P_TERMINAL=63,P_NAME=64,
+    /* Optional v6 extension; words 64..67 remain the 16-byte filename.
+     * P_TOTAL retains the original pre-cleanup comparison interval.
+     * COMPLETE includes cleanup, the uncached SAVE validation, and snapshots;
+     * it ends just before the final report bookkeeping/terminal publication. */
+    P_CACHE_ENABLED=68,P_INITIAL_MPU_CTRL,P_FINAL_CCR,
+    P_CLEANUP_LO,P_CLEANUP_HI,P_POSTCLEAN_VALIDATE_LO,P_POSTCLEAN_VALIDATE_HI,
+    P_COMPLETE_LO,P_COMPLETE_HI,P_POSTCLEAN_FNV,P_POSTCLEAN_VALIDATED
+};
+#endif

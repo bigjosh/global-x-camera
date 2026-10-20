@@ -25,6 +25,10 @@ from nor_bench import Bench
 LOAD=0x34320000
 REQUEST=0x343F9F00
 LOADER=0x343F9E00
+LOW_POWER_PROOF=0x343F9C00
+LOW_POWER_MAGIC=0x4C504D31
+LATE_COMPLETION_PROOF=0x343F9B00
+LATE_COMPLETION_MAGIC=0x4C504C31
 REPORT=0x343FA000
 CARD=0x343FA200
 FS=0x343FA400
@@ -325,9 +329,24 @@ def maintenance_park_proof(bench):
     context=context_proof(bench,{CACHE+0x72,CACHE+0x74},"preflight")
     return dict(frame=frame,cache_status=list(status),cache_sha256=sha(cache),context=context)
 
+def reject_low_power_completion(bench, tag=""):
+    """Peripheral teardown invalidates ordinary maintenance prerequisites.
+
+    Even a partial/refused record may follow clock or pin changes. Do not
+    interpret an old storage DONE record as permission to access gated devices.
+    Reset into the separately checked early UART recovery park instead.
+    """
+    magic,=struct.unpack("<I",bench.upload(LOW_POWER_PROOF,4,tag+"low-power-magic.bin"))
+    if magic==LOW_POWER_MAGIC:
+        raise ValueError("Low-power completion owns the target; use verified early UART recovery before maintenance")
+    late,=struct.unpack("<I",bench.upload(LATE_COMPLETION_PROOF,4,tag+"late-completion-magic.bin"))
+    if late==LATE_COMPLETION_MAGIC:
+        raise ValueError("Late completion owns the target; use verified early UART recovery before maintenance")
+
 
 def preflight(bench,manifest,code,prior_manifest=None,prior_code=None):
     """No halt/write before terminal evidence; no retry path for an SD error."""
+    reject_low_power_completion(bench)
     loader=struct.unpack("<16I",bench.upload(LOADER,64,"prior-loader.bin"))
     raw=bench.upload(REPORT,512,"prior-report.bin")
     prior=decode_report(raw)
@@ -335,6 +354,7 @@ def preflight(bench,manifest,code,prior_manifest=None,prior_code=None):
         raise ValueError("Prior module manifest and code must be supplied together")
     if prior_manifest is not None:
         proof=exact_storage_proof(bench,prior_manifest,prior_code,loader,raw,"prior")
+        reject_low_power_completion(bench,"post-save-")
         offset=number(prior_manifest["park_address"])-LOAD
         if (not 0<=offset<len(code)-1 or
                 (code[offset:offset+2]!=b"\xfe\xe7" and
@@ -350,6 +370,7 @@ def preflight(bench,manifest,code,prior_manifest=None,prior_code=None):
                     module_already_identical=prior_code==code)
     if validate_storage_activity(loader,prior):
         proof=exact_storage_proof(bench,manifest,code,loader,raw,"prior")
+        reject_low_power_completion(bench,"post-save-")
         if proof["automatic_save"]:
             return dict(path="automatic_save_maintenance",**proof,
                         **maintenance_park_proof(bench),module_already_identical=True)
@@ -576,6 +597,8 @@ def self_test():
                     self.reads=0
                 def upload(self,address,length,name):
                     self.reads+=1
+                    if (address,length) in ((LOW_POWER_PROOF,4),(LATE_COMPLETION_PROOF,4)):
+                        return bytes(4)
                     if (address,length)==(LOADER,64):
                         return bytes(64)
                     assert (address,length)==(REPORT,512)
@@ -590,11 +613,34 @@ def self_test():
                 fake=ReadOnlyPrior(struct.pack("<128I",*words))
                 with self.assertRaises(ValueError):
                     preflight(fake,{},b"")
-                self.assertEqual(fake.reads,2)
+                self.assertEqual(fake.reads,4)
                 fake=ReadOnlyPrior(struct.pack("<128I",*words))
                 with self.assertRaises(ValueError):
                     preflight(fake,{},b"",{"park_address":hex(LOAD)},b"\xfe\xe7")
-                self.assertEqual(fake.reads,2)
+                self.assertEqual(fake.reads,4)
+
+        def test_low_power_completion_never_reaches_storage_or_halt(self):
+            class LowPower:
+                def upload(self,address,length,name):
+                    assert (address,length)==(LOW_POWER_PROOF,4)
+                    return struct.pack("<I",LOW_POWER_MAGIC)
+                def call(self,*args,**kwargs):
+                    raise AssertionError("Low-power completion must not be halted")
+            with self.assertRaisesRegex(ValueError,"early UART recovery"):
+                preflight(LowPower(),{},b"")
+
+        def test_late_completion_never_reaches_storage_or_halt(self):
+            class LateCompletion:
+                def upload(self,address,length,name):
+                    assert length==4
+                    if address==LOW_POWER_PROOF:
+                        return bytes(4)
+                    assert address==LATE_COMPLETION_PROOF
+                    return struct.pack("<I",LATE_COMPLETION_MAGIC)
+                def call(self,*args,**kwargs):
+                    raise AssertionError("Late completion must not be halted")
+            with self.assertRaisesRegex(ValueError,"early UART recovery"):
+                preflight(LateCompletion(),{},b"")
 
         def test_module_switch_proves_old_code_and_preserves_park(self):
             class Prior:

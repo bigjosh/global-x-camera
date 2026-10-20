@@ -1,22 +1,24 @@
 # Capture to PNG on SD — October 20 implementation log
 
-**Current selection: v50 autonomous capture → PNG16 → FAT32, awake completion.**
+**Current selection: v59 autonomous capture → PNG16 → FAT32 → Standby.**
 The installed first-sector SHA-256 is
-`9ffc2c1cbaacf9f60258343ac6a061b35fb62f8b62b42c1a5b50ccc5f432f5cd`.
+`7fda9d00cc7ffb3fbb9e6aac6695cf18545754b5dbfce1520cf30b2da39c4e63`.
 It uses the v8b cached, `-Os`, dedicated fast-loop compressor with no PNG row
-filter. Four normal cold boots have saved distinct files; the first automatic
-file passed complete readback and exact comparison of every sensor sample.
-Early VCP recovery passed between the second and third normal boots.
+filter. Four tested Standby cycles each recovered on the first warm UART
+request, with the retained hardware Standby flag set. Three complete measured
+cycles used 1.410–1.424 J and reached a stable 8.10–8.21 mA board-input plateau
+in 2.96–2.98 s. See [the current qualification](#post-save-standby-and-complete-cycle-energy--october-20).
 
 The selected same-frame benchmark saves took **1.6831–1.6842 s** and produced
 **919,353 bytes**, with conditional save-duration energy bounds of
 **0.7675–0.8129 J**. These are save-module results, not full cold-cycle
-measurements or isolated production-camera power. Completion remains awake;
-WFI recovery, regulator-off shutdown and sudden power-loss protection remain
+measurements or isolated production-camera power. They preceded the Standby
+work. LTC regulator-off shutdown and sudden power-loss protection remain
 unqualified.
 
-The [final selection and integration](#selected-v8b-compressor-and-v50-integration)
-supersede the earlier blocked/v45b and RAM-only/v46 checkpoints below.
+The [v50 selection and integration](#selected-v8b-compressor-and-v50-integration)
+superseded the earlier blocked/v45b and RAM-only/v46 checkpoints, and the v59
+section supersedes its awake completion.
 Historical sections retain what was known at each step. The
 [hardware archive](../../firmware/capture-sd/evidence/2026-10-20-hardware/README.md)
 contains the exact builds, proof records and replayable measurements without
@@ -573,7 +575,137 @@ The review used cached primary manuals:
 `tmp/capture-research/rm0486-compact.txt`,
 `tmp/hardware-review/mcu/STM32N6_ES0620_errata.txt`, and
 `tmp/hardware-review/mcu/STM32N6_UM3234_boot_ROM.txt`.
-Keep the installed v50 completion awake for storage work. A later isolated diagnostic can compare
+At that checkpoint, v50 completion was kept awake for storage work. A later isolated diagnostic can compare
 DBGMCU identity/control/status through its documented aliases and save
 firmware readbacks before host attachment and before sleep. No speculative
 reset or sleep experiment should interrupt active or uncertain storage I/O.
+
+## Post-save Standby and complete-cycle energy — October 20
+
+The next implemented prototype policy is **successful capture → PNG save →
+card-ready/deinitialization → peripheral shutdown → MCU Standby**. The
+installed v59 sector is
+`7fda9d00cc7ffb3fbb9e6aac6695cf18545754b5dbfce1520cf30b2da39c4e63`.
+The selected v8b PNG/FAT32 module is unchanged. Failure paths preserve
+diagnostics and leave power on; arbitrary power-loss protection remains
+unqualified. This supersedes the v50 awake-completion requirement above.
+
+Standby is the selected terminal MCU state. The prototype still receives
+5 V through the Joulescope; firmware does not yet release an LTC RUN latch.
+Standby's PWR_ON behavior disables the stock Nucleo's switched camera,
+SD, NOR and core supplies. Main VDD/VDDIO and board overhead remain powered.
+Do not enable retained GPIO pulls that could feed the switched-off devices.
+Actual per-rail discharge and interface leakage still require separate
+measurement. The earlier 0.1 µA main-path product target is an externally
+switched-off target, not a claim for this powered evaluation board.
+
+Recovery remains the existing 1 Mbaud repeated `0xC0` request on PE6 across
+ST-LINK BREAK-controlled NRST. It selects the exact early recovery park
+before sensor or SD activity. Four initial v59 trials reached Standby and
+then recovered on the first request, with SBF set on each post-reset check.
+This is demonstrated recovery for those trials, not an all-state guarantee.
+PE1's external wire remains disconnected.
+
+### Implementation decisions and discoveries
+
+- Put bulk shutdown code in a separate late-loaded, CRC-checked module at
+  NOR `0xE000`, executing at `0x343C0000`, after SAVE. The initial monolithic
+  v51b receiver crossed the existing first-frame timing guard and captured
+  nothing. The guard was not relaxed. V59's early receiver is 15,560 bytes,
+  only 564 bytes larger than v50; separate exposure-timing qualification is
+  still needed.
+- Require successful SAVE, completed rename/sync, idle/deinitialized SD,
+  idle camera/I2C/NOR and safe CPU/cache context before teardown. Disable
+  the CSI PHY, reset the sensor, and reset/gate the inactive interfaces.
+  Preserve BSEC's clock for the documented low-power erratum.
+- PN1 read LOW in AF9 despite an idle NOR controller. Its cause remains
+  unresolved. A measured GPIO handoff established HIGH: preload nCS HIGH,
+  switch only nCS to GPIO, require HIGH readback, then disable XSPI and
+  change CLK/MOSI. Do not send NOR deep-power-down: ROM must read NOR before
+  reaching the recovery guard.
+- Clear low-power debug emulation, mask wake sources, and verify existing
+  option shadows before Standby. No fuse programming, RTC/backup-domain
+  change or automatic retry is performed.
+- Publish `LPL1` ownership before legacy capture-complete, and retain it
+  throughout SAVE and late loading. Maintenance helpers check `LPL1`/`LPM1`
+  both before inspection and after SAVE validation, closing the race where
+  a successful save could otherwise be halted during shutdown.
+- Standby loses the frame and high-SRAM proof records. Do not infer physical
+  entry from an ARMED record. Use the measured terminal plateau, exact
+  installed control flow, warm-reset history and retained SBF instead.
+  Unlike SBF, STOPF clears on any reset, so the intermediate Stop experiment's
+  post-reset STOPF=0 is inconclusive.
+
+The intermediate peripheral-off awake test verified IMG00037.PNG and
+complete teardown at about 77.05 mA. The Stop candidate settled at about
+62.12 mA, with normal debug access unavailable; its first warm UART recovery
+passed. Standby settled near 8.2 mA. These are board-input observations,
+not isolated MCU current.
+
+### Complete-cycle measurement
+
+Three native-sample JS110 cycle windows within one continuous recording gave
+**1.410–1.424 J** from observed current onset to the stable Standby plateau,
+over **2.96–2.98 s**. The separate one-second plateau confirmation contributes
+about 0.040 J and is not included in those cycle values. The terminal current
+was **8.10–8.21 mA**, compared with about 80.03 mA for the prior awake state.
+Every measured cycle was followed by a first-attempt UART recovery and
+retained SBF check, without an intervening power cycle.
+
+Integration uses synchronized power samples and native sample IDs, with no
+host-UTC alignment. The one-millisecond plateau criterion includes any
+physical settling; it is not an exact WFI-entry or file-completion timestamp.
+No dropped chunks or discontinuities were reported. Initial nonfinite
+current samples precede all measured windows and are excluded. The
+recorder preserves and records range/suppression configuration; finite data
+alone is not proof that no driver interpolation occurred.
+
+The older awake waveform reached an approximately 80 mA level before its
+final uncached frame-integrity check finished. Its measured 2.524 s / 1.239 J
+to that plateau therefore **does not represent a complete capture/save cycle**.
+The baseline proof contains a further 381.195 ms post-total interval,
+including that checksum. Use the old trace to compare idle current, not
+to claim that adding Standby increased cycle energy. Scene content and card
+behavior also prevent a controlled cycle-energy comparison here.
+
+These measurements cover the JS110-fed Nucleo branch. CN8 sense/USB bypasses
+and debugger signal paths remain outside a fully isolated DUT boundary.
+They do not establish production battery energy or coin-cell inrush behavior.
+
+### Readback after Standby
+
+A separate, reviewed RAM-only bridge starts from exact v59 early recovery,
+initializes expanded SRAM, and permits only the frozen v8b READ operation.
+It leaves NOR unchanged and preserves the normal maintenance guards.
+Each chunk must finish successfully with zero written sectors, an idle/
+deinitialized card, disabled caches and the exact terminal park.
+
+The original IMG00001.PNG retained its original SHA-256. IMG00038.PNG
+(Stop trial), IMG00039.PNG (initial Standby trial), and all three
+energy-trial files passed full readback, every PNG chunk CRC, independent
+decoding, 1120 × 1364 grayscale16, `sBIT=10`, and zero low six bits in every
+sample. The energy-trial files were:
+
+| Cycle | File | Bytes |
+|---|---|---:|
+| 1 | IMG00040.PNG | 1,781,540 |
+| 2 | IMG00041.PNG | 1,788,929 |
+| 3 | IMG00042.PNG | 1,786,611 |
+
+Standby destroys the original RAM frame, so this is file-integrity/format
+verification, not a new exact comparison against those lost capture samples.
+The earlier v50 pixel-for-pixel qualification still covers the unchanged
+encoder/save module. Images and SD-sector contents remain local; the repo
+stores their hashes and verification results.
+
+After readback, one final normal cold boot returned to the same Standby
+current level. The JS110 helper stopped cleanly at **19:16:42 UTC**, restored
+range 128, and left the board powered; last input was **4.892899 V /
+8.209705 mA**. No additional reset was sent to read SBF for this final run.
+The expected next file, IMG00043.PNG, was not downloaded. COM8 is closed,
+BREAK released, both boot jumpers are unchanged on pins 1–2, and Logic 2
+remains running. No bench helper remains active.
+
+See [hardware notes](../../firmware/capture-sd/low_power/hardware-notes-2026-10-20.md),
+[supply and teardown details](../../firmware/capture-sd/low_power/peripherals.md),
+and the [reproducible firmware and measurement archive](../../firmware/capture-sd/evidence/2026-10-20-low-power/README.md).

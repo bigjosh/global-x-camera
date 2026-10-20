@@ -30,6 +30,32 @@ VCP_FIELDS = (
     'reserved30 reserved31').split()
 # An unknown/self-consistent build is insufficient authorization to halt.
 APPROVED = {
+    # v57/v58/v59 qualify nCS after GPIO takeover; all earlier guards retained.
+    '67278231209a8eec1201d1b596cc862a41a288c237a3c2214ec3834c56995d23':
+        {'bytes': 5140, 'park': 0x3418078C, 'vcp': True,
+         'sector': '44ea4f525d965e5b01a5178e4bb12e332f88184be2896e8c412e6ae13fc6caeb'},
+    '34e5ef66662471b1d98f453d3ec33b9e9f60511970dc263e6db875924785d940':
+        {'bytes': 5140, 'park': 0x3418078C, 'vcp': True,
+         'sector': '758d5bd20b48282983f434a647aedf46d2561f4732d0ce8fb01dc4dfd883b4e3'},
+    '9a6c498a94c9415ec3dc39933bae2e958ceb0a43b53a1b2c8b931ef26475d071':
+        {'bytes': 5140, 'park': 0x3418078C, 'vcp': True,
+         'sector': '7fda9d00cc7ffb3fbb9e6aac6695cf18545754b5dbfce1520cf30b2da39c4e63'},
+    # v55d Stop and v56d Standby; same reviewed early guard and v8b writer.
+    '35f0540ac1254ef7afeadb2afe53df305588ad954249bf3b5e51f4e31cd3e9f4':
+        {'bytes': 5140, 'park': 0x3418078C, 'vcp': True,
+         'sector': '26c8bbaffe917f2b222dc65ce0e9ccc21310ccc6175ca217b90c3e772e7138c7'},
+    'e9e16460d775e697aa8acf7ea13680b5fd00ba91707008aff2fdfc1ea483da41':
+        {'bytes': 5140, 'park': 0x3418078C, 'vcp': True,
+         'sector': 'adfb2e736f58fb2ebb838db5aadab2f63c9a25522dafdcd1ce64f89e6d3cec1f'},
+    # v54d late-loaded peripheral-off trial, unchanged v8b save module.
+    '3476b99d2ad9c32fdbe40f9f7c2bceb1c8075fa44b86ddeb75fc7a5751833c2a':
+        {'bytes': 5140, 'park': 0x3418078C, 'vcp': True,
+         'sector': 'bfdf657721b96fecfaabd037b28dcecd57350e9be2f46934b2c0dd666945d82c'},
+    # v51b terminal peripheral-off trial; same early guard/literals as v50.
+    # Receiver length and storage-module offset were independently checked.
+    '3d39b1d481469d2013c8d25e796c96ef67e6439ac5455ce90c61c86137ae95e5':
+        {'bytes': 5140, 'park': 0x3418078C, 'vcp': True,
+         'sector': 'fd729d9609c74c22c0fbedc63b49d388e2f75b47c47ba4650e687a5188a295f5'},
     # v50 capture/PNG/SD awake integration; reviewed exact v8b storage module.
     # Early guard and all referenced literals match the v45b/v46 baseline.
     '8a65df7b36a0c9a0c80e25c4a1000d4bae914ce9d3a46e5ff83e5454cdf109f7':

@@ -208,7 +208,7 @@ class StorageMaintenanceGuardsTest(unittest.TestCase):
 
     def test_legacy_unrecognized_storage_proofs_remain_read_only(self):
         fake = Mock()
-        fake.upload.side_effect = [bytes(64), bytes(512)]
+        fake.upload.side_effect = [bytes(4), bytes(4), bytes(64), bytes(512)]
         self.assertEqual(maintenance.read_storage_proof(fake),
                          dict(recognized=False, legacy_completed_capture=True))
         fake.call.assert_not_called()
@@ -220,7 +220,7 @@ class StorageMaintenanceGuardsTest(unittest.TestCase):
         loader[0] = 0x534C4431
         fake = Mock()
         fake.upload.side_effect = [struct.pack('<64I', *trace),
-                                   struct.pack('<16I', *loader), bytes(512)]
+                                   bytes(4), bytes(4), struct.pack('<16I', *loader), bytes(512)]
         with patch.object(maintenance, 'Bench', return_value=fake), patch('sys.argv',
                 ['prepare_maintenance.py', '--out', 'unused', '--layout', 'raw10']):
             with self.assertRaisesRegex(ValueError, 'loader is active'):
@@ -234,7 +234,7 @@ class StorageMaintenanceGuardsTest(unittest.TestCase):
             report = bytearray(raw)
             struct.pack_into('<I', report, guard.FIELDS.index(field) * 4, value)
             fake = Mock()
-            fake.upload.side_effect = [struct.pack('<16I', *loader), bytes(report)]
+            fake.upload.side_effect = [bytes(4), bytes(4), struct.pack('<16I', *loader), bytes(report)]
             with self.subTest(field=field), self.assertRaises(ValueError):
                 maintenance.read_storage_proof(fake, (manifest, code))
             fake.call.assert_not_called()
@@ -242,11 +242,12 @@ class StorageMaintenanceGuardsTest(unittest.TestCase):
     def test_successful_auto_save_requires_explicit_exact_build(self):
         guard, code, manifest, loader, raw, card, fs = self.successful_storage()
         fake = Mock()
-        fake.upload.side_effect = [struct.pack('<16I', *loader), raw]
+        fake.upload.side_effect = [bytes(4), bytes(4), struct.pack('<16I', *loader), raw]
         with self.assertRaisesRegex(ValueError, '--save-build'):
             maintenance.read_storage_proof(fake)
         fake.call.assert_not_called()
-        fake.upload.side_effect = [struct.pack('<16I', *loader), raw, code, card, fs]
+        fake.upload.side_effect = [bytes(4), bytes(4), struct.pack('<16I', *loader), raw, code, card, fs,
+                                   bytes(4), bytes(4)]
         result = maintenance.read_storage_proof(fake, (manifest, code))
         self.assertTrue(result['recognized'])
         self.assertTrue(result['automatic_save'])
@@ -269,7 +270,7 @@ class StorageMaintenanceGuardsTest(unittest.TestCase):
             elif kind == 'card':
                 changed_card = card[:52] + struct.pack('<I', 1) + card[56:]
             fake = Mock()
-            fake.upload.side_effect = [struct.pack('<16I', *changed_loader),
+            fake.upload.side_effect = [bytes(4), bytes(4), struct.pack('<16I', *changed_loader),
                                        raw, changed_code, changed_card, changed_fs]
             with self.subTest(kind=kind), self.assertRaises(ValueError):
                 maintenance.read_storage_proof(fake, (manifest, code))
@@ -285,7 +286,8 @@ class StorageMaintenanceGuardsTest(unittest.TestCase):
     def test_auto_save_preflight_must_use_maintenance_park_path(self):
         guard, code, manifest, loader, raw, card, fs = self.successful_storage()
         fake = Mock()
-        fake.upload.side_effect = [struct.pack('<16I', *loader), raw, code, card, fs]
+        fake.upload.side_effect = [bytes(4), bytes(4), struct.pack('<16I', *loader), raw, code, card, fs,
+                                   bytes(4), bytes(4)]
         with patch.object(guard, 'maintenance_park_proof', return_value={
                 'frame': {'verified': True}, 'context': {'exact_cache_park': True}}) as cache_check, \
                 patch.object(guard, 'context_proof') as direct_park:
@@ -295,6 +297,37 @@ class StorageMaintenanceGuardsTest(unittest.TestCase):
         cache_check.assert_called_once_with(fake)
         direct_park.assert_not_called()
         fake.call.assert_not_called()
+
+    def test_low_power_completion_refuses_before_halt_or_peripheral_read(self):
+        fake = Mock()
+        fake.upload.side_effect = [struct.pack('<I', 0x4C504D31)]
+        with self.assertRaisesRegex(ValueError, 'early UART recovery'):
+            maintenance.read_storage_proof(fake)
+        self.assertEqual(fake.upload.call_count, 1)
+        fake.call.assert_not_called()
+
+    def test_late_completion_refuses_before_halt_or_peripheral_read(self):
+        fake = Mock()
+        fake.upload.side_effect = [bytes(4), struct.pack('<I', 0x4C504C31)]
+        with self.assertRaisesRegex(ValueError, 'early UART recovery'):
+            maintenance.read_storage_proof(fake)
+        self.assertEqual(fake.upload.call_count, 2)
+        fake.call.assert_not_called()
+
+    def test_late_ownership_appearing_during_save_proof_never_halts(self):
+        guard, code, manifest, loader, raw, card, fs = self.successful_storage()
+        for operation in ('maintenance', 'preflight'):
+            fake = Mock()
+            fake.upload.side_effect = [
+                bytes(4), bytes(4), struct.pack('<16I', *loader), raw, code, card, fs,
+                bytes(4), struct.pack('<I', 0x4C504C31)]
+            with self.subTest(operation=operation), self.assertRaisesRegex(
+                    ValueError, 'early UART recovery'):
+                if operation == 'maintenance':
+                    maintenance.read_storage_proof(fake, (manifest, code))
+                else:
+                    guard.preflight(fake, manifest, code)
+            fake.call.assert_not_called()
 
 
 class LatePhyReaderTest(unittest.TestCase):

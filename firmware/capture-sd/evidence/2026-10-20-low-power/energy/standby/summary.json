@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "recording_finalized": true,
+  "native_sample_rate_hz": 2000000,
+  "uses_host_utc_alignment": false,
+  "plateau_boundary_bin_s": 0.001,
+  "cycles": [
+    {
+      "name": "v59-Standby-cycle-1",
+      "onset_to_plateau_s": 2.9628615,
+      "onset_to_plateau_energy_j": 1.411007755618521,
+      "confirmation_duration_s": 1,
+      "confirmation_energy_j": 0.0401741715625301,
+      "pretrigger_energy_j": 0.0,
+      "plateau_mean_current_ma": 8.20899049665347,
+      "plateau_mean_power_mw": 40.16156407964458,
+      "peak_current_a": 7.71635103225708,
+      "minimum_source_voltage_v": 1.9664742946624756
+    },
+    {
+      "name": "v59-Standby-cycle-2",
+      "onset_to_plateau_s": 2.9825315,
+      "onset_to_plateau_energy_j": 1.423818548507724,
+      "confirmation_duration_s": 1,
+      "confirmation_energy_j": 0.039649467703109606,
+      "pretrigger_energy_j": 0.0,
+      "plateau_mean_current_ma": 8.103175721250397,
+      "plateau_mean_power_mw": 39.64495312688264,
+      "peak_current_a": 7.720992565155029,
+      "minimum_source_voltage_v": 1.968744158744812
+    },
+    {
+      "name": "v59-Standby-cycle-3",
+      "onset_to_plateau_s": 2.9671225,
+      "onset_to_plateau_energy_j": 1.4098410906889047,
+      "confirmation_duration_s": 1,
+      "confirmation_energy_j": 0.040181789843911304,
+      "pretrigger_energy_j": 0.0,
+      "plateau_mean_current_ma": 8.212158422688894,
+      "plateau_mean_power_mw": 40.17653258039978,
+      "peak_current_a": 7.733370780944824,
+      "minimum_source_voltage_v": 1.9710140228271484
+    }
+  ],
+  "mean_onset_to_plateau_s": 2.9708384999999997,
+  "mean_onset_to_plateau_energy_j": 1.4148891316050498,
+  "baseline": {
+    "name": "v50 awake-level onset (not completion)",
+    "onset_to_plateau_s": 2.5238294999999997,
+    "onset_to_plateau_energy_j": 1.2390715368978893,
+    "plateau_mean_current_ma": 80.0343699354733,
+    "plateau_mean_power_mw": 390.6911339825946,
+    "png_bytes": 1726988,
+    "completion_boundary_qualified": false,
+    "onset_to_plateau_energy_is_complete_cycle": false
+  },
+  "final_image_readback_status": "pending; separately recorded later verification may supersede this note",
+  "limits": [
+    "Current onset is not a physical target-power-good edge.",
+    "Terminal plateau boundary may include analog settling and is not the exact WFI/Standby-entry timestamp.",
+    "Per-cycle terminal qualification is SAVE firmware guard plus subsequent SBF and exact recovery/reset history; pixel/file readback is separate.",
+    "Initial startup power transient is included, but auto-range suppression settings can alter delivered sample values; no unsuppressed transient accuracy is inferred.",
+    "CN8/debugger bypass paths remain outside the measured JS110 branch.",
+    "Baseline and final scenes/PNG sizes may differ; do not attribute cycle time/energy difference solely to the shutdown change.",
+    "Only three final cycles were measured; these are observations, not PVT limits.",
+    "v50 baseline 1.239 J ends at an ambiguous awake-current level and is not a complete-cycle energy baseline. Do not subtract it from v59 complete-cycle energy."
+  ],
+  "future_optimization": "The baseline proof shows a 381.195 ms TOTAL-to-COMPLETE tail that includes uncached frame validation. This is a potential future optimization; the current experiments preserve the checksum and cache-cleanup checks."
+}

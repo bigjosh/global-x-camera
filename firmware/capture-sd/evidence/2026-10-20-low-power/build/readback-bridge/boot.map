@@ -1,0 +1,86 @@
+
+Discarded input sections
+
+ .comment       0x00000000       0x44 C:\Users\joshd\AppData\Local\Temp\ccXJ5Aji.o
+ .comment       0x00000000       0x44 C:\Users\joshd\AppData\Local\Temp\cc4e7tfW.o
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+CODE             0x341e0000         0x00008000         xr
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+LOAD C:\Users\joshd\AppData\Local\Temp\ccCtVZ9L.o
+LOAD C:\Users\joshd\AppData\Local\Temp\ccXJ5Aji.o
+LOAD C:\Users\joshd\AppData\Local\Temp\cc4e7tfW.o
+
+.text           0x341e0000      0x52c
+ *(.entry)
+ .entry         0x341e0000       0x20 C:\Users\joshd\AppData\Local\Temp\ccCtVZ9L.o
+                0x341e0000                readback_boot_entry
+                0x341e0016                readback_boot_park
+ *(.text*)
+ .text          0x341e0020        0x0 C:\Users\joshd\AppData\Local\Temp\ccCtVZ9L.o
+ .text          0x341e0020      0x288 C:\Users\joshd\AppData\Local\Temp\ccXJ5Aji.o
+                0x341e0040                readback_boot_main
+ .text          0x341e02a8      0x260 C:\Users\joshd\AppData\Local\Temp\cc4e7tfW.o
+                0x341e02a8                raw10_memory_fault
+                0x341e02d0                raw10_memory_init
+ *(.rodata*)
+ .rodata        0x341e0508       0x24 C:\Users\joshd\AppData\Local\Temp\cc4e7tfW.o
+                0x341e052c                        . = ALIGN (0x4)
+
+.glue_7         0x341e052c        0x0
+ .glue_7        0x341e052c        0x0 linker stubs
+
+.glue_7t        0x341e052c        0x0
+ .glue_7t       0x341e052c        0x0 linker stubs
+
+.vfp11_veneer   0x341e052c        0x0
+ .vfp11_veneer  0x341e052c        0x0 linker stubs
+
+.v4_bx          0x341e052c        0x0
+ .v4_bx         0x341e052c        0x0 linker stubs
+
+.iplt           0x341e052c        0x0
+ .iplt          0x341e052c        0x0 C:\Users\joshd\AppData\Local\Temp\ccCtVZ9L.o
+
+.rel.dyn        0x341e052c        0x0
+ .rel.iplt      0x341e052c        0x0 C:\Users\joshd\AppData\Local\Temp\ccCtVZ9L.o
+
+.data           0x341e052c        0x0
+ *(.data*)
+ .data          0x341e052c        0x0 C:\Users\joshd\AppData\Local\Temp\ccCtVZ9L.o
+ .data          0x341e052c        0x0 C:\Users\joshd\AppData\Local\Temp\ccXJ5Aji.o
+ .data          0x341e052c        0x0 C:\Users\joshd\AppData\Local\Temp\cc4e7tfW.o
+
+.igot.plt       0x341e052c        0x0
+ .igot.plt      0x341e052c        0x0 C:\Users\joshd\AppData\Local\Temp\ccCtVZ9L.o
+
+.bss            0x341e052c        0x0
+ *(.bss*)
+ .bss           0x341e052c        0x0 C:\Users\joshd\AppData\Local\Temp\ccCtVZ9L.o
+ .bss           0x341e052c        0x0 C:\Users\joshd\AppData\Local\Temp\ccXJ5Aji.o
+ .bss           0x341e052c        0x0 C:\Users\joshd\AppData\Local\Temp\cc4e7tfW.o
+ *(COMMON)
+
+/DISCARD/
+ *(.ARM.exidx*)
+ *(.ARM.extab*)
+ *(.comment*)
+ *(.note*)
+                0x00000001                        ASSERT ((SIZEOF (.text) <= 0x8000), Low SRAM code overflow)
+                0x00000001                        ASSERT (((SIZEOF (.data) == 0x0) && (SIZEOF (.bss) == 0x0)), No static state)
+OUTPUT(D:\Github\global-x-camera\tmp\bringup\capture-sleep-20261020\recovery-read-bridge-v1\boot.elf elf32-littlearm)
+LOAD linker stubs
+
+.ARM.attributes
+                0x00000000       0x34
+ .ARM.attributes
+                0x00000000       0x26 C:\Users\joshd\AppData\Local\Temp\ccCtVZ9L.o
+ .ARM.attributes
+                0x00000026       0x36 C:\Users\joshd\AppData\Local\Temp\ccXJ5Aji.o
+ .ARM.attributes
+                0x0000005c       0x36 C:\Users\joshd\AppData\Local\Temp\cc4e7tfW.o

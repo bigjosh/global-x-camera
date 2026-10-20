@@ -1,0 +1,481 @@
+
+D:\Github\global-x-camera\tmp\bringup\capture-sleep-20261020\recovery-read-bridge-v1\boot.elf:     file format elf32-littlearm
+
+
+Disassembly of section .text:
+
+341e0000 <readback_boot_entry>:
+341e0000:	b672      	cpsid	i
+341e0002:	2000      	movs	r0, #0
+341e0004:	f380 880a 	msr	MSPLIM, r0
+341e0008:	f8df d00c 	ldr.w	sp, [pc, #12]	@ 341e0018 <readback_boot_park+0x2>
+341e000c:	4803      	ldr	r0, [pc, #12]	@ (341e001c <readback_boot_park+0x6>)
+341e000e:	f380 880a 	msr	MSPLIM, r0
+341e0012:	f000 f815 	bl	341e0040 <readback_boot_main>
+
+341e0016 <readback_boot_park>:
+341e0016:	e7fe      	b.n	341e0016 <readback_boot_park>
+341e0018:	341b8000 	.word	0x341b8000
+341e001c:	341b6000 	.word	0x341b6000
+
+341e0020 <fail>:
+341e0020:	4a05      	ldr	r2, [pc, #20]	@ (341e0038 <fail+0x18>)
+341e0022:	f8c2 0110 	str.w	r0, [r2, #272]	@ 0x110
+341e0026:	f3bf 8f4f 	dsb	sy
+341e002a:	4b04      	ldr	r3, [pc, #16]	@ (341e003c <fail+0x1c>)
+341e002c:	f8c2 3158 	str.w	r3, [r2, #344]	@ 0x158
+341e0030:	f3bf 8f4f 	dsb	sy
+341e0034:	4770      	bx	lr
+341e0036:	bf00      	nop
+341e0038:	341b4000 	.word	0x341b4000
+341e003c:	5242444e 	.word	0x5242444e
+
+341e0040 <readback_boot_main>:
+341e0040:	b538      	push	{r3, r4, r5, lr}
+341e0042:	f04f 0e17 	mov.w	lr, #23
+341e0046:	2200      	movs	r2, #0
+341e0048:	f04e e001 	dls	lr, lr
+341e004c:	4b85      	ldr	r3, [pc, #532]	@ (341e0264 <readback_boot_main+0x224>)
+341e004e:	f843 2b04 	str.w	r2, [r3], #4
+341e0052:	f00f c005 	le	lr, 341e004e <readback_boot_main+0xe>
+341e0056:	2101      	movs	r1, #1
+341e0058:	2017      	movs	r0, #23
+341e005a:	4b83      	ldr	r3, [pc, #524]	@ (341e0268 <readback_boot_main+0x228>)
+341e005c:	4a83      	ldr	r2, [pc, #524]	@ (341e026c <readback_boot_main+0x22c>)
+341e005e:	f8c3 2100 	str.w	r2, [r3, #256]	@ 0x100
+341e0062:	f8c3 1104 	str.w	r1, [r3, #260]	@ 0x104
+341e0066:	f8c3 0108 	str.w	r0, [r3, #264]	@ 0x108
+341e006a:	6858      	ldr	r0, [r3, #4]
+341e006c:	f8c3 010c 	str.w	r0, [r3, #268]	@ 0x10c
+341e0070:	f04f 30ff 	mov.w	r0, #4294967295
+341e0074:	f8c3 0110 	str.w	r0, [r3, #272]	@ 0x110
+341e0078:	f8c3 1114 	str.w	r1, [r3, #276]	@ 0x114
+341e007c:	6819      	ldr	r1, [r3, #0]
+341e007e:	4291      	cmp	r1, r2
+341e0080:	d105      	bne.n	341e008e <readback_boot_main+0x4e>
+341e0082:	685a      	ldr	r2, [r3, #4]
+341e0084:	b11a      	cbz	r2, 341e008e <readback_boot_main+0x4e>
+341e0086:	689a      	ldr	r2, [r3, #8]
+341e0088:	b90a      	cbnz	r2, 341e008e <readback_boot_main+0x4e>
+341e008a:	68da      	ldr	r2, [r3, #12]
+341e008c:	b11a      	cbz	r2, 341e0096 <readback_boot_main+0x56>
+341e008e:	2001      	movs	r0, #1
+341e0090:	e8bd 4038 	ldmia.w	sp!, {r3, r4, r5, lr}
+341e0094:	e7c4      	b.n	341e0020 <fail>
+341e0096:	4a76      	ldr	r2, [pc, #472]	@ (341e0270 <readback_boot_main+0x230>)
+341e0098:	6951      	ldr	r1, [r2, #20]
+341e009a:	f8c3 1118 	str.w	r1, [r3, #280]	@ 0x118
+341e009e:	f3ef 8114 	mrs	r1, CONTROL
+341e00a2:	f8c3 111c 	str.w	r1, [r3, #284]	@ 0x11c
+341e00a6:	f3ef 8105 	mrs	r1, IPSR
+341e00aa:	f8c3 1120 	str.w	r1, [r3, #288]	@ 0x120
+341e00ae:	f3ef 8110 	mrs	r1, PRIMASK
+341e00b2:	f8c3 1124 	str.w	r1, [r3, #292]	@ 0x124
+341e00b6:	f3ef 8113 	mrs	r1, FAULTMASK
+341e00ba:	f8c3 1128 	str.w	r1, [r3, #296]	@ 0x128
+341e00be:	496d      	ldr	r1, [pc, #436]	@ (341e0274 <readback_boot_main+0x234>)
+341e00c0:	6b49      	ldr	r1, [r1, #52]	@ 0x34
+341e00c2:	f8c3 112c 	str.w	r1, [r3, #300]	@ 0x12c
+341e00c6:	f8d2 2094 	ldr.w	r2, [r2, #148]	@ 0x94
+341e00ca:	f8c3 2130 	str.w	r2, [r3, #304]	@ 0x130
+341e00ce:	f8d3 2118 	ldr.w	r2, [r3, #280]	@ 0x118
+341e00d2:	f412 3f40 	tst.w	r2, #196608	@ 0x30000
+341e00d6:	d115      	bne.n	341e0104 <readback_boot_main+0xc4>
+341e00d8:	f8d3 211c 	ldr.w	r2, [r3, #284]	@ 0x11c
+341e00dc:	b992      	cbnz	r2, 341e0104 <readback_boot_main+0xc4>
+341e00de:	f8d3 2120 	ldr.w	r2, [r3, #288]	@ 0x120
+341e00e2:	b97a      	cbnz	r2, 341e0104 <readback_boot_main+0xc4>
+341e00e4:	f8d3 2124 	ldr.w	r2, [r3, #292]	@ 0x124
+341e00e8:	2a01      	cmp	r2, #1
+341e00ea:	d10b      	bne.n	341e0104 <readback_boot_main+0xc4>
+341e00ec:	f8d3 3128 	ldr.w	r3, [r3, #296]	@ 0x128
+341e00f0:	b943      	cbnz	r3, 341e0104 <readback_boot_main+0xc4>
+341e00f2:	4a5d      	ldr	r2, [pc, #372]	@ (341e0268 <readback_boot_main+0x228>)
+341e00f4:	f8d2 312c 	ldr.w	r3, [r2, #300]	@ 0x12c
+341e00f8:	07db      	lsls	r3, r3, #31
+341e00fa:	d403      	bmi.n	341e0104 <readback_boot_main+0xc4>
+341e00fc:	f8d2 3130 	ldr.w	r3, [r2, #304]	@ 0x130
+341e0100:	07dd      	lsls	r5, r3, #31
+341e0102:	d501      	bpl.n	341e0108 <readback_boot_main+0xc8>
+341e0104:	2002      	movs	r0, #2
+341e0106:	e7c3      	b.n	341e0090 <readback_boot_main+0x50>
+341e0108:	4b5b      	ldr	r3, [pc, #364]	@ (341e0278 <readback_boot_main+0x238>)
+341e010a:	6a19      	ldr	r1, [r3, #32]
+341e010c:	f8c2 1134 	str.w	r1, [r2, #308]	@ 0x134
+341e0110:	6a59      	ldr	r1, [r3, #36]	@ 0x24
+341e0112:	f8c2 1138 	str.w	r1, [r2, #312]	@ 0x138
+341e0116:	6a19      	ldr	r1, [r3, #32]
+341e0118:	4a58      	ldr	r2, [pc, #352]	@ (341e027c <readback_boot_main+0x23c>)
+341e011a:	4291      	cmp	r1, r2
+341e011c:	d121      	bne.n	341e0162 <readback_boot_main+0x122>
+341e011e:	6a5a      	ldr	r2, [r3, #36]	@ 0x24
+341e0120:	f5b2 1f80 	cmp.w	r2, #1048576	@ 0x100000
+341e0124:	d11d      	bne.n	341e0162 <readback_boot_main+0x122>
+341e0126:	f8d3 1080 	ldr.w	r1, [r3, #128]	@ 0x80
+341e012a:	4a55      	ldr	r2, [pc, #340]	@ (341e0280 <readback_boot_main+0x240>)
+341e012c:	4291      	cmp	r1, r2
+341e012e:	d118      	bne.n	341e0162 <readback_boot_main+0x122>
+341e0130:	f8d3 2084 	ldr.w	r2, [r3, #132]	@ 0x84
+341e0134:	b9aa      	cbnz	r2, 341e0162 <readback_boot_main+0x122>
+341e0136:	f8d3 1088 	ldr.w	r1, [r3, #136]	@ 0x88
+341e013a:	4a52      	ldr	r2, [pc, #328]	@ (341e0284 <readback_boot_main+0x244>)
+341e013c:	4291      	cmp	r1, r2
+341e013e:	d110      	bne.n	341e0162 <readback_boot_main+0x122>
+341e0140:	f8d3 20c4 	ldr.w	r2, [r3, #196]	@ 0xc4
+341e0144:	4950      	ldr	r1, [pc, #320]	@ (341e0288 <readback_boot_main+0x248>)
+341e0146:	400a      	ands	r2, r1
+341e0148:	f5b2 3f00 	cmp.w	r2, #131072	@ 0x20000
+341e014c:	d109      	bne.n	341e0162 <readback_boot_main+0x122>
+341e014e:	f8d3 20c8 	ldr.w	r2, [r3, #200]	@ 0xc8
+341e0152:	400a      	ands	r2, r1
+341e0154:	f5b2 3f40 	cmp.w	r2, #196608	@ 0x30000
+341e0158:	d103      	bne.n	341e0162 <readback_boot_main+0x122>
+341e015a:	f8d3 3240 	ldr.w	r3, [r3, #576]	@ 0x240
+341e015e:	079c      	lsls	r4, r3, #30
+341e0160:	d401      	bmi.n	341e0166 <readback_boot_main+0x126>
+341e0162:	2003      	movs	r0, #3
+341e0164:	e794      	b.n	341e0090 <readback_boot_main+0x50>
+341e0166:	4d44      	ldr	r5, [pc, #272]	@ (341e0278 <readback_boot_main+0x238>)
+341e0168:	4c3f      	ldr	r4, [pc, #252]	@ (341e0268 <readback_boot_main+0x228>)
+341e016a:	f8d5 3260 	ldr.w	r3, [r5, #608]	@ 0x260
+341e016e:	f8c4 313c 	str.w	r3, [r4, #316]	@ 0x13c
+341e0172:	f8d5 3220 	ldr.w	r3, [r5, #544]	@ 0x220
+341e0176:	f8c4 3140 	str.w	r3, [r4, #320]	@ 0x140
+341e017a:	f242 0320 	movw	r3, #8224	@ 0x2020
+341e017e:	f8d4 213c 	ldr.w	r2, [r4, #316]	@ 0x13c
+341e0182:	ea02 0103 	and.w	r1, r2, r3
+341e0186:	4393      	bics	r3, r2
+341e0188:	d107      	bne.n	341e019a <readback_boot_main+0x15a>
+341e018a:	f8d4 3140 	ldr.w	r3, [r4, #320]	@ 0x140
+341e018e:	420b      	tst	r3, r1
+341e0190:	d103      	bne.n	341e019a <readback_boot_main+0x15a>
+341e0192:	f8d4 313c 	ldr.w	r3, [r4, #316]	@ 0x13c
+341e0196:	0618      	lsls	r0, r3, #24
+341e0198:	d501      	bpl.n	341e019e <readback_boot_main+0x15e>
+341e019a:	2004      	movs	r0, #4
+341e019c:	e778      	b.n	341e0090 <readback_boot_main+0x50>
+341e019e:	4b3b      	ldr	r3, [pc, #236]	@ (341e028c <readback_boot_main+0x24c>)
+341e01a0:	6a1b      	ldr	r3, [r3, #32]
+341e01a2:	f8c4 3144 	str.w	r3, [r4, #324]	@ 0x144
+341e01a6:	f647 7320 	movw	r3, #32544	@ 0x7f20
+341e01aa:	f8d4 2144 	ldr.w	r2, [r4, #324]	@ 0x144
+341e01ae:	421a      	tst	r2, r3
+341e01b0:	d001      	beq.n	341e01b6 <readback_boot_main+0x176>
+341e01b2:	2005      	movs	r0, #5
+341e01b4:	e76c      	b.n	341e0090 <readback_boot_main+0x50>
+341e01b6:	f8d5 325c 	ldr.w	r3, [r5, #604]	@ 0x25c
+341e01ba:	0659      	lsls	r1, r3, #25
+341e01bc:	d506      	bpl.n	341e01cc <readback_boot_main+0x18c>
+341e01be:	4b34      	ldr	r3, [pc, #208]	@ (341e0290 <readback_boot_main+0x250>)
+341e01c0:	681a      	ldr	r2, [r3, #0]
+341e01c2:	4b34      	ldr	r3, [pc, #208]	@ (341e0294 <readback_boot_main+0x254>)
+341e01c4:	4013      	ands	r3, r2
+341e01c6:	4a34      	ldr	r2, [pc, #208]	@ (341e0298 <readback_boot_main+0x258>)
+341e01c8:	4293      	cmp	r3, r2
+341e01ca:	d001      	beq.n	341e01d0 <readback_boot_main+0x190>
+341e01cc:	2006      	movs	r0, #6
+341e01ce:	e75f      	b.n	341e0090 <readback_boot_main+0x50>
+341e01d0:	2302      	movs	r3, #2
+341e01d2:	f8c4 3114 	str.w	r3, [r4, #276]	@ 0x114
+341e01d6:	f000 f87b 	bl	341e02d0 <raw10_memory_init>
+341e01da:	4b30      	ldr	r3, [pc, #192]	@ (341e029c <readback_boot_main+0x25c>)
+341e01dc:	685a      	ldr	r2, [r3, #4]
+341e01de:	f8c4 2148 	str.w	r2, [r4, #328]	@ 0x148
+341e01e2:	f8d5 224c 	ldr.w	r2, [r5, #588]	@ 0x24c
+341e01e6:	f8c4 214c 	str.w	r2, [r4, #332]	@ 0x14c
+341e01ea:	6819      	ldr	r1, [r3, #0]
+341e01ec:	4a2c      	ldr	r2, [pc, #176]	@ (341e02a0 <readback_boot_main+0x260>)
+341e01ee:	4291      	cmp	r1, r2
+341e01f0:	d101      	bne.n	341e01f6 <readback_boot_main+0x1b6>
+341e01f2:	685b      	ldr	r3, [r3, #4]
+341e01f4:	b10b      	cbz	r3, 341e01fa <readback_boot_main+0x1ba>
+341e01f6:	2007      	movs	r0, #7
+341e01f8:	e74a      	b.n	341e0090 <readback_boot_main+0x50>
+341e01fa:	2120      	movs	r1, #32
+341e01fc:	f041 e001 	dls	lr, r1
+341e0200:	4a1b      	ldr	r2, [pc, #108]	@ (341e0270 <readback_boot_main+0x230>)
+341e0202:	f8d2 30fc 	ldr.w	r3, [r2, #252]	@ 0xfc
+341e0206:	f043 7380 	orr.w	r3, r3, #16777216	@ 0x1000000
+341e020a:	f8c2 30fc 	str.w	r3, [r2, #252]	@ 0xfc
+341e020e:	f5a2 425d 	sub.w	r2, r2, #56576	@ 0xdd00
+341e0212:	6813      	ldr	r3, [r2, #0]
+341e0214:	f043 0301 	orr.w	r3, r3, #1
+341e0218:	6013      	str	r3, [r2, #0]
+341e021a:	6853      	ldr	r3, [r2, #4]
+341e021c:	bf00      	nop
+341e021e:	3901      	subs	r1, #1
+341e0220:	f00f c005 	le	lr, 341e021c <readback_boot_main+0x1dc>
+341e0224:	6850      	ldr	r0, [r2, #4]
+341e0226:	1ac0      	subs	r0, r0, r3
+341e0228:	4b0f      	ldr	r3, [pc, #60]	@ (341e0268 <readback_boot_main+0x228>)
+341e022a:	f8c3 0154 	str.w	r0, [r3, #340]	@ 0x154
+341e022e:	6812      	ldr	r2, [r2, #0]
+341e0230:	f8c3 2150 	str.w	r2, [r3, #336]	@ 0x150
+341e0234:	f8d3 2150 	ldr.w	r2, [r3, #336]	@ 0x150
+341e0238:	07d2      	lsls	r2, r2, #31
+341e023a:	d502      	bpl.n	341e0242 <readback_boot_main+0x202>
+341e023c:	f8d3 2154 	ldr.w	r2, [r3, #340]	@ 0x154
+341e0240:	b90a      	cbnz	r2, 341e0246 <readback_boot_main+0x206>
+341e0242:	2008      	movs	r0, #8
+341e0244:	e724      	b.n	341e0090 <readback_boot_main+0x50>
+341e0246:	2203      	movs	r2, #3
+341e0248:	f8c3 2114 	str.w	r2, [r3, #276]	@ 0x114
+341e024c:	f8c3 1110 	str.w	r1, [r3, #272]	@ 0x110
+341e0250:	f3bf 8f4f 	dsb	sy
+341e0254:	4a13      	ldr	r2, [pc, #76]	@ (341e02a4 <readback_boot_main+0x264>)
+341e0256:	f8c3 2158 	str.w	r2, [r3, #344]	@ 0x158
+341e025a:	f3bf 8f4f 	dsb	sy
+341e025e:	2000      	movs	r0, #0
+341e0260:	bd38      	pop	{r3, r4, r5, pc}
+341e0262:	bf00      	nop
+341e0264:	341b4100 	.word	0x341b4100
+341e0268:	341b4000 	.word	0x341b4000
+341e026c:	52425231 	.word	0x52425231
+341e0270:	e000ed00 	.word	0xe000ed00
+341e0274:	e000ef00 	.word	0xe000ef00
+341e0278:	56028000 	.word	0x56028000
+341e027c:	33330000 	.word	0x33330000
+341e0280:	00404b00 	.word	0x00404b00
+341e0284:	49000005 	.word	0x49000005
+341e0288:	30ff0000 	.word	0x30ff0000
+341e028c:	58025000 	.word	0x58025000
+341e0290:	56021800 	.word	0x56021800
+341e0294:	00330003 	.word	0x00330003
+341e0298:	00110001 	.word	0x00110001
+341e029c:	341f5000 	.word	0x341f5000
+341e02a0:	5231304d 	.word	0x5231304d
+341e02a4:	5242444e 	.word	0x5242444e
+
+341e02a8 <raw10_memory_fault>:
+341e02a8:	4b07      	ldr	r3, [pc, #28]	@ (341e02c8 <raw10_memory_fault+0x20>)
+341e02aa:	4a08      	ldr	r2, [pc, #32]	@ (341e02cc <raw10_memory_fault+0x24>)
+341e02ac:	6058      	str	r0, [r3, #4]
+341e02ae:	6a91      	ldr	r1, [r2, #40]	@ 0x28
+341e02b0:	6399      	str	r1, [r3, #56]	@ 0x38
+341e02b2:	6ad1      	ldr	r1, [r2, #44]	@ 0x2c
+341e02b4:	63d9      	str	r1, [r3, #60]	@ 0x3c
+341e02b6:	6b91      	ldr	r1, [r2, #56]	@ 0x38
+341e02b8:	6419      	str	r1, [r3, #64]	@ 0x40
+341e02ba:	6b52      	ldr	r2, [r2, #52]	@ 0x34
+341e02bc:	645a      	str	r2, [r3, #68]	@ 0x44
+341e02be:	f3bf 8f4f 	dsb	sy
+341e02c2:	bf00      	nop
+341e02c4:	e7fd      	b.n	341e02c2 <raw10_memory_fault+0x1a>
+341e02c6:	bf00      	nop
+341e02c8:	341f5000 	.word	0x341f5000
+341e02cc:	e000ed00 	.word	0xe000ed00
+
+341e02d0 <raw10_memory_init>:
+341e02d0:	b5f0      	push	{r4, r5, r6, r7, lr}
+341e02d2:	f04f 0e20 	mov.w	lr, #32
+341e02d6:	4b7a      	ldr	r3, [pc, #488]	@ (341e04c0 <raw10_memory_init+0x1f0>)
+341e02d8:	2200      	movs	r2, #0
+341e02da:	461c      	mov	r4, r3
+341e02dc:	f04e e001 	dls	lr, lr
+341e02e0:	b08b      	sub	sp, #44	@ 0x2c
+341e02e2:	f843 2b04 	str.w	r2, [r3], #4
+341e02e6:	f00f c005 	le	lr, 341e02e2 <raw10_memory_init+0x12>
+341e02ea:	2201      	movs	r2, #1
+341e02ec:	4b75      	ldr	r3, [pc, #468]	@ (341e04c4 <raw10_memory_init+0x1f4>)
+341e02ee:	6023      	str	r3, [r4, #0]
+341e02f0:	4b75      	ldr	r3, [pc, #468]	@ (341e04c8 <raw10_memory_init+0x1f8>)
+341e02f2:	6062      	str	r2, [r4, #4]
+341e02f4:	6a19      	ldr	r1, [r3, #32]
+341e02f6:	60a1      	str	r1, [r4, #8]
+341e02f8:	f8d3 10ec 	ldr.w	r1, [r3, #236]	@ 0xec
+341e02fc:	60e1      	str	r1, [r4, #12]
+341e02fe:	f8d3 1240 	ldr.w	r1, [r3, #576]	@ 0x240
+341e0302:	6121      	str	r1, [r4, #16]
+341e0304:	f8d3 124c 	ldr.w	r1, [r3, #588]	@ 0x24c
+341e0308:	6161      	str	r1, [r4, #20]
+341e030a:	6a18      	ldr	r0, [r3, #32]
+341e030c:	496f      	ldr	r1, [pc, #444]	@ (341e04cc <raw10_memory_init+0x1fc>)
+341e030e:	4288      	cmp	r0, r1
+341e0310:	d10c      	bne.n	341e032c <raw10_memory_init+0x5c>
+341e0312:	f8d3 0080 	ldr.w	r0, [r3, #128]	@ 0x80
+341e0316:	496e      	ldr	r1, [pc, #440]	@ (341e04d0 <raw10_memory_init+0x200>)
+341e0318:	4288      	cmp	r0, r1
+341e031a:	d107      	bne.n	341e032c <raw10_memory_init+0x5c>
+341e031c:	f8d3 1084 	ldr.w	r1, [r3, #132]	@ 0x84
+341e0320:	b921      	cbnz	r1, 341e032c <raw10_memory_init+0x5c>
+341e0322:	f8d3 0088 	ldr.w	r0, [r3, #136]	@ 0x88
+341e0326:	496b      	ldr	r1, [pc, #428]	@ (341e04d4 <raw10_memory_init+0x204>)
+341e0328:	4288      	cmp	r0, r1
+341e032a:	d002      	beq.n	341e0332 <raw10_memory_init+0x62>
+341e032c:	2002      	movs	r0, #2
+341e032e:	f7ff ffbb 	bl	341e02a8 <raw10_memory_fault>
+341e0332:	4969      	ldr	r1, [pc, #420]	@ (341e04d8 <raw10_memory_init+0x208>)
+341e0334:	6949      	ldr	r1, [r1, #20]
+341e0336:	03c8      	lsls	r0, r1, #15
+341e0338:	d501      	bpl.n	341e033e <raw10_memory_init+0x6e>
+341e033a:	2003      	movs	r0, #3
+341e033c:	e7f7      	b.n	341e032e <raw10_memory_init+0x5e>
+341e033e:	f44f 5180 	mov.w	r1, #4096	@ 0x1000
+341e0342:	f8c3 1a54 	str.w	r1, [r3, #2644]	@ 0xa54
+341e0346:	f8c3 2a78 	str.w	r2, [r3, #2680]	@ 0xa78
+341e034a:	f04f 4280 	mov.w	r2, #1073741824	@ 0x40000000
+341e034e:	4963      	ldr	r1, [pc, #396]	@ (341e04dc <raw10_memory_init+0x20c>)
+341e0350:	f8c3 2a60 	str.w	r2, [r3, #2656]	@ 0xa60
+341e0354:	f8d3 2254 	ldr.w	r2, [r3, #596]	@ 0x254
+341e0358:	f8d3 2278 	ldr.w	r2, [r3, #632]	@ 0x278
+341e035c:	f8d3 2260 	ldr.w	r2, [r3, #608]	@ 0x260
+341e0360:	6f8a      	ldr	r2, [r1, #120]	@ 0x78
+341e0362:	61a2      	str	r2, [r4, #24]
+341e0364:	4a5e      	ldr	r2, [pc, #376]	@ (341e04e0 <raw10_memory_init+0x210>)
+341e0366:	6810      	ldr	r0, [r2, #0]
+341e0368:	61e0      	str	r0, [r4, #28]
+341e036a:	6f89      	ldr	r1, [r1, #120]	@ 0x78
+341e036c:	07c9      	lsls	r1, r1, #31
+341e036e:	d501      	bpl.n	341e0374 <raw10_memory_init+0xa4>
+341e0370:	2004      	movs	r0, #4
+341e0372:	e7dc      	b.n	341e032e <raw10_memory_init+0x5e>
+341e0374:	6816      	ldr	r6, [r2, #0]
+341e0376:	f016 0601 	ands.w	r6, r6, #1
+341e037a:	d001      	beq.n	341e0380 <raw10_memory_init+0xb0>
+341e037c:	2005      	movs	r0, #5
+341e037e:	e7d6      	b.n	341e032e <raw10_memory_init+0x5e>
+341e0380:	f8d3 2240 	ldr.w	r2, [r3, #576]	@ 0x240
+341e0384:	f412 6f80 	tst.w	r2, #1024	@ 0x400
+341e0388:	f8d3 20ec 	ldr.w	r2, [r3, #236]	@ 0xec
+341e038c:	d006      	beq.n	341e039c <raw10_memory_init+0xcc>
+341e038e:	4b55      	ldr	r3, [pc, #340]	@ (341e04e4 <raw10_memory_init+0x214>)
+341e0390:	4013      	ands	r3, r2
+341e0392:	f5b3 3f40 	cmp.w	r3, #196608	@ 0x30000
+341e0396:	d00f      	beq.n	341e03b8 <raw10_memory_init+0xe8>
+341e0398:	2006      	movs	r0, #6
+341e039a:	e7c8      	b.n	341e032e <raw10_memory_init+0x5e>
+341e039c:	f022 5243 	bic.w	r2, r2, #817889280	@ 0x30c00000
+341e03a0:	f422 127c 	bic.w	r2, r2, #4128768	@ 0x3f0000
+341e03a4:	f442 3240 	orr.w	r2, r2, #196608	@ 0x30000
+341e03a8:	f8c3 20ec 	str.w	r2, [r3, #236]	@ 0xec
+341e03ac:	f44f 6280 	mov.w	r2, #1024	@ 0x400
+341e03b0:	f8c3 2a40 	str.w	r2, [r3, #2624]	@ 0xa40
+341e03b4:	f8d3 3240 	ldr.w	r3, [r3, #576]	@ 0x240
+341e03b8:	4b4b      	ldr	r3, [pc, #300]	@ (341e04e8 <raw10_memory_init+0x218>)
+341e03ba:	ad01      	add	r5, sp, #4
+341e03bc:	cb0f      	ldmia	r3, {r0, r1, r2, r3}
+341e03be:	e885 000f 	stmia.w	r5, {r0, r1, r2, r3}
+341e03c2:	2204      	movs	r2, #4
+341e03c4:	4849      	ldr	r0, [pc, #292]	@ (341e04ec <raw10_memory_init+0x21c>)
+341e03c6:	f855 3b04 	ldr.w	r3, [r5], #4
+341e03ca:	6819      	ldr	r1, [r3, #0]
+341e03cc:	f840 1026 	str.w	r1, [r0, r6, lsl #2]
+341e03d0:	6819      	ldr	r1, [r3, #0]
+341e03d2:	f421 1180 	bic.w	r1, r1, #1048576	@ 0x100000
+341e03d6:	6019      	str	r1, [r3, #0]
+341e03d8:	681b      	ldr	r3, [r3, #0]
+341e03da:	02db      	lsls	r3, r3, #11
+341e03dc:	d501      	bpl.n	341e03e2 <raw10_memory_init+0x112>
+341e03de:	1df0      	adds	r0, r6, #7
+341e03e0:	e7a5      	b.n	341e032e <raw10_memory_init+0x5e>
+341e03e2:	3a01      	subs	r2, #1
+341e03e4:	f106 0601 	add.w	r6, r6, #1
+341e03e8:	d1ed      	bne.n	341e03c6 <raw10_memory_init+0xf6>
+341e03ea:	f240 420f 	movw	r2, #1039	@ 0x40f
+341e03ee:	4b36      	ldr	r3, [pc, #216]	@ (341e04c8 <raw10_memory_init+0x1f8>)
+341e03f0:	f8c3 2a4c 	str.w	r2, [r3, #2636]	@ 0xa4c
+341e03f4:	f8d3 224c 	ldr.w	r2, [r3, #588]	@ 0x24c
+341e03f8:	6322      	str	r2, [r4, #48]	@ 0x30
+341e03fa:	f8d3 30ec 	ldr.w	r3, [r3, #236]	@ 0xec
+341e03fe:	6363      	str	r3, [r4, #52]	@ 0x34
+341e0400:	f3bf 8f4f 	dsb	sy
+341e0404:	4e3a      	ldr	r6, [pc, #232]	@ (341e04f0 <raw10_memory_init+0x220>)
+341e0406:	ad05      	add	r5, sp, #20
+341e0408:	ce0f      	ldmia	r6!, {r0, r1, r2, r3}
+341e040a:	c50f      	stmia	r5!, {r0, r1, r2, r3}
+341e040c:	2105      	movs	r1, #5
+341e040e:	6833      	ldr	r3, [r6, #0]
+341e0410:	4e38      	ldr	r6, [pc, #224]	@ (341e04f4 <raw10_memory_init+0x224>)
+341e0412:	602b      	str	r3, [r5, #0]
+341e0414:	4b38      	ldr	r3, [pc, #224]	@ (341e04f8 <raw10_memory_init+0x228>)
+341e0416:	a805      	add	r0, sp, #20
+341e0418:	f850 2b04 	ldr.w	r2, [r0], #4
+341e041c:	6815      	ldr	r5, [r2, #0]
+341e041e:	6013      	str	r3, [r2, #0]
+341e0420:	f3bf 8f4f 	dsb	sy
+341e0424:	6817      	ldr	r7, [r2, #0]
+341e0426:	f846 7023 	str.w	r7, [r6, r3, lsl #2]
+341e042a:	6817      	ldr	r7, [r2, #0]
+341e042c:	429f      	cmp	r7, r3
+341e042e:	d002      	beq.n	341e0436 <raw10_memory_init+0x166>
+341e0430:	4832      	ldr	r0, [pc, #200]	@ (341e04fc <raw10_memory_init+0x22c>)
+341e0432:	4418      	add	r0, r3
+341e0434:	e77b      	b.n	341e032e <raw10_memory_init+0x5e>
+341e0436:	3901      	subs	r1, #1
+341e0438:	6015      	str	r5, [r2, #0]
+341e043a:	f103 0301 	add.w	r3, r3, #1
+341e043e:	d1eb      	bne.n	341e0418 <raw10_memory_init+0x148>
+341e0440:	f04f 0e25 	mov.w	lr, #37	@ 0x25
+341e0444:	2200      	movs	r2, #0
+341e0446:	f04e e001 	dls	lr, lr
+341e044a:	4b2d      	ldr	r3, [pc, #180]	@ (341e0500 <raw10_memory_init+0x230>)
+341e044c:	f843 2b04 	str.w	r2, [r3], #4
+341e0450:	f00f c005 	le	lr, 341e044c <raw10_memory_init+0x17c>
+341e0454:	f04f 0e10 	mov.w	lr, #16
+341e0458:	2200      	movs	r2, #0
+341e045a:	f04e e001 	dls	lr, lr
+341e045e:	4b29      	ldr	r3, [pc, #164]	@ (341e0504 <raw10_memory_init+0x234>)
+341e0460:	f843 2b04 	str.w	r2, [r3], #4
+341e0464:	f00f c005 	le	lr, 341e0460 <raw10_memory_init+0x190>
+341e0468:	f3bf 8f4f 	dsb	sy
+341e046c:	2325      	movs	r3, #37	@ 0x25
+341e046e:	4a24      	ldr	r2, [pc, #144]	@ (341e0500 <raw10_memory_init+0x230>)
+341e0470:	6811      	ldr	r1, [r2, #0]
+341e0472:	b109      	cbz	r1, 341e0478 <raw10_memory_init+0x1a8>
+341e0474:	2010      	movs	r0, #16
+341e0476:	e75a      	b.n	341e032e <raw10_memory_init+0x5e>
+341e0478:	3b01      	subs	r3, #1
+341e047a:	f102 0204 	add.w	r2, r2, #4
+341e047e:	d1f7      	bne.n	341e0470 <raw10_memory_init+0x1a0>
+341e0480:	2310      	movs	r3, #16
+341e0482:	4a20      	ldr	r2, [pc, #128]	@ (341e0504 <raw10_memory_init+0x234>)
+341e0484:	6811      	ldr	r1, [r2, #0]
+341e0486:	b109      	cbz	r1, 341e048c <raw10_memory_init+0x1bc>
+341e0488:	2011      	movs	r0, #17
+341e048a:	e750      	b.n	341e032e <raw10_memory_init+0x5e>
+341e048c:	3b01      	subs	r3, #1
+341e048e:	f102 0204 	add.w	r2, r2, #4
+341e0492:	d1f7      	bne.n	341e0484 <raw10_memory_init+0x1b4>
+341e0494:	2394      	movs	r3, #148	@ 0x94
+341e0496:	f04f 0e20 	mov.w	lr, #32
+341e049a:	65e3      	str	r3, [r4, #92]	@ 0x5c
+341e049c:	2340      	movs	r3, #64	@ 0x40
+341e049e:	f04e e001 	dls	lr, lr
+341e04a2:	6623      	str	r3, [r4, #96]	@ 0x60
+341e04a4:	4b06      	ldr	r3, [pc, #24]	@ (341e04c0 <raw10_memory_init+0x1f0>)
+341e04a6:	6061      	str	r1, [r4, #4]
+341e04a8:	f503 1200 	add.w	r2, r3, #2097152	@ 0x200000
+341e04ac:	f853 1b04 	ldr.w	r1, [r3], #4
+341e04b0:	6011      	str	r1, [r2, #0]
+341e04b2:	f00f c807 	le	lr, 341e04a8 <raw10_memory_init+0x1d8>
+341e04b6:	f3bf 8f4f 	dsb	sy
+341e04ba:	b00b      	add	sp, #44	@ 0x2c
+341e04bc:	bdf0      	pop	{r4, r5, r6, r7, pc}
+341e04be:	bf00      	nop
+341e04c0:	341f5000 	.word	0x341f5000
+341e04c4:	5231304d 	.word	0x5231304d
+341e04c8:	56028000 	.word	0x56028000
+341e04cc:	33330000 	.word	0x33330000
+341e04d0:	00404b00 	.word	0x00404b00
+341e04d4:	49000005 	.word	0x49000005
+341e04d8:	e000ed00 	.word	0xe000ed00
+341e04dc:	56008000 	.word	0x56008000
+341e04e0:	580dfc00 	.word	0x580dfc00
+341e04e4:	30ff0000 	.word	0x30ff0000
+341e04e8:	341e0508 	.word	0x341e0508
+341e04ec:	341f5020 	.word	0x341f5020
+341e04f0:	341e0518 	.word	0x341e0518
+341e04f4:	aeb71048 	.word	0xaeb71048
+341e04f8:	a15a1000 	.word	0xa15a1000
+341e04fc:	5ea5f00b 	.word	0x5ea5f00b
+341e0500:	343c0000 	.word	0x343c0000
+341e0504:	343c0400 	.word	0x343c0400
+341e0508:	52023100 	.word	0x52023100
+341e050c:	52023180 	.word	0x52023180
+341e0510:	52023200 	.word	0x52023200
+341e0514:	52023280 	.word	0x52023280
+341e0518:	34200000 	.word	0x34200000
+341e051c:	34270000 	.word	0x34270000
+341e0520:	342e0000 	.word	0x342e0000
+341e0524:	34350000 	.word	0x34350000
+341e0528:	343f0000 	.word	0x343f0000

@@ -1,11 +1,30 @@
 # Capture → PNG16 → FAT32 prototype
 
-**October 20: autonomous cold capture → PNG16 → SD is installed and working.**
-The installed **v50 awake image** has verified first-sector SHA-256
-`9ffc2c1cbaacf9f60258343ac6a061b35fb62f8b62b42c1a5b50ccc5f432f5cd`.
+**October 20: autonomous cold capture → PNG16 → SD → Standby is installed.**
+The installed **v59 Standby image** has verified first-sector SHA-256
+`7fda9d00cc7ffb3fbb9e6aac6695cf18545754b5dbfce1520cf30b2da39c4e63`.
 It captures one frame and saves a new numbered PNG using the selected
 **v8b fast-loop compressor, no row filter, D-cache enabled, `-Os`**.
-The first automatic file, `IMG00024.PNG`, was read back in full: every one of
+Successful save now shuts down peripherals and enters MCU Standby. Four
+tested Standby cycles each recovered through the existing PE6 UART request
+and ST-LINK BREAK/NRST on the first attempt; the retained hardware SBF flag
+confirmed Standby entry after every cycle. No boot-jumper changes were needed.
+See [low-power evidence and reproducible build](evidence/2026-10-20-low-power/README.md)
+and [shutdown implementation](low_power/peripherals.md).
+
+Three complete cold cycles measured **1.410–1.424 J** and **2.96–2.98 s**
+from observed current onset to the stable Standby plateau. Terminal board
+current was **8.10–8.21 mA**, versus about **80.03 mA** awake. These are
+JS110-fed Nucleo-branch measurements, not isolated production-camera
+consumption. See [measurement method and limits](cycle-energy.md).
+
+The three measured-cycle files, IMG00040–42.PNG (1.78–1.79 MB), passed full
+post-Standby readback, all PNG chunk CRCs and independent decoding. The
+original IMG00001.PNG remains byte-identical. These checks use a
+[guarded RAM-only READ bridge](low_power/readback_recovery/README.md);
+Standby's lost RAW frame cannot be compared again.
+
+The prior v50 awake baseline's first automatic file, `IMG00024.PNG`, was read back in full: every one of
 its 1,527,680 pixels exactly matched the retained sensor frame. Three further
 cold boots saved distinct files. A requested recovery cold boot reached the
 exact early recovery park without writing NOR or the card.
@@ -35,8 +54,10 @@ The receiver completes and validates its first frame, stops capture and the
 sensor, then loads the save module from NOR offset `0x6000`. The loader reuses
 the verified finite XSPI1 read configuration, checks the exact module CRC and
 executes it in high SRAM. No SD initialization, PNG module load or compression
-is added before exposure. The receiver itself grows by 652 bytes; the effect
-of that added receiver transfer on startup still needs separate measurement.
+is added before exposure. V59 loads its 3,764-byte shutdown module from NOR
+offset `0xE000` only after save completes. Its early receiver is 15,560 bytes,
+564 bytes larger than v50; its effect on exposure timing still needs a separate
+measurement. The existing first-frame deadline guard remains unchanged.
 
 The module checks capture geometry, error history, frame count, RAW10 format,
 DMA byte count, frame canary and checksum. It uses native **one-bit SDMMC2 at
@@ -51,10 +72,15 @@ atomicity or protect older files from an arbitrary power cut inside the card's
 flash translation layer. Failures preserve diagnostics and leave power on.
 
 Red indicates boot, blue acquisition and green saving; success turns the LEDs
-off. **V50 remains awake after completion**, preserving bench access. Its
-optional WFI completion variant is unqualified; neither an awake park nor WFI
-is regulator-off shutdown. The earlier loss of debug access is not established
-to have been caused by WFI.
+off and enters Standby. Standby loses the frame and high-SRAM diagnostics and
+disables ordinary debug access. Recovery therefore sends the qualified UART
+pulse train across an NRST pulse, then verifies the exact early recovery park.
+It does not resume the completed capture. The LTC regulator is not switched
+off by this firmware; Nucleo standby overhead remains.
+
+Both the late-loader `LPL1` and completion `LPM1` records own the terminal path.
+The ordinary maintenance helpers refuse these states even if capture or SAVE
+has completed. Never bypass those guards to halt an active shutdown.
 
 ## Selected compressor and measured tradeoff
 
@@ -129,13 +155,14 @@ was read in full again: all pixels and its original SHA-256
 still matched. This verifies preservation through these completed operations;
 it is not an arbitrary-power-loss test.
 
-The final normal boot left `IMG00027.PNG` complete, LEDs off (phase 0,
+The historical v50 final normal boot left `IMG00027.PNG` complete, LEDs off (phase 0,
 active-low off mask `0x501`) and the CPU awake at the `0x343022D8` completion
 loop, explicitly resumed after inspection. The card was idle and deinitialized.
 At **06:55:51 UTC**, the JS110 helper stopped cleanly and restored range 128;
-the last measured input was 4.881844 V at 80.1278 mA. The target remains
-powered, COM8 is closed, BREAK released and JP1/JP2 remain on pins 1–2.
-See [final bench state](evidence/2026-10-20-hardware/results/final-state.json).
+the last measured input was 4.881844 V at 80.1278 mA. At that checkpoint the target remained
+powered, COM8 was closed, BREAK released and JP1/JP2 on pins 1–2.
+See [historical bench state](evidence/2026-10-20-hardware/results/final-state.json);
+the [v59 archive](evidence/2026-10-20-low-power/README.md) supersedes it.
 
 ## Timing and energy scope
 
@@ -187,7 +214,8 @@ actually establish synchronization.
 | `0x34320000..0x3439FFFF` | Save code, encoder and filesystem workspace |
 | `0x343A0000..0x343AFFFF` | Reserved 64 KiB save stack |
 | `0x343B0000` | Stack top |
-| `0x343C0000` | Post-capture maintenance helper |
+| `0x343C0000..0x343C1FFF` | V59 late shutdown code; mutually exclusive with the historical maintenance helper |
+| `0x343F9B00`, `0x343F9C00`, `0x343F9D00` | Late-loader, completion and peripheral-shutdown proofs |
 | `0x343F9E00` | NOR save-loader proof |
 | `0x343F9F00` | Explicit bench request |
 | `0x343FA000` | Save report |
@@ -196,7 +224,9 @@ actually establish synchronization.
 `save_entry.S` temporarily lowers MSPLIM from the receiver's 4 KiB stack limit
 to the reserved 64 KiB floor, preserving it for return, and fills lower stack
 with a canary. The compressor alone needs more than 5.5 KiB of stack.
-The linker rejects overlap and code exceeding the 40 KiB NOR module window.
+The standalone linker rejects overlap and code exceeding its 40 KiB NOR
+module window; the v59 packer additionally limits SAVE to the 32 KiB before
+the late module at `0xE000`.
 
 The selected module is **27,420 bytes** of code/data and **300,472 bytes** of
 BSS, SHA-256
@@ -230,8 +260,11 @@ python firmware/capture-sd/build.py `
 
 `-Os` is default, with explicit `-mno-unaligned-access`. The canonical cached
 build reproduces the tested v8b binary exactly. `--optimization O2/O3` are
-experimental alternatives. Keep `--awake`; omitting it selects the unqualified
-WFI completion path. The builder verifies input hashes, memory bounds and
+experimental alternatives. Keep `--awake` for this historical awake-build
+example; omitting it without `--completion` selects the unqualified legacy
+WFI path. V59 uses `--completion standby`; its exact portable recipe is in
+the [low-power archive](evidence/2026-10-20-low-power/README.md).
+The builder verifies input hashes, memory bounds and
 byte identity of early recovery code/literals. A successful build does not
 waive the exact maintenance park, allowlist or programming readback checks.
 
@@ -290,8 +323,10 @@ actual-FatFs integration passes 14. Tests cover exact pixels, all three modes,
 dictionary/tail boundaries, alias checks, failure injection, no-overwrite
 behavior, cleanup and refusal to halt uncertain storage operations.
 
-End-to-end electrical power-to-file timing, lowest-power completion/WFI
-recovery, regulator-off shutdown, arbitrary power loss, long retention,
+V59 Standby entry and UART reset recovery are bench-qualified for the tested
+cycles. A current-threshold-to-Standby energy measurement does not independently
+identify electrical power-good, exposure, or filesystem completion timestamps.
+LTC regulator-off shutdown, arbitrary power loss, long retention,
 card-to-card variation and isolated production power remain unqualified.
 The RX abort drain bound is still 64 words versus the N6's 256-word FIFO:
 a read fault with more queued data can leave `media_idle=0` and require
