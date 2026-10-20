@@ -12,6 +12,40 @@ confirmed Standby entry after every cycle. No boot-jumper changes were needed.
 See [low-power evidence and reproducible build](evidence/2026-10-20-low-power/README.md)
 and [shutdown implementation](low_power/peripherals.md).
 
+**October 20 follow-up:** after the two [CN10-disconnected power cycles](evidence/2026-10-20-stlink-off/README.md),
+the user inspected the SD card and reported that the photos check out. This
+resolves the pending user image check for those runs; it is not an automated
+byte-for-byte/CRC readback or a new SBF measurement. The original measurement
+archive retains its contemporaneous pending status.
+
+## Current power-up to Standby flow
+
+```mermaid
+flowchart TD
+    A[Power applied / reset released] --> B[STM32 boot ROM loads small bootstrap from NOR]
+    B --> C{Early recovery request?}
+    C -->|Yes| R[Enable debugging and park; no photo]
+    C -->|No| D[Initialize memory, sensor and receiver; red LED]
+    D --> E[Expose and capture one RAW10 frame into RAM; blue LED]
+    E --> F[Validate frame; stop capture and sensor streaming]
+    F --> G[Load and check save module from NOR; green LED]
+    G --> H[Initialize SD and mount FAT32; choose unused image number]
+    H --> I[Convert samples to 16-bit gray; compress PNG while streaming to TMP file]
+    I --> J[Sync and close; wait for card; rename to PNG; wait again]
+    J --> K[Deinitialize SD; clean caches and recheck frame integrity]
+    K --> L[Load shutdown module; check successful save and idle peripherals]
+    L --> M[Disable receiver, camera interface and NOR interface; LEDs off]
+    M --> N[Enter MCU Standby; board-controlled switched rails turn off]
+```
+
+This is the successful path in v59. Failure paths preserve diagnostics and
+leave power on instead of pretending shutdown succeeded. Exposure does not wait
+for SD initialization or PNG/save-module loading. PNG encoding shifts each
+10-bit sample left six bits and uses the selected fast compressor without a row
+filter. MCU Standby ends this boot; another photo requires reset/power cycling.
+The external LTC regulator remains enabled. The last board-branch idle current
+was about 8.23 mA, so this is not full external power removal.
+
 Three complete cold cycles measured **1.410–1.424 J** and **2.96–2.98 s**
 from observed current onset to the stable Standby plateau. Terminal board
 current was **8.10–8.21 mA**, versus about **80.03 mA** awake. These are
