@@ -140,6 +140,140 @@ boot/capture and uses an already-powered card; it is not substituted into this
 cold-cycle table. See the [baseline report](evidence/2026-10-23-one-bit-baseline/README.md)
 and [separate SAVE counters](evidence/2026-10-23-one-bit-baseline/same-frame/README.md).
 
+### Why the frame checks take so long
+
+Source/timing audit, October 23: the current qualification firmware reads the
+entire **3,055,360-byte RAW buffer four times for validation**, in addition to
+reading the pixels for encoding. These passes look for RAM corruption or cache
+coherency mistakes during bring-up. They do not verify the saved file on SD.
+The following are recommendations, not changes to the installed v59 firmware.
+
+| Full-frame pass | Cache state | What it establishes | Timing evidence |
+| --- | --- | --- | --- |
+| Receiver statistics and initial FNV | Off | Byte min/max/sum and reference fingerprint after capture | Included in the 435.518 ms sensor-STOP/statistics bracket below |
+| Pre-encode FNV | On | Input still matches the receiver's fingerprint | 61.229 ms including the cheap frame-validity checks |
+| Post-commit FNV | On | Encoding/saving did not change the RAW input | No separate timer; the similar pre-encode pass suggests roughly 61 ms, but that is an estimate |
+| Post-cache-clean FNV | Off | Physical RAM still matches after cleaning/disabling D-cache | 380.690 ms directly measured |
+
+Those individual measurements come from the **v60 automatic cold-capture run**,
+using DWT cycles divided by nominal 400 MHz. They explain the work inside the
+v61 table's 457.1/447.1 ms intervals, but are not exact subdivisions of that
+different run or its Saleae clock. The cache clean/disable operation itself
+takes only **0.034 ms**; the large final cost is the subsequent uncached scan.
+
+The persisted v60 receiver events and loader report give this finer,
+consecutive breakdown of the first long interval:
+
+| Frame-complete to SAVE setup, same v60 run | DWT duration (ms) |
+| --- | ---: |
+| Frame IRQ to main-loop acknowledgement | 0.014 |
+| Post-frame register diagnostics, receiver stop and bookkeeping | 1.048 |
+| Disable receiver data lanes | 0.009 |
+| Sensor STOP/standby acknowledgement, full RAW statistics/FNV scan and snapshots | 435.518 |
+| Capture-complete publication to loader start | 0.003 |
+| Load and CRC-check the 27,576-byte SAVE module | 6.970 |
+| Enter SAVE, fill stack canary, zero 300,472-byte BSS and initialize report | 6.848 |
+| **Total to SAVE timing start** | **450.409** |
+
+The intermediate FAST snapshots were not saved, so sensor STOP cannot be
+separated exactly from the first RAW scan. The source and the separately
+measured 380.690 ms uncached FNV make the scan the leading explanation; the
+whole 435.518 ms must not be reported as a measured checksum-only duration.
+The second long interval contains the untimed cached post-commit FNV, SD
+deinitialization, stack-watermark/report work, the 0.034 ms cache operation,
+and the 380.690 ms uncached FNV. Its subcomponents are not all individually
+metered. See the [replayable source/counter audit](evidence/2026-10-23-one-bit-baseline/analysis/phase-audit.json).
+
+**Recommendation for normal operation:** retain cheap frame-completion,
+error-history, byte-count, address/geometry/format and canary checks; proper
+DMA/receiver/sensor shutdown; sample-range validation already in the encoder;
+PNG chunk CRCs and zlib checksum; SD CRC/error/timeout handling, exact write
+counts, sync/close/rename and card-ready checks; loaded-code CRC verification;
+and real cache/ownership transitions. Move repeated whole-RAW fingerprints,
+byte statistics, per-shot sensor clock/ROM register dumps and full
+stack-watermark scans to a diagnostic
+profile. Image statistics currently do not reject a black or white frame.
+
+This offers approximately a second of avoidable work across the cycle, not
+a measured optimized result. An intermediate experiment could cache the first
+scan after DMA stops, with correct invalidation, while preserving its existing
+validation semantics. A fingerprint accumulated during the encoder's existing
+pixel traversal is another option, but does not provide an independent
+before/after RAM comparison. None of these substitutes for SD-file readback.
+
+The current shutdown/maintenance proofs explicitly require successful
+post-clean validation and matching fingerprints. A production profile must
+change/version those requirements honestly while preserving completed/idle
+storage and recovery ownership. Do not simply skip the scans and set their
+success flags. The diagnostic profile remains useful for regressions and
+full host readback comparisons.
+
+### PNG and SD pipeline: measured work and overlap
+
+The same v60 automatic SAVE report gives the following **disjoint accounting**.
+It is a separate DWT measurement, not a splice into the v61 Saleae table.
+This run produced a 1,458,185-byte PNG; the later verification addendum confirms
+full readback and exact pixels. SD initialization is cold in this run.
+
+| Work within SAVE | Time (ms) | Scope |
+| --- | ---: | --- |
+| SD initialization/setup | 122.558 | Before mount/encode |
+| Mount FAT32 | 1.694 | Before validation |
+| Initial RAW checks/FNV | 61.229 | Before file creation |
+| PNG encoder CPU work, excluding output callbacks | 930.736 | Conversion, range checks, DEFLATE, Adler/PNG CRCs and framing |
+| Output callbacks | 580.053 | Buffer copies, filesystem work, synchronous SD transfers and waits |
+| Final buffered tail and file commit | 24.642 | Flush, sync/close, card-ready, rename and card-ready |
+| Other work before legacy TOTAL checkpoint | 112.324 | Untimed file open/name search, cached post-commit FNV, deinit and bookkeeping |
+| D-cache clean/disable | 0.034 | Actual cache operation |
+| Final uncached RAW FNV | 380.690 | Diagnostic pass |
+| Other work after TOTAL through COMPLETE | 0.441 | Stack/report/marker/completion overhead outside the timed cache and FNV scopes |
+| **SAVE COMPLETE** | **2,214.401** | Excludes receiver checks and SAVE-module loading/entry |
+
+Rounding can affect the displayed sum. The encoder's reported 1,510.789 ms
+**includes** its 580.053 ms callbacks; only subtracting callbacks yields the
+930.736 ms CPU row. Driver read/write/ready counters are nested within broader
+scopes and cannot be added again. Three retained-frame repetitions independently
+gave 931.625–931.870 ms encoder CPU work and 555.151–561.849 ms callbacks, with
+an already-powered card's shorter 26.558 ms initialization.
+
+The existing counters cannot split conversion, DEFLATE and checksum CPU work,
+or isolate file creation and the cached post-commit hash. File creation calls
+`f_getfree`, searches from IMG00001 for an unused PNG/TMP pair, and opens the
+new TMP file. The cost can grow as files accumulate. The 112.324 ms residual
+must not all be attributed to file creation. Before another optimization
+comparison, add separate DWT scopes for name lookup/open, the post-commit hash,
+deinit, sample conversion, compression and PNG checksum work. Keep timings
+disjoint or explicitly record nested scopes; do not subtract cross-clock
+Saleae and DWT numbers to fill missing timers.
+
+Currently the CPU compresses into one 32 KiB output buffer. When it fills,
+encoding stops while `f_write` feeds the SDMMC FIFO and waits for transfer/card
+completion. The SD driver disables IDMA. This streams the image without a full
+PNG buffer, but **compression and SD output do not run concurrently**.
+
+Two output buffers and SDMMC IDMA could let the CPU compress buffer B while
+the controller sends buffer A, including useful CPU work during card busy
+intervals. ST's N6 driver implements
+[`HAL_SDEx_DMALinkedList_WriteBlocks`](https://raw.githubusercontent.com/STMicroelectronics/stm32n6xx-hal-driver/main/Src/stm32n6xx_hal_sd_ex.c),
+so the controller has an appropriate asynchronous transfer mechanism. Two
+32 KiB buffers require 64 KiB total plus any metadata/bounce/descriptor storage.
+The design must clean DMA source cache lines, retain buffers until completion,
+preserve filesystem ordering and error propagation, and drain outstanding work
+before sync/close/shutdown. Merely replacing the polling loop with blocking DMA
+does not create overlap; the producer and filesystem/driver need coordinated
+asynchronous progress without violating FatFS buffer-lifetime assumptions.
+
+An idealized pipeline could approach the larger of roughly 0.93 s encoding
+and 0.55–0.58 s output, plus fill/drain and serial metadata work, instead of
+their sum. This suggests an opportunity to hide much of about half a second,
+not a promised saving: callback copies/FAT work still consume CPU and DMA can
+contend for memory. Four-bit bus savings and overlap savings must not simply
+be added, since they target some of the same waiting time. Cold SD startup
+could also be advanced asynchronously after exposure without putting blocking
+card initialization on the exposure-critical path. Energy effects require new
+measurement. First priority is the diagnostic scans; finer timers and output
+overlap follow. No firmware or bench state was changed for this audit.
+
 ## Data and execution
 
 The 1120 × 1364 RAW10 frame stays at `0x34000000`, right-aligned in little-endian
