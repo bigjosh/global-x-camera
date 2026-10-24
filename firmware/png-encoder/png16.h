@@ -15,7 +15,10 @@ extern "C" {
 typedef enum {
     PNG16_STORED_NONE = 0,
     PNG16_FAST_NONE = 1,
-    PNG16_FAST_SUB = 2
+    PNG16_FAST_SUB = 2,
+    /* Optional experiment: bytewise Sub + dynamic Huffman, no LZ matching.
+     * Not the selected camera default; qualify total MCU/storage cost. */
+    PNG16_HUFFMAN_SUB = 3
 } png16_mode;
 
 typedef enum {

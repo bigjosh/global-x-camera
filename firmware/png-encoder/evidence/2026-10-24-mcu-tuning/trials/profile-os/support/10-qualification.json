@@ -1,0 +1,31 @@
+{
+  "scope": "Offline-only profiling qualification, no hardware access",
+  "passed": true,
+  "build_sha256": "e3a1e8f3e8b27ce75323460901405fc6a17fd8561c2bafc723c9ee60b905f05a",
+  "binary_bytes": 17012,
+  "source_hashes": {
+    "EXPERIMENT.json": "1d8af6d74a80be8beeda93b3aa1df365ff9fdd4ad0ecfe2e37ef15a8efd93705",
+    "PROFILE.md": "6087d7782634dc62cdaba36eed34dc322ff0f58df2a79a5929107aab13918f43",
+    "decode_profile.py": "e89795ed7d3564890403b847d83e4c87bcc8b5f54657b3720d21c2e3c3ffd6c7",
+    "test_profile.py": "ec1c9ce227f3df977b1921b7c403f825df2ef125797abe9a9ffb22e7b22f3d31",
+    "vendor/miniz/miniz_profile.h": "c117ce680b7d33e2987b1edf3a5fb21e1c94148668dac4ba66afb907ac79f42a",
+    "vendor/miniz/miniz_tdef.c": "1445dc21132a8d24a59ab2d9e12336bbf7c4228afa0246f8e3d1030e2b53f1a0",
+    "bench/bench_main.c": "e5939a839038152902b4206aaab2fc4e912af0f7d61af31f4fbf6397952d2a51",
+    "bench/build.py": "49e7b47d08f59a0ccb34e373fe2346c35a5ae205d96d3685497b889520b8722f"
+  },
+  "tests": [
+    {
+      "log": "../profile-tests-v1.log",
+      "tests": 25,
+      "passed": true,
+      "coverage": "Existing exact golden/output/independent decode/timing/raw fallback/callback tests, including ASan+UBSan; supplier reversal excluded for explicit local instrumentation"
+    },
+    {
+      "log": "../profile-counter-tests-v1.log",
+      "tests": 3,
+      "passed": true,
+      "coverage": "12 baseline byte comparisons, coarse nesting, export boundary canaries, failure paths, reset, wrong extension"
+    }
+  ],
+  "hardware_status": "not_executed_by_subagent"
+}

@@ -1,0 +1,122 @@
+{
+  "schema": 1,
+  "dtype": "<f4",
+  "raw_queue_chunks": 1024,
+  "sample_ids": "native ticks, shared current/voltage/power timeline",
+  "finalized": true,
+  "status": {
+    "chunks": 2262,
+    "dropped_chunks": 0,
+    "error": null,
+    "complete": true,
+    "complete_scope": "logging_only; see coverage checks separately",
+    "coverage": {
+      "passed": true,
+      "checks": {
+        "current_samples_present": true,
+        "current_sample_ids_contiguous": true,
+        "voltage_samples_present": true,
+        "voltage_sample_ids_contiguous": true,
+        "power_samples_present": true,
+        "power_sample_ids_contiguous": true
+      },
+      "signals": {
+        "current": {
+          "chunks": 754,
+          "samples": 49307076,
+          "nonfinite_samples": 71,
+          "first_sample_id": 0,
+          "last_sample_id_end_exclusive": 49307076,
+          "discontinuities": 0,
+          "missing_native_samples": 0,
+          "overlap_or_reset_events": 0
+        },
+        "voltage": {
+          "chunks": 754,
+          "samples": 49307076,
+          "nonfinite_samples": 0,
+          "first_sample_id": 16128,
+          "last_sample_id_end_exclusive": 49323204,
+          "discontinuities": 0,
+          "missing_native_samples": 0,
+          "overlap_or_reset_events": 0
+        },
+        "power": {
+          "chunks": 754,
+          "samples": 49307076,
+          "nonfinite_samples": 0,
+          "first_sample_id": 16128,
+          "last_sample_id_end_exclusive": 49323204,
+          "discontinuities": 0,
+          "missing_native_samples": 0,
+          "overlap_or_reset_events": 0
+        }
+      },
+      "scope": "Received sample intervals only; stream boundaries, nonfinite samples and clipping are not validated."
+    }
+  },
+  "starting_measurement_settings": {
+    "s/i/range/select": 128,
+    "s/v/range/select": 0,
+    "s/i/range/mode": 2,
+    "s/i/range/pre": 1,
+    "s/i/range/win": 2,
+    "s/i/range/win_sz": 10,
+    "s/i/range/post": 1,
+    "s/i/lsb_src": 2,
+    "s/v/lsb_src": 3
+  },
+  "range_commands": [
+    {
+      "state": "off",
+      "retained_range": 0,
+      "command_start": {
+        "utc": "2026-10-24T04:15:02.658183+00:00",
+        "monotonic_ns": 380712453000000
+      },
+      "command_end": {
+        "utc": "2026-10-24T04:15:02.668421+00:00",
+        "monotonic_ns": 380712468000000
+      },
+      "scope": "host diagnostics only; not physical sample boundaries"
+    },
+    {
+      "state": "auto",
+      "retained_range": 128,
+      "command_start": {
+        "utc": "2026-10-24T04:15:18.357640+00:00",
+        "monotonic_ns": 380728156000000
+      },
+      "command_end": {
+        "utc": "2026-10-24T04:15:18.368486+00:00",
+        "monotonic_ns": 380728171000000
+      },
+      "scope": "host diagnostics only; not physical sample boundaries"
+    }
+  ],
+  "files": {
+    "current": {
+      "path": "current.f32",
+      "bytes": 197228304,
+      "sha256": "cdd9da674be49cb018f1837a79b66046f071e519610ffa371f5e1835d9bccfbf"
+    },
+    "voltage": {
+      "path": "voltage.f32",
+      "bytes": 197228304,
+      "sha256": "d698e70332d685d1ef45c8cc7226867a00eefebaa1a4c6fed2e0aec2a45ef9b2"
+    },
+    "power": {
+      "path": "power.f32",
+      "bytes": 197228304,
+      "sha256": "40c569d9e13c102d06e67626eb2e6f4a13cc9aea01d7041da7becf3eca91e6de"
+    }
+  },
+  "chunks_sha256": "1ba10b37c5d02e07529d7bb13be5a4eb1c5d3d46a0f3768c2f7a24c48550ad36",
+  "measurement_boundary": "JS110 input, not isolated DUT energy",
+  "limits": [
+    "IN+ voltage does not observe the switched target rail.",
+    "No GPIO marker is captured or configured.",
+    "Range, suppression, clipping and analog accuracy need separate qualification.",
+    "Logging completion alone does not qualify a power or sleep transition."
+  ]
+}

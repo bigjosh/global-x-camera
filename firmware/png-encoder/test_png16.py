@@ -153,7 +153,7 @@ class EncoderTests(unittest.TestCase):
         self.assertEqual((w, h), (width, height))
         self.assertEqual(pixels, [v << 6 for v in samples])
         self.assertEqual([v >> 6 for v in pixels], samples)
-        self.assertEqual(filters, [1 if mode == 2 else 0]*height)
+        self.assertEqual(filters, [1 if mode in (2, 3) else 0]*height)
         with Image.open(io.BytesIO(encoded)) as image:
             image.load()
             self.assertEqual(image.size, (width, height))
@@ -167,25 +167,25 @@ class EncoderTests(unittest.TestCase):
 
     def test_all_1024_sensor_values_and_extrema(self):
         samples = list(range(1024))+list(reversed(range(1024)))
-        for mode in range(3):
+        for mode in range(4):
             with self.subTest(mode=mode):
                 self.check_roundtrip(samples, 1024, 2, mode)
 
     def test_odd_dimensions_padding_and_unaligned_input(self):
         samples = [0, 1, 1023, 256, 4, 511, 3, 7, 17, 99, 100, 101, 9, 8, 7]
-        for mode in range(3):
+        for mode in range(4):
             self.check_roundtrip(samples, 3, 5, mode, stride=11, unaligned=True)
 
     def test_single_pixel_and_constant_rows(self):
         for value in (0, 1, 511, 1023):
-            for mode in range(3):
+            for mode in range(4):
                 self.check_roundtrip([value], 1, 1, mode)
                 self.check_roundtrip([value]*67*4, 67, 4, mode)
 
     def test_full_frame_noise_and_multiple_idat_chunks(self):
         rng = random.Random(0x5943)
         samples = [rng.randrange(1024) for _ in range(1120*1364)]
-        for mode in range(3):
+        for mode in range(4):
             encoded = self.check_roundtrip(samples, 1120, 1364, mode)
             chunks = parse_png(encoded)[4]
             self.assertGreater(sum(n == b"IDAT" for n, _ in chunks), 10)
@@ -211,7 +211,7 @@ class EncoderTests(unittest.TestCase):
             for pattern in ("repeat", "noise"):
                 samples = ([i % 31 for i in range(width*height)] if pattern == "repeat"
                            else [rng.randrange(1024) for _ in range(width*height)])
-                for mode in (1, 2):
+                for mode in (1, 2, 3):
                     with self.subTest(width=width, height=height, pattern=pattern, mode=mode):
                         self.check_roundtrip(samples, width, height, mode,
                                              stride=width*2+1, unaligned=True)
@@ -283,14 +283,14 @@ class EncoderTests(unittest.TestCase):
 
     def test_reused_dirty_workspace_does_not_change_output(self):
         samples = [(i*127) % 1024 for i in range(181*61)]
-        for mode in range(3):
+        for mode in range(4):
             a = self.check_roundtrip(samples, 181, 61, mode, fill=0x00)
             b = self.check_roundtrip(samples, 181, 61, mode, fill=0xFF)
             self.assertEqual(a, b)
 
     def test_callback_failure_stops_without_iend(self):
         samples = [i % 1024 for i in range(1120*64)]
-        for mode in range(3):
+        for mode in range(4):
             for accepted in (0, 1, 4, 7, 10):
                 with self.subTest(mode=mode, accepted=accepted):
                     result, partial, stats = self.encode(
@@ -300,7 +300,7 @@ class EncoderTests(unittest.TestCase):
                     self.assertFalse(partial.endswith(b"\x00\x00\x00\x00IEND\xaeB`\x82"))
 
     def test_nonraw10_sample_is_rejected_without_modifying_source(self):
-        for mode in range(3):
+        for mode in range(4):
             result, partial, stats = self.encode([1, 2, 3, 0xFC00], 2, 2, mode)
             self.assertEqual(result, -3)
             self.assertEqual(stats.rows_encoded, 1)
@@ -322,7 +322,7 @@ class EncoderTests(unittest.TestCase):
         changes = [
             (0, None, -1), (1, 31, -1), (2, 0, -1), (2, 1121, -1),
             (3, 0, -1), (3, 1365, -1), (4, 7, -1),
-            (4, C.c_size_t(-1).value, -1), (5, -1, -1), (5, 3, -1),
+            (4, C.c_size_t(-1).value, -1), (5, -1, -1), (5, 4, -1),
             (6, None, -1), (6, C.addressof(inp), -2),
             (6, C.addressof(workspace)+1, -2), (7, needed-1, -2),
             (10, C.cast(workspace, C.POINTER(Stats)), -1),
@@ -346,8 +346,11 @@ class EncoderTests(unittest.TestCase):
         self.assertEqual(patches["upstream_commit"], info["commit"])
         patch_data = (root / patches["patch_file"]).read_bytes()
         self.assertEqual(hashlib.sha256(patch_data).hexdigest(), patches["patch_sha256"])
+        for extra in patches["additional_patches"]:
+            data=(root/extra["patch_file"]).read_bytes()
+            self.assertEqual(hashlib.sha256(data).hexdigest(),extra["patch_sha256"])
         changed = {record["file"]:record for record in patches["patches"]}
-        self.assertEqual(set(changed), {"miniz.h", "miniz_common.h", "miniz_tdef.c"})
+        self.assertEqual(set(changed), {"miniz.h", "miniz_common.h", "miniz_tdef.c", "miniz_tdef.h"})
         for record in info["files"]:
             data = (root / record["file"]).read_bytes()
             if record["file"] in changed:
@@ -358,6 +361,25 @@ class EncoderTests(unittest.TestCase):
             else:
                 self.assertEqual(len(data), record["bytes"])
                 self.assertEqual(hashlib.sha256(data).hexdigest(), record["sha256"])
+        # Reverse the exact local patch chain to recover every pinned upstream
+        # source byte. This catches a manifest that merely blesses changed files.
+        with tempfile.TemporaryDirectory(prefix="png16-provenance-") as folder:
+            for record in info["files"]:
+                shutil.copyfile(root/record["file"],Path(folder)/record["file"])
+            for extra in reversed(patches["additional_patches"]):
+                for record in extra["files"]:
+                    data=(Path(folder)/record["file"]).read_bytes()
+                    self.assertEqual(hashlib.sha256(data).hexdigest(),record["after_sha256"])
+                    self.assertEqual(len(data),record["after_bytes"])
+                subprocess.run(["git","-c","core.autocrlf=false","-c","core.eol=lf","apply","--reverse",str((root/extra["patch_file"]).resolve())],
+                    cwd=folder,check=True,capture_output=True)
+                for record in extra["files"]:
+                    self.assertEqual(hashlib.sha256((Path(folder)/record["file"]).read_bytes()).hexdigest(),
+                                     record["before_sha256"])
+            subprocess.run(["git","-c","core.autocrlf=false","-c","core.eol=lf","apply","--reverse",str((root/patches["patch_file"]).resolve())],
+                cwd=folder,check=True,capture_output=True)
+            for record in info["files"]:
+                self.assertEqual(hashlib.sha256((Path(folder)/record["file"]).read_bytes()).hexdigest(),record["sha256"])
 
     def test_native_address_and_undefined_behavior_sanitizers(self):
         compiler = shutil.which("clang")
@@ -373,7 +395,24 @@ class EncoderTests(unittest.TestCase):
                 "-o", str(exe),
             ], check=True, capture_output=True)
             result = subprocess.run([str(exe)], check=True, capture_output=True, text=True)
-            self.assertIn("432 ASan/UBSan encode cases passed", result.stdout)
+            self.assertIn("648 ASan/UBSan encode cases passed", result.stdout)
+
+    def test_huffman_sub_one_byte_changes_and_all_callback_failures(self):
+        samples=[(i*127+(i//1120)*43)%1024 for i in range(1120*31)]
+        original=self.check_roundtrip(samples,1120,31,3,unaligned=True)
+        for index in (0,1119,1120,16383,16384,len(samples)-1):
+            changed=samples.copy();changed[index]^=1
+            with self.subTest(index=index):
+                encoded=self.check_roundtrip(changed,1120,31,3,unaligned=True)
+                self.assertNotEqual(encoded,original)
+        result,_,stats=self.encode(samples,1120,31,3)
+        self.assertEqual(result,0)
+        for accepted in range(stats.callback_calls):
+            with self.subTest(accepted=accepted):
+                result,partial,failed=self.encode(samples,1120,31,3,fail_after=accepted)
+                self.assertEqual(result,-4)
+                self.assertEqual(failed.callback_calls,accepted+1)
+                self.assertFalse(partial.endswith(b"\x00\x00\x00\x00IEND\xaeB`\x82"))
 
 
 if __name__ == "__main__":

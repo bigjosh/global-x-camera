@@ -1,0 +1,36 @@
+{
+  "scope": "Follow-up UTF-8 repair only; historical applied.json unchanged",
+  "path": "firmware/png-encoder/README.md",
+  "before_sha256": "5a4edd0d3411ea60f4d56e47ac9431aa3f327403b6d010f442a7a321c6529f51",
+  "after_sha256": "fe92ff8b61025097e9529dac2f029de2e7e183b1261311fdfa8ddde3bd1a3359",
+  "after_bytes": 11807,
+  "repaired_lines": [
+    {
+      "line": 8,
+      "before": "Every input sample `v` must be 0\u00e2\u20ac\u201c1023. The PNG stores `v << 6`, with grayscale",
+      "after": "Every input sample `v` must be 0\u20131023. The PNG stores `v << 6`, with grayscale"
+    },
+    {
+      "line": 36,
+      "before": "The caller must keep the input stable throughout encoding. Width is 1\u00e2\u20ac\u201c1120,",
+      "after": "The caller must keep the input stable throughout encoding. Width is 1\u20131120,"
+    },
+    {
+      "line": 37,
+      "before": "height 1\u00e2\u20ac\u201c1364; row stride may include padding. Byte-unaligned input is supported.",
+      "after": "height 1\u20131364; row stride may include padding. Byte-unaligned input is supported."
+    },
+    {
+      "line": 87,
+      "before": "size is `88 + height * (18 + 2 * width)` bytes: **3,080,000 bytes** for 1120\u00c3\u20141364.",
+      "after": "size is `88 + height * (18 + 2 * width)` bytes: **3,080,000 bytes** for 1120\u00d71364."
+    },
+    {
+      "line": 123,
+      "before": "also decode every pixel. Boundary cases cover 1\u00e2\u20ac\u201c4-byte tails, 4 KiB lookahead and",
+      "after": "also decode every pixel. Boundary cases cover 1\u20134-byte tails, 4 KiB lookahead and"
+    }
+  ],
+  "binary_source_changed": false,
+  "before_and_after_references": "All repaired characters match Git HEAD and the pre-promotion UTF-8 backup; new prose preserved"
+}

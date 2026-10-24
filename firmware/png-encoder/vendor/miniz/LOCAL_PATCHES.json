@@ -1,5 +1,5 @@
 {
-  "schema": 1,
+  "schema": 2,
   "upstream_commit": "174573d60290f447c13a2b1b3405de2b96e27d6c",
   "date": "2026-10-20",
   "license": "LICENSE (upstream copyright and permission unchanged)",
@@ -21,17 +21,63 @@
     {
       "file": "miniz_tdef.c",
       "upstream_sha256": "30aa8bf68ebcd6d15f03e1db3c7e72d70a038d4a44e74e69193185ea9187ecd0",
-      "patched_sha256": "e534a11368f819a314002d11ac4c6619a74d02cb043a82c2a2d69e0fe44bd060",
-      "patched_bytes": 75396
+      "patched_sha256": "64bb78afb7e14615dfca859bd295cc0a24b610aa21ba524f88b71b6cbf83cf1b",
+      "patched_bytes": 82591
+    },
+    {
+      "file": "miniz_tdef.h",
+      "upstream_sha256": "d62da02953c3834dfcbde4db026c6d9345013ef9b0e53185131016a3a4e48c33",
+      "patched_sha256": "fe4db3fb35386e6c1bc9c919f03b95661b40b1eb7d4a8618ef28a483c2acc799",
+      "patched_bytes": 11013
     }
   ],
   "purpose": [
     "Enable the dedicated one-probe fast matcher without undefined unaligned C accesses.",
     "Use byte pointers with two-byte strides and forced-inline bytewise little-endian reads.",
     "Store exactly two distance bytes in the three-byte LZ token.",
-    "Keep the safe path active under UBSan; unused common LE macros remain bytewise."
+    "Keep the safe path active under UBSan; unused common LE macros remain bytewise.",
+    "Optional TDEFL_FAST_HUFFMAN_ONLY flag selects a callback-only literal path; unsupported strategy combinations fail before initialization.",
+    "Keep paired literal emission and eight-literal accumulation byte-identical to the earlier optional Huffman mode, with explicitly bounded shifts and retained stored fallback."
   ],
   "configuration": "../../miniz_config.h selects this path; capture-sd builder retains -Os and adds -mno-unaligned-access.",
   "default_upstream_record": "UPSTREAM.json retains original downloaded hashes; it is not rewritten to label patched files upstream.",
-  "reviewed_binary_sha256": "91e1edfa43f95a9608b94457cfbf900c6f51d5ecd10d2b3b7667c84d40cd3844"
+  "last_update": "2026-10-24",
+  "additional_patches": [
+    {
+      "patch_file": "literal-only-huffman.patch",
+      "patch_sha256": "e22dc9c2c5eaef77cc9c124cf6f6be81de934cb9ab259dcb066a743dcd6fa09e",
+      "date": "2026-10-24",
+      "files": [
+        {
+          "file": "miniz_tdef.c",
+          "before_sha256": "e534a11368f819a314002d11ac4c6619a74d02cb043a82c2a2d69e0fe44bd060",
+          "after_sha256": "5609c7c4c384942cd633e94f57cc04e8fdba9c6a65f0b433236b7cf7c6e62070",
+          "after_bytes": 76937
+        },
+        {
+          "file": "miniz_tdef.h",
+          "before_sha256": "d62da02953c3834dfcbde4db026c6d9345013ef9b0e53185131016a3a4e48c33",
+          "after_sha256": "fe4db3fb35386e6c1bc9c919f03b95661b40b1eb7d4a8618ef28a483c2acc799",
+          "after_bytes": 11013
+        }
+      ],
+      "purpose": "Explicit optional literal-only Huffman path; retains dictionary bytes for shared stored-block fallback but avoids LZ hash/search. Existing modes unchanged."
+    },
+    {
+      "patch_file": "huffman-batch-pair.patch",
+      "patch_sha256": "f77eeb8d790f4d0dc5f1a28c16dd567c15963f45b90a5e714f3e72ffc973a87e",
+      "date": "2026-10-24",
+      "files": [
+        {
+          "file": "miniz_tdef.c",
+          "before_sha256": "5609c7c4c384942cd633e94f57cc04e8fdba9c6a65f0b433236b7cf7c6e62070",
+          "after_sha256": "64bb78afb7e14615dfca859bd295cc0a24b610aa21ba524f88b71b6cbf83cf1b",
+          "after_bytes": 82591
+        }
+      ],
+      "purpose": "Optional literal-only mode: hoisted state, bounded eight-literal groups, packed code/length lookup and bounded pair emission; preserve dictionary/raw fallback and exact output; explicit noinline contains only the Huffman-only functions."
+    }
+  ],
+  "historical_reviewed_binary_sha256": "91e1edfa43f95a9608b94457cfbf900c6f51d5ecd10d2b3b7667c84d40cd3844",
+  "qualification": "Optional Huffman-only mode was exercised in guarded compute-only MCU RAM trials; see the MCU tuning archive. The installed capture/SAVE mode remains FAST_NONE (1), and full capture/save/energy qualification is separate."
 }

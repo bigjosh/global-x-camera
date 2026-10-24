@@ -1,0 +1,19 @@
+
+        /* EXPERIMENT ONLY: avoid useless hash chains for literal-only input. */
+        if ((d->m_flags & TDEFL_MAX_PROBES_MASK) == 0) {
+            while (src_buf_left) {
+                mz_uint8 lit=*pSrc++;
+                --src_buf_left;
+                d->m_dict[d->m_lookahead_pos & TDEFL_LZ_DICT_SIZE_MASK]=lit;
+                ++d->m_lookahead_pos;
+                d->m_dict_size=MZ_MIN(d->m_dict_size+1U,(mz_uint)TDEFL_LZ_DICT_SIZE);
+                tdefl_record_literal(d,lit);
+                if (d->m_pLZ_code_buf > &d->m_lz_code_buf[TDEFL_LZ_CODE_BUF_SIZE-8]) {
+                    int n;
+                    d->m_pSrc=pSrc;d->m_src_buf_left=src_buf_left;
+                    if ((n=tdefl_flush_block(d,0))!=0) return n<0 ? MZ_FALSE:MZ_TRUE;
+                }
+            }
+            d->m_pSrc=pSrc;d->m_src_buf_left=src_buf_left;
+            return MZ_TRUE;
+        }

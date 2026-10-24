@@ -764,3 +764,80 @@ evidence; the failed strict width decoding remains recorded. The nominal
 See the [normal-profile evidence and final state](../../firmware/capture-sd/evidence/2026-10-24-normal-profile/README.md)
 for exact readback scope, measurements, reproducible builds and maintenance
 corrections. Arbitrary SD power-loss protection remains unqualified.
+
+## October 24 — compression tuned for the one-bit SD pipeline
+
+The user requested less CPU-intensive PNG compression, use of MCU hardware
+where useful, and a producer rate close to the time needed to write the
+previous buffer. During recovery troubleshooting, the user also confirmed
+exclusive use of this board and authorized overwriting experimental RAM,
+flash or SD contents as needed. This experiment used RAM-only compute
+modules; it did not replace the installed v66c NOR image.
+
+The selected **pipeline candidate**, not the installed SAVE default, is
+lossless Sub filtering followed by literal-only dynamic Huffman coding,
+eight-literal accumulation, paired code packing and selective O2 compilation.
+Its MVE row converter checks RAW10 range, shifts samples left six bits,
+converts to PNG byte order and applies Sub eight pixels at a time. The
+canonical encoder now exposes the optimized optional `PNG16_HUFFMAN_SUB`
+mode. The MVE implementation, exact experimental wrappers and build inputs
+are preserved in the evidence archive; they are not yet integrated into SAVE.
+
+On the same retained 1120 × 1364 frame, the original scalar Os fast/no-filter
+encoder took **0.954 s** of CPU time and produced **1,452,183 bytes**. The final
+scalar Huffman candidate took **0.507 s**; adding MVE conversion reduced this
+to **0.435 s**, producing **1,026,718 bytes**. Each reported value is based on
+three MCU repetitions at the nominal 400 MHz clock. Conversion/filtering in
+the final build takes about 14 ms. Relative to the original comparison this
+is about **54% less CPU time and 29% fewer output bytes** for this frame.
+
+Using the previously measured driver rate of 2,649,960 bytes/s, the smaller
+output would take **0.387 s** to write. A full 32 KiB buffer takes approximately
+12.37 ms at that rate; the new producer averages roughly 14 ms per such buffer.
+This is close enough to prioritize double-buffered DMA and measurement of the
+real overlap before further compressor micro-optimization. These are payload
+models, not concurrent SD measurements, complete-cycle timing or new energy
+results. Let the producer run ahead and apply buffer backpressure; do not add
+delays to force equal producer/consumer times. Card busy intervals and scene
+content vary, and a four-bit bus will change the balance again.
+
+The profile located most remaining work in literal accumulation and code
+emission, rather than tree construction. A generic 32-bit bit-writer change
+provided little benefit and was rejected. Huffman-only coding can produce
+larger files than LZ on very smooth/repeated scenes, so this single fixture
+does not establish a universal mode. The final O2 build also slowed the older
+fast-LZ mode (about 1.088 s CPU in its comparison); unchanged PNG bytes do not
+mean unchanged performance. Preserve the qualified installed binary and
+requalify any replacement instead of applying compiler changes indiscriminately.
+
+Every completed compute trial checked the entire output byte count/FNV,
+input before/after, guards, context, cache cleanup and exact final RAM park.
+Host output from each frozen source was independently decoded and compared
+against every original sample. The compute harness did **not** download all
+MCU-generated PNG bytes; its FNV check is not cryptographic equality proof
+or a new full-file SD readback. Existing modes' golden outputs and sanitizer
+tests remain covered. No image payloads are committed to the repository.
+
+The first MVE trial stopped at PREPARE because the recovery bridge leaves
+CPACR disabled. Corrected experiments explicitly own CP10/11 permission,
+normalize only their own top-level vector context after C returns and restore
+the incoming permission state before publishing completion. SAVE integration
+must instead preserve its live caller's original CONTROL/CPACR context and
+publish completion after that return path is safe. It must also fit the
+32 KiB integrated SAVE allocation and pass SD readback, shutdown/recovery
+and complete-cycle power tests. DMA, these integration changes and new energy
+qualification remain deferred; the current installed capture path is unchanged.
+
+At the final bench checkpoint, the first restoration attempt refused to
+switch power after seeing unexplained high current despite a verified completed
+compute park. A second preflight already measured about 83.8 mA before any
+power switch; the disappearance of the earlier high draw therefore cannot be
+attributed to the later restart. One recorded 15-second off/on cycle then ran
+the unchanged v66c image and returned to **8.169 mA at 4.892 V**. The helper
+stopped cleanly at **04:15:24 UTC**, restoring range 128 and leaving power on;
+COM8 is closed, BREAK released and Logic 2 remains running. This is a current
+signature, without a new SBF check or final-photo readback. The phase-width
+decoder still failed its strict check and was not used to claim completion.
+
+See the [MCU measurements, exact builds and final bench checkpoint](../../firmware/png-encoder/evidence/2026-10-24-mcu-tuning/README.md)
+and [integration requirements](../../firmware/png-encoder/evidence/2026-10-24-mcu-tuning/integration-proposal.md).

@@ -1,0 +1,185 @@
+--- a/miniz_tdef.c
++++ b/miniz_tdef.c
+@@ -445,9 +445,81 @@
+ 
+     static const mz_uint mz_bitmasks[17] = { 0x0000, 0x0001, 0x0003, 0x0007, 0x000F, 0x001F, 0x003F, 0x007F, 0x00FF, 0x01FF, 0x03FF, 0x07FF, 0x0FFF, 0x1FFF, 0x3FFF, 0x7FFF, 0xFFFF };
+ 
++
++#if defined(_MSC_VER)
++#define HUFF_NOINLINE __declspec(noinline)
++#elif defined(__GNUC__) || defined(__clang__)
++#define HUFF_NOINLINE __attribute__((noinline))
++#else
++#define HUFF_NOINLINE
++#endif
++
++    /* Explicit FAST_HUFFMAN_ONLY blocks contain only literal tokens. Keep
++     * their exact flag-byte layout and shared header/fallback behavior, but
++     * avoid match-token branches. Pack the code+length lookup once per block.
++     * Each insertion starts with <8 pending bits. A combined pair is allowed
++     * only for <=24 new bits, hence at most31 total and shift counts <=22.
++     * Longer pairs use two individually bounded insertions. Byte output is
++     * alignment-safe and saturates exactly like TDEFL_PUT_BITS. */
++    static HUFF_NOINLINE mz_bool tdefl_compress_huffman_lz_codes(tdefl_compressor *d)
++    {
++        mz_uint32 table[257];
++        mz_uint i,bits_in=d->m_bits_in;
++        mz_uint32 bit_buffer=d->m_bit_buffer;
++        mz_uint8 *p=d->m_lz_code_buf,*last=d->m_pLZ_code_buf;
++        mz_uint8 *out=d->m_pOutput_buf,*end=d->m_pOutput_buf_end;
++        for(i=0;i<257;++i)
++            table[i]=(mz_uint32)d->m_huff_codes[0][i] | ((mz_uint32)d->m_huff_code_sizes[0][i]<<16);
++#define HUF_FLUSH_BYTES() do { \
++    while(bits_in>=8) { \
++        if(out<end) *out++=(mz_uint8)bit_buffer; \
++        bit_buffer>>=8;bits_in-=8; \
++    } \
++} MZ_MACRO_END
++#define HUF_ONE(v) do { \
++    mz_uint32 packed_code=(v); \
++    bit_buffer|=(packed_code&0xffffU)<<bits_in; \
++    bits_in+=packed_code>>16; \
++    HUF_FLUSH_BYTES(); \
++} MZ_MACRO_END
++        while(p<last)
++        {
++            mz_uint count;
++            MZ_ASSERT(*p==0); /* only the explicit literal-only flag uses this */
++            ++p;
++            count=(mz_uint)MZ_MIN((size_t)8,(size_t)(last-p));
++            while(count>=2)
++            {
++                mz_uint32 a=table[p[0]],b=table[p[1]];
++                mz_uint na=a>>16,nb=b>>16;
++                MZ_ASSERT(na && na<=15 && nb && nb<=15);
++                if(na+nb<=24)
++                {
++                    bit_buffer|=(a&0xffffU)<<bits_in;
++                    bit_buffer|=(b&0xffffU)<<(bits_in+na);
++                    bits_in+=na+nb;
++                    HUF_FLUSH_BYTES();
++                }
++                else
++                {
++                    HUF_ONE(a);
++                    HUF_ONE(b);
++                }
++                p+=2;count-=2;
++            }
++            if(count) { HUF_ONE(table[*p]);++p; }
++        }
++        HUF_ONE(table[256]);
++        d->m_pOutput_buf=out;d->m_bit_buffer=bit_buffer;d->m_bits_in=bits_in;
++#undef HUF_ONE
++#undef HUF_FLUSH_BYTES
++        return out<end;
++    }
++
+ #if MINIZ_USE_UNALIGNED_LOADS_AND_STORES && MINIZ_LITTLE_ENDIAN && MINIZ_HAS_64BIT_REGISTERS
+     static mz_bool tdefl_compress_lz_codes(tdefl_compressor *d)
+     {
++        if(d->m_flags&TDEFL_FAST_HUFFMAN_ONLY) return tdefl_compress_huffman_lz_codes(d);
+         mz_uint flags;
+         mz_uint8 *pLZ_codes;
+         mz_uint8 *pOutput_buf = d->m_pOutput_buf;
+@@ -543,6 +615,7 @@
+ #else
+ static mz_bool tdefl_compress_lz_codes(tdefl_compressor *d)
+ {
++        if(d->m_flags&TDEFL_FAST_HUFFMAN_ONLY) return tdefl_compress_huffman_lz_codes(d);
+     mz_uint flags;
+     mz_uint8 *pLZ_codes;
+ 
+@@ -1070,23 +1143,77 @@
+      * hash chains or search for matches. The bounded token buffer and shared
+      * dynamic Huffman/flush/Adler paths are unchanged. No lookahead is retained.
+      * tdefl_init restricts the new flag to the callback API and checksum flags. */
+-    static mz_bool tdefl_compress_huffman_only(tdefl_compressor *d)
+-    {
+-        while (d->m_src_buf_left)
+-        {
+-            mz_uint8 lit = *d->m_pSrc++;
+-            --d->m_src_buf_left;
+-            d->m_dict[d->m_lookahead_pos & TDEFL_LZ_DICT_SIZE_MASK] = lit;
+-            ++d->m_lookahead_pos;
+-            d->m_dict_size = MZ_MIN(d->m_dict_size + 1U, (mz_uint)TDEFL_LZ_DICT_SIZE);
+-            tdefl_record_literal(d, lit);
+-            if (d->m_pLZ_code_buf > &d->m_lz_code_buf[TDEFL_LZ_CODE_BUF_SIZE - 8])
+-            {
+-                int n = tdefl_flush_block(d, 0);
++    static HUFF_NOINLINE mz_bool tdefl_compress_huffman_only(tdefl_compressor *d)
++    {
++        const mz_uint8 *pSrc = d->m_pSrc;
++        size_t src_left = d->m_src_buf_left;
++        mz_uint lookahead_pos = d->m_lookahead_pos, dict_size = d->m_dict_size;
++        mz_uint total_lz_bytes = d->m_total_lz_bytes, num_flags_left = d->m_num_flags_left;
++        mz_uint8 *pLZ_code_buf = d->m_pLZ_code_buf, *pLZ_flags = d->m_pLZ_flags;
++        while (src_left)
++        {
++            /* Consume eight whole literals only when the old per-byte path
++             * cannot flush or wrap the dictionary within this group. Keep
++             * its exact token layout, trailing flag reservation and flush
++             * boundaries. memcpy preserves byte alignment on all targets;
++             * the build retains -mno-unaligned-access. No wide pointer casts. */
++            if (num_flags_left == 8 && src_left >= 8 &&
++                (lookahead_pos & TDEFL_LZ_DICT_SIZE_MASK) <= TDEFL_LZ_DICT_SIZE - 8 &&
++                (size_t)(&d->m_lz_code_buf[TDEFL_LZ_CODE_BUF_SIZE - 8] - pLZ_code_buf) >= 9)
++            {
++                memcpy(&d->m_dict[lookahead_pos & TDEFL_LZ_DICT_SIZE_MASK], pSrc, 8);
++                memcpy(pLZ_code_buf, pSrc, 8);
++                ++d->m_huff_count[0][pSrc[0]];
++                ++d->m_huff_count[0][pSrc[1]];
++                ++d->m_huff_count[0][pSrc[2]];
++                ++d->m_huff_count[0][pSrc[3]];
++                ++d->m_huff_count[0][pSrc[4]];
++                ++d->m_huff_count[0][pSrc[5]];
++                ++d->m_huff_count[0][pSrc[6]];
++                ++d->m_huff_count[0][pSrc[7]];
++                *pLZ_flags = 0;
++                pLZ_code_buf += 8;
++                pLZ_flags = pLZ_code_buf++;
++                pSrc += 8; src_left -= 8;
++                lookahead_pos += 8;
++                dict_size = MZ_MIN(dict_size + 8U, (mz_uint)TDEFL_LZ_DICT_SIZE);
++                total_lz_bytes += 8;
++                continue;
++            }
++
++            mz_uint8 lit = *pSrc++;
++            --src_left;
++            d->m_dict[lookahead_pos & TDEFL_LZ_DICT_SIZE_MASK] = lit;
++            ++lookahead_pos;
++            dict_size = MZ_MIN(dict_size + 1U, (mz_uint)TDEFL_LZ_DICT_SIZE);
++            ++total_lz_bytes;
++            *pLZ_code_buf++ = lit;
++            *pLZ_flags = (mz_uint8)(*pLZ_flags >> 1);
++            if (--num_flags_left == 0)
++            {
++                num_flags_left = 8;
++                pLZ_flags = pLZ_code_buf++;
++            }
++            ++d->m_huff_count[0][lit];
++            if (pLZ_code_buf > &d->m_lz_code_buf[TDEFL_LZ_CODE_BUF_SIZE - 8])
++            {
++                int n;
++                d->m_pSrc = pSrc; d->m_src_buf_left = src_left;
++                d->m_lookahead_pos = lookahead_pos; d->m_dict_size = dict_size;
++                d->m_total_lz_bytes = total_lz_bytes; d->m_num_flags_left = num_flags_left;
++                d->m_pLZ_code_buf = pLZ_code_buf; d->m_pLZ_flags = pLZ_flags;
++                n = tdefl_flush_block(d, 0);
+                 if (n != 0)
+                     return n < 0 ? MZ_FALSE : MZ_TRUE;
+-            }
+-        }
++                total_lz_bytes = d->m_total_lz_bytes;
++                num_flags_left = d->m_num_flags_left;
++                pLZ_code_buf = d->m_pLZ_code_buf; pLZ_flags = d->m_pLZ_flags;
++            }
++        }
++        d->m_pSrc = pSrc; d->m_src_buf_left = src_left;
++        d->m_lookahead_pos = lookahead_pos; d->m_dict_size = dict_size;
++        d->m_total_lz_bytes = total_lz_bytes; d->m_num_flags_left = num_flags_left;
++        d->m_pLZ_code_buf = pLZ_code_buf; d->m_pLZ_flags = pLZ_flags;
+         return MZ_TRUE;
+     }
+ 

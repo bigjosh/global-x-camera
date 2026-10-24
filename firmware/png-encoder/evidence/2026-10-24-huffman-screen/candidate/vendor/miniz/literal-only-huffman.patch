@@ -1,0 +1,73 @@
+--- a/miniz_tdef.c
++++ b/miniz_tdef.c
+@@ -1065,6 +1065,31 @@
+         d->m_huff_count[0][lit]++;
+     }
+ 
++    /* Local, explicitly selected literal-only path. Keep dictionary bytes for
++     * the shared flush routine's stored-block fallback, but do not construct
++     * hash chains or search for matches. The bounded token buffer and shared
++     * dynamic Huffman/flush/Adler paths are unchanged. No lookahead is retained.
++     * tdefl_init restricts the new flag to the callback API and checksum flags. */
++    static mz_bool tdefl_compress_huffman_only(tdefl_compressor *d)
++    {
++        while (d->m_src_buf_left)
++        {
++            mz_uint8 lit = *d->m_pSrc++;
++            --d->m_src_buf_left;
++            d->m_dict[d->m_lookahead_pos & TDEFL_LZ_DICT_SIZE_MASK] = lit;
++            ++d->m_lookahead_pos;
++            d->m_dict_size = MZ_MIN(d->m_dict_size + 1U, (mz_uint)TDEFL_LZ_DICT_SIZE);
++            tdefl_record_literal(d, lit);
++            if (d->m_pLZ_code_buf > &d->m_lz_code_buf[TDEFL_LZ_CODE_BUF_SIZE - 8])
++            {
++                int n = tdefl_flush_block(d, 0);
++                if (n != 0)
++                    return n < 0 ? MZ_FALSE : MZ_TRUE;
++            }
++        }
++        return MZ_TRUE;
++    }
++
+     static MZ_FORCEINLINE void tdefl_record_match(tdefl_compressor *d, mz_uint match_len, mz_uint match_dist)
+     {
+         mz_uint32 s0, s1;
+@@ -1293,6 +1318,12 @@
+         if ((d->m_output_flush_remaining) || (d->m_finished))
+             return (d->m_prev_return_status = tdefl_flush_output_buffer(d));
+ 
++        if (d->m_flags & TDEFL_FAST_HUFFMAN_ONLY)
++        {
++            if (!tdefl_compress_huffman_only(d))
++                return d->m_prev_return_status;
++        }
++        else
+ #if MINIZ_USE_UNALIGNED_LOADS_AND_STORES && MINIZ_LITTLE_ENDIAN
+         if (((d->m_flags & TDEFL_MAX_PROBES_MASK) == 1) &&
+             ((d->m_flags & TDEFL_GREEDY_PARSING_FLAG) != 0) &&
+@@ -1335,6 +1366,10 @@
+ 
+     tdefl_status tdefl_init(tdefl_compressor *d, tdefl_put_buf_func_ptr pPut_buf_func, void *pPut_buf_user, int flags)
+     {
++        if ((flags & TDEFL_FAST_HUFFMAN_ONLY) &&
++            (!pPut_buf_func || ((mz_uint)flags & ~(mz_uint)(TDEFL_FAST_HUFFMAN_ONLY |
++                TDEFL_WRITE_ZLIB_HEADER | TDEFL_COMPUTE_ADLER32))))
++            return TDEFL_STATUS_BAD_PARAM;
+         d->m_pPut_buf_func = pPut_buf_func;
+         d->m_pPut_buf_user = pPut_buf_user;
+         d->m_flags = (mz_uint)(flags);
+--- a/miniz_tdef.h
++++ b/miniz_tdef.h
+@@ -41,7 +41,11 @@
+         TDEFL_RLE_MATCHES = 0x10000,
+         TDEFL_FILTER_MATCHES = 0x20000,
+         TDEFL_FORCE_ALL_STATIC_BLOCKS = 0x40000,
+-        TDEFL_FORCE_ALL_RAW_BLOCKS = 0x80000
++        TDEFL_FORCE_ALL_RAW_BLOCKS = 0x80000,
++        /* Local extension: literal-only streaming loop without LZ hash/search.
++         * May combine only with WRITE_ZLIB_HEADER and/or COMPUTE_ADLER32.
++         * Requires the output callback API. Existing flags keep their paths. */
++        TDEFL_FAST_HUFFMAN_ONLY = 0x100000
+     };
+ 
+     /* High level compression functions: */

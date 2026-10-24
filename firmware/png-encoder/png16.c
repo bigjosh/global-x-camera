@@ -128,7 +128,7 @@ png16_result png16_encode_timed(
     size_t extent;
     if (!input || !workspace || !write || !width || !height ||
         width>PNG16_MAX_WIDTH || height>PNG16_MAX_HEIGHT ||
-        stride<row_bytes || (unsigned)mode>PNG16_FAST_SUB ||
+        stride<row_bytes || (unsigned)mode>PNG16_HUFFMAN_SUB ||
         (height>1U && stride>(SIZE_MAX-row_bytes)/(height-1U)))
         return PNG16_BAD_ARGUMENT;
     extent=(size_t)(height-1U)*stride+row_bytes;
@@ -169,7 +169,9 @@ png16_result png16_encode_timed(
     const int stored=mode==PNG16_STORED_NONE;
     uint32_t adler=1;
     if (!stored) {
-        const int flags=TDEFL_WRITE_ZLIB_HEADER | TDEFL_GREEDY_PARSING_FLAG | 1;
+        const int flags=mode==PNG16_HUFFMAN_SUB ?
+            TDEFL_WRITE_ZLIB_HEADER | TDEFL_FAST_HUFFMAN_ONLY :
+            TDEFL_WRITE_ZLIB_HEADER | TDEFL_GREEDY_PARSING_FLAG | 1;
         uint64_t start=tick(e);
         tdefl_status status=tdefl_init(&e->compressor,compressed_output,e,flags);
         accumulate(e,&e->timing.deflate_inclusive_cycles,start);
@@ -195,7 +197,8 @@ png16_result png16_encode_timed(
         const uint8_t *p=input+(size_t)y*stride;
         uint8_t *row=e->row+(stored ? 5U : 0U);
         uint8_t prev_hi=0,prev_lo=0;
-        row[0]=mode==PNG16_FAST_SUB ? 1U : 0U;
+        const int sub=mode==PNG16_FAST_SUB || mode==PNG16_HUFFMAN_SUB;
+        row[0]=sub ? 1U : 0U;
         for (uint32_t x=0;x<width;++x) {
             uint32_t v=(uint32_t)p[2*x]|((uint32_t)p[2*x+1]<<8);
             if (v>1023U) {
@@ -204,8 +207,8 @@ png16_result png16_encode_timed(
                 goto done;
             }
             uint8_t hi=(uint8_t)(v>>2),lo=(uint8_t)(v<<6);
-            row[2*x+1]=mode==PNG16_FAST_SUB ? (uint8_t)(hi-prev_hi) : hi;
-            row[2*x+2]=mode==PNG16_FAST_SUB ? (uint8_t)(lo-prev_lo) : lo;
+            row[2*x+1]=sub ? (uint8_t)(hi-prev_hi) : hi;
+            row[2*x+2]=sub ? (uint8_t)(lo-prev_lo) : lo;
             prev_hi=hi; prev_lo=lo;
         }
         accumulate(e,&e->timing.conversion_cycles,conversion_start);

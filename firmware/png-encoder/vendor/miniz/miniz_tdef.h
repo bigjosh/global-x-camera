@@ -41,7 +41,11 @@ extern "C"
         TDEFL_RLE_MATCHES = 0x10000,
         TDEFL_FILTER_MATCHES = 0x20000,
         TDEFL_FORCE_ALL_STATIC_BLOCKS = 0x40000,
-        TDEFL_FORCE_ALL_RAW_BLOCKS = 0x80000
+        TDEFL_FORCE_ALL_RAW_BLOCKS = 0x80000,
+        /* Local extension: literal-only streaming loop without LZ hash/search.
+         * May combine only with WRITE_ZLIB_HEADER and/or COMPUTE_ADLER32.
+         * Requires the output callback API. Existing flags keep their paths. */
+        TDEFL_FAST_HUFFMAN_ONLY = 0x100000
     };
 
     /* High level compression functions: */

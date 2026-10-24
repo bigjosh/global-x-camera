@@ -102,7 +102,7 @@ class TimingTests(unittest.TestCase):
                          timing.framing_inclusive_cycles-timing.framing_callback_cycles)
 
     def test_all_modes_keep_bytes_and_pixels_and_default_api(self):
-        for mode in range(3):
+        for mode in range(4):
             with self.subTest(mode=mode):
                 old = self.encode(mode, timed=False)
                 disabled = self.encode(mode, timed=None)
@@ -114,7 +114,7 @@ class TimingTests(unittest.TestCase):
                 self.partition(timed[3])
 
     def test_sink_delay_is_counted_once_and_excluded_from_cpu_categories(self):
-        for mode in range(3):
+        for mode in range(4):
             with self.subTest(mode=mode):
                 baseline = self.encode(mode)
                 delayed = self.encode(mode, delay=997)
@@ -138,7 +138,7 @@ class TimingTests(unittest.TestCase):
                     self.assertEqual(b.deflate_output_cycles, 0)
 
     def test_failed_callbacks_and_late_bad_samples_keep_partial_accounting(self):
-        for mode in range(3):
+        for mode in range(4):
             last = self.encode(mode)[2].callback_calls-1
             for accepted in sorted({0, 1, 4, min(8, last), last}):
                 with self.subTest(mode=mode, accepted=accepted):

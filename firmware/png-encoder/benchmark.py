@@ -48,7 +48,7 @@ def main():
             for name, raw in cases:
                 source = C.create_string_buffer(raw)
                 expected = np.frombuffer(raw, dtype="<u2").astype(np.uint32) << 6
-                for mode, mode_name in enumerate(("stored_none", "fast_none", "fast_sub")):
+                for mode, mode_name in enumerate(("stored_none", "fast_none", "fast_sub", "huffman_sub")):
                     pieces = []
 
                     @WRITE
@@ -72,7 +72,9 @@ def main():
                     assert C.string_at(source, len(raw)) == raw
                     results.append(dict(
                         source=name, input_sha256=hashlib.sha256(raw).hexdigest(),
-                        mode=mode_name, input_bytes=len(raw), png_bytes=len(encoded),
+                        mode=mode_name, optional_huffman=(mode == 3),
+                        installed_save_selection_unchanged=True,
+                        input_bytes=len(raw), png_bytes=len(encoded),
                         ratio=len(encoded)/len(raw), host_encode_ms=elapsed*1000,
                         png_sha256=hashlib.sha256(encoded).hexdigest(),
                         callback_calls=stats.callback_calls, idat_chunks=stats.idat_chunks,

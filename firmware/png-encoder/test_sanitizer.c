@@ -37,7 +37,7 @@ int main(void)
                     input[y*stride+2*x]=(uint8_t)v;
                     input[y*stride+2*x+1]=(uint8_t)(v>>8);
                 }
-                for (unsigned mode=1;mode<=2;mode++) {
+                for (unsigned mode=1;mode<=3;mode++) {
                     memset(workspace,pattern ? 0xff : 0,png16_workspace_size());
                     png16_stats stats;
                     int rc=png16_encode(input,(size_t)stride*h,w,h,stride,
