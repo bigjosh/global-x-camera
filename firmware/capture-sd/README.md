@@ -87,6 +87,59 @@ left sudden power-loss protection unqualified. Normal firmware never formats
 a card. Existing PNG/TMP filenames are skipped, older files are not
 overwritten, and full storage stops a save.
 
+## Capture-cycle timing comparison
+
+Starting baseline, October 23: NUCLEO-N657X0-Q / CAM-6G3-073CLR, 1120 × 1364
+RAW10 capture, grayscale16 PNG with the cached v8b fast-none encoder, and
+native **one-bit SDMMC2 at 25 MHz / 3.3 V**. The table uses one complete cold
+trace from the v61b timing overlay of the v59 Standby path. Original v59 is
+installed; no hardware was changed to assemble this table. Add future measured
+configurations alongside this baseline, retaining the same phase boundaries.
+
+All rows are consecutive, non-overlapping intervals on the same Saleae clock.
+Elapsed time starts at the observed target 5 V digital threshold crossing,
+not at button press or analog power-good. Values are rounded to 0.1 ms.
+
+| Phase | Current one-bit baseline (ms) | Elapsed at phase end (ms) |
+| --- | ---: | ---: |
+| Observed 5 V rise → reset release | 1.6 | 1.6 |
+| ROM boot, code loading and sensor startup → receiver entry | 21.5 | 23.1 |
+| Receiver preparation / wait → first STROBE interrupt | 1.3 | 24.4 |
+| Exposure and frame readout/transfer → frame-complete interrupt | 21.9 | 46.3 |
+| Frame checks, stop camera, load and enter SAVE code | 457.1 | 503.4 |
+| SAVE setup and cold-card initialization | 117.1 | 620.5 |
+| Mount FAT32 | 1.7 | 622.2 |
+| Pre-write checks, open file, compress PNG and stream writes to SD | 1,629.2 | 2,251.4 |
+| Flush buffered tail, sync/close/rename, wait for card ready | 22.0 | 2,273.4 |
+| Post-write frame checks, SD deinitialization and cache cleanup | 447.1 | 2,720.5 |
+| Load shutdown code, disable peripherals and prepare Standby | 13.3 | 2,733.8 |
+| **Total to the checkpoint immediately before Standby WFI** | **2,733.8** | **2,733.8** |
+
+The phase edges are measured, but their names are **inferred from the reviewed
+source call order**: the original pulse-width decoder failed qualification.
+This is one diagnostic run, not a median or a guaranteed bound. STROBE and frame
+markers include interrupt latency; the 21.9 ms row is not exposure time alone.
+Actual WFI-to-electrical-Standby latency was not separately resolved. Marker
+execution and additional code loading can perturb timing; no correction is
+subtracted. See the [exact trace and interpretation](evidence/2026-10-23-one-bit-baseline/phase/v61-cycle-01/ordered-analysis.json).
+
+The 457.1 ms preparation interval includes an uncached full-frame statistics
+and checksum scan, sensor/receiver shutdown, and SAVE-code loading/checking.
+The 447.1 ms cleanup interval includes a cached post-save frame checksum and
+another full-frame checksum after D-cache cleanup/disable. These checks examine
+the RAW frame in RAM; they do **not** read back the saved PNG from SD. The
+1,629.2 ms interval includes both CPU compression and synchronous filesystem/SD
+callbacks, plus pre-write validation and file creation. Internal encoder/write
+counters overlap, so do not add them as extra phases to this table.
+
+For comparison, three **unchanged-v59** cold runs measured median **2.714624 s /
+1.288948 J** from current onset to the selected low-current plateau. That uses
+different start/end observations and is kept separate from the table's
+2.733800 s. The retained-frame **2.102061 s** SAVE median also excludes cold
+boot/capture and uses an already-powered card; it is not substituted into this
+cold-cycle table. See the [baseline report](evidence/2026-10-23-one-bit-baseline/README.md)
+and [separate SAVE counters](evidence/2026-10-23-one-bit-baseline/same-frame/README.md).
+
 ## Data and execution
 
 The 1120 × 1364 RAW10 frame stays at `0x34000000`, right-aligned in little-endian
