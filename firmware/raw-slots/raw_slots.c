@@ -205,6 +205,28 @@ int raw_slots_finish(raw_slots_t *f,const void *tail)
     if(writer(f->card,f->payload_lba+f->written_sectors,f->io,1))
         return fault(f,RAW_SLOTS_ERR_IO);
     f->written_sectors++;f->write_sectors++;
+    return raw_slots_commit(f);
+}
+
+int raw_slots_write_padded(raw_slots_t *f,const void *buffer)
+{
+    if(!f || !f->opened || !f->active || f->error) return RAW_SLOTS_ERR_STATE;
+    if(!buffer || ((uintptr_t)buffer&31U) || !f->write_payload)
+        return fault(f,RAW_SLOTS_ERR_ARGUMENT);
+    if(f->written_sectors) return fault(f,RAW_SLOTS_ERR_LENGTH);
+    if(!zero((const uint8_t *)buffer+RAW_SLOTS_PAYLOAD_BYTES,
+             RAW_SLOTS_PADDED_BYTES-RAW_SLOTS_PAYLOAD_BYTES))
+        return fault(f,RAW_SLOTS_ERR_ARGUMENT);
+    if(f->write_payload(f->card,f->payload_lba,buffer,RAW_SLOTS_PAYLOAD_SECTORS))
+        return fault(f,RAW_SLOTS_ERR_IO);
+    f->written_sectors=RAW_SLOTS_PAYLOAD_SECTORS;
+    f->write_sectors+=RAW_SLOTS_PAYLOAD_SECTORS;return 0;
+}
+
+int raw_slots_commit(raw_slots_t *f)
+{
+    if(!f || !f->opened || !f->active || f->error) return RAW_SLOTS_ERR_STATE;
+    if(f->written_sectors!=RAW_SLOTS_PAYLOAD_SECTORS) return fault(f,RAW_SLOTS_ERR_LENGTH);
     if(ready(f)) return f->error;
     make_slot(f,f->selected_slot,RAW_SLOTS_FULL);
     if(write_one(f,slot_lba(f->selected_slot)) || ready(f)) return f->error;

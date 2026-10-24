@@ -30,6 +30,14 @@ VCP_FIELDS = (
     'reserved30 reserved31').split()
 # An unknown/self-consistent build is insufficient authorization to halt.
 APPROVED = {
+    # RAW v16 preerase experiments: only two CRC literals differ from v15.
+    # Exact recovery instructions remain unchanged; admission is not qualification.
+    '31b8a97eb8a68e574c1adab17e44b838044277bd95f81f5b22c30b9fdaaccd2e':
+        {'bytes': 5140, 'park': 0x3418078C, 'vcp': True,
+         'sector': '285fba4951f88deb12033e7b3c2948c802371862982da5a8e304c6cae35fb58f'},
+    '2bafcb1a4d2fe20d2ae6ae9a04d3a43416a5ed7f50bbea7e0e29959aa13094eb':
+        {'bytes': 5140, 'park': 0x3418078C, 'vcp': True,
+         'sector': '52edac834cc8aebd649c8d35a8f3fd6ef20e2e6c12dc99bcf0944a636d445508'},
     # RAW v15 Standby: receiver boot revokes retained late-loader authority.
     # Versus v12 only the two reviewed prefix CRC words differ; qualification only.
     'db234498a9b347f6cb9f41daf22da1fb0f9266dba264b9ca203ef33d1b1711df':

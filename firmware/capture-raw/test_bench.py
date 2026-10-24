@@ -258,5 +258,41 @@ class ManifestGuards(unittest.TestCase):
                 bench.checked_build(folder, m["binary_sha256"])
 
 
+class WholeImageGuards(unittest.TestCase):
+    def fixture(self):
+        m=dict(whole_image_preerase=True,transport='idma',dma_sleep=False,chunk_sectors=3730,
+               original_guard=bench.FRAME+bench.FRAME_BYTES,whole_proof_words=8,
+               whole_proof=bench.LOAD+0x2000,bss_start=bench.LOAD+0x2000,bss_end=bench.LOAD+0x2020,
+               guard=bench.FRAME+1909760,chunk_trace=0x343FE000)
+        p=dict(chunk_count=1,chunk_overflow=0)
+        data={'frame-guard.bin':struct.pack('<8I',*(0xA15A1000+i for i in range(8))),
+              'whole-proof.bin':struct.pack('<8I',0x52575031,3,0,0,bench.FRAME_BYTES,1909760,160,3730),
+              'frame-padding.bin':bytes(160),
+              'whole-chunk.bin':struct.pack('<8I',1,2,0,3730,bench.FRAME_BYTES,0x900,0,4)}
+        return m,p,data
+
+    def test_guards_transition_padding_and_single_transaction(self):
+        m,p,data=self.fixture()
+        class B:
+            def upload(self,address,count,name):
+                assert count==len(data[name]);return data[name]
+        result=bench.frame_guards(B(),m,p)
+        self.assertTrue(result['original_guard_checked_before_zero_padding'])
+        self.assertTrue(result['post_padding_guard_intact'])
+        for name in data:
+            original=data[name]
+            data[name]=bytes(len(original)) if any(original) else bytes([1])*len(original)
+            with self.subTest(name=name),self.assertRaises(ValueError):bench.frame_guards(B(),m,p)
+            data[name]=original
+        for changed in ({'chunk_count':2},{'chunk_count':0},{'chunk_overflow':1}):
+            with self.subTest(changed=changed),self.assertRaises(ValueError):bench.frame_guards(B(),m,dict(p,**changed))
+
+    def test_whole_layout_requires_reviewed_dma_and_explicit_proof(self):
+        m,_,_=self.fixture();bench.whole_layout(m)
+        for changed in ({'transport':'pio'},{'dma_sleep':True},{'chunk_sectors':1024},
+                        {'original_guard':0},{'whole_proof_words':7},{'whole_proof':0}):
+            with self.subTest(changed=changed),self.assertRaises(ValueError):bench.whole_layout(dict(m,**changed))
+
+
 if __name__ == "__main__":
     unittest.main()

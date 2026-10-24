@@ -93,6 +93,14 @@ def frozen_manifest(folder):
 def transform_capture(text):
     text=replace(text,'#define BYTES (WIDTH * HEIGHT * 2U)',
         '#define BYTES (WIDTH * HEIGHT * 5U / 4U)\n#include "runtime.h"')
+    text=replace(text,'uint8_t g_frame[BYTES];',
+        'uint8_t g_frame[RAW_WHOLE_IMAGE_PREERASE?RAW_SLOTS_PADDED_BYTES+32U:BYTES];')
+    text=replace(text,'  for(unsigned i=0;i<8;++i) guard[i]=0xA15A1000U+i;',
+        '''  for(unsigned i=0;i<8;++i) guard[i]=0xA15A1000U+i;
+#if RAW_WHOLE_IMAGE_PREERASE
+  volatile uint32_t *pad_guard=(volatile uint32_t *)(0x34000000U+RAW_SLOTS_PADDED_BYTES);
+  for(unsigned i=0;i<8;++i) pad_guard[i]=0xA15A1000U+i;
+#endif''')
     text=replace(text,'DCMIPP_CSI_DT_BPP10)','DCMIPP_CSI_DT_BPP8)')
     text=replace(text,'.DataTypeIDA=DCMIPP_DT_RAW10','.DataTypeIDA=0x30U')
     text=replace(text,'if(raw_bits!=10U || raw_dt!=0x2BU)','if(raw_bits!=10U || raw_dt!=0x30U)')
@@ -192,6 +200,7 @@ def main():
     p.add_argument('--pattern',choices=('scene','diagonal'),default='scene')
     p.add_argument('--transport',choices=('pio','idma'),default='idma')
     p.add_argument('--chunk-sectors',type=int,default=1024)
+    p.add_argument('--whole-image-preerase',action='store_true',help='One CMD55/ACMD23 + CMD25 for all3730 padded payload sectors')
     p.add_argument('--flash',action='store_true')
     p.add_argument('--standby',action='store_true')
     p.add_argument('--async-stop',action='store_true')
@@ -207,6 +216,8 @@ def main():
     if not 1<=a.chunk_sectors<=1024: p.error('chunk sectors must be1..1024')
     if a.async_stop and a.transport!='idma': p.error('Asynchronous I2C STOP polling requires IDMA transport')
     if a.dma_sleep and a.transport!='idma': p.error('DMA sleep requires IDMA transport')
+    if a.whole_image_preerase and (a.transport!='idma' or a.dma_sleep):
+        p.error('Whole-image preerase requires polling IDMA')
     if (a.preinit or a.snapshot or a.poison) and (a.flash or not a.line_stream):
         p.error('Preinit/snapshot/poison require RAM LINEstreamdiagnostic mode')
     rbase=a.base/'receiver'; pbase=a.base/'staged'
@@ -257,9 +268,10 @@ def main():
               f'-DRAW_STANDBY={int(a.standby)}',f'-DRAW_DMA={int(a.transport=="idma")}',
               f'-DRAW_ASYNC_STOP={int(a.async_stop)}',
               f'-DRAW_DMA_SLEEP={int(a.dma_sleep)}',
+              f'-DRAW_WHOLE_IMAGE_PREERASE={int(a.whole_image_preerase)}',
               f'-DRAW_LINE_STREAM={int(a.line_stream)}',f'-DRAW_PREINIT={int(a.preinit)}',
               f'-DRAW_LINE_SNAPSHOTS={int(a.snapshot)}',f'-DRAW_LINE_POISON={int(a.poison)}',
-              f'-DRAW_CHUNK_SECTORS={a.chunk_sectors}U','-DSTAGE1_SENSOR_TRIM=1',
+              f'-DRAW_CHUNK_SECTORS={3730 if a.whole_image_preerase else a.chunk_sectors}U','-DSTAGE1_SENSOR_TRIM=1',
               '-DLOW_POWER_MODE=3','-DLOW_POWER_ENTRY_DELAY_US=0']
     compiler=compile_with_late if a.flash else compile_sources
     code,size=compiler(out,compiled,flags,out/'capture.ld','capture',libc=True)
@@ -282,11 +294,14 @@ def main():
         abort_address=0x343FD300,abort_words=16,
         chunk_trace=0x343FE000,chunk_trace_capacity=128,chunk_trace_words=8,
         frame=0x34000000,frame_bytes=1909600,width=1120,height=1364,
-        guard=0x34000000+1909600,guard_bytes=32,allocation_bytes=1909600,
+        guard=0x34000000+(1909760 if a.whole_image_preerase else 1909600),guard_bytes=32,
+        allocation_bytes=1909760 if a.whole_image_preerase else 1909600,
+        original_guard=0x34000000+1909600,whole_image_preerase=a.whole_image_preerase,
+        whole_proof=symbol('raw_whole_proof',a.whole_image_preerase),whole_proof_words=8,
         bss_start=symbol('_sbss'),bss_end=symbol('_ebss'),data_start=symbol('_sdata'),
         data_end=symbol('_edata'),immutable_bytes=symbol('_sdata')-0x34300000,
         system_core_clock=symbol('SystemCoreClock'),card=symbol('raw_card'),slots=symbol('raw_slots'),
-        pattern=int(a.pattern=='diagonal'),transport=a.transport,chunk_sectors=a.chunk_sectors,
+        pattern=int(a.pattern=='diagonal'),transport=a.transport,chunk_sectors=3730 if a.whole_image_preerase else a.chunk_sectors,
         flash=a.flash,standby=a.standby,async_stop=a.async_stop,line_stream=a.line_stream,
         dma_sleep=a.dma_sleep,dma_wait=symbol('raw_dma_wait',a.dma_sleep),dma_wait_bytes=24,
         dma_wait_clock=(symbol('HAL_GetTick')|1) if a.dma_sleep else None,
@@ -295,7 +310,7 @@ def main():
         producer=symbol('raw_producer',False),producer_bytes=416,
         snapshot_address=0x343D0000,snapshot_capacity=20,snapshot_bytes=512,
         expected_flags=int(a.async_stop)|(int(a.line_stream)<<1)|(int(a.preinit)<<2)|
-            (int(a.snapshot)<<3)|(int(a.poison)<<4)|(int(a.dma_sleep)<<5),
+            (int(a.snapshot)<<3)|(int(a.poison)<<4)|(int(a.dma_sleep)<<5)|(int(a.whole_image_preerase)<<6),
         phase_markers=PHASE_PROTOCOL,
         binary_bytes=len(code),binary_sha256=sha(code),
         base_receiver_sha256=BASE_RECEIVER,base_prefix_sha256=pm['stage1_raw_sha256'],

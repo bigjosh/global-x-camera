@@ -31,6 +31,13 @@ SECTOR_SHA="7fda9d00cc7ffb3fbb9e6aac6695cf18545754b5dbfce1520cf30b2da39c4e63"
 # command-line opt-in for unknown firmware. This table does not broaden the
 # bridge or READ-module identities, and check_park still verifies live code.
 APPROVED_RECOVERY={
+    # RAW v16 preerase: exact unchanged early recovery, two CRC literal changes.
+    '31b8a97eb8a68e574c1adab17e44b838044277bd95f81f5b22c30b9fdaaccd2e':
+        dict(name="raw-v16-preerase-standby",sector_sha256=
+             '285fba4951f88deb12033e7b3c2948c802371862982da5a8e304c6cae35fb58f'),
+    '2bafcb1a4d2fe20d2ae6ae9a04d3a43416a5ed7f50bbea7e0e29959aa13094eb':
+        dict(name="raw-v16-preerase-awake",sector_sha256=
+             '52edac834cc8aebd649c8d35a8f3fd6ef20e2e6c12dc99bcf0944a636d445508'),
     # RAW v15 Standby: fresh receiver RLOK guard; exact early recovery unchanged.
     # Admission supports qualification and is not evidence of installation.
     'db234498a9b347f6cb9f41daf22da1fb0f9266dba264b9ca203ef33d1b1711df':

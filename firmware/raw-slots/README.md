@@ -46,6 +46,22 @@ reports READY/TRANSFER, DAT0 is high and the host is idle. It does not guarantee
 that an SD card's internal flash translation layer survives arbitrary power loss.
 An error leaves the operation active/failed; it is never permission to cut power.
 
+The opt-in whole-image path keeps the same on-card format. After `begin()`,
+set `write_payload = sd_write_blocks_dma_preerase` and call
+`raw_slots_write_padded()` once with the entire immutable, 32-byte-aligned
+**1,909,760-byte** buffer. The core checks its last 160 bytes are zero and makes
+one callback for all 3730 payload sectors; it does not copy the frame or include
+its header in the announced range. The caller must allocate the padding and
+validate camera completion and any frame guard before writing those zero bytes.
+
+`raw_slots_write_padded()` leaves the slot PARTIAL. After any remaining capture,
+sensor-STOP and guard checks pass, `raw_slots_commit()` requires all 3730 sectors,
+checks fresh READY, writes the separate FULL header, and checks READY again.
+The original `append()`/`finish()` sequence remains available and unchanged in
+purpose. The [SD driver](../sd-storage/README.md) documents the preannouncement
+and transaction-completion contract; this option alone makes no speed or energy
+claim.
+
 There is no full-image checksum in this format version. The SD link checks each
 transfer's CRC, while the metadata CRC detects damaged headers. This avoids a
 CPU pass through the frame but does not provide an independent end-to-end check

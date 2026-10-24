@@ -37,6 +37,12 @@
 #endif
 sd_card_t raw_card;
 raw_slots_t raw_slots;
+#if RAW_WHOLE_IMAGE_PREERASE
+/* magic,state,true-boundary faults,post-pad faults,valid,padded,pad,sectors.
+ * Original guard is validated before conversion to zero padding; the distinct
+ * guard after the sector allocation remains live throughout DMA and commit. */
+volatile uint32_t raw_whole_proof[8];
+#endif
 #if RAW_DMA_SLEEP
 sd_dma_wait_t raw_dma_wait;
 /* 0..7: memory/RIF/SD clocks before+after, configured, readback faults.
@@ -268,6 +274,9 @@ void raw_runtime_dispatch(void)
     *(volatile uint32_t *)0x343F9E3CU=0U;
     __DSB();
 #endif
+#if RAW_WHOLE_IMAGE_PREERASE
+    for(unsigned i=0;i<8U;++i) raw_whole_proof[i]=0;
+#endif
     for(unsigned i=0;i<RAW_PROOF_WORDS;++i) P[i]=0;
     for(unsigned i=0;i<RAW_ABORT_WORDS;++i) ABORT[i]=0;
     operation=RAW_FLASH?RAW_OP_CAPTURE:Q[2];
@@ -281,7 +290,7 @@ void raw_runtime_dispatch(void)
     P[RP_COMPLETION]=RAW_STANDBY;
     P[RP_FLAGS]=(RAW_ASYNC_STOP?1U:0U)|(RAW_LINE_STREAM?2U:0U)|
         (RAW_PREINIT?4U:0U)|(RAW_LINE_SNAPSHOTS?8U:0U)|(RAW_LINE_POISON?16U:0U)|
-        (RAW_DMA_SLEEP?32U:0U);
+        (RAW_DMA_SLEEP?32U:0U)|(RAW_WHOLE_IMAGE_PREERASE?64U:0U);
 #if RAW_DMA_SLEEP
     raw_dma_wait.milliseconds=HAL_GetTick;
 #endif
@@ -342,7 +351,9 @@ void raw_capture_stopped(void) { P[RP_CAMERA_STOP]=DWT->CYCCNT; }
 
 static int payload_transport(sd_card_t *card,uint32_t lba,const void *data,uint32_t count)
 {
-#if RAW_DMA
+#if RAW_WHOLE_IMAGE_PREERASE
+    int r=sd_write_blocks_dma_preerase(card,lba,data,count);
+#elif RAW_DMA
 #if RAW_DMA_SLEEP
     /* First qualification sleeps only after both producer and sensor are done.
      * DWT-based camera STOP deadlines therefore never run across CPU WFI.
@@ -401,7 +412,8 @@ static int payload_transport(sd_card_t *card,uint32_t lba,const void *data,uint3
 #endif
     /* The slot layer uses the payload callback for its final padded sector,
      * allowing an exact tail-complete marker before its FULL metadata write. */
-    if(!r && raw_slots.written_sectors==RAW_SLOTS_WHOLE_SECTORS && count==1U)
+    if(!r && ((RAW_WHOLE_IMAGE_PREERASE && count==RAW_SLOTS_PAYLOAD_SECTORS) ||
+       (raw_slots.written_sectors==RAW_SLOTS_WHOLE_SECTORS && count==1U)))
         (void)phase_gpio_emit(7U);
     return r;
 }
@@ -417,7 +429,8 @@ void raw_storage_execute(void)
     if(r) complete_storage(0x310U|(uint32_t)r);
     P[RP_SCAN_DONE]=DWT->CYCCNT;
     uint32_t began=DWT->CYCCNT;
-    while(!RAW_LINE_STREAM && raw_capture_available()!=RAW_SLOTS_PAYLOAD_BYTES) {
+    while((RAW_WHOLE_IMAGE_PREERASE && !raw_capture_frame_validated()) ||
+          (!RAW_LINE_STREAM && raw_capture_available()!=RAW_SLOTS_PAYLOAD_BYTES)) {
         sd_progress();
         if(raw_capture_fault() || (uint32_t)(DWT->CYCCNT-began)>800000000U)
             complete_storage(0x501U);
@@ -433,6 +446,36 @@ void raw_storage_execute(void)
     P[RP_SLOT_BEGIN]=DWT->CYCCNT;
     raw_slots.write_payload=payload_transport;
     status_led_set(STATUS_LED_NAND_WRITE); P[RP_STAGE]=5U;
+#if RAW_WHOLE_IMAGE_PREERASE
+    /* No camera writes remain: validation checked the exact byte count,
+     * original32-byte guard, receiver idle and data disable. Pad in place only
+     * now; no full-frame copy and no speculative read from an active producer. */
+    volatile uint32_t *original_guard=(volatile uint32_t *)(0x34000000U+RAW_SLOTS_PAYLOAD_BYTES);
+    volatile uint32_t *pad_guard=(volatile uint32_t *)(0x34000000U+RAW_SLOTS_PADDED_BYTES);
+    raw_whole_proof[0]=0x52575031U;raw_whole_proof[1]=1U;
+    raw_whole_proof[4]=RAW_SLOTS_PAYLOAD_BYTES;raw_whole_proof[5]=RAW_SLOTS_PADDED_BYTES;
+    raw_whole_proof[6]=RAW_SLOTS_PADDED_BYTES-RAW_SLOTS_PAYLOAD_BYTES;
+    raw_whole_proof[7]=RAW_SLOTS_PAYLOAD_SECTORS;
+    for(uint32_t i=0;i<8U;i++) {
+        if(original_guard[i]!=(0xA15A1000U+i)) raw_whole_proof[2]|=1U<<i;
+        if(pad_guard[i]!=(0xA15A1000U+i)) raw_whole_proof[3]|=1U<<i;
+    }
+    if(raw_whole_proof[2] || raw_whole_proof[3] || !raw_capture_frame_validated())
+        complete_storage(0x505U);
+    volatile uint8_t *pad=(volatile uint8_t *)(0x34000000U+RAW_SLOTS_PAYLOAD_BYTES);
+    for(uint32_t i=0;i<RAW_SLOTS_PADDED_BYTES-RAW_SLOTS_PAYLOAD_BYTES;i++) pad[i]=0;
+    __DSB();raw_whole_proof[1]=2U;
+    P[RP_FIRST_WRITE]=DWT->CYCCNT;(void)phase_gpio_emit(6U);
+    uint32_t start=DWT->CYCCNT;
+    SD_OPERATION(r,raw_slots_write_padded(&raw_slots,(const void *)0x34000000U));
+    volatile uint32_t *row=(volatile uint32_t *)RAW_CHUNK_TRACE_ADDRESS;
+    row[0]=start;row[1]=DWT->CYCCNT;row[2]=0;row[3]=RAW_SLOTS_PAYLOAD_SECTORS;
+    row[4]=raw_capture_available();row[5]=raw_card.last_ready_r1;
+    row[6]=(uint32_t)r;row[7]=raw_card.transfer_cycles;
+    __DMB();P[RP_CHUNK_COUNT]=1U;
+    if(r) complete_storage(0x330U|(uint32_t)r);
+    if(raw_capture_fault()) complete_storage(0x503U);
+#else
     uint32_t sectors=0;
     began=DWT->CYCCNT;
     while(sectors<RAW_SLOTS_WHOLE_SECTORS) {
@@ -462,6 +505,7 @@ void raw_storage_execute(void)
         sectors+=count;
         began=DWT->CYCCNT;
     }
+#endif
     P[RP_PAYLOAD_DONE]=DWT->CYCCNT; P[RP_STAGE]=6U;
     /* A completed image is immutable once camera DMA drains. Sensor STOP can
      * finish concurrently with SD IDMA, but is mandatory before committing and
@@ -475,7 +519,15 @@ void raw_storage_execute(void)
     capture_active=0;
     raw_slots.metadata.exposure_us=raw_capture_exposure_us();
     raw_slots.metadata.metadata_flags|=RAW_SLOTS_META_EXPOSURE_VALID;
+#if RAW_WHOLE_IMAGE_PREERASE
+    for(uint32_t i=0;i<8U;i++)
+        if(pad_guard[i]!=(0xA15A1000U+i)) raw_whole_proof[3]|=1U<<i;
+    if(raw_whole_proof[3]) complete_storage(0x506U);
+    raw_whole_proof[1]=3U;__DSB();
+    SD_OPERATION(r,raw_slots_commit(&raw_slots));
+#else
     SD_OPERATION(r,raw_slots_finish(&raw_slots,(const void *)(0x34000000U+RAW_SLOTS_WHOLE_SECTORS*512U)));
+#endif
     if(r) complete_storage(0x340U|(uint32_t)r);
     P[RP_COMMIT_DONE]=DWT->CYCCNT; P[RP_STAGE]=8U;
     (void)phase_gpio_emit(8U);
@@ -484,7 +536,15 @@ void raw_storage_execute(void)
 
 int raw_storage_shutdown_ready(void)
 {
-    return P[RP_MAGIC]==RAW_PROOF_MAGIC && P[RP_SCHEMA]==1U &&
+    return
+#if RAW_WHOLE_IMAGE_PREERASE
+        raw_whole_proof[0]==0x52575031U && raw_whole_proof[1]==3U &&
+        !raw_whole_proof[2] && !raw_whole_proof[3] &&
+        raw_whole_proof[4]==RAW_SLOTS_PAYLOAD_BYTES && raw_whole_proof[5]==RAW_SLOTS_PADDED_BYTES &&
+        raw_whole_proof[6]==160U && raw_whole_proof[7]==RAW_SLOTS_PAYLOAD_SECTORS &&
+        P[RP_CHUNK_COUNT]==1U && !P[RP_CHUNK_OVERFLOW] &&
+#endif
+        P[RP_MAGIC]==RAW_PROOF_MAGIC && P[RP_SCHEMA]==1U &&
         P[RP_TERMINAL]==RAW_PROOF_TERMINAL && P[RP_STATE]==3U &&
         P[RP_OPERATION]==RAW_OP_CAPTURE && !P[RP_RESULT] && P[RP_STAGE]==8U &&
         P[RP_CAMERA_READY]==RAW_SLOTS_PAYLOAD_BYTES && P[RP_CAMERA_STOP] &&

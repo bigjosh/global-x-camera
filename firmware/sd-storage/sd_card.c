@@ -40,6 +40,7 @@ _Static_assert(SDMMC2_BASE_S==0x58026800UL, "SDMMC2 address");
 _Static_assert(offsetof(SDMMC_TypeDef,FIFO)==0x80, "FIFO offset");
 _Static_assert(SD_MAX_TRANSFER_SECTORS*SD_SECTOR_BYTES<=0x1FFFFFFUL, "DLEN");
 _Static_assert(SD_DMA_MAX_TRANSFER_SECTORS*SD_SECTOR_BYTES<=0x1FFFFFFUL, "IDMA DLEN");
+_Static_assert(SD_DMA_PREERASE_MAX_SECTORS*SD_SECTOR_BYTES<=0x1FFFFFFUL, "preerase IDMA DLEN");
 
 enum response { RESP_NONE, RESP_R1, RESP_R2, RESP_R3, RESP_R6, RESP_R7 };
 
@@ -369,7 +370,8 @@ static uint32_t dma_wait_context(void)
 }
 
 static int transfer_dma_write(sd_card_t *c, uint32_t lba,
-                              const uint8_t *buffer, uint32_t count, sd_dma_wait_t *wait)
+                              const uint8_t *buffer, uint32_t count, sd_dma_wait_t *wait,
+                              uint32_t preerase)
 {
     int result=ready(c);
     if (result) return result;
@@ -381,6 +383,17 @@ static int transfer_dma_write(sd_card_t *c, uint32_t lba,
     c->media_idle=0;
     c->transfer_words=0;
     c->transfer_sta=0;
+    if (preerase) {
+        /* SD Physical Layer, APP_CMD and pre-erase write requirements:
+         * APP_CMD must acknowledge both the
+         * prefix and accepted ACMD. Announce exactly the exclusively owned
+         * destination extent, then issue CMD25 next (no intervening CMD13).
+         * ACMD23 does not terminate the write: CMD12 is still required. */
+        if ((result=command(c,55,c->rca,RESP_R1,0))) return result;
+        if (!(c->last_r1&(1UL<<5))) return fault(c,SD_ERR_UNSUPPORTED);
+        if ((result=command(c,23,count,RESP_R1,0))) return result;
+        if (!(c->last_r1&(1UL<<5))) return fault(c,SD_ERR_UNSUPPORTED);
+    }
     X->DCTRL=0;
     X->ICR=DMA_FLAGS;
     X->DTIMER=c->clock_hz*2UL;
@@ -614,7 +627,7 @@ int sd_write_blocks(sd_card_t *c, uint32_t lba, const void *buffer, uint32_t cou
 }
 
 static int dma_request(sd_card_t *c, uint32_t lba, const void *buffer,
-                        uint32_t count, sd_dma_wait_t *wait)
+                        uint32_t count, sd_dma_wait_t *wait, uint32_t preerase)
 {
     if (!c || !buffer || !count) return SD_ERR_ARGUMENT;
     if (!c->initialized || !c->controller_owned) return SD_ERR_STATE;
@@ -651,13 +664,20 @@ static int dma_request(sd_card_t *c, uint32_t lba, const void *buffer,
     }
     if (c->clock_hz!=100000UL && c->clock_hz!=12500000UL && c->clock_hz!=25000000UL)
         return fault(c,SD_ERR_CLOCK);
-    uint32_t limit=c->clock_hz==100000UL ? 16UL : SD_DMA_MAX_TRANSFER_SECTORS;
+    if (preerase && (count<2 || count>SD_DMA_PREERASE_MAX_SECTORS))
+        return fault(c,SD_ERR_ARGUMENT);
+    /* 4096 sectors take 1.342 s of payload at 12.5 MHz, fitting both the
+     * two-second SDMMC data timer and five-second software deadline. A slow
+     * identification-clock transaction cannot satisfy those same bounds. */
+    if (preerase && c->clock_hz==100000UL) return fault(c,SD_ERR_CLOCK);
+    uint32_t limit=preerase ? SD_DMA_PREERASE_MAX_SECTORS :
+        c->clock_hz==100000UL ? 16UL : SD_DMA_MAX_TRANSFER_SECTORS;
     const uint8_t *p=(const uint8_t *)buffer;
     while (count) {
         sd_progress();
         uint32_t chunk=count>limit ? limit : count;
         uint32_t start=DWT->CYCCNT;
-        int result=transfer_dma_write(c,lba,p,chunk,wait);
+        int result=transfer_dma_write(c,lba,p,chunk,wait,preerase);
         c->write_cycles+=(uint32_t)(DWT->CYCCNT-start);
         sd_progress();
         if (result) return result;
@@ -668,14 +688,20 @@ static int dma_request(sd_card_t *c, uint32_t lba, const void *buffer,
 
 int sd_write_blocks_dma(sd_card_t *c, uint32_t lba, const void *buffer, uint32_t count)
 {
-    return dma_request(c,lba,buffer,count,NULL);
+    return dma_request(c,lba,buffer,count,NULL,0);
+}
+
+int sd_write_blocks_dma_preerase(sd_card_t *c, uint32_t lba,
+                                 const void *buffer, uint32_t count)
+{
+    return dma_request(c,lba,buffer,count,NULL,1);
 }
 
 int sd_write_blocks_dma_wait(sd_card_t *c, uint32_t lba, const void *buffer,
                              uint32_t count, sd_dma_wait_t *wait)
 {
     if (!wait) return SD_ERR_ARGUMENT;
-    return dma_request(c,lba,buffer,count,wait);
+    return dma_request(c,lba,buffer,count,wait,0);
 }
 
 int sd_sync(sd_card_t *c)

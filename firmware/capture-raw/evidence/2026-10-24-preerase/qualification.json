@@ -1,0 +1,251 @@
+{
+  "passed": true,
+  "hardware_access": false,
+  "no_scene_pixels": true,
+  "builds": 5,
+  "terminal_proofs": 87,
+  "installations": [
+    {
+      "build": "flash-awake-v16",
+      "full_sector_verified": true,
+      "following4096_unchanged": true,
+      "sector_sha256": "52edac834cc8aebd649c8d35a8f3fd6ef20e2e6c12dc99bcf0944a636d445508"
+    },
+    {
+      "build": "flash-standby-v16",
+      "full_sector_verified": true,
+      "following4096_unchanged": true,
+      "sector_sha256": "285fba4951f88deb12033e7b3c2948c802371862982da5a8e304c6cae35fb58f"
+    }
+  ],
+  "offline_tests": 70,
+  "final_handoff": {
+    "verified": true,
+    "utc": "2026-10-24T16:23:03.973899+00:00",
+    "slot18_not_read": true,
+    "sbf_not_read": true
+  },
+  "image_reports": [
+    {
+      "record": "pattern-read",
+      "slot": 13,
+      "pixels_replayed": true,
+      "original_sensor_frame_comparison": true
+    },
+    {
+      "record": "awake-scene-read",
+      "slot": 14,
+      "pixels_replayed": false,
+      "original_sensor_frame_comparison": true
+    },
+    {
+      "record": "baseline01-read",
+      "slot": 10,
+      "pixels_replayed": false,
+      "original_sensor_frame_comparison": false
+    },
+    {
+      "record": "baseline02-read",
+      "slot": 11,
+      "pixels_replayed": false,
+      "original_sensor_frame_comparison": false
+    },
+    {
+      "record": "baseline03-read",
+      "slot": 12,
+      "pixels_replayed": false,
+      "original_sensor_frame_comparison": false
+    },
+    {
+      "record": "candidate01-read",
+      "slot": 15,
+      "pixels_replayed": false,
+      "original_sensor_frame_comparison": false
+    },
+    {
+      "record": "candidate02-read",
+      "slot": 16,
+      "pixels_replayed": false,
+      "original_sensor_frame_comparison": false
+    },
+    {
+      "record": "candidate03-read",
+      "slot": 17,
+      "pixels_replayed": false,
+      "original_sensor_frame_comparison": false
+    }
+  ],
+  "groups": [
+    {
+      "build": "flash-standby-line-v15",
+      "sector_sha256": "efb3c440e008e448a1682285034fe30b77bdbb5834024da9de787f3f51f42629",
+      "cycles": [
+        {
+          "name": "baseline01",
+          "events": [
+            1,
+            2,
+            4,
+            3,
+            5,
+            6,
+            7,
+            8,
+            9,
+            null
+          ],
+          "standby_attributed": true,
+          "time_s": 0.7839855,
+          "energy_j": 0.42872723697872084
+        },
+        {
+          "name": "baseline02",
+          "events": [
+            1,
+            2,
+            4,
+            3,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "standby_attributed": true,
+          "time_s": 0.7975734999999999,
+          "energy_j": 0.43541789375163287
+        },
+        {
+          "name": "baseline03",
+          "events": [
+            1,
+            2,
+            4,
+            3,
+            5,
+            6,
+            7,
+            8,
+            9,
+            null
+          ],
+          "standby_attributed": true,
+          "time_s": 0.7963764999999999,
+          "energy_j": 0.4352968421780583
+        }
+      ],
+      "compact": {
+        "passed": true,
+        "cycles": 3,
+        "energy_intervals_replayed": 12,
+        "exact_native_sample_sum_bins": true,
+        "raw_boundary_classification_replayed": false
+      },
+      "median_time_s": 0.7963764999999999,
+      "median_energy_j": 0.4352968421780583,
+      "criteria": {
+        "bin_s": 0.001,
+        "off_baseline_s": 0.5,
+        "off_abs_max_a": 0.0001,
+        "onset_a": 0.12,
+        "pretrigger_s": 0.1,
+        "plateau_min_s": 1.0,
+        "plateau_mean_min_a": 0.007,
+        "plateau_mean_max_a": 0.01,
+        "plateau_peak_abs_max_a": 0.0105,
+        "plateau_mean_span_a": 0.002,
+        "current_valid_abs_max_a": 9.5
+      }
+    },
+    {
+      "build": "flash-standby-v16",
+      "sector_sha256": "285fba4951f88deb12033e7b3c2948c802371862982da5a8e304c6cae35fb58f",
+      "cycles": [
+        {
+          "name": "candidate01",
+          "events": [
+            1,
+            2,
+            4,
+            3,
+            5,
+            6,
+            7,
+            8,
+            9,
+            null
+          ],
+          "standby_attributed": true,
+          "time_s": 0.7742365,
+          "energy_j": 0.4237627094806335
+        },
+        {
+          "name": "candidate02",
+          "events": [
+            1,
+            2,
+            4,
+            3,
+            5,
+            6,
+            7,
+            8,
+            9,
+            null
+          ],
+          "standby_attributed": true,
+          "time_s": 0.780385,
+          "energy_j": 0.42679586050883817
+        },
+        {
+          "name": "candidate03",
+          "events": [
+            1,
+            2,
+            4,
+            3,
+            5,
+            6,
+            7,
+            8,
+            9,
+            null
+          ],
+          "standby_attributed": true,
+          "time_s": 0.7940275,
+          "energy_j": 0.43332325250479764
+        }
+      ],
+      "compact": {
+        "passed": true,
+        "cycles": 3,
+        "energy_intervals_replayed": 12,
+        "exact_native_sample_sum_bins": true,
+        "raw_boundary_classification_replayed": false
+      },
+      "median_time_s": 0.780385,
+      "median_energy_j": 0.42679586050883817,
+      "criteria": {
+        "bin_s": 0.001,
+        "off_baseline_s": 0.5,
+        "off_abs_max_a": 0.0001,
+        "onset_a": 0.12,
+        "pretrigger_s": 0.1,
+        "plateau_min_s": 1.0,
+        "plateau_mean_min_a": 0.007,
+        "plateau_mean_max_a": 0.01,
+        "plateau_peak_abs_max_a": 0.0105,
+        "plateau_mean_span_a": 0.002,
+        "current_valid_abs_max_a": 9.5
+      }
+    }
+  ],
+  "time_reduction_fraction": 0.020080326328062115,
+  "energy_reduction_fraction": 0.01952915997893412,
+  "limitations": [
+    "Scene pixels omitted: historical checks are hash-bound, not independently recomputed.",
+    "Compact native sums replay energy integrals but cannot repeat raw boundary classification.",
+    "No power-loss, isolated-DUT, battery-energy or statistical-significance claim."
+  ]
+}

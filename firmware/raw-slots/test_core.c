@@ -13,6 +13,9 @@ static uint32_t fail_write, fail_sync, writes, syncs, progresses, dma_writes;
 static raw_slots_t fs;
 static sd_card_t card;
 static uint8_t frame[RAW_SLOTS_PAYLOAD_BYTES] __attribute__((aligned(32)));
+static uint8_t padded[RAW_SLOTS_PADDED_BYTES] __attribute__((aligned(32)));
+static uint32_t whole_count,whole_lba;
+
 
 int sd_read_blocks(sd_card_t *c,uint32_t lba,void *buffer,uint32_t count)
 {
@@ -36,6 +39,8 @@ int sd_sync(sd_card_t *c)
 void sd_progress(void) { progresses++; }
 static int dma_write(sd_card_t *c,uint32_t lba,const void *b,uint32_t n)
 { dma_writes++;return sd_write_blocks(c,lba,b,n); }
+static int whole_write(sd_card_t *c,uint32_t lba,const void *b,uint32_t n)
+{ whole_count=n;whole_lba=lba;return dma_write(c,lba,b,n); }
 static void fresh_card(void)
 {
     memset(&card,0,sizeof(card));card.initialized=1;card.media_idle=1;card.sector_count=TEST_SECTORS;
@@ -138,6 +143,35 @@ int main(int argc,char **argv)
     reset_disk();format(0);begin();assert(raw_slots_append(&fs,frame,3729)==0);
     fail_sync=syncs+1;assert(raw_slots_finish(&fs,frame+3729*512)==RAW_SLOTS_ERR_IO);
     assert(u32(header(0)+12)==RAW_SLOTS_PARTIAL);
+    /* Whole-image path uses one callback, commits separately, and keeps the
+       original disk format. Padding and producer length fail closed. */
+    memcpy(padded,frame,sizeof(frame));memset(padded+sizeof(frame),0,160);
+    reset_disk();format(0);begin();fs.write_payload=whole_write;
+    uint32_t before=writes;
+    assert(raw_slots_write_padded(&fs,padded)==0);
+    assert(dma_writes==1 && writes==before+1 && whole_count==3730 && whole_lba==9);
+    assert(fs.active && fs.written_sectors==3730 && u32(header(0)+12)==RAW_SLOTS_PARTIAL);
+    assert(memcmp(header(0)+512,padded,sizeof(padded))==0);
+    assert(raw_slots_commit(&fs)==0 && !fs.active && u32(header(0)+12)==RAW_SLOTS_FULL);
+    assert(u32(header(1)+12)==RAW_SLOTS_FREE && disk[(TEST_SECTORS-1)*512]==0xa5);
+    reset_disk();format(0);begin();fs.write_payload=whole_write;padded[sizeof(frame)]=1;
+    before=writes;assert(raw_slots_write_padded(&fs,padded)==RAW_SLOTS_ERR_ARGUMENT);
+    assert(writes==before && u32(header(0)+12)==RAW_SLOTS_PARTIAL);padded[sizeof(frame)]=0;
+    reset_disk();format(0);begin();fs.write_payload=whole_write;fail_write=writes+1;
+    assert(raw_slots_write_padded(&fs,padded)==RAW_SLOTS_ERR_IO);
+    assert(raw_slots_commit(&fs)==RAW_SLOTS_ERR_STATE && u32(header(0)+12)==RAW_SLOTS_PARTIAL);
+    reset_disk();format(0);begin();fs.write_payload=whole_write;
+    assert(raw_slots_write_padded(&fs,padded)==0);fail_sync=syncs+1;
+    assert(raw_slots_commit(&fs)==RAW_SLOTS_ERR_IO && u32(header(0)+12)==RAW_SLOTS_PARTIAL);
+    reset_disk();format(0);begin();fs.write_payload=whole_write;
+    assert(raw_slots_commit(&fs)==RAW_SLOTS_ERR_LENGTH && u32(header(0)+12)==RAW_SLOTS_PARTIAL);
+    reset_disk();format(0);begin();fs.write_payload=whole_write;
+    assert(raw_slots_append(&fs,frame,1)==0);
+    assert(raw_slots_write_padded(&fs,padded)==RAW_SLOTS_ERR_LENGTH);
+    reset_disk();format(0);begin();fs.write_payload=whole_write;
+    assert(raw_slots_write_padded(&fs,padded+1)==RAW_SLOTS_ERR_ARGUMENT);
+    reset_disk();format(0);begin();
+    assert(raw_slots_write_padded(&fs,padded)==RAW_SLOTS_ERR_ARGUMENT);
     /* Bounds/card identity are checked on mount. */
     fresh_card();card.sector_count--;
     assert(raw_slots_open(&fs,&card)==RAW_SLOTS_ERR_CAPACITY);

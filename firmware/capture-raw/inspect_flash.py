@@ -32,7 +32,8 @@ def checked_build(folder,receiver_sha,sector_sha):
     exact=dict(schema=1,kind='raw-slots',load=bench.LOAD,stack=0x343B0000,
         stack_floor=0x343AF000,request=bench.REQUEST,proof=bench.PROOF,proof_words=96,
         frame=bench.FRAME,frame_bytes=bench.FRAME_BYTES,width=1120,height=1364,
-        guard=bench.FRAME+bench.FRAME_BYTES,guard_bytes=32,allocation_bytes=bench.FRAME_BYTES,
+        guard=bench.FRAME+(1909760 if m.get('whole_image_preerase') else bench.FRAME_BYTES),guard_bytes=32,
+        allocation_bytes=1909760 if m.get('whole_image_preerase') else bench.FRAME_BYTES,
         flash=True,standby=False,pattern=0,preinit=False,line_snapshots=False,line_poison=False)
     if any(m.get(k)!=v for k,v in exact.items()): raise ValueError('Only reviewed flash/awake scene layout accepted')
     if (sha(code)!=receiver_sha or m['binary_sha256']!=receiver_sha or len(code)!=m['binary_bytes'] or
@@ -77,9 +78,10 @@ def checked_build(folder,receiver_sha,sector_sha):
         off=m[key]-bench.LOAD
         if not 0<=off<len(code)-1 or code[off:off+2]!=b'\xfe\xe7':
             raise ValueError('Missing exact terminal branch')
-    flags=('async_stop','line_stream','preinit','line_snapshots','line_poison','dma_sleep')
+    flags=('async_stop','line_stream','preinit','line_snapshots','line_poison','dma_sleep','whole_image_preerase')
     if m['expected_flags']!=sum(int(bool(m.get(k,False)))<<i for i,k in enumerate(flags)):
         raise ValueError('Feature flags differ')
+    bench.whole_layout(m)
     return m,p,code
 
 
@@ -198,8 +200,7 @@ def inspect(b,folder,m,code,*,download_frame=False):
     for index,(start,end) in enumerate(m['immutable_ranges']):
         if b.upload(start,end-start,f'code-{index}.bin')!=code[start-bench.LOAD:end-bench.LOAD]:
             raise ValueError('Immutable early/late receiver code changed')
-    expected=struct.pack('<8I',*(0xA15A1000+i for i in range(8)))
-    if b.upload(m['guard'],32,'frame-guard.bin')!=expected: raise ValueError('Frame guard damaged')
+    whole=bench.frame_guards(b,m,p)
     if struct.unpack('<I',b.upload(m['system_core_clock'],4,'clock.bin'))!=(400000000,):
         raise ValueError('CPU clock differs from qualified profile')
     if bench.decode(b.upload(bench.PROOF,384,'proof-before-halt.bin'),names)!=p:
@@ -208,7 +209,7 @@ def inspect(b,folder,m,code,*,download_frame=False):
     context=bench.sd.context_proof(b,{m['park']},'completed')
     result=dict(passed=True,kind='raw-flash-inspection',proof=p,context=context,card=card,
         slots=slots,loader_words=loader,sd_payload_integrity_verified=False,
-        binary_sha256=sha(code),halt_after_success_idle_only=True)
+        binary_sha256=sha(code),halt_after_success_idle_only=True,whole_image=whole)
     result['camera_telemetry']=camera_telemetry(b,folder,m)
     chunks=b.upload(m['chunk_trace'],p['chunk_count']*32,'chunks.bin')
     (b.output.parent/'chunks.bin').write_bytes(chunks)

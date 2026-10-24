@@ -19,6 +19,7 @@
 #define RAW_SLOTS_PAYLOAD_SECTORS 3730U
 #define RAW_SLOTS_WHOLE_SECTORS 3729U
 #define RAW_SLOTS_TAIL_BYTES 352U
+#define RAW_SLOTS_PADDED_BYTES (RAW_SLOTS_PAYLOAD_SECTORS*SD_SECTOR_BYTES)
 #define RAW_SLOTS_PACKING_MIPI_RAW10 1U
 #define RAW_SLOTS_FREE 0x45455246U
 #define RAW_SLOTS_PARTIAL 0x54524150U
@@ -92,5 +93,13 @@ int raw_slots_append(raw_slots_t *fs, const void *buffer, uint32_t count);
  * authorizes shutdown: independently establish card idle with sd_sync/deinit.
  * Protocol ready is not qualification against sudden power loss in the FTL. */
 int raw_slots_finish(raw_slots_t *fs, const void *tail352);
+/* Opt-in whole-image transport. The caller owns a contiguous 3730-sector
+ * buffer whose last160 bytes are zero and whose camera writes have stopped.
+ * Calls the explicitly selected payload writer exactly once. PARTIAL remains
+ * until a separate commit, so the caller can finish sensor/guard checks first. */
+int raw_slots_write_padded(raw_slots_t *fs, const void *buffer);
+/* Commit only an exactly complete payload; performs fresh READY before FULL
+ * and again after its separate metadata-sector write. */
+int raw_slots_commit(raw_slots_t *fs);
 
 #endif

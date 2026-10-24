@@ -110,3 +110,38 @@ UART recovery instructions unchanged. Executable regression checks cover stale
 marker values. A separate cold v15 smoke run passed SBF, UART recovery and full
 slot-8 readback/PNG reconstruction, measuring 0.778143 s / 0.424945 J. This is a
 single follow-up measurement, not a replacement for the three-run v12 baseline.
+
+## October 24 follow-up: ACMD23 and one whole-image transaction
+
+The user requested a comparison of `CMD55 + ACMD23` followed by one multiblock
+write for the whole image against the current implementation. V16 provides
+`--whole-image-preerase`: the exact announcement is 3730 payload sectors,
+including the padded final sector and excluding both PARTIAL/FULL header writes.
+It sends CMD25 immediately after the accepted hint, then explicitly terminates
+with CMD12 and requires fresh READY/TRANSFER, DAT0 high and an idle controller.
+Both application-command acknowledgments are checked; there is no silent
+fallback after a rejected hint. ACMD23 is not a cache-flush guarantee.
+
+The full image is validated before submission. The original guard is checked
+before its location becomes zero padding; a distinct post-padding guard remains
+intact through transfer and commit. Only 160 padding bytes are written by the CPU.
+No full-frame copy, compression or checksum was added. The previous chunked LINE
+path remains available, since a future faster-initializing card could benefit
+from before-FRAME streaming. With the current card, SD initialization already
+finishes after FRAME, so this experiment does not delay the first payload.
+
+Three fresh v15 runs had median 796.377 ms / 435.297 mJ; three v16 runs had
+780.385 ms / 426.796 mJ on the same JS-fed Nucleo branch. The payload median
+improved from 633.320 to 626.438 ms. The observed total saving is about 2%, but
+SD initialization also varied by about 9.6 ms between group medians. Later slot
+scan positions and unknown card state confound this chronological comparison;
+do not claim statistical significance or attribute the entire gain to the hint.
+This test changes both preannouncement and transaction grouping together.
+
+Keep v16 selected for this prototype, retaining the prior chunked option. Its
+early load remains 15,804 bytes and recovery instructions remain unchanged;
+DMA-WFI stays disabled. Separate pattern and normal cold-scene readbacks matched
+every saved byte to the captured RAM image. Standby and warm UART recovery passed
+for all six comparison cycles. See the
+[experiment archive](../../firmware/capture-raw/evidence/2026-10-24-preerase/README.md)
+for per-run measurements, full slot readbacks, firmware identities and final state.

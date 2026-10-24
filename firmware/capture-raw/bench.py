@@ -77,7 +77,8 @@ def checked_build(folder, digest):
         stack_floor=0x343AF000, request=REQUEST, request_words=16, proof=PROOF,
         proof_words=96, read_buffer=READ_BUFFER, read_buffer_bytes=READ_MAX,
         frame=FRAME, frame_bytes=FRAME_BYTES, width=1120, height=1364,
-        guard=FRAME+FRAME_BYTES, guard_bytes=32, allocation_bytes=FRAME_BYTES,
+        guard=FRAME+(1909760 if m.get('whole_image_preerase') else FRAME_BYTES), guard_bytes=32,
+        allocation_bytes=1909760 if m.get('whole_image_preerase') else FRAME_BYTES,
         flash=False, standby=False)
     if any(m.get(k) != v for k,v in exact.items()):
         raise ValueError('Only reviewed RAM/awake layout is accepted')
@@ -108,9 +109,9 @@ def checked_build(folder, digest):
             raise ValueError('Frozen source changed: '+name)
     if m['pattern'] not in (0, 1) or m['transport'] not in ('pio','idma'):
         raise ValueError('Unsupported pattern/transport')
-    if not 1 <= m['chunk_sectors'] <= 1024:
+    if not (m['chunk_sectors']==3730 if m.get('whole_image_preerase') else 1 <= m['chunk_sectors'] <= 1024):
         raise ValueError('Chunk bound')
-    flag_names = ('async_stop','line_stream','preinit','line_snapshots','line_poison','dma_sleep')
+    flag_names = ('async_stop','line_stream','preinit','line_snapshots','line_poison','dma_sleep','whole_image_preerase')
     expected_flags = sum(int(bool(m.get(k,False))) << i for i,k in enumerate(flag_names))
     if m.get('expected_flags',0) != expected_flags:
         raise ValueError('Build feature flags differ')
@@ -121,7 +122,37 @@ def checked_build(folder, digest):
             (m.get('snapshot_address'),m.get('snapshot_capacity'),m.get('snapshot_bytes')) !=
             (0x343D0000,20,512)):
         raise ValueError('Snapshot layout differs')
+    whole_layout(m)
     return m, code
+
+
+def whole_layout(m):
+    if m.get('whole_image_preerase') and (
+            m.get('transport')!='idma' or m.get('dma_sleep') or m.get('chunk_sectors')!=3730 or
+            m.get('original_guard')!=FRAME+FRAME_BYTES or m.get('whole_proof_words')!=8 or
+            not m['bss_start']<=m.get('whole_proof',0)<=m['bss_end']-32):
+        raise ValueError('Whole-image preerase layout/features differ')
+
+
+def frame_guards(b,m,p):
+    expected=struct.pack('<8I',*(0xA15A1000+i for i in range(8)))
+    if b.upload(m['guard'],32,'frame-guard.bin')!=expected:
+        raise ValueError('Frame/post-padding guard damaged')
+    if not m.get('whole_image_preerase'): return None
+    whole_layout(m)
+    if p['chunk_count']!=1 or p['chunk_overflow']:
+        raise ValueError('Whole image must have exactly one payload call')
+    raw=b.upload(m['whole_proof'],32,'whole-proof.bin')
+    if raw!=struct.pack('<8I',0x52575031,3,0,0,FRAME_BYTES,1909760,160,3730):
+        raise ValueError('Original guard/padding transition proof differs')
+    if b.upload(FRAME+FRAME_BYTES,160,'frame-padding.bin')!=bytes(160):
+        raise ValueError('Whole-image padding is not zero')
+    chunks=b.upload(m['chunk_trace'],32,'whole-chunk.bin')
+    words=struct.unpack('<8I',chunks)
+    if (words[2:5]!=(0,3730,FRAME_BYTES) or words[5]&0x1F00!=0x900 or words[6]):
+        raise ValueError('Whole-image payload trace differs')
+    return dict(proof=list(struct.unpack('<8I',raw)),chunk=list(words),padding_zero=True,
+                original_guard_checked_before_zero_padding=True,post_padding_guard_intact=True)
 
 
 def decode(raw, names):
@@ -287,8 +318,7 @@ def run(a):
     if clock!=400000000: raise ValueError('Clock differs from qualified profile')
     result=dict(passed=True,binary_sha256=sha(code),request_words=words,proof=p,context=context,card=card)
     if op==1:
-        expected=struct.pack('<8I',*(0xA15A1000+i for i in range(8)))
-        if b.upload(m['guard'],32,'frame-guard.bin') != expected: raise ValueError('Frame guard damaged')
+        result['whole_image']=frame_guards(b,m,p)
         if p['chunk_overflow'] or not 1 <= p['chunk_count'] <= 128:
             raise ValueError('Incomplete chunk trace')
         (a.out/'chunks.bin').write_bytes(b.upload(0x343FE000,p['chunk_count']*32,'chunks.bin'))

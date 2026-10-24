@@ -20,6 +20,7 @@ uint32_t test_primask,test_basepri,test_faultmask;
 static std::vector<uint32_t> commands, arguments, output;
 static uint32_t words, expected_words, current_lba, operation, stop_count, fifo_resets;
 static uint32_t data_error_at, busy_polls, command_error, late_card_error;
+static uint32_t app_prefix_r1, app_preerase_r1;
 static uint32_t abort_tail_end;
 static uint32_t tx_sent, tx_start_words, tx_max_occupancy;
 static bool tx_started;
@@ -58,7 +59,12 @@ static void command_write(uint32_t value)
         test_sd.STA.value=SDMMC_STA_CTIMEOUT;
         return;
     }
-    if (index==17 || index==18 || index==24 || index==25) {
+    if (index==55) test_sd.RESP1.value=app_prefix_r1;
+    else if (index==23) {
+        assert(commands.size()>=2 && commands[commands.size()-2]==55);
+        assert(!test_sd.IDMACTRL.value && !operation);
+        test_sd.RESP1.value=app_preerase_r1;
+    } else if (index==17 || index==18 || index==24 || index==25) {
         assert(value&SDMMC_CMD_CMDTRANS);
         assert(!(value&SDMMC_CMD_CMDSTOP));
         operation=index; words=0; expected_words=test_sd.DLEN.value/4;
@@ -209,12 +215,13 @@ static sd_card_t reset_model()
     commands.clear(); arguments.clear(); output.clear();
     words=0; expected_words=0; current_lba=0; operation=0; stop_count=0; fifo_resets=0;
     data_error_at=0xFFFFFFFFU; busy_polls=0; command_error=0xFFFFFFFFU;
+    app_prefix_r1=app_preerase_r1=0x920U;
     late_card_error=0; waiting_for_stop=false; permanent_busy=false;
     abort_pending=false; abort_tail_end=0;
     tx_sent=0; tx_started=false; tx_start_words=0; tx_max_occupancy=0;
     dma_error_at=0xFFFFFFFFU; dma_final_error=0; dma_residual=0; dma_fifo_accesses=0;
     dma_stalled=false; dma_abort_stuck=false;
-    dma_memory.resize(1025U*512U);
+    dma_memory.resize(4097U*512U);
     for(unsigned n=0;n<dma_memory.size();++n) dma_memory[n]=uint8_t(n*7U+19U);
     test_rcc.AHB3ENR.value=RCC_AHB3ENR_RIFSCEN;
     test_rif.RIMC_ATTRx[3].value=0x310;
@@ -358,6 +365,78 @@ int main()
     { auto c=reset_model(); c.clock_hz=100000;
       assert(sd_write_blocks_dma(&c,10,dma_buffer,32)==SD_OK);
       assert(number_of(25)==2 && stop_count==2 && c.written_sectors==32);
+    }
+    { auto c=reset_model();
+      assert(sd_write_blocks_dma_preerase(&c,100,dma_buffer,3730)==SD_OK);
+      const std::vector<uint32_t> wanted={13,55,23,25,12,13};
+      const std::vector<uint32_t> args={c.rca,c.rca,3730,100,0,c.rca};
+      assert(commands==wanted && arguments==args);
+      assert(c.command_count==6 && stop_count==1 && !number_of(24));
+      assert(c.written_sectors==3730 && c.transfer_words==3730U*128U);
+      assert(c.media_idle && !test_sd.IDMACTRL.value && !dma_fifo_accesses && !fifo_resets);
+      assert(output.size()==3730U*128U && test_sd.DLEN.value==3730U*512U);
+      for(unsigned n=0;n<output.size();++n) assert(output[n]==load_word(dma_memory.data()+4*n));
+    }
+    { auto c=reset_model(); c.clock_hz=12500000;
+      assert(sd_write_blocks_dma_preerase(&c,100,dma_buffer,4096)==SD_OK);
+      assert(c.written_sectors==4096 && stop_count==1 && number_of(25)==1);
+      assert(number_of(23)==1 && arguments[2]==4096 && c.media_idle);
+    }
+    for(unsigned scenario=0;scenario<9;++scenario) {
+      auto c=reset_model(); const void *source=dma_buffer; uint32_t count=3730;
+      const int expected[]={SD_ERR_ARGUMENT,SD_ERR_ARGUMENT,SD_ERR_CLOCK,
+        SD_ERR_CACHE,SD_ERR_SECURITY,SD_ERR_SECURITY,SD_ERR_SECURITY,
+        SD_ERR_ARGUMENT,SD_ERR_CAPACITY};
+      switch(scenario) {
+      case 0: count=1; break;
+      case 1: count=4097; break;
+      case 2: c.clock_hz=100000; break;
+      case 3: test_scb.CCR.value=SCB_CCR_DC_Msk; break;
+      case 4: test_rif.RIMC_ATTRx[3].value=0; break;
+      case 5: test_rif.RISC_SECCFGRx[1].value=0; break;
+      case 6: test_rcc.AHB3ENR.value=0; break;
+      case 7: source=reinterpret_cast<void *>(uintptr_t(0x34300000U)); break;
+      case 8: c.sector_count=100; break;
+      }
+      assert(sd_write_blocks_dma_preerase(&c,100,source,count)==expected[scenario]);
+      assert(commands.empty() && output.empty() && !test_sd.IDMACTRL.value);
+    }
+    for(unsigned scenario=0;scenario<6;++scenario) {
+      auto c=reset_model();
+      const int expected[]={SD_ERR_UNSUPPORTED,SD_ERR_UNSUPPORTED,SD_ERR_CARD,
+        SD_ERR_CARD,SD_ERR_COMMAND_TIMEOUT,SD_ERR_COMMAND_TIMEOUT};
+      switch(scenario) {
+      case 0: app_prefix_r1=0x900; break;
+      case 1: app_preerase_r1=0x900; break;
+      case 2: app_prefix_r1=0x920|(1U<<22); break;
+      case 3: app_preerase_r1=0x920|(1U<<22); break;
+      case 4: command_error=55; break;
+      case 5: command_error=23; break;
+      }
+      assert(sd_write_blocks_dma_preerase(&c,100,dma_buffer,3730)==expected[scenario]);
+      assert(c.error==uint32_t(expected[scenario]) && !c.media_idle);
+      assert(!number_of(25) && !number_of(24) && !stop_count);
+      assert(!c.written_sectors && output.empty() && !test_sd.IDMACTRL.value);
+      assert(c.error_command==((scenario==0 || scenario==2 || scenario==4)?55U:23U));
+      auto before=commands.size();
+      assert(sd_write_blocks_dma_preerase(&c,100,dma_buffer,3730)==expected[scenario]);
+      assert(commands.size()==before); /* first error remains latched */
+    }
+    { auto c=reset_model(); dma_error_at=256;
+      assert(sd_write_blocks_dma_preerase(&c,100,dma_buffer,3730)==SD_ERR_DMA);
+      assert(number_of(55)==1 && number_of(23)==1 && number_of(25)==1 && stop_count==1);
+      assert(c.media_idle && !c.written_sectors && !test_sd.IDMACTRL.value);
+      assert(!dma_fifo_accesses && !fifo_resets);
+    }
+    { auto c=reset_model(); command_error=25;
+      assert(sd_write_blocks_dma_preerase(&c,100,dma_buffer,3730)==SD_ERR_COMMAND_TIMEOUT);
+      assert(number_of(55)==1 && number_of(23)==1 && stop_count==1);
+      assert(c.media_idle && !c.written_sectors && !test_sd.IDMACTRL.value);
+    }
+    { auto c=reset_model(); late_card_error=1;
+      assert(sd_write_blocks_dma_preerase(&c,100,dma_buffer,3730)==SD_ERR_CARD);
+      assert(stop_count==1 && !c.media_idle && !c.written_sectors);
+      assert(!test_sd.IDMACTRL.value && output.size()==3730U*128U);
     }
     { auto c=reset_model(); dma_error_at=256;
       assert(sd_write_blocks_dma(&c,10,dma_buffer,8)==SD_ERR_DMA);

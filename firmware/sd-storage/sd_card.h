@@ -11,6 +11,7 @@
 #define SD_SECTOR_BYTES 512U
 #define SD_MAX_TRANSFER_SECTORS 64U
 #define SD_DMA_MAX_TRANSFER_SECTORS 1024U
+#define SD_DMA_PREERASE_MAX_SECTORS 4096U
 
 enum sd_error {
     SD_OK=0, SD_ERR_ARGUMENT, SD_ERR_STATE, SD_ERR_CLOCK, SD_ERR_GPIO,
@@ -74,6 +75,20 @@ int sd_write_blocks(sd_card_t *card, uint32_t lba, const void *buffer, uint32_t 
  * buffer must remain valid/immutable until ownership is explicitly recovered.
  */
 int sd_write_blocks_dma(sd_card_t *card, uint32_t lba, const void *buffer, uint32_t count);
+/* Opt-in pre-announced single CMD25 transaction. The complete immutable source
+ * must already be present, including any caller-provided final-sector padding.
+ * Accepts 2..4096 sectors at 12.5/25 MHz only; it never splits the request.
+ * After fresh ready and all normal DMA checks: CMD55(RCA), ACMD23(exact count),
+ * CMD25, CMD12, fresh ready. Both application responses must set APP_CMD and
+ * be free of R1 errors. An unsupported/rejected announcement fails without
+ * silently reverting to unannounced writes. No CMD23 fixed-count mode is used.
+ * ACMD23 is a preparation hint, not a flush command or power-loss guarantee.
+ * A failed/interrupted CMD25 can leave any announced but unwritten sectors
+ * undefined, so the caller must own the entire announced range exclusively.
+ * The existing DMA timeout, security, cache and ownership rules still apply.
+ */
+int sd_write_blocks_dma_preerase(sd_card_t *card, uint32_t lba,
+                                 const void *buffer, uint32_t count);
 typedef struct {
     uint32_t (*milliseconds)(void);
     uint32_t wait_calls, wall_ms, active_cycles, immediate_wakes;

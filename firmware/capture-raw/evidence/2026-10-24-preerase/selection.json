@@ -1,0 +1,708 @@
+{
+  "schema": 1,
+  "status": "complete",
+  "selection": {
+    "schema": 1,
+    "bench": "tmp/bringup/raw-preerase-20261024/bench",
+    "records": [
+      {
+        "id": "preflight",
+        "classification": "initial identity/ownership/RAW metadata checks",
+        "pixels": "omit"
+      },
+      {
+        "id": "initial-recovery",
+        "classification": "initial identity/ownership/RAW metadata checks",
+        "pixels": "omit"
+      },
+      {
+        "id": "initial-park",
+        "classification": "initial identity/ownership/RAW metadata checks",
+        "pixels": "omit"
+      },
+      {
+        "id": "initial-volume",
+        "classification": "initial identity/ownership/RAW metadata checks",
+        "pixels": "omit",
+        "metadata_sectors": [
+          "sectors.bin",
+          "bootstrap/sectors.bin"
+        ],
+        "attachments": {
+          "volume-validation.json": "tmp/bringup/raw-preerase-20261024/bench/initial-volume-validation.json"
+        }
+      },
+      {
+        "id": "initial-slot10",
+        "classification": "initial identity/ownership/RAW metadata checks",
+        "pixels": "omit",
+        "metadata_sectors": [
+          "sectors.bin",
+          "operation/sectors.bin"
+        ]
+      },
+      {
+        "id": "baseline-start-recovery",
+        "classification": "initial identity/ownership/RAW metadata checks",
+        "pixels": "omit"
+      },
+      {
+        "id": "baseline-start-park",
+        "classification": "initial identity/ownership/RAW metadata checks",
+        "pixels": "omit"
+      },
+      {
+        "id": "baseline-start-js",
+        "classification": "initial identity/ownership/RAW metadata checks",
+        "pixels": "omit"
+      },
+      {
+        "id": "baseline01",
+        "classification": "cold capture recording; independent recovery/SBF and image checks required",
+        "pixels": "omit",
+        "keep_files": [
+          "raw/chunks.jsonl",
+          "phase/binary/analog_4.bin"
+        ],
+        "attachments": {
+          "qualification.json": "tmp/bringup/raw-preerase-20261024/bench/baseline01-qualification.json"
+        }
+      },
+      {
+        "id": "baseline01-recovery",
+        "classification": "bounded warm PE6 request",
+        "pixels": "omit",
+        "keep_files": [
+          "signal-summary.json"
+        ]
+      },
+      {
+        "id": "baseline01-park",
+        "classification": "exact early recovery park",
+        "pixels": "omit",
+        "keep_files": []
+      },
+      {
+        "id": "baseline01-sbf",
+        "classification": "read-only SBF observation",
+        "pixels": "omit",
+        "keep_files": []
+      },
+      {
+        "id": "baseline02",
+        "classification": "cold capture recording; independent recovery/SBF and image checks required",
+        "pixels": "omit",
+        "keep_files": [
+          "raw/chunks.jsonl",
+          "phase/binary/analog_4.bin"
+        ],
+        "attachments": {
+          "qualification.json": "tmp/bringup/raw-preerase-20261024/bench/baseline02-qualification.json"
+        }
+      },
+      {
+        "id": "baseline02-recovery",
+        "classification": "bounded warm PE6 request",
+        "pixels": "omit",
+        "keep_files": [
+          "signal-summary.json"
+        ]
+      },
+      {
+        "id": "baseline02-park",
+        "classification": "exact early recovery park",
+        "pixels": "omit",
+        "keep_files": []
+      },
+      {
+        "id": "baseline02-sbf",
+        "classification": "read-only SBF observation",
+        "pixels": "omit",
+        "keep_files": []
+      },
+      {
+        "id": "baseline03",
+        "classification": "cold capture recording; independent recovery/SBF and image checks required",
+        "pixels": "omit",
+        "keep_files": [
+          "raw/chunks.jsonl",
+          "phase/binary/analog_4.bin"
+        ],
+        "attachments": {
+          "qualification.json": "tmp/bringup/raw-preerase-20261024/bench/baseline03-qualification.json"
+        }
+      },
+      {
+        "id": "baseline03-recovery",
+        "classification": "bounded warm PE6 request",
+        "pixels": "omit",
+        "keep_files": [
+          "signal-summary.json"
+        ]
+      },
+      {
+        "id": "baseline03-park",
+        "classification": "exact early recovery park",
+        "pixels": "omit",
+        "keep_files": []
+      },
+      {
+        "id": "baseline03-sbf",
+        "classification": "read-only SBF observation",
+        "pixels": "omit",
+        "keep_files": []
+      },
+      {
+        "id": "baseline-analysis-final",
+        "classification": "same-boundary native-energy and phase reports",
+        "pixels": "omit",
+        "attachments": {
+          "spec.json": "tmp/bringup/raw-preerase-20261024/bench/baseline-spec-final.json",
+          "baseline-summary.json": "firmware/capture-sd/evidence/2026-10-24-normal-profile/analysis/energy/summary.json"
+        }
+      },
+      {
+        "id": "baseline-compacts",
+        "classification": "exact signed native sample sums for four intervals per cycle",
+        "pixels": "omit",
+        "keep_files": [
+          "baseline01/power-compact.json.gz",
+          "baseline01/raw-chunks.jsonl.gz",
+          "baseline02/power-compact.json.gz",
+          "baseline02/raw-chunks.jsonl.gz",
+          "baseline03/power-compact.json.gz",
+          "baseline03/raw-chunks.jsonl.gz"
+        ]
+      },
+      {
+        "id": "candidate01",
+        "classification": "cold capture recording; independent recovery/SBF and image checks required",
+        "pixels": "omit",
+        "keep_files": [
+          "raw/chunks.jsonl",
+          "phase/binary/analog_4.bin"
+        ],
+        "attachments": {
+          "qualification.json": "tmp/bringup/raw-preerase-20261024/bench/candidate01-qualification.json"
+        }
+      },
+      {
+        "id": "candidate01-recovery",
+        "classification": "bounded warm PE6 request",
+        "pixels": "omit",
+        "keep_files": [
+          "signal-summary.json"
+        ]
+      },
+      {
+        "id": "candidate01-park",
+        "classification": "exact early recovery park",
+        "pixels": "omit",
+        "keep_files": []
+      },
+      {
+        "id": "candidate01-sbf",
+        "classification": "read-only SBF observation",
+        "pixels": "omit",
+        "keep_files": []
+      },
+      {
+        "id": "candidate02",
+        "classification": "cold capture recording; independent recovery/SBF and image checks required",
+        "pixels": "omit",
+        "keep_files": [
+          "raw/chunks.jsonl",
+          "phase/binary/analog_4.bin"
+        ],
+        "attachments": {
+          "qualification.json": "tmp/bringup/raw-preerase-20261024/bench/candidate02-qualification.json"
+        }
+      },
+      {
+        "id": "candidate02-recovery",
+        "classification": "bounded warm PE6 request",
+        "pixels": "omit",
+        "keep_files": [
+          "signal-summary.json"
+        ]
+      },
+      {
+        "id": "candidate02-park",
+        "classification": "exact early recovery park",
+        "pixels": "omit",
+        "keep_files": []
+      },
+      {
+        "id": "candidate02-sbf",
+        "classification": "read-only SBF observation",
+        "pixels": "omit",
+        "keep_files": []
+      },
+      {
+        "id": "candidate03",
+        "classification": "cold capture recording; independent recovery/SBF and image checks required",
+        "pixels": "omit",
+        "keep_files": [
+          "raw/chunks.jsonl",
+          "phase/binary/analog_4.bin"
+        ],
+        "attachments": {
+          "qualification.json": "tmp/bringup/raw-preerase-20261024/bench/candidate03-qualification.json"
+        }
+      },
+      {
+        "id": "candidate03-recovery",
+        "classification": "bounded warm PE6 request",
+        "pixels": "omit",
+        "keep_files": [
+          "signal-summary.json"
+        ]
+      },
+      {
+        "id": "candidate03-park",
+        "classification": "exact early recovery park",
+        "pixels": "omit",
+        "keep_files": []
+      },
+      {
+        "id": "candidate03-sbf",
+        "classification": "read-only SBF observation",
+        "pixels": "omit",
+        "keep_files": []
+      },
+      {
+        "id": "candidate-analysis-final",
+        "classification": "same-boundary native-energy and phase reports",
+        "pixels": "omit",
+        "attachments": {
+          "spec.json": "tmp/bringup/raw-preerase-20261024/bench/candidate-spec-final.json",
+          "baseline-summary.json": "firmware/capture-sd/evidence/2026-10-24-normal-profile/analysis/energy/summary.json",
+          "comparison.json": "tmp/bringup/raw-preerase-20261024/bench/comparison.json"
+        }
+      },
+      {
+        "id": "candidate-compacts",
+        "classification": "exact signed native sample sums for four intervals per cycle",
+        "pixels": "omit",
+        "keep_files": [
+          "candidate01/power-compact.json.gz",
+          "candidate01/raw-chunks.jsonl.gz",
+          "candidate02/power-compact.json.gz",
+          "candidate02/raw-chunks.jsonl.gz",
+          "candidate03/power-compact.json.gz",
+          "candidate03/raw-chunks.jsonl.gz"
+        ]
+      },
+      {
+        "id": "pattern-capture",
+        "classification": "completed deterministic whole-image preerase capture; exact source frame retained",
+        "pixels": "pattern"
+      },
+      {
+        "id": "pattern-read",
+        "classification": "complete slot13 retrieval exactly equals retained capture RAM; deterministic pixels retained",
+        "pixels": "pattern",
+        "capture": "pattern-capture"
+      },
+      {
+        "id": "awake02-inspect",
+        "classification": "completed awake cold whole-image capture with exact code/guard/one-transfer proof; scene pixels omitted",
+        "pixels": "omit"
+      },
+      {
+        "id": "awake-scene-read",
+        "classification": "complete slot14 SD readback exactly equals retained same-capture RAM; scene pixels omitted",
+        "pixels": "omit"
+      },
+      {
+        "id": "baseline01-read",
+        "classification": "complete baseline Standby slot read and PNG reconstruction; original capture RAM lost",
+        "pixels": "omit"
+      },
+      {
+        "id": "baseline02-read",
+        "classification": "complete baseline Standby slot read and PNG reconstruction; original capture RAM lost",
+        "pixels": "omit"
+      },
+      {
+        "id": "baseline03-read",
+        "classification": "complete baseline Standby slot read and PNG reconstruction; original capture RAM lost",
+        "pixels": "omit"
+      },
+      {
+        "id": "candidate01-read",
+        "classification": "full Standby image retrieval; original RAM lost",
+        "pixels": "omit"
+      },
+      {
+        "id": "candidate02-read",
+        "classification": "full Standby image retrieval; original RAM lost",
+        "pixels": "omit"
+      },
+      {
+        "id": "candidate03-read",
+        "classification": "full Standby image retrieval; original RAM lost",
+        "pixels": "omit"
+      },
+      {
+        "id": "install-standby-write",
+        "classification": "candidatev16 full NOR write/readback; behavior qualified separately",
+        "pixels": "omit"
+      },
+      {
+        "id": "install-standby-diagnostic",
+        "classification": "candidatev16 NOR completion/idle diagnostic",
+        "pixels": "omit"
+      },
+      {
+        "id": "install-standby-following",
+        "classification": "following4KiB readback after candidatev16 install",
+        "pixels": "omit"
+      },
+      {
+        "id": "final-handoff",
+        "classification": "Final normal cold power signature only; slot18 and SBF not read; excluded from A/B",
+        "pixels": "omit",
+        "keep_files": [
+          "raw/chunks.jsonl",
+          "phase/binary/analog_4.bin"
+        ]
+      },
+      {
+        "id": "test-output",
+        "classification": "actual offline protocol and integration test commands/results",
+        "pixels": "omit",
+        "source": "tmp/bringup/raw-preerase-20261024/test-output"
+      },
+      {
+        "id": "initial-park-js",
+        "classification": "read-only target power measurement",
+        "pixels": "omit"
+      },
+      {
+        "id": "baseline02-start-js",
+        "classification": "read-only precycle current/voltage",
+        "pixels": "omit"
+      },
+      {
+        "id": "baseline03-start-js",
+        "classification": "read-only precycle current/voltage",
+        "pixels": "omit"
+      },
+      {
+        "id": "preerase-read-start",
+        "classification": "frozen RAM READ bridge entry after baseline",
+        "pixels": "omit"
+      },
+      {
+        "id": "pattern-read-recovery",
+        "classification": "exact recovery request before deterministic pattern",
+        "pixels": "omit",
+        "keep_files": [
+          "signal-summary.json"
+        ]
+      },
+      {
+        "id": "awake-read-recovery",
+        "classification": "qualified recovery request after completed awake capture",
+        "pixels": "omit",
+        "keep_files": [
+          "signal-summary.json"
+        ]
+      },
+      {
+        "id": "awake-read-start",
+        "classification": "frozen RAM READ bridge before scene retrieval",
+        "pixels": "omit"
+      },
+      {
+        "id": "awake01-start-js",
+        "classification": "preflight before host-only safe-start refusal",
+        "pixels": "omit",
+        "attachments": {
+          "host-safe-start-refusal.log": "tmp/bringup/raw-preerase-20261024/bench/awake01-safe.log"
+        }
+      },
+      {
+        "id": "awake02-start-js",
+        "classification": "preflight before actual awake cold cycle",
+        "pixels": "omit"
+      },
+      {
+        "id": "awake02",
+        "classification": "normal awake cold capture observation; terminal proof separate",
+        "pixels": "omit",
+        "keep_files": [
+          "raw/chunks.jsonl",
+          "phase/binary/analog_4.bin"
+        ]
+      },
+      {
+        "id": "install-awake-recovery",
+        "classification": "exact recovery request before awake candidate install",
+        "pixels": "omit",
+        "keep_files": [
+          "signal-summary.json"
+        ]
+      },
+      {
+        "id": "install-awake-park",
+        "classification": "exact early recovery park before awake candidate install",
+        "pixels": "omit"
+      },
+      {
+        "id": "install-awake-info",
+        "classification": "guarded NOR identity/info before awake candidate install",
+        "pixels": "omit"
+      },
+      {
+        "id": "install-awake-write",
+        "classification": "complete awake candidate NOR write/readback",
+        "pixels": "omit"
+      },
+      {
+        "id": "install-awake-diagnostic",
+        "classification": "awake candidate NOR completion/idle diagnostic",
+        "pixels": "omit"
+      },
+      {
+        "id": "install-awake-following",
+        "classification": "following4KiB readback after awake candidate install",
+        "pixels": "omit"
+      },
+      {
+        "id": "install-standby-recovery",
+        "classification": "exact recovery request before Standby candidate install",
+        "pixels": "omit",
+        "keep_files": [
+          "signal-summary.json"
+        ]
+      },
+      {
+        "id": "install-standby-park",
+        "classification": "exact recovery park before Standby candidate install",
+        "pixels": "omit"
+      },
+      {
+        "id": "install-standby-info",
+        "classification": "guarded NOR identity/info before Standby candidate install",
+        "pixels": "omit"
+      },
+      {
+        "id": "following-v15-reference",
+        "source": "tmp/bringup/raw-slots-20261024/bench/v15-following-after",
+        "classification": "priorv15 following4KiB reference used for unchanged-region comparison",
+        "pixels": "omit"
+      },
+      {
+        "id": "candidate01-start-js",
+        "classification": "Completed root bench action or final handoff record; qualification separately bound",
+        "pixels": "omit"
+      },
+      {
+        "id": "candidate02-start-js",
+        "classification": "Completed root bench action or final handoff record; qualification separately bound",
+        "pixels": "omit"
+      },
+      {
+        "id": "candidate03-start-js",
+        "classification": "Completed root bench action or final handoff record; qualification separately bound",
+        "pixels": "omit"
+      },
+      {
+        "id": "candidate-read-start",
+        "classification": "Completed root bench action or final handoff record; qualification separately bound",
+        "pixels": "omit"
+      },
+      {
+        "id": "final-recovery",
+        "classification": "Completed root bench action or final handoff record; qualification separately bound",
+        "pixels": "omit",
+        "keep_files": [
+          "signal-summary.json"
+        ]
+      },
+      {
+        "id": "final-park",
+        "classification": "Completed root bench action or final handoff record; qualification separately bound",
+        "pixels": "omit"
+      },
+      {
+        "id": "final-handoff-start-js",
+        "classification": "Completed root bench action or final handoff record; qualification separately bound",
+        "pixels": "omit"
+      },
+      {
+        "id": "final-state",
+        "classification": "Completed root bench action or final handoff record; qualification separately bound",
+        "pixels": "omit"
+      },
+      {
+        "id": "baseline-analysis",
+        "classification": "Superseded pre-image-readback analysis; excluded from headline comparison",
+        "pixels": "omit",
+        "attachments": {
+          "spec.json": "tmp/bringup/raw-preerase-20261024/bench/baseline-spec.json",
+          "baseline-summary.json": "firmware/capture-sd/evidence/2026-10-24-normal-profile/analysis/energy/summary.json"
+        }
+      },
+      {
+        "id": "candidate-analysis",
+        "classification": "Superseded pre-image-readback analysis; excluded from headline comparison",
+        "pixels": "omit",
+        "attachments": {
+          "spec.json": "tmp/bringup/raw-preerase-20261024/bench/candidate-spec.json",
+          "baseline-summary.json": "firmware/capture-sd/evidence/2026-10-24-normal-profile/analysis/energy/summary.json"
+        }
+      }
+    ],
+    "extra_builds": [
+      "tmp/bringup/capture-raw-20261024/flash-standby-line-v15",
+      "tmp/bringup/capture-raw-20261024/ram-idma-secure-v6",
+      "tmp/bringup/raw-onewrite-20261024/ram-pattern-v16",
+      "tmp/bringup/raw-onewrite-20261024/flash-awake-v16",
+      "tmp/bringup/raw-onewrite-20261024/flash-standby-v16"
+    ],
+    "tools": {
+      "raw_slots.py": "firmware/raw-slots/raw_slots.py",
+      "sd_card.c": "firmware/sd-storage/sd_card.c",
+      "sd_card.h": "firmware/sd-storage/sd_card.h",
+      "test_sd_driver.cpp": "firmware/sd-storage/test_sd_driver.cpp",
+      "test_sd_driver.py": "firmware/sd-storage/test_sd_driver.py",
+      "test_core.c": "firmware/raw-slots/test_core.c",
+      "test_raw_slots.py": "firmware/raw-slots/test_raw_slots.py",
+      "bench_support.py": "tmp/bringup/raw-preerase-20261024/bench_support.py",
+      "archive_preerase.py": "tmp/bringup/raw-preerase-20261024/archive_preerase.py",
+      "replay_preerase.py": "tmp/bringup/raw-preerase-20261024/replay_preerase.py",
+      "cycle_energy.py": "firmware/capture-sd/evidence/2026-10-24-normal-profile/analysis/energy/support/cycle_energy.py",
+      "build.py": "firmware/capture-raw/build.py",
+      "bench.py": "firmware/capture-raw/bench.py",
+      "inspect_flash.py": "firmware/capture-raw/inspect_flash.py",
+      "cold_cycle.py": "firmware/capture-raw/cold_cycle.py",
+      "phase_decode.py": "firmware/capture-raw/phase_decode.py",
+      "phase_protocol.py": "firmware/capture-raw/phase_protocol.py",
+      "summarize_cycles.py": "firmware/capture-raw/summarize_cycles.py",
+      "energy_compacts.py": "firmware/capture-raw/energy_compacts.py",
+      "late_build.py": "firmware/capture-raw/late_build.py",
+      "test_bench.py": "firmware/capture-raw/test_bench.py",
+      "root_flash.py": "tmp/bringup/raw-preerase-20261024/root_flash.py",
+      "root_inspect_awake.py": "tmp/bringup/raw-preerase-20261024/root_inspect_awake.py",
+      "root_next_cycle.py": "tmp/bringup/raw-preerase-20261024/root_next_cycle.py",
+      "root_qualify_cycle.py": "tmp/bringup/raw-preerase-20261024/root_qualify_cycle.py",
+      "root_read_slots.py": "tmp/bringup/raw-preerase-20261024/root_read_slots.py"
+    },
+    "reference_archive": "firmware/capture-packed/evidence/2026-10-24-packed-raw10",
+    "limits": [
+      "Explicit completed/refused record selection; no live ownership inference.",
+      "Scene pixels omitted and only hashes retained.",
+      "Raw JS arrays omitted; exact native sample sum bins replay interval energy.",
+      "Generated build sources, binaries and listings exact; external toolchain/vendor dependencies not bundled.",
+      "Protocol READY does not qualify arbitrary power loss."
+    ]
+  },
+  "experiment": {
+    "groups": [
+      {
+        "name": "baseline",
+        "build": "flash-standby-line-v15",
+        "analysis": "baseline-analysis-final",
+        "compacts": "baseline-compacts",
+        "cycles": [
+          {
+            "record": "baseline01",
+            "park": "baseline01-park",
+            "sbf": "baseline01-sbf",
+            "image": "baseline01-read"
+          },
+          {
+            "record": "baseline02",
+            "park": "baseline02-park",
+            "sbf": "baseline02-sbf",
+            "image": "baseline02-read"
+          },
+          {
+            "record": "baseline03",
+            "park": "baseline03-park",
+            "sbf": "baseline03-sbf",
+            "image": "baseline03-read"
+          }
+        ]
+      },
+      {
+        "name": "candidate",
+        "build": "flash-standby-v16",
+        "analysis": "candidate-analysis-final",
+        "compacts": "candidate-compacts",
+        "cycles": [
+          {
+            "record": "candidate01",
+            "park": "candidate01-park",
+            "sbf": "candidate01-sbf",
+            "image": "candidate01-read"
+          },
+          {
+            "record": "candidate02",
+            "park": "candidate02-park",
+            "sbf": "candidate02-sbf",
+            "image": "candidate02-read"
+          },
+          {
+            "record": "candidate03",
+            "park": "candidate03-park",
+            "sbf": "candidate03-sbf",
+            "image": "candidate03-read"
+          }
+        ]
+      }
+    ],
+    "image_comparisons": [
+      {
+        "capture": "pattern-capture",
+        "readback": "pattern-read"
+      },
+      {
+        "capture": "awake02-inspect",
+        "readback": "awake-scene-read"
+      },
+      {
+        "readback": "baseline01-read"
+      },
+      {
+        "readback": "baseline02-read"
+      },
+      {
+        "readback": "baseline03-read"
+      },
+      {
+        "readback": "candidate01-read"
+      },
+      {
+        "readback": "candidate02-read"
+      },
+      {
+        "readback": "candidate03-read"
+      }
+    ],
+    "installs": [
+      {
+        "build": "flash-awake-v16",
+        "write": "install-awake-write",
+        "diagnostic": "install-awake-diagnostic",
+        "following": "install-awake-following",
+        "following_reference": "following-v15-reference"
+      },
+      {
+        "build": "flash-standby-v16",
+        "write": "install-standby-write",
+        "diagnostic": "install-standby-diagnostic",
+        "following": "install-standby-following",
+        "following_reference": "following-v15-reference"
+      }
+    ],
+    "final_handoff": {
+      "state": "final-state",
+      "cycle": "final-handoff",
+      "build": "flash-standby-v16"
+    }
+  }
+}

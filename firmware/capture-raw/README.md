@@ -6,9 +6,33 @@ the existing UART recovery mechanism. It uses the container in
 [raw-slots](../raw-slots/README.md); there is no FAT filesystem, image conversion,
 compression or full-frame CPU checksum in the normal save path.
 
-The selected prototype is **RAW v15, polling IDMA with LINE publication and
-asynchronous sensor STOP, followed by Standby**. Its programmed 64 KiB sector is
-`efb3c440e008e448a1682285034fe30b77bdbb5834024da9de787f3f51f42629`.
+The selected prototype is **RAW v16, polling IDMA with whole-image ACMD23
+preannouncement and asynchronous sensor STOP, followed by Standby**. Its
+programmed 64 KiB sector is
+`285fba4951f88deb12033e7b3c2948c802371862982da5a8e304c6cae35fb58f`.
+The earlier chunked LINE path remains selectable. The new option waits for
+validated FRAME before writing; on this card, cold SD initialization already
+finishes after FRAME, so this adds no observed wait. Early receiver load remains
+15,804 bytes and the recovery instructions are unchanged.
+
+Three fresh cold runs per build gave the following medians, measured from
+current onset to stable Standby plateau on the JS-fed Nucleo branch:
+
+| Metric | Chunked v15 | ACMD23 + one CMD25, v16 |
+| --- | ---: | ---: |
+| Total cycle | 796.377 ms | 780.385 ms |
+| Energy | 435.297 mJ | 426.796 mJ |
+| Payload submission through final card readiness | 633.320 ms | 626.438 ms |
+
+The observed total reductions are 2.01% in time and 1.95% in energy. The payload
+improvement is 6.882 ms (1.09%). SD initialization also varied by about 9.6 ms
+between group medians; scan positions and card internal state differed. Do not
+attribute the entire cycle difference to preannouncement, or separate the hint's
+effect from the single-transaction effect. See the
+[preerase experiment](evidence/2026-10-24-preerase/README.md) for every run,
+readback qualification and exact final bench state.
+
+The following measurements describe the earlier RAW qualification.
 The preceding v12 three-run baseline reached hardware-confirmed Standby and passed first-attempt
 warm PE6 UART recovery. Separate deterministic and cold scene captures passed
 complete SD-to-RAM byte comparisons. The forced-overlap LINE test also checked
@@ -80,7 +104,8 @@ The camera retains the previously qualified ForceRx/lane sequencing and the
 idle-checked receiver-data disable before sensor STOP. Sensor output datatype
 is `0x30`, while its sample depth remains ten bits; CSI treats it as opaque
 eight-bit transport data. The frame is 1,909,600 bytes at `0x34000000` with an
-independent 32-byte guard immediately after the true image boundary.
+independent 32-byte guard immediately after the true image boundary. V16 also
+allocates a separate guard after the padded 1,909,760-byte sector extent.
 
 After arming capture, the remaining storage code loads from NOR and SD
 initialization runs while camera DMA and its interrupts continue. The selected
@@ -89,15 +114,25 @@ producer remains available as a fallback. The current card finishes acquisition
 before cold SD initialization completes, so the overlap improves readiness but
 cannot make this card accept the first sector during that cold frame.
 
-The slot layer scans valid headers for the first FREE slot, writes PARTIAL,
-then transfers published packed bytes in large multiblock chunks. The final
-352 image bytes are copied into a separate aligned sector with 160 zero padding
-bytes. Padding never overwrites the frame guard. A FULL header is published only
-after the payload and fresh card-ready checks complete. The SD driver then
-deinitializes before terminal completion or the separately qualified Standby path.
+The slot layer scans valid headers for the first FREE slot. With
+`--whole-image-preerase`, it waits for validated FRAME before writing PARTIAL,
+then checks the original guard and replaces that boundary area with exactly
+160 zero padding bytes.
+The separate post-padding guard remains live. This avoids copying the full frame
+or placing the final sector in a separate transaction. The driver sends
+`CMD55(RCA) → ACMD23(3730) → CMD25(payload LBA)`, transferring all 3730 sectors
+in one IDMA request. CMD12 and fresh card-ready checks still terminate the write;
+ACMD23 is a preparation hint, not automatic transfer termination.
 
-The selected `--line-stream` producer can publish conservative prefixes before
-FRAME. Its separate [LINE qualification procedure](LINE.md) explains the
+FULL is a separate header write after payload completion, sensor STOP and the
+post-padding guard check. The driver then deinitializes before Standby. Without
+the option, the original published-prefix chunks and separate padded final
+sector remain unchanged. That path preserves before-FRAME streaming for future
+cards which finish initialization sooner.
+
+The available `--line-stream` producer can publish conservative prefixes before
+FRAME; the whole-image option waits for FRAME even when this producer is enabled.
+Its separate [LINE qualification procedure](LINE.md) explains the
 64-line holdback, immediate ISR snapshots and forced-overlap diagnostic. The
 linear frame buffer is retained in full; transmitted memory is never overwritten
 or recycled while camera capture is active.
