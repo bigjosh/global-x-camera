@@ -37,6 +37,13 @@
 #endif
 sd_card_t raw_card;
 raw_slots_t raw_slots;
+#if RAW_MAGIC_FORMAT
+magic_slots_t raw_magic_slots;
+sd_scr_t raw_scr;
+sd_stream_t raw_stream;
+sd_erase_t raw_erase;
+volatile uint32_t raw_magic_proof[8];
+#endif
 #if RAW_WHOLE_IMAGE_PREERASE
 /* magic,state,true-boundary faults,post-pad faults,valid,padded,pad,sectors.
  * Original guard is validated before conversion to zero padding; the distinct
@@ -117,6 +124,19 @@ void raw_capture_fail(uint32_t where,int32_t result)
 
 static void snapshot(void)
 {
+#if RAW_MAGIC_FORMAT
+    /* Compatibility mirror for the common ownership report. No old header or
+     * generation is written to media in magic mode. */
+    raw_slots.card=&raw_card;
+    raw_slots.selected_slot=raw_magic_slots.selected_slot;
+    raw_slots.payload_lba=raw_magic_slots.slot_lba;
+    raw_slots.slot_count=raw_magic_slots.slot_count;
+    raw_slots.written_sectors=raw_magic_slots.written_sectors;
+    raw_slots.scan_headers=raw_magic_slots.scan_headers;
+    raw_slots.opened=raw_magic_slots.opened;
+    raw_slots.active=raw_magic_slots.active;
+    raw_slots.error=raw_magic_slots.error;
+#endif
     P[RP_CAPTURE_ERROR]=operation==RAW_OP_CAPTURE?raw_capture_fault():0U;
     P[RP_CARD]=(uint32_t)&raw_card; P[RP_CARD_SIZE]=sizeof(raw_card);
     P[RP_SLOTS]=(uint32_t)&raw_slots; P[RP_SLOTS_SIZE]=sizeof(raw_slots);
@@ -277,20 +297,23 @@ void raw_runtime_dispatch(void)
 #if RAW_WHOLE_IMAGE_PREERASE
     for(unsigned i=0;i<8U;++i) raw_whole_proof[i]=0;
 #endif
+#if RAW_MAGIC_FORMAT
+    for(unsigned i=0;i<8U;++i) raw_magic_proof[i]=0;
+#endif
     for(unsigned i=0;i<RAW_PROOF_WORDS;++i) P[i]=0;
     for(unsigned i=0;i<RAW_ABORT_WORDS;++i) ABORT[i]=0;
     operation=RAW_FLASH?RAW_OP_CAPTURE:Q[2];
     P[RP_MAGIC]=RAW_PROOF_MAGIC; P[RP_SCHEMA]=1; P[RP_WORDS]=RAW_PROOF_WORDS;
     P[RP_NONCE]=RAW_FLASH?0:Q[1]; P[RP_OPERATION]=operation;
     P[RP_STATE]=1; P[RP_RESULT]=0xFFFFFFFFU; P[RP_STAGE]=1;
-    P[RP_FRAME]=0x34000000U; P[RP_BYTES]=RAW_SLOTS_PAYLOAD_BYTES;
+    P[RP_FRAME]=RAW_FRAME_ADDRESS; P[RP_BYTES]=RAW_SLOTS_PAYLOAD_BYTES;
     P[RP_WIDTH]=RAW_SLOTS_WIDTH; P[RP_HEIGHT]=RAW_SLOTS_HEIGHT;
     P[RP_PATTERN]=RAW_PATTERN; P[RP_BEGIN]=DWT->CYCCNT;
     P[RP_TRANSPORT]=RAW_DMA; P[RP_CHUNK_SECTORS]=RAW_CHUNK_SECTORS;
     P[RP_COMPLETION]=RAW_STANDBY;
     P[RP_FLAGS]=(RAW_ASYNC_STOP?1U:0U)|(RAW_LINE_STREAM?2U:0U)|
         (RAW_PREINIT?4U:0U)|(RAW_LINE_SNAPSHOTS?8U:0U)|(RAW_LINE_POISON?16U:0U)|
-        (RAW_DMA_SLEEP?32U:0U)|(RAW_WHOLE_IMAGE_PREERASE?64U:0U);
+        (RAW_DMA_SLEEP?32U:0U)|(RAW_WHOLE_IMAGE_PREERASE?64U:0U)|(RAW_MAGIC_FORMAT?128U:0U);
 #if RAW_DMA_SLEEP
     raw_dma_wait.milliseconds=HAL_GetTick;
 #endif
@@ -309,7 +332,7 @@ void raw_runtime_dispatch(void)
         init_card();
 #endif
 #if RAW_LINE_POISON
-        volatile uint32_t *frame=(volatile uint32_t *)0x34000000U;
+        volatile uint32_t *frame=(volatile uint32_t *)RAW_FRAME_ADDRESS;
         for(uint32_t i=0;i<RAW_SLOTS_PAYLOAD_BYTES/4U;i++) frame[i]=0xA5A5A5A5U;
         __DSB();
 #endif
@@ -320,7 +343,17 @@ void raw_runtime_dispatch(void)
     int r;
     if(operation==RAW_OP_FORMAT) {
         P[RP_STAGE]=3U;
+#if RAW_MAGIC_FORMAT
+        if(Q[3] || Q[4] || Q[5]) complete_storage(3);
+        SD_OPERATION(r,sd_read_scr(&raw_card,&raw_scr));
+        if(r) complete_storage(0x300U|(uint32_t)r);
+        r=magic_slots_open(&raw_magic_slots,&raw_card,raw_scr.erased_byte);
+        if(r) complete_storage(0x310U|(uint32_t)r);
+        SD_OPERATION(r,sd_erase_all(&raw_card,600000U,&raw_erase));
+        if(!r) raw_slots.formatted_slots=raw_magic_slots.slot_count;
+#else
         SD_OPERATION(r,raw_slots_format(&raw_slots,&raw_card,Q[3],Q[4],Q[5]));
+#endif
         if(r) complete_storage(0x300U|(uint32_t)r);
     } else {
         /* Raw block reads are explicit and cannot touch the retained frame. */
@@ -418,8 +451,15 @@ static int payload_transport(sd_card_t *card,uint32_t lba,const void *data,uint3
     return r;
 }
 
+#if RAW_MAGIC_FORMAT
+#include "magic_runtime.inc"
+#endif
+
 void raw_storage_execute(void)
 {
+#if RAW_MAGIC_FORMAT
+    raw_magic_execute();
+#else
     if(!raw_card.initialized) init_card();
     raw_capture_poll(); /* safe boundary, outside any SD call */
     P[RP_STAGE]=3U;
@@ -532,11 +572,22 @@ void raw_storage_execute(void)
     P[RP_COMMIT_DONE]=DWT->CYCCNT; P[RP_STAGE]=8U;
     (void)phase_gpio_emit(8U);
     complete_storage(0);
+#endif
 }
 
 int raw_storage_shutdown_ready(void)
 {
     return
+#if RAW_MAGIC_FORMAT
+        raw_magic_proof[0]==0x524D4731U && raw_magic_proof[1]==3U &&
+        !raw_magic_proof[2] && !raw_magic_proof[3] &&
+        raw_magic_proof[4]==MAGIC_SLOTS_START_MAGIC && raw_magic_proof[5]==MAGIC_SLOTS_END_MAGIC &&
+        raw_magic_proof[6]==152U && raw_magic_proof[7]==3730U &&
+        raw_scr.valid && raw_magic_slots.opened && !raw_magic_slots.active &&
+        !raw_magic_slots.error && raw_magic_slots.written_sectors==3730U &&
+        raw_card.written_sectors==3730U &&
+        P[RP_CHUNK_COUNT]==1U && !P[RP_CHUNK_OVERFLOW] &&
+#endif
 #if RAW_WHOLE_IMAGE_PREERASE
         raw_whole_proof[0]==0x52575031U && raw_whole_proof[1]==3U &&
         !raw_whole_proof[2] && !raw_whole_proof[3] &&

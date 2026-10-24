@@ -31,6 +31,15 @@ SECTOR_SHA="7fda9d00cc7ffb3fbb9e6aac6695cf18545754b5dbfce1520cf30b2da39c4e63"
 # command-line opt-in for unknown firmware. This table does not broaden the
 # bridge or READ-module identities, and check_park still verifies live code.
 APPROVED_RECOVERY={
+    # RAW v17c/v17d magic format, reviewed unchanged recovery code and literals.
+    # v17d's erase-only fix leaves both complete flash sectors byte-identical.
+    # Only the exact pairs are admitted; this is not hardware qualification.
+    'c6991a534d50569562c9d8426cb1d30c3bea20f208878bb81c56356747f41003':
+        dict(name="raw-v17c-magic-awake",sector_sha256=
+             'f9c6a8935ed7d4aa90f71463f622bdf9261f5c30ba63a4de724cc7c198e45847'),
+    '44c3425ea8e22c06168d8a8d0b65ae7813a0cad147a6d06ad18278f71bd4b9c2':
+        dict(name="raw-v17c-magic-standby",sector_sha256=
+             '2ad7168302fe05b928b2b1aa62ef9732dfeab0d61e6092de2c086412d4485880'),
     # RAW v16 preerase: exact unchanged early recovery, two CRC literal changes.
     '31b8a97eb8a68e574c1adab17e44b838044277bd95f81f5b22c30b9fdaaccd2e':
         dict(name="raw-v16-preerase-standby",sector_sha256=

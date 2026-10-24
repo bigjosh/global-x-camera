@@ -13,6 +13,7 @@ import sys
 import zlib
 from producer_transform import transform as transform_producer
 from phase_protocol import PHASE_PROTOCOL
+from magic_transform import transform as transform_magic, sensor_exposure
 
 HERE=Path(__file__).resolve().parent
 ROOT=HERE.parents[1]
@@ -201,6 +202,8 @@ def main():
     p.add_argument('--transport',choices=('pio','idma'),default='idma')
     p.add_argument('--chunk-sectors',type=int,default=1024)
     p.add_argument('--whole-image-preerase',action='store_true',help='One CMD55/ACMD23 + CMD25 for all3730 padded payload sectors')
+    p.add_argument('--magic-format',action='store_true',help='Erased append-only GXRS + packedRAW + GXRE slots; one progressive CMD25')
+    p.add_argument('--exposure-coarse',type=int,default=1428,help='RAM diagnostic exposure in sensor lines')
     p.add_argument('--flash',action='store_true')
     p.add_argument('--standby',action='store_true')
     p.add_argument('--async-stop',action='store_true')
@@ -210,6 +213,10 @@ def main():
     p.add_argument('--snapshot',action='store_true',help='RAM diagnostic: copy the last 512 B at each published prefix')
     p.add_argument('--poison',action='store_true',help='RAM diagnostic: fill the frame with A5 before sensor start')
     a=p.parse_args()
+    if a.magic_format and (a.transport!='idma' or a.dma_sleep or a.whole_image_preerase or not a.line_stream):
+        p.error('Magic format requires LINE producer and polling IDMA/flow-controlled stream, without legacy whole-image option')
+    if not 1<=a.exposure_coarse<=63000 or (a.flash and a.exposure_coarse!=1428):
+        p.error('Nondefault exposure is RAM diagnostic only; coarse range1..63000')
     if a.standby and not a.flash: p.error('First qualify RAM awake; Standby currently flash-only')
     if a.flash and a.pattern!='scene':
         p.error('Flash builds preserve the exact scene prefix and recovery guard; use RAM for diagonal-pattern tests')
@@ -231,7 +238,9 @@ def main():
         if src.name in excluded: continue
         dst=out/src.name
         data=src.read_bytes()
-        if src.name=='capture.c': dst.write_text(transform_capture(data.decode().replace('\r\n','\n')),newline='\n')
+        if src.name=='capture.c':
+            capture=transform_capture(data.decode().replace('\r\n','\n'))
+            dst.write_text(transform_magic(capture) if a.magic_format else capture,newline='\n')
         elif src.name=='phase_gpio.c':
             # RAW protocol v2: retain bounded GPIO writes but separate IDs by
             # 2 us, well above the measured ~0.24 us output/call overhead.
@@ -249,8 +258,17 @@ def main():
             text=(ROOT/'firmware'/folder/name).read_text().replace('../sd-storage/sd_card.h','sd_card.h')
             dst.write_text(text,newline='\n')
             if dst.suffix=='.c': compiled.append(dst)
+    if a.magic_format:
+        for folder,names in [('raw-slots',('magic_slots.c','magic_slots.h')),
+                             ('capture-raw',('magic_runtime.inc',))]:
+            for name in names:
+                dst=out/name
+                dst.write_text((ROOT/'firmware'/folder/name).read_text().replace('../sd-storage/sd_card.h','sd_card.h'),newline='\n')
+                if dst.suffix=='.c': compiled.append(dst)
     if not a.flash:
-        (out/'stage1_sensor.c').write_text(sensor_source((pbase/'stage1_sensor.c').read_text()),newline='\n')
+        sensor=sensor_source((pbase/'stage1_sensor.c').read_text())
+        if a.exposure_coarse!=1428: sensor=sensor_exposure(sensor,a.exposure_coarse)
+        (out/'stage1_sensor.c').write_text(sensor,newline='\n')
         compiled.append(out/'stage1_sensor.c')
     if a.standby:
         for name in ('completion.c','completion.h','peripherals.c','peripherals.h'):
@@ -269,9 +287,11 @@ def main():
               f'-DRAW_ASYNC_STOP={int(a.async_stop)}',
               f'-DRAW_DMA_SLEEP={int(a.dma_sleep)}',
               f'-DRAW_WHOLE_IMAGE_PREERASE={int(a.whole_image_preerase)}',
+              f'-DRAW_MAGIC_FORMAT={int(a.magic_format)}',
+              f'-DRAW_EXPOSURE_COARSE={a.exposure_coarse}U',
               f'-DRAW_LINE_STREAM={int(a.line_stream)}',f'-DRAW_PREINIT={int(a.preinit)}',
               f'-DRAW_LINE_SNAPSHOTS={int(a.snapshot)}',f'-DRAW_LINE_POISON={int(a.poison)}',
-              f'-DRAW_CHUNK_SECTORS={3730 if a.whole_image_preerase else a.chunk_sectors}U','-DSTAGE1_SENSOR_TRIM=1',
+              f'-DRAW_CHUNK_SECTORS={3730 if a.whole_image_preerase or a.magic_format else a.chunk_sectors}U','-DSTAGE1_SENSOR_TRIM=1',
               '-DLOW_POWER_MODE=3','-DLOW_POWER_ENTRY_DELAY_US=0']
     compiler=compile_with_late if a.flash else compile_sources
     code,size=compiler(out,compiled,flags,out/'capture.ld','capture',libc=True)
@@ -293,15 +313,22 @@ def main():
         proof=0x343FD100,proof_words=96,read_buffer=0x34200000,read_buffer_bytes=262144,
         abort_address=0x343FD300,abort_words=16,
         chunk_trace=0x343FE000,chunk_trace_capacity=128,chunk_trace_words=8,
-        frame=0x34000000,frame_bytes=1909600,width=1120,height=1364,
-        guard=0x34000000+(1909760 if a.whole_image_preerase else 1909600),guard_bytes=32,
-        allocation_bytes=1909760 if a.whole_image_preerase else 1909600,
-        original_guard=0x34000000+1909600,whole_image_preerase=a.whole_image_preerase,
+        frame=0x34000010 if a.magic_format else 0x34000000,frame_bytes=1909600,width=1120,height=1364,
+        guard=(0x3400000C if a.magic_format else 0x34000000)+(1909760 if a.whole_image_preerase or a.magic_format else 1909600),guard_bytes=32,
+        allocation_bytes=1909760 if a.whole_image_preerase or a.magic_format else 1909600,
+        original_guard=(0x34000010 if a.magic_format else 0x34000000)+1909600,whole_image_preerase=a.whole_image_preerase,
+        magic_format=a.magic_format,slot_buffer=0x3400000C if a.magic_format else None,
+        magic_slots=symbol('raw_magic_slots',a.magic_format),magic_slots_bytes=576,
+        magic_proof=symbol('raw_magic_proof',a.magic_format),magic_proof_words=8,
+        sd_scr=symbol('raw_scr',a.magic_format),sd_scr_bytes=16,
+        sd_erase=symbol('raw_erase',a.magic_format and not a.flash),sd_erase_bytes=32,
+        sd_stream=symbol('raw_stream',a.magic_format),sd_stream_bytes=44,
+        exposure_coarse=a.exposure_coarse,
         whole_proof=symbol('raw_whole_proof',a.whole_image_preerase),whole_proof_words=8,
         bss_start=symbol('_sbss'),bss_end=symbol('_ebss'),data_start=symbol('_sdata'),
         data_end=symbol('_edata'),immutable_bytes=symbol('_sdata')-0x34300000,
         system_core_clock=symbol('SystemCoreClock'),card=symbol('raw_card'),slots=symbol('raw_slots'),
-        pattern=int(a.pattern=='diagonal'),transport=a.transport,chunk_sectors=3730 if a.whole_image_preerase else a.chunk_sectors,
+        pattern=int(a.pattern=='diagonal'),transport=a.transport,chunk_sectors=3730 if a.whole_image_preerase or a.magic_format else a.chunk_sectors,
         flash=a.flash,standby=a.standby,async_stop=a.async_stop,line_stream=a.line_stream,
         dma_sleep=a.dma_sleep,dma_wait=symbol('raw_dma_wait',a.dma_sleep),dma_wait_bytes=24,
         dma_wait_clock=(symbol('HAL_GetTick')|1) if a.dma_sleep else None,
@@ -310,14 +337,14 @@ def main():
         producer=symbol('raw_producer',False),producer_bytes=416,
         snapshot_address=0x343D0000,snapshot_capacity=20,snapshot_bytes=512,
         expected_flags=int(a.async_stop)|(int(a.line_stream)<<1)|(int(a.preinit)<<2)|
-            (int(a.snapshot)<<3)|(int(a.poison)<<4)|(int(a.dma_sleep)<<5)|(int(a.whole_image_preerase)<<6),
+            (int(a.snapshot)<<3)|(int(a.poison)<<4)|(int(a.dma_sleep)<<5)|(int(a.whole_image_preerase)<<6)|(int(a.magic_format)<<7),
         phase_markers=PHASE_PROTOCOL,
         binary_bytes=len(code),binary_sha256=sha(code),
         base_receiver_sha256=BASE_RECEIVER,base_prefix_sha256=pm['stage1_raw_sha256'],
         flags=flags,size=size,capture_available_boundary=('experimental 64-line holdback, complete FRAME for tail'
             if a.line_stream else 'hardware-tested complete-frame boundary'),
         storage_overlap='SD init overlaps camera capture and guarded STOP',hardware_status='untested',
-        source_hashes={f.name:sha(f.read_bytes()) for f in out.iterdir() if f.suffix.lower() in ('.c','.h','.s','.ld')})
+        source_hashes={f.name:sha(f.read_bytes()) for f in out.iterdir() if f.suffix.lower() in ('.c','.h','.s','.ld','.inc')})
     if late_meta:
         manifest['late_load']=late_meta
         manifest['immutable_ranges']=late_meta['immutable_ranges']

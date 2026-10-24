@@ -26,6 +26,7 @@ LOAD, FRAME, REQUEST, PROOF = 0x34300000, 0x34000000, 0x343FD000, 0x343FD100
 READ_BUFFER, READ_MAX, FRAME_BYTES = 0x34200000, 262144, 1909600
 MAGIC, DONE = 0x52535731, 0x5253444E
 OPS = {'capture': 1, 'format': 2, 'read': 3}
+MAGIC_FRAME, MAGIC_BUFFER, SLOT_BYTES = 0x34000010, 0x3400000C, 1909760
 DMA_WAIT_FAULTS = ('missing_clock', 'exception', 'primask', 'basepri', 'faultmask',
     'deep_sleep', 'sleep_on_exit', 'systick_control', 'systick_load',
     'ram_sleep_clocks', 'rif_sleep_clocks', 'sd_sleep_clock', 'bus_sleep_clocks',
@@ -70,15 +71,23 @@ def fields(folder):
     return [n.lower() for n in names] + ['reserved_'+str(n) for n in range(len(names), 96)]
 
 
+def frame_layout(m):
+    """Exact opt-in geometry; old manifests retain their original addresses."""
+    if m.get('magic_format'):
+        return dict(frame=MAGIC_FRAME,frame_bytes=FRAME_BYTES,
+                    guard=MAGIC_BUFFER+SLOT_BYTES,guard_bytes=32,allocation_bytes=SLOT_BYTES)
+    return dict(frame=FRAME,frame_bytes=FRAME_BYTES,
+                guard=FRAME+(SLOT_BYTES if m.get('whole_image_preerase') else FRAME_BYTES),
+                guard_bytes=32,allocation_bytes=SLOT_BYTES if m.get('whole_image_preerase') else FRAME_BYTES)
+
+
 def checked_build(folder, digest):
     m = json.loads((folder/'manifest.json').read_text())
     code = (folder/'capture.bin').read_bytes()
     exact = dict(schema=1, kind='raw-slots', load=LOAD, stack=0x343B0000,
         stack_floor=0x343AF000, request=REQUEST, request_words=16, proof=PROOF,
         proof_words=96, read_buffer=READ_BUFFER, read_buffer_bytes=READ_MAX,
-        frame=FRAME, frame_bytes=FRAME_BYTES, width=1120, height=1364,
-        guard=FRAME+(1909760 if m.get('whole_image_preerase') else FRAME_BYTES), guard_bytes=32,
-        allocation_bytes=1909760 if m.get('whole_image_preerase') else FRAME_BYTES,
+        **frame_layout(m), width=1120, height=1364,
         flash=False, standby=False)
     if any(m.get(k) != v for k,v in exact.items()):
         raise ValueError('Only reviewed RAM/awake layout is accepted')
@@ -109,9 +118,9 @@ def checked_build(folder, digest):
             raise ValueError('Frozen source changed: '+name)
     if m['pattern'] not in (0, 1) or m['transport'] not in ('pio','idma'):
         raise ValueError('Unsupported pattern/transport')
-    if not (m['chunk_sectors']==3730 if m.get('whole_image_preerase') else 1 <= m['chunk_sectors'] <= 1024):
+    if not (m['chunk_sectors']==3730 if m.get('whole_image_preerase') or m.get('magic_format') else 1 <= m['chunk_sectors'] <= 1024):
         raise ValueError('Chunk bound')
-    flag_names = ('async_stop','line_stream','preinit','line_snapshots','line_poison','dma_sleep','whole_image_preerase')
+    flag_names = ('async_stop','line_stream','preinit','line_snapshots','line_poison','dma_sleep','whole_image_preerase','magic_format')
     expected_flags = sum(int(bool(m.get(k,False))) << i for i,k in enumerate(flag_names))
     if m.get('expected_flags',0) != expected_flags:
         raise ValueError('Build feature flags differ')
@@ -123,6 +132,7 @@ def checked_build(folder, digest):
             (0x343D0000,20,512)):
         raise ValueError('Snapshot layout differs')
     whole_layout(m)
+    magic_layout(m)
     return m, code
 
 
@@ -134,10 +144,67 @@ def whole_layout(m):
         raise ValueError('Whole-image preerase layout/features differ')
 
 
+def magic_layout(m):
+    if not m.get('magic_format'): return
+    if (m['magic_format'] is not True or m.get('whole_image_preerase') or
+            m.get('transport')!='idma' or m.get('dma_sleep') or m.get('chunk_sectors')!=3730 or
+            m.get('slot_buffer')!=MAGIC_BUFFER or m.get('original_guard')!=MAGIC_FRAME+FRAME_BYTES or
+            any(m.get(k)!=v for k,v in frame_layout(m).items()) or
+            m.get('magic_proof_words')!=8):
+        raise ValueError('Magic-slot geometry/features differ')
+    spans=[('card',m['card'],200),('slots',m['slots'],640)]
+    for key,size in [('magic_slots',576),('magic_proof',32),('sd_scr',16),('sd_erase',32),('sd_stream',44)]:
+        if key!='magic_proof' and m.get(key+'_bytes')!=size:
+            raise ValueError('Magic object ABI differs: '+key)
+        address=m.get(key,0)
+        # FLASH has no request dispatcher and cannot enter destructive FORMAT;
+        # LTO may remove its unused erase object. RAM must retain that object.
+        if key=='sd_erase' and m.get('flash') is True and address is None:
+            continue
+        if type(address) is not int or address%4 or not m['bss_start']<=address<=m['bss_end']-size:
+            raise ValueError('Magic object outside BSS: '+key)
+        spans.append((key,address,size))
+    if m['magic_slots']%32: raise ValueError('Magic slots object alignment differs')
+    for i,(name,start,size) in enumerate(spans):
+        for other,begin,length in spans[i+1:]:
+            if start<begin+length and begin<start+size:
+                raise ValueError('Magic object overlap: '+name+'/'+other)
+
+
+def capture_geometry(p,m):
+    if m.get('magic_format'):
+        if (p['payload_lba']!=p['slot']*3730 or p['card_write_hi'] or p['card_write_lo']!=3730 or
+                p['generation_lo'] or p['generation_hi'] or p['slot_count']>2**32//3730 or
+                p['scan_headers']!=p['slot']+1 or p['chunk_count']!=1 or p['chunk_overflow']):
+            raise ValueError('Magic-slot completion geometry differs')
+    else:
+        if p['payload_lba']!=9+p['slot']*3731 or p['card_write_hi'] or p['card_write_lo']!=3732:
+            raise ValueError('Unexpected image sector writes')
+        if (not(p['generation_lo'] or p['generation_hi']) or p['slot_count']>(2**32-8)//3731 or
+                p['scan_headers']!=p['slot']+1):
+            raise ValueError('Slot geometry/generation mismatch')
+
+
 def frame_guards(b,m,p):
     expected=struct.pack('<8I',*(0xA15A1000+i for i in range(8)))
     if b.upload(m['guard'],32,'frame-guard.bin')!=expected:
         raise ValueError('Frame/post-padding guard damaged')
+    if m.get('magic_format'):
+        magic_layout(m)
+        if p['chunk_count']!=1 or p['chunk_overflow']:
+            raise ValueError('Magic slot must use exactly one payload call')
+        raw=b.upload(m['magic_proof'],32,'magic-proof.bin')
+        if raw!=struct.pack('<8I',0x524D4731,3,0,0,0x53525847,0x45525847,152,3730):
+            raise ValueError('Magic original guard/commit proof differs')
+        if (b.upload(MAGIC_BUFFER,4,'leading-magic.bin')!=b'GXRS' or
+                b.upload(MAGIC_FRAME+FRAME_BYTES,4,'trailing-magic.bin')!=b'GXRE' or
+                b.upload(MAGIC_FRAME+FRAME_BYTES+4,152,'frame-padding.bin')!=bytes(152)):
+            raise ValueError('Magic markers/padding differ')
+        row=struct.unpack('<8I',b.upload(m['chunk_trace'],32,'magic-chunk.bin'))
+        if row[2:5]!=(0,3730,FRAME_BYTES) or row[5]&0x1F00!=0x900 or row[6]:
+            raise ValueError('Magic single-transaction trace differs')
+        return dict(format='magic',proof=list(struct.unpack('<8I',raw)),chunk=list(row),padding_zero=True,
+                    original_guard_checked_before_trailer=True,post_padding_guard_intact=True)
     if not m.get('whole_image_preerase'): return None
     whole_layout(m)
     if p['chunk_count']!=1 or p['chunk_overflow']:
@@ -161,15 +228,18 @@ def decode(raw, names):
     return dict(zip(names, struct.unpack('<96I',raw)))
 
 
-def request(operation, nonce, arg0=0, arg1=0, arg2=0):
+def request(operation, nonce, arg0=0, arg1=0, arg2=0, *, magic_format=False):
     if operation not in OPS.values() or not 0 < nonce < 2**32:
         raise ValueError('Unknown operation/nonzero nonce required')
     if any(type(n) is not int or not 0 <= n < 2**32 for n in (arg0,arg1,arg2)):
         raise ValueError('Request argument outside uint32')
     if operation == 1 and (arg0 or arg1 or arg2):
         raise ValueError('Capture has no request arguments')
-    if operation == 2 and not (arg0 or arg1):
-        raise ValueError('Format requires a nonzero new generation')
+    if operation == 2:
+        if magic_format and (arg0 or arg1 or arg2):
+            raise ValueError('Magic erase has no generation or slot-limit arguments')
+        if not magic_format and not (arg0 or arg1):
+            raise ValueError('Format requires a nonzero new generation')
     if operation == 3 and (not 1 <= arg1 <= READ_MAX//512 or arg2 or arg0+arg1 > 2**32):
         raise ValueError('Read bounds')
     return struct.pack('<16I', 0x52535131, nonce, operation, arg0,arg1,arg2,*([0]*10))
@@ -179,10 +249,10 @@ def validate(p, m, words):
     if (not isinstance(words,(list,tuple)) or len(words)!=16 or
             any(type(n) is not int or not 0<=n<2**32 for n in words) or
             words[0]!=0x52535131 or any(words[6:]) or
-            request(words[2],words[1],*words[3:6])!=struct.pack('<16I',*words)):
+            request(words[2],words[1],*words[3:6],magic_format=bool(m.get('magic_format')))!=struct.pack('<16I',*words)):
         raise ValueError('Stored request is malformed')
     exact = dict(magic=MAGIC, schema=1, words=96, nonce=words[1],operation=words[2],
-        state=3, result=0, stage=8, terminal=DONE, frame=FRAME, bytes=FRAME_BYTES,
+        state=3, result=0, stage=8, terminal=DONE, frame=MAGIC_FRAME if m.get('magic_format') else FRAME, bytes=FRAME_BYTES,
         width=1120,height=1364,card=m['card'],card_size=200,slots=m['slots'],slots_size=640,
         sd_error=0,media_idle=1,initialized=0,controller_owned=0,cleanup_error=0,
         control=0,ipsr=0,primask=1,cpacr=0,pattern=m['pattern'],
@@ -200,15 +270,17 @@ def validate(p, m, words):
             written_sectors=3730,capture_error=0)
         if any(p.get(k) != v for k,v in capture.items()) or not p['slot_count'] > p['slot']:
             raise ValueError('Capture/slot completion mismatch')
-        if p['payload_lba'] != 9+p['slot']*3731 or p['card_write_hi'] or p['card_write_lo'] != 3732:
-            raise ValueError('Unexpected image sector writes')
-        if (not(p['generation_lo'] or p['generation_hi']) or p['slot_count']>(2**32-8)//3731 or
-                p['scan_headers']!=p['slot']+1):
-            raise ValueError('Slot geometry/generation mismatch')
+        capture_geometry(p,m)
         if p['p0fctcr'] & 8 or p['cmsr1'] & 0x8000 or p['csi_sr0'] & 0x20000:
             raise ValueError('Capture pipe still active')
     elif words[2] == 2:
-        if (not p['slot_count'] or p['formatted_slots'] != p['slot_count'] or
+        if m.get('magic_format'):
+            if (not p['slot_count'] or p['slot_count']>2**32//3730 or p['formatted_slots']!=p['slot_count'] or
+                    p['generation_lo'] or p['generation_hi'] or p['card_write_hi'] or p['card_write_lo'] or
+                    p['slot']!=0xFFFFFFFF or p['written_sectors'] or p['scan_headers'] or
+                    p['camera_ready'] or p['card_read_lo'] or p['card_read_hi']):
+                raise ValueError('Incomplete magic whole-card erase')
+        elif (not p['slot_count'] or p['formatted_slots'] != p['slot_count'] or
                 p['generation_lo'] != words[3] or p['generation_hi'] != words[4] or
                 p['card_write_hi'] or p['card_write_lo'] != p['slot_count']+2 or
                 (words[5] and p['slot_count'] != words[5])):
@@ -221,13 +293,86 @@ def validate(p, m, words):
             raise ValueError('READ scope/count mismatch')
 
 
+def magic_snapshot(b,m,p,label,card):
+    """Read the new owning object, not a fabricated legacy on-card header."""
+    magic_layout(m)
+    if p['operation']==3:
+        return dict(read_only=True,slot_objects_not_opened=True)
+    scr_raw=b.upload(m['sd_scr'],16,label+'-scr.bin')
+    if len(scr_raw)!=16: raise ValueError('Incomplete SCR object')
+    valid,erased=struct.unpack_from('<2I',scr_raw,8)
+    if valid!=1 or scr_raw[0]>>4 or erased!=(255 if scr_raw[1]&0x80 else 0):
+        raise ValueError('SCR erased-byte proof differs')
+    raw=b.upload(m['magic_slots'],576,label+'-magic-slots.bin')
+    if len(raw)!=576: raise ValueError('Incomplete magic-slot object')
+    names='card slot_count selected_slot slot_lba erased_byte opened selected_valid active error scan_headers read_sectors written_sectors write_sectors'.split()
+    slots=dict(zip(names,struct.unpack_from('<13I',raw)))
+    expected=dict(card=m['card'],slot_count=p['slot_count'],selected_slot=p['slot'],slot_lba=p['payload_lba'],
+        erased_byte=erased,opened=1,selected_valid=0,active=0,error=0,scan_headers=p['scan_headers'],
+        read_sectors=p['scan_headers'],written_sectors=p['written_sectors'],write_sectors=p['written_sectors'])
+    if any(slots[k]!=v for k,v in expected.items()):
+        raise ValueError('Magic-slot ownership/count snapshot differs')
+    if p['operation']==1 and raw[64:68]!=bytes([erased])*4:
+        raise ValueError('Retained selected free-word observation differs')
+    mirror=b.upload(m['slots'],640,label+'-slots-mirror.bin')
+    if len(mirror)!=640: raise ValueError('Incomplete legacy reporting mirror')
+    u=struct.unpack_from('<16I',mirror)
+    if (list(u[:4])!=[m['card'],0,0,0] or
+            list(u[4:14])!=[p['slot_count'],p['slot'],p['payload_lba'],p['written_sectors'],
+                1,0,0,0,p['scan_headers'],p['formatted_slots']] or any(mirror[64:])):
+        raise ValueError('Magic reporting mirror disagrees with owning object')
+    result=dict(slots=slots,scr_wire_bytes=list(scr_raw[:8]),erased_byte=erased,
+                legacy_mirror_only=True,on_media_metadata=False)
+    if p['operation']==1:
+        sensor_raw=b.upload(0x343F4000,128,label+'-sensor-status.bin')
+        if len(sensor_raw)!=128: raise ValueError('Incomplete sensor exposure status')
+        sensor_words=struct.unpack('<32I',sensor_raw)
+        coarse=m.get('exposure_coarse',1428)
+        sensor=dict(applied_coarse=sensor_words[20],exposure_us=sensor_words[21],
+            frame_length=sensor_words[18],margin=sensor_words[19],
+            nondefault_frame_bound_checked=coarse!=1428)
+        if (not 1<=coarse<=63000 or sensor['applied_coarse']!=coarse or not sensor['exposure_us'] or
+                (coarse!=1428 and (sensor['frame_length']<sensor['margin']+7 or
+                    coarse>sensor['frame_length']-sensor['margin']-7)) or
+                (coarse==30000 and sensor['exposure_us']!=230597)):
+            raise ValueError('Applied sensor exposure differs from capture manifest/bounds')
+        result['sensor']=sensor
+        raw=b.upload(m['sd_stream'],44,label+'-stream.bin')
+        if len(raw)!=44: raise ValueError('Incomplete SD stream object')
+        names='publish context mode initial_available_bytes published_bytes queued_bytes publication_calls starved_polls producer_error producer_wait_cycles max_wait_cycles'.split()
+        stream=dict(zip(names,struct.unpack('<11I',raw)))
+        code_spans=m.get('immutable_ranges',[[LOAD,LOAD+m['immutable_bytes']]])
+        if (not stream['publish']&1 or not any(start<=stream['publish']-1<end for start,end in code_spans) or
+                stream['context'] or stream['mode'] not in (1,2) or
+                not 512<=stream['initial_available_bytes']<=SLOT_BYTES or
+                stream['published_bytes']!=SLOT_BYTES or stream['queued_bytes']!=SLOT_BYTES or
+                not stream['publication_calls'] or stream['producer_error'] or
+                stream['max_wait_cycles']>stream['producer_wait_cycles'] or
+                (stream['mode']==1)!=(stream['initial_available_bytes']==SLOT_BYTES)):
+            raise ValueError('SD producer stream completion differs')
+        result['stream']=stream
+    elif p['operation']==2:
+        raw=b.upload(m['sd_erase'],32,label+'-erase.bin')
+        if len(raw)!=32: raise ValueError('Incomplete whole-card erase proof')
+        names='started completed first_lba last_lba timeout_ms elapsed_ms last_r1 command_count'.split()
+        erase=dict(zip(names,struct.unpack('<8I',raw)))
+        if (erase['started']!=1 or erase['completed']!=1 or erase['first_lba'] or
+                erase['last_lba']!=card['sector_count']-1 or erase['timeout_ms']!=600000 or
+                erase['elapsed_ms']>erase['timeout_ms'] or erase['last_r1']&0x1F00!=0x900 or
+                erase['command_count']<4):
+            raise ValueError('Explicit whole-card erase completion differs')
+        result['erase']=erase
+    return result
+
+
 def terminal_gate(b, folder, m, code, prior, label):
     names = fields(folder)
     p = decode(b.upload(PROOF,384,label+'-proof.bin'),names)
     if p != prior['proof'] or prior['binary_sha256'] != sha(code):
         raise ValueError('Live proof differs from prior operation')
     validate(p,m,prior['request_words'])
-    card_snapshot(b,m,p,label)
+    card=card_snapshot(b,m,p,label)
+    if m.get('magic_format'): magic_snapshot(b,m,p,label,card)
     if b.upload(LOAD,m['immutable_bytes'],label+'-code.bin') != code[:m['immutable_bytes']]:
         raise ValueError('Live executable changed')
     return sd.context_proof(b,{m['park']},label+'-context')
@@ -248,8 +393,11 @@ def card_snapshot(b,m,p,label):
             c['written_sectors']!=(p['card_write_hi']<<32|p['card_write_lo']) or
             c['read_sectors']!=(p['card_read_hi']<<32|p['card_read_lo'])):
         raise ValueError('Live card ownership/idle snapshot differs')
-    if p['slot_count'] and 8+p['slot_count']*3731>c['sector_count']:
+    extent=p['slot_count']*3730 if m.get('magic_format') else 8+p['slot_count']*3731
+    if p['slot_count'] and extent>c['sector_count']:
         raise ValueError('Slot volume exceeds card capacity')
+    if m.get('magic_format') and p['slot_count'] and p['slot_count']!=c['sector_count']//3730:
+        raise ValueError('Magic slot count does not cover full card geometry')
     return c
 
 
@@ -257,11 +405,16 @@ def run(a):
     folder=a.build.resolve(); m,code=checked_build(folder,a.expected_sha)
     names=fields(folder); op=OPS[a.operation]; nonce=secrets.randbelow(0xffffffff)+1
     if op==2:
-        generation=a.generation or secrets.randbits(64) or 1
-        args=(generation&0xffffffff,generation>>32,a.slot_limit)
+        if m.get('magic_format'):
+            if a.generation is not None or a.slot_limit:
+                raise ValueError('Magic whole-card erase refuses generation/slot-limit options')
+            args=(0,0,0)
+        else:
+            generation=a.generation or secrets.randbits(64) or 1
+            args=(generation&0xffffffff,generation>>32,a.slot_limit)
     elif op==3: args=(a.lba,a.count,0)
     else: args=(0,0,0)
-    req=request(op,nonce,*args); words=list(struct.unpack('<16I',req))
+    req=request(op,nonce,*args,magic_format=bool(m.get('magic_format'))); words=list(struct.unpack('<16I',req))
     a.out.mkdir(parents=True,exist_ok=False)
     dump(a.out/'plan.json',dict(execute=a.execute,operation=a.operation,request_words=words,
         binary_sha256=sha(code),build=str(folder),prior=str(a.prior) if a.prior else None,
@@ -310,6 +463,7 @@ def run(a):
     dump(a.out/'proof.json',p)
     validate(p,m,words)
     card=card_snapshot(b,m,p,'completed')
+    magic=magic_snapshot(b,m,p,'completed',card) if m.get('magic_format') else None
     # Live execution state is checked only after exact completed/idle proof.
     context=sd.context_proof(b,{m['park']},'completed')
     if b.upload(LOAD,m['immutable_bytes'],'completed-code.bin') != code[:m['immutable_bytes']]:
@@ -317,6 +471,7 @@ def run(a):
     clock,=struct.unpack('<I',b.upload(m['system_core_clock'],4,'system-clock.bin'))
     if clock!=400000000: raise ValueError('Clock differs from qualified profile')
     result=dict(passed=True,binary_sha256=sha(code),request_words=words,proof=p,context=context,card=card)
+    if magic is not None: result['magic_format']=magic
     if op==1:
         result['whole_image']=frame_guards(b,m,p)
         if p['chunk_overflow'] or not 1 <= p['chunk_count'] <= 128:
@@ -330,7 +485,7 @@ def run(a):
             raw,stats=dma_wait_snapshot(b,m)
             (a.out/'dma-wait.bin').write_bytes(raw);result['dma_wait']=stats
         if a.download_frame:
-            frame=b''.join(b.upload(FRAME+off,min(READ_MAX,FRAME_BYTES-off),f'frame-{off:08x}.bin') for off in range(0,FRAME_BYTES,READ_MAX))
+            frame=b''.join(b.upload(m['frame']+off,min(READ_MAX,FRAME_BYTES-off),f'frame-{off:08x}.bin') for off in range(0,FRAME_BYTES,READ_MAX))
             (a.out/'frame.bin').write_bytes(frame); result['frame_sha256']=sha(frame)
     elif op==3:
         raw=b.upload(READ_BUFFER,p['read_bytes'],'sectors.bin')

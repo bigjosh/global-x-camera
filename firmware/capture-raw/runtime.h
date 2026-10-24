@@ -4,6 +4,16 @@
 #include "sd_card.h"
 #include "raw_slots.h"
 #include "producer.h"
+#ifndef RAW_MAGIC_FORMAT
+#define RAW_MAGIC_FORMAT 0
+#endif
+#if RAW_MAGIC_FORMAT
+#include "magic_slots.h"
+#define RAW_FRAME_ADDRESS 0x34000010U
+#define RAW_SLOT_BUFFER_ADDRESS 0x3400000CU
+#else
+#define RAW_FRAME_ADDRESS 0x34000000U
+#endif
 #ifndef RAW_LINE_STREAM
 #define RAW_LINE_STREAM 0
 #endif

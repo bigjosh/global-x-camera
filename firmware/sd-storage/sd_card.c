@@ -369,6 +369,17 @@ static uint32_t dma_wait_context(void)
     return faults;
 }
 
+static int preannounce(sd_card_t *c,uint32_t count)
+{
+    int result=command(c,55,c->rca,RESP_R1,0);
+    if(result) return result;
+    if(!(c->last_r1&(1UL<<5))) return fault(c,SD_ERR_UNSUPPORTED);
+    result=command(c,23,count,RESP_R1,0);
+    if(result) return result;
+    if(!(c->last_r1&(1UL<<5))) return fault(c,SD_ERR_UNSUPPORTED);
+    return SD_OK;
+}
+
 static int transfer_dma_write(sd_card_t *c, uint32_t lba,
                               const uint8_t *buffer, uint32_t count, sd_dma_wait_t *wait,
                               uint32_t preerase)
@@ -389,10 +400,7 @@ static int transfer_dma_write(sd_card_t *c, uint32_t lba,
          * prefix and accepted ACMD. Announce exactly the exclusively owned
          * destination extent, then issue CMD25 next (no intervening CMD13).
          * ACMD23 does not terminate the write: CMD12 is still required. */
-        if ((result=command(c,55,c->rca,RESP_R1,0))) return result;
-        if (!(c->last_r1&(1UL<<5))) return fault(c,SD_ERR_UNSUPPORTED);
-        if ((result=command(c,23,count,RESP_R1,0))) return result;
-        if (!(c->last_r1&(1UL<<5))) return fault(c,SD_ERR_UNSUPPORTED);
+        if ((result=preannounce(c,count))) return result;
     }
     X->DCTRL=0;
     X->ICR=DMA_FLAGS;
@@ -626,8 +634,7 @@ int sd_write_blocks(sd_card_t *c, uint32_t lba, const void *buffer, uint32_t cou
     return block_request(c,lba,(void *)buffer,count,1);
 }
 
-static int dma_request(sd_card_t *c, uint32_t lba, const void *buffer,
-                        uint32_t count, sd_dma_wait_t *wait, uint32_t preerase)
+static int dma_source_checks(sd_card_t *c,uint32_t lba,const void *buffer,uint32_t count)
 {
     if (!c || !buffer || !count) return SD_ERR_ARGUMENT;
     if (!c->initialized || !c->controller_owned) return SD_ERR_STATE;
@@ -654,6 +661,14 @@ static int dma_request(sd_card_t *c, uint32_t lba, const void *buffer,
      * returns zeros for protected SRAM reads, without an SD/IDMA bus error.
      * Checking RIMC alone therefore cannot qualify the transfer source. */
     if (!(RIFSC_S->RISC_SECCFGRx[1]&(1UL<<22))) return fault(c,SD_ERR_SECURITY);
+    return SD_OK;
+}
+
+static int dma_request(sd_card_t *c, uint32_t lba, const void *buffer,
+                        uint32_t count, sd_dma_wait_t *wait, uint32_t preerase)
+{
+    int checked=dma_source_checks(c,lba,buffer,count);
+    if(checked) return checked;
     if (wait) {
         uint32_t context_faults=dma_wait_context();
         if (!wait->milliseconds) context_faults|=SD_WAIT_NO_CLOCK;
@@ -702,6 +717,229 @@ int sd_write_blocks_dma_wait(sd_card_t *c, uint32_t lba, const void *buffer,
 {
     if (!wait) return SD_ERR_ARGUMENT;
     return dma_request(c,lba,buffer,count,wait,0);
+}
+
+int sd_read_scr(sd_card_t *c,sd_scr_t *scr)
+{
+    if(!c || !scr) return SD_ERR_ARGUMENT;
+    scr->valid=0;scr->erased_byte=0;
+    for(unsigned n=0;n<8;n++) scr->bytes[n]=0;
+    if(!c->initialized || !c->controller_owned) return SD_ERR_STATE;
+    if(c->error) return (int)c->error;
+    c->stage=SD_STAGE_SCR;
+    int result=ready(c);
+    if(result) return result;
+    if(X->IDMACTRL) return fault(c,SD_ERR_CONTROLLER_BUSY);
+    c->media_idle=0;
+    result=command(c,55,c->rca,RESP_R1,0);
+    if(result) return result;
+    if(!(c->last_r1&(1UL<<5))) return fault(c,SD_ERR_UNSUPPORTED);
+    uint32_t start=DWT->CYCCNT,words=0,sta=0;
+    X->DCTRL=0;X->ICR=DATA_FLAGS;X->DTIMER=c->clock_hz*2U;
+    X->DLEN=8U;
+    /* SCR always has an8-byte data block, independent of CMD16. Keeping the
+     * normal512-byte card block length avoids changing subsequent SDSC I/O. */
+    X->DCTRL=(3U<<SDMMC_DCTRL_DBLOCKSIZE_Pos)|SDMMC_DCTRL_DTDIR;
+    result=command(c,51,0,RESP_R1,1);
+    if(!result && !(c->last_r1&(1UL<<5))) result=fault(c,SD_ERR_UNSUPPORTED);
+    if(!result) for(uint32_t i=0;i<POLL_LIMIT;i++) {
+        sta=X->STA;c->last_sta=sta;
+        if(sta&DATA_ERRORS) {result=fault(c,SD_ERR_DATA);break;}
+        /* At most two owned words may remain in FIFO after DATAEND. Unlike
+         * a speculative inactive-bank read, RXFIFOE proves received data. */
+        if(words<2U && !(sta&SDMMC_STA_RXFIFOE)) {
+            store_word(scr->bytes+words*4U,X->FIFO);words++;
+        }
+        if((sta&SDMMC_STA_DATAEND) && !(sta&SDMMC_STA_DPSMACT) && words==2U) break;
+        if((uint32_t)(DWT->CYCCNT-start)>=READ_TIMEOUT_CYCLES) {
+            result=fault(c,SD_ERR_DATA_TIMEOUT);break;
+        }
+        if(i==POLL_LIMIT-1) result=fault(c,SD_ERR_TIMER);
+        if(!(i&255U)) sd_progress();
+    }
+    c->transfer_words=words;c->transfer_sta=sta;c->transfer_cycles=DWT->CYCCNT-start;
+    X->CMD&=~SDMMC_CMD_CMDTRANS;
+    if(!result && (words!=2U || !(sta&SDMMC_STA_DATAEND) || (sta&(DATA_ERRORS|SDMMC_STA_DPSMACT))))
+        result=fault(c,SD_ERR_LENGTH);
+    if(result) {abort_transfer(c,1);return result;}
+    X->DCTRL=0;X->ICR=DATA_FLAGS;
+    result=ready(c);if(result) return result;
+    if(scr->bytes[0]>>4) return fault(c,SD_ERR_UNSUPPORTED);
+    scr->erased_byte=(scr->bytes[1]&0x80U)?255U:0U;scr->valid=1U;
+    return SD_OK;
+}
+
+int sd_erase_all(sd_card_t *c,uint32_t timeout_ms,sd_erase_t *proof)
+{
+    if(!c || !proof || timeout_ms<1000U || timeout_ms>600000U) return SD_ERR_ARGUMENT;
+    volatile uint8_t *clear=(volatile uint8_t *)proof;
+    for(unsigned i=0;i<sizeof(*proof);i++) clear[i]=0;
+    proof->timeout_ms=timeout_ms;
+    if(!c->initialized || !c->controller_owned) return SD_ERR_STATE;
+    if(c->error) return (int)c->error;
+    c->stage=SD_STAGE_ERASE;
+    if(!c->sector_count || c->sector_count>(1ULL<<32) ||
+       (!(c->ocr&(1UL<<30)) && c->sector_count>(1ULL<<23))) return fault(c,SD_ERR_CAPACITY);
+    uint32_t last=(uint32_t)(c->sector_count-1U);
+    proof->last_lba=last;
+    int result=ready(c);if(result) return result;
+    if(X->IDMACTRL) return fault(c,SD_ERR_CONTROLLER_BUSY);
+    const uint32_t previous_hz=c->clock_hz,previous_clkcr=X->CLKCR;
+    const uint32_t previous_timer=X->DTIMER;
+    if((previous_hz!=100000U && previous_hz!=12500000U && previous_hz!=25000000U) ||
+       previous_clkcr!=((HCLK_HZ/(2U*previous_hz))|SDMMC_CLKCR_HWFC_EN))
+        return fault(c,SD_ERR_CLOCK);
+    /* CMD38 returns R1b: its busy detector uses DTIMER even with CMDTRANS=0.
+     * A previous SCR/read timer is only 2 s; timeout leaves DPSM stuck in Busy
+     * awaiting CPSM Abort (RM0486 Table220). At 25 MHz, even UINT32_MAX cannot
+     * represent 600 s. Use the qualified 100 kHz divider while idle and a
+     * hardware bound 1 s beyond the software limit. Never rewrite it busy. */
+    X->CLKCR=750U|SDMMC_CLKCR_HWFC_EN;c->clock_hz=100000U;
+    X->DCTRL=0;X->DLEN=0;X->ICR=DATA_FLAGS;
+    X->DTIMER=(timeout_ms+1000U)*100U;
+    if((result=delay_us(c,1000))) return result;
+    uint32_t commands_before=c->command_count;
+    c->media_idle=0;
+    if((result=command(c,32,0,RESP_R1,0)) ||
+       (result=command(c,33,(c->ocr&(1UL<<30))?last:last*512U,RESP_R1,0))) return result;
+    /* Mark possible ownership before CMD38: even a lost response cannot prove
+     * that the destructive operation did not start. No automatic retry. */
+    proof->started=1U;
+    result=command(c,38,0,RESP_R1,0);
+    proof->command_count=c->command_count-commands_before;
+    if(result) return result;
+    uint32_t previous=DWT->CYCCNT;
+    uint64_t elapsed=0;
+    for(uint32_t i=0;i<600001U;i++) {
+        sd_progress();
+        result=command(c,13,c->rca,RESP_R1,0);
+        uint32_t now=DWT->CYCCNT;elapsed+=(uint32_t)(now-previous);previous=now;
+        proof->elapsed_ms=(uint32_t)(elapsed/400000ULL);
+        proof->command_count=c->command_count-commands_before;
+        proof->last_r1=c->last_r1;c->last_ready_r1=c->last_r1;c->gpioc_idr=C->IDR;
+        if(result) return result;
+        if((c->last_r1&0x1F00U)==0x900U && (c->gpioc_idr&DAT0) &&
+           !(X->STA&(SDMMC_STA_DPSMACT|SDMMC_STA_CPSMACT)) && !X->IDMACTRL) {
+            /* Restore only after both card and host are independently idle.
+             * Uncertain/failed erase leaves the slow clock and ownership in
+             * place; changing DTIMER in active DPSM would be illegal. */
+            X->ICR=DATA_FLAGS;X->DTIMER=previous_timer;
+            X->CLKCR=previous_clkcr;c->clock_hz=previous_hz;
+            __DSB();
+            c->media_idle=1U;proof->completed=1U;return SD_OK;
+        }
+        if(proof->elapsed_ms>=timeout_ms) break;
+        if((result=delay_us(c,1000))) return result;
+    }
+    return fault(c,SD_ERR_NOT_READY);
+}
+
+static int stream_publish(sd_card_t *c,sd_stream_t *s,uint32_t bytes,uint32_t api_start)
+{
+    uint32_t available=0;s->publication_calls++;
+    int result=s->publish(s->context,&available);
+    if(result) {s->producer_error=(uint32_t)result;return fault(c,SD_ERR_PRODUCER);}
+    /* A bounded camera fault check may take seconds. Recheck after it returns,
+     * before accepting its new prefix or reading any more source/FIFO words. */
+    if((uint32_t)(DWT->CYCCNT-api_start)>=1200000000U)
+        return fault(c,SD_ERR_DATA_TIMEOUT);
+    if(available>s->published_bytes && available<=bytes) {
+        __DSB();s->published_bytes=available;
+    } else if(available<s->published_bytes || available>bytes) {
+        s->producer_error=0xFFFFFFFFU;return fault(c,SD_ERR_PRODUCER);
+    }
+    return SD_OK;
+}
+
+int sd_write_blocks_stream_preerase(sd_card_t *c,uint32_t lba,const void *buffer,
+                                    uint32_t count,sd_stream_t *s)
+{
+    if(!s || !s->publish) return SD_ERR_ARGUMENT;
+    s->mode=s->initial_available_bytes=s->published_bytes=s->queued_bytes=0;
+    s->publication_calls=s->starved_polls=s->producer_error=0;
+    s->producer_wait_cycles=s->max_wait_cycles=0;
+    int result=dma_source_checks(c,lba,buffer,count);
+    if(result) return result;
+    if(count<2U || count>SD_DMA_PREERASE_MAX_SECTORS) return fault(c,SD_ERR_ARGUMENT);
+    if(c->clock_hz!=12500000U && c->clock_hz!=25000000U) return fault(c,SD_ERR_CLOCK);
+    const uint32_t flow_mask=SDMMC_CLKCR_HWFC_EN|SDMMC_CLKCR_BUSSPEED|
+        SDMMC_CLKCR_SELCLKRX|SDMMC_CLKCR_DDR|SDMMC_CLKCR_WIDBUS;
+    if((X->CLKCR&flow_mask)!=SDMMC_CLKCR_HWFC_EN) return fault(c,SD_ERR_CLOCK);
+    uint32_t api_start=DWT->CYCCNT,bytes=count*512U;
+    if((result=stream_publish(c,s,bytes,api_start))) return result;
+    s->initial_available_bytes=s->published_bytes;
+    for(uint32_t i=0;s->published_bytes<512U;i++) {
+        sd_progress();s->starved_polls++;
+        if((uint32_t)(DWT->CYCCNT-api_start)>=1200000000U) return fault(c,SD_ERR_DATA_TIMEOUT);
+        if(i==POLL_LIMIT-1U) return fault(c,SD_ERR_TIMER);
+        if((result=stream_publish(c,s,bytes,api_start))) return result;
+    }
+    s->producer_wait_cycles=DWT->CYCCNT-api_start;
+    s->max_wait_cycles=s->producer_wait_cycles;
+    if(s->published_bytes==bytes) {
+        s->mode=SD_STREAM_IDMA;
+        result=sd_write_blocks_dma_preerase(c,lba,buffer,count);
+        if(!result) s->queued_bytes=bytes;
+        return result;
+    }
+    s->mode=SD_STREAM_PIO;
+    result=ready(c);if(result) return result;
+    if(X->IDMACTRL) return fault(c,SD_ERR_CONTROLLER_BUSY);
+    c->media_idle=0;
+    if((result=preannounce(c,count))) return result;
+    uint32_t start=DWT->CYCCNT,words=0,total=count*128U,sta=0;
+    uint32_t waiting=0,wait_start=0;
+    c->transfer_words=0;c->transfer_sta=0;
+    X->DCTRL=0;X->ICR=DATA_FLAGS;X->DTIMER=c->clock_hz*2U;X->DLEN=bytes;
+    X->DCTRL=9U<<SDMMC_DCTRL_DBLOCKSIZE_Pos;
+    result=command(c,25,(c->ocr&(1UL<<30))?lba:lba*512U,RESP_R1,1);
+    if(!result) for(uint32_t i=0;i<POLL_LIMIT;i++) {
+        sta=X->STA;c->last_sta=sta;
+        if(sta&DATA_ERRORS) {result=fault(c,SD_ERR_DATA);break;}
+        if((sta&SDMMC_STA_DATAEND) && !(sta&SDMMC_STA_DPSMACT)) break;
+        if(s->published_bytes<bytes) {
+            sd_progress();
+            if((result=stream_publish(c,s,bytes,api_start))) break;
+            if((uint32_t)(DWT->CYCCNT-api_start)>=1200000000U) {
+                result=fault(c,SD_ERR_DATA_TIMEOUT);break;
+            }
+        }
+        uint32_t available_words=(s->published_bytes/512U)*128U;
+        if(words>=available_words && words<total) {
+            s->starved_polls++;
+            if(!waiting) {waiting=1;wait_start=DWT->CYCCNT;}
+        } else if(waiting) {
+            uint32_t spent=DWT->CYCCNT-wait_start;
+            s->producer_wait_cycles+=spent;
+            if(spent>s->max_wait_cycles) s->max_wait_cycles=spent;
+            waiting=0;
+        }
+        if((sta&SDMMC_STA_TXFIFOHE) && words<available_words) {
+            for(uint32_t n=0;n<256U && words<available_words;n++) {
+                uint32_t fifo_sta=X->STA;
+                if((fifo_sta&(SDMMC_STA_TXFIFOF|DATA_ERRORS)) || !(fifo_sta&SDMMC_STA_DPSMACT)) break;
+                X->FIFO=load_word((const uint8_t *)buffer+words*4U);words++;
+            }
+            s->queued_bytes=words*4U;
+        }
+        if((uint32_t)(DWT->CYCCNT-start)>=WRITE_TIMEOUT_CYCLES) {result=fault(c,SD_ERR_DATA_TIMEOUT);break;}
+        if(i==POLL_LIMIT-1) result=fault(c,SD_ERR_TIMER);
+        if(!(i&255U)) sd_progress();
+    }
+    if(waiting) {
+        uint32_t spent=DWT->CYCCNT-wait_start;s->producer_wait_cycles+=spent;
+        if(spent>s->max_wait_cycles) s->max_wait_cycles=spent;
+    }
+    c->transfer_words=words;c->transfer_sta=sta;c->transfer_cycles=DWT->CYCCNT-start;
+    c->write_cycles+=c->transfer_cycles;
+    X->CMD&=~SDMMC_CMD_CMDTRANS;
+    if(!result && (words!=total || s->published_bytes!=bytes || !(sta&SDMMC_STA_DATAEND) ||
+       (sta&(DATA_ERRORS|SDMMC_STA_DPSMACT)) || X->DCOUNT)) result=fault(c,SD_ERR_LENGTH);
+    if(!result) result=command(c,12,0,RESP_R1,0);
+    if(result) {abort_transfer(c,0);return result;}
+    X->DCTRL=0;X->ICR=DATA_FLAGS;
+    result=ready(c);if(!result) c->written_sectors+=count;
+    return result;
 }
 
 int sd_sync(sd_card_t *c)

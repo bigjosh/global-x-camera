@@ -31,9 +31,7 @@ def checked_build(folder,receiver_sha,sector_sha):
     code=(folder/'capture.bin').read_bytes(); sector=(folder/'staged/capture_sector_0.bin').read_bytes()
     exact=dict(schema=1,kind='raw-slots',load=bench.LOAD,stack=0x343B0000,
         stack_floor=0x343AF000,request=bench.REQUEST,proof=bench.PROOF,proof_words=96,
-        frame=bench.FRAME,frame_bytes=bench.FRAME_BYTES,width=1120,height=1364,
-        guard=bench.FRAME+(1909760 if m.get('whole_image_preerase') else bench.FRAME_BYTES),guard_bytes=32,
-        allocation_bytes=1909760 if m.get('whole_image_preerase') else bench.FRAME_BYTES,
+        **bench.frame_layout(m),width=1120,height=1364,
         flash=True,standby=False,pattern=0,preinit=False,line_snapshots=False,line_poison=False)
     if any(m.get(k)!=v for k,v in exact.items()): raise ValueError('Only reviewed flash/awake scene layout accepted')
     if (sha(code)!=receiver_sha or m['binary_sha256']!=receiver_sha or len(code)!=m['binary_bytes'] or
@@ -78,10 +76,11 @@ def checked_build(folder,receiver_sha,sector_sha):
         off=m[key]-bench.LOAD
         if not 0<=off<len(code)-1 or code[off:off+2]!=b'\xfe\xe7':
             raise ValueError('Missing exact terminal branch')
-    flags=('async_stop','line_stream','preinit','line_snapshots','line_poison','dma_sleep','whole_image_preerase')
+    flags=('async_stop','line_stream','preinit','line_snapshots','line_poison','dma_sleep','whole_image_preerase','magic_format')
     if m['expected_flags']!=sum(int(bool(m.get(k,False)))<<i for i,k in enumerate(flags)):
         raise ValueError('Feature flags differ')
     bench.whole_layout(m)
+    bench.magic_layout(m)
     return m,p,code
 
 
@@ -103,7 +102,7 @@ def fresh_boot(path,receiver_sha,sector_sha,now=None):
 
 def validate_proof(p,m):
     exact=dict(magic=bench.MAGIC,schema=1,words=96,nonce=0,operation=1,state=3,result=0,
-        stage=8,terminal=bench.DONE,frame=bench.FRAME,bytes=bench.FRAME_BYTES,
+        stage=8,terminal=bench.DONE,frame=bench.MAGIC_FRAME if m.get('magic_format') else bench.FRAME,bytes=bench.FRAME_BYTES,
         width=1120,height=1364,card=m['card'],card_size=200,slots=m['slots'],slots_size=640,
         sd_error=0,media_idle=1,initialized=0,controller_owned=0,cleanup_error=0,
         control=0,ipsr=0,primask=1,cpacr=0,pattern=0,completion=0,
@@ -112,12 +111,10 @@ def validate_proof(p,m):
         canary=0,format=10,data_type=0x30,vc0cfgr1=0x201,written_sectors=3730,capture_error=0)
     if any(p.get(k)!=v for k,v in exact.items()): raise ValueError('Flash capture is not successful/complete/idle')
     if (p['ccr']&0x30000 or p['fpccr']&1 or p['systick']&3 or p['last_ready']&0x1F00!=0x900 or
-        not p['slot_count']>p['slot'] or p['payload_lba']!=9+p['slot']*3731 or
-        p['card_write_hi'] or p['card_write_lo']!=3732 or
-        not(p['generation_lo'] or p['generation_hi']) or p['slot_count']>(2**32-8)//3731 or
-        p['scan_headers']!=p['slot']+1 or p['p0fctcr']&8 or p['cmsr1']&0x8000 or p['csi_sr0']&0x20000 or
+        not p['slot_count']>p['slot'] or p['p0fctcr']&8 or p['cmsr1']&0x8000 or p['csi_sr0']&0x20000 or
         p['chunk_overflow'] or not 1<=p['chunk_count']<=128):
         raise ValueError('Flash camera/slot/terminal context differs')
+    bench.capture_geometry(p,m)
     for field in ('begin','arm','frame_done','camera_stop','first_write','commit_done','deinit_done','end'):
         if not p[field]: raise ValueError('Missing completion timestamp: '+field)
 
@@ -195,7 +192,8 @@ def inspect(b,folder,m,code,*,download_frame=False):
     p=bench.decode(b.upload(bench.PROOF,384,'proof-before.bin'),names)
     validate_proof(p,m)
     card=bench.card_snapshot(b,m,p,'before')
-    slots=validate_slots(b.upload(m['slots'],640,'slots-before.bin'),p,m)
+    slots=(bench.magic_snapshot(b,m,p,'before',card) if m.get('magic_format') else
+           validate_slots(b.upload(m['slots'],640,'slots-before.bin'),p,m))
     loader=validate_loader(b.upload(m['late_load']['proof'],64,'late-loader.bin'),m)
     for index,(start,end) in enumerate(m['immutable_ranges']):
         if b.upload(start,end-start,f'code-{index}.bin')!=code[start-bench.LOAD:end-bench.LOAD]:
@@ -222,7 +220,7 @@ def inspect(b,folder,m,code,*,download_frame=False):
         (b.output.parent/'dma-wait.bin').write_bytes(data)
         result['dma_wait']=stats
     if download_frame:
-        frame=b''.join(b.upload(bench.FRAME+off,min(bench.READ_MAX,bench.FRAME_BYTES-off),
+        frame=b''.join(b.upload(m['frame']+off,min(bench.READ_MAX,bench.FRAME_BYTES-off),
             f'frame-{off:08x}.bin') for off in range(0,bench.FRAME_BYTES,bench.READ_MAX))
         (b.output.parent/'frame.bin').write_bytes(frame);result['frame_sha256']=sha(frame)
     if bench.decode(b.upload(bench.PROOF,384,'proof-final.bin'),names)!=p:

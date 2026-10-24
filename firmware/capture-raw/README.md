@@ -6,7 +6,137 @@ the existing UART recovery mechanism. It uses the container in
 [raw-slots](../raw-slots/README.md); there is no FAT filesystem, image conversion,
 compression or full-frame CPU checksum in the normal save path.
 
-The selected prototype is **RAW v16, polling IDMA with whole-image ACMD23
+## Current prototype: v17d magic slots
+
+The selected prototype is **v17d capture → magic RAW slot → Standby**, using
+one announced multiblock write and the existing PE6 UART recovery guard. Its
+installed 64 KiB sector is
+`2ad7168302fe05b928b2b1aa62ef9732dfeab0d61e6092de2c086412d4485880`.
+The flash executable is byte-identical to v17c: v17d corrects the explicit
+erase operation in the RAM maintenance build, which flash capture cannot enter.
+The early load remains 15,804 bytes; the recovery instructions and literals are
+unchanged. See the [magic-slot evidence archive](evidence/2026-10-24-magic-slots/README.md)
+for exact builds, readbacks, measurements, failure evidence and final bench state.
+
+Each fixed **3730-sector** slot starts at `slot_index * 3730`, including LBA 0.
+There is no superblock, generation, allocation table or separately written
+PARTIAL/FULL header. The complete object is:
+
+| Contents | Bytes |
+| --- | ---: |
+| Leading `GXRS` magic | 4 |
+| Unchanged 1120 × 1364 packed RAW10 image | 1,909,600 |
+| Trailing `GXRE` completion magic | 4 |
+| Zero padding | 152 |
+| Total | 1,909,760 |
+
+The card is explicitly erased during commissioning. Allocation scans the first
+sector of each slot and uses a slot only if its first four bytes all equal the
+erased byte reported by SCR `DATA_STAT_AFTER_ERASE`. Any other word is occupied,
+including malformed magic; a read error stops allocation. Normal boot never
+formats, and a full card preserves existing images. The
+[format and extraction utility](../raw-slots/README.md#magic-slot-format-selected-october-24)
+retain support for the older header-based format.
+
+The current capture/save sequence is:
+
+1. Put `GXRS` at `0x3400000C`; arm camera DMA at the 16-byte-aligned
+   `0x34000010`, immediately after it. Seed separate image-boundary and
+   post-slot guards.
+2. Load the remaining storage code after receiver arm, then initialize SD and
+   scan for the first erased slot while acquisition continues.
+3. Wait for a safely published complete sector. The present conservative
+   64-line holdback first publishes **89,600 image bytes**, yielding 175 complete
+   slot sectors (89,600 bytes including the magic). It does not yet start at
+   the first 512 image bytes.
+4. Send `CMD55 → ACMD23(3730) → CMD25(slot LBA)` once. If the entire validated
+   object is already available, use hardware IDMA. Otherwise feed only published
+   sectors with CPU PIO and SDMMC hardware flow control, continuing the same
+   CMD25 as more data becomes available.
+5. Validate FRAME, stop the receiver and sensor, and check both guards. Only
+   then replace the original image-boundary guard with `GXRE` and 152 zero
+   padding bytes, publishing the final sector. Camera errors return to the SD
+   owner for bounded transfer cleanup; callbacks do not park inside CMD25.
+6. Require complete data transfer, CMD12, fresh READY/TRANSFER, DAT0 high and
+   idle host state. Check final guards, deinitialize SD, and enter Standby.
+
+The entire approximately 1.91 MB slot buffer remains in RAM throughout capture
+and saving. It is a linear producer/consumer buffer, not a small circular FIFO;
+transmitted memory is never recycled during acquisition. The separate 256 KiB
+buffer is for maintenance readback. DMA sleep remains disabled. The current
+hardware is still one-bit SDMMC at 3.3 V; four-bit operation is future work.
+
+The first explicit erase exposed an SDMMC R1b busy-timer error: CMD38 inherited
+the preceding SCR read's two-second timer at 25 MHz. The card later reported
+READY and DAT0 high, but the host retained its timeout/busy state. The original
+600-second software timeout remains a failed erase record; it does not mean
+the card required 600 seconds. A bounded host recovery established idle without
+reset or power cycling. V17d sets 100 kHz and a hardware timer longer than the
+requested erase timeout before CMD38, restoring the previous clock/timer only
+after fresh idle proof. The corrected full-card erase completed; twenty sampled
+sectors matched the SCR-reported erased byte. This is not a readback of every
+sector or proof of physical NAND placement. Details are in the
+[SD driver documentation](../sd-storage/README.md#scr-and-explicit-whole-card-erase).
+
+Functional qualification:
+
+| Path | Verified result |
+| --- | --- |
+| Deterministic RAM capture, slot 0 | Complete SD object equals the original camera RAM; PNG decoding matches every sample |
+| Long-exposure RAM capture, slot 1 | Same complete comparison, plus twenty immediate LINE snapshots; progressive PIO began before FRAME |
+| Normal awake flash scene, slot 2 | Complete SD object equals the retained camera RAM; independent PNG decoding passed |
+| Standby flash, slots 3–5 | All three cold cycles passed warm recovery, independent SBF checks, full slot readback and PNG/sample decoding; original camera RAM was lost in Standby |
+
+The long diagnostic used coarse exposure 30,000, frame length 32,000 and a
+nominal 230,597 µs exposure. Recorded 400 MHz DWT timestamps put first write
+submission **9.451 ms before FRAME** and SD readiness **213.447 ms before FRAME**.
+This qualifies the overlap path; it is not the normal cold-cycle timing or
+energy baseline. It did not exhaust the published prefix, so prolonged physical
+FIFO starvation is still covered by the register model rather than this run.
+
+Three fresh cold cycles per build were measured from current onset to stable
+Standby plateau on the JS-fed Nucleo branch:
+
+| Metric | Header-format v16 | Magic-format v17d |
+| --- | ---: | ---: |
+| Median complete cycle | 997.516 ms | 998.118 ms |
+| Cycle range | 796.301–1041.987 ms | 983.274–1016.510 ms |
+| Median measured energy | 549.897 mJ | 536.883 mJ |
+| Energy range | 444.034–582.389 mJ | 528.532–546.401 mJ |
+
+There is **no demonstrated speed gain**: the median increased by 0.602 ms
+(0.060%). Median measured energy decreased by 13.014 mJ (2.367%). The card was
+erased between groups, and scan positions and internal card state differed;
+three samples do not isolate the firmware change or establish a statistical
+advantage. These are board-branch measurements, not production battery energy.
+The earlier v16 result below is a separate historical baseline.
+
+All six comparison cycles passed warm recovery, independent SBF checks and
+complete saved-image readback. Their PNG samples match the retrieved RAW bytes;
+the original camera RAM was lost in Standby, so this is not an original-frame
+comparison. Separate awake captures above provide that comparison. All three
+candidate scenes were also visually inspected and showed the discernible LED
+panel and bench. The strict decoder identifies events 1–9; the final pre-WFI
+pulse remains unidentified, with Standby established independently. Slot 0 was
+reread after the later saves and still matched its original deterministic image.
+
+The final extra normal cold boot returned to the low-current plateau at
+**4.892311 V / 8.075647 mA** at 17:56:22.939300 UTC. Its expected slot 6 and SBF
+were not reread, so it is not another qualified comparison sample. JS110 stopped
+cleanly and restored range 128, leaving target power on; COM8 was closed and
+BREAK released. The v17d image remains installed. The tables below retain the
+earlier firmware measurements as historical evidence.
+
+The two magic words are completion markers, **not a payload checksum or a
+power-loss guarantee**. Logical erase and ACMD23 do not expose or reserve
+physical NAND. The object stores no exposure, timestamp or orientation metadata;
+exposure telemetry is currently retained only in RAM/evidence. Automatic
+reclamation, deletion, allocation hints and on-camera PNG/PTP export remain
+deferred. Host extraction reconstructs RAW or PNG16 with `sample << 6`.
+
+## Historical measurements: v12–v16
+
+The preceding prototype was **RAW v16, polling IDMA with whole-image ACMD23
 preannouncement and asynchronous sensor STOP, followed by Standby**. Its
 programmed 64 KiB sector is
 `285fba4951f88deb12033e7b3c2948c802371862982da5a8e304c6cae35fb58f`.
@@ -83,7 +213,8 @@ sources and the installed STM32 GNU toolchain remain the same pinned dependencie
 used by `capture-sd` and `capture-packed`.
 
 ```powershell
-python firmware/capture-raw/build.py --out tmp/bringup/raw-example --transport idma --pattern diagonal
+python firmware/capture-raw/build.py --out tmp/bringup/raw-example `
+  --magic-format --line-stream --async-stop --pattern diagonal
 ```
 
 The default output is a RAM test image. It must be entered through a verified
@@ -98,7 +229,11 @@ routine for a returning function. Success requires a fresh terminal proof,
 idle/deinitialized card, disabled caches, exact immutable code and the expected
 park address. A failure report alone does not authorize a power cycle.
 
-## Capture and storage sequence
+## Historical v12–v16 capture and storage paths
+
+This section preserves the earlier header-based implementation and experiments.
+The magic-slot sequence above supersedes its addresses, header writes and
+publication rules for the selected prototype.
 
 The camera retains the previously qualified ForceRx/lane sequencing and the
 idle-checked receiver-data disable before sensor STOP. Sensor output datatype
@@ -190,8 +325,12 @@ are magic `0x52535131`, a nonzero request nonce and operation:
 | Operation | Number | Arguments in words 3 onward |
 | --- | ---: | --- |
 | Capture and save | 1 | None |
-| Explicit destructive format | 2 | Generation low, generation high, slot limit; zero limit uses all capacity |
+| Explicit destructive format | 2 | Magic format: words 3 onward must be zero; erase the entire card |
 | Read sectors only | 3 | First LBA, count from 1 to 512 |
+
+The older header format instead requires generation low/high and an optional
+slot limit for FORMAT. Its request rules remain separate; a zero-generation
+request is accepted only for an explicitly identified magic-format build.
 
 READ writes only the dedicated RAM buffer at `0x34200000`, at most 256 KiB,
 and issues no card writes. It can retrieve a retained image in chunks without
@@ -206,11 +345,12 @@ record call start/end, payload-sector offset, count, published producer bytes,
 last READY response, return result and driver transfer cycles. Only the published
 row count is current; unused rows deliberately retain prior contents.
 
-Exposure metadata uses the read-back coarse exposure and line length with the
+Exposure telemetry uses the read-back coarse exposure and line length with the
 fixed sensor's nominal 160.8 MHz pixel clock, rounded only after multiplication.
 This avoids the shipped driver's integer-microsecond line-time truncation.
-Timestamp and orientation remain explicitly unavailable. Metadata validity flags
-distinguish unknown values from the configured unity analog/digital gains.
+Magic slots do not store this telemetry or other image metadata. The legacy
+header format retains its metadata validity flags; timestamp and orientation
+remain explicitly unavailable.
 
 ## Cold-start constraint
 
@@ -229,9 +369,10 @@ before any camera preparation or arm failure can consult it. This fixed-address
 diagnostic area lies outside `.bss` and can retain a previous boot's success
 marker across reset. Clearing it prevents early failure cleanup from trusting
 late code that the current boot has not yet loaded and verified. This review
-fix is **not present in the frozen, measured v12 image**. The selected v15
-contains it and passed the separate cold save/Standby/recovery/readback smoke
-test described above. The early-failure case itself is covered offline.
+fix is **not present in the frozen, measured v12 image**. V15 and later builds,
+including selected v17d, contain it. The separate v15 cold
+save/Standby/recovery/readback smoke test is described above; the early-failure
+case itself is covered offline.
 
 The linker audit requires the vectors and camera interrupt handlers to remain
 in the early range, checks direct crossings into late code, and caps early
@@ -260,7 +401,7 @@ maintenance allowlist is a separate explicit bench preparation step.
 
 ```powershell
 python firmware/capture-raw/build.py --out tmp/bringup/raw-flash-awake `
-  --flash --transport idma --async-stop --line-stream
+  --flash --magic-format --async-stop --line-stream
 ```
 
 Only after awake hardware qualification should `--standby` be added. It retains

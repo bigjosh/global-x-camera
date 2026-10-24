@@ -1,5 +1,109 @@
 # Fixed RAW image slots
 
+## Magic-slot format selected October 24
+
+The new format is implemented separately in `magic_slots.c/.h`, with read-only
+inspection/extraction in `magic_slots.py`. The older version-1 implementation
+and parser remain unchanged below so historical evidence is still readable.
+Selection of this format does not itself establish that firmware was installed
+or the physical card was erased; see the capture firmware's bench checkpoint.
+
+Commissioning explicitly erases the **entire card** through the SD driver's
+erase operation and waits for successful card readiness. Every allocation scan
+uses the erased byte reported by that card's SCR `DATA_STAT_AFTER_ERASE`: value 0
+means byte `0x00`, value 1 means byte `0xff`. The byte is never inferred from a slot
+that happens to look empty. The old `raw_slots_format()` only writes headers and
+does **not** establish this new format's erased-card precondition. Erase is a
+separate operator-authorized operation, never automatic on boot or a mount error.
+There is no on-card generation, superblock, allocation table or stored metadata.
+An interrupted commissioning erase is not a completed format and must be repeated
+successfully before use. Ordinary SD erase is not a secure data-sanitization claim.
+
+Each slot is **3730 consecutive 512-byte logical sectors**, starting at LBA
+`slot_index * 3730`; slot zero begins at **LBA 0**. The final fraction of a slot
+at the end of the card is unused. Each image writes every sector of its slot once.
+
+| Offset within slot | Bytes | Contents |
+| --- | ---: | --- |
+| 0 | 4 | Leading magic: ASCII `GXRS` (`0x53525847` little endian) |
+| 4 | 1,909,600 | Packed MIPI RAW10, 1120 × 1364 samples, 1400 bytes per row |
+| 1,909,604 | 4 | Completion magic: ASCII `GXRE` (`0x45525847` little endian) |
+| 1,909,608 | 152 | Zero padding to the end of sector 3730 |
+
+Allocation reads one complete sector per slot, beginning at slot zero, and
+compares only its first four bytes. Four copies of the SCR-reported erased byte
+mean FREE; **every other word is occupied**, including unknown or damaged magic.
+A read error stops the search and never creates free space. Search returns the
+first FREE slot, or reports full without overwriting occupied images. This is a
+linear scan and grows with the number of occupied slots. No slot reclamation or
+per-photo deletion is implemented. Sequential logical addresses do not establish
+the physical NAND placement or write amplification inside the card.
+
+The leading magic is prepared before capture. The camera writes image samples
+immediately after it. DCMIPP Pipe0 requires a **16-byte-aligned image address**,
+whereas SDMMC IDMA requires a four-byte-aligned source. A no-copy layout uses
+slot buffer `0x3400000C` and camera destination `0x34000010`; simply adding four
+to the old `0x34000000` camera destination would be invalid. The caller owns the
+changed frame bounds and guard checks. It prepares the trailing magic and zero
+padding only after the complete frame passes required capture validation, then
+publishes the final sector to the transport. This permits a one-pass forward write
+with no separate PARTIAL/FULL sector write or later overwrite of the first block.
+The completion marker is not a checksum and cannot detect arbitrary corruption
+within the pixels or guarantee atomicity under unexpected card power loss.
+
+```c
+magic_slots_t slots;
+magic_slots_open(&slots, &card, scr_reported_erased_byte);
+magic_slots_find_free(&slots);
+/* Prepare GXRS before capture. The transport consumes only published bytes,
+   withholding the final sector until capture validation and GXRE preparation. */
+magic_slots_write(&slots, slot_buffer, progressive_writer, writer_context);
+```
+
+Check every return value. `open()` validates capacity and the supplied erased
+byte but does not perform a disk write or certify commissioning. `write()` invokes
+the callback exactly once for the complete selected 3730-sector extent. On return
+it checks transport success, card idle, the exact written-sector count, both RAM
+markers and 152 padding bytes; it does not scan/copy/checksum the image. Successful
+transport must include fresh readiness, and the capture owner's guard/STOP and
+shutdown checks remain required. The callback owns producer pacing and SD command
+sequencing. Repeated old blocking-write calls would create separate transactions;
+they do not constitute one progressively fed CMD25. A failed attempt retains the
+slot as active/failed in RAM and is never retried or marked FREE by this layer.
+
+Host extraction requires the recorded erased byte and known capacity. An ordinary
+image file can supply its own extent; an explicitly identified physical device
+requires `--sectors`. The utility opens only the named source, read-only, and
+refuses to overwrite existing output files. The qualified prototype card reports
+`0x00`; substitute the actual SCR-reported byte for another card:
+
+```powershell
+python firmware/raw-slots/magic_slots.py card.img --erased-byte 0x00 list --all
+python firmware/raw-slots/magic_slots.py card.img --erased-byte 0x00 extract 0 photo.png
+python firmware/raw-slots/magic_slots.py card.img --erased-byte 0x00 extract 0 photo.raw10 --kind raw
+```
+
+Two valid markers classify an object COMPLETE. Valid leading magic without a
+trailing magic is PARTIAL; unknown non-erased leading magic is OCCUPIED. None of
+those states makes space reusable. `--allow-partial` permits recovery of PARTIAL
+or OCCUPIED objects with an explicit corruption warning; FREE objects are never
+extracted. The reader does not synthesize a missing sector or report a short read
+as free space. RAW output strips both markers and padding. PNG output reconstructs
+16-bit grayscale samples as `sample << 6`, with `sBIT=10`; its text comment contains
+derived inspection results, not metadata stored on the card.
+
+Run both format generations' host tests with the command at the end of this file.
+The new C-core tests exercise both erased polarities, damaged first words, full
+and truncated slots, read/write errors, exact sector counts, word-aligned/no-copy
+buffers and idle/marker failure gates. Python independently checks the resulting
+container, every RAW10 sample, PNG chunk CRCs and all exported pixels. These are
+offline tests, not physical erase, streaming or power-loss qualification.
+
+Reference: [ST RM0486 Rev4](https://www.st.com/resource/en/reference_manual/rm0486-stm32n647657xx-armbased-32bit-mcus-stmicroelectronics.pdf),
+DCMIPP base alignment on page 1923 and SDMMC IDMA alignment on page 1451.
+
+## Legacy version-1 format and interface
+
 This storage core saves the hardware-qualified packed RAW10 frame directly to
 consecutive SD logical sectors. It performs no image conversion, compression or
 full-frame checksum pass. Capture timing, producer publication, cache ownership,

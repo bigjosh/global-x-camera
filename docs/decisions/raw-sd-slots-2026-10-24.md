@@ -145,3 +145,235 @@ every saved byte to the captured RAM image. Standby and warm UART recovery passe
 for all six comparison cycles. See the
 [experiment archive](../../firmware/capture-raw/evidence/2026-10-24-preerase/README.md)
 for per-run measurements, full slot readbacks, firmware identities and final state.
+
+## October 24 follow-up: erased-card magic slots and progressive whole-slot writes
+
+**Decision:** The user selected a simpler prototype layout and authorized erasing
+the existing card to establish it. This supersedes the earlier explicit FREE /
+PARTIAL / FULL header and generation choice for the new prototype. The earlier
+implementation and its parser remain available to interpret the recorded v12–v16
+evidence. This entry records the design and implementation under qualification;
+it does not claim that the new format has been installed, the physical card has
+been erased, or a new timing/energy result has passed.
+
+The complete card is explicitly erased once through the SD erase protocol,
+waiting for successful card readiness before use. The expected erased byte comes
+from SCR `DATA_STAT_AFTER_ERASE`: value 0 means `0x00`, value 1 means `0xff`.
+Firmware never guesses that polarity from arbitrary card contents and never
+silently formats on boot or after a read error. The previous format's operation,
+which wrote FREE headers without erasing payloads, is insufficient commissioning
+for this layout. An interrupted erase must be completed successfully before the
+card is admitted to normal capture. With no on-card format-completion record,
+successful commissioning and its card identity must be retained externally.
+
+Each slot begins at **LBA `slot_index * 3730`**, including slot zero at LBA 0.
+There is no superblock, format generation, allocation table or separate header
+sector. Each 1,909,760-byte slot contains exactly:
+
+| Offset | Bytes | Contents |
+| --- | ---: | --- |
+| 0 | 4 | Leading magic `GXRS` |
+| 4 | 1,909,600 | The unchanged 1120 × 1364 packed RAW10 image |
+| 1,909,604 | 4 | Trailing completion magic `GXRE` |
+| 1,909,608 | 152 | Zero padding to 3730 logical sectors |
+
+Allocation reads the first sector of each slot, scanning from slot zero, and
+examines its first four bytes. Only four copies of the reported erased byte mean
+FREE. Valid leading magic means used, and any other non-erased word is also
+reserved/occupied and skipped; malformed magic is never permission to overwrite.
+A read error stops allocation rather than presenting the slot as free. The card
+still transfers a full 512-byte read sector even though only four bytes determine
+occupancy. The first FREE slot is selected; a full card preserves existing photos
+and stops. Unused sectors after the final complete slot are not allocatable.
+
+The leading magic is placed in RAM before acquisition. Camera DMA writes directly
+after it, with no image move or full-frame CPU processing. DCMIPP Pipe0 requires
+a 16-byte-aligned destination, so the planned addresses are image `0x34000010`
+and slot buffer `0x3400000C`, which still satisfies SDMMC's word alignment.
+The original image-boundary guard is checked before its bytes become the trailing
+magic/padding; a separate guard protects the end of the complete slot allocation.
+The last sector is withheld until complete capture validation and successful
+sensor STOP permit writing the trailing magic. This keeps the completion marker
+in the same forward pass, without rewriting the leading block or adding another
+sector transaction.
+
+The transport announces **3730 sectors** with `CMD55(RCA)` / `ACMD23(3730)` and
+opens one CMD25 at the selected slot LBA. It begins as soon as at least one
+complete, safely published sector exists, then sends newly available sectors in
+order within that same transaction. The single command is closed with CMD12;
+successful data completion and fresh card readiness still precede deinitialization
+and shutdown. An incomplete producer uses a progressive PIO path with SDMMC
+hardware flow control so unavailable bytes are never supplied. If the complete
+validated object is already published at launch, the existing hardware IDMA path
+can transfer it directly. These are two implementations of the same on-media
+format and one-command transfer contract, not separate per-chunk CMD25 requests.
+
+The software must **not** assume that SD initialization finishes after FRAME.
+That happened in the recent short-exposure measurements, but longer exposures
+or a different card can reverse the order. Producer availability, immutable
+prefix ownership, final-marker withholding, and bounded failure handling are
+required in both cases. The existing conservative LINE publication rule remains
+an engineering margin to qualify on the actual camera/SD/bus combination; a CPU
+barrier alone cannot drain a separate DMA master's outstanding writes. Failure
+handling must return control to an active SD transaction for bounded cleanup,
+rather than park inside a camera callback while the card still owns a transfer.
+
+The new layout writes **3730 sectors once each**, instead of 3730 payload sectors
+plus two writes of the former PARTIAL/FULL header. It also uses one fewer logical
+sector per slot. These are logical-I/O savings, not a guarantee of reduced NAND
+program operations inside the card. Erase establishes the card's specified
+logical read value; it does not expose physical NAND placement. ACMD23 gives the
+card a preparation hint, not a physical reservation, a fixed mapping to erased
+NAND, or a power-loss-safe commit. No SD FTL atomicity, secure erasure, arbitrary
+power-loss protection or production battery-energy claim follows from this layout.
+
+Two valid markers identify a nominally complete object; they do not checksum its
+pixel bytes. A missing trailing marker identifies a partial object when the
+leading magic survives, while an unknown non-erased leading word remains occupied.
+Readback/extraction can recover image bytes with an explicit warning for partial
+or damaged objects. Corruption that leaves both markers intact can remain
+undetected. Power interruption during a logical-sector update can also defeat
+assumptions about which bytes survive; this prototype does not qualify that case.
+
+The user-selected layout stores **no exposure, timestamp, orientation, capture
+identifier or other image metadata** beyond the two magic words. Slot position
+and fixed geometry are known externally. The host utility can reconstruct RAW10
+or grayscale PNG16 (`sample << 6`), but cannot recover metadata that was never
+stored. Adding metadata, checksums, reclamation/deletion or an allocation hint
+is explicitly deferred rather than silently expanding this prototype object.
+
+The specification and new C/host interfaces are in
+[the magic-slot section](../../firmware/raw-slots/README.md#magic-slot-format-selected-october-24).
+Offline tests exercise allocation, failure handling and extraction while retaining
+the legacy format tests. Physical erase, short- and long-exposure streaming,
+complete image readback, recovery, shutdown and time/energy comparison remain
+qualification work at the time of this decision entry. Later evidence must state
+which of those passed and preserve any failures rather than rewriting this history.
+
+## October 24 implementation follow-up: magic slots qualified through awake capture
+
+**Decision:** Select the implemented v17d magic-slot prototype and retain the
+earlier v12–v16 header-format measurements as historical evidence. The new
+Standby flash image is installed with sector SHA-256
+`2ad7168302fe05b928b2b1aa62ef9732dfeab0d61e6092de2c086412d4485880`.
+It is byte-identical to the v17c flash image because the v17d change affects
+explicit erase, which is linked only into the RAM maintenance build. Early
+loading remains 15,804 bytes, the boot-fresh late-loader guard remains intact,
+and the exact PE1/PE6 recovery instructions and literals are preserved.
+
+The implementation uses the selected layout exactly: slot zero at LBA 0,
+3730 sectors per slot, and `4 + 1,909,600 + 4 + 152` bytes for leading `GXRS`,
+packed image, trailing `GXRE`, and zero padding. No superblock, generation,
+separate header write or image metadata was added. Camera DMA writes at
+`0x34000010`, with its leading magic four bytes earlier, satisfying both the
+camera's 16-byte and SDMMC's word-alignment requirements. The complete buffer
+remains allocated until saving finishes; the 256 KiB maintenance readback buffer
+is separate and is not a circular capture FIFO.
+
+The first usable producer watermark remains **89,600 image bytes**, from the
+conservative 64-line holdback. The first submitted prefix is 175 complete slot
+sectors, including the leading magic. Starting as soon as the first individual
+512-byte image block arrives would need a finer, independently qualified DMA
+visibility mechanism and is not claimed by this implementation. A complete
+object at launch uses IDMA; an incomplete object uses PIO with hardware flow
+control inside the same announced CMD25. FRAME validation, successful sensor
+STOP and both guard checks precede publication of the trailing magic. Returning
+camera failures hand control back to the SD owner for bounded cleanup.
+
+**Discovered erase constraint:** The first explicit whole-card erase inherited
+the SCR read's 50,000,000-cycle SDMMC timer, which expires after two seconds at
+25 MHz. The ensuing software wait timed out after 600 seconds even though the
+card reported READY/TRANSFER and DAT0 was high: SDMMC had retained
+`DPSMACT`, `BUSYD0` and `DTIMEOUT`. This was a host R1b busy-state problem,
+not evidence of a ten-minute card erase. The failed FORMAT record remains
+failed. A separately bounded host recovery proved idle without reset or power
+cycling and did not retroactively qualify that FORMAT.
+
+V17d selects the qualified 100 kHz clock before CMD38 and configures the hardware
+busy timer for the requested software timeout plus one second; even the maximum
+ten-minute request then fits its 32-bit register. It restores the former clock
+and timer only after fresh card and host idle proof. An uncertain operation
+retains ownership and the slow clock. The corrected explicit erase completed
+over LBAs 0–122,507,263. Twenty probes across initial slots and distant card
+locations matched the SCR-reported erased value. Those probes are sampling,
+not verification of every logical block, physical NAND erasure or secure
+sanitization. See the [driver explanation](../../firmware/sd-storage/README.md#scr-and-explicit-whole-card-erase).
+
+**Verified functional paths:** Deterministic slot 0, long-exposure slot 1 and
+normal awake-flash scene slot 2 each passed complete SD-to-original-camera-RAM
+byte comparison and independent PNG/sample decoding. The long diagnostic used
+coarse exposure 30,000, frame length 32,000 and a nominal 230,597 µs integration.
+Its 400 MHz DWT record places first write submission 9.451 ms before FRAME and
+card readiness 213.447 ms before FRAME. Twenty immediate LINE tail snapshots
+also matched the final frame. This verifies before-FRAME writes with the new
+four-byte offset; it is not a normal cold-boot speed or energy result. The run
+did not exhaust its published prefix, so prolonged physical FIFO starvation
+remains a hardware qualification item despite passing modeled starvation tests.
+
+The first cold cycle of the installed Standby image passed warm UART recovery
+and an independent SBF check. At this checkpoint, the new three-cycle comparison,
+per-cycle image qualification and final handoff are still in progress. Do not
+reuse v16's medians as v17d measurements or treat this entry as a completed
+three-run baseline. The [new evidence archive](../../firmware/capture-raw/evidence/2026-10-24-magic-slots/README.md)
+will retain successful paths, the original erase failure and its recovery,
+exact firmware identities, and the later measurement qualification.
+
+**Limits retained:** Both markers can survive pixel corruption, so they are not
+an image checksum. Logical erase and ACMD23 do not reserve physical NAND or
+establish power-loss atomicity. No arbitrary power-loss, isolated-DUT or
+production battery-energy claim is made. The agreed object still contains no
+exposure/time/orientation metadata; those fields, deletion/reclamation,
+allocation hints and on-camera PNG/PTP export remain deferred. Host extraction
+continues to support both formats and the agreed PNG16 `sample << 6` mapping.
+
+## October 24 final qualification: magic slots complete, no measured speed gain
+
+**Decision:** Retain v17d as the current prototype after successful capture,
+storage, Standby and recovery qualification. The new format reduces logical
+writes and removes the separate slot-header updates, but the fresh comparison
+does not demonstrate a shorter complete cycle.
+
+Three cold cycles per build used the same current-onset to stable-Standby
+measurement boundary on the Joulescope-fed Nucleo branch:
+
+| Metric | Header-format v16 | Magic-format v17d |
+| --- | ---: | ---: |
+| Median duration | 997.516 ms | 998.118 ms |
+| Duration range | 796.301–1041.987 ms | 983.274–1016.510 ms |
+| Median energy | 549.897 mJ | 536.883 mJ |
+| Energy range | 444.034–582.389 mJ | 528.532–546.401 mJ |
+
+The median duration increased 0.602 ms (0.060%), while median measured energy
+decreased 13.014 mJ (2.367%). The whole card was erased between groups, so card
+state, scan position and the small sample size confound attributing either
+difference to the container change. This is not a statistical performance
+claim or a measurement of isolated DUT or production battery energy. The
+earlier v16 median of 780.385 ms belongs to a separate historical experiment
+and is not substituted for this comparison's fresh v16 baseline.
+
+All six comparison cycles passed warm UART recovery, independent SBF checks
+and complete saved-object readback. Candidate slots 3–5 passed independent
+PNG/sample decoding and visual inspection, showing the discernible LED panel
+and bench. Original camera RAM was lost in Standby, so their image checks
+compare PNG decoding against retrieved SD bytes rather than the original
+frame. The separately qualified awake captures retain the complete original
+RAM comparison. Deterministic slot 0 was reread after the later captures and
+still matched every original byte. The strict pulse decoder identifies events
+1–9; the final pre-WFI pulse remains unidentified rather than being relabeled
+from position. SBF establishes Standby independently.
+
+The final extra normal cold boot left the target powered at the low-current
+plateau, **4.892311 V / 8.075647 mA**, at 17:56:22.939300 UTC. Its expected
+slot 6 and SBF were not reread, so this handoff is not another qualified sample.
+JS110 stopped cleanly and restored range 128, COM8 was closed and BREAK
+released; v17d remains installed. Final wiring and instrument ownership are
+recorded in the project checkpoint. The [evidence archive](../../firmware/capture-raw/evidence/2026-10-24-magic-slots/README.md)
+contains the comparison, per-cycle qualification, preservation check, original
+erase failure and recovery, and final bench state.
+
+**Limits retained:** Neither the observed image checks nor the two magic words
+qualify arbitrary power loss or detect every possible pixel corruption. The
+long-exposure overlap test remains distinct from normal-cycle benchmarking;
+it demonstrated before-FRAME writes but did not exhaust the published prefix.
+On-media exposure/time/orientation metadata, reclamation/deletion and finer
+than 64-line producer publication remain deferred.

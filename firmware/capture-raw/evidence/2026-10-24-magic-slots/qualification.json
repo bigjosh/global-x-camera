@@ -1,0 +1,362 @@
+{
+  "passed": true,
+  "hardware_access": false,
+  "no_scene_pixels": true,
+  "builds": 7,
+  "terminal_proofs": 121,
+  "installations": [
+    {
+      "build": "flash-magic-awake-v17d",
+      "sector_sha256": "f9c6a8935ed7d4aa90f71463f622bdf9261f5c30ba63a4de724cc7c198e45847",
+      "full_sector_verified": true,
+      "following4096_unchanged": true
+    },
+    {
+      "build": "flash-magic-standby-v17d",
+      "sector_sha256": "2ad7168302fe05b928b2b1aa62ef9732dfeab0d61e6092de2c086412d4485880",
+      "full_sector_verified": true,
+      "following4096_unchanged": true
+    }
+  ],
+  "erase_probes": {
+    "verified": true,
+    "erased_byte": 0,
+    "sampled_sectors": 20,
+    "whole_card_contents_not_verified": true
+  },
+  "offline_tests": 111,
+  "recovery_review": [
+    {
+      "build": "flash-magic-awake-v17d",
+      "preserved": true,
+      "prefix_sha256": "c6991a534d50569562c9d8426cb1d30c3bea20f208878bb81c56356747f41003",
+      "sector_sha256": "f9c6a8935ed7d4aa90f71463f622bdf9261f5c30ba63a4de724cc7c198e45847"
+    },
+    {
+      "build": "flash-magic-standby-v17d",
+      "preserved": true,
+      "prefix_sha256": "44c3425ea8e22c06168d8a8d0b65ae7813a0cad147a6d06ad18278f71bd4b9c2",
+      "sector_sha256": "2ad7168302fe05b928b2b1aa62ef9732dfeab0d61e6092de2c086412d4485880"
+    }
+  ],
+  "long_overlap": {
+    "verified": true,
+    "timing": {
+      "elapsed_cycles_since_begin": {
+        "sd_begin": 76446035,
+        "sd_ready": 87145254,
+        "first_write": 168743494,
+        "frame_done": 172523980,
+        "payload_done": 504932270,
+        "commit_done": 504934147,
+        "deinit_done": 504957823,
+        "end": 504968880
+      },
+      "elapsed_ms_since_begin": {
+        "sd_begin": 191.1150875,
+        "sd_ready": 217.863135,
+        "first_write": 421.858735,
+        "frame_done": 431.30995,
+        "payload_done": 1262.330675,
+        "commit_done": 1262.3353675,
+        "deinit_done": 1262.3945575,
+        "end": 1262.4222
+      },
+      "sd_ready_before_frame_done": true,
+      "first_write_before_frame_done": true,
+      "sd_ready_to_frame_done_ms": 213.446815,
+      "first_write_to_frame_done_ms": 9.451215,
+      "clock_hz": 400000000,
+      "counter_wrap_handled": true
+    },
+    "image_verified": true
+  },
+  "line_snapshots": [
+    {
+      "capture": "long",
+      "snapshot_count": 20,
+      "bytes_compared": 10240,
+      "passed": true
+    }
+  ],
+  "host_recovery": {
+    "passed": true,
+    "original_format_remains_failed": true,
+    "commands": 3,
+    "cmdstop_used": true,
+    "dtimer_unchanged": true
+  },
+  "preserved_slot": {
+    "passed": true,
+    "slot": 0,
+    "bytes": 1909760,
+    "slot_sha256": "d20cee0a027c21cba63724666e8692ce65825468b4f37dce99b13a23cfa9244e",
+    "entire_slot_byte_identical": true
+  },
+  "next_free": {
+    "passed": true,
+    "slot": 6,
+    "first_sector_erased_before_final_capture": true,
+    "final_image_not_verified": true
+  },
+  "visual_review": {
+    "passed": true,
+    "images": 3,
+    "root_attestation_only": true,
+    "original_camera_ram_comparison": false
+  },
+  "final_handoff": {
+    "verified": true,
+    "utc": "2026-10-24T17:56:22.939300+00:00",
+    "final_expected_slot": 6,
+    "slot_not_read": true,
+    "sbf_not_read": true
+  },
+  "image_reports": [
+    {
+      "record": "baseline01-image",
+      "slot": 19,
+      "magic_format": false,
+      "pixels_replayed": false,
+      "original_sensor_frame_comparison": false
+    },
+    {
+      "record": "baseline02-image",
+      "slot": 20,
+      "magic_format": false,
+      "pixels_replayed": false,
+      "original_sensor_frame_comparison": false
+    },
+    {
+      "record": "baseline03-image",
+      "slot": 21,
+      "magic_format": false,
+      "pixels_replayed": false,
+      "original_sensor_frame_comparison": false
+    },
+    {
+      "record": "candidate01-image",
+      "slot": 3,
+      "magic_format": true,
+      "pixels_replayed": false,
+      "original_sensor_frame_comparison": false
+    },
+    {
+      "record": "candidate02-image",
+      "slot": 4,
+      "magic_format": true,
+      "pixels_replayed": false,
+      "original_sensor_frame_comparison": false
+    },
+    {
+      "record": "candidate03-image",
+      "slot": 5,
+      "magic_format": true,
+      "pixels_replayed": false,
+      "original_sensor_frame_comparison": false
+    },
+    {
+      "record": "pattern-image",
+      "slot": 0,
+      "magic_format": true,
+      "pixels_replayed": true,
+      "original_sensor_frame_comparison": true
+    },
+    {
+      "record": "long-image",
+      "slot": 1,
+      "magic_format": true,
+      "pixels_replayed": true,
+      "original_sensor_frame_comparison": true
+    },
+    {
+      "record": "awake-image",
+      "slot": 2,
+      "magic_format": true,
+      "pixels_replayed": false,
+      "original_sensor_frame_comparison": true
+    },
+    {
+      "record": "preservation",
+      "slot": 0,
+      "magic_format": true,
+      "pixels_replayed": true,
+      "original_sensor_frame_comparison": false
+    }
+  ],
+  "groups": [
+    {
+      "build": "flash-standby-v16",
+      "sector_sha256": "285fba4951f88deb12033e7b3c2948c802371862982da5a8e304c6cae35fb58f",
+      "cycles": [
+        {
+          "name": "baseline01",
+          "events": [
+            1,
+            2,
+            4,
+            3,
+            5,
+            6,
+            7,
+            8,
+            9,
+            null
+          ],
+          "standby_attributed": true,
+          "time_s": 0.7963005,
+          "energy_j": 0.44403377970941876
+        },
+        {
+          "name": "baseline02",
+          "events": [
+            1,
+            2,
+            4,
+            3,
+            5,
+            6,
+            7,
+            8,
+            9,
+            null
+          ],
+          "standby_attributed": true,
+          "time_s": 1.041987,
+          "energy_j": 0.582388758867877
+        },
+        {
+          "name": "baseline03",
+          "events": [
+            1,
+            2,
+            4,
+            3,
+            5,
+            6,
+            7,
+            8,
+            9,
+            null
+          ],
+          "standby_attributed": true,
+          "time_s": 0.997516,
+          "energy_j": 0.5498965333040408
+        }
+      ],
+      "compact": {
+        "passed": true,
+        "cycles": 3,
+        "energy_intervals_replayed": 12,
+        "exact_native_sample_sum_bins": true,
+        "raw_boundary_classification_replayed": false
+      },
+      "median_time_s": 0.997516,
+      "median_energy_j": 0.5498965333040408,
+      "criteria": {
+        "bin_s": 0.001,
+        "off_baseline_s": 0.5,
+        "off_abs_max_a": 0.0001,
+        "onset_a": 0.12,
+        "pretrigger_s": 0.1,
+        "plateau_min_s": 1.0,
+        "plateau_mean_min_a": 0.007,
+        "plateau_mean_max_a": 0.01,
+        "plateau_peak_abs_max_a": 0.0105,
+        "plateau_mean_span_a": 0.002,
+        "current_valid_abs_max_a": 9.5
+      }
+    },
+    {
+      "build": "flash-magic-standby-v17d",
+      "sector_sha256": "2ad7168302fe05b928b2b1aa62ef9732dfeab0d61e6092de2c086412d4485880",
+      "cycles": [
+        {
+          "name": "candidate01",
+          "events": [
+            1,
+            2,
+            4,
+            3,
+            5,
+            6,
+            7,
+            8,
+            9,
+            null
+          ],
+          "standby_attributed": true,
+          "time_s": 0.998118,
+          "energy_j": 0.536882794003305
+        },
+        {
+          "name": "candidate02",
+          "events": [
+            1,
+            2,
+            4,
+            3,
+            5,
+            6,
+            7,
+            8,
+            9,
+            null
+          ],
+          "standby_attributed": true,
+          "time_s": 1.01651,
+          "energy_j": 0.5464010669013774
+        },
+        {
+          "name": "candidate03",
+          "events": [
+            1,
+            2,
+            4,
+            3,
+            5,
+            6,
+            7,
+            8,
+            9,
+            null
+          ],
+          "standby_attributed": true,
+          "time_s": 0.983274,
+          "energy_j": 0.5285319921745141
+        }
+      ],
+      "compact": {
+        "passed": true,
+        "cycles": 3,
+        "energy_intervals_replayed": 12,
+        "exact_native_sample_sum_bins": true,
+        "raw_boundary_classification_replayed": false
+      },
+      "median_time_s": 0.998118,
+      "median_energy_j": 0.536882794003305,
+      "criteria": {
+        "bin_s": 0.001,
+        "off_baseline_s": 0.5,
+        "off_abs_max_a": 0.0001,
+        "onset_a": 0.12,
+        "pretrigger_s": 0.1,
+        "plateau_min_s": 1.0,
+        "plateau_mean_min_a": 0.007,
+        "plateau_mean_max_a": 0.01,
+        "plateau_peak_abs_max_a": 0.0105,
+        "plateau_mean_span_a": 0.002,
+        "current_valid_abs_max_a": 9.5
+      }
+    }
+  ],
+  "time_reduction_fraction": -0.0006034990917438421,
+  "energy_reduction_fraction": 0.023665796222687607,
+  "limitations": [
+    "Scene pixels omitted; their historical equality checks remain hash-bound, not replayed.",
+    "Card erase changes internal media state between A/B groups; differences cannot be attributed solely to firmware.",
+    "Compact sums replay energy integration, not raw boundary classification.",
+    "Completion markers are not payload checksums or power-loss atomicity.",
+    "No power-loss, isolated-DUT, production battery-energy or statistical-significance claim."
+  ]
+}

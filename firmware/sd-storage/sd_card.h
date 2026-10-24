@@ -3,8 +3,9 @@
 
 #include <stdint.h>
 
-/* Native SDMMC2, one bit, 3.3 V. No card cache, UHS, bus-width, erase or trim
- * commands are enabled. All APIs are synchronous and require one owner.
+/* Native SDMMC2, one bit, 3.3 V. No card cache, UHS, bus-width or trim commands
+ * are enabled. Erase is an explicit opt-in API, never part of initialization.
+ * All APIs are synchronous and require one owner.
  * The caller must place this object and its buffers outside the capture frame.
  * Zero-initialize the object before its first sd_init().
  */
@@ -18,13 +19,14 @@ enum sd_error {
     SD_ERR_VOLTAGE, SD_ERR_TIMER, SD_ERR_COMMAND_TIMEOUT, SD_ERR_COMMAND_CRC,
     SD_ERR_RESPONSE, SD_ERR_CARD, SD_ERR_UNSUPPORTED, SD_ERR_NOT_READY,
     SD_ERR_CAPACITY, SD_ERR_DATA, SD_ERR_DATA_TIMEOUT, SD_ERR_LENGTH,
-    SD_ERR_CONTROLLER_BUSY, SD_ERR_DMA, SD_ERR_CACHE, SD_ERR_SECURITY, SD_ERR_WAIT
+    SD_ERR_CONTROLLER_BUSY, SD_ERR_DMA, SD_ERR_CACHE, SD_ERR_SECURITY, SD_ERR_WAIT,
+    SD_ERR_PRODUCER
 };
 
 enum sd_stage {
     SD_STAGE_NONE=0, SD_STAGE_PREFLIGHT, SD_STAGE_GPIO, SD_STAGE_IDENTIFY,
     SD_STAGE_SELECT, SD_STAGE_READ, SD_STAGE_WRITE, SD_STAGE_SYNC,
-    SD_STAGE_ABORT, SD_STAGE_DEINIT
+    SD_STAGE_ABORT, SD_STAGE_DEINIT, SD_STAGE_SCR, SD_STAGE_ERASE
 };
 
 typedef struct sd_card {
@@ -90,6 +92,57 @@ int sd_write_blocks_dma(sd_card_t *card, uint32_t lba, const void *buffer, uint3
 int sd_write_blocks_dma_preerase(sd_card_t *card, uint32_t lba,
                                  const void *buffer, uint32_t count);
 typedef struct {
+    uint8_t bytes[8]; /* SCR wire order: bytes[0] holds bits63..56. */
+    uint32_t valid, erased_byte; /* DATA_STAT_AFTER_ERASE: 0x00 or0xFF. */
+} sd_scr_t;
+/* Explicit readonly ACMD51. This does not alter sd_card_t or run at init.
+ * Success validates SCR_STRUCTURE=0 and decodes bit55 from bytes[1]. */
+int sd_read_scr(sd_card_t *card, sd_scr_t *scr);
+typedef struct {
+    uint32_t started, completed, first_lba, last_lba;
+    uint32_t timeout_ms, elapsed_ms, last_r1, command_count;
+} sd_erase_t;
+/* DESTRUCTIVE explicit full-card CMD32/CMD33/CMD38 erase. Never called by init.
+ * The caller authorizes loss of all card contents. timeout_ms=1000..600000;
+ * polls busy with a wrap-safe extended DWT clock and sd_progress(). Timeout
+ * leaves media_idle=0: it is not permission to reset/power off a busy erase.
+ * While idle, selects the known 100 kHz bus clock and programs DTIMER for the
+ * requested timeout plus 1 s, covering R1b busy independently of prior reads.
+ * Restores the original supported clock/timer only after fresh card/host idle;
+ * an uncertain error leaves the 100 kHz clock and controller ownership intact.
+ * The observed erased read value is separately obtained with sd_read_scr(). */
+int sd_erase_all(sd_card_t *card, uint32_t timeout_ms, sd_erase_t *proof);
+typedef struct {
+    /* Publish an immutable prefix. Return0 on success, nonzero on producer
+     * failure. No SD reentry, sleep, or controller/clock/cache changes allowed.
+     * Must be bounded and include the required producer-to-CPU memory barrier.
+     * Bounded fault validation may take up to 3 seconds (e.g. camera stop/I2C
+     * timeouts); ordinary calls should return promptly.
+     * The API's 3-second producer deadline is checked AFTER every callback,
+     * before accepting new bytes. Expiry before CMD25 makes no card write;
+     * expiry during CMD25 aborts through the normal idle-proof cleanup.
+     * All bytes, including end magic and padding, must be validated before
+     * publishing the full extent. Unpublished memory is never read. */
+    int (*publish)(void *context, uint32_t *available_bytes);
+    void *context;
+    uint32_t mode, initial_available_bytes, published_bytes, queued_bytes;
+    uint32_t publication_calls, starved_polls, producer_error;
+    uint32_t producer_wait_cycles, max_wait_cycles;
+} sd_stream_t;
+enum { SD_STREAM_NONE=0U, SD_STREAM_IDMA=1U, SD_STREAM_PIO=2U };
+/* One ACMD23+CMD25; accepts the same range/security/clock rules as preerase.
+ * Waits for at least one complete sector before announcement. If the initial
+ * publication covers the full transfer, uses the existing IDMA fast path.
+ * Otherwise PIO feeds only complete published sectors; HWFC_EN stalls SDMMC_CK
+ * when FIFO data runs out (RM0486 30.7.1). IDMA cannot safely pause on a missing
+ * linked-list node: ABR=0 is an error, not producer backpressure.
+ * Producer must finish within3s of API entry; data phase has the existing5s
+ * bound. No source copying, speculative reads, linked list or WFI is used.
+ * On success mode/queued_bytes identify how the transaction was fed. */
+int sd_write_blocks_stream_preerase(sd_card_t *card, uint32_t lba,
+                                    const void *buffer, uint32_t count,
+                                    sd_stream_t *stream);
+typedef struct {
     uint32_t (*milliseconds)(void);
     uint32_t wait_calls, wall_ms, active_cycles, immediate_wakes;
     uint32_t context_faults;
@@ -134,7 +187,14 @@ int sd_deinit(sd_card_t *card);
 /* Optional monotonic-clock service hook. The weak default is empty. A caller
  * may override it to extend DWT's 32-bit count while long filesystem operations
  * run. Calls occur at command/chunk boundaries and throughout bounded waits,
- * never per FIFO word. The override must be bounded (at most 50 ms), and must not
+ * never per FIFO word. Healthy service should finish within 50 ms. A bounded
+ * camera fault path may take roughly 2 seconds for sequential pipe/VC stop
+ * waits plus an I2C timeout, up to 3 seconds total. It must latch the fault and
+ * return to the SD owner, never park or perform failure cleanup from the hook.
+ * Consumers must account for that blocking interval and recheck deadlines
+ * after service before using newly published data; a deadline cannot interrupt
+ * a callback. The stream API checks its deadline before accepting publication.
+ * The override must not
  * change SD registers, its clocks/pins, buffer ownership, CPU clock/cache state,
  * or call back into this driver/filesystem (no reentrancy). It may service an
  * independent camera completion/STOP without violating those restrictions.

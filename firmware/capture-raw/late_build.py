@@ -14,7 +14,7 @@ import zlib
 from build_raw10 import TC, replace
 
 HERE=Path(__file__).resolve().parent
-COLD_OBJECTS=('sd_card','raw_slots','completion','peripherals')
+COLD_OBJECTS=('sd_card','raw_slots','magic_slots','completion','peripherals')
 COLD_LIBGCC=('_aeabi_uldivmod.o','_udivmoddi4.o','_dvmd_tls.o')
 COLD_RUNTIME=('sd_progress','configure_sd_master','complete_storage','init_card',
               'raw_storage_execute','raw_storage_shutdown_ready','payload_transport',
