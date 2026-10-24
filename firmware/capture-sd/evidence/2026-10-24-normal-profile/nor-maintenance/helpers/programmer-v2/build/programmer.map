@@ -1,0 +1,71 @@
+
+Discarded input sections
+
+ .comment       0x00000000       0x44 C:\Users\joshd\AppData\Local\Temp\ccFER86w.o
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+CODE             0x341e0000         0x00010000         xr
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+LOAD C:\Users\joshd\AppData\Local\Temp\ccOn1flP.o
+LOAD C:\Users\joshd\AppData\Local\Temp\ccFER86w.o
+
+.text           0x341e0000      0xcf8
+ *(.text.entry)
+ .text.entry    0x341e0000       0x20 C:\Users\joshd\AppData\Local\Temp\ccOn1flP.o
+                0x341e0000                ROM_NOR_Programmer
+ *(.text*)
+ .text          0x341e0020        0x0 C:\Users\joshd\AppData\Local\Temp\ccOn1flP.o
+ .text          0x341e0020      0xcd8 C:\Users\joshd\AppData\Local\Temp\ccFER86w.o
+                0x341e0520                rom_nor_programmer
+                0x341e0cba                rom_nor_programmer_ready
+ *(.rodata*)
+
+.data           0x341e0cf8        0x0
+ .data          0x341e0cf8        0x0 C:\Users\joshd\AppData\Local\Temp\ccOn1flP.o
+ .data          0x341e0cf8        0x0 C:\Users\joshd\AppData\Local\Temp\ccFER86w.o
+
+.igot.plt       0x341e0cf8        0x0
+ .igot.plt      0x341e0cf8        0x0 C:\Users\joshd\AppData\Local\Temp\ccOn1flP.o
+
+.glue_7         0x341e0cf8        0x0
+ .glue_7        0x341e0cf8        0x0 linker stubs
+
+.glue_7t        0x341e0cf8        0x0
+ .glue_7t       0x341e0cf8        0x0 linker stubs
+
+.vfp11_veneer   0x341e0cf8        0x0
+ .vfp11_veneer  0x341e0cf8        0x0 linker stubs
+
+.v4_bx          0x341e0cf8        0x0
+ .v4_bx         0x341e0cf8        0x0 linker stubs
+
+.iplt           0x341e0cf8        0x0
+ .iplt          0x341e0cf8        0x0 C:\Users\joshd\AppData\Local\Temp\ccOn1flP.o
+
+.rel.dyn        0x341e0cf8        0x0
+ .rel.iplt      0x341e0cf8        0x0 C:\Users\joshd\AppData\Local\Temp\ccOn1flP.o
+
+.bss            0x341e0cf8        0x0
+ .bss           0x341e0cf8        0x0 C:\Users\joshd\AppData\Local\Temp\ccOn1flP.o
+ .bss           0x341e0cf8        0x0 C:\Users\joshd\AppData\Local\Temp\ccFER86w.o
+
+/DISCARD/
+ *(.ARM.exidx*)
+ *(.ARM.extab*)
+ *(.comment*)
+ *(.note*)
+                0x00000001                        ASSERT ((SIZEOF (.text) <= 0x10000), Code exceeds reserved RAM)
+OUTPUT(D:\Github\global-x-camera\tmp\bringup\rom-nor-programmer-v2-20261024\programmer.elf elf32-littlearm)
+LOAD linker stubs
+
+.ARM.attributes
+                0x00000000       0x34
+ .ARM.attributes
+                0x00000000       0x26 C:\Users\joshd\AppData\Local\Temp\ccOn1flP.o
+ .ARM.attributes
+                0x00000026       0x36 C:\Users\joshd\AppData\Local\Temp\ccFER86w.o

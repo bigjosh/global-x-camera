@@ -1,0 +1,121 @@
+{
+  "schema": 1,
+  "firmware": "v66c normal Standby",
+  "source_order_qualified": true,
+  "width_qualified": false,
+  "representative_trial": "standby03 (median measured energy/time)",
+  "intervals": {
+    "reset_to_strobe_irq": {
+      "trial_ms": {
+        "standby02": 22.942130000000006,
+        "standby03": 22.683610000000005,
+        "standby04": 22.772199999999998
+      },
+      "median_ms": 22.772199999999998,
+      "minimum_ms": 22.683610000000005,
+      "maximum_ms": 22.942130000000006
+    },
+    "reset_to_frame_irq": {
+      "trial_ms": {
+        "standby02": 44.80345999999999,
+        "standby03": 44.54492000000002,
+        "standby04": 44.63358999999999
+      },
+      "median_ms": 44.63358999999999,
+      "minimum_ms": 44.54492000000002,
+      "maximum_ms": 44.80345999999999
+    },
+    "frame_irq_to_save": {
+      "trial_ms": {
+        "standby02": 72.91477999999998,
+        "standby03": 72.98785,
+        "standby04": 73.51655000000001
+      },
+      "median_ms": 72.98785,
+      "minimum_ms": 72.91477999999998,
+      "maximum_ms": 73.51655000000001
+    },
+    "sd_init": {
+      "trial_ms": {
+        "standby02": 123.72423000000005,
+        "standby03": 98.10042000000003,
+        "standby04": 98.04830000000001
+      },
+      "median_ms": 98.10042000000003,
+      "minimum_ms": 98.04830000000001,
+      "maximum_ms": 123.72423000000005
+    },
+    "mount": {
+      "trial_ms": {
+        "standby02": 1.680299999999968,
+        "standby03": 1.5192799999999562,
+        "standby04": 1.6560199999999803
+      },
+      "median_ms": 1.6560199999999803,
+      "minimum_ms": 1.5192799999999562,
+      "maximum_ms": 1.680299999999968
+    },
+    "mount_to_png_return": {
+      "trial_ms": {
+        "standby02": 1645.2706999999998,
+        "standby03": 1799.10359,
+        "standby04": 1821.3094099999998
+      },
+      "median_ms": 1799.10359,
+      "minimum_ms": 1645.2706999999998,
+      "maximum_ms": 1821.3094099999998
+    },
+    "final_flush_commit": {
+      "trial_ms": {
+        "standby02": 27.99156000000025,
+        "standby03": 24.317000000000366,
+        "standby04": 27.16580000000013
+      },
+      "median_ms": 27.16580000000013,
+      "minimum_ms": 24.317000000000366,
+      "maximum_ms": 27.99156000000025
+    },
+    "final_checks": {
+      "trial_ms": {
+        "standby02": 0.1268599999999509,
+        "standby03": 0.12761999999977292,
+        "standby04": 0.12836000000016057
+      },
+      "median_ms": 0.12761999999977292,
+      "minimum_ms": 0.1268599999999509,
+      "maximum_ms": 0.12836000000016057
+    },
+    "late_load_and_peripheral_shutdown_to_pre_wfi": {
+      "trial_ms": {
+        "standby02": 13.590329999999984,
+        "standby03": 13.60220000000023,
+        "standby04": 13.883560000000017
+      },
+      "median_ms": 13.60220000000023,
+      "minimum_ms": 13.590329999999984,
+      "maximum_ms": 13.883560000000017
+    },
+    "reset_to_pre_wfi": {
+      "trial_ms": {
+        "standby02": 1930.10222,
+        "standby03": 2054.30288,
+        "standby04": 2080.34159
+      },
+      "median_ms": 2054.30288,
+      "minimum_ms": 1930.10222,
+      "maximum_ms": 2080.34159
+    }
+  },
+  "input_sha256": {
+    "standby02": "42480f2c954967c802ae145c76a3c3bfcac40de6b53a8a69ec41ada131115e50",
+    "standby03": "79057a92b74bf9c17d243cb124a55a60c89b2e554e807248c7ae5981a6ed3ef0",
+    "standby04": "662eea2a95af3816a62fdb5fd94e98d3a85187bdfda1e31e10f25f834019d8a6"
+  },
+  "limits": [
+    "External Saleae time base only; not combined with nominal DWT timings.",
+    "STROBE/frame markers are IRQ observations, not exact exposure edges.",
+    "Marker10 is pre-WFI intent; actual Standby is independently supported by historical SBF plus owner reset/power history.",
+    "Mount-to-PNG includes essential frame validation, free-space/name/file open, conversion, compression, CRC/framing and synchronous SD callbacks; awake02 CPU timing partitions those components for a separate captured frame.",
+    "Card/image variation is not separated; no phase-specific energy is assigned."
+  ]
+}

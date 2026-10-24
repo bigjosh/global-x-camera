@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "supersedes_shutdown_readiness_review": "v65-normal-standby-peer-review.json",
+  "historical_review_preserved": true,
+  "finding": "The exact-build review verified layout and recovery but missed late_loader's hardcoded SAVE schema 1 gate. SAVE schema 2 therefore could not reach late shutdown.",
+  "observed_by_hardware_owner": "v65 saved IMG00068.PNG; LPL reason 2 rejected completion before any late NOR read or teardown. Uninitialized LPM bytes are not entry evidence.",
+  "fix": "Use SAVE_REPORT_SCHEMA and the exact compiled profile and required SAVE checks mask before any XSPI read.",
+  "unchanged_guards": ["context", "automatic SAVE nonce", "terminal success", "card idle", "SAVE loader CRC/length/return", "XSPI clock/reset/config/idle", "late read deadlines and terminal status", "late code CRC"],
+  "actual_c_test_combinations": 132,
+  "test_scope": "33 cases at 16 and 8192 bytes, both normal and diagnostic profiles; schema 2 succeeds, schema 1/unknown/profile/flag mismatches fail before any XSPI read.",
+  "other_schema_1_uses": "Distinct proof/manifest ABIs, explicitly legacy host analysis, and frozen historical code remain unchanged.",
+  "replacement_build": "v66 normal Standby, pending exact build review and hardware qualification",
+  "hardware_activity_by_reviewer": false
+}

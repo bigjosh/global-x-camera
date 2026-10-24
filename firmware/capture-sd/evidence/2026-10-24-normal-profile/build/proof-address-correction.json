@@ -1,0 +1,121 @@
+{
+  "scope": "Proof metadata overlap; no frame buffer or encoded PNG overlap",
+  "affected_builds": [
+    "v62",
+    "v62b",
+    "v63"
+  ],
+  "observed_build": "v62b normal awake",
+  "old_rcp2": {
+    "start": "0x343f8a00",
+    "end_exclusive": "0x343f8a80"
+  },
+  "led": {
+    "start": "0x343f89c0",
+    "end_exclusive": "0x343f8a40",
+    "words": 32
+  },
+  "overlap": "LED words 16..31 alias old RCP2 words 0..15",
+  "observed_words": [
+    1380143154,
+    2,
+    32,
+    0,
+    0,
+    1,
+    0,
+    0,
+    2,
+    0,
+    0,
+    43,
+    0,
+    3055360,
+    0,
+    255,
+    11723964,
+    11806665,
+    11808787,
+    11809997,
+    11820661,
+    25826894,
+    0,
+    0,
+    25832357,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "overwritten_fields": [
+    {
+      "rcp2_word": 4,
+      "led_word": 20,
+      "observed": 0,
+      "led_field": "SCR"
+    },
+    {
+      "rcp2_word": 5,
+      "led_word": 21,
+      "observed": 1,
+      "led_field": "PRIMASK"
+    },
+    {
+      "rcp2_word": 6,
+      "led_word": 22,
+      "observed": 0,
+      "led_field": "SYSTICK_CTRL"
+    },
+    {
+      "rcp2_word": 7,
+      "led_word": 23,
+      "observed": 0,
+      "led_field": "ICSR"
+    },
+    {
+      "rcp2_word": 8,
+      "led_word": 24,
+      "observed": 2,
+      "led_field": "SLEEP_STATE"
+    },
+    {
+      "rcp2_word": 9,
+      "led_word": 25,
+      "observed": 0,
+      "led_field": "NVIC_ENABLE_OR"
+    },
+    {
+      "rcp2_word": 10,
+      "led_word": 26,
+      "observed": 0,
+      "led_field": "NVIC_PENDING_OR"
+    }
+  ],
+  "timing_words": "RCP2 words 16..31 were beyond the LED block and remained intact; prior timing interpretation must state this scope",
+  "image_verification": "IMG00066.PNG passed all chunk CRCs and all 1,527,680 pixels equal captured RAW10 samples shifted left 6; see compact verification metadata",
+  "fix": {
+    "builds": [
+      "v64-normal-awake",
+      "v65-normal-standby"
+    ],
+    "start": "0x343f8a80",
+    "end_exclusive": "0x343f8b00",
+    "control_flow_unchanged": true,
+    "full_high_sram_inventory_regions": 22
+  },
+  "tests": {
+    "receiver_actual_c_scenarios": 24,
+    "receiver_unittest_methods": 3,
+    "archived_layout_tests": 4,
+    "old_address_rejected": true,
+    "expanded_led_record_rejected": true,
+    "actual_headers_used": true,
+    "early_regions_with_prefix_stack": 12
+  },
+  "post_freeze_audit_addition": "Conservatively reserve prefix stack 0x34182000..0x34188000; no firmware or original manifest changed",
+  "prior_review_correction": "Earlier v62b/v63 peer reviews missed LED1 in the map; their approval is superseded for proof-layout qualification",
+  "hardware_accessed_by_archive": false
+}

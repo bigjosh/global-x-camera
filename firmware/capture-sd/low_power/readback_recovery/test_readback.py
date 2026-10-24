@@ -7,6 +7,7 @@ import struct
 import subprocess
 import tempfile
 import unittest
+from unittest import mock
 import zlib
 
 import run as r
@@ -102,6 +103,66 @@ int main(int argc,char **argv) {
 
 
 class Tests(unittest.TestCase):
+    def test_exact_recovery_pair_and_byte_changes(self):
+        legacy=r.ROOT/"firmware/capture-sd/evidence/2026-10-20-low-power/build/prefix"
+        identity=r.checked_recovery(legacy)
+        self.assertEqual(identity,dict(name="v59",prefix_sha256=r.RECOVERY_SHA,
+                                      sector_sha256=r.SECTOR_SHA))
+        with tempfile.TemporaryDirectory() as folder:
+            work=Path(folder)
+            prefix=(legacy/"stage1.bin").read_bytes()
+            sector=(legacy/"capture_sector_0.bin").read_bytes()
+            for bad_prefix,bad_sector in (
+                    (prefix[:-1],sector),(prefix,sector[:-1]),
+                    (bytes([prefix[0]^1])+prefix[1:],sector),
+                    (prefix,sector[:-1]+bytes([sector[-1]^1]))):
+                (work/"stage1.bin").write_bytes(bad_prefix)
+                (work/"capture_sector_0.bin").write_bytes(bad_sector)
+                with self.assertRaises(ValueError): r.checked_recovery(work)
+
+    def test_fresh_recovery_result_must_match_selected_image(self):
+        identity=dict(prefix_sha256=r.RECOVERY_SHA,sector_sha256=r.SECTOR_SHA,name="v59")
+        r.checked_recovery_result(dict(passed=True,prefix_sha256=r.RECOVERY_SHA),identity)
+        for result in ({},dict(passed=False,prefix_sha256=r.RECOVERY_SHA),
+                       dict(passed=1,prefix_sha256=r.RECOVERY_SHA),
+                       dict(passed=True,prefix_sha256="0"*64)):
+            with self.assertRaises(ValueError): r.checked_recovery_result(result,identity)
+
+    def test_withdrawn_v63_overlap_candidate_is_rejected(self):
+        prefix="d7732adf26fbd058cecd628d2ccf44e0b4e08cadb977ed51d0ff626f08dc6708"
+        sector="8226ba5c4aa9ac6ad2b04a358f38cf19fc7902dc9b39abaffbad75ac7923b192"
+        self.assertNotIn(prefix,r.APPROVED_RECOVERY)
+        # Early recovery was unchanged, but its later RCP2 proof overlapped
+        # LED1. The uninstalled candidate must not remain an approved pair.
+        with tempfile.TemporaryDirectory() as folder:
+            work=Path(folder)
+            (work/"stage1.bin").write_bytes(bytes(5140))
+            (work/"capture_sector_0.bin").write_bytes(bytes(65536))
+            for digests in ([prefix,sector],[prefix,r.SECTOR_SHA],
+                            [r.RECOVERY_SHA,sector],["0"*64]):
+                with mock.patch.object(r.sd,"sha",side_effect=digests):
+                    with self.assertRaises(ValueError): r.checked_recovery(work)
+
+    def test_v65_pair_selection_never_accepts_mixed_or_arbitrary_hashes(self):
+        prefix="6f07ee096565b43a8d5c1f09a0dc28e300599667bda4b025868cb278288baefb"
+        sector="409628f664b41b39b8a6397d9098a7bd3420d23c9d8441538e11e59ae9ee593c"
+        self.assertEqual(r.APPROVED_RECOVERY[prefix],
+            dict(name="v65-normal-standby",sector_sha256=sector))
+        # Exact candidate bytes are independently reviewed; this unit test
+        # isolates pair selection from the separately tested SHA function.
+        with tempfile.TemporaryDirectory() as folder:
+            work=Path(folder)
+            (work/"stage1.bin").write_bytes(bytes(5140))
+            (work/"capture_sector_0.bin").write_bytes(bytes(65536))
+            with mock.patch.object(r.sd,"sha",side_effect=[prefix,sector]):
+                identity=r.checked_recovery(work)
+            r.checked_recovery_result(dict(passed=True,prefix_sha256=prefix),identity)
+            with self.assertRaises(ValueError):
+                r.checked_recovery_result(dict(passed=True,prefix_sha256=r.RECOVERY_SHA),identity)
+            for digests in ([prefix,r.SECTOR_SHA],[r.RECOVERY_SHA,sector],["0"*64]):
+                with mock.patch.object(r.sd,"sha",side_effect=digests):
+                    with self.assertRaises(ValueError): r.checked_recovery(work)
+
     def test_actual_boot_c_guards(self):
         compiler=shutil.which("clang") or shutil.which("gcc")
         self.assertTrue(compiler)
@@ -120,6 +181,27 @@ class Tests(unittest.TestCase):
             for scenario in range(25):
                 with self.subTest(scenario=scenario):
                     subprocess.run([str(exe),str(scenario)],check=True,capture_output=True)
+
+    def test_v66c_exact_selection_and_cross_pair_rejection(self):
+        prefix="247f27c231e0053b7024af29914c6a0cb1b7decb1632ac0d6142a68b89e2da58"
+        sector="8129f9cc79e92c678207b4aee838810cc805d0b860c40b2f77b434ae746c8b61"
+        self.assertEqual(r.APPROVED_RECOVERY[prefix],
+            dict(name="v66c-normal-standby",sector_sha256=sector))
+        with tempfile.TemporaryDirectory() as folder:
+            work=Path(folder)
+            (work/"stage1.bin").write_bytes(bytes(5140))
+            (work/"capture_sector_0.bin").write_bytes(bytes(65536))
+            with mock.patch.object(r.sd,"sha",side_effect=[prefix,sector]):
+                identity=r.checked_recovery(work)
+            r.checked_recovery_result(dict(passed=True,prefix_sha256=prefix),identity)
+            for other_prefix,other in r.APPROVED_RECOVERY.items():
+                if other_prefix==prefix: continue
+                with mock.patch.object(r.sd,"sha",side_effect=[prefix,other['sector_sha256']]):
+                    with self.assertRaises(ValueError): r.checked_recovery(work)
+                with mock.patch.object(r.sd,"sha",side_effect=[other_prefix,sector]):
+                    with self.assertRaises(ValueError): r.checked_recovery(work)
+                with self.assertRaises(ValueError):
+                    r.checked_recovery_result(dict(passed=True,prefix_sha256=other_prefix),identity)
 
     def test_read_requests_cannot_select_mutating_operation(self):
         raw,req=r.read_request("IMG00042.PNG",262144,12)

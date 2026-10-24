@@ -1,0 +1,51 @@
+{
+  "schema": 1,
+  "profile": "normal",
+  "cpu_hz_assumed": 400000000,
+  "start": "RCP2 post-frame processing begin",
+  "end": "SAVE P_BEGIN",
+  "start_cycle": 11719596,
+  "end_cycle": 39803167,
+  "total_cycles": 28083571,
+  "total_ms": 70.2089275,
+  "partition_sum_exact": true,
+  "disjoint_cycles": {
+    "essential_frame_checks": 82701,
+    "bookkeeping_before_pipe_stop": 2122,
+    "pipe_stop": 1210,
+    "receiver_data_disable": 10664,
+    "sensor_stop_call": 13960561,
+    "bookkeeping_to_handoff": 5463,
+    "handoff_to_loader_start": 1775,
+    "nor_module_read_and_crc": 2898712,
+    "loader_tail_entry_bss_and_report_initialization": 11120363
+  },
+  "disjoint_ms": {
+    "essential_frame_checks": 0.2067525,
+    "bookkeeping_before_pipe_stop": 0.005305,
+    "pipe_stop": 0.003025,
+    "receiver_data_disable": 0.02666,
+    "sensor_stop_call": 34.9014025,
+    "bookkeeping_to_handoff": 0.0136575,
+    "handoff_to_loader_start": 0.0044375,
+    "nor_module_read_and_crc": 7.24678,
+    "loader_tail_entry_bss_and_report_initialization": 27.8009075
+  },
+  "module_sha256": "0a1a116fea60ba1b60c8974853e69f29edf8a38faf3b934d1811f816f77396d6",
+  "name": "IMG00067.PNG",
+  "limits": [
+    "This starts at post-frame processing, not at the frame interrupt or exposure end.",
+    "All boundaries use DWT; milliseconds assume nominal 400 MHz and include timer overhead.",
+    "Sensor STOP is the full function interval including its polling and protocol overhead.",
+    "The loader-to-SAVE interval includes loader tail, I-cache disable, entry/context setup, BSS zeroing and report initialization. It is not a pure BSS timer.",
+    "Normal profile skips full-frame FNV/statistics and bulk register dumps; zero scan fields mean skipped.",
+    "These intervals are sequential and disjoint. No Saleae or Joulescope alignment is inferred."
+  ],
+  "input_sha256": {
+    "frame_result": "d1c0f9a01690e2554b2c722bdca0dfb595309797341a88e46fe2e71983c963b6",
+    "receiver_raw": "002b80d32e10727d5e60f3e74f29541bca75ea115a52e25aee858dc7f9500d9c",
+    "maintenance": "36755ebf90a02ba948996362ee716806dd1d7aa25fac18e30318dda0c06804f2",
+    "report_raw": "19a8fa7736ed650858036dbfd24952047cd4a4e85689b65abc3e0c19e85d4818",
+    "loader_raw": "ba324dbefbca6df5e763428949f6cde09858835701480cec7be581b747553690"
+  }
+}

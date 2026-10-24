@@ -30,6 +30,29 @@ VCP_FIELDS = (
     'reserved30 reserved31').split()
 # An unknown/self-consistent build is insufficient authorization to halt.
 APPROVED = {
+    # v66c normal Standby accepts the current SAVE profile at the late loader.
+    # The exact early recovery bytes/literals remain unchanged.
+    '247f27c231e0053b7024af29914c6a0cb1b7decb1632ac0d6142a68b89e2da58':
+        {'bytes': 5140, 'park': 0x3418078C, 'vcp': True,
+         'sector': '8129f9cc79e92c678207b4aee838810cc805d0b860c40b2f77b434ae746c8b61'},
+    # v64 normal awake; relocated RCP2 is clear of the complete LED proof.
+    '58dbd958018a2e55de8bb49807a90a3875c643f605a68e053b77979f86332107':
+        {'bytes': 5140, 'park': 0x3418078C, 'vcp': True,
+         'sector': '6823ef327e6625d26877aa5d3a9b09353b52556434f41fc8d736e64bad508cc7'},
+    # v65 normal Standby; same exact early guard/literals as v64/v59.
+    '6f07ee096565b43a8d5c1f09a0dc28e300599667bda4b025868cb278288baefb':
+        {'bytes': 5140, 'park': 0x3418078C, 'vcp': True,
+         'sector': '409628f664b41b39b8a6397d9098a7bd3420d23c9d8441538e11e59ae9ee593c'},
+    # v62b normal awake retains original CSI error-history snapshots.
+    # Reviewed early guard/literals; approval is not hardware qualification.
+    'e03eee01bfde90acfc1bb9466c12f2568ebf3d5890695f0ed4bdbfa5776a03f4':
+        {'bytes': 5140, 'park': 0x3418078C, 'vcp': True,
+         'sector': 'ae732240a491e4cba5e5ce408e43f56ee1ed99c33fe8008b2848c0ff6c98118d'},
+    # v62 normal-profile awake qualification; all early guard bytes/literals
+    # match the qualified guard. Exact approval is not hardware qualification.
+    'e754f7cf914fd64cb8a34486ef5e466ece5e00108ad3fed7325aefa3075ea746':
+        {'bytes': 5140, 'park': 0x3418078C, 'vcp': True,
+         'sector': 'ec2c2ae7855a85aadf658078f8a44c12735ce82a1820883b1ef27a6b59363163'},
     # v60c awake / v61b Standby PD12 timing overlays, independently reviewed.
     # Exact early guard/literals are unchanged; hardware timing is unqualified.
     'e14913fa5c47f9d03e6680ca3ab8499afee0bf73f6654ef7d892c7303fa0ba42':

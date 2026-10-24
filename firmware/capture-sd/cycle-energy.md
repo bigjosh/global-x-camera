@@ -1,5 +1,16 @@
 # Complete-cycle energy on the JS110 sample timeline
 
+**Latest baseline, October 24:** three v66c normal-profile cold cycles measured
+median **2.057802 s / 1.061503 J** from current onset to stable Standby plateau,
+with ranges **1.933433–2.082825 s / 0.992903–1.080464 J**. Each had a subsequent
+exact UART recovery/SBF observation, separately bound to its cycle without an
+intervening power-off. The one-second plateau confirmation energy is excluded
+from these values. The prior signature-only v59 medians were 2.714624 s /
+1.288948 J using the same analysis criteria. Different captures and card
+latency prevent attribution of every change to the removed diagnostics.
+See [current results, source-order phase timing and verification scope](evidence/2026-10-24-normal-profile/README.md)
+and [native-sample summary](evidence/2026-10-24-normal-profile/analysis/energy/summary.json).
+
 `js110_session.py --cycle-raw-dir NEW_DIRECTORY` opts into raw current,
 voltage and power recording inside the existing single device owner. It does
 not open a second driver, cycle power, use GPIO, or change suppression settings.

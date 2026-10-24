@@ -27,6 +27,22 @@ MODULE_SHA="91e1edfa43f95a9608b94457cfbf900c6f51d5ecd10d2b3b7667c84d40cd3844"
 MODULE_MANIFEST_SHA="09685b857c2e2fd8d3ea01a614edb8d097131b0a7f941eec443d29ec69759b4d"
 RECOVERY_SHA="9a6c498a94c9415ec3dc39933bae2e958ceb0a43b53a1b2c8b931ef26475d071"
 SECTOR_SHA="7fda9d00cc7ffb3fbb9e6aac6695cf18545754b5dbfce1520cf30b2da39c4e63"
+# Each entry requires an independent exact-prefix/sector review. There is no
+# command-line opt-in for unknown firmware. This table does not broaden the
+# bridge or READ-module identities, and check_park still verifies live code.
+APPROVED_RECOVERY={
+    RECOVERY_SHA:dict(name="v59",sector_sha256=SECTOR_SHA),
+    # Historical v65 early recovery remains usable for READ. Its later
+    # schema-1 loader gate refused shutdown; this is not Standby approval.
+    "6f07ee096565b43a8d5c1f09a0dc28e300599667bda4b025868cb278288baefb":
+        dict(name="v65-normal-standby",sector_sha256=
+             "409628f664b41b39b8a6397d9098a7bd3420d23c9d8441538e11e59ae9ee593c"),
+    # v66c fixes the late-loader schema/profile gate. Exact early recovery,
+    # SRAM initializer, complete region map and fixed loader reviewed.
+    "247f27c231e0053b7024af29914c6a0cb1b7decb1632ac0d6142a68b89e2da58":
+        dict(name="v66c-normal-standby",sector_sha256=
+             "8129f9cc79e92c678207b4aee838810cc805d0b860c40b2f77b434ae746c8b61"),
+}
 LOAD,BOOT_REQUEST,BOOT_PROOF=0x341E0000,0x341B4000,0x341B4100
 BOOT_PARK=0x341E0016
 MAX_BYTES=3100000
@@ -66,9 +82,20 @@ def checked_module(path):
 
 
 def checked_recovery(path):
-    if (sd.sha((path/"stage1.bin").read_bytes())!=RECOVERY_SHA or
-            sd.sha((path/"capture_sector_0.bin").read_bytes())!=SECTOR_SHA):
-        raise ValueError("Only the reviewed v59 recovery prefix/sector is supported")
+    prefix=(path/"stage1.bin").read_bytes()
+    sector=(path/"capture_sector_0.bin").read_bytes()
+    digest=sd.sha(prefix)
+    approved=APPROVED_RECOVERY.get(digest)
+    if (approved is None or len(prefix)!=5140 or len(sector)!=65536 or
+            sd.sha(sector)!=approved["sector_sha256"]):
+        raise ValueError("Unreviewed recovery prefix/sector pair")
+    return dict(approved,prefix_sha256=digest)
+
+
+def checked_recovery_result(result,identity):
+    if (result.get("passed") is not True or
+            result.get("prefix_sha256")!=identity["prefix_sha256"]):
+        raise ValueError("Fresh guard did not prove the selected recovery image")
 
 
 def checked_names(names):
@@ -174,6 +201,7 @@ def wait_boot(bench,nonce):
 
 
 def bootstrap(args,out,boot_code):
+    identity=checked_recovery(args.recovery_build.resolve())
     b=sd.Bench(out/"bootstrap")
     guard=ROOT/"firmware/capture-timing/recovery_gpio/check_park.py"
     proc=subprocess.run([sys.executable,str(guard),"--build",
@@ -183,8 +211,7 @@ def bootstrap(args,out,boot_code):
     if proc.returncode:
         raise RuntimeError("Fresh exact early-recovery guard failed; no bridge write")
     result=json.loads((b.output/"early-guard/result.json").read_text())
-    if result.get("passed") is not True or result.get("prefix_sha256")!=RECOVERY_SHA:
-        raise ValueError("Early recovery was not proved")
+    checked_recovery_result(result,identity)
     nonce=secrets.randbelow(0xFFFFFFFF)+1
     request=struct.pack("<4I",0x52425231,nonce,0,0)
     (b.output/"request.bin").write_bytes(request)
@@ -207,7 +234,7 @@ def bootstrap(args,out,boot_code):
     if struct.unpack_from("<2I",memory)!=(0x5231304D,0):
         raise ValueError("Expanded memory initializer did not succeed")
     sd.json_file(b.output/"verified.json",dict(proof=proof,context=context,
-        early_recovery=result,bridge_sha256=BOOT_SHA))
+        early_recovery=result,recovery_identity=identity,bridge_sha256=BOOT_SHA))
     return b
 
 
@@ -273,11 +300,13 @@ def chunk(out,manifest,code,name,offset,prior):
 
 
 def execute(args,manifest,code,boot_code):
+    identity=checked_recovery(args.recovery_build.resolve())
     out=args.out.resolve()
     out.relative_to((ROOT/"tmp").resolve())
     out.mkdir(parents=True,exist_ok=False)
     sd.json_file(out/"plan.json",dict(names=args.name,module_sha256=MODULE_SHA,
-        bridge_sha256=BOOT_SHA,raw_frame_available=False,read_only=True))
+        bridge_sha256=BOOT_SHA,recovery_identity=identity,
+        raw_frame_available=False,read_only=True))
     b=bootstrap(args,out,boot_code)
     frozen=b.output/"frozen-save.bin"; frozen.write_bytes(code)
     b.call("-halt","-w",frozen,hex(sd.LOAD),"-v",success="Download verified successfully")
@@ -329,12 +358,13 @@ def main():
             p.error("--known-sha needs a selected unique NAME=lowercase SHA256")
         known[name]=digest
     a.known_sha=known
-    checked_recovery(a.recovery_build.resolve())
+    identity=checked_recovery(a.recovery_build.resolve())
     _,boot=checked_bridge(a.bridge.resolve())
     manifest,code=checked_module(a.module.resolve())
     if not a.execute:
         print(json.dumps(dict(offline_valid=True,bridge_sha256=BOOT_SHA,
-            module_sha256=MODULE_SHA,names=a.name,read_only=True),indent=2))
+            module_sha256=MODULE_SHA,recovery_identity=identity,
+            names=a.name,read_only=True),indent=2))
         return
     execute(a,manifest,code,boot)
 

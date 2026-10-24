@@ -6,6 +6,30 @@ Run the existing exact early-UART recovery check first; this runner repeats
 that check immediately before its first RAM write. Archive Standby/SBF evidence
 before starting, because expanded SRAM will be initialized.
 
+`run.py` accepts only explicit reviewed prefix/sector pairs in
+`APPROVED_RECOVERY`: the current v66c normal Standby image and historical
+v59/v65 early-recovery identities. There is no arbitrary-build override. It hashes both files,
+then repeats the live exact-prefix/park check and binds that result to the
+selected identity before any RAM write. This allowlist is an offline safety
+review, not a claim that a particular trial completed or preserved an image.
+
+The superseded, uninstalled v63 candidate was removed after its receiver proof
+was found to overlap LED1. V65 relocated RCP2 to `0x343F8A80`, but its late loader
+still required the old SAVE schema and refused shutdown before reading the
+late module. Its verified early recovery remains accepted for historical READ
+access; this does not qualify v65 Standby. V66c fixes that loader gate using
+the current schema and exact profile/check mask. Its complete fixed memory
+map, early recovery bytes/literals, SRAM initializer and corrected loader were reviewed.
+The helper still loads the same frozen schema-1 v8b **READ** executable and
+bridge; it does not adopt the newer normal-profile SAVE code or relax their
+read-only completion checks. Normal versus diagnostic capture hashes do not
+change the independent host PNG validation described below.
+
+On October 24 the v66c path passed full readback of IMG68–71 and original
+IMG1, with zero card writes. The three final capture files decoded completely;
+IMG1 retained its original SHA-256. Independent NOR readback afterward still
+matched v66c. See the [qualified record and final bench state](../../evidence/2026-10-24-normal-profile/README.md).
+
 The 1,324-byte bridge uses the unchanged `raw10_memory_init()` from the frozen
 prefix to enable expanded SRAM, verifies the existing ROM clock profile and
 LED dependency, and enables/checks DWT. It has no sensor, CSI, NOR-command or

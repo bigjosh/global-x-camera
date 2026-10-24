@@ -1,0 +1,109 @@
+{
+  "schema": 1,
+  "recording": "tmp\\bringup\\sd-normal-20261024\\standby03-cycle\\raw",
+  "manifest_sha256": "9abde17b6a3ff25e0c8fb22155e9b64b45c8e82b8be154f3c031889228083f0f",
+  "sample_rate_hz": 2000000,
+  "decimate_factor": 1,
+  "starting_measurement_settings": {
+    "s/i/range/select": 128,
+    "s/v/range/select": 0,
+    "s/i/range/mode": 2,
+    "s/i/range/pre": 1,
+    "s/i/range/win": 2,
+    "s/i/range/win_sz": 10,
+    "s/i/range/post": 1,
+    "s/i/lsb_src": 2,
+    "s/v/lsb_src": 3
+  },
+  "range_commands": [
+    {
+      "state": "off",
+      "retained_range": 0,
+      "command_start": {
+        "utc": "2026-10-24T02:28:49.153573+00:00",
+        "monotonic_ns": 374338953000000
+      },
+      "command_end": {
+        "utc": "2026-10-24T02:28:49.164092+00:00",
+        "monotonic_ns": 374338968000000
+      },
+      "scope": "host diagnostics only; not physical sample boundaries"
+    },
+    {
+      "state": "auto",
+      "retained_range": 128,
+      "command_start": {
+        "utc": "2026-10-24T02:29:04.858836+00:00",
+        "monotonic_ns": 374354656000000
+      },
+      "command_end": {
+        "utc": "2026-10-24T02:29:04.868356+00:00",
+        "monotonic_ns": 374354671000000
+      },
+      "scope": "host diagnostics only; not physical sample boundaries"
+    }
+  ],
+  "uses_host_utc_alignment": false,
+  "unqualified_plateau_mode_enabled": false,
+  "cycles": [
+    {
+      "name": "standby03 (v66c Standby)",
+      "terminal_evidence": "D:\\Github\\global-x-camera\\firmware\\capture-sd\\evidence\\2026-10-24-normal-profile\\analysis\\energy\\records\\standby03\\measurement-context.json",
+      "terminal_evidence_sha256": "d448047b415bdac77d9c8e0feb7f3924006941ea4e5cd829366c171a75412421",
+      "terminal_state_qualified": true,
+      "terminal_state_qualification": "caller attestation; analyzer does not interpret firmware proof",
+      "window": {
+        "start_sample_id": 10016128,
+        "end_sample_id": 48914712
+      },
+      "boundaries": {
+        "current_onset_sample_id": 37277108,
+        "first_activity_above_off_threshold_sample_id": 37277108,
+        "integration_start_sample_id": 37077108,
+        "terminal_plateau_start_sample_id": 41392712,
+        "integration_end_sample_id": 43392712,
+        "sample_interval_s": 5e-07,
+        "plateau_boundary_bin_s": 0.001
+      },
+      "onset_to_plateau_s": 2.0578019999999997,
+      "integration_duration_s": 3.1578019999999998,
+      "pretrigger_energy_j": 0.0,
+      "onset_to_plateau_energy_j": 1.061502985215054,
+      "plateau_confirmation_energy_j": 0.039489470657227556,
+      "pretrigger_through_confirmed_plateau_energy_j": 1.1009924558722815,
+      "whole_window_energy_j": 1.2099991454751462,
+      "baseline_power_w": 0.0,
+      "conditional_baseline_subtracted_energy_j": 1.1009924558722815,
+      "peak_current_a": 7.312524795532227,
+      "minimum_source_voltage_v": 1.9732838869094849,
+      "plateau": {
+        "observed_s": 3.7609999999999997,
+        "mean_current_a": 0.008070476186094269,
+        "mean_power_w": 0.03948315880353429,
+        "bin_mean_span_a": 2.6672143023461284e-05,
+        "peak_abs_current_a": 0.009137428365647793
+      },
+      "criteria": {
+        "bin_s": 0.001,
+        "off_baseline_s": 0.5,
+        "off_abs_max_a": 0.0001,
+        "onset_a": 0.12,
+        "pretrigger_s": 0.1,
+        "plateau_min_s": 1.0,
+        "plateau_mean_min_a": 0.007,
+        "plateau_mean_max_a": 0.01,
+        "plateau_peak_abs_max_a": 0.0105,
+        "plateau_mean_span_a": 0.002,
+        "current_valid_abs_max_a": 9.5
+      },
+      "limits": [
+        "Boundaries are measured-current thresholds, not physical target-rail edges.",
+        "Pretrigger includes measured startup charge only if activity begins inside its window.",
+        "Subthreshold charge before pretrigger is not proven absent; whole-window energy is also reported.",
+        "Plateau classification and firmware completion require the external qualification.",
+        "Baseline subtraction assumes stationary background; raw energy is the primary result.",
+        "No analog calibration, saturation detection, suppression interpolation, or CN8 bypass correction is inferred."
+      ]
+    }
+  ]
+}

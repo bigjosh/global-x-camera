@@ -11,15 +11,19 @@ save_entry:
     mrs r6,msplim
     ldr r0,=0x343A0000
     msr msplim,r0
-    /* Fill only unused lower stack, preserving this frame and its caller. */
+    /* The bottom canary and MSPLIM are always present. Bulk watermark fill
+     * and later scanning are diagnostic-only, preserving the caller frame. */
+    ldr r2,=0x5354414B
+    str r2,[r0]
+#if CAPTURE_DIAGNOSTICS
     mov r1,sp
     subs r1,#64
-    ldr r2,=0x5354414B
 3:  cmp r0,r1
     bcs 4f
     str r2,[r0],#4
     b 3b
 4:
+#endif
     ldr r0,=_sbss
     ldr r1,=_ebss
     movs r2,#0

@@ -1,5 +1,70 @@
 # Capture → PNG16 → FAT32 prototype
 
+## Current measured baseline — October 24
+
+**v66c normal-profile capture → PNG16/FAT32 → Standby is installed.** Expensive
+frame scans and stack-watermark diagnostics are optional and disabled by
+default. The exact image has passed three cold cycles, each followed by
+first-attempt UART recovery and hardware Standby-flag inspection.
+
+| Current-onset → stable Standby plateau | Previous v59 baseline | Normal v66c |
+|---|---:|---:|
+| Median duration | 2.715 s | **2.058 s** |
+| Median energy | 1.289 J | **1.062 J** |
+| Three-run duration range | 2.685–2.721 s | **1.933–2.083 s** |
+| Three-run energy range | 1.279–1.291 J | **0.993–1.080 J** |
+
+The observed medians improve by about 24% in time and 18% in energy. These are
+JS-fed Nucleo-branch results with the same onset/plateau criteria, different
+captures and variable card latency; the old baseline was signature-only.
+They are not isolated MCU/battery measurements or a controlled same-frame
+attribution to diagnostic removal alone. Terminal branch current remains
+about 8.06–8.17 mA.
+
+The [full phase table, finer SAVE breakdown, exact verification and bench state](evidence/2026-10-24-normal-profile/README.md)
+are the current record. The final SAVE module also passed full PNG readback
+and pixel-for-pixel RAW comparison in a separate awake trial. Fine timing
+separates conversion, compression, framing, blocking output, file opening and
+commit costs. Encoding and SD writing still run sequentially; DMA remains the
+next separate experiment.
+
+## Build profiles — source update, October 24
+
+New builds default to **normal**. Select `--diagnostics-profile diagnostic` on
+both `build_module.py` and `build.py` for the full bring-up checks. The receiver,
+SAVE module and shutdown code must use the same profile; the integrated builder
+rejects a mismatch. Hardware qualification belongs to the exact built image,
+separately from this source-level behavior and the dated results below.
+
+Normal retains capture/error-history, byte-count, geometry/RAW10 format and
+canary checks; the guarded receiver/sensor stop sequence; loaded-code CRCs;
+encoder sample-range checks, PNG CRCs and zlib checksum; SD transfer/error/timeout
+handling; filesystem write counts, sync/close/rename and card-ready checks; and
+real cache cleanup and ownership transitions. Cheap FAST/CSI snapshots and
+their cumulative raw error history remain enabled.
+
+Diagnostic additionally runs the receiver's complete RAW statistics/FNV pass,
+three complete RAW FNV passes in SAVE, optional sensor register dumps, and the
+full stack-watermark fill/scan. Normal retains the stack limit and bottom
+canary, but leaves skipped hashes, statistics, watermark results and their
+performed flags zero. These RAM checks never substitute for SD-file readback.
+
+The receiver publishes RCP2 schema 2 at `0x343F8A80`; SAVE publishes report
+schema 2 with the profile and checks actually attempted. Successful normal and
+diagnostic reports have different required flags. Historical schema-1 handling
+remains separate; skipped checks must not be reported as successful checks.
+The superseded v62/v63 address `0x343F8A00` overlapped LED1 and must not be reused.
+
+Fine SAVE timers now separate file-space/name lookup/open, the optional
+post-save hash, SD deinitialization, final buffer flush and final cheap frame
+checks. The encoder partitions conversion/range-check/filter work, DEFLATE
+(including Adler), PNG framing/CRC, synchronous output callbacks and other
+work. Inclusive counters remain nested evidence: `FINISH` includes `FLUSH`,
+and encoder time includes callbacks. Encoding still pauses for synchronous SD
+writes; this update adds no DMA or concurrent double buffering.
+
+## Dated hardware checkpoints
+
 **October 23 baseline completed; original v59 restored.** Three unchanged-v59
 cold power signatures measured median **2.714624 s / 1.288948 J** on the
 JS110-fed board branch. Temporary instrumented firmware measured repeated
@@ -11,8 +76,8 @@ restoration, UART recovery passed, and the final cold boot returned to about
 [baseline report, phase inference limits and final bench state](evidence/2026-10-23-one-bit-baseline/README.md).
 The SD wiring remains native one-bit; four-bit operation has not been tested.
 
-**October 20: autonomous cold capture → PNG16 → SD → Standby is installed.**
-The installed **v59 Standby image** has verified first-sector SHA-256
+**October 20: autonomous cold capture → PNG16 → SD → Standby checkpoint.**
+The **v59 Standby image** installed at that checkpoint has verified first-sector SHA-256
 `7fda9d00cc7ffb3fbb9e6aac6695cf18545754b5dbfce1520cf30b2da39c4e63`.
 It captures one frame and saves a new numbered PNG using the selected
 **v8b fast-loop compressor, no row filter, D-cache enabled, `-Os`**.
@@ -29,7 +94,7 @@ resolves the pending user image check for those runs; it is not an automated
 byte-for-byte/CRC readback or a new SBF measurement. The original measurement
 archive retains its contemporaneous pending status.
 
-## Current power-up to Standby flow
+## Current source power-up to Standby flow
 
 ```mermaid
 flowchart TD
@@ -38,26 +103,29 @@ flowchart TD
     C -->|Yes| R[Enable debugging and park; no photo]
     C -->|No| D[Initialize memory, sensor and receiver; red LED]
     D --> E[Expose and capture one RAW10 frame into RAM; blue LED]
-    E --> F[Validate frame; stop capture and sensor streaming]
+    E --> F[Check frame metadata, errors and canaries; stop capture and sensor streaming]
     F --> G[Load and check save module from NOR]
     G --> H[Green LED; initialize SD and mount FAT32; choose unused image number]
     H --> I[Convert samples to 16-bit gray; compress PNG while streaming to TMP file]
     I --> J[Sync and close; wait for card; rename to PNG; wait again]
-    J --> K[Deinitialize SD; clean caches and recheck frame integrity; LEDs off]
+    J --> K[Deinitialize SD; clean caches; recheck metadata and canaries; LEDs off]
     K --> L[Load shutdown module; check successful save and idle peripherals]
     L --> M[Disable receiver, camera interface and NOR interface; LEDs off]
     M --> N[Enter MCU Standby; board-controlled switched rails turn off]
 ```
 
-This is the successful path in v59. Failure paths preserve diagnostics and
+This is the successful normal-profile path; diagnostic builds add the full
+RAW scans described above. The historical v59 path included those scans.
+Failure paths preserve diagnostics and
 leave power on instead of pretending shutdown succeeded. Exposure does not wait
 for SD initialization or PNG/save-module loading. PNG encoding shifts each
 10-bit sample left six bits and uses the selected fast compressor without a row
 filter. MCU Standby ends this boot; another photo requires reset/power cycling.
-The external LTC regulator remains enabled. The last board-branch idle current
-was about 8.23 mA, so this is not full external power removal.
+The external board supply remains on; this bench does not yet exercise LTC
+RUN shutdown. The October 20 board-branch idle current was about 8.23 mA,
+so this is not full external power removal.
 
-Three complete cold cycles measured **1.410–1.424 J** and **2.96–2.98 s**
+On October 20, three complete cold cycles measured **1.410–1.424 J** and **2.96–2.98 s**
 from observed current onset to the stable Standby plateau. Terminal board
 current was **8.10–8.21 mA**, versus about **80.03 mA** awake. These are
 JS110-fed Nucleo-branch measurements, not isolated production-camera
@@ -92,8 +160,8 @@ overwritten, and full storage stops a save.
 Starting baseline, October 23: NUCLEO-N657X0-Q / CAM-6G3-073CLR, 1120 × 1364
 RAW10 capture, grayscale16 PNG with the cached v8b fast-none encoder, and
 native **one-bit SDMMC2 at 25 MHz / 3.3 V**. The table uses one complete cold
-trace from the v61b timing overlay of the v59 Standby path. Original v59 is
-installed; no hardware was changed to assemble this table. Add future measured
+trace from the v61b timing overlay of the v59 Standby path. Original v59 was
+restored at that checkpoint; no hardware was changed to assemble this table. Add future measured
 configurations alongside this baseline, retaining the same phase boundaries.
 
 All rows are consecutive, non-overlapping intervals on the same Saleae clock.
@@ -142,11 +210,12 @@ and [separate SAVE counters](evidence/2026-10-23-one-bit-baseline/same-frame/REA
 
 ### Why the frame checks take so long
 
-Source/timing audit, October 23: the current qualification firmware reads the
+Historical source/timing audit, October 23: that qualification firmware reads the
 entire **3,055,360-byte RAW buffer four times for validation**, in addition to
 reading the pixels for encoding. These passes look for RAM corruption or cache
 coherency mistakes during bring-up. They do not verify the saved file on SD.
-The following are recommendations, not changes to the installed v59 firmware.
+The following audit motivated the October 24 profiles above; it is not a
+measurement of the normal profile.
 
 | Full-frame pass | Cache state | What it establishes | Timing evidence |
 | --- | --- | --- | --- |
@@ -201,12 +270,11 @@ validation semantics. A fingerprint accumulated during the encoder's existing
 pixel traversal is another option, but does not provide an independent
 before/after RAM comparison. None of these substitutes for SD-file readback.
 
-The current shutdown/maintenance proofs explicitly require successful
-post-clean validation and matching fingerprints. A production profile must
-change/version those requirements honestly while preserving completed/idle
-storage and recovery ownership. Do not simply skip the scans and set their
-success flags. The diagnostic profile remains useful for regressions and
-full host readback comparisons.
+The historical schema-1 shutdown/maintenance proofs require successful
+post-clean validation and matching fingerprints. Schema 2 now records the
+selected profile and performed checks while preserving completed/idle storage
+and recovery ownership. Skipped scans have zero results and unset flags. The
+diagnostic profile remains useful for regressions and full host readback comparisons.
 
 ### PNG and SD pipeline: measured work and overlap
 
@@ -236,12 +304,12 @@ scopes and cannot be added again. Three retained-frame repetitions independently
 gave 931.625–931.870 ms encoder CPU work and 555.151–561.849 ms callbacks, with
 an already-powered card's shorter 26.558 ms initialization.
 
-The existing counters cannot split conversion, DEFLATE and checksum CPU work,
+Those historical counters cannot split conversion, DEFLATE and checksum CPU work,
 or isolate file creation and the cached post-commit hash. File creation calls
 `f_getfree`, searches from IMG00001 for an unused PNG/TMP pair, and opens the
 new TMP file. The cost can grow as files accumulate. The 112.324 ms residual
-must not all be attributed to file creation. Before another optimization
-comparison, add separate DWT scopes for name lookup/open, the post-commit hash,
+must not all be attributed to file creation. The October 24 schema-2 counters
+add separate DWT scopes for name lookup/open, the post-commit hash,
 deinit, sample conversion, compression and PNG checksum work. Keep timings
 disjoint or explicitly record nested scopes; do not subtract cross-clock
 Saleae and DWT numbers to fill missing timers.
@@ -404,9 +472,11 @@ comparable fast-none COMPLETE interval from 19.0995 s to about 2.09 s;
 v7/v8b then improved the encode path. Older v5 TOTAL measurements do not
 include all of v6b's subsequently added completion diagnostics.
 
-**COMPLETE** includes stack checking, owned-cache cleanup and the uncached
-final frame checksum. **TOTAL** ends before those steps. The uncached frame
-recheck alone takes about 380.7 ms. COMPLETE starts inside `save_main`, so it
+**COMPLETE** includes owned-cache cleanup and final checks. In the historical
+schema-1 and new diagnostic profiles these include the stack-watermark scan
+and uncached final frame checksum; normal omits those expensive scans.
+**TOTAL** ends before cleanup/final checks. The historical uncached frame
+recheck alone took about 380.7 ms. COMPLETE starts inside `save_main`, so it
 excludes NOR module loading, entry BSS/stack initialization and final return/
 parking. It is not a full cold power-to-file time. Encoder wall time includes
 output callbacks; encoding, callback, SD and busy intervals overlap and must
@@ -447,6 +517,8 @@ actually establish synchronization.
 | `0x343A0000..0x343AFFFF` | Reserved 64 KiB save stack |
 | `0x343B0000` | Stack top |
 | `0x343C0000..0x343C1FFF` | V59 late shutdown code; mutually exclusive with the historical maintenance helper |
+| `0x343F89C0..0x343F8A3F` | LED1 proof |
+| `0x343F8A80..0x343F8AFF` | Schema-2 receiver profile/timing proof; separate from LED1 |
 | `0x343F9B00`, `0x343F9C00`, `0x343F9D00` | Late-loader, completion and peripheral-shutdown proofs |
 | `0x343F9E00` | NOR save-loader proof |
 | `0x343F9F00` | Explicit bench request |
@@ -454,13 +526,14 @@ actually establish synchronization.
 | `0x343FA200`, `0x343FA400` | Card and filesystem snapshots |
 
 `save_entry.S` temporarily lowers MSPLIM from the receiver's 4 KiB stack limit
-to the reserved 64 KiB floor, preserving it for return, and fills lower stack
-with a canary. The compressor alone needs more than 5.5 KiB of stack.
+to the reserved 64 KiB floor, preserving it for return, and always writes the
+bottom canary. Diagnostic builds additionally fill the lower stack for watermark
+scanning. The compressor alone needs more than 5.5 KiB of stack.
 The standalone linker rejects overlap and code exceeding its 40 KiB NOR
 module window; the v59 packer additionally limits SAVE to the 32 KiB before
 the late module at `0xE000`.
 
-The selected module is **27,420 bytes** of code/data and **300,472 bytes** of
+The historical selected v8b module is **27,420 bytes** of code/data and **300,472 bytes** of
 BSS, SHA-256
 `91e1edfa43f95a9608b94457cfbf900c6f51d5ecd10d2b3b7667c84d40cd3844`.
 Its entry is `0x34320001`, bench entry `0x34320051`, terminal park
@@ -470,11 +543,14 @@ Its entry is `0x34320001`, bench entry `0x34320051`, terminal park
 D-cache must be disabled on entry; the cached variant also rejects an enabled
 inherited MPU. After frame validation, it enables its own D-cache through the
 CMSIS invalidation sequence. Capture DMA has stopped and SD is CPU-polled.
-After card/filesystem completion it checks stack canaries, cleans/invalidates/
-disables its owned D-cache, and checks the frame again uncached. It finalizes
+After card/filesystem completion it checks the stack canary, cleans/invalidates/
+disables its owned D-cache, and repeats cheap frame checks uncached. Diagnostic
+builds additionally scan the stack and rehash the complete RAW frame. It finalizes
 diagnostics, disables I-cache, then publishes DONE after barriers. Intermediate
-cached progress is not proof of completed I/O. Qualified reports have matching
-pre/post/post-clean checksums and final `CCR=0x201`, both caches disabled.
+cached progress is not proof of completed I/O. Successful reports require both
+caches disabled and the exact profile's performed-check mask. Matching
+pre/post/post-clean checksums are required only for diagnostic SAVE or the
+historical schema-1 SAVE path; normal explicitly records zero skipped hashes.
 
 ## Reproducible build
 
@@ -483,15 +559,16 @@ The pinned CubeN6 headers and GCC toolchain come from
 Builders create new directories and never operate hardware:
 
 ```powershell
-python firmware/capture-sd/build_module.py --out tmp/bringup/my-save-module --data-cache
+python firmware/capture-sd/build_module.py --out tmp/bringup/my-save-module --data-cache --diagnostics-profile normal
 python firmware/capture-sd/build.py `
   --base tmp/bringup/capture-vcp-recovery-v45b-20261020 `
   --module tmp/bringup/my-save-module `
-  --out tmp/bringup/my-capture-sd --awake
+  --out tmp/bringup/my-capture-sd --awake --diagnostics-profile normal
 ```
 
 `-Os` is default, with explicit `-mno-unaligned-access`. The canonical cached
-build reproduces the tested v8b binary exactly. `--optimization O2/O3` are
+build now emits report schema 2; reproduce historical v8b with its frozen
+archive sources and recipe. `--optimization O2/O3` are
 experimental alternatives. Keep `--awake` for this historical awake-build
 example; omitting it without `--completion` selects the unqualified legacy
 WFI path. V59 uses `--completion standby`; its exact portable recipe is in
@@ -550,7 +627,8 @@ python firmware/capture-sd/test_save_cache.py
 python firmware/capture-sd/bench.py --self-test
 ```
 
-Canonical encoder tests pass 16 cases, including 432 ASan/UBSan C scenarios;
+Canonical encoder tests pass 22 cases, including 432 ASan/UBSan C scenarios
+and timed/untimed byte identity with nested callback accounting;
 actual-FatFs integration passes 14. Tests cover exact pixels, all three modes,
 dictionary/tail boundaries, alias checks, failure injection, no-overwrite
 behavior, cleanup and refusal to halt uncertain storage operations.

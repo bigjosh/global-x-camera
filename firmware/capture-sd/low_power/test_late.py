@@ -105,7 +105,9 @@ int main(int argc,char **argv) {
  primask=1;scb.CCR=0x201;dwt.CYCCNT=100;rcc.AHB5ENR=0x2020;
  xspi.CR=0x10000001;xspi.DCR1=0x001F0000;xspi.DCR2=1;
  xspi.CCR=0x01002101;xspi.TCR=8;xspi.IR=0x0B;xspim=2;
- report[P_MAGIC]=SAVE_REPORT_MAGIC;report[P_SCHEMA]=1;report[P_WORDS]=128;
+ report[P_MAGIC]=SAVE_REPORT_MAGIC;report[P_SCHEMA]=SAVE_REPORT_SCHEMA;report[P_WORDS]=128;
+ report[P_PROFILE]=CAPTURE_DIAGNOSTICS;
+ report[P_CHECKS_PERFORMED]=CAPTURE_DIAGNOSTICS?SAVE_CHECKS_DIAGNOSTIC:SAVE_CHECKS_NORMAL;
  report[P_TERMINAL]=0x444F4E45;report[P_STATE]=2;report[P_OP]=SAVE_OP_SAVE;
  report[P_MEDIA_IDLE]=1;sproof[0]=0x534C4431;sproof[7]=SAVE_CRC32;
  sproof[8]=SAVE_BYTES;sproof[11]=1000;
@@ -117,7 +119,17 @@ int main(int argc,char **argv) {
   case 10:sproof[11]=0;break;case 11:rcc.AHB5ENR=0;break;
   case 12:rcc.AHB5RSTR=0x20;break;case 13:break;
   case 14:xspi.IR=2;break;case 15:case 16:case 17:case 18:case 19:case 20:break;
-  case 21:entry_return=1;break;case 22:break;default:abort();
+  case 21:entry_return=1;break;case 22:break;
+  case 23:report[P_SCHEMA]=1;break; /* Historical SAVE cannot authorize new shutdown. */
+  case 24:report[P_SCHEMA]=3;break; /* Unknown schema must fail closed. */
+  case 25:report[P_PROFILE]=!CAPTURE_DIAGNOSTICS;break;
+  case 26:report[P_CHECKS_PERFORMED]^=SAVE_CHECK_FRAME;break;
+  case 27:report[P_CHECKS_PERFORMED]|=0x200U;break;
+  case 28:report[P_CHECKS_PERFORMED]=CAPTURE_DIAGNOSTICS?
+              SAVE_CHECKS_NONIMAGE_DIAGNOSTIC:SAVE_CHECKS_NONIMAGE_NORMAL;break;
+  case 29:report[P_STATE]=3;break;case 30:report[P_RESULT]=1;break;
+  case 31:report[P_NONCE]=1;break;case 32:sproof[10]=1;break;
+  default:abort();
  }
  int jump=setjmp(finish_jump);
  if(!jump)status_led_complete_sleep();
@@ -131,6 +143,7 @@ int main(int argc,char **argv) {
   if(scenario==20)assert(got==LATE_BYTES/4 && !entered && lproof[3]==12);
   if(scenario==21)assert(entered==1 && lproof[3]==13);
   if(scenario==22)assert(got==LATE_BYTES/4 && !entered && lproof[3]==11);
+  if(scenario>=23)assert(!armed && !got && !entered && reads==0 && lproof[3]==2);
  }
  printf("scenario %u passed\n",scenario);return 0;
 }
@@ -206,14 +219,16 @@ class LateTests(unittest.TestCase):
                     "#define LATE_ENTRY_ADDRESS 0x343C0001U\n"
                     f"#define LATE_BYTES {size}U\n"
                     f"#define LATE_CRC32 0x{zlib.crc32(data):08x}U\n", encoding="utf-8")
-                exe=work/f"test-{size}.exe"
-                subprocess.run([compiler,"-std=c11","-O2","-Wall","-Wextra",
-                                "-I",str(work),"-I",str(HERE.parent),
-                                str(work/"main.c"),"-o",str(exe)],check=True)
-                for scenario in range(23):
-                    with self.subTest(size=size,scenario=scenario):
-                        subprocess.run([str(exe),str(scenario)],check=True,
-                                       capture_output=True,text=True)
+                for profile in (0,1):
+                    exe=work/f"test-{size}-{profile}.exe"
+                    subprocess.run([compiler,"-std=c11","-O2","-Wall","-Wextra",
+                                    f"-DCAPTURE_DIAGNOSTICS={profile}",
+                                    "-I",str(work),"-I",str(HERE.parent),
+                                    str(work/"main.c"),"-o",str(exe)],check=True)
+                    for scenario in range(33):
+                        with self.subTest(size=size,profile=profile,scenario=scenario):
+                            subprocess.run([str(exe),str(scenario)],check=True,
+                                           capture_output=True,text=True)
 
     def test_actual_save_loader_refuses_final_transfer_error(self):
         compiler = shutil.which("clang") or shutil.which("gcc")

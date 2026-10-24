@@ -1,0 +1,216 @@
+{
+  "schema": 1,
+  "marker_channel": 1,
+  "marker_pin": "PD12 / CN15.21 / Arduino D8",
+  "sequence": "cold",
+  "expected_event_ids": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "nominal_step_s": 5e-07,
+  "tolerance_s": 1.5e-07,
+  "pulses": [
+    {
+      "start_s": 0.12288316,
+      "end_s": 0.12288389,
+      "width_s": 7.299999999904605e-07,
+      "complete": true,
+      "index": 0,
+      "event_id": null,
+      "event": null,
+      "error": "unknown_pulse_width"
+    },
+    {
+      "start_s": 0.12418189,
+      "end_s": 0.12418313,
+      "width_s": 1.2399999999995748e-06,
+      "complete": true,
+      "index": 1,
+      "event_id": null,
+      "event": null,
+      "error": "unknown_pulse_width"
+    },
+    {
+      "start_s": 0.1460432,
+      "end_s": 0.14604494,
+      "width_s": 1.7400000000000748e-06,
+      "complete": true,
+      "index": 2,
+      "event_id": null,
+      "event": null,
+      "error": "unknown_pulse_width"
+    },
+    {
+      "start_s": 0.21903105,
+      "end_s": 0.21903374,
+      "width_s": 2.689999999999637e-06,
+      "complete": true,
+      "index": 3,
+      "event_id": null,
+      "event": null,
+      "error": "unknown_pulse_width"
+    },
+    {
+      "start_s": 0.31713147,
+      "end_s": 0.31713419,
+      "width_s": 2.719999999956091e-06,
+      "complete": true,
+      "index": 4,
+      "event_id": null,
+      "event": null,
+      "error": "unknown_pulse_width"
+    },
+    {
+      "start_s": 0.31865075,
+      "end_s": 0.31865382,
+      "width_s": 3.069999999993911e-06,
+      "complete": true,
+      "index": 5,
+      "event_id": 6,
+      "event": "mount_complete",
+      "width_error_s": 6.999999999391086e-08
+    },
+    {
+      "start_s": 2.11775434,
+      "end_s": 2.11775791,
+      "width_s": 3.5700000000638e-06,
+      "complete": true,
+      "index": 6,
+      "event_id": 7,
+      "event": "png_encode_complete",
+      "width_error_s": 7.000000006379997e-08
+    },
+    {
+      "start_s": 2.14207134,
+      "end_s": 2.14207542,
+      "width_s": 4.079999999628825e-06,
+      "complete": true,
+      "index": 7,
+      "event_id": 8,
+      "event": "file_commit_close_complete",
+      "width_error_s": 7.999999962882516e-08
+    },
+    {
+      "start_s": 2.14219896,
+      "end_s": 2.14220395,
+      "width_s": 4.989999999871486e-06,
+      "complete": true,
+      "index": 8,
+      "event_id": 10,
+      "event": "pre_standby_wfi_or_awake_diagnostic_completion",
+      "width_error_s": -1.0000000128513437e-08
+    },
+    {
+      "start_s": 2.15580116,
+      "end_s": 2.15580674,
+      "width_s": 5.579999999838492e-06,
+      "complete": true,
+      "index": 9,
+      "event_id": null,
+      "event": null,
+      "error": "unknown_pulse_width"
+    }
+  ],
+  "cycles": [],
+  "errors": [
+    {
+      "pulse_index": 0,
+      "error": "unknown_pulse_width"
+    },
+    {
+      "pulse_index": 1,
+      "error": "unknown_pulse_width"
+    },
+    {
+      "pulse_index": 2,
+      "error": "unknown_pulse_width"
+    },
+    {
+      "pulse_index": 3,
+      "error": "unknown_pulse_width"
+    },
+    {
+      "pulse_index": 4,
+      "error": "unknown_pulse_width"
+    },
+    {
+      "pulse_index": 9,
+      "error": "unknown_pulse_width"
+    },
+    {
+      "pulse_index": 5,
+      "error": "event_before_sequence_start"
+    },
+    {
+      "pulse_index": 6,
+      "error": "event_before_sequence_start"
+    },
+    {
+      "pulse_index": 7,
+      "error": "event_before_sequence_start"
+    },
+    {
+      "pulse_index": 8,
+      "error": "event_before_sequence_start"
+    }
+  ],
+  "decode_passed": false,
+  "actual_standby_verified": false,
+  "image_integrity_verified": false,
+  "limitations": [
+    "Event timestamps are observed GPIO rising edges after their software checkpoints.",
+    "First STROBE/frame IRQ observations include interrupt latency.",
+    "Event 9 precedes final COMPLETE/terminal report publication and return to the receiver.",
+    "Event 10 is pre-WFI intent or awake diagnostic completion, not proof of Standby.",
+    "Power channel is a digital threshold crossing, not an analog power-good guarantee.",
+    "Missing edges are not invented for channels initially HIGH.",
+    "Host UTC/monotonic times do not synchronize independent instruments.",
+    "Pulse calls and code-layout changes can perturb the measured firmware."
+  ],
+  "input_files": {
+    "0": {
+      "path": "D:\\Github\\global-x-camera\\tmp\\bringup\\sd-normal-20261024\\standby03-cycle\\phase\\binary\\digital_0.bin",
+      "bytes": 52,
+      "sha256": "746476930c082870512a69d1f97cb2bcaff6377ac16508c6864e255fb219c56b",
+      "format_version": 0,
+      "initial_state": 0,
+      "begin_s": 7.04817499999999e-05,
+      "end_s": 10.00532096
+    },
+    "1": {
+      "path": "D:\\Github\\global-x-camera\\tmp\\bringup\\sd-normal-20261024\\standby03-cycle\\phase\\binary\\digital_1.bin",
+      "bytes": 204,
+      "sha256": "0b5c057f2c27fefad0e48487aa657140ab5c703d1b782d2e1cae6ac0bd385979",
+      "format_version": 0,
+      "initial_state": 0,
+      "begin_s": 7.04817499999999e-05,
+      "end_s": 10.00532096
+    },
+    "4": {
+      "path": "D:\\Github\\global-x-camera\\tmp\\bringup\\sd-normal-20261024\\standby03-cycle\\phase\\binary\\digital_4.bin",
+      "bytes": 52,
+      "sha256": "e6f1cfdcb46d63e43c7aedf5d0fd765a6e797dc4814c91fa935d4004a29633b0",
+      "format_version": 0,
+      "initial_state": 0,
+      "begin_s": 7.04817499999999e-05,
+      "end_s": 10.00532096
+    },
+    "6": {
+      "path": "D:\\Github\\global-x-camera\\tmp\\bringup\\sd-normal-20261024\\standby03-cycle\\phase\\binary\\digital_6.bin",
+      "bytes": 44,
+      "sha256": "a66977588e58a6444f95046e2447351207d05882e3c62b0651e5367ac9daf942",
+      "format_version": 0,
+      "initial_state": 1,
+      "begin_s": 7.04817499999999e-05,
+      "end_s": 10.00532096
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "trial": "standby04",
+  "terminal_state_qualified": true,
+  "qualification": "Fresh exact early-recovery park plus SBF, attributed by owner power/reset history",
+  "owner_attestation": "Root confirmed after standby04: exact v66c installed; no SWD during cycle/plateau; warm UART only afterward; exact early park and SBF true with no intervening power-off. The SBF reader itself retains trial_entry_proven=false; attribution uses this separate history attestation.",
+  "sector_sha256": "8129f9cc79e92c678207b4aee838810cc805d0b860c40b2f77b434ae746c8b61",
+  "phase_spec_sha256": "50bae10cfd0be9313599135a19bbb8ee1dd5804ea66a814ba150bc1fda07c002",
+  "phase_analysis_sha256": "662eea2a95af3816a62fdb5fd94e98d3a85187bdfda1e31e10f25f834019d8a6",
+  "fresh_sbf_result_sha256": "e5e701caa646c8b9aefb53d768f7d51166fc6d8a129661bd7d49ffa062231e29",
+  "image_integrity_verified": false,
+  "limits": [
+    "The native current-level boundary includes analog settling and is not an exact WFI timestamp.",
+    "SBF/completion and image integrity are separate; file verification is recorded separately.",
+    "JS voltage is measured at IN+; this is measured board-supply branch energy, not isolated MCU or battery energy.",
+    "Saleae and Joulescope clocks are not synchronized; no phase-specific energy is inferred."
+  ]
+}

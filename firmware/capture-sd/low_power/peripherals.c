@@ -49,20 +49,39 @@ static int storage_complete(void)
     volatile const uint32_t *l = LOADER_REPORT;
     volatile const sd_card_t *c = CARD_REPORT;
     volatile const photo_fs_report_t *f = FS_REPORT;
-    if (r[P_MAGIC] != SAVE_REPORT_MAGIC || r[P_SCHEMA] != 1U ||
+    if (r[P_MAGIC] != SAVE_REPORT_MAGIC || r[P_SCHEMA] != SAVE_REPORT_SCHEMA ||
         r[P_WORDS] != 128U || r[P_TERMINAL] != 0x444F4E45U ||
         r[P_STATE] != 2U || r[P_OP] != SAVE_OP_SAVE ||
         r[P_MODE] != SAVE_DEFAULT_MODE || r[P_NONCE] != 0U ||
         r[P_RESULT] || r[P_STAGE] != 8U || r[P_MEDIA_IDLE] != 1U ||
         r[P_CARD_ERROR] || r[P_FS_RESULT] || r[P_PNG_RESULT] ||
         (r[P_FINAL_CCR] & CACHE_MASK) ||
-        r[P_POSTCLEAN_VALIDATED] != 1U ||
-        r[P_FNV_BEFORE] != r[P_FNV_AFTER] ||
-        r[P_FNV_BEFORE] != r[P_POSTCLEAN_FNV] ||
+        r[P_PROFILE] != CAPTURE_DIAGNOSTICS ||
+        r[P_CHECKS_PERFORMED] != (CAPTURE_DIAGNOSTICS ?
+            SAVE_CHECKS_DIAGNOSTIC : SAVE_CHECKS_NORMAL) ||
+        r[P_STACK_CANARY] != 0x5354414BU ||
+        !r[P_PNG_CLOCK_CALLS] || r[P_PNG_CLOCK_ERROR] ||
+        r[P_RECEIVER_FLAGS] != (CAPTURE_DIAGNOSTICS ? 0x7FU : 0x1FU) ||
         r[P_WIDTH] != SAVE_WIDTH || r[P_HEIGHT] != SAVE_HEIGHT ||
         r[P_FRAME_BYTES] != SAVE_FRAME_BYTES ||
         r[P_CARD_SIZE] != sizeof(*c) || r[P_FS_SIZE] != sizeof(*f))
         return CAMERA_PERIPHERAL_BAD_SAVE;
+    /* Schema 1 is deliberately not accepted by newly generated shutdown
+     * code. Historical images keep their frozen, all-hashes-required gate. */
+#if CAPTURE_DIAGNOSTICS
+    if (r[P_POSTCLEAN_VALIDATED] != 1U ||
+        r[P_FNV_BEFORE] != r[P_FNV_AFTER] ||
+        r[P_FNV_BEFORE] != r[P_POSTCLEAN_FNV] ||
+        r[P_FNV_BEFORE] != r[P_RECEIVER_FNV])
+        return CAMERA_PERIPHERAL_BAD_SAVE;
+#else
+    if (r[P_FNV_BEFORE] || r[P_FNV_AFTER] || r[P_POSTCLEAN_FNV] ||
+        r[P_POSTCLEAN_VALIDATED] || r[P_RECEIVER_FNV] || r[P_STACK_USED] ||
+        r[P_POSTHASH_LO] || r[P_POSTHASH_HI] ||
+        r[P_POSTCLEAN_VALIDATE_LO] || r[P_POSTCLEAN_VALIDATE_HI] ||
+        r[P_STACK_SCAN_LO] || r[P_STACK_SCAN_HI])
+        return CAMERA_PERIPHERAL_BAD_SAVE;
+#endif
     if (l[0] != 0x534C4431U || l[7] != SAVE_CRC32 ||
         l[8] != SAVE_BYTES || l[10] || !l[11])
         return CAMERA_PERIPHERAL_BAD_LOADER;

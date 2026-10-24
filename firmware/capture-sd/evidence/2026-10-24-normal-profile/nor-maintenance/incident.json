@@ -1,0 +1,91 @@
+{
+  "schema": 1,
+  "scope": "NOR firmware maintenance, not camera/SD data. Root owned hardware; archive assembled offline.",
+  "part": {
+    "schematic": "MB1940 page 5 U31 MX25UM51245GXDI00",
+    "jedec_id": "C2803A",
+    "datasheet": "MX25UM51245G PM2183 v1.6, section 9-1 and Figures 17/18"
+  },
+  "initial_failures": [
+    {
+      "operation": "install-v62",
+      "sequence": 241004,
+      "result": 16,
+      "failure_stage": 8,
+      "failure_address": 25088,
+      "failure_opcode": 43,
+      "cleanup_result": 0,
+      "flags": 47,
+      "pages_programmed": 88
+    },
+    {
+      "operation": "repair-v62",
+      "sequence": 241007,
+      "result": 16,
+      "failure_stage": 8,
+      "failure_address": 29952,
+      "failure_opcode": 43,
+      "cleanup_result": 0,
+      "flags": 47,
+      "pages_programmed": 21
+    }
+  ],
+  "evidence_chain": [
+    {
+      "operation": "install-v62",
+      "sequence": 241004
+    },
+    {
+      "operation": "nor-after-write-failure",
+      "sequence": 241005
+    },
+    {
+      "operation": "nor-partial",
+      "sequence": 241006
+    },
+    {
+      "operation": "repair-v62",
+      "sequence": 241007
+    },
+    {
+      "operation": "nor-after-repair-failure",
+      "sequence": 241009
+    },
+    {
+      "operation": "nor-partial-02",
+      "sequence": 241010
+    },
+    {
+      "operation": "nor-v2-info",
+      "sequence": 241011
+    },
+    {
+      "operation": "install-v62b-v2",
+      "sequence": 241012
+    }
+  ],
+  "repair": {
+    "sequence": 241012,
+    "current_path": "operations/nor-partial-02/nor.bin",
+    "current_sha256": "9a8c787b44b577fa460ea1103a712e6d8164ccd9f77a3ecb2328d37d0cad8238",
+    "desired_path": "inputs/v62b-desired.bin",
+    "desired_sha256": "ae732240a491e4cba5e5ce408e43f56ee1ed99c33fe8008b2848c0ff6c98118d",
+    "byte_for_byte_verified": true,
+    "pages_programmed": 184,
+    "changed_erased_completed_mask": 32703,
+    "completion_calls": 198,
+    "wel_pending_reads": 0,
+    "helper_sha256": "e69f0d0c3c49c2bad1ad5e7e8ff5907fcf3b251cb5b968629c18a9c57247f307"
+  },
+  "interpretation": {
+    "original_failures_remain_failures": true,
+    "cause_established": false,
+    "transient_wel_state_reproduced_by_v2": false,
+    "policy": "Two separately authorized guarded writes with original helper failed, each followed by fresh INFO and exact partial NOR read. A separately built/reviewed v2 helper then performed one guarded write from the second exact partial state to revised v62b firmware. No automatic retry or controller guard relaxation.",
+    "readback_scope": "V2 helper final full NOR read was uploaded from RAM and compared byte-for-byte by the host; following 4 KiB guard was read independently with the frozen read-only helper.",
+    "old_status_limit": "Original result16 follows RDSCUR and checks the cached WIP-clear status byte; cleanup overwrites that byte, so final NOR status/security zero are not the triggering observation.",
+    "successful_run_limit": "Zero WIP-clear/WEL-pending observations in the successful v2 run; success qualifies this run but does not prove the former failure mechanism or immunity to recurrence.",
+    "owner_attestation": "Root reports no reset or power interruption during failed-write diagnosis and repairs."
+  },
+  "excluded": "No camera frames, PNG pixels, SD file buffers, raw instruments, process inventories or unrelated files."
+}

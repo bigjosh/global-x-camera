@@ -55,7 +55,11 @@ __attribute__((noreturn,noinline,used)) void status_led_complete_sleep(void)
         (FPU->FPCCR & FPU_FPCCR_LSPACT_Msk)) late_fail(1);
     /* These are fresh automatic-operation proofs. The late peripheral module
      * independently validates the complete card/FS/capture success snapshots. */
-    if (SAVE_DONE[P_MAGIC]!=SAVE_REPORT_MAGIC || SAVE_DONE[P_SCHEMA]!=1U ||
+    if (SAVE_DONE[P_MAGIC]!=SAVE_REPORT_MAGIC ||
+        SAVE_DONE[P_SCHEMA]!=SAVE_REPORT_SCHEMA ||
+        SAVE_DONE[P_PROFILE]!=CAPTURE_DIAGNOSTICS ||
+        SAVE_DONE[P_CHECKS_PERFORMED]!=(CAPTURE_DIAGNOSTICS ?
+            SAVE_CHECKS_DIAGNOSTIC : SAVE_CHECKS_NORMAL) ||
         SAVE_DONE[P_WORDS]!=128U || SAVE_DONE[P_TERMINAL]!=0x444F4E45U ||
         SAVE_DONE[P_STATE]!=2U || SAVE_DONE[P_OP]!=SAVE_OP_SAVE ||
         SAVE_DONE[P_RESULT] || SAVE_DONE[P_NONCE] ||

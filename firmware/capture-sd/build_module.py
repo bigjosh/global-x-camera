@@ -10,18 +10,29 @@ ROOT=HERE.parents[1]
 sys.path.insert(0,str(HERE.parent/"capture-timing"))
 from build_raw10 import compile_sources,sha,VENDOR
 
+def resolved_path(path):
+    """Keep Windows extended-length aliases consistent in source identities."""
+    value=str(Path(path).resolve())
+    if value.startswith("\\\\?\\UNC\\"):
+        value="\\\\"+value[8:]
+    elif value.startswith("\\\\?\\"):
+        value=value[4:]
+    return Path(value)
+
 def main():
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument("--out",type=Path,required=True)
     p.add_argument("--default-mode",type=int,choices=(0,1,2),default=1)
+    p.add_argument("--diagnostics-profile",choices=("normal","diagnostic"),default="normal",
+                   help="Normal omits full-frame hashes/statistics and stack watermark")
     p.add_argument("--data-cache",action="store_true",
                    help="Experimental CPU D-cache; requires inherited MPU disabled")
     p.add_argument("--optimization",choices=("Os","O2","O3"),default="Os",
                    help="Explicit compiler optimization; default preserves -Os")
     p.add_argument("--led-header",type=Path,default=ROOT/"tmp/bringup/capture-vcp-recovery-v45b-20261020/receiver/status_leds.h")
     a=p.parse_args()
-    out=a.out.resolve(); out.mkdir(parents=True,exist_ok=False)
-    origins=[HERE/n for n in ("save_main.c","save_entry.S","save_protocol.h","save.ld",
+    out=resolved_path(a.out); out.mkdir(parents=True,exist_ok=False)
+    origins=[HERE/n for n in ("save_main.c","save_entry.S","save_protocol.h","capture_profile.h","save.ld",
                              "photo_fs.c","photo_fs.h")]
     origins+=[HERE/"fs"/n for n in ("ff.c","ff.h","ffconf.h","diskio.h","sd_diskio.c","sd_diskio.h")]
     origins+=[HERE.parent/"sd-storage"/n for n in ("sd_card.c","sd_card.h")]
@@ -43,6 +54,7 @@ def main():
     flags=["-mcpu=cortex-m55","-mthumb","-mcmse","-mfpu=fpv5-d16","-mfloat-abi=hard",
            f"-{a.optimization}","-g3","-ffunction-sections","-fdata-sections","-fstack-usage",
            "-DSTM32N657xx","-DNDEBUG",f"-DSAVE_DATA_CACHE={int(a.data_cache)}",
+           f"-DCAPTURE_DIAGNOSTICS={int(a.diagnostics_profile=='diagnostic')}",
            "-Wall","-Wextra","-Werror",
            f"-I{out}",f"-I{out/'fs'}",f"-I{drivers/'CMSIS/Include'}",
            f"-I{drivers/'CMSIS/Device/ST/STM32N6xx/Include'}"]
@@ -59,6 +71,8 @@ def main():
     assert len(raw)<=40960 and symbols["_ebss"]<=0x343A0000
     assert not any(s in symbols for s in ("malloc","calloc","realloc","_sbrk"))
     manifest=dict(schema=1,hardware_status="untested",default_mode=a.default_mode,
+        report_schema=2,diagnostics_profile=a.diagnostics_profile,
+        expensive_checks=a.diagnostics_profile=="diagnostic",fine_timing_extension=1,
         data_cache_enabled=a.data_cache,cache_report_extension=1,
         optimization=a.optimization,
         binary_bytes=len(raw),binary_sha256=sha(raw),load_address="0x34320000",

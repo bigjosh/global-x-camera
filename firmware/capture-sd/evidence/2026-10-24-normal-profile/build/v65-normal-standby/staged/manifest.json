@@ -1,0 +1,726 @@
+{
+  "hardware_status": "untested",
+  "stage1": {
+    "image_bytes": 6176,
+    "payload_bytes_including_alignment": 5600,
+    "vector_address": "0x34180400",
+    "stack_pointer": "0x34188000",
+    "entry_point": "0x34180441",
+    "checksum": "0x000872b7",
+    "sha256": "63076278f1aa21176e30f15df0e68d2e8a70d542aa98a06440e4f2ef73d1f56a"
+  },
+  "stage1_raw_bytes": 5140,
+  "stage1_raw_sha256": "6f07ee096565b43a8d5c1f09a0dc28e300599667bda4b025868cb278288baefb",
+  "stage2_flash_offset": "0x2000",
+  "stage2_load_address": "0x34300000",
+  "stage2_bytes": 15796,
+  "stage2_crc32": "0xfe7773f1",
+  "stage2_sha256": "3708e2c0371b3b4ad2ec54abf547510be4e9be82d51a790027ee2a2d0f7ac366",
+  "stage2_build_manifest": "D:\\Github\\global-x-camera\\tmp\\bringup\\sd-normal-20261024\\v65-normal-standby\\receiver\\manifest.json",
+  "stage2_manifest_sha256": "c17fee23d979cc8aa3237a777963033fff95eb7454be311a8ccfa8cdc9db2330",
+  "program_bytes": 65536,
+  "program_sha256": "409628f664b41b39b8a6397d9098a7bd3420d23c9d8441538e11e59ae9ee593c",
+  "snapshot_sha256": "9fde1c8206eb450b06b74a56cb6e36b220ed2e0d1188fb6a55031171eae3409a",
+  "snapshot_path": "D:\\Github\\global-x-camera\\tmp\\bringup\\debug-awake-payload-size-20261017\\restore_original_sector_0.bin",
+  "sources": {
+    "tmp\\bringup\\sd-normal-20261024\\v65-normal-standby\\staged\\stage1.c": "b752af48ed1f8d3803f3e69036b0a6591bf22b79f22652f44f0d7b321c43ba95",
+    "tmp\\bringup\\sd-normal-20261024\\v65-normal-standby\\staged\\stage1.S": "4506e09f05bd1e343637cf0b134324191c6ab2ef7a1e970d2043dd317471b973",
+    "tmp\\bringup\\sd-normal-20261024\\v65-normal-standby\\staged\\stage1_sensor.c": "253ad968492f39d75f65900793cf2fcdbec376ce9a8241951792073bb99d752e",
+    "tmp\\bringup\\sd-normal-20261024\\v65-normal-standby\\staged\\stage1.ld": "8e7e016b0e58058bbeb25bfbd49e72559aabd29d86368c4c4cd081e64205d5ab",
+    "tmp\\bringup\\sd-normal-20261024\\v65-normal-standby\\staged\\raw10_memory.c": "0f97b344e25728702636bc17560a0b663ce3a0636e34027e3351223f43d6bc13",
+    "tmp\\bringup\\sd-normal-20261024\\v65-normal-standby\\staged\\recovery_gpio.c": "a8eb54fd71470a28c832c159b0cb1003f0469a54a62d8c52f19cfde3236ddbe9",
+    "tmp\\bringup\\sd-normal-20261024\\v65-normal-standby\\staged\\recovery_gpio.h": "2d1b3acf598021a9122fc2c0ab0474afffd40d2664905ab9e91f276e341d09fc",
+    "tmp\\bringup\\sd-normal-20261024\\v65-normal-standby\\staged\\status_leds.h": "c9f80d353b729ee432b55357eab528fc86cd1e3e3ff267d7d2cbefaab4c29b48",
+    "tmp\\bringup\\sd-normal-20261024\\v65-normal-standby\\staged\\pulse_detector.h": "ae2ee659ab11ca379bb39a62d3363214630c2928fa7b181c9eec0ef06aefa290"
+  },
+  "size": "   text\t   data\t    bss\t    dec\t    hex\tfilename\n   5140\t      0\t      0\t   5140\t   1414\tD:\\Github\\global-x-camera\\tmp\\bringup\\sd-normal-20261024\\v65-normal-standby\\staged\\stage1.elf\n",
+  "compile_flags": [
+    "-ID:\\Github\\global-x-camera\\tmp\\bringup\\sd-normal-20261024\\v65-normal-standby\\staged",
+    "-mcpu=cortex-m55",
+    "-mthumb",
+    "-mcmse",
+    "-mfloat-abi=soft",
+    "-mgeneral-regs-only",
+    "-Os",
+    "-g3",
+    "-ffunction-sections",
+    "-fdata-sections",
+    "-fno-builtin",
+    "-fno-unwind-tables",
+    "-fno-asynchronous-unwind-tables",
+    "-flto",
+    "-Wall",
+    "-Wextra",
+    "-DSTM32N657xx",
+    "-DSTAGE2_FLASH_OFFSET=8192U",
+    "-DSTAGE1_SKIP_SENSOR_RESET=1",
+    "-DSTAGE1_WORD_READS=1",
+    "-DSTAGE1_XSPI_64MHZ=0",
+    "-DSTAGE1_EARLY_SENSOR=1",
+    "-DSTAGE1_INLINE_CRC=1",
+    "-DSTAGE1_SENSOR_TRIM=1",
+    "-ID:\\Github\\global-x-camera\\tmp\\bringup\\x-cube-n6-camera-capture\\STM32Cube_FW_N6\\Drivers\\CMSIS\\Include",
+    "-ID:\\Github\\global-x-camera\\tmp\\bringup\\x-cube-n6-camera-capture\\STM32Cube_FW_N6\\Drivers\\CMSIS\\Device\\ST\\STM32N6xx\\Include",
+    "-ID:\\Github\\global-x-camera\\tmp\\bringup\\capture-recovery-pe1-v34c-20261017\\staged",
+    "-ID:\\Github\\global-x-camera\\tmp\\bringup\\sd-normal-20261024\\v65-normal-standby\\staged",
+    "-DSTAGE2_BYTES=15796U",
+    "-DSTAGE2_EXPECTED_CRC32=0xfe7773f1U"
+  ],
+  "stage1_source_directory": "D:\\Github\\global-x-camera\\tmp\\bringup\\capture-early-trim-v23-20261017",
+  "skip_sensor_reset": true,
+  "word_reads": true,
+  "xspi64": false,
+  "early_sensor": true,
+  "inline_crc": true,
+  "prefix_opt": "Os",
+  "trim_sensor": true,
+  "sensor_source_path": "D:\\Github\\global-x-camera\\tmp\\bringup\\capture-early-trim-v23-20261017\\stage1_sensor.c",
+  "trace_address": "0x343f0000",
+  "event_address": "0x343f0100",
+  "error_address": "0x343f1000",
+  "prefix_status_address": "0x343f3000",
+  "sensor_status_address": "0x343f4000",
+  "memory_status_address": "0x343f5000",
+  "raw10_status_address": "0x343f6000",
+  "memory_bootstrap_address": "0x341f5000",
+  "frame_address": "0x34000000",
+  "frame_bytes": 3055360,
+  "pixel_format": "raw10_le16",
+  "bytes_per_pixel": 2,
+  "sample_bits": 10,
+  "sample_alignment": "right",
+  "raw10_relocated": true,
+  "frozen_prefix_manifest_sha256": "8c89921c8193f830197d096420bcc6a0863ff19de7200937ae2a7e5a221774dd",
+  "recovery_gpio": {
+    "schema": 1,
+    "pin": "PE1",
+    "header": "CN15.24",
+    "active_low": true,
+    "internal_pull": "up",
+    "status_address": "0x341f7000",
+    "published_status_address": "0x343f7000",
+    "status_words": 24,
+    "status_fields": [
+      "magic",
+      "schema",
+      "words",
+      "state",
+      "reason",
+      "pin",
+      "nominal_hz",
+      "settle_cycles",
+      "begin_cycle",
+      "sample_cycle",
+      "elapsed_cycles",
+      "polls",
+      "idr",
+      "moder",
+      "pupdr",
+      "ahb4enr",
+      "demcr",
+      "dwt_ctrl",
+      "control",
+      "ipsr",
+      "primask",
+      "dbgcr",
+      "ap_unlock",
+      "reserved"
+    ],
+    "settle_cycles": 40000,
+    "nominal_clock_hz": 400000000,
+    "max_polls": 100000,
+    "park_symbol": "recovery_gpio_park",
+    "park_address": "0x3418078c",
+    "park_bytes": "fee7",
+    "clock_qualification": "Unchanged v45b 40000-cycle observation deadline at nominal 400 MHz; not a total boot-latency or all-state recovery guarantee",
+    "external_drive": "PE1 diode interface remains supported; no connected external drive assumed. Current bench recovery uses ST-LINK VCP on PE6.",
+    "receiver_unchanged": false,
+    "reserved_semantics": "request source bits: bit0 PE1 low, bit1 qualified PE6 pulse train",
+    "source_compatibility": "Early PE1/PE6 guard, park and referenced literals match v45b; later receiver length/CRC constants can change",
+    "receiver_comparison": "exact v45b receiver binary"
+  },
+  "frozen_program_sha256": "a325b36ed6d3f893ebe0d1153f476fd06fc51c648a1fe55aac15d353c959b4d8",
+  "generator_inputs": {
+    "firmware\\capture-timing\\recovery_vcp\\build.py": "4d552b8ad9901bb728b7e79947cbc833a728adf5e7d3460e62364f709420f329",
+    "firmware\\capture-timing\\recovery_vcp\\recovery_gpio.c": "a8eb54fd71470a28c832c159b0cb1003f0469a54a62d8c52f19cfde3236ddbe9",
+    "firmware\\capture-timing\\recovery_vcp\\pulse_detector.h": "ae2ee659ab11ca379bb39a62d3363214630c2928fa7b181c9eec0ef06aefa290",
+    "firmware\\capture-sd\\build.py": "2b02deb9e86db688d9439cb93639879ac6a11a6ad19d0709f3cc793867d0f04d"
+  },
+  "data_enable": "force_lane1",
+  "coarse_lines": 1428,
+  "coarse_lines_source": "prefix manual[2:4], little-endian",
+  "shutdown_data_off": true,
+  "stop_dwell_us": 100,
+  "stop_dwell_cycles": 40000,
+  "data_stop_state_required": true,
+  "readiness_gate": 6,
+  "data_enable_readiness": "force_rx_lane1_both_stop_stable100us",
+  "status_leds": {
+    "schema": 1,
+    "active_low": true,
+    "pins": {
+      "red": "PG10",
+      "green": "PG0",
+      "blue": "PG8"
+    },
+    "proof_address": "0x343f89c0",
+    "proof_words": 32,
+    "proof_fields": [
+      "magic",
+      "schema",
+      "words",
+      "phase",
+      "red_cycle",
+      "red_odr",
+      "red_idr",
+      "blue_cycle",
+      "blue_odr",
+      "blue_idr",
+      "off_cycle",
+      "off_odr",
+      "off_idr",
+      "sleep_cycle",
+      "sleep_odr",
+      "sleep_idr",
+      "moder",
+      "otyper",
+      "ospeedr",
+      "pupdr",
+      "scr",
+      "primask",
+      "systick_ctrl",
+      "icsr",
+      "sleep_state",
+      "nvic_enable_or",
+      "nvic_pending_or",
+      "ahb4enr",
+      "error_cycle",
+      "error_odr",
+      "error_idr",
+      "reserved"
+    ],
+    "red_start": "first operation in stage1_main; ROM boot precedes application code",
+    "red_snapshot": "after raw10_memory_init; not a timestamp of initial LED assertion",
+    "blue_start": "first PA0 rising STROBE, after original event50",
+    "blue_end": "first DCMIPP frame callback, after original event30",
+    "green_start": "save loader after complete-frame validation and sensor STOP; SD write phase",
+    "completion": "all off after successful SD save; standby",
+    "failure": "solid red; existing awake debug failure behavior retained",
+    "sleep": "experimental standby; see low_power proof and qualification",
+    "sleep_state": null
+  },
+  "prefix_requires_new_exact_allowlist": true,
+  "receiver_byte_identical_to_v44": false,
+  "recovery_vcp": {
+    "schema": 1,
+    "pin": "PE6",
+    "header": "CN15.2",
+    "internal_pull": "up",
+    "status_address": "0x341f7080",
+    "published_status_address": "0x343f7080",
+    "status_words": 32,
+    "status_fields": [
+      "magic",
+      "schema",
+      "words",
+      "pin",
+      "nominal_hz",
+      "window_cycles",
+      "baud",
+      "min_low",
+      "max_low",
+      "min_high",
+      "max_high",
+      "required",
+      "first_cycle",
+      "last_cycle",
+      "edges",
+      "good_pulses",
+      "bad_pulses",
+      "max_train",
+      "last_low",
+      "last_high",
+      "request",
+      "request_cycle",
+      "initial_level",
+      "final_level",
+      "source_bits",
+      "polls",
+      "reserved26",
+      "reserved27",
+      "reserved28",
+      "reserved29",
+      "reserved30",
+      "reserved31"
+    ],
+    "baud": 1000000,
+    "pattern": "Three complete bounded LOW pulses separated by bounded HIGH intervals; pulse detector, not UART byte decoding",
+    "min_low_cycles": 2400,
+    "max_low_cycles": 5200,
+    "min_high_cycles": 100,
+    "max_high_cycles": 1600,
+    "required_pulses": 3,
+    "window_cycles": 40000,
+    "nominal_clock_hz": 400000000,
+    "deadline": "same begin timestamp and deadline as PE1 settling; no wait extension",
+    "retries": "host bounded reset/retry after safe idle verification; long USB gaps may miss",
+    "break_behavior": "ST-LINK BREAK controls NRST on measured V3J15M6, not PE6",
+    "qualification": "Early guard matches v45b, which reached verified cold/warm recovery parks; later warm requests also failed. This exact integrated image is untested.",
+    "recommended_request_byte": "0xc0",
+    "reference_waveforms": "1 Mbaud 8N1: 0xC0 gives nominal 7 us LOW/3 us HIGH; 0x00 gives 9 us LOW/1 us HIGH with less sampling margin"
+  },
+  "diagnostics_profile": "normal",
+  "receiver_pad_words": 2,
+  "receiver_proof": {
+    "schema": 2,
+    "address": "0x343f8a80",
+    "bytes": 128,
+    "magic": "0x52435032",
+    "diagnostics_profile": "normal",
+    "profile_value": 0,
+    "required_performed_flags": "0x1f",
+    "skipped_trace_words": [
+      8,
+      9,
+      10,
+      11
+    ],
+    "fine_timing_clock": "DWT CYCCNT at nominal 400 MHz; unsigned 32-bit deltas",
+    "essential_sensor_reads": [
+      "0x0300 line length",
+      "0x030a RAW bits",
+      "0x030f data type"
+    ],
+    "full_frame_scan": false,
+    "routine_register_snapshots": true,
+    "optional_sensor_register_reads": false,
+    "disjoint_proof_regions": {
+      "TRACE": {
+        "start": "0x343f0000",
+        "end_exclusive": "0x343f0100"
+      },
+      "EVENTS": {
+        "start": "0x343f0100",
+        "end_exclusive": "0x343f0d80"
+      },
+      "ERROR_HISTORY": {
+        "start": "0x343f1000",
+        "end_exclusive": "0x343f1300"
+      },
+      "STAGE1_STATUS_RESERVED": {
+        "start": "0x343f3000",
+        "end_exclusive": "0x343f3100"
+      },
+      "SENSOR": {
+        "start": "0x343f4000",
+        "end_exclusive": "0x343f4080"
+      },
+      "MEMORY_COPY": {
+        "start": "0x343f5000",
+        "end_exclusive": "0x343f5080"
+      },
+      "RAW10": {
+        "start": "0x343f6000",
+        "end_exclusive": "0x343f6028"
+      },
+      "PE1_RECOVERY_COPY": {
+        "start": "0x343f7000",
+        "end_exclusive": "0x343f7060"
+      },
+      "VCP_RECOVERY_COPY": {
+        "start": "0x343f7080",
+        "end_exclusive": "0x343f7100"
+      },
+      "FAST": {
+        "start": "0x343f8000",
+        "end_exclusive": "0x343f8880"
+      },
+      "SHUTDOWN": {
+        "start": "0x343f8900",
+        "end_exclusive": "0x343f8940"
+      },
+      "FORCE": {
+        "start": "0x343f8940",
+        "end_exclusive": "0x343f89c0"
+      },
+      "LED": {
+        "start": "0x343f89c0",
+        "end_exclusive": "0x343f8a40"
+      },
+      "RCP2": {
+        "start": "0x343f8a80",
+        "end_exclusive": "0x343f8b00"
+      },
+      "LATE_LOADER": {
+        "start": "0x343f9b00",
+        "end_exclusive": "0x343f9b40"
+      },
+      "COMPLETION": {
+        "start": "0x343f9c00",
+        "end_exclusive": "0x343f9d00"
+      },
+      "PERIPHERALS": {
+        "start": "0x343f9d00",
+        "end_exclusive": "0x343f9e00"
+      },
+      "SAVE_LOADER": {
+        "start": "0x343f9e00",
+        "end_exclusive": "0x343f9e40"
+      },
+      "SAVE_REQUEST": {
+        "start": "0x343f9f00",
+        "end_exclusive": "0x343f9f40"
+      },
+      "SAVE_REPORT": {
+        "start": "0x343fa000",
+        "end_exclusive": "0x343fa200"
+      },
+      "CARD_RESERVED": {
+        "start": "0x343fa200",
+        "end_exclusive": "0x343fa400"
+      },
+      "FS_RESERVED": {
+        "start": "0x343fa400",
+        "end_exclusive": "0x343fa600"
+      }
+    },
+    "lifetime_aliases": [
+      {
+        "region": "0x34000000..0x342e9f20",
+        "ownership": "captured frame plus 32-byte canary",
+        "aliases": "completed low-SRAM prefix, recovery proofs and NOR/readback helpers; never concurrent"
+      },
+      {
+        "region": "0x34320000..0x343a0000",
+        "ownership": "SAVE code and bounded BSS",
+        "aliases": "PNG workspace and READ buffer are an operation-exclusive union"
+      },
+      {
+        "region": "0x343a0000..0x343b0000",
+        "ownership": "runtime stack and canary",
+        "aliases": "none"
+      },
+      {
+        "region": "0x343c0000..0x343c2000",
+        "ownership": "late completion code",
+        "aliases": "148-byte maintenance helper at 0x343c0000 and 64-byte status at 0x343c0400; LPL/LPM guards prohibit concurrent maintenance"
+      }
+    ],
+    "early_helper_regions": {
+      "PREFIX_RESERVED": {
+        "start": "0x34180400",
+        "end_exclusive": "0x34182000"
+      },
+      "NOR_OR_READBACK_REQUEST": {
+        "start": "0x341b4000",
+        "end_exclusive": "0x341b4040"
+      },
+      "NOR_OR_READBACK_PROOF_RESERVED": {
+        "start": "0x341b4100",
+        "end_exclusive": "0x341b41e0"
+      },
+      "NOR_DIAGNOSTIC": {
+        "start": "0x341b4300",
+        "end_exclusive": "0x341b4368"
+      },
+      "HELPER_STACK": {
+        "start": "0x341b6000",
+        "end_exclusive": "0x341b8000"
+      },
+      "NOR_INPUT": {
+        "start": "0x341c0000",
+        "end_exclusive": "0x341d0000"
+      },
+      "NOR_OUTPUT": {
+        "start": "0x341d0000",
+        "end_exclusive": "0x341e0000"
+      },
+      "HELPER_CODE_RESERVED": {
+        "start": "0x341e0000",
+        "end_exclusive": "0x341f0000"
+      },
+      "MEMORY_BOOT": {
+        "start": "0x341f5000",
+        "end_exclusive": "0x341f5080"
+      },
+      "PE1_RECOVERY": {
+        "start": "0x341f7000",
+        "end_exclusive": "0x341f7060"
+      },
+      "VCP_RECOVERY": {
+        "start": "0x341f7080",
+        "end_exclusive": "0x341f7100"
+      }
+    }
+  },
+  "receiver_byte_identical_to_v45b": false,
+  "base_receiver_sha256": "478680d7ca87b19a0bcbab208535b36ab1fd985e141ce69a86b3602963a621ac",
+  "capture_sd": {
+    "enabled": true,
+    "awake_completion": false,
+    "module_offset": 24576,
+    "module_bytes": 28960,
+    "module_sha256": "0a1a116fea60ba1b60c8974853e69f29edf8a38faf3b934d1811f816f77396d6",
+    "module_data_cache_enabled": true,
+    "module_load_phase": "after completed capture and sensor STOP",
+    "diagnostics_profile": "normal",
+    "receiver_proof": {
+      "schema": 2,
+      "address": "0x343f8a80",
+      "bytes": 128,
+      "magic": "0x52435032",
+      "diagnostics_profile": "normal",
+      "profile_value": 0,
+      "required_performed_flags": "0x1f",
+      "skipped_trace_words": [
+        8,
+        9,
+        10,
+        11
+      ],
+      "fine_timing_clock": "DWT CYCCNT at nominal 400 MHz; unsigned 32-bit deltas",
+      "essential_sensor_reads": [
+        "0x0300 line length",
+        "0x030a RAW bits",
+        "0x030f data type"
+      ],
+      "full_frame_scan": false,
+      "routine_register_snapshots": true,
+      "optional_sensor_register_reads": false,
+      "disjoint_proof_regions": {
+        "TRACE": {
+          "start": "0x343f0000",
+          "end_exclusive": "0x343f0100"
+        },
+        "EVENTS": {
+          "start": "0x343f0100",
+          "end_exclusive": "0x343f0d80"
+        },
+        "ERROR_HISTORY": {
+          "start": "0x343f1000",
+          "end_exclusive": "0x343f1300"
+        },
+        "STAGE1_STATUS_RESERVED": {
+          "start": "0x343f3000",
+          "end_exclusive": "0x343f3100"
+        },
+        "SENSOR": {
+          "start": "0x343f4000",
+          "end_exclusive": "0x343f4080"
+        },
+        "MEMORY_COPY": {
+          "start": "0x343f5000",
+          "end_exclusive": "0x343f5080"
+        },
+        "RAW10": {
+          "start": "0x343f6000",
+          "end_exclusive": "0x343f6028"
+        },
+        "PE1_RECOVERY_COPY": {
+          "start": "0x343f7000",
+          "end_exclusive": "0x343f7060"
+        },
+        "VCP_RECOVERY_COPY": {
+          "start": "0x343f7080",
+          "end_exclusive": "0x343f7100"
+        },
+        "FAST": {
+          "start": "0x343f8000",
+          "end_exclusive": "0x343f8880"
+        },
+        "SHUTDOWN": {
+          "start": "0x343f8900",
+          "end_exclusive": "0x343f8940"
+        },
+        "FORCE": {
+          "start": "0x343f8940",
+          "end_exclusive": "0x343f89c0"
+        },
+        "LED": {
+          "start": "0x343f89c0",
+          "end_exclusive": "0x343f8a40"
+        },
+        "RCP2": {
+          "start": "0x343f8a80",
+          "end_exclusive": "0x343f8b00"
+        },
+        "LATE_LOADER": {
+          "start": "0x343f9b00",
+          "end_exclusive": "0x343f9b40"
+        },
+        "COMPLETION": {
+          "start": "0x343f9c00",
+          "end_exclusive": "0x343f9d00"
+        },
+        "PERIPHERALS": {
+          "start": "0x343f9d00",
+          "end_exclusive": "0x343f9e00"
+        },
+        "SAVE_LOADER": {
+          "start": "0x343f9e00",
+          "end_exclusive": "0x343f9e40"
+        },
+        "SAVE_REQUEST": {
+          "start": "0x343f9f00",
+          "end_exclusive": "0x343f9f40"
+        },
+        "SAVE_REPORT": {
+          "start": "0x343fa000",
+          "end_exclusive": "0x343fa200"
+        },
+        "CARD_RESERVED": {
+          "start": "0x343fa200",
+          "end_exclusive": "0x343fa400"
+        },
+        "FS_RESERVED": {
+          "start": "0x343fa400",
+          "end_exclusive": "0x343fa600"
+        }
+      },
+      "lifetime_aliases": [
+        {
+          "region": "0x34000000..0x342e9f20",
+          "ownership": "captured frame plus 32-byte canary",
+          "aliases": "completed low-SRAM prefix, recovery proofs and NOR/readback helpers; never concurrent"
+        },
+        {
+          "region": "0x34320000..0x343a0000",
+          "ownership": "SAVE code and bounded BSS",
+          "aliases": "PNG workspace and READ buffer are an operation-exclusive union"
+        },
+        {
+          "region": "0x343a0000..0x343b0000",
+          "ownership": "runtime stack and canary",
+          "aliases": "none"
+        },
+        {
+          "region": "0x343c0000..0x343c2000",
+          "ownership": "late completion code",
+          "aliases": "148-byte maintenance helper at 0x343c0000 and 64-byte status at 0x343c0400; LPL/LPM guards prohibit concurrent maintenance"
+        }
+      ],
+      "early_helper_regions": {
+        "PREFIX_RESERVED": {
+          "start": "0x34180400",
+          "end_exclusive": "0x34182000"
+        },
+        "NOR_OR_READBACK_REQUEST": {
+          "start": "0x341b4000",
+          "end_exclusive": "0x341b4040"
+        },
+        "NOR_OR_READBACK_PROOF_RESERVED": {
+          "start": "0x341b4100",
+          "end_exclusive": "0x341b41e0"
+        },
+        "NOR_DIAGNOSTIC": {
+          "start": "0x341b4300",
+          "end_exclusive": "0x341b4368"
+        },
+        "HELPER_STACK": {
+          "start": "0x341b6000",
+          "end_exclusive": "0x341b8000"
+        },
+        "NOR_INPUT": {
+          "start": "0x341c0000",
+          "end_exclusive": "0x341d0000"
+        },
+        "NOR_OUTPUT": {
+          "start": "0x341d0000",
+          "end_exclusive": "0x341e0000"
+        },
+        "HELPER_CODE_RESERVED": {
+          "start": "0x341e0000",
+          "end_exclusive": "0x341f0000"
+        },
+        "MEMORY_BOOT": {
+          "start": "0x341f5000",
+          "end_exclusive": "0x341f5080"
+        },
+        "PE1_RECOVERY": {
+          "start": "0x341f7000",
+          "end_exclusive": "0x341f7060"
+        },
+        "VCP_RECOVERY": {
+          "start": "0x341f7080",
+          "end_exclusive": "0x341f7100"
+        }
+      }
+    },
+    "unchanged_prefix_leading_bytes": 2816,
+    "checked_recovery_literal_offsets": [
+      1660,
+      1664,
+      1668,
+      1672,
+      1676,
+      1680,
+      1684,
+      1688,
+      1692,
+      1696,
+      1700,
+      1704,
+      1708,
+      1712,
+      1716,
+      1720,
+      1724,
+      1728,
+      1732,
+      1736
+    ]
+  },
+  "completion_policy": "standby; experimental, not hardware qualified",
+  "low_power": {
+    "mode": "standby",
+    "proof_address": "0x343f9c00",
+    "proof_max_bytes": 512,
+    "recovery_requires_reset": true,
+    "entry_delay_us": 0,
+    "sram_lost": true,
+    "late_module": {
+      "flash_offset": 57344,
+      "load_address": "0x343c0000",
+      "entry_address": "0x343c0001",
+      "binary_bytes": 3984,
+      "binary_sha256": "927788c34c90caf7a67323fd48389ce49998029d225ec1a180e30887d037a2b6",
+      "crc32": "0x2042788b",
+      "loader_proof_address": "0x343f9b00",
+      "sleep_idle_address": "0x343c0f32",
+      "failure_park_address": "0x343c020c",
+      "return_park_address": "0x343c0f64",
+      "no_initialized_data_or_bss": true,
+      "section_sizes": {
+        "text": 3984,
+        "data": 0,
+        "bss": 0
+      },
+      "manifest_path": "D:\\Github\\global-x-camera\\tmp\\bringup\\sd-normal-20261024\\v65-normal-standby\\late\\manifest.json",
+      "manifest_sha256": "ccfa35e6fb035948626e6ad8d376f2e46e2c9989c0a0583b19371df742e272a8"
+    },
+    "loader_failure_park_address": "0x3430156a"
+  },
+  "phase_markers": {
+    "pin": "PD12",
+    "header": "CN15.21 / CN14.1 (Arduino D8)",
+    "idle_level": 0,
+    "nominal_cpu_hz": 400000000,
+    "pulse_high_cycles_per_id": 200,
+    "nominal_high_us_per_id": 0.5,
+    "poll_limit": 4096,
+    "events": {
+      "1": "receiver main entry; first stage and sensor START already completed",
+      "2": "first sensor STROBE rising IRQ observed; not exact physical exposure edge",
+      "3": "first complete frame IRQ observed",
+      "4": "SAVE module entered; beginning target timing",
+      "5": "SD initialization completed successfully",
+      "6": "FAT32 mount completed successfully",
+      "7": "PNG encoding completed; final callback buffer can still need flushing",
+      "8": "photo_fs_finish completed: closed/renamed PNG and card-ready checks",
+      "9": "SD deinit, cache clean/disable, profile-selected validation and final snapshots complete; DONE follows",
+      "10": "immediately before Standby WFI, or awake diagnostic completion park; intent only"
+    },
+    "timing_limit": "Diagnostic software observations; interrupt latency and pulse-call overhead apply. Widths need external qualification; event10 does not itself prove Standby."
+  },
+  "uninstrumented_sector_sha256": "85df2e5e557dc8456c519a317e0eb28d2e3697151bdef6fa1dce6a008af14aac"
+}

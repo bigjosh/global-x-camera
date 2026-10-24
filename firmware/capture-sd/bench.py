@@ -50,6 +50,11 @@ fs_size nonce initial_msplim""".split()
 CACHE_FIELDS="""cache_enabled initial_mpu_ctrl final_ccr cleanup_lo cleanup_hi
 postclean_validate_lo postclean_validate_hi complete_lo complete_hi postclean_fnv
 postclean_validated""".split()
+FINE_PAIRS={81:"open",83:"posthash",85:"deinit",87:"stack_scan",
+    89:"png_total",91:"png_conversion",93:"png_deflate",95:"png_framing",
+    97:"png_callback",99:"png_other",101:"png_deflate_inclusive",
+    103:"png_deflate_output",105:"png_framing_inclusive",
+    107:"png_framing_callback",113:"final_check",115:"flush"}
 CARD_QWORDS="sector_count read_sectors written_sectors read_cycles write_cycles ready_cycles".split()
 CARD_WORDS="""initialized controller_owned media_idle clock_hz ocr rca cid0 cid1
 cid2 cid3 csd0 csd1 csd2 csd3 error error_stage error_command error_sta stage
@@ -148,6 +153,13 @@ def decode_report(raw):
     words=struct.unpack("<128I",raw)
     result=dict(zip(FIELDS,words))
     result.update(zip(CACHE_FIELDS,words[68:79]))
+    if words[1]==2:
+        result.update(profile=words[79],checks_performed=words[80],
+                      png_clock_calls=words[109],png_clock_error=words[110],
+                      receiver_flags=words[111],receiver_fnv=words[112])
+        for index,field in FINE_PAIRS.items():
+            result[field]=words[index] | words[index+1]<<32
+            result[field+"_ms"]=result[field]*1000/400000000
     result["result_signed"]=signed(result["result"])
     result["png_result_signed"]=signed(result["png_result"])
     result["terminal"]=words[63]
@@ -162,9 +174,52 @@ def decode_report(raw):
     return result
 
 
+def validate_profile(report,manifest):
+    """Schema 2 omission is explicit, not an invented successful hash check."""
+    profile=manifest.get("diagnostics_profile")
+    if (profile not in ("normal","diagnostic") or
+            manifest.get("fine_timing_extension")!=1 or
+            manifest.get("expensive_checks") is not (profile=="diagnostic") or
+            report.get("profile")!=int(profile=="diagnostic")):
+        raise ValueError("Report profile differs from the reviewed module")
+    diagnostic=profile=="diagnostic"
+    saving=report["operation"]==OPERATIONS["save"]
+    expected=(0x1FF if diagnostic else 0x1E1) if saving else (0xB0 if diagnostic else 0xA0)
+    if report.get("checks_performed")!=expected:
+        raise ValueError("Required checks absent or skipped checks falsely claimed")
+    if not diagnostic and any(report[k] for k in (
+            "fnv_before","fnv_after","postclean_fnv","postclean_validated",
+            "postclean_validate","posthash","stack_scan","stack_used","receiver_fnv")):
+        raise ValueError("Normal profile must explicitly leave skipped diagnostics zero")
+    if saving:
+        if report["receiver_flags"]!=(0x7F if diagnostic else 0x1F):
+            raise ValueError("Receiver proof profile differs from SAVE")
+        if diagnostic and (report["postclean_validated"]!=1 or
+                report["receiver_fnv"]!=report["fnv_before"] or
+                report["fnv_before"]!=report["fnv_after"] or
+                report["postclean_fnv"]!=report["fnv_before"]):
+            raise ValueError("Diagnostic SAVE lacks matching completed fingerprints")
+        if report["png_clock_error"] or not report["png_clock_calls"]:
+            raise ValueError("PNG timing clock failed")
+        partition=sum(report["png_"+k] for k in
+                      ("conversion","deflate","framing","callback","other"))
+        if (partition!=report["png_total"] or report["png_total"]>report["encode"] or
+                report["png_deflate_inclusive"]-report["png_deflate_output"]!=report["png_deflate"] or
+                report["png_framing_inclusive"]-report["png_framing_callback"]!=report["png_framing"] or
+                report["flush"]>report["finish"]):
+            raise ValueError("Fine timer partition is inconsistent")
+    elif any(report[k] for k in ("receiver_flags","receiver_fnv","fnv_before",
+            "fnv_after","postclean_fnv","postclean_validated","png_clock_calls",
+            "png_clock_error",*(v for v in FINE_PAIRS.values() if v not in ("deinit","stack_scan")))):
+        raise ValueError("Nonimage operation falsely claims image validation/timing")
+
+
 def validate_success(report,manifest,request=None,allow_auto=False):
     buffer_address,buffer_bytes=module_buffer(manifest,report["operation"])
-    exact={"magic":0x53564431,"schema":1,"words":128,"state":2,"result":0,
+    schema=manifest.get("report_schema",1)
+    if schema not in (1,2):
+        raise ValueError("Unsupported reviewed report schema")
+    exact={"magic":0x53564431,"schema":schema,"words":128,"state":2,"result":0,
            "terminal":0x444F4E45,"cpu_hz":400000000,"media_idle":1,
            "card_error":0,"fs_result":0,"width":1120,"height":1364,
            "frame_bytes":FRAME_BYTES,"buffer_bytes":buffer_bytes,
@@ -185,7 +240,7 @@ def validate_success(report,manifest,request=None,allow_auto=False):
         if report["read_bytes"]>request["length"]:
             raise ValueError("Read result exceeds the requested chunk")
     if report["operation"]==OPERATIONS["save"]:
-        if (report["fnv_before"]!=report["fnv_after"] or report["rows"]!=1364
+        if ((schema==1 and report["fnv_before"]!=report["fnv_after"]) or report["rows"]!=1364
                 or report["png_result"] or not 0<report["png_bytes"]<=3100000):
             raise ValueError("Completed PNG/frame-integrity proof is missing")
     if manifest.get("cache_report_extension")==1:
@@ -193,10 +248,12 @@ def validate_success(report,manifest,request=None,allow_auto=False):
                 or report["final_ccr"]&0x30000 or report["complete"]<report["total"]
                 or (report["cache_enabled"] and report["initial_mpu_ctrl"]&1)):
             raise ValueError("Cache ownership/cleanup proof is missing")
-        if report["operation"]==OPERATIONS["save"] and (
+        if schema==1 and report["operation"]==OPERATIONS["save"] and (
                 report["postclean_validated"]!=1 or
                 report["postclean_fnv"]!=report["fnv_before"]):
             raise ValueError("Fresh uncached frame-integrity proof is missing")
+    if schema==2:
+        validate_profile(report,manifest)
 
 
 def decode_card(raw):
@@ -277,7 +334,7 @@ def validate_storage_activity(loader,report):
     module_known=report["magic"]==0x53564431
     if loader_known and (not loader[11] or loader[10] or not loader[8] or not loader[9]):
         raise ValueError("Storage loader is active/failed/unknown; no halt, retry or reset")
-    if module_known and (report["schema"]!=1 or report["words"]!=128
+    if module_known and (report["schema"] not in (1,2) or report["words"]!=128
             or report["terminal"]!=0x444F4E45 or report["state"]!=2
             or report["result"] or report["media_idle"]!=1 or report["card_error"]
             or report["fs_result"]):
@@ -476,7 +533,7 @@ def run_request(build,out,expected_sha,operation,mode,sd_hz=25000000,
                            nonce=report["nonce"],terminal=report["terminal"])
         timing["polls"].append(poll_timing)
         json_file(bench.output/"host-timing.json",timing)
-        if (report["magic"]==0x53564431 and report["schema"]==1
+        if (report["magic"]==0x53564431 and report["schema"]==manifest.get("report_schema",1)
                 and report["nonce"]==request["nonce"] and report["terminal"]==0x444F4E45):
             break
         if time.monotonic()>=deadline:

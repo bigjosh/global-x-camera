@@ -1,4 +1,4 @@
-"""Offline PD12 marker overlays on exact v50/v59 and v8b frozen builds.
+"""Offline PD12 overlays on frozen legacy or explicitly pinned profile builds.
 
 Never modifies their inputs or invokes hardware. Outputs are new directories.
 """
@@ -34,7 +34,7 @@ EVENTS = {
     6: "FAT32 mount completed successfully",
     7: "PNG encoding completed; final callback buffer can still need flushing",
     8: "photo_fs_finish completed: closed/renamed PNG and card-ready checks",
-    9: "SD deinit, cache clean/disable, uncached frame validation and final snapshots complete; DONE follows",
+    9: "SD deinit, cache clean/disable, profile-selected validation and final snapshots complete; DONE follows",
     10: "immediately before Standby WFI, or awake diagnostic completion park; intent only",
 }
 
@@ -64,7 +64,7 @@ def flags_for(manifest, original, out):
     return [f"-I{out}"] + [f.replace(str(original), str(out)) for f in manifest["compile_flags"]]
 
 def patch(path, old, new, expected=1):
-    path.write_text(replace(path.read_text(), old, new, expected=expected), encoding="utf-8")
+    path.write_text(replace(path.read_text(encoding="utf-8"), old, new, expected=expected), encoding="utf-8")
 
 def phase_metadata():
     return dict(pin="PD12", header="CN15.21 / CN14.1 (Arduino D8)",
@@ -73,10 +73,10 @@ def phase_metadata():
         timing_limit="Diagnostic software observations; interrupt latency and pulse-call overhead apply. "
                      "Widths need external qualification; event10 does not itself prove Standby.")
 
-def build_module(original, out):
+def build_module(original, out, expected_sha=MODULE_SHA):
     md = checked_manifest(original)
-    assert sha((original / "save.bin").read_bytes()) == MODULE_SHA
-    assert md["binary_sha256"] == MODULE_SHA and md["data_cache_enabled"]
+    assert sha((original / "save.bin").read_bytes()) == expected_sha
+    assert md["binary_sha256"] == expected_sha and md["data_cache_enabled"]
     sources = copied_sources(original, out, md)
     markers(out, sources)
     path = out / "save_main.c"
@@ -98,7 +98,7 @@ def build_module(original, out):
         entry_address=hex(sym["save_entry"] | 1), bench_entry_address=hex(sym["save_bench_entry"] | 1),
         park_address=hex(sym["save_park"]), bss_start=hex(sym["_sbss"]), bss_end=hex(sym["_ebss"]),
         buffer_address=hex(sym["output_buffer"]), read_buffer_address=hex(sym["scratch"]),
-        compile_flags=flags, size=size, phase_markers=phase_metadata(), uninstrumented_module_sha256=MODULE_SHA)
+        compile_flags=flags, size=size, phase_markers=phase_metadata(), uninstrumented_module_sha256=expected_sha)
     write_manifest(out, md, sources)
     return md, raw
 
@@ -134,17 +134,33 @@ def build_late(base, out, rdir, module_header):
         f"#define LATE_CRC32 0x{zlib.crc32(raw):08x}U\n")
     return raw, identity
 
-def build(base, module, out, mode):
+def build(base, module, out, mode, expected_base_sha=None, expected_module_sha=None,
+          standby_pad_words=1):
+    if not 0 <= standby_pad_words <= 16:
+        raise ValueError("Standby padding must be 0..16 words")
     base, module, out = base.resolve(), module.resolve(), out.resolve()
     pm = checked_manifest(base / "staged")
     rm = checked_manifest(base / "receiver")
     old_sector = (base / "staged/capture_sector_0.bin").read_bytes()
     old_prefix = (base / "staged/stage1.bin").read_bytes()
-    assert sha(old_sector) == BASELINES[mode] and pm["program_sha256"] == BASELINES[mode]
+    if (expected_base_sha is None) != (expected_module_sha is None):
+        raise ValueError("Explicit base and module identities must be supplied together")
+    pinned_base = expected_base_sha or BASELINES[mode]
+    pinned_module = expected_module_sha or MODULE_SHA
+    assert sha(old_sector) == pinned_base and pm["program_sha256"] == pinned_base
     assert sha(old_prefix) == pm["stage1_raw_sha256"]
     assert sha((base / "receiver/capture.bin").read_bytes()) == rm["raw_sha256"]
+    if expected_base_sha:
+        module_manifest = checked_manifest(module)
+        assert module_manifest.get("report_schema") == 2
+        assert rm.get("diagnostics_profile") in ("normal", "diagnostic")
+        assert module_manifest["diagnostics_profile"] == rm["diagnostics_profile"] == pm["diagnostics_profile"]
+        assert rm["capture_sd"]["module_sha256"] == pinned_module
+        assert bool(rm["capture_sd"]["awake_completion"]) == (mode == "awake")
+        if mode == "standby":
+            assert rm["low_power"]["mode"] == "standby"
     out.mkdir(parents=True, exist_ok=False)
-    md, module_raw = build_module(module, out / "module")
+    md, module_raw = build_module(module, out / "module", pinned_module)
     rdir, pdir = out / "receiver", out / "staged"
     sources = copied_sources(base / "receiver", rdir, rm)
     markers(rdir, sources)
@@ -173,11 +189,16 @@ def build(base, module, out, mode):
     # Data remains one final SystemCoreClock word. Identity assertions below
     # remain authoritative; no early-guard bytes or literals may change.
     if mode == "awake":
-        patch(rdir / "capture.ld", "  .data :", "  .data 0x34303CC4 : /* Diagnostic layout: final length15560. */")
+        # Full diagnostics needs 64 more bytes than the normal/legacy layout.
+        # Both end with the sole mutable SystemCoreClock word, and the prefix
+        # guard identity is verified after linking rather than inferred here.
+        data_address = 0x34303D04 if rm.get("diagnostics_profile") == "diagnostic" else 0x34303CC4
+        patch(rdir / "capture.ld", "  .data :",
+              f"  .data 0x{data_address:08X} : /* Fixed profile layout; final clock word. */")
     else:
         patch(rdir / "capture.ld", "    *(.rodata*)        /* .rodata* sections (constants, strings, etc.) */",
               "    *(.rodata*)        /* .rodata* sections (constants, strings, etc.) */\n"
-              "    LONG(0); /* Explicit diagnostic layout padding, included in CRC. */")
+              + "    LONG(0); /* Explicit diagnostic layout padding, included in CRC. */\n" * standby_pad_words)
     flags = flags_for(rm, base / "receiver", rdir)
     raw, size = compile_sources(rdir, [s for s in sources if s.suffix in (".c", ".s", ".S")],
                                 flags, rdir / "capture.ld", "capture", libc=True)
@@ -187,7 +208,8 @@ def build(base, module, out, mode):
     rm.update(hardware_status="untested", raw_bytes=len(raw), raw_sha256=sha(raw), size=size,
               entry_point=hex(struct.unpack_from("<I", raw, 4)[0]), compile_flags=flags,
               failure_park_address=hex(sym["fast_failure_idle"]), capture_source_path=str(path),
-              phase_markers=phase_metadata(), uninstrumented_sector_sha256=BASELINES[mode])
+              phase_markers=phase_metadata(), uninstrumented_sector_sha256=pinned_base,
+              phase_standby_pad_words=standby_pad_words if mode == "standby" else 0)
     rm["capture_sd"].update(module_bytes=len(module_raw), module_sha256=sha(module_raw))
     if late_identity:
         rm["low_power"].update(late_module=late_identity, loader_failure_park_address=hex(sym["late_completion_failure_idle"]))
@@ -216,7 +238,7 @@ def build(base, module, out, mode):
               stage2_build_manifest=str(rdir / "manifest.json"),
               stage2_manifest_sha256=sha((rdir / "manifest.json").read_bytes()),
               program_sha256=sha(sector), phase_markers=phase_metadata(),
-              uninstrumented_sector_sha256=BASELINES[mode])
+              uninstrumented_sector_sha256=pinned_base)
     pm["capture_sd"].update(module_bytes=len(module_raw), module_sha256=sha(module_raw),
                             unchanged_prefix_leading_bytes=first, checked_recovery_literal_offsets=offsets)
     if late_identity:
@@ -228,6 +250,7 @@ def build(base, module, out, mode):
                     module_bytes=len(module_raw), module_sha256=sha(module_raw),
                     module_manifest=str(out / "module/manifest.json"),
                     recovery_literals_verified=offsets, phase_markers=phase_metadata(),
+                    standby_pad_words=standby_pad_words if mode == "standby" else 0,
                     builder_sha256=sha(Path(__file__).read_bytes()))
     (out / "phase-build.json").write_text(json.dumps(identity, indent=2)+"\n")
     return identity
@@ -238,8 +261,14 @@ def main():
     parser.add_argument("--module", type=Path, required=True)
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--mode", choices=BASELINES, required=True)
+    parser.add_argument("--expected-base-sha256", help="Explicit profile-aware input sector identity")
+    parser.add_argument("--expected-module-sha256", help="Explicit profile-aware input module identity")
+    parser.add_argument("--standby-pad-words", type=int, default=1,
+                        help="Inert linked words for prefix-layout stability (default: 1)")
     args = parser.parse_args()
-    print(json.dumps(build(args.base, args.module, args.out, args.mode), indent=2))
+    print(json.dumps(build(args.base, args.module, args.out, args.mode,
+                          args.expected_base_sha256, args.expected_module_sha256,
+                          args.standby_pad_words), indent=2))
 
 if __name__ == "__main__":
     main()

@@ -1,0 +1,105 @@
+{
+  "schema": 1,
+  "firmware": "v66c normal Standby",
+  "cycles": [
+    {
+      "name": "standby02",
+      "compact_file": "records/standby02/power-compact.json.gz",
+      "onset_to_plateau_s": 1.9334324999999999,
+      "onset_to_plateau_energy_j": 0.9929034955938332,
+      "pretrigger_energy_j": 0.0,
+      "plateau_confirmation_energy_j": 0.039981618599288164,
+      "plateau_mean_current_a": 0.00817168911853616,
+      "plateau_mean_power_w": 0.039977811923895164,
+      "peak_current_a": 7.300146579742432,
+      "reset_to_pre_wfi_marker_ms": 1930.10222,
+      "terminal_state_qualified": true,
+      "image_integrity_verified": false
+    },
+    {
+      "name": "standby03",
+      "compact_file": "records/standby03/power-compact.json.gz",
+      "onset_to_plateau_s": 2.0578019999999997,
+      "onset_to_plateau_energy_j": 1.061502985215054,
+      "pretrigger_energy_j": 0.0,
+      "plateau_confirmation_energy_j": 0.039489470657227556,
+      "plateau_mean_current_a": 0.008070476186094269,
+      "plateau_mean_power_w": 0.03948315880353429,
+      "peak_current_a": 7.312524795532227,
+      "reset_to_pre_wfi_marker_ms": 2054.30288,
+      "terminal_state_qualified": true,
+      "image_integrity_verified": false
+    },
+    {
+      "name": "standby04",
+      "compact_file": "records/standby04/power-compact.json.gz",
+      "onset_to_plateau_s": 2.0828245,
+      "onset_to_plateau_energy_j": 1.0804637747700465,
+      "pretrigger_energy_j": 0.0,
+      "plateau_confirmation_energy_j": 0.03942662448017299,
+      "plateau_mean_current_a": 0.008057407771029212,
+      "plateau_mean_power_w": 0.03941851107997485,
+      "peak_current_a": 7.321807861328125,
+      "reset_to_pre_wfi_marker_ms": 2080.34159,
+      "terminal_state_qualified": true,
+      "image_integrity_verified": false
+    }
+  ],
+  "energy_j": {
+    "median": 1.061502985215054,
+    "minimum": 0.9929034955938332,
+    "maximum": 1.0804637747700465,
+    "n": 3
+  },
+  "current_onset_to_plateau_s": {
+    "median": 2.0578019999999997,
+    "minimum": 1.9334324999999999,
+    "maximum": 2.0828245,
+    "n": 3
+  },
+  "reset_to_pre_wfi_marker_ms": {
+    "median": 2054.30288,
+    "minimum": 1930.10222,
+    "maximum": 2080.34159,
+    "n": 3
+  },
+  "prior_summary_sha256": "627b361670434815e98da4917cf62195ce0ef97d0590cac868632d45e795a462",
+  "same_boundary_criteria": {
+    "bin_s": 0.001,
+    "off_baseline_s": 0.5,
+    "off_abs_max_a": 0.0001,
+    "onset_a": 0.12,
+    "pretrigger_s": 0.1,
+    "plateau_min_s": 1.0,
+    "plateau_mean_min_a": 0.007,
+    "plateau_mean_max_a": 0.01,
+    "plateau_peak_abs_max_a": 0.0105,
+    "plateau_mean_span_a": 0.002,
+    "current_valid_abs_max_a": 9.5
+  },
+  "limits": [
+    "3 final trials are included; median/range are descriptive, not population bounds.",
+    "Native-current energy boundaries are distinct from the independently clocked Saleae GPIO markers.",
+    "Observed quiet-tail onset can include analog settling; it is not an exact WFI entry time.",
+    "Measured JS branch energy includes board overhead and omits unmeasured bypass paths; no isolated-MCU or battery conversion is inferred.",
+    "The previous v59 baseline used the same threshold criteria but has signature-only qualification and different frames/firmware.",
+    "Normal-profile timing/check removal and card/image variability are not isolated by this comparison.",
+    "Separate PNG verification records establish image integrity; SBF alone does not inspect pixels."
+  ],
+  "prior_energy_j": {
+    "median": 1.2889484328311933,
+    "minimum": 1.278877252662483,
+    "maximum": 1.2910827574464105,
+    "n": 3
+  },
+  "observed_median_energy_reduction_fraction": 0.17645814357099787,
+  "prior_current_onset_to_plateau_s": {
+    "median": 2.7146239999999997,
+    "minimum": 2.684675,
+    "maximum": 2.7214544999999997,
+    "n": 3
+  },
+  "observed_median_time_reduction_fraction": 0.24195689716144853,
+  "firmware_sector_sha256": "8129f9cc79e92c678207b4aee838810cc805d0b860c40b2f77b434ae746c8b61",
+  "firmware_prefix_sha256": "247f27c231e0053b7024af29914c6a0cb1b7decb1632ac0d6142a68b89e2da58"
+}

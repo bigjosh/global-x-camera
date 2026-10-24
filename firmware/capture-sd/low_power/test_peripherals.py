@@ -169,11 +169,17 @@ int main(int argc,char **argv) {
  photo_fs_report_t *f=(photo_fs_report_t *)fake_fs_bytes;
  uint32_t *r=fake_report,*l=fake_loader;
  fake_primask=1; fake_scb.CCR=0x201; fake_dwt.CYCCNT=100;
- r[P_MAGIC]=SAVE_REPORT_MAGIC; r[P_SCHEMA]=1;r[P_WORDS]=128;
+ r[P_MAGIC]=SAVE_REPORT_MAGIC; r[P_SCHEMA]=2;r[P_WORDS]=128;
  r[P_TERMINAL]=0x444F4E45; r[P_STATE]=2;r[P_OP]=SAVE_OP_SAVE;
  r[P_MODE]=SAVE_DEFAULT_MODE;r[P_STAGE]=8;r[P_MEDIA_IDLE]=1;
- r[P_FINAL_CCR]=0x201;r[P_POSTCLEAN_VALIDATED]=1;
+ r[P_FINAL_CCR]=0x201;r[P_PROFILE]=CAPTURE_DIAGNOSTICS;
+ r[P_CHECKS_PERFORMED]=CAPTURE_DIAGNOSTICS?0x1ff:0x1e1;
+ r[P_STACK_CANARY]=0x5354414b;r[P_PNG_CLOCK_CALLS]=100;
+ r[P_RECEIVER_FLAGS]=CAPTURE_DIAGNOSTICS?0x7f:0x1f;
+#if CAPTURE_DIAGNOSTICS
+ r[P_POSTCLEAN_VALIDATED]=1;r[P_RECEIVER_FNV]=123;
  r[P_FNV_BEFORE]=r[P_FNV_AFTER]=r[P_POSTCLEAN_FNV]=123;
+#endif
  r[P_WIDTH]=SAVE_WIDTH;r[P_HEIGHT]=SAVE_HEIGHT;r[P_FRAME_BYTES]=SAVE_FRAME_BYTES;
  r[P_CARD_SIZE]=sizeof(*c);r[P_FS_SIZE]=sizeof(*f);r[P_PNG_BYTES_LO]=1234;
  l[0]=0x534C4431;l[7]=SAVE_CRC32;l[8]=SAVE_BYTES;l[11]=1000;
@@ -229,6 +235,16 @@ int main(int argc,char **argv) {
   case 34:case 43:fake_n.IDR=0;break;
   case 35:fake_c.IDR=0;break;
   case 36:break; /* Sensor reset pin physically stuck HIGH. */
+  case 44:r[P_SCHEMA]=1;break; /* Historical proof cannot enter new shutdown. */
+  case 45:r[P_PROFILE]^=1;break;
+  case 46:r[P_CHECKS_PERFORMED]^=2;break;
+  case 47:r[P_FNV_AFTER]^=1;break;
+  case 48:r[P_PNG_CLOCK_ERROR]=1;break;
+  case 49:r[P_PNG_CLOCK_CALLS]=0;break;
+  case 50:r[P_STACK_CANARY]^=1;break;
+  case 51:r[P_RECEIVER_FLAGS]^=0x20;break;
+  case 52:r[P_POSTCLEAN_VALIDATED]^=1;break;
+  case 53:r[P_RECEIVER_FNV]^=1;break;
   default:abort();
  }
  if(scenario==1) fake_control=0x0C;
@@ -257,7 +273,7 @@ int main(int argc,char **argv) {
   else assert(result==0 && proof.word[LP_REPEAT_COUNT]==1);
  } else {
   assert(result!=0 && proof.word[LP_TERMINAL]!=CAMERA_PERIPHERAL_DONE);
-  if(scenario<36) assert(!proof.word[LP_MUTATION_STARTED] && clock_writes==0);
+  if(scenario<36 || scenario>=44) assert(!proof.word[LP_MUTATION_STARTED] && clock_writes==0);
   else {
    assert(proof.word[LP_MUTATION_STARTED]);
    if(scenario==43) {
@@ -320,16 +336,18 @@ class PeripheralTests(unittest.TestCase):
                 "#define SAVE_DEFAULT_MODE 1U\n", encoding="utf-8")
             (work / "under_test.c").write_text(source, encoding="utf-8")
             (work / "main.c").write_text(HARNESS, encoding="utf-8")
-            exe = work / "test.exe"
-            subprocess.run([compiler, "-std=c11", "-O2", "-Wall", "-Wextra",
-                            "-Wno-unused-variable", "-I", str(work),
-                            "-I", str(HERE), "-I", str(HERE.parent),
-                            "-I", str(ROOT / "firmware/sd-storage"),
-                            str(work / "main.c"), "-o", str(exe)], check=True)
-            for scenario in range(44):
-                with self.subTest(scenario=scenario):
-                    subprocess.run([str(exe), str(scenario)], check=True,
-                                   capture_output=True, text=True)
+            for diagnostics in (0,1):
+                exe = work / f"test-{diagnostics}.exe"
+                subprocess.run([compiler, "-std=c11", "-O2", "-Wall", "-Wextra",
+                                f"-DCAPTURE_DIAGNOSTICS={diagnostics}",
+                                "-Wno-unused-variable", "-I", str(work),
+                                "-I", str(HERE), "-I", str(HERE.parent),
+                                "-I", str(ROOT / "firmware/sd-storage"),
+                                str(work / "main.c"), "-o", str(exe)], check=True)
+                for scenario in range(54):
+                    with self.subTest(diagnostics=diagnostics,scenario=scenario):
+                        subprocess.run([str(exe), str(scenario)], check=True,
+                                       capture_output=True, text=True)
 
 
 if __name__ == "__main__":

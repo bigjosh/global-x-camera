@@ -9,6 +9,8 @@ import sys
 import zlib
 
 HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE))
+from receiver_profile import transform as receiver_profile_transform, profile_metadata
 sys.path.insert(0, str(HERE.parent / "capture-timing"))
 from build_raw10 import (ROOT, VENDOR, checked_manifest, compile_sources, make_image,
                         inspect_image, sha, write_manifest, replace)
@@ -103,7 +105,7 @@ def pack_sector(original, boot, receiver, module=None, late=None):
     return sector
 
 
-def build_late(out, rdir, mode, delay_us):
+def build_late(out, rdir, mode, delay_us, diagnostics_profile="normal"):
     """Build stateless completion code, loaded after SAVE into unused high SRAM."""
     ldir = out / "late"
     ldir.mkdir()
@@ -114,7 +116,7 @@ def build_late(out, rdir, mode, delay_us):
         dst.write_bytes((HERE / "low_power" / name).read_bytes())
         sources.append(dst)
     for name in ("status_leds.h", "save_protocol.h", "photo_fs.h",
-                 "sd_card.h", "save_module_config.h"):
+                 "sd_card.h", "save_module_config.h", "capture_profile.h"):
         dst = ldir / name
         dst.write_bytes((rdir / name).read_bytes())
         sources.append(dst)
@@ -126,7 +128,8 @@ def build_late(out, rdir, mode, delay_us):
              f"-I{ldir}", f"-I{drivers / 'CMSIS/Include'}",
              f"-I{drivers / 'CMSIS/Device/ST/STM32N6xx/Include'}",
              f"-DLOW_POWER_MODE={('peripherals-off','sleep','stop','standby').index(mode)}",
-             f"-DLOW_POWER_ENTRY_DELAY_US={delay_us}U"]
+             f"-DLOW_POWER_ENTRY_DELAY_US={delay_us}U",
+             f"-DCAPTURE_DIAGNOSTICS={int(diagnostics_profile == 'diagnostic')}"]
     raw, size = compile_sources(ldir, [s for s in sources if s.suffix in (".c", ".S")],
                                 flags, ldir / "late.ld", "late")
     assert 0 < len(raw) <= LATE_MAX_BYTES and len(raw) % 4 == 0
@@ -145,7 +148,7 @@ def build_late(out, rdir, mode, delay_us):
         metadata["return_park_address"] = hex(symbol(ldir, "low_power_return_idle"))
     manifest = dict(schema=1, hardware_status="untested", mode=mode,
                     entry_delay_us=delay_us, binary_file="late.bin", size=size,
-                    compile_flags=flags, **metadata)
+                    compile_flags=flags, diagnostics_profile=diagnostics_profile, **metadata)
     write_manifest(ldir, manifest, sources)
     metadata.update(manifest_path=str(ldir / "manifest.json"),
                     manifest_sha256=sha((ldir / "manifest.json").read_bytes()))
@@ -185,11 +188,16 @@ def main():
     p.add_argument("--entry-delay-us", type=int, default=0,
                    help="Qualification-only delay before low-power entry, 0..1000000")
     p.add_argument("--module", type=Path)
+    p.add_argument("--diagnostics-profile", choices=("normal", "diagnostic"), default="normal")
+    p.add_argument("--receiver-pad-words", type=int, default=0,
+                   help="Explicit 0..16 inert linker words for recovery-prefix literal layout")
     a = p.parse_args()
     if a.completion and (a.awake or not a.module):
         p.error("--completion requires --module and cannot be combined with --awake")
     if not 0 <= a.entry_delay_us <= 1000000 or (a.entry_delay_us and not a.completion):
         p.error("--entry-delay-us requires --completion and must be 0..1000000")
+    if not 0 <= a.receiver_pad_words <= 16:
+        p.error("--receiver-pad-words must be 0..16")
     # Bulk completion code is loaded after SAVE; it must not inflate the
     # pre-capture receiver transfer and consume the first-frame timing margin.
     module_offset = MODULE_OFFSET
@@ -217,9 +225,16 @@ def main():
             text = replace(text, "/* Prepared; CPU context proves WFI. */",
                            "/* Prepared for the awake diagnostic completion park. */")
             raw = text.encode()
-        if src.name == "capture.c" and a.module:
-            raw = capture_save_handoff(raw.decode("utf-8"), bool(a.completion)).encode()
+        if src.name == "capture.c":
+            text = receiver_profile_transform(raw.decode("utf-8"))
+            if a.module:
+                text = capture_save_handoff(text, bool(a.completion))
+            raw = text.encode("utf-8")
         dst.write_bytes(raw); sources.append(dst)
+    profile_header = rdir / "capture_profile.h"
+    profile_header.write_bytes((HERE / "capture_profile.h").read_bytes())
+    sources.append(profile_header)
+    receiver_proof = profile_metadata(a.diagnostics_profile, rdir / "status_leds.h", profile_header)
     if a.completion:
         for name in ("save_protocol.h", "photo_fs.h", "sd_card.h"):
             dst = rdir / name
@@ -229,6 +244,9 @@ def main():
     md = None
     if a.module:
         md = json.loads((a.module / "manifest.json").read_text())
+        assert md.get("report_schema") == 2, "Profile-aware receiver requires SAVE report schema 2"
+        assert md.get("diagnostics_profile") == a.diagnostics_profile, "Receiver/SAVE profile mismatch"
+        assert (a.module / "capture_profile.h").read_bytes() == profile_header.read_bytes()
         for path, expected in md["sources"].items():
             assert sha((ROOT / path).read_bytes()) == expected, path
         module = (a.module / "save.bin").read_bytes()
@@ -259,10 +277,17 @@ def main():
     late_metadata = None
     if a.completion:
         late, late_metadata, late_header = build_late(
-            out, rdir, a.completion, a.entry_delay_us)
+            out, rdir, a.completion, a.entry_delay_us, a.diagnostics_profile)
         sources.append(late_header)
         assert len(module) <= LATE_OFFSET - module_offset
-    flags = list(rm["compile_flags"]) + [f"-I{rdir}"]
+    if a.receiver_pad_words:
+        linker = rdir / "capture.ld"
+        anchor = "    *(.rodata*)        /* .rodata* sections (constants, strings, etc.) */"
+        linker.write_text(replace(linker.read_text(encoding="utf-8"), anchor,
+            anchor + "\n" + "    LONG(0); /* Explicit checked layout padding. */\n" * a.receiver_pad_words),
+            encoding="utf-8")
+    flags = list(rm["compile_flags"]) + [f"-I{rdir}",
+            f"-DCAPTURE_DIAGNOSTICS={int(a.diagnostics_profile == 'diagnostic')}"]
     raw, size = compile_sources(rdir, [s for s in sources if s.suffix in (".c", ".s", ".S")],
                                 flags, rdir / "capture.ld", "capture", libc=True)
     assert len(raw) + 0x2000 <= module_offset
@@ -276,7 +301,8 @@ def main():
         module_bytes=len(module) if module else 0,
         module_sha256=sha(module) if module else None,
         module_data_cache_enabled=bool(md and md.get("data_cache_enabled", False)),
-        module_load_phase="after completed capture and sensor STOP" if module else None)
+        module_load_phase="after completed capture and sensor STOP" if module else None,
+        diagnostics_profile=a.diagnostics_profile, receiver_proof=receiver_proof)
     manifest.update(raw_bytes=len(raw), raw_sha256=sha(raw), size=size, entry_point=hex(entry),
                     hardware_status="untested", compile_flags=flags,
                     failure_park_address=hex(symbol(rdir, "fast_failure_idle")),
@@ -286,11 +312,15 @@ def main():
                     base_receiver_sha256=BASE_RECEIVER,
                     base_receiver_manifest_sha256=sha((base / "receiver/manifest.json").read_bytes()),
                     receiver_byte_identical_to_v45b=receiver_unchanged,
-                    capture_sd=copy.deepcopy(capture_sd))
+                    capture_sd=copy.deepcopy(capture_sd), diagnostics_profile=a.diagnostics_profile,
+                    receiver_pad_words=a.receiver_pad_words,
+                    receiver_proof=receiver_proof)
     manifest["parameters"]["first_frame_qualification"] = (
         "pending hardware qualification of this exact capture/storage variant")
     manifest.setdefault("generator_inputs", {})[str(HERE.relative_to(ROOT) / "build.py")] = sha(
         Path(__file__).read_bytes())
+    manifest["generator_inputs"][str(HERE.relative_to(ROOT) / "receiver_profile.py")] = sha(
+        (HERE / "receiver_profile.py").read_bytes())
     completion_metadata(manifest, a.awake, bool(module))
     if a.completion:
         manifest["completion_policy"] = a.completion + "; experimental, not hardware qualified"
@@ -336,7 +366,9 @@ def main():
                     stage2_crc32=hex(zlib.crc32(raw)), compile_flags=pflags,
                     stage2_build_manifest=str(rdir / "manifest.json"),
                     stage2_manifest_sha256=sha((rdir / "manifest.json").read_bytes()),
-                    program_sha256=sha(sector),
+                    program_sha256=sha(sector), diagnostics_profile=a.diagnostics_profile,
+                    receiver_pad_words=a.receiver_pad_words,
+                    receiver_proof=receiver_proof,
                     receiver_byte_identical_to_v44=receiver_unchanged,
                     receiver_byte_identical_to_v45b=receiver_unchanged,
                     base_receiver_sha256=BASE_RECEIVER,

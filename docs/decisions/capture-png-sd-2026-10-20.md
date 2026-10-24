@@ -709,3 +709,58 @@ remains running. No bench helper remains active.
 See [hardware notes](../../firmware/capture-sd/low_power/hardware-notes-2026-10-20.md),
 [supply and teardown details](../../firmware/capture-sd/low_power/peripherals.md),
 and the [reproducible firmware and measurement archive](../../firmware/capture-sd/evidence/2026-10-20-low-power/README.md).
+
+## October 24 — optional diagnostics and a measured normal profile
+
+The user approved making expensive checks optional, disabling them during
+normal operation, and measuring the result before attempting DMA. New builds
+therefore default to `normal`; `--diagnostics-profile diagnostic` restores the
+complete RAW statistics/FNV passes, optional sensor register dumps and stack
+watermark fill/scan. Receiver, SAVE and shutdown profiles must agree.
+
+Normal keeps capture error history, exact geometry/format/byte counts, frame
+and stack canaries, guarded sensor/receiver stop, loaded-code CRCs, inline
+sample-range validation, PNG checksums, SD transfer checks, filesystem commit,
+card-idle proof and cache cleanup. Skipped diagnostics are explicitly absent
+from performed-check flags and their result fields remain zero. A skipped
+frame hash is not evidence that a frame passed a hash check. The host still
+performs independent full-file readback when qualifying firmware.
+
+SAVE report schema 2 and RCP2 schema 2 carry the profile and fine counters.
+The encoder reports a disjoint partition of conversion/check/filter work,
+DEFLATE including Adler, PNG framing/CRC, synchronous output callbacks and
+remaining overhead. Inclusive counters are retained separately and must not
+be added to that partition. File lookup/open, final buffer flush, commit/close,
+deinitialization and optional checks have separate timers. No DMA or concurrent
+encoding/writing was introduced; encoding pauses during SD callbacks.
+
+Two implementation mistakes found during qualification are preserved in the
+evidence. RCP2 initially overlapped the LED report; its canonical address is
+now `0x343F8A80`, with a region-overlap regression check. An old late-loader
+schema-1 gate then refused shutdown after v65 successfully saved IMG68. The
+corrected v66c gate requires the current schema and exact profile/check mask
+before XSPI access. The failed shutdown run is excluded from the energy
+baseline. Neither failure was bypassed by weakening the maintenance guards.
+
+The selected v66c sector is
+`8129f9cc79e92c678207b4aee838810cc805d0b860c40b2f77b434ae746c8b61`.
+Its SAVE module is byte-identical to the v64 awake trial whose saved PNG was
+read back and compared against every retained RAW sample. Three v66c cold
+cycles subsequently reached Standby and each passed first-attempt UART
+recovery plus SBF inspection. Their median current-onset-to-plateau result is
+**2.057802 s / 1.061503 J**, with ranges **1.933433–2.082825 s** and
+**0.992903–1.080464 J**. These are JS-fed board-branch measurements; the earlier
+v59 comparison is signature-only and uses different captures. The observed
+median reductions of about 24% in time and 18% in energy do not isolate every
+change from card or image variability.
+
+Deferred until after this baseline: DMA/double buffering, a possible
+instruction-fetch/alignment improvement to the uncached SAVE entry/BSS loop,
+and a robust replacement for the phase marker's pulse-width decoder. Current
+external phase labels use exact source order plus independent completion
+evidence; the failed strict width decoding remains recorded. The nominal
+400 MHz CPU timers and Saleae timestamps are separate clock domains.
+
+See the [normal-profile evidence and final state](../../firmware/capture-sd/evidence/2026-10-24-normal-profile/README.md)
+for exact readback scope, measurements, reproducible builds and maintenance
+corrections. Arbitrary SD power-loss protection remains unqualified.

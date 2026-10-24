@@ -1,0 +1,80 @@
+{
+  "schema": 1,
+  "prior": "v60c awake IMG00061.PNG",
+  "current": "v64 normal awake IMG00067.PNG",
+  "same_frame": false,
+  "controlled_profile_only_comparison": false,
+  "external_saleae_intervals": {
+    "frame_irq_to_save": {
+      "prior_ms": 453.95014999999995,
+      "current_ms": 70.73000999999998,
+      "observed_reduction_ms": 383.22013999999996
+    },
+    "sd_init": {
+      "prior_ms": 123.57782000000006,
+      "current_ms": 110.99365999999999,
+      "observed_reduction_ms": 12.584160000000068
+    },
+    "mount": {
+      "prior_ms": 1.7089599999999816,
+      "current_ms": 1.7007099999999942,
+      "observed_reduction_ms": 0.008249999999987434
+    },
+    "mount_to_png_return": {
+      "prior_ms": 1633.9735600000001,
+      "current_ms": 1576.8126100000002,
+      "observed_reduction_ms": 57.16094999999996
+    },
+    "final_flush_and_commit_close": {
+      "prior_ms": 24.797190000000136,
+      "current_ms": 23.88459999999992,
+      "observed_reduction_ms": 0.9125900000002147
+    },
+    "post_commit_to_marker9": {
+      "prior_ms": 445.11248999999964,
+      "current_ms": 0.12772000000005335,
+      "observed_reduction_ms": 444.98476999999957
+    },
+    "save_begin_to_marker9": {
+      "prior_ms": 2229.1700199999996,
+      "current_ms": 1713.5193000000002,
+      "observed_reduction_ms": 515.6507199999994
+    },
+    "reset_release_to_first_strobe_irq": {
+      "prior_ms": 22.54302000000001,
+      "current_ms": 22.871239999999986,
+      "observed_reduction_ms": -0.32821999999997686
+    },
+    "reset_release_to_first_frame_irq": {
+      "prior_ms": 44.40479000000001,
+      "current_ms": 44.73318000000001,
+      "observed_reduction_ms": -0.32838999999999885
+    },
+    "reset_release_to_awake_checkpoint": {
+      "prior_ms": 2727.5426199999997,
+      "current_ms": 1829.0003,
+      "observed_reduction_ms": 898.5423199999998
+    }
+  },
+  "nominal_400MHz_save_complete": {
+    "prior_ms": 2214.4012475,
+    "current_ms": 1701.19689
+  },
+  "png_bytes": {
+    "prior": 1458185,
+    "current": 1452183
+  },
+  "input_sha256": {
+    "prior_phase": "2ded4989373f1641e849b354f6e839b9ad8c32caafa1fb0a6eece54844eb4b8c",
+    "prior_save": "911497529a01265aff67f777edc56a808c6b55736065965def48bd3c6d77f9e2",
+    "current_phase": "873e90ff5575c16002ca6c94b435cc1b9326dac3d19bed30bad220f7847c9e90"
+  },
+  "limits": [
+    "Both external timelines use source-order labels; strict pulse-width qualification remains false.",
+    "STROBE and frame markers are interrupt observations, not exact exposure edges; interrupt latency remains included.",
+    "These are different cold captures, firmware layouts and frame contents. Differences are observations, not a controlled causal benchmark.",
+    "The prior post-commit phase includes diagnostic scans/checks; the normal profile retains essential checks and explicitly skips those bulk diagnostics.",
+    "External Saleae milliseconds and nominal-400MHz DWT milliseconds are separate time bases and are not added.",
+    "Awake current does not independently reveal completion; no complete-cycle energy is assigned to either trial."
+  ]
+}

@@ -1,0 +1,1166 @@
+
+D:\Github\global-x-camera\tmp\bringup\rom-nor-programmer-v2-20261024\programmer.elf:     file format elf32-littlearm
+
+
+Disassembly of section .text:
+
+341e0000 <ROM_NOR_Programmer>:
+341e0000:	b672      	cpsid	i
+341e0002:	f3ef 8008 	mrs	r0, MSP
+341e0006:	f3ef 810a 	mrs	r1, MSPLIM
+341e000a:	2200      	movs	r2, #0
+341e000c:	f382 880a 	msr	MSPLIM, r2
+341e0010:	4a02      	ldr	r2, [pc, #8]	@ (341e001c <ROM_NOR_Programmer+0x1c>)
+341e0012:	f382 8808 	msr	MSP, r2
+341e0016:	f000 ba83 	b.w	341e0520 <rom_nor_programmer>
+341e001a:	0000      	.short	0x0000
+341e001c:	341b8000 	.word	0x341b8000
+
+341e0020 <compare>:
+341e0020:	1c4b      	adds	r3, r1, #1
+341e0022:	1841      	adds	r1, r0, r1
+341e0024:	b510      	push	{r4, lr}
+341e0026:	d200      	bcs.n	341e002a <compare+0xa>
+341e0028:	b901      	cbnz	r1, 341e002c <compare+0xc>
+341e002a:	2301      	movs	r3, #1
+341e002c:	3b01      	subs	r3, #1
+341e002e:	d101      	bne.n	341e0034 <compare+0x14>
+341e0030:	2001      	movs	r0, #1
+341e0032:	e010      	b.n	341e0056 <compare+0x36>
+341e0034:	f100 5150 	add.w	r1, r0, #872415232	@ 0x34000000
+341e0038:	f501 14e8 	add.w	r4, r1, #1900544	@ 0x1d0000
+341e003c:	7824      	ldrb	r4, [r4, #0]
+341e003e:	b2e4      	uxtb	r4, r4
+341e0040:	b952      	cbnz	r2, 341e0058 <compare+0x38>
+341e0042:	f501 11e0 	add.w	r1, r1, #1835008	@ 0x1c0000
+341e0046:	7809      	ldrb	r1, [r1, #0]
+341e0048:	b2c9      	uxtb	r1, r1
+341e004a:	428c      	cmp	r4, r1
+341e004c:	d006      	beq.n	341e005c <compare+0x3c>
+341e004e:	4b04      	ldr	r3, [pc, #16]	@ (341e0060 <compare+0x40>)
+341e0050:	f8c3 01d0 	str.w	r0, [r3, #464]	@ 0x1d0
+341e0054:	2000      	movs	r0, #0
+341e0056:	bd10      	pop	{r4, pc}
+341e0058:	21ff      	movs	r1, #255	@ 0xff
+341e005a:	e7f6      	b.n	341e004a <compare+0x2a>
+341e005c:	3001      	adds	r0, #1
+341e005e:	e7e5      	b.n	341e002c <compare+0xc>
+341e0060:	341b4000 	.word	0x341b4000
+
+341e0064 <fail>:
+341e0064:	6803      	ldr	r3, [r0, #0]
+341e0066:	bb1b      	cbnz	r3, 341e00b0 <fail+0x4c>
+341e0068:	4b12      	ldr	r3, [pc, #72]	@ (341e00b4 <fail+0x50>)
+341e006a:	f8d3 2360 	ldr.w	r2, [r3, #864]	@ 0x360
+341e006e:	b98a      	cbnz	r2, 341e0094 <fail+0x30>
+341e0070:	f8d3 2110 	ldr.w	r2, [r3, #272]	@ 0x110
+341e0074:	f8c3 2350 	str.w	r2, [r3, #848]	@ 0x350
+341e0078:	f8d3 2114 	ldr.w	r2, [r3, #276]	@ 0x114
+341e007c:	f8c3 2354 	str.w	r2, [r3, #852]	@ 0x354
+341e0080:	f8d3 2124 	ldr.w	r2, [r3, #292]	@ 0x124
+341e0084:	f8c3 2358 	str.w	r2, [r3, #856]	@ 0x358
+341e0088:	f8d3 2128 	ldr.w	r2, [r3, #296]	@ 0x128
+341e008c:	f8c3 235c 	str.w	r2, [r3, #860]	@ 0x35c
+341e0090:	f8c3 1360 	str.w	r1, [r3, #864]	@ 0x360
+341e0094:	4b07      	ldr	r3, [pc, #28]	@ (341e00b4 <fail+0x50>)
+341e0096:	6001      	str	r1, [r0, #0]
+341e0098:	f8d3 2110 	ldr.w	r2, [r3, #272]	@ 0x110
+341e009c:	f8c3 2158 	str.w	r2, [r3, #344]	@ 0x158
+341e00a0:	f8d3 2114 	ldr.w	r2, [r3, #276]	@ 0x114
+341e00a4:	f8c3 215c 	str.w	r2, [r3, #348]	@ 0x15c
+341e00a8:	f8d3 2164 	ldr.w	r2, [r3, #356]	@ 0x164
+341e00ac:	f8c3 2160 	str.w	r2, [r3, #352]	@ 0x160
+341e00b0:	4770      	bx	lr
+341e00b2:	bf00      	nop
+341e00b4:	341b4000 	.word	0x341b4000
+
+341e00b8 <transfer>:
+341e00b8:	e92d 47f0 	stmdb	sp!, {r4, r5, r6, r7, r8, r9, sl, lr}
+341e00bc:	2500      	movs	r5, #0
+341e00be:	e9dd 6c08 	ldrd	r6, ip, [sp, #32]
+341e00c2:	4c67      	ldr	r4, [pc, #412]	@ (341e0260 <transfer+0x1a8>)
+341e00c4:	f5b6 7f80 	cmp.w	r6, #256	@ 0x100
+341e00c8:	4f66      	ldr	r7, [pc, #408]	@ (341e0264 <transfer+0x1ac>)
+341e00ca:	bf98      	it	ls
+341e00cc:	4627      	movls	r7, r4
+341e00ce:	4c66      	ldr	r4, [pc, #408]	@ (341e0268 <transfer+0x1b0>)
+341e00d0:	f8dd e028 	ldr.w	lr, [sp, #40]	@ 0x28
+341e00d4:	f8c4 1164 	str.w	r1, [r4, #356]	@ 0x164
+341e00d8:	f8c4 5118 	str.w	r5, [r4, #280]	@ 0x118
+341e00dc:	f8d0 800c 	ldr.w	r8, [r0, #12]
+341e00e0:	f8df 9188 	ldr.w	r9, [pc, #392]	@ 341e026c <transfer+0x1b4>
+341e00e4:	4c62      	ldr	r4, [pc, #392]	@ (341e0270 <transfer+0x1b8>)
+341e00e6:	f8d9 5004 	ldr.w	r5, [r9, #4]
+341e00ea:	eba5 0508 	sub.w	r5, r5, r8
+341e00ee:	f5b5 7fc8 	cmp.w	r5, #400	@ 0x190
+341e00f2:	d209      	bcs.n	341e0108 <transfer+0x50>
+341e00f4:	3c01      	subs	r4, #1
+341e00f6:	d1f6      	bne.n	341e00e6 <transfer+0x2e>
+341e00f8:	2301      	movs	r3, #1
+341e00fa:	2116      	movs	r1, #22
+341e00fc:	61c3      	str	r3, [r0, #28]
+341e00fe:	f7ff ffb1 	bl	341e0064 <fail>
+341e0102:	2000      	movs	r0, #0
+341e0104:	e8bd 87f0 	ldmia.w	sp!, {r4, r5, r6, r7, r8, r9, sl, pc}
+341e0108:	f647 7820 	movw	r8, #32544	@ 0x7f20
+341e010c:	4d59      	ldr	r5, [pc, #356]	@ (341e0274 <transfer+0x1bc>)
+341e010e:	6a2c      	ldr	r4, [r5, #32]
+341e0110:	ea14 0408 	ands.w	r4, r4, r8
+341e0114:	d003      	beq.n	341e011e <transfer+0x66>
+341e0116:	2301      	movs	r3, #1
+341e0118:	2107      	movs	r1, #7
+341e011a:	61c3      	str	r3, [r0, #28]
+341e011c:	e7ef      	b.n	341e00fe <transfer+0x46>
+341e011e:	f8df 8148 	ldr.w	r8, [pc, #328]	@ 341e0268 <transfer+0x1b0>
+341e0122:	2a00      	cmp	r2, #0
+341e0124:	f8d8 8188 	ldr.w	r8, [r8, #392]	@ 0x188
+341e0128:	f028 5840 	bic.w	r8, r8, #805306368	@ 0x30000000
+341e012c:	f8c5 8000 	str.w	r8, [r5]
+341e0130:	f242 1801 	movw	r8, #8449	@ 0x2101
+341e0134:	bf08      	it	eq
+341e0136:	f04f 0801 	moveq.w	r8, #1
+341e013a:	f1b6 0900 	subs.w	r9, r6, #0
+341e013e:	bf18      	it	ne
+341e0140:	f04f 0901 	movne.w	r9, #1
+341e0144:	ea48 6809 	orr.w	r8, r8, r9, lsl #24
+341e0148:	f1a1 090b 	sub.w	r9, r1, #11
+341e014c:	f8c5 8100 	str.w	r8, [r5, #256]	@ 0x100
+341e0150:	f1d9 0800 	rsbs	r8, r9, #0
+341e0154:	eb48 0809 	adc.w	r8, r8, r9
+341e0158:	ea4f 08c8 	mov.w	r8, r8, lsl #3
+341e015c:	f8c5 8108 	str.w	r8, [r5, #264]	@ 0x108
+341e0160:	b11e      	cbz	r6, 341e016a <transfer+0xb2>
+341e0162:	f106 38ff 	add.w	r8, r6, #4294967295
+341e0166:	f8c5 8040 	str.w	r8, [r5, #64]	@ 0x40
+341e016a:	f04f 0803 	mov.w	r8, #3
+341e016e:	f8c5 8024 	str.w	r8, [r5, #36]	@ 0x24
+341e0172:	f8df 80f8 	ldr.w	r8, [pc, #248]	@ 341e026c <transfer+0x1b4>
+341e0176:	f8d8 8004 	ldr.w	r8, [r8, #4]
+341e017a:	f8c5 1110 	str.w	r1, [r5, #272]	@ 0x110
+341e017e:	b102      	cbz	r2, 341e0182 <transfer+0xca>
+341e0180:	64ab      	str	r3, [r5, #72]	@ 0x48
+341e0182:	f1bc 0f00 	cmp.w	ip, #0
+341e0186:	d00d      	beq.n	341e01a4 <transfer+0xec>
+341e0188:	4d37      	ldr	r5, [pc, #220]	@ (341e0268 <transfer+0x1b0>)
+341e018a:	f8df 90e8 	ldr.w	r9, [pc, #232]	@ 341e0274 <transfer+0x1bc>
+341e018e:	f8d5 5188 	ldr.w	r5, [r5, #392]	@ 0x188
+341e0192:	f025 5540 	bic.w	r5, r5, #805306368	@ 0x30000000
+341e0196:	f045 5580 	orr.w	r5, r5, #268435456	@ 0x10000000
+341e019a:	f8c9 5000 	str.w	r5, [r9]
+341e019e:	b322      	cbz	r2, 341e01ea <transfer+0x132>
+341e01a0:	f8c9 3048 	str.w	r3, [r9, #72]	@ 0x48
+341e01a4:	f3bf 8f4f 	dsb	sy
+341e01a8:	4a2f      	ldr	r2, [pc, #188]	@ (341e0268 <transfer+0x1b0>)
+341e01aa:	4d32      	ldr	r5, [pc, #200]	@ (341e0274 <transfer+0x1bc>)
+341e01ac:	f8d2 31d8 	ldr.w	r3, [r2, #472]	@ 0x1d8
+341e01b0:	f8df 90b8 	ldr.w	r9, [pc, #184]	@ 341e026c <transfer+0x1b4>
+341e01b4:	3301      	adds	r3, #1
+341e01b6:	4930      	ldr	r1, [pc, #192]	@ (341e0278 <transfer+0x1c0>)
+341e01b8:	f8c2 31d8 	str.w	r3, [r2, #472]	@ 0x1d8
+341e01bc:	f8d2 311c 	ldr.w	r3, [r2, #284]	@ 0x11c
+341e01c0:	3301      	adds	r3, #1
+341e01c2:	f8c2 311c 	str.w	r3, [r2, #284]	@ 0x11c
+341e01c6:	6a2b      	ldr	r3, [r5, #32]
+341e01c8:	f013 0f01 	tst.w	r3, #1
+341e01cc:	f8c2 3120 	str.w	r3, [r2, #288]	@ 0x120
+341e01d0:	d00e      	beq.n	341e01f0 <transfer+0x138>
+341e01d2:	2109      	movs	r1, #9
+341e01d4:	f7ff ff46 	bl	341e0064 <fail>
+341e01d8:	4b23      	ldr	r3, [pc, #140]	@ (341e0268 <transfer+0x1b0>)
+341e01da:	210a      	movs	r1, #10
+341e01dc:	f8c3 4118 	str.w	r4, [r3, #280]	@ 0x118
+341e01e0:	f7ff ff40 	bl	341e0064 <fail>
+341e01e4:	2301      	movs	r3, #1
+341e01e6:	61c3      	str	r3, [r0, #28]
+341e01e8:	e78b      	b.n	341e0102 <transfer+0x4a>
+341e01ea:	f8c9 1110 	str.w	r1, [r9, #272]	@ 0x110
+341e01ee:	e7d9      	b.n	341e01a4 <transfer+0xec>
+341e01f0:	42b4      	cmp	r4, r6
+341e01f2:	d221      	bcs.n	341e0238 <transfer+0x180>
+341e01f4:	f1bc 0f00 	cmp.w	ip, #0
+341e01f8:	d016      	beq.n	341e0228 <transfer+0x170>
+341e01fa:	f413 4ffe 	tst.w	r3, #32512	@ 0x7f00
+341e01fe:	d00d      	beq.n	341e021c <transfer+0x164>
+341e0200:	f895 3050 	ldrb.w	r3, [r5, #80]	@ 0x50
+341e0204:	b2db      	uxtb	r3, r3
+341e0206:	f80e 3004 	strb.w	r3, [lr, r4]
+341e020a:	3401      	adds	r4, #1
+341e020c:	f8d9 3004 	ldr.w	r3, [r9, #4]
+341e0210:	eba3 0308 	sub.w	r3, r3, r8
+341e0214:	42bb      	cmp	r3, r7
+341e0216:	d31e      	bcc.n	341e0256 <transfer+0x19e>
+341e0218:	210a      	movs	r1, #10
+341e021a:	e7db      	b.n	341e01d4 <transfer+0x11c>
+341e021c:	f003 0322 	and.w	r3, r3, #34	@ 0x22
+341e0220:	2b02      	cmp	r3, #2
+341e0222:	d1f3      	bne.n	341e020c <transfer+0x154>
+341e0224:	210b      	movs	r1, #11
+341e0226:	e7d5      	b.n	341e01d4 <transfer+0x11c>
+341e0228:	045b      	lsls	r3, r3, #17
+341e022a:	d4ef      	bmi.n	341e020c <transfer+0x154>
+341e022c:	f81e 3004 	ldrb.w	r3, [lr, r4]
+341e0230:	b2db      	uxtb	r3, r3
+341e0232:	f885 3050 	strb.w	r3, [r5, #80]	@ 0x50
+341e0236:	e7e8      	b.n	341e020a <transfer+0x152>
+341e0238:	f003 0a22 	and.w	sl, r3, #34	@ 0x22
+341e023c:	f1ba 0f02 	cmp.w	sl, #2
+341e0240:	d1e4      	bne.n	341e020c <transfer+0x154>
+341e0242:	f8c2 4118 	str.w	r4, [r2, #280]	@ 0x118
+341e0246:	4a09      	ldr	r2, [pc, #36]	@ (341e026c <transfer+0x1b4>)
+341e0248:	f413 4ffe 	tst.w	r3, #32512	@ 0x7f00
+341e024c:	6852      	ldr	r2, [r2, #4]
+341e024e:	60c2      	str	r2, [r0, #12]
+341e0250:	d004      	beq.n	341e025c <transfer+0x1a4>
+341e0252:	210c      	movs	r1, #12
+341e0254:	e7be      	b.n	341e01d4 <transfer+0x11c>
+341e0256:	3901      	subs	r1, #1
+341e0258:	d1b0      	bne.n	341e01bc <transfer+0x104>
+341e025a:	e7bd      	b.n	341e01d8 <transfer+0x120>
+341e025c:	2001      	movs	r0, #1
+341e025e:	e751      	b.n	341e0104 <transfer+0x4c>
+341e0260:	003d0900 	.word	0x003d0900
+341e0264:	02625a00 	.word	0x02625a00
+341e0268:	341b4000 	.word	0x341b4000
+341e026c:	e0001000 	.word	0xe0001000
+341e0270:	000186a0 	.word	0x000186a0
+341e0274:	58025000 	.word	0x58025000
+341e0278:	007a1200 	.word	0x007a1200
+
+341e027c <status>:
+341e027c:	b530      	push	{r4, r5, lr}
+341e027e:	2300      	movs	r3, #0
+341e0280:	2401      	movs	r4, #1
+341e0282:	b087      	sub	sp, #28
+341e0284:	f10d 0217 	add.w	r2, sp, #23
+341e0288:	9202      	str	r2, [sp, #8]
+341e028a:	2105      	movs	r1, #5
+341e028c:	461a      	mov	r2, r3
+341e028e:	e9cd 4400 	strd	r4, r4, [sp]
+341e0292:	4605      	mov	r5, r0
+341e0294:	f88d 3017 	strb.w	r3, [sp, #23]
+341e0298:	f7ff ff0e 	bl	341e00b8 <transfer>
+341e029c:	b130      	cbz	r0, 341e02ac <status+0x30>
+341e029e:	4620      	mov	r0, r4
+341e02a0:	f89d 2017 	ldrb.w	r2, [sp, #23]
+341e02a4:	4b02      	ldr	r3, [pc, #8]	@ (341e02b0 <status+0x34>)
+341e02a6:	f8c3 2124 	str.w	r2, [r3, #292]	@ 0x124
+341e02aa:	622c      	str	r4, [r5, #32]
+341e02ac:	b007      	add	sp, #28
+341e02ae:	bd30      	pop	{r4, r5, pc}
+341e02b0:	341b4000 	.word	0x341b4000
+
+341e02b4 <security>:
+341e02b4:	b510      	push	{r4, lr}
+341e02b6:	2300      	movs	r3, #0
+341e02b8:	2401      	movs	r4, #1
+341e02ba:	b086      	sub	sp, #24
+341e02bc:	f10d 0217 	add.w	r2, sp, #23
+341e02c0:	9202      	str	r2, [sp, #8]
+341e02c2:	212b      	movs	r1, #43	@ 0x2b
+341e02c4:	461a      	mov	r2, r3
+341e02c6:	e9cd 4400 	strd	r4, r4, [sp]
+341e02ca:	f88d 3017 	strb.w	r3, [sp, #23]
+341e02ce:	f7ff fef3 	bl	341e00b8 <transfer>
+341e02d2:	b128      	cbz	r0, 341e02e0 <security+0x2c>
+341e02d4:	4620      	mov	r0, r4
+341e02d6:	f89d 2017 	ldrb.w	r2, [sp, #23]
+341e02da:	4b02      	ldr	r3, [pc, #8]	@ (341e02e4 <security+0x30>)
+341e02dc:	f8c3 2128 	str.w	r2, [r3, #296]	@ 0x128
+341e02e0:	b006      	add	sp, #24
+341e02e2:	bd10      	pop	{r4, pc}
+341e02e4:	341b4000 	.word	0x341b4000
+
+341e02e8 <healthy>:
+341e02e8:	b508      	push	{r3, lr}
+341e02ea:	4b09      	ldr	r3, [pc, #36]	@ (341e0310 <healthy+0x28>)
+341e02ec:	f8d3 2124 	ldr.w	r2, [r3, #292]	@ 0x124
+341e02f0:	f012 0f3c 	tst.w	r2, #60	@ 0x3c
+341e02f4:	d104      	bne.n	341e0300 <healthy+0x18>
+341e02f6:	f8d3 3128 	ldr.w	r3, [r3, #296]	@ 0x128
+341e02fa:	f013 0fec 	tst.w	r3, #236	@ 0xec
+341e02fe:	d004      	beq.n	341e030a <healthy+0x22>
+341e0300:	210e      	movs	r1, #14
+341e0302:	f7ff feaf 	bl	341e0064 <fail>
+341e0306:	2000      	movs	r0, #0
+341e0308:	bd08      	pop	{r3, pc}
+341e030a:	2001      	movs	r0, #1
+341e030c:	e7fc      	b.n	341e0308 <healthy+0x20>
+341e030e:	bf00      	nop
+341e0310:	341b4000 	.word	0x341b4000
+
+341e0314 <write_enable>:
+341e0314:	b5f0      	push	{r4, r5, r6, r7, lr}
+341e0316:	b085      	sub	sp, #20
+341e0318:	4604      	mov	r4, r0
+341e031a:	f7ff ffaf 	bl	341e027c <status>
+341e031e:	b148      	cbz	r0, 341e0334 <write_enable+0x20>
+341e0320:	4f1b      	ldr	r7, [pc, #108]	@ (341e0390 <write_enable+0x7c>)
+341e0322:	f8d7 5124 	ldr.w	r5, [r7, #292]	@ 0x124
+341e0326:	f015 0503 	ands.w	r5, r5, #3
+341e032a:	d006      	beq.n	341e033a <write_enable+0x26>
+341e032c:	210f      	movs	r1, #15
+341e032e:	4620      	mov	r0, r4
+341e0330:	f7ff fe98 	bl	341e0064 <fail>
+341e0334:	2000      	movs	r0, #0
+341e0336:	b005      	add	sp, #20
+341e0338:	bdf0      	pop	{r4, r5, r6, r7, pc}
+341e033a:	4620      	mov	r0, r4
+341e033c:	f7ff ffba 	bl	341e02b4 <security>
+341e0340:	2800      	cmp	r0, #0
+341e0342:	d0f7      	beq.n	341e0334 <write_enable+0x20>
+341e0344:	4620      	mov	r0, r4
+341e0346:	f7ff ffcf 	bl	341e02e8 <healthy>
+341e034a:	2800      	cmp	r0, #0
+341e034c:	d0f2      	beq.n	341e0334 <write_enable+0x20>
+341e034e:	2601      	movs	r6, #1
+341e0350:	61a6      	str	r6, [r4, #24]
+341e0352:	f8d7 31d4 	ldr.w	r3, [r7, #468]	@ 0x1d4
+341e0356:	462a      	mov	r2, r5
+341e0358:	4433      	add	r3, r6
+341e035a:	f8c7 31d4 	str.w	r3, [r7, #468]	@ 0x1d4
+341e035e:	2106      	movs	r1, #6
+341e0360:	462b      	mov	r3, r5
+341e0362:	4620      	mov	r0, r4
+341e0364:	e9cd 5501 	strd	r5, r5, [sp, #4]
+341e0368:	9500      	str	r5, [sp, #0]
+341e036a:	f7ff fea5 	bl	341e00b8 <transfer>
+341e036e:	2800      	cmp	r0, #0
+341e0370:	d0e0      	beq.n	341e0334 <write_enable+0x20>
+341e0372:	4620      	mov	r0, r4
+341e0374:	f7ff ff82 	bl	341e027c <status>
+341e0378:	2800      	cmp	r0, #0
+341e037a:	d0db      	beq.n	341e0334 <write_enable+0x20>
+341e037c:	f8d7 3124 	ldr.w	r3, [r7, #292]	@ 0x124
+341e0380:	4630      	mov	r0, r6
+341e0382:	f003 0303 	and.w	r3, r3, #3
+341e0386:	2b02      	cmp	r3, #2
+341e0388:	d0d5      	beq.n	341e0336 <write_enable+0x22>
+341e038a:	2110      	movs	r1, #16
+341e038c:	e7cf      	b.n	341e032e <write_enable+0x1a>
+341e038e:	bf00      	nop
+341e0390:	341b4000 	.word	0x341b4000
+
+341e0394 <write_finished>:
+341e0394:	f44f 73c8 	mov.w	r3, #400	@ 0x190
+341e0398:	e92d 47f0 	stmdb	sp!, {r4, r5, r6, r7, r8, r9, sl, lr}
+341e039c:	2500      	movs	r5, #0
+341e039e:	4c50      	ldr	r4, [pc, #320]	@ (341e04e0 <write_finished+0x14c>)
+341e03a0:	f8df 9140 	ldr.w	r9, [pc, #320]	@ 341e04e4 <write_finished+0x150>
+341e03a4:	fb03 f801 	mul.w	r8, r3, r1
+341e03a8:	f8d9 a004 	ldr.w	sl, [r9, #4]
+341e03ac:	f8d4 3310 	ldr.w	r3, [r4, #784]	@ 0x310
+341e03b0:	4606      	mov	r6, r0
+341e03b2:	3301      	adds	r3, #1
+341e03b4:	f8c4 3310 	str.w	r3, [r4, #784]	@ 0x310
+341e03b8:	f8d4 3110 	ldr.w	r3, [r4, #272]	@ 0x110
+341e03bc:	462f      	mov	r7, r5
+341e03be:	f8c4 3330 	str.w	r3, [r4, #816]	@ 0x330
+341e03c2:	f8d4 3114 	ldr.w	r3, [r4, #276]	@ 0x114
+341e03c6:	f8c4 3334 	str.w	r3, [r4, #820]	@ 0x334
+341e03ca:	f04f 33ff 	mov.w	r3, #4294967295
+341e03ce:	f8c4 3338 	str.w	r3, [r4, #824]	@ 0x338
+341e03d2:	f8c4 333c 	str.w	r3, [r4, #828]	@ 0x33c
+341e03d6:	f8c4 5344 	str.w	r5, [r4, #836]	@ 0x344
+341e03da:	f8c4 5348 	str.w	r5, [r4, #840]	@ 0x348
+341e03de:	f8c4 5340 	str.w	r5, [r4, #832]	@ 0x340
+341e03e2:	4630      	mov	r0, r6
+341e03e4:	f7ff ff4a 	bl	341e027c <status>
+341e03e8:	2800      	cmp	r0, #0
+341e03ea:	d05c      	beq.n	341e04a6 <write_finished+0x112>
+341e03ec:	f8d4 2124 	ldr.w	r2, [r4, #292]	@ 0x124
+341e03f0:	f8d9 3004 	ldr.w	r3, [r9, #4]
+341e03f4:	f8d4 1314 	ldr.w	r1, [r4, #788]	@ 0x314
+341e03f8:	eba3 030a 	sub.w	r3, r3, sl
+341e03fc:	3101      	adds	r1, #1
+341e03fe:	f8c4 1314 	str.w	r1, [r4, #788]	@ 0x314
+341e0402:	f8d4 1344 	ldr.w	r1, [r4, #836]	@ 0x344
+341e0406:	3101      	adds	r1, #1
+341e0408:	f8c4 1344 	str.w	r1, [r4, #836]	@ 0x344
+341e040c:	b90f      	cbnz	r7, 341e0412 <write_finished+0x7e>
+341e040e:	f8c4 2338 	str.w	r2, [r4, #824]	@ 0x338
+341e0412:	f8c4 233c 	str.w	r2, [r4, #828]	@ 0x33c
+341e0416:	f8c4 3340 	str.w	r3, [r4, #832]	@ 0x340
+341e041a:	f8d4 134c 	ldr.w	r1, [r4, #844]	@ 0x34c
+341e041e:	428b      	cmp	r3, r1
+341e0420:	f002 0103 	and.w	r1, r2, #3
+341e0424:	bf88      	it	hi
+341e0426:	f8c4 334c 	strhi.w	r3, [r4, #844]	@ 0x34c
+341e042a:	2902      	cmp	r1, #2
+341e042c:	d13e      	bne.n	341e04ac <write_finished+0x118>
+341e042e:	f8d4 1318 	ldr.w	r1, [r4, #792]	@ 0x318
+341e0432:	b959      	cbnz	r1, 341e044c <write_finished+0xb8>
+341e0434:	f8d4 1110 	ldr.w	r1, [r4, #272]	@ 0x110
+341e0438:	f8c4 1320 	str.w	r1, [r4, #800]	@ 0x320
+341e043c:	f8d4 1114 	ldr.w	r1, [r4, #276]	@ 0x114
+341e0440:	f8c4 1324 	str.w	r1, [r4, #804]	@ 0x324
+341e0444:	f8c4 2328 	str.w	r2, [r4, #808]	@ 0x328
+341e0448:	f8c4 332c 	str.w	r3, [r4, #812]	@ 0x32c
+341e044c:	f8d4 1318 	ldr.w	r1, [r4, #792]	@ 0x318
+341e0450:	3101      	adds	r1, #1
+341e0452:	f8c4 1318 	str.w	r1, [r4, #792]	@ 0x318
+341e0456:	f8d4 1348 	ldr.w	r1, [r4, #840]	@ 0x348
+341e045a:	b921      	cbnz	r1, 341e0466 <write_finished+0xd2>
+341e045c:	f8d4 131c 	ldr.w	r1, [r4, #796]	@ 0x31c
+341e0460:	3101      	adds	r1, #1
+341e0462:	f8c4 131c 	str.w	r1, [r4, #796]	@ 0x31c
+341e0466:	f8d4 1348 	ldr.w	r1, [r4, #840]	@ 0x348
+341e046a:	3101      	adds	r1, #1
+341e046c:	f8c4 1348 	str.w	r1, [r4, #840]	@ 0x348
+341e0470:	f002 0201 	and.w	r2, r2, #1
+341e0474:	f082 0501 	eor.w	r5, r2, #1
+341e0478:	b92a      	cbnz	r2, 341e0486 <write_finished+0xf2>
+341e047a:	f8d4 21dc 	ldr.w	r2, [r4, #476]	@ 0x1dc
+341e047e:	4293      	cmp	r3, r2
+341e0480:	bf88      	it	hi
+341e0482:	f8c4 31dc 	strhi.w	r3, [r4, #476]	@ 0x1dc
+341e0486:	4598      	cmp	r8, r3
+341e0488:	d903      	bls.n	341e0492 <write_finished+0xfe>
+341e048a:	4b17      	ldr	r3, [pc, #92]	@ (341e04e8 <write_finished+0x154>)
+341e048c:	3701      	adds	r7, #1
+341e048e:	429f      	cmp	r7, r3
+341e0490:	d1a7      	bne.n	341e03e2 <write_finished+0x4e>
+341e0492:	4b13      	ldr	r3, [pc, #76]	@ (341e04e0 <write_finished+0x14c>)
+341e0494:	f8d3 1124 	ldr.w	r1, [r3, #292]	@ 0x124
+341e0498:	f001 0101 	and.w	r1, r1, #1
+341e049c:	f1c1 0110 	rsb	r1, r1, #16
+341e04a0:	4630      	mov	r0, r6
+341e04a2:	f7ff fddf 	bl	341e0064 <fail>
+341e04a6:	2000      	movs	r0, #0
+341e04a8:	e8bd 87f0 	ldmia.w	sp!, {r4, r5, r6, r7, r8, r9, sl, pc}
+341e04ac:	2d00      	cmp	r5, #0
+341e04ae:	d0df      	beq.n	341e0470 <write_finished+0xdc>
+341e04b0:	2900      	cmp	r1, #0
+341e04b2:	d1dd      	bne.n	341e0470 <write_finished+0xdc>
+341e04b4:	4598      	cmp	r8, r3
+341e04b6:	d9db      	bls.n	341e0470 <write_finished+0xdc>
+341e04b8:	4630      	mov	r0, r6
+341e04ba:	f7ff fefb 	bl	341e02b4 <security>
+341e04be:	2800      	cmp	r0, #0
+341e04c0:	d0f1      	beq.n	341e04a6 <write_finished+0x112>
+341e04c2:	4630      	mov	r0, r6
+341e04c4:	f7ff ff10 	bl	341e02e8 <healthy>
+341e04c8:	2800      	cmp	r0, #0
+341e04ca:	d0ec      	beq.n	341e04a6 <write_finished+0x112>
+341e04cc:	4b04      	ldr	r3, [pc, #16]	@ (341e04e0 <write_finished+0x14c>)
+341e04ce:	f8d3 3124 	ldr.w	r3, [r3, #292]	@ 0x124
+341e04d2:	079b      	lsls	r3, r3, #30
+341e04d4:	d501      	bpl.n	341e04da <write_finished+0x146>
+341e04d6:	2110      	movs	r1, #16
+341e04d8:	e7e2      	b.n	341e04a0 <write_finished+0x10c>
+341e04da:	2001      	movs	r0, #1
+341e04dc:	e7e4      	b.n	341e04a8 <write_finished+0x114>
+341e04de:	bf00      	nop
+341e04e0:	341b4000 	.word	0x341b4000
+341e04e4:	e0001000 	.word	0xe0001000
+341e04e8:	000f4240 	.word	0x000f4240
+
+341e04ec <crc32_bytes.constprop.0>:
+341e04ec:	f04f 33ff 	mov.w	r3, #4294967295
+341e04f0:	2200      	movs	r2, #0
+341e04f2:	b510      	push	{r4, lr}
+341e04f4:	4c09      	ldr	r4, [pc, #36]	@ (341e051c <crc32_bytes.constprop.0+0x30>)
+341e04f6:	5c81      	ldrb	r1, [r0, r2]
+341e04f8:	404b      	eors	r3, r1
+341e04fa:	2108      	movs	r1, #8
+341e04fc:	f041 e001 	dls	lr, r1
+341e0500:	f343 0100 	sbfx	r1, r3, #0, #1
+341e0504:	4021      	ands	r1, r4
+341e0506:	ea81 0353 	eor.w	r3, r1, r3, lsr #1
+341e050a:	f00f c807 	le	lr, 341e0500 <crc32_bytes.constprop.0+0x14>
+341e050e:	3201      	adds	r2, #1
+341e0510:	f5b2 3f80 	cmp.w	r2, #65536	@ 0x10000
+341e0514:	d1ef      	bne.n	341e04f6 <crc32_bytes.constprop.0+0xa>
+341e0516:	43d8      	mvns	r0, r3
+341e0518:	bd10      	pop	{r4, pc}
+341e051a:	bf00      	nop
+341e051c:	edb88320 	.word	0xedb88320
+
+341e0520 <rom_nor_programmer>:
+341e0520:	e92d 4880 	stmdb	sp!, {r7, fp, lr}
+341e0524:	2300      	movs	r3, #0
+341e0526:	f04f 0e24 	mov.w	lr, #36	@ 0x24
+341e052a:	461a      	mov	r2, r3
+341e052c:	f04e e001 	dls	lr, lr
+341e0530:	b091      	sub	sp, #68	@ 0x44
+341e0532:	ac07      	add	r4, sp, #28
+341e0534:	54e2      	strb	r2, [r4, r3]
+341e0536:	3301      	adds	r3, #1
+341e0538:	f00f c005 	le	lr, 341e0534 <rom_nor_programmer+0x14>
+341e053c:	4b8b      	ldr	r3, [pc, #556]	@ (341e076c <rom_nor_programmer+0x24c>)
+341e053e:	4a8c      	ldr	r2, [pc, #560]	@ (341e0770 <rom_nor_programmer+0x250>)
+341e0540:	f8c3 2100 	str.w	r2, [r3, #256]	@ 0x100
+341e0544:	f3bf 8f4f 	dsb	sy
+341e0548:	f04f 0e37 	mov.w	lr, #55	@ 0x37
+341e054c:	2500      	movs	r5, #0
+341e054e:	f04e e001 	dls	lr, lr
+341e0552:	4a88      	ldr	r2, [pc, #544]	@ (341e0774 <rom_nor_programmer+0x254>)
+341e0554:	f842 5b04 	str.w	r5, [r2], #4
+341e0558:	f00f c005 	le	lr, 341e0554 <rom_nor_programmer+0x34>
+341e055c:	4a86      	ldr	r2, [pc, #536]	@ (341e0778 <rom_nor_programmer+0x258>)
+341e055e:	f8c3 2300 	str.w	r2, [r3, #768]	@ 0x300
+341e0562:	f3bf 8f4f 	dsb	sy
+341e0566:	f04f 0e19 	mov.w	lr, #25
+341e056a:	2200      	movs	r2, #0
+341e056c:	f04e e001 	dls	lr, lr
+341e0570:	4b82      	ldr	r3, [pc, #520]	@ (341e077c <rom_nor_programmer+0x25c>)
+341e0572:	f843 2b04 	str.w	r2, [r3], #4
+341e0576:	f00f c005 	le	lr, 341e0572 <rom_nor_programmer+0x52>
+341e057a:	2201      	movs	r2, #1
+341e057c:	4b7b      	ldr	r3, [pc, #492]	@ (341e076c <rom_nor_programmer+0x24c>)
+341e057e:	f8c3 2304 	str.w	r2, [r3, #772]	@ 0x304
+341e0582:	685d      	ldr	r5, [r3, #4]
+341e0584:	f8c3 5308 	str.w	r5, [r3, #776]	@ 0x308
+341e0588:	f8c3 230c 	str.w	r2, [r3, #780]	@ 0x30c
+341e058c:	685d      	ldr	r5, [r3, #4]
+341e058e:	f8c3 5108 	str.w	r5, [r3, #264]	@ 0x108
+341e0592:	689d      	ldr	r5, [r3, #8]
+341e0594:	f8c3 510c 	str.w	r5, [r3, #268]	@ 0x10c
+341e0598:	f04f 35ff 	mov.w	r5, #4294967295
+341e059c:	f8c3 5104 	str.w	r5, [r3, #260]	@ 0x104
+341e05a0:	f8c3 2110 	str.w	r2, [r3, #272]	@ 0x110
+341e05a4:	f8c3 0174 	str.w	r0, [r3, #372]	@ 0x174
+341e05a8:	f8c3 1178 	str.w	r1, [r3, #376]	@ 0x178
+341e05ac:	f8c3 51d0 	str.w	r5, [r3, #464]	@ 0x1d0
+341e05b0:	699a      	ldr	r2, [r3, #24]
+341e05b2:	f8c3 214c 	str.w	r2, [r3, #332]	@ 0x14c
+341e05b6:	69da      	ldr	r2, [r3, #28]
+341e05b8:	f8c3 2150 	str.w	r2, [r3, #336]	@ 0x150
+341e05bc:	6819      	ldr	r1, [r3, #0]
+341e05be:	4a70      	ldr	r2, [pc, #448]	@ (341e0780 <rom_nor_programmer+0x260>)
+341e05c0:	4291      	cmp	r1, r2
+341e05c2:	d117      	bne.n	341e05f4 <rom_nor_programmer+0xd4>
+341e05c4:	f8d3 210c 	ldr.w	r2, [r3, #268]	@ 0x10c
+341e05c8:	2a02      	cmp	r2, #2
+341e05ca:	d105      	bne.n	341e05d8 <rom_nor_programmer+0xb8>
+341e05cc:	68da      	ldr	r2, [r3, #12]
+341e05ce:	b91a      	cbnz	r2, 341e05d8 <rom_nor_programmer+0xb8>
+341e05d0:	691a      	ldr	r2, [r3, #16]
+341e05d2:	b90a      	cbnz	r2, 341e05d8 <rom_nor_programmer+0xb8>
+341e05d4:	695a      	ldr	r2, [r3, #20]
+341e05d6:	b192      	cbz	r2, 341e05fe <rom_nor_programmer+0xde>
+341e05d8:	f8d3 210c 	ldr.w	r2, [r3, #268]	@ 0x10c
+341e05dc:	2a03      	cmp	r2, #3
+341e05de:	d109      	bne.n	341e05f4 <rom_nor_programmer+0xd4>
+341e05e0:	68da      	ldr	r2, [r3, #12]
+341e05e2:	f5b2 3f80 	cmp.w	r2, #65536	@ 0x10000
+341e05e6:	d105      	bne.n	341e05f4 <rom_nor_programmer+0xd4>
+341e05e8:	691a      	ldr	r2, [r3, #16]
+341e05ea:	b91a      	cbnz	r2, 341e05f4 <rom_nor_programmer+0xd4>
+341e05ec:	695a      	ldr	r2, [r3, #20]
+341e05ee:	4b65      	ldr	r3, [pc, #404]	@ (341e0784 <rom_nor_programmer+0x264>)
+341e05f0:	429a      	cmp	r2, r3
+341e05f2:	d004      	beq.n	341e05fe <rom_nor_programmer+0xde>
+341e05f4:	2101      	movs	r1, #1
+341e05f6:	4620      	mov	r0, r4
+341e05f8:	f7ff fd34 	bl	341e0064 <fail>
+341e05fc:	e0ff      	b.n	341e07fe <rom_nor_programmer+0x2de>
+341e05fe:	f3ef 8214 	mrs	r2, CONTROL
+341e0602:	4b5a      	ldr	r3, [pc, #360]	@ (341e076c <rom_nor_programmer+0x24c>)
+341e0604:	f8c3 2168 	str.w	r2, [r3, #360]	@ 0x168
+341e0608:	f3ef 8205 	mrs	r2, IPSR
+341e060c:	f8c3 216c 	str.w	r2, [r3, #364]	@ 0x16c
+341e0610:	4a5d      	ldr	r2, [pc, #372]	@ (341e0788 <rom_nor_programmer+0x268>)
+341e0612:	6952      	ldr	r2, [r2, #20]
+341e0614:	f8c3 2170 	str.w	r2, [r3, #368]	@ 0x170
+341e0618:	f8d3 2168 	ldr.w	r2, [r3, #360]	@ 0x168
+341e061c:	b912      	cbnz	r2, 341e0624 <rom_nor_programmer+0x104>
+341e061e:	f8d3 216c 	ldr.w	r2, [r3, #364]	@ 0x16c
+341e0622:	b10a      	cbz	r2, 341e0628 <rom_nor_programmer+0x108>
+341e0624:	2102      	movs	r1, #2
+341e0626:	e7e6      	b.n	341e05f6 <rom_nor_programmer+0xd6>
+341e0628:	f8d3 2170 	ldr.w	r2, [r3, #368]	@ 0x170
+341e062c:	03d2      	lsls	r2, r2, #15
+341e062e:	d501      	bpl.n	341e0634 <rom_nor_programmer+0x114>
+341e0630:	2103      	movs	r1, #3
+341e0632:	e7e0      	b.n	341e05f6 <rom_nor_programmer+0xd6>
+341e0634:	4a55      	ldr	r2, [pc, #340]	@ (341e078c <rom_nor_programmer+0x26c>)
+341e0636:	f8d2 1260 	ldr.w	r1, [r2, #608]	@ 0x260
+341e063a:	f8c3 117c 	str.w	r1, [r3, #380]	@ 0x17c
+341e063e:	f8d2 1220 	ldr.w	r1, [r2, #544]	@ 0x220
+341e0642:	f8c3 1180 	str.w	r1, [r3, #384]	@ 0x180
+341e0646:	6a11      	ldr	r1, [r2, #32]
+341e0648:	f8c3 11ac 	str.w	r1, [r3, #428]	@ 0x1ac
+341e064c:	6a51      	ldr	r1, [r2, #36]	@ 0x24
+341e064e:	f8c3 11b0 	str.w	r1, [r3, #432]	@ 0x1b0
+341e0652:	f8d2 1080 	ldr.w	r1, [r2, #128]	@ 0x80
+341e0656:	f8c3 11b4 	str.w	r1, [r3, #436]	@ 0x1b4
+341e065a:	f8d2 1084 	ldr.w	r1, [r2, #132]	@ 0x84
+341e065e:	f8c3 11b8 	str.w	r1, [r3, #440]	@ 0x1b8
+341e0662:	f8d2 2088 	ldr.w	r2, [r2, #136]	@ 0x88
+341e0666:	f8c3 21bc 	str.w	r2, [r3, #444]	@ 0x1bc
+341e066a:	f242 0220 	movw	r2, #8224	@ 0x2020
+341e066e:	f8d3 117c 	ldr.w	r1, [r3, #380]	@ 0x17c
+341e0672:	ea01 0002 	and.w	r0, r1, r2
+341e0676:	438a      	bics	r2, r1
+341e0678:	d11a      	bne.n	341e06b0 <rom_nor_programmer+0x190>
+341e067a:	f8d3 2180 	ldr.w	r2, [r3, #384]	@ 0x180
+341e067e:	4202      	tst	r2, r0
+341e0680:	d116      	bne.n	341e06b0 <rom_nor_programmer+0x190>
+341e0682:	f8d3 11ac 	ldr.w	r1, [r3, #428]	@ 0x1ac
+341e0686:	4a42      	ldr	r2, [pc, #264]	@ (341e0790 <rom_nor_programmer+0x270>)
+341e0688:	4291      	cmp	r1, r2
+341e068a:	d111      	bne.n	341e06b0 <rom_nor_programmer+0x190>
+341e068c:	f8d3 21b0 	ldr.w	r2, [r3, #432]	@ 0x1b0
+341e0690:	f5b2 1f80 	cmp.w	r2, #1048576	@ 0x100000
+341e0694:	d10c      	bne.n	341e06b0 <rom_nor_programmer+0x190>
+341e0696:	f8d3 11b4 	ldr.w	r1, [r3, #436]	@ 0x1b4
+341e069a:	4a3e      	ldr	r2, [pc, #248]	@ (341e0794 <rom_nor_programmer+0x274>)
+341e069c:	4291      	cmp	r1, r2
+341e069e:	d107      	bne.n	341e06b0 <rom_nor_programmer+0x190>
+341e06a0:	f8d3 21b8 	ldr.w	r2, [r3, #440]	@ 0x1b8
+341e06a4:	b922      	cbnz	r2, 341e06b0 <rom_nor_programmer+0x190>
+341e06a6:	f8d3 21bc 	ldr.w	r2, [r3, #444]	@ 0x1bc
+341e06aa:	4b3b      	ldr	r3, [pc, #236]	@ (341e0798 <rom_nor_programmer+0x278>)
+341e06ac:	429a      	cmp	r2, r3
+341e06ae:	d001      	beq.n	341e06b4 <rom_nor_programmer+0x194>
+341e06b0:	2104      	movs	r1, #4
+341e06b2:	e7a0      	b.n	341e05f6 <rom_nor_programmer+0xd6>
+341e06b4:	4b39      	ldr	r3, [pc, #228]	@ (341e079c <rom_nor_programmer+0x27c>)
+341e06b6:	4d2d      	ldr	r5, [pc, #180]	@ (341e076c <rom_nor_programmer+0x24c>)
+341e06b8:	f8d3 3400 	ldr.w	r3, [r3, #1024]	@ 0x400
+341e06bc:	f8c5 3184 	str.w	r3, [r5, #388]	@ 0x184
+341e06c0:	f8d5 3184 	ldr.w	r3, [r5, #388]	@ 0x184
+341e06c4:	2b02      	cmp	r3, #2
+341e06c6:	d001      	beq.n	341e06cc <rom_nor_programmer+0x1ac>
+341e06c8:	2105      	movs	r1, #5
+341e06ca:	e794      	b.n	341e05f6 <rom_nor_programmer+0xd6>
+341e06cc:	4b34      	ldr	r3, [pc, #208]	@ (341e07a0 <rom_nor_programmer+0x280>)
+341e06ce:	681a      	ldr	r2, [r3, #0]
+341e06d0:	f8c5 2188 	str.w	r2, [r5, #392]	@ 0x188
+341e06d4:	689a      	ldr	r2, [r3, #8]
+341e06d6:	f8c5 218c 	str.w	r2, [r5, #396]	@ 0x18c
+341e06da:	68da      	ldr	r2, [r3, #12]
+341e06dc:	f8c5 2190 	str.w	r2, [r5, #400]	@ 0x190
+341e06e0:	6a1a      	ldr	r2, [r3, #32]
+341e06e2:	f8c5 2194 	str.w	r2, [r5, #404]	@ 0x194
+341e06e6:	f8d3 2100 	ldr.w	r2, [r3, #256]	@ 0x100
+341e06ea:	f8c5 2198 	str.w	r2, [r5, #408]	@ 0x198
+341e06ee:	f8d3 2108 	ldr.w	r2, [r3, #264]	@ 0x108
+341e06f2:	f8c5 219c 	str.w	r2, [r5, #412]	@ 0x19c
+341e06f6:	f8d3 2110 	ldr.w	r2, [r3, #272]	@ 0x110
+341e06fa:	f8c5 21a0 	str.w	r2, [r5, #416]	@ 0x1a0
+341e06fe:	6c1a      	ldr	r2, [r3, #64]	@ 0x40
+341e0700:	f8c5 21a4 	str.w	r2, [r5, #420]	@ 0x1a4
+341e0704:	6c9b      	ldr	r3, [r3, #72]	@ 0x48
+341e0706:	f8c5 31a8 	str.w	r3, [r5, #424]	@ 0x1a8
+341e070a:	f8d5 2188 	ldr.w	r2, [r5, #392]	@ 0x188
+341e070e:	4b25      	ldr	r3, [pc, #148]	@ (341e07a4 <rom_nor_programmer+0x284>)
+341e0710:	429a      	cmp	r2, r3
+341e0712:	d115      	bne.n	341e0740 <rom_nor_programmer+0x220>
+341e0714:	f8d5 318c 	ldr.w	r3, [r5, #396]	@ 0x18c
+341e0718:	f5b3 1ff8 	cmp.w	r3, #2031616	@ 0x1f0000
+341e071c:	d110      	bne.n	341e0740 <rom_nor_programmer+0x220>
+341e071e:	f8d5 0190 	ldr.w	r0, [r5, #400]	@ 0x190
+341e0722:	2801      	cmp	r0, #1
+341e0724:	d10c      	bne.n	341e0740 <rom_nor_programmer+0x220>
+341e0726:	f8d5 2198 	ldr.w	r2, [r5, #408]	@ 0x198
+341e072a:	4b1f      	ldr	r3, [pc, #124]	@ (341e07a8 <rom_nor_programmer+0x288>)
+341e072c:	429a      	cmp	r2, r3
+341e072e:	d107      	bne.n	341e0740 <rom_nor_programmer+0x220>
+341e0730:	f8d5 319c 	ldr.w	r3, [r5, #412]	@ 0x19c
+341e0734:	2b08      	cmp	r3, #8
+341e0736:	d103      	bne.n	341e0740 <rom_nor_programmer+0x220>
+341e0738:	f8d5 31a0 	ldr.w	r3, [r5, #416]	@ 0x1a0
+341e073c:	2b0b      	cmp	r3, #11
+341e073e:	d001      	beq.n	341e0744 <rom_nor_programmer+0x224>
+341e0740:	2106      	movs	r1, #6
+341e0742:	e758      	b.n	341e05f6 <rom_nor_programmer+0xd6>
+341e0744:	f647 7320 	movw	r3, #32544	@ 0x7f20
+341e0748:	f8d5 2194 	ldr.w	r2, [r5, #404]	@ 0x194
+341e074c:	421a      	tst	r2, r3
+341e074e:	d001      	beq.n	341e0754 <rom_nor_programmer+0x234>
+341e0750:	2107      	movs	r1, #7
+341e0752:	e750      	b.n	341e05f6 <rom_nor_programmer+0xd6>
+341e0754:	4e0c      	ldr	r6, [pc, #48]	@ (341e0788 <rom_nor_programmer+0x268>)
+341e0756:	4b15      	ldr	r3, [pc, #84]	@ (341e07ac <rom_nor_programmer+0x28c>)
+341e0758:	f8d6 10fc 	ldr.w	r1, [r6, #252]	@ 0xfc
+341e075c:	9108      	str	r1, [sp, #32]
+341e075e:	681a      	ldr	r2, [r3, #0]
+341e0760:	0197      	lsls	r7, r2, #6
+341e0762:	9209      	str	r2, [sp, #36]	@ 0x24
+341e0764:	d524      	bpl.n	341e07b0 <rom_nor_programmer+0x290>
+341e0766:	2108      	movs	r1, #8
+341e0768:	e745      	b.n	341e05f6 <rom_nor_programmer+0xd6>
+341e076a:	bf00      	nop
+341e076c:	341b4000 	.word	0x341b4000
+341e0770:	52554e4e 	.word	0x52554e4e
+341e0774:	341b4104 	.word	0x341b4104
+341e0778:	4e435032 	.word	0x4e435032
+341e077c:	341b4304 	.word	0x341b4304
+341e0780:	4e4f5244 	.word	0x4e4f5244
+341e0784:	57524954 	.word	0x57524954
+341e0788:	e000ed00 	.word	0xe000ed00
+341e078c:	56028000 	.word	0x56028000
+341e0790:	33330000 	.word	0x33330000
+341e0794:	00404b00 	.word	0x00404b00
+341e0798:	49000005 	.word	0x49000005
+341e079c:	5802b000 	.word	0x5802b000
+341e07a0:	58025000 	.word	0x58025000
+341e07a4:	10000001 	.word	0x10000001
+341e07a8:	01002101 	.word	0x01002101
+341e07ac:	e0001000 	.word	0xe0001000
+341e07b0:	f041 7180 	orr.w	r1, r1, #16777216	@ 0x1000000
+341e07b4:	f042 0201 	orr.w	r2, r2, #1
+341e07b8:	f8c6 10fc 	str.w	r1, [r6, #252]	@ 0xfc
+341e07bc:	601a      	str	r2, [r3, #0]
+341e07be:	900b      	str	r0, [sp, #44]	@ 0x2c
+341e07c0:	f3bf 8f4f 	dsb	sy
+341e07c4:	f3bf 8f6f 	isb	sy
+341e07c8:	685a      	ldr	r2, [r3, #4]
+341e07ca:	f8c5 21c0 	str.w	r2, [r5, #448]	@ 0x1c0
+341e07ce:	f242 7210 	movw	r2, #10000	@ 0x2710
+341e07d2:	6859      	ldr	r1, [r3, #4]
+341e07d4:	f8d5 01c0 	ldr.w	r0, [r5, #448]	@ 0x1c0
+341e07d8:	1a09      	subs	r1, r1, r0
+341e07da:	f8c5 11c8 	str.w	r1, [r5, #456]	@ 0x1c8
+341e07de:	f8d5 11c8 	ldr.w	r1, [r5, #456]	@ 0x1c8
+341e07e2:	2900      	cmp	r1, #0
+341e07e4:	d05e      	beq.n	341e08a4 <rom_nor_programmer+0x384>
+341e07e6:	685b      	ldr	r3, [r3, #4]
+341e07e8:	2701      	movs	r7, #1
+341e07ea:	930a      	str	r3, [sp, #40]	@ 0x28
+341e07ec:	2302      	movs	r3, #2
+341e07ee:	970c      	str	r7, [sp, #48]	@ 0x30
+341e07f0:	4620      	mov	r0, r4
+341e07f2:	f8c5 3110 	str.w	r3, [r5, #272]	@ 0x110
+341e07f6:	f7ff fd41 	bl	341e027c <status>
+341e07fa:	2800      	cmp	r0, #0
+341e07fc:	d155      	bne.n	341e08aa <rom_nor_programmer+0x38a>
+341e07fe:	4dbf      	ldr	r5, [pc, #764]	@ (341e0afc <rom_nor_programmer+0x5dc>)
+341e0800:	9e07      	ldr	r6, [sp, #28]
+341e0802:	f8d5 3158 	ldr.w	r3, [r5, #344]	@ 0x158
+341e0806:	9304      	str	r3, [sp, #16]
+341e0808:	f8d5 315c 	ldr.w	r3, [r5, #348]	@ 0x15c
+341e080c:	f8d5 7160 	ldr.w	r7, [r5, #352]	@ 0x160
+341e0810:	9305      	str	r3, [sp, #20]
+341e0812:	2300      	movs	r3, #0
+341e0814:	9307      	str	r3, [sp, #28]
+341e0816:	230b      	movs	r3, #11
+341e0818:	f8c5 3110 	str.w	r3, [r5, #272]	@ 0x110
+341e081c:	9b0c      	ldr	r3, [sp, #48]	@ 0x30
+341e081e:	2b00      	cmp	r3, #0
+341e0820:	f000 81bf 	beq.w	341e0ba2 <rom_nor_programmer+0x682>
+341e0824:	e9dd 320d 	ldrd	r3, r2, [sp, #52]	@ 0x34
+341e0828:	2a00      	cmp	r2, #0
+341e082a:	f040 81ba 	bne.w	341e0ba2 <rom_nor_programmer+0x682>
+341e082e:	2b00      	cmp	r3, #0
+341e0830:	f000 81c3 	beq.w	341e0bba <rom_nor_programmer+0x69a>
+341e0834:	f8df b2c8 	ldr.w	fp, [pc, #712]	@ 341e0b00 <rom_nor_programmer+0x5e0>
+341e0838:	f8df a2c8 	ldr.w	sl, [pc, #712]	@ 341e0b04 <rom_nor_programmer+0x5e4>
+341e083c:	f8db 8004 	ldr.w	r8, [fp, #4]
+341e0840:	f8df 92c4 	ldr.w	r9, [pc, #708]	@ 341e0b08 <rom_nor_programmer+0x5e8>
+341e0844:	4620      	mov	r0, r4
+341e0846:	f7ff fd19 	bl	341e027c <status>
+341e084a:	2800      	cmp	r0, #0
+341e084c:	f000 81a9 	beq.w	341e0ba2 <rom_nor_programmer+0x682>
+341e0850:	f8d5 3124 	ldr.w	r3, [r5, #292]	@ 0x124
+341e0854:	f013 0f01 	tst.w	r3, #1
+341e0858:	f8db 3004 	ldr.w	r3, [fp, #4]
+341e085c:	eba3 0308 	sub.w	r3, r3, r8
+341e0860:	f040 8195 	bne.w	341e0b8e <rom_nor_programmer+0x66e>
+341e0864:	f8d5 21dc 	ldr.w	r2, [r5, #476]	@ 0x1dc
+341e0868:	4293      	cmp	r3, r2
+341e086a:	d901      	bls.n	341e0870 <rom_nor_programmer+0x350>
+341e086c:	f8c5 31dc 	str.w	r3, [r5, #476]	@ 0x1dc
+341e0870:	2300      	movs	r3, #0
+341e0872:	2104      	movs	r1, #4
+341e0874:	461a      	mov	r2, r3
+341e0876:	4620      	mov	r0, r4
+341e0878:	e9cd 3301 	strd	r3, r3, [sp, #4]
+341e087c:	9300      	str	r3, [sp, #0]
+341e087e:	f7ff fc1b 	bl	341e00b8 <transfer>
+341e0882:	2800      	cmp	r0, #0
+341e0884:	f000 818d 	beq.w	341e0ba2 <rom_nor_programmer+0x682>
+341e0888:	4620      	mov	r0, r4
+341e088a:	f7ff fcf7 	bl	341e027c <status>
+341e088e:	2800      	cmp	r0, #0
+341e0890:	f000 8187 	beq.w	341e0ba2 <rom_nor_programmer+0x682>
+341e0894:	4b99      	ldr	r3, [pc, #612]	@ (341e0afc <rom_nor_programmer+0x5dc>)
+341e0896:	f8d3 3124 	ldr.w	r3, [r3, #292]	@ 0x124
+341e089a:	0799      	lsls	r1, r3, #30
+341e089c:	f000 8181 	beq.w	341e0ba2 <rom_nor_programmer+0x682>
+341e08a0:	2110      	movs	r1, #16
+341e08a2:	e17b      	b.n	341e0b9c <rom_nor_programmer+0x67c>
+341e08a4:	3a01      	subs	r2, #1
+341e08a6:	d194      	bne.n	341e07d2 <rom_nor_programmer+0x2b2>
+341e08a8:	e75d      	b.n	341e0766 <rom_nor_programmer+0x246>
+341e08aa:	f8d5 6124 	ldr.w	r6, [r5, #292]	@ 0x124
+341e08ae:	f016 0603 	ands.w	r6, r6, #3
+341e08b2:	d001      	beq.n	341e08b8 <rom_nor_programmer+0x398>
+341e08b4:	210f      	movs	r1, #15
+341e08b6:	e69e      	b.n	341e05f6 <rom_nor_programmer+0xd6>
+341e08b8:	4620      	mov	r0, r4
+341e08ba:	f7ff fcfb 	bl	341e02b4 <security>
+341e08be:	2800      	cmp	r0, #0
+341e08c0:	d09d      	beq.n	341e07fe <rom_nor_programmer+0x2de>
+341e08c2:	4620      	mov	r0, r4
+341e08c4:	f7ff fd10 	bl	341e02e8 <healthy>
+341e08c8:	2800      	cmp	r0, #0
+341e08ca:	d098      	beq.n	341e07fe <rom_nor_programmer+0x2de>
+341e08cc:	f04f 0803 	mov.w	r8, #3
+341e08d0:	ab06      	add	r3, sp, #24
+341e08d2:	e9cd 7301 	strd	r7, r3, [sp, #4]
+341e08d6:	4632      	mov	r2, r6
+341e08d8:	4633      	mov	r3, r6
+341e08da:	219f      	movs	r1, #159	@ 0x9f
+341e08dc:	4620      	mov	r0, r4
+341e08de:	f8cd 8000 	str.w	r8, [sp]
+341e08e2:	f7ff fbe9 	bl	341e00b8 <transfer>
+341e08e6:	2800      	cmp	r0, #0
+341e08e8:	d089      	beq.n	341e07fe <rom_nor_programmer+0x2de>
+341e08ea:	f89d 1019 	ldrb.w	r1, [sp, #25]
+341e08ee:	f89d 3018 	ldrb.w	r3, [sp, #24]
+341e08f2:	0209      	lsls	r1, r1, #8
+341e08f4:	ea41 4103 	orr.w	r1, r1, r3, lsl #16
+341e08f8:	f89d 301a 	ldrb.w	r3, [sp, #26]
+341e08fc:	4319      	orrs	r1, r3
+341e08fe:	f8c5 112c 	str.w	r1, [r5, #300]	@ 0x12c
+341e0902:	f8d5 212c 	ldr.w	r2, [r5, #300]	@ 0x12c
+341e0906:	4b81      	ldr	r3, [pc, #516]	@ (341e0b0c <rom_nor_programmer+0x5ec>)
+341e0908:	429a      	cmp	r2, r3
+341e090a:	d001      	beq.n	341e0910 <rom_nor_programmer+0x3f0>
+341e090c:	210d      	movs	r1, #13
+341e090e:	e672      	b.n	341e05f6 <rom_nor_programmer+0xd6>
+341e0910:	f8d5 310c 	ldr.w	r3, [r5, #268]	@ 0x10c
+341e0914:	2b02      	cmp	r3, #2
+341e0916:	f43f af72 	beq.w	341e07fe <rom_nor_programmer+0x2de>
+341e091a:	487d      	ldr	r0, [pc, #500]	@ (341e0b10 <rom_nor_programmer+0x5f0>)
+341e091c:	f8c5 8110 	str.w	r8, [r5, #272]	@ 0x110
+341e0920:	f7ff fde4 	bl	341e04ec <crc32_bytes.constprop.0>
+341e0924:	f8c5 0144 	str.w	r0, [r5, #324]	@ 0x144
+341e0928:	f8d5 2144 	ldr.w	r2, [r5, #324]	@ 0x144
+341e092c:	f8d5 3150 	ldr.w	r3, [r5, #336]	@ 0x150
+341e0930:	429a      	cmp	r2, r3
+341e0932:	d001      	beq.n	341e0938 <rom_nor_programmer+0x418>
+341e0934:	2111      	movs	r1, #17
+341e0936:	e65e      	b.n	341e05f6 <rom_nor_programmer+0xd6>
+341e0938:	2304      	movs	r3, #4
+341e093a:	f8c5 3110 	str.w	r3, [r5, #272]	@ 0x110
+341e093e:	4b75      	ldr	r3, [pc, #468]	@ (341e0b14 <rom_nor_programmer+0x5f4>)
+341e0940:	463a      	mov	r2, r7
+341e0942:	e9cd 7301 	strd	r7, r3, [sp, #4]
+341e0946:	f44f 3380 	mov.w	r3, #65536	@ 0x10000
+341e094a:	210b      	movs	r1, #11
+341e094c:	9300      	str	r3, [sp, #0]
+341e094e:	4620      	mov	r0, r4
+341e0950:	4633      	mov	r3, r6
+341e0952:	f7ff fbb1 	bl	341e00b8 <transfer>
+341e0956:	2800      	cmp	r0, #0
+341e0958:	f43f af51 	beq.w	341e07fe <rom_nor_programmer+0x2de>
+341e095c:	486d      	ldr	r0, [pc, #436]	@ (341e0b14 <rom_nor_programmer+0x5f4>)
+341e095e:	f7ff fdc5 	bl	341e04ec <crc32_bytes.constprop.0>
+341e0962:	4d66      	ldr	r5, [pc, #408]	@ (341e0afc <rom_nor_programmer+0x5dc>)
+341e0964:	f8c5 0140 	str.w	r0, [r5, #320]	@ 0x140
+341e0968:	f8d5 2140 	ldr.w	r2, [r5, #320]	@ 0x140
+341e096c:	f8d5 314c 	ldr.w	r3, [r5, #332]	@ 0x14c
+341e0970:	429a      	cmp	r2, r3
+341e0972:	d002      	beq.n	341e097a <rom_nor_programmer+0x45a>
+341e0974:	2112      	movs	r1, #18
+341e0976:	a807      	add	r0, sp, #28
+341e0978:	e63e      	b.n	341e05f8 <rom_nor_programmer+0xd8>
+341e097a:	2305      	movs	r3, #5
+341e097c:	2600      	movs	r6, #0
+341e097e:	f8c5 3110 	str.w	r3, [r5, #272]	@ 0x110
+341e0982:	2200      	movs	r2, #0
+341e0984:	f44f 5180 	mov.w	r1, #4096	@ 0x1000
+341e0988:	0330      	lsls	r0, r6, #12
+341e098a:	f7ff fb49 	bl	341e0020 <compare>
+341e098e:	b930      	cbnz	r0, 341e099e <rom_nor_programmer+0x47e>
+341e0990:	2301      	movs	r3, #1
+341e0992:	f8d5 2130 	ldr.w	r2, [r5, #304]	@ 0x130
+341e0996:	40b3      	lsls	r3, r6
+341e0998:	4313      	orrs	r3, r2
+341e099a:	f8c5 3130 	str.w	r3, [r5, #304]	@ 0x130
+341e099e:	3601      	adds	r6, #1
+341e09a0:	2e10      	cmp	r6, #16
+341e09a2:	d1ee      	bne.n	341e0982 <rom_nor_programmer+0x462>
+341e09a4:	f04f 33ff 	mov.w	r3, #4294967295
+341e09a8:	2700      	movs	r7, #0
+341e09aa:	f44f 5980 	mov.w	r9, #4096	@ 0x1000
+341e09ae:	4d53      	ldr	r5, [pc, #332]	@ (341e0afc <rom_nor_programmer+0x5dc>)
+341e09b0:	f8c5 31d0 	str.w	r3, [r5, #464]	@ 0x1d0
+341e09b4:	f04f 0a01 	mov.w	sl, #1
+341e09b8:	f8d5 3130 	ldr.w	r3, [r5, #304]	@ 0x130
+341e09bc:	fa0a f807 	lsl.w	r8, sl, r7
+341e09c0:	ea18 0f03 	tst.w	r8, r3
+341e09c4:	f000 80b1 	beq.w	341e0b2a <rom_nor_programmer+0x60a>
+341e09c8:	2306      	movs	r3, #6
+341e09ca:	033e      	lsls	r6, r7, #12
+341e09cc:	f8c5 6114 	str.w	r6, [r5, #276]	@ 0x114
+341e09d0:	a807      	add	r0, sp, #28
+341e09d2:	f8c5 3110 	str.w	r3, [r5, #272]	@ 0x110
+341e09d6:	f7ff fc9d 	bl	341e0314 <write_enable>
+341e09da:	2800      	cmp	r0, #0
+341e09dc:	f43f af0f 	beq.w	341e07fe <rom_nor_programmer+0x2de>
+341e09e0:	2300      	movs	r3, #0
+341e09e2:	4652      	mov	r2, sl
+341e09e4:	e9cd 3301 	strd	r3, r3, [sp, #4]
+341e09e8:	9300      	str	r3, [sp, #0]
+341e09ea:	2120      	movs	r1, #32
+341e09ec:	4633      	mov	r3, r6
+341e09ee:	a807      	add	r0, sp, #28
+341e09f0:	f7ff fb62 	bl	341e00b8 <transfer>
+341e09f4:	2800      	cmp	r0, #0
+341e09f6:	f43f af02 	beq.w	341e07fe <rom_nor_programmer+0x2de>
+341e09fa:	4942      	ldr	r1, [pc, #264]	@ (341e0b04 <rom_nor_programmer+0x5e4>)
+341e09fc:	a807      	add	r0, sp, #28
+341e09fe:	f7ff fcc9 	bl	341e0394 <write_finished>
+341e0a02:	2800      	cmp	r0, #0
+341e0a04:	f43f aefb 	beq.w	341e07fe <rom_nor_programmer+0x2de>
+341e0a08:	f8d5 3134 	ldr.w	r3, [r5, #308]	@ 0x134
+341e0a0c:	f44f 5b80 	mov.w	fp, #4096	@ 0x1000
+341e0a10:	ea48 0303 	orr.w	r3, r8, r3
+341e0a14:	f8c5 3134 	str.w	r3, [r5, #308]	@ 0x134
+341e0a18:	2307      	movs	r3, #7
+341e0a1a:	f8c5 3110 	str.w	r3, [r5, #272]	@ 0x110
+341e0a1e:	4b3e      	ldr	r3, [pc, #248]	@ (341e0b18 <rom_nor_programmer+0x5f8>)
+341e0a20:	4652      	mov	r2, sl
+341e0a22:	444b      	add	r3, r9
+341e0a24:	e9cd a301 	strd	sl, r3, [sp, #4]
+341e0a28:	210b      	movs	r1, #11
+341e0a2a:	4633      	mov	r3, r6
+341e0a2c:	f8cd b000 	str.w	fp, [sp]
+341e0a30:	a807      	add	r0, sp, #28
+341e0a32:	f7ff fb41 	bl	341e00b8 <transfer>
+341e0a36:	2800      	cmp	r0, #0
+341e0a38:	f43f aee1 	beq.w	341e07fe <rom_nor_programmer+0x2de>
+341e0a3c:	4652      	mov	r2, sl
+341e0a3e:	4659      	mov	r1, fp
+341e0a40:	4630      	mov	r0, r6
+341e0a42:	f7ff faed 	bl	341e0020 <compare>
+341e0a46:	b928      	cbnz	r0, 341e0a54 <rom_nor_programmer+0x534>
+341e0a48:	2113      	movs	r1, #19
+341e0a4a:	e794      	b.n	341e0976 <rom_nor_programmer+0x456>
+341e0a4c:	f506 7680 	add.w	r6, r6, #256	@ 0x100
+341e0a50:	45b1      	cmp	r9, r6
+341e0a52:	d963      	bls.n	341e0b1c <rom_nor_programmer+0x5fc>
+341e0a54:	f106 5a50 	add.w	sl, r6, #872415232	@ 0x34000000
+341e0a58:	f50a 1be0 	add.w	fp, sl, #1835008	@ 0x1c0000
+341e0a5c:	4659      	mov	r1, fp
+341e0a5e:	2200      	movs	r2, #0
+341e0a60:	f44f 7380 	mov.w	r3, #256	@ 0x100
+341e0a64:	f811 0b01 	ldrb.w	r0, [r1], #1
+341e0a68:	28ff      	cmp	r0, #255	@ 0xff
+341e0a6a:	bf18      	it	ne
+341e0a6c:	2201      	movne	r2, #1
+341e0a6e:	3b01      	subs	r3, #1
+341e0a70:	d1f8      	bne.n	341e0a64 <rom_nor_programmer+0x544>
+341e0a72:	2a00      	cmp	r2, #0
+341e0a74:	d0ea      	beq.n	341e0a4c <rom_nor_programmer+0x52c>
+341e0a76:	2308      	movs	r3, #8
+341e0a78:	f8c5 6114 	str.w	r6, [r5, #276]	@ 0x114
+341e0a7c:	a807      	add	r0, sp, #28
+341e0a7e:	f8c5 3110 	str.w	r3, [r5, #272]	@ 0x110
+341e0a82:	f7ff fc47 	bl	341e0314 <write_enable>
+341e0a86:	2800      	cmp	r0, #0
+341e0a88:	f43f aeb9 	beq.w	341e07fe <rom_nor_programmer+0x2de>
+341e0a8c:	2300      	movs	r3, #0
+341e0a8e:	f8cd b008 	str.w	fp, [sp, #8]
+341e0a92:	f44f 7b80 	mov.w	fp, #256	@ 0x100
+341e0a96:	2201      	movs	r2, #1
+341e0a98:	e9cd b300 	strd	fp, r3, [sp]
+341e0a9c:	2102      	movs	r1, #2
+341e0a9e:	4633      	mov	r3, r6
+341e0aa0:	a807      	add	r0, sp, #28
+341e0aa2:	f7ff fb09 	bl	341e00b8 <transfer>
+341e0aa6:	2800      	cmp	r0, #0
+341e0aa8:	f43f aea9 	beq.w	341e07fe <rom_nor_programmer+0x2de>
+341e0aac:	f242 7110 	movw	r1, #10000	@ 0x2710
+341e0ab0:	a807      	add	r0, sp, #28
+341e0ab2:	f7ff fc6f 	bl	341e0394 <write_finished>
+341e0ab6:	2800      	cmp	r0, #0
+341e0ab8:	f43f aea1 	beq.w	341e07fe <rom_nor_programmer+0x2de>
+341e0abc:	f8d5 313c 	ldr.w	r3, [r5, #316]	@ 0x13c
+341e0ac0:	2201      	movs	r2, #1
+341e0ac2:	3301      	adds	r3, #1
+341e0ac4:	f8c5 313c 	str.w	r3, [r5, #316]	@ 0x13c
+341e0ac8:	2309      	movs	r3, #9
+341e0aca:	f8c5 3110 	str.w	r3, [r5, #272]	@ 0x110
+341e0ace:	f50a 13e8 	add.w	r3, sl, #1900544	@ 0x1d0000
+341e0ad2:	9302      	str	r3, [sp, #8]
+341e0ad4:	210b      	movs	r1, #11
+341e0ad6:	4633      	mov	r3, r6
+341e0ad8:	e9cd b200 	strd	fp, r2, [sp]
+341e0adc:	a807      	add	r0, sp, #28
+341e0ade:	f7ff faeb 	bl	341e00b8 <transfer>
+341e0ae2:	2800      	cmp	r0, #0
+341e0ae4:	f43f ae8b 	beq.w	341e07fe <rom_nor_programmer+0x2de>
+341e0ae8:	2200      	movs	r2, #0
+341e0aea:	4659      	mov	r1, fp
+341e0aec:	4630      	mov	r0, r6
+341e0aee:	f7ff fa97 	bl	341e0020 <compare>
+341e0af2:	2800      	cmp	r0, #0
+341e0af4:	d1aa      	bne.n	341e0a4c <rom_nor_programmer+0x52c>
+341e0af6:	2114      	movs	r1, #20
+341e0af8:	e73d      	b.n	341e0976 <rom_nor_programmer+0x456>
+341e0afa:	bf00      	nop
+341e0afc:	341b4000 	.word	0x341b4000
+341e0b00:	e0001000 	.word	0xe0001000
+341e0b04:	000f4240 	.word	0x000f4240
+341e0b08:	17d783ff 	.word	0x17d783ff
+341e0b0c:	00c2803a 	.word	0x00c2803a
+341e0b10:	341c0000 	.word	0x341c0000
+341e0b14:	341d0000 	.word	0x341d0000
+341e0b18:	341cf000 	.word	0x341cf000
+341e0b1c:	4a71      	ldr	r2, [pc, #452]	@ (341e0ce4 <rom_nor_programmer_ready+0x2a>)
+341e0b1e:	f8d2 3138 	ldr.w	r3, [r2, #312]	@ 0x138
+341e0b22:	ea48 0303 	orr.w	r3, r8, r3
+341e0b26:	f8c2 3138 	str.w	r3, [r2, #312]	@ 0x138
+341e0b2a:	3701      	adds	r7, #1
+341e0b2c:	2f10      	cmp	r7, #16
+341e0b2e:	f509 5980 	add.w	r9, r9, #4096	@ 0x1000
+341e0b32:	f47f af3f 	bne.w	341e09b4 <rom_nor_programmer+0x494>
+341e0b36:	2600      	movs	r6, #0
+341e0b38:	230a      	movs	r3, #10
+341e0b3a:	2201      	movs	r2, #1
+341e0b3c:	f44f 3780 	mov.w	r7, #65536	@ 0x10000
+341e0b40:	4d68      	ldr	r5, [pc, #416]	@ (341e0ce4 <rom_nor_programmer_ready+0x2a>)
+341e0b42:	f8df 81a4 	ldr.w	r8, [pc, #420]	@ 341e0ce8 <rom_nor_programmer_ready+0x2e>
+341e0b46:	f8c5 6114 	str.w	r6, [r5, #276]	@ 0x114
+341e0b4a:	210b      	movs	r1, #11
+341e0b4c:	f8c5 3110 	str.w	r3, [r5, #272]	@ 0x110
+341e0b50:	a807      	add	r0, sp, #28
+341e0b52:	4633      	mov	r3, r6
+341e0b54:	e9cd 2801 	strd	r2, r8, [sp, #4]
+341e0b58:	9700      	str	r7, [sp, #0]
+341e0b5a:	f7ff faad 	bl	341e00b8 <transfer>
+341e0b5e:	2800      	cmp	r0, #0
+341e0b60:	f43f ae4d 	beq.w	341e07fe <rom_nor_programmer+0x2de>
+341e0b64:	4640      	mov	r0, r8
+341e0b66:	f7ff fcc1 	bl	341e04ec <crc32_bytes.constprop.0>
+341e0b6a:	f8c5 0148 	str.w	r0, [r5, #328]	@ 0x148
+341e0b6e:	f8d5 2148 	ldr.w	r2, [r5, #328]	@ 0x148
+341e0b72:	f8d5 3150 	ldr.w	r3, [r5, #336]	@ 0x150
+341e0b76:	429a      	cmp	r2, r3
+341e0b78:	d001      	beq.n	341e0b7e <rom_nor_programmer+0x65e>
+341e0b7a:	2115      	movs	r1, #21
+341e0b7c:	e6fb      	b.n	341e0976 <rom_nor_programmer+0x456>
+341e0b7e:	4632      	mov	r2, r6
+341e0b80:	4639      	mov	r1, r7
+341e0b82:	4630      	mov	r0, r6
+341e0b84:	f7ff fa4c 	bl	341e0020 <compare>
+341e0b88:	2800      	cmp	r0, #0
+341e0b8a:	d0f6      	beq.n	341e0b7a <rom_nor_programmer+0x65a>
+341e0b8c:	e637      	b.n	341e07fe <rom_nor_programmer+0x2de>
+341e0b8e:	454b      	cmp	r3, r9
+341e0b90:	d803      	bhi.n	341e0b9a <rom_nor_programmer+0x67a>
+341e0b92:	f1ba 0a01 	subs.w	sl, sl, #1
+341e0b96:	f47f ae55 	bne.w	341e0844 <rom_nor_programmer+0x324>
+341e0b9a:	210f      	movs	r1, #15
+341e0b9c:	4620      	mov	r0, r4
+341e0b9e:	f7ff fa61 	bl	341e0064 <fail>
+341e0ba2:	9b0d      	ldr	r3, [sp, #52]	@ 0x34
+341e0ba4:	b133      	cbz	r3, 341e0bb4 <rom_nor_programmer+0x694>
+341e0ba6:	4a4f      	ldr	r2, [pc, #316]	@ (341e0ce4 <rom_nor_programmer_ready+0x2a>)
+341e0ba8:	f8d2 3154 	ldr.w	r3, [r2, #340]	@ 0x154
+341e0bac:	f043 0308 	orr.w	r3, r3, #8
+341e0bb0:	f8c2 3154 	str.w	r3, [r2, #340]	@ 0x154
+341e0bb4:	9b0c      	ldr	r3, [sp, #48]	@ 0x30
+341e0bb6:	2b00      	cmp	r3, #0
+341e0bb8:	d03c      	beq.n	341e0c34 <rom_nor_programmer+0x714>
+341e0bba:	4b4c      	ldr	r3, [pc, #304]	@ (341e0cec <rom_nor_programmer_ready+0x32>)
+341e0bbc:	6a1a      	ldr	r2, [r3, #32]
+341e0bbe:	f647 7320 	movw	r3, #32544	@ 0x7f20
+341e0bc2:	421a      	tst	r2, r3
+341e0bc4:	bf01      	itttt	eq
+341e0bc6:	4a47      	ldreq	r2, [pc, #284]	@ (341e0ce4 <rom_nor_programmer_ready+0x2a>)
+341e0bc8:	f8d2 3154 	ldreq.w	r3, [r2, #340]	@ 0x154
+341e0bcc:	f043 0301 	orreq.w	r3, r3, #1
+341e0bd0:	f8c2 3154 	streq.w	r3, [r2, #340]	@ 0x154
+341e0bd4:	e9dd 210e 	ldrd	r2, r1, [sp, #56]	@ 0x38
+341e0bd8:	4b42      	ldr	r3, [pc, #264]	@ (341e0ce4 <rom_nor_programmer_ready+0x2a>)
+341e0bda:	2900      	cmp	r1, #0
+341e0bdc:	d076      	beq.n	341e0ccc <rom_nor_programmer_ready+0x12>
+341e0bde:	2a00      	cmp	r2, #0
+341e0be0:	d177      	bne.n	341e0cd2 <rom_nor_programmer_ready+0x18>
+341e0be2:	f8d3 2124 	ldr.w	r2, [r3, #292]	@ 0x124
+341e0be6:	07d2      	lsls	r2, r2, #31
+341e0be8:	d56a      	bpl.n	341e0cc0 <rom_nor_programmer_ready+0x6>
+341e0bea:	f8d3 1154 	ldr.w	r1, [r3, #340]	@ 0x154
+341e0bee:	f001 0103 	and.w	r1, r1, #3
+341e0bf2:	2903      	cmp	r1, #3
+341e0bf4:	d16d      	bne.n	341e0cd2 <rom_nor_programmer_ready+0x18>
+341e0bf6:	f8d3 0188 	ldr.w	r0, [r3, #392]	@ 0x188
+341e0bfa:	4a3c      	ldr	r2, [pc, #240]	@ (341e0cec <rom_nor_programmer_ready+0x32>)
+341e0bfc:	f020 5040 	bic.w	r0, r0, #805306368	@ 0x30000000
+341e0c00:	6010      	str	r0, [r2, #0]
+341e0c02:	f8d3 0198 	ldr.w	r0, [r3, #408]	@ 0x198
+341e0c06:	f8c2 0100 	str.w	r0, [r2, #256]	@ 0x100
+341e0c0a:	f8d3 019c 	ldr.w	r0, [r3, #412]	@ 0x19c
+341e0c0e:	f8c2 0108 	str.w	r0, [r2, #264]	@ 0x108
+341e0c12:	f8d3 01a4 	ldr.w	r0, [r3, #420]	@ 0x1a4
+341e0c16:	6410      	str	r0, [r2, #64]	@ 0x40
+341e0c18:	f8d3 01a0 	ldr.w	r0, [r3, #416]	@ 0x1a0
+341e0c1c:	f8c2 0110 	str.w	r0, [r2, #272]	@ 0x110
+341e0c20:	f8d3 0188 	ldr.w	r0, [r3, #392]	@ 0x188
+341e0c24:	6010      	str	r0, [r2, #0]
+341e0c26:	6251      	str	r1, [r2, #36]	@ 0x24
+341e0c28:	f8d3 2154 	ldr.w	r2, [r3, #340]	@ 0x154
+341e0c2c:	f042 0204 	orr.w	r2, r2, #4
+341e0c30:	f8c3 2154 	str.w	r2, [r3, #340]	@ 0x154
+341e0c34:	9b0b      	ldr	r3, [sp, #44]	@ 0x2c
+341e0c36:	b18b      	cbz	r3, 341e0c5c <rom_nor_programmer+0x73c>
+341e0c38:	4a2d      	ldr	r2, [pc, #180]	@ (341e0cf0 <rom_nor_programmer_ready+0x36>)
+341e0c3a:	4b2a      	ldr	r3, [pc, #168]	@ (341e0ce4 <rom_nor_programmer_ready+0x2a>)
+341e0c3c:	6851      	ldr	r1, [r2, #4]
+341e0c3e:	f8c3 11c4 	str.w	r1, [r3, #452]	@ 0x1c4
+341e0c42:	9909      	ldr	r1, [sp, #36]	@ 0x24
+341e0c44:	6011      	str	r1, [r2, #0]
+341e0c46:	9908      	ldr	r1, [sp, #32]
+341e0c48:	f502 425d 	add.w	r2, r2, #56576	@ 0xdd00
+341e0c4c:	f8c2 10fc 	str.w	r1, [r2, #252]	@ 0xfc
+341e0c50:	f8d3 2154 	ldr.w	r2, [r3, #340]	@ 0x154
+341e0c54:	f042 0220 	orr.w	r2, r2, #32
+341e0c58:	f8c3 2154 	str.w	r2, [r3, #340]	@ 0x154
+341e0c5c:	4b21      	ldr	r3, [pc, #132]	@ (341e0ce4 <rom_nor_programmer_ready+0x2a>)
+341e0c5e:	9a07      	ldr	r2, [sp, #28]
+341e0c60:	f8c3 21cc 	str.w	r2, [r3, #460]	@ 0x1cc
+341e0c64:	b146      	cbz	r6, 341e0c78 <rom_nor_programmer+0x758>
+341e0c66:	9a04      	ldr	r2, [sp, #16]
+341e0c68:	9607      	str	r6, [sp, #28]
+341e0c6a:	f8c3 2158 	str.w	r2, [r3, #344]	@ 0x158
+341e0c6e:	9a05      	ldr	r2, [sp, #20]
+341e0c70:	f8c3 215c 	str.w	r2, [r3, #348]	@ 0x15c
+341e0c74:	f8c3 7160 	str.w	r7, [r3, #352]	@ 0x160
+341e0c78:	9a07      	ldr	r2, [sp, #28]
+341e0c7a:	f8c3 2104 	str.w	r2, [r3, #260]	@ 0x104
+341e0c7e:	220c      	movs	r2, #12
+341e0c80:	f8c3 2110 	str.w	r2, [r3, #272]	@ 0x110
+341e0c84:	9b07      	ldr	r3, [sp, #28]
+341e0c86:	2b00      	cmp	r3, #0
+341e0c88:	bf14      	ite	ne
+341e0c8a:	2203      	movne	r2, #3
+341e0c8c:	2202      	moveq	r2, #2
+341e0c8e:	4b15      	ldr	r3, [pc, #84]	@ (341e0ce4 <rom_nor_programmer_ready+0x2a>)
+341e0c90:	f8c3 230c 	str.w	r2, [r3, #780]	@ 0x30c
+341e0c94:	f3bf 8f4f 	dsb	sy
+341e0c98:	4a16      	ldr	r2, [pc, #88]	@ (341e0cf4 <rom_nor_programmer_ready+0x3a>)
+341e0c9a:	f8c3 2364 	str.w	r2, [r3, #868]	@ 0x364
+341e0c9e:	f3bf 8f4f 	dsb	sy
+341e0ca2:	f102 4276 	add.w	r2, r2, #4127195136	@ 0xf6000000
+341e0ca6:	f502 2240 	add.w	r2, r2, #786432	@ 0xc0000
+341e0caa:	f602 12f7 	addw	r2, r2, #2551	@ 0x9f7
+341e0cae:	f8c3 2100 	str.w	r2, [r3, #256]	@ 0x100
+341e0cb2:	f3bf 8f4f 	dsb	sy
+341e0cb6:	f3bf 8f6f 	isb	sy
+
+341e0cba <rom_nor_programmer_ready>:
+341e0cba:	bf00      	nop
+341e0cbc:	f7ff bffd 	b.w	341e0cba <rom_nor_programmer_ready>
+341e0cc0:	f8d3 2154 	ldr.w	r2, [r3, #340]	@ 0x154
+341e0cc4:	f042 0202 	orr.w	r2, r2, #2
+341e0cc8:	f8c3 2154 	str.w	r2, [r3, #340]	@ 0x154
+341e0ccc:	9a0e      	ldr	r2, [sp, #56]	@ 0x38
+341e0cce:	2a00      	cmp	r2, #0
+341e0cd0:	d08b      	beq.n	341e0bea <rom_nor_programmer+0x6ca>
+341e0cd2:	4a04      	ldr	r2, [pc, #16]	@ (341e0ce4 <rom_nor_programmer_ready+0x2a>)
+341e0cd4:	f8d2 3154 	ldr.w	r3, [r2, #340]	@ 0x154
+341e0cd8:	f043 0310 	orr.w	r3, r3, #16
+341e0cdc:	f8c2 3154 	str.w	r3, [r2, #340]	@ 0x154
+341e0ce0:	e7a8      	b.n	341e0c34 <rom_nor_programmer+0x714>
+341e0ce2:	bf00      	nop
+341e0ce4:	341b4000 	.word	0x341b4000
+341e0ce8:	341d0000 	.word	0x341d0000
+341e0cec:	58025000 	.word	0x58025000
+341e0cf0:	e0001000 	.word	0xe0001000
+341e0cf4:	4e43444e 	.word	0x4e43444e
