@@ -1,0 +1,579 @@
+{
+  "schema": 1,
+  "bench": "tmp/bringup/raw-slots-20261024/bench",
+  "records": [
+    {
+      "id": "format128-01",
+      "classification": "host refused before RAW operation completion",
+      "pixels": "omit",
+      "keep_cli": true
+    },
+    {
+      "id": "format128-02",
+      "classification": "completed bounded format",
+      "pixels": "omit"
+    },
+    {
+      "id": "pio-pattern01",
+      "classification": "capture and SD readback passed",
+      "pixels": "pattern"
+    },
+    {
+      "id": "read-slot0",
+      "classification": "read-only slot retrieval",
+      "pixels": "pattern",
+      "capture": "pio-pattern01"
+    },
+    {
+      "id": "idma-pattern01",
+      "classification": "controller success but complete SD payload corrupt",
+      "pixels": "pattern"
+    },
+    {
+      "id": "read-slot1",
+      "classification": "read-only retrieval preserving zero-payload failure",
+      "pixels": "pattern",
+      "capture": "idma-pattern01"
+    },
+    {
+      "id": "rif-diagnostic01",
+      "classification": "initial RIF diagnostic without complete result",
+      "pixels": "omit",
+      "keep_cli": true
+    },
+    {
+      "id": "rif-diagnostic02",
+      "classification": "RIF violation diagnostic",
+      "pixels": "omit",
+      "keep_cli": true
+    },
+    {
+      "id": "rif-port-diagnostic01",
+      "classification": "SDMMC2 nonsecure configuration-port diagnostic",
+      "pixels": "omit",
+      "keep_cli": true
+    },
+    {
+      "id": "idma-secure-pattern01",
+      "classification": "secure IDMA capture and SD readback passed",
+      "pixels": "pattern"
+    },
+    {
+      "id": "read-slot2",
+      "classification": "read-only slot retrieval",
+      "pixels": "pattern",
+      "capture": "idma-secure-pattern01"
+    },
+    {
+      "id": "line-pattern01",
+      "classification": "warm preinitialized LINE overlap and SD readback passed",
+      "pixels": "pattern"
+    },
+    {
+      "id": "read-slot3",
+      "classification": "read-only slot retrieval",
+      "pixels": "pattern",
+      "capture": "line-pattern01"
+    },
+    {
+      "id": "format-full01",
+      "classification": "completed all-capacity logical slot format",
+      "pixels": "omit"
+    },
+    {
+      "id": "nor-before01",
+      "classification": "pre-install NOR sector readback",
+      "pixels": "omit"
+    },
+    {
+      "id": "nor-following-before01",
+      "classification": "following NOR guard readback before install",
+      "pixels": "omit"
+    },
+    {
+      "id": "flash-awake-write01",
+      "classification": "v9 awake NOR install with exact readback",
+      "pixels": "omit",
+      "keep_cli": true
+    },
+    {
+      "id": "flash-awake-write01-diagnostic",
+      "classification": "NOR helper completion diagnostics",
+      "pixels": "omit"
+    },
+    {
+      "id": "nor-following-after01",
+      "classification": "following NOR guard readback after install",
+      "pixels": "omit"
+    },
+    {
+      "id": "awake-cycle01",
+      "classification": "cold powered observation ending awake; strict phase decoder failed",
+      "pixels": "omit",
+      "keep_files": [
+        "raw/chunks.jsonl"
+      ]
+    },
+    {
+      "id": "awake-inspect02",
+      "classification": "successful v9 awake cold-capture inspection; scene pixels omitted",
+      "pixels": "omit"
+    },
+    {
+      "id": "awake-profile01",
+      "classification": "post-frame cycle-counter profile",
+      "pixels": "omit"
+    },
+    {
+      "id": "read-scene-slot0",
+      "classification": "scene readback reported exact; replay retains hashes and proofs only",
+      "pixels": "omit",
+      "capture": "awake-inspect02"
+    },
+    {
+      "id": "wfi-pattern01",
+      "classification": "failed v9 DMA-WFI capture; no FULL commit",
+      "pixels": "omit",
+      "keep_cli": true
+    },
+    {
+      "id": "wfi-failure-diagnostic02",
+      "classification": "failure park with observed camera reset and idle deinitialized SD",
+      "pixels": "omit",
+      "keep_cli": true
+    },
+    {
+      "id": "wfi-pattern02",
+      "classification": "v14b WFI trial lost debugger/SRAM access; explicitly authorized interruption",
+      "pixels": "omit",
+      "keep_cli": true,
+      "attachments": {
+        "wfi-pattern02-output.txt": "tmp/bringup/raw-slots-20261024/bench/wfi-pattern02-output.txt",
+        "wfi-ap0-debug.log": "tmp/bringup/raw-slots-20261024/bench/wfi-ap0-debug.log",
+        "wfi-ap0-direct-debug.log": "tmp/bringup/raw-slots-20261024/bench/wfi-ap0-direct-debug.log",
+        "wfi-ap0-lp.log": "tmp/bringup/raw-slots-20261024/bench/wfi-ap0-lp.log",
+        "wfi-ap2-proof.log": "tmp/bringup/raw-slots-20261024/bench/wfi-ap2-proof.log"
+      }
+    },
+    {
+      "id": "wfi-pattern02-observe01",
+      "classification": "read-only attempt could not access stalled WFI proof",
+      "pixels": "omit",
+      "keep_cli": true
+    },
+    {
+      "id": "wfi-stalled-js",
+      "classification": "stalled WFI target current observation only",
+      "pixels": "omit"
+    },
+    {
+      "id": "recovery-vcp09",
+      "classification": "UART/reset signal observed; MCU access did not recover",
+      "pixels": "omit",
+      "keep_files": [
+        "signal-summary.json"
+      ]
+    },
+    {
+      "id": "early-park09",
+      "classification": "post-reset early-park access failed",
+      "pixels": "omit",
+      "keep_cli": true
+    },
+    {
+      "id": "wfi-abort-cold-recovery01",
+      "classification": "authorized non-idle cold abort; host error then helper restored starting power range",
+      "pixels": "omit"
+    },
+    {
+      "id": "wfi-abort-restored-observe01",
+      "classification": "normal v9 flash resumed and reported complete slot3",
+      "pixels": "omit",
+      "keep_cli": true
+    },
+    {
+      "id": "abort-restored-inspect01",
+      "classification": "exact awake v9 capture terminal verified after restored power; slot3 committed",
+      "pixels": "omit"
+    },
+    {
+      "id": "nor-before02",
+      "classification": "pre-v12-install NOR sector readback",
+      "pixels": "omit"
+    },
+    {
+      "id": "flash-standby-write01",
+      "classification": "v12 polling Standby image NOR install with exact readback",
+      "pixels": "omit",
+      "keep_cli": true
+    },
+    {
+      "id": "flash-standby-write01-diagnostic",
+      "classification": "v12 NOR helper completion diagnostics",
+      "pixels": "omit"
+    },
+    {
+      "id": "nor-following-after02",
+      "classification": "following NOR guard unchanged after v12 install",
+      "pixels": "omit"
+    },
+    {
+      "id": "standby-cycle01",
+      "classification": "completed cold cycle with separately attributed SBF; strict final marker failed",
+      "pixels": "omit",
+      "keep_files": [
+        "raw/chunks.jsonl",
+        "phase/binary/analog_4.bin"
+      ],
+      "attachments": {
+        "qualification.json": "tmp/bringup/raw-slots-20261024/bench/standby-cycle01-qualification.json"
+      }
+    },
+    {
+      "id": "standby01-recovery",
+      "classification": "warm PE6 UART recovery waveform and request record",
+      "pixels": "omit",
+      "keep_files": [
+        "signal-summary.json"
+      ]
+    },
+    {
+      "id": "standby01-park",
+      "classification": "exact v12 early recovery park after measured cold cycle",
+      "pixels": "omit"
+    },
+    {
+      "id": "standby01-sbf",
+      "classification": "read-only SBF observation bound to exact recovery and owner reset/power attribution",
+      "pixels": "omit"
+    },
+    {
+      "id": "standby-cycle02",
+      "classification": "completed cold cycle with separately attributed SBF; strict final marker failed",
+      "pixels": "omit",
+      "keep_files": [
+        "raw/chunks.jsonl",
+        "phase/binary/analog_4.bin"
+      ],
+      "attachments": {
+        "qualification.json": "tmp/bringup/raw-slots-20261024/bench/standby-cycle02-qualification.json"
+      }
+    },
+    {
+      "id": "standby02-recovery",
+      "classification": "warm PE6 UART recovery waveform and request record",
+      "pixels": "omit",
+      "keep_files": [
+        "signal-summary.json"
+      ]
+    },
+    {
+      "id": "standby02-park",
+      "classification": "exact v12 early recovery park after measured cold cycle",
+      "pixels": "omit"
+    },
+    {
+      "id": "standby02-sbf",
+      "classification": "read-only SBF observation bound to exact recovery and owner reset/power attribution",
+      "pixels": "omit"
+    },
+    {
+      "id": "standby-cycle03",
+      "classification": "completed cold cycle with separately attributed SBF; strict final marker failed",
+      "pixels": "omit",
+      "keep_files": [
+        "raw/chunks.jsonl",
+        "phase/binary/analog_4.bin"
+      ],
+      "attachments": {
+        "qualification.json": "tmp/bringup/raw-slots-20261024/bench/standby-cycle03-qualification.json"
+      }
+    },
+    {
+      "id": "standby03-recovery",
+      "classification": "warm PE6 UART recovery waveform and request record",
+      "pixels": "omit",
+      "keep_files": [
+        "signal-summary.json"
+      ]
+    },
+    {
+      "id": "standby03-park",
+      "classification": "exact v12 early recovery park after measured cold cycle",
+      "pixels": "omit"
+    },
+    {
+      "id": "standby03-sbf",
+      "classification": "read-only SBF observation bound to exact recovery and owner reset/power attribution",
+      "pixels": "omit"
+    },
+    {
+      "id": "standby-three-cycle-analysis",
+      "classification": "offline signed raw-power integration and directly decoded phase intervals; SBF qualified separately",
+      "pixels": "omit",
+      "attachments": {
+        "spec.json": "tmp/bringup/raw-slots-20261024/bench/standby-three-cycle-spec.json",
+        "baseline-summary.json": "firmware/capture-sd/evidence/2026-10-24-normal-profile/analysis/energy/summary.json"
+      }
+    },
+    {
+      "id": "standby-three-cycle-compacts",
+      "classification": "native-sample compact sums reproduce all twelve selected energy intervals",
+      "pixels": "omit",
+      "keep_files": [
+        "standby-cycle01/power-compact.json.gz",
+        "standby-cycle01/raw-chunks.jsonl.gz",
+        "standby-cycle02/power-compact.json.gz",
+        "standby-cycle02/raw-chunks.jsonl.gz",
+        "standby-cycle03/power-compact.json.gz",
+        "standby-cycle03/raw-chunks.jsonl.gz"
+      ]
+    },
+    {
+      "id": "final-headers01",
+      "classification": "CRC-valid final slot headers preserve two PARTIAL slots and subsequent FULL captures",
+      "pixels": "omit",
+      "metadata_sectors": [
+        "slot0/operation/sectors.bin",
+        "slot1/operation/sectors.bin",
+        "slot2/operation/sectors.bin",
+        "slot3/operation/sectors.bin",
+        "slot4/operation/sectors.bin",
+        "slot5/operation/sectors.bin",
+        "slot6/operation/sectors.bin",
+        "slot7/operation/sectors.bin"
+      ]
+    },
+    {
+      "id": "read-standby-slot6",
+      "classification": "complete slot6 payload read and PNG decode; original sensor RAM frame lost in Standby",
+      "pixels": "omit"
+    },
+    {
+      "id": "reread-scene-slot0",
+      "classification": "original scene payload reread byte-identical after failed WFI trials and later captures",
+      "pixels": "omit"
+    },
+    {
+      "id": "standby-cycle04",
+      "classification": "final cold power signature only; no new SBF or image readback",
+      "pixels": "omit",
+      "keep_files": [
+        "raw/chunks.jsonl",
+        "phase/binary/analog_4.bin"
+      ],
+      "attachments": {
+        "final-state.json": "tmp/bringup/raw-slots-20261024/bench/final-state.json"
+      }
+    },
+    {
+      "id": "v15-preflight",
+      "classification": "read-only bench preflight before corrected-image installation",
+      "pixels": "omit",
+      "keep_cli": false,
+      "keep_files": []
+    },
+    {
+      "id": "v15-pre-recovery",
+      "classification": "warm recovery from preceding v12 state",
+      "pixels": "omit",
+      "keep_cli": false,
+      "keep_files": [
+        "signal-summary.json"
+      ]
+    },
+    {
+      "id": "v15-pre-park",
+      "classification": "exact v12 recovery park before v15 install",
+      "pixels": "omit",
+      "keep_cli": false,
+      "keep_files": []
+    },
+    {
+      "id": "v15-pre-info",
+      "classification": "guarded NOR information before v15 install",
+      "pixels": "omit",
+      "keep_cli": false,
+      "keep_files": []
+    },
+    {
+      "id": "v15-install",
+      "classification": "corrected v15 image full NOR programming and exact readback",
+      "pixels": "omit",
+      "keep_cli": true,
+      "keep_files": []
+    },
+    {
+      "id": "v15-install-diagnostic",
+      "classification": "v15 NOR helper completion/idle diagnostics",
+      "pixels": "omit",
+      "keep_cli": false,
+      "keep_files": []
+    },
+    {
+      "id": "v15-following-after",
+      "classification": "following NOR 4KiB unchanged after corrected v15 installation",
+      "pixels": "omit",
+      "keep_cli": false,
+      "keep_files": []
+    },
+    {
+      "id": "v15-precycle-js",
+      "classification": "power/current check before v15 smoke cycle",
+      "pixels": "omit",
+      "keep_cli": false,
+      "keep_files": []
+    },
+    {
+      "id": "v15-cycle01",
+      "classification": "corrected v15 cold capture with separate exact recovery/SBF and slot8 readback",
+      "pixels": "omit",
+      "keep_files": [
+        "raw/chunks.jsonl",
+        "phase/binary/analog_4.bin"
+      ],
+      "attachments": {
+        "qualification.json": "tmp/bringup/raw-slots-20261024/bench/v15-cycle01-qualification.json",
+        "qualification-analysis.json": "tmp/bringup/raw-slots-20261024/bench/v15-cycle01-qualification-analysis.json"
+      }
+    },
+    {
+      "id": "v15-recovery01",
+      "classification": "first-attempt warm PE6 recovery after v15 cold capture",
+      "pixels": "omit",
+      "keep_files": [
+        "signal-summary.json"
+      ]
+    },
+    {
+      "id": "v15-park01",
+      "classification": "exact v15 early recovery park",
+      "pixels": "omit"
+    },
+    {
+      "id": "v15-sbf01",
+      "classification": "v15 SBF1 read with root reset/power attribution",
+      "pixels": "omit"
+    },
+    {
+      "id": "v15-read-start",
+      "classification": "read-only SRAM bridge selected from v15 recovery",
+      "pixels": "omit"
+    },
+    {
+      "id": "v15-read-slot8",
+      "classification": "host missing-prior-file refusal before hardware operation",
+      "pixels": "omit",
+      "attachments": {
+        "host-failure.log": "tmp/bringup/raw-slots-20261024/bench/v15-read-slot8.log"
+      }
+    },
+    {
+      "id": "v15-read-slot8b",
+      "classification": "complete slot8 full read and PNG conversion; original frame lost in Standby",
+      "pixels": "omit"
+    },
+    {
+      "id": "v15-smoke-analysis",
+      "classification": "one corrected-v15 SBF and image-readback qualified energy run; separate from v12 baseline",
+      "pixels": "omit",
+      "attachments": {
+        "spec.json": "tmp/bringup/raw-slots-20261024/bench/v15-smoke-spec.json"
+      }
+    },
+    {
+      "id": "v15-smoke-compacts",
+      "classification": "corrected-v15 single-cycle compact signed native-sample energy sums",
+      "pixels": "omit",
+      "keep_files": [
+        "v15-cycle01/power-compact.json.gz",
+        "v15-cycle01/raw-chunks.jsonl.gz"
+      ]
+    },
+    {
+      "id": "v15-cycle02-final",
+      "classification": "final selected-v15 power signature only; slot9 and SBF not reread",
+      "pixels": "omit",
+      "keep_files": [
+        "raw/chunks.jsonl",
+        "phase/binary/analog_4.bin"
+      ],
+      "attachments": {
+        "final-state.json": "tmp/bringup/raw-slots-20261024/bench/v15-final-state.json",
+        "safe-start-source.json": "tmp/bringup/raw-slots-20261024/bench/v15-final-safe-start.json"
+      }
+    },
+    {
+      "id": "v15-final-recovery",
+      "classification": "exact recovery request before final normal v15 boot",
+      "pixels": "omit",
+      "keep_files": [
+        "signal-summary.json"
+      ]
+    },
+    {
+      "id": "v15-final-park",
+      "classification": "v15 early park before final normal boot",
+      "pixels": "omit"
+    },
+    {
+      "id": "v15-final-preflight",
+      "classification": "read-only power/current preflight before final normal boot",
+      "pixels": "omit"
+    }
+  ],
+  "extra_builds": [
+    "tmp/bringup/capture-raw-20261024/flash-awake-line-v9",
+    "tmp/bringup/capture-raw-20261024/flash-standby-line-v12",
+    "tmp/bringup/capture-raw-20261024/flash-standby-line-v15"
+  ],
+  "tools": {
+    "raw_slots.py": "firmware/raw-slots/raw_slots.py",
+    "verify_producer.py": "firmware/capture-raw/verify_producer.py",
+    "analyze.py": "firmware/capture-raw/analyze.py",
+    "bench.py": "firmware/capture-raw/bench.py",
+    "build.py": "firmware/capture-raw/build.py",
+    "late_build.py": "firmware/capture-raw/late_build.py",
+    "producer_transform.py": "firmware/capture-raw/producer_transform.py",
+    "read_slot.py": "tmp/bringup/raw-slots-20261024/read_slot.py",
+    "inspect_rif.py": "tmp/bringup/raw-slots-20261024/inspect_rif.py",
+    "inspect_flash.py": "firmware/capture-raw/inspect_flash.py",
+    "cold_cycle.py": "firmware/capture-raw/cold_cycle.py",
+    "phase_decode.py": "firmware/capture-raw/phase_decode.py",
+    "diagnose_wfi.py": "tmp/bringup/raw-slots-20261024/diagnose_wfi.py",
+    "summarize_cycles.py": "firmware/capture-raw/summarize_cycles.py",
+    "phase_protocol.py": "firmware/capture-raw/phase_protocol.py",
+    "digital_decode.py": "firmware/capture-sd/phase_markers/decode.py",
+    "cycle_energy.py": "firmware/capture-sd/evidence/2026-10-24-normal-profile/analysis/energy/support/cycle_energy.py",
+    "read_standby_flag.py": "firmware/capture-sd/low_power/read_standby_flag.py",
+    "check_park.py": "firmware/capture-timing/recovery_gpio/check_park.py",
+    "energy_compacts.py": "firmware/capture-raw/energy_compacts.py"
+  },
+  "reference_archive": "firmware/capture-packed/evidence/2026-10-24-packed-raw10",
+  "limits": [
+    "Only explicit completed/refused record groups are selected; no instrument ownership or final bench state is inferred.",
+    "Controller success alone did not prove image integrity: the first IDMA build wrote zeros and remains failed.",
+    "LINE overlap used warm preinitialized SD and diagnostic snapshots; it is not a cold-start energy measurement or a PVT visibility guarantee.",
+    "All-capacity format initializes slot headers; it does not validate physical capacity, erase every payload sector, or qualify arbitrary power loss.",
+    "Scene photo pixels are omitted. Captured payloads here are explicitly verified test-pattern runs or their failed SD readback.",
+    "Frozen generated sources and binary bytes are retained; external vendor/toolchain dependencies are not a portable build closure.",
+    "Tool files are labeled archive-time snapshots, not asserted to be the exact versions executed for every historical run.",
+    "Awake-cycle01 ends in an awake park, not Standby. Its strict phase decoder failed and remains failed.",
+    "Scene readback integrity is a retained historical comparison with matching hashes; omitted scene pixels cannot be independently replayed here.",
+    "The v9 DMA-WFI run failed before commit. Its separate camera-reset and SD-idle diagnostic does not convert that capture into success.",
+    "The v14b WFI trial lost debug/SRAM access and has no completion or idle proof; it remains failed and unselected.",
+    "Reset and cold abort were explicitly authorized despite unknown storage state. The cold-abort host error restored power through helper cleanup; this is not a qualified recovery protocol or power-loss test.",
+    "Restored v9 committed slot3; this does not establish the contents of the interrupted slots or full integrity of earlier photos.",
+    "The v12 installation is verified independently of any subsequent capture/Standby/energy qualification.",
+    "Three v12 Standby claims combine exact recovery/SBF bytes with root attestations of flag clear and no intervening power-off; a current plateau alone is not the proof.",
+    "Energy reports retain native boundaries and signed delivered-sample integrals, including about 7.4 A startup samples under the unchanged 9.5 A validity criterion; no physical-inrush, clipping or isolated battery claim is inferred.",
+    "The final Standby marker fails its width bound and remains unknown. Events 1-9 have directly decoded widths; independent JS and Saleae clocks do not support per-phase energy.",
+    "Compact native-sample sums reproduce all twelve selected energy intervals and aggregate durations; omitted raw arrays prevent rerunning sample-order onset/plateau classification.",
+    "Final metadata shows slots1/2 PARTIAL and slots4/5/6 FULL. Slot6 full read/decode passes but cannot be compared to its original sensor RAM frame after Standby.",
+    "Original slot0 preservation is a retained byte-comparison report with matching payload hashes; scene pixels are omitted.",
+    "Final cycle04 leaves power on at the observed low-current plateau; its expected slot7 and actual SBF were not reread and remain unverified.",
+    "v15 corrects retained late-loader-token boot freshness; v12 timing/energy and handoff remain historical and are not automatically attributed to v15.",
+    "v15 slot8 read/decode validates the retrieved RAW and PNG conversion, not equality to the sensor frame that was lost in Standby.",
+    "Latest v15 final cycle leaves power on at the observed plateau; its expected slot9 and SBF were not reread. v15 has one separately qualified smoke cycle, while v12 retains its three-cycle baseline."
+  ]
+}

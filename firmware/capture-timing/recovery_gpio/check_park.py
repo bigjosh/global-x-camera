@@ -30,6 +30,21 @@ VCP_FIELDS = (
     'reserved30 reserved31').split()
 # An unknown/self-consistent build is insufficient authorization to halt.
 APPROVED = {
+    # RAW v15 Standby: receiver boot revokes retained late-loader authority.
+    # Versus v12 only the two reviewed prefix CRC words differ; qualification only.
+    'db234498a9b347f6cb9f41daf22da1fb0f9266dba264b9ca203ef33d1b1711df':
+        {'bytes': 5140, 'park': 0x3418078C, 'vcp': True,
+         'sector': 'efb3c440e008e448a1682285034fe30b77bdbb5834024da9de787f3f51f42629'},
+    # RAW v12 Standby: phase protocol v2 and two checked CRC literal relocations.
+    # Early guard/literals remain exact v66c; this admits qualification only.
+    '82ce8c0411a0990c7a5081633cb358012bbd081fcb7368241010091f7d1f913b':
+        {'bytes': 5140, 'park': 0x3418078C, 'vcp': True,
+         'sector': '03cbd89553944838922bbcd7e2b21813297f3466db64730c5e3e2903a7942424'},
+    # RAW v9 awake: fixed 15804-byte early receiver, checked late storage load.
+    # Complete early guard/literals match v66c; this permits qualification only.
+    '55525083edf15a7961d6ad27eb2bb3b54063fc9e597bde5a6008c94d760adcf5':
+        {'bytes': 5140, 'park': 0x3418078C, 'vcp': True,
+         'sector': 'dd4db5228d3a4fe9c352630201bacfe1dfd08888725e6f5a63be2a4fb82392bc'},
     # v66c normal Standby accepts the current SAVE profile at the late loader.
     # The exact early recovery bytes/literals remain unchanged.
     '247f27c231e0053b7024af29914c6a0cb1b7decb1632ac0d6142a68b89e2da58':

@@ -31,6 +31,20 @@ SECTOR_SHA="7fda9d00cc7ffb3fbb9e6aac6695cf18545754b5dbfce1520cf30b2da39c4e63"
 # command-line opt-in for unknown firmware. This table does not broaden the
 # bridge or READ-module identities, and check_park still verifies live code.
 APPROVED_RECOVERY={
+    # RAW v15 Standby: fresh receiver RLOK guard; exact early recovery unchanged.
+    # Admission supports qualification and is not evidence of installation.
+    'db234498a9b347f6cb9f41daf22da1fb0f9266dba264b9ca203ef33d1b1711df':
+        dict(name="raw-v15-standby",sector_sha256=
+             'efb3c440e008e448a1682285034fe30b77bdbb5834024da9de787f3f51f42629'),
+    # RAW v12 Standby; phase-v2 timing and CRC relocation do not change recovery.
+    '82ce8c0411a0990c7a5081633cb358012bbd081fcb7368241010091f7d1f913b':
+        dict(name="raw-v12-standby",sector_sha256=
+             '03cbd89553944838922bbcd7e2b21813297f3466db64730c5e3e2903a7942424'),
+    # RAW v9 awake, independently checked identical early recovery guard.
+    # Only the existing READ-only bridge is admitted from this exact pair.
+    '55525083edf15a7961d6ad27eb2bb3b54063fc9e597bde5a6008c94d760adcf5':
+        dict(name="raw-v9-awake",sector_sha256=
+             'dd4db5228d3a4fe9c352630201bacfe1dfd08888725e6f5a63be2a4fb82392bc'),
     RECOVERY_SHA:dict(name="v59",sector_sha256=SECTOR_SHA),
     # Historical v65 early recovery remains usable for READ. Its later
     # schema-1 loader gate refused shutdown; this is not Standby approval.

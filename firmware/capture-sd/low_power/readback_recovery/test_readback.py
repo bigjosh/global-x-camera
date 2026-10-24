@@ -214,6 +214,31 @@ class Tests(unittest.TestCase):
         for names in ([],["IMG00001.PNG"]*2,["IMG00001.PNG"]*17):
             with self.assertRaises(ValueError): r.checked_names(names)
 
+    def test_v15_exact_pair_in_both_recovery_gates(self):
+        prefix="db234498a9b347f6cb9f41daf22da1fb0f9266dba264b9ca203ef33d1b1711df"
+        sector="efb3c440e008e448a1682285034fe30b77bdbb5834024da9de787f3f51f42629"
+        old_prefix="82ce8c0411a0990c7a5081633cb358012bbd081fcb7368241010091f7d1f913b"
+        old_sector="03cbd89553944838922bbcd7e2b21813297f3466db64730c5e3e2903a7942424"
+        spec=importlib.util.spec_from_file_location("v15_check_park",
+            r.ROOT/"firmware/capture-timing/recovery_gpio/check_park.py")
+        park=importlib.util.module_from_spec(spec); spec.loader.exec_module(park)
+        self.assertEqual(r.APPROVED_RECOVERY[prefix],
+                         dict(name="raw-v15-standby",sector_sha256=sector))
+        self.assertEqual(park.APPROVED[prefix],
+                         dict(bytes=5140,park=0x3418078C,vcp=True,sector=sector))
+        with tempfile.TemporaryDirectory() as folder:
+            work=Path(folder)
+            (work/"stage1.bin").write_bytes(bytes(5140))
+            (work/"capture_sector_0.bin").write_bytes(bytes(65536))
+            with mock.patch.object(r.sd,"sha",side_effect=[prefix,sector]):
+                identity=r.checked_recovery(work)
+            r.checked_recovery_result(dict(passed=True,prefix_sha256=prefix),identity)
+            for pair in ([prefix,old_sector],[old_prefix,sector],["0"*64]):
+                with mock.patch.object(r.sd,"sha",side_effect=pair):
+                    with self.assertRaises(ValueError): r.checked_recovery(work)
+            with self.assertRaises(ValueError):
+                r.checked_recovery_result(dict(passed=True,prefix_sha256=old_prefix),identity)
+
     def test_stale_or_failed_boot_rejected(self):
         words=[0x52425231,1,23,14,0,3,0x201,0,0,1,0,0,4,0x33330000,
                0x00100000,0x2020,0,0,0,0x55,1,32,0x5242444e]

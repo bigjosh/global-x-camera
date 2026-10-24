@@ -5,7 +5,7 @@
  * HAL_SD_WriteBlocks and LL SDMMC_CmdStopTransfer. Open-ended CMD18/CMD25 use
  * DATAEND followed by CMD12/CMDSTOP, then an explicit ready/TRANSFER check.
  *
- * No hardcoded data/code RAM addresses, HAL tick dependency, DMA, interrupts,
+ * The opt-in single-buffer IDMA API accepts secure AXI SRAM only. No HAL library dependency, interrupt configuration,
  * CPU/PLL/NOR clock changes, card power switching, or filesystem operations.
  * All errors are bounded; an unverified abort leaves media_idle=0 and the host
  * powered. The caller must not treat that case as permission to cut power.
@@ -29,6 +29,8 @@
 #define CMD_FLAGS (SDMMC_STA_CCRCFAIL|SDMMC_STA_CTIMEOUT|SDMMC_STA_CMDREND|SDMMC_STA_CMDSENT|SDMMC_STA_BUSYD0END)
 #define DATA_ERRORS (SDMMC_STA_DCRCFAIL|SDMMC_STA_DTIMEOUT|SDMMC_STA_RXOVERR|SDMMC_STA_TXUNDERR)
 #define DATA_FLAGS (DATA_ERRORS|SDMMC_STA_DATAEND|SDMMC_STA_DBCKEND|SDMMC_STA_DABORT|SDMMC_STA_BUSYD0END)
+#define DMA_ERRORS (DATA_ERRORS|SDMMC_STA_IDMATE)
+#define DMA_FLAGS (DATA_FLAGS|SDMMC_STA_IDMATE|SDMMC_STA_IDMABTC)
 #define R1_ERRORS 0xFDFFE008UL
 #define C_MASK ((3UL<<4)|(3UL<<6)|(3UL<<8))
 #define C_PINS ((1UL<<2)|(1UL<<3)|(1UL<<4))
@@ -37,6 +39,7 @@
 _Static_assert(SDMMC2_BASE_S==0x58026800UL, "SDMMC2 address");
 _Static_assert(offsetof(SDMMC_TypeDef,FIFO)==0x80, "FIFO offset");
 _Static_assert(SD_MAX_TRANSFER_SECTORS*SD_SECTOR_BYTES<=0x1FFFFFFUL, "DLEN");
+_Static_assert(SD_DMA_MAX_TRANSFER_SECTORS*SD_SECTOR_BYTES<=0x1FFFFFFUL, "IDMA DLEN");
 
 enum response { RESP_NONE, RESP_R1, RESP_R2, RESP_R3, RESP_R6, RESP_R7 };
 
@@ -104,6 +107,7 @@ static int command(sd_card_t *c, uint32_t index, uint32_t argument,
             sample_response(c,sta);
             return fault(c,SD_ERR_TIMER);
         }
+        if (!(i&4095UL)) sd_progress();
     }
     sample_response(c,sta);
     X->ICR=CMD_FLAGS;
@@ -141,7 +145,8 @@ static int ready(sd_card_t *c)
         c->gpioc_idr=C->IDR;
         if ((c->last_ready_r1&0x1F00UL)==0x900UL &&
             (c->gpioc_idr&DAT0) &&
-            !(X->STA&(SDMMC_STA_DPSMACT|SDMMC_STA_CPSMACT))) {
+            !(X->STA&(SDMMC_STA_DPSMACT|SDMMC_STA_CPSMACT)) &&
+            !(X->IDMACTRL&SDMMC_IDMA_IDMAEN)) {
             c->media_idle=1;
             c->ready_cycles+=(uint32_t)(DWT->CYCCNT-start);
             return SD_OK;
@@ -297,6 +302,155 @@ static int transfer(sd_card_t *c, uint32_t lba, uint8_t *buffer,
     if (writing) c->written_sectors+=count;
     else c->read_sectors+=count;
     return SD_OK;
+}
+
+/* With IDMA enabled, hardware owns FIFO draining/flushing during CMD12 abort
+ * (RM0486 30.6.2). IDMAEN itself is writable only while DPSM is inactive. Do not
+ * reuse the CPU FIFO abort, write FIFORST, or disable IDMA underneath active DMA.
+ */
+static void abort_dma_write(sd_card_t *c)
+{
+    uint32_t saved_stage=c->stage, start=DWT->CYCCNT;
+    c->stage=SD_STAGE_ABORT;
+    c->media_idle=0;
+    X->CMD&=~SDMMC_CMD_CMDTRANS;
+    int result=command(c,12,0,RESP_R1,0);
+    if (result && result!=SD_ERR_COMMAND_TIMEOUT) {
+        c->cleanup_error=(uint32_t)result;
+        c->stage=saved_stage;
+        return;
+    }
+    for (uint32_t i=0;i<POLL_LIMIT;++i) {
+        uint32_t sta=X->STA;
+        if (!(sta&(SDMMC_STA_DPSMACT|SDMMC_STA_CPSMACT))) {
+            X->IDMACTRL=0;
+            __DSB();
+            X->DCTRL=0;
+            X->ICR=DMA_FLAGS;
+            c->cleanup_error=(uint32_t)ready(c);
+            c->stage=saved_stage;
+            return;
+        }
+        if ((uint32_t)(DWT->CYCCNT-start)>=READY_TIMEOUT_CYCLES) break;
+        if (!(i&255UL)) sd_progress();
+    }
+    c->cleanup_error=SD_ERR_NOT_READY;
+    c->stage=saved_stage;
+}
+
+static uint32_t dma_wait_context(void)
+{
+    const uint32_t ram=RCC_MEMLPENR_AXISRAM1LPEN|RCC_MEMLPENR_AXISRAM2LPEN|
+        RCC_MEMLPENR_AXISRAM3LPEN|RCC_MEMLPENR_AXISRAM4LPEN|
+        RCC_MEMLPENR_AXISRAM5LPEN|RCC_MEMLPENR_AXISRAM6LPEN;
+    const uint32_t rif=RCC_AHB3LPENR_RIFSCLPEN|RCC_AHB3LPENR_RISAFLPEN;
+    const uint32_t bus=RCC_BUSLPENR_ACLKNLPEN|RCC_BUSLPENR_ACLKNCLPEN;
+    const uint32_t tick=SysTick_CTRL_ENABLE_Msk|SysTick_CTRL_TICKINT_Msk|SysTick_CTRL_CLKSOURCE_Msk;
+    uint32_t faults=0;
+    if (__get_IPSR()) faults|=SD_WAIT_EXCEPTION;
+    if (__get_PRIMASK()) faults|=SD_WAIT_PRIMASK;
+    if (__get_BASEPRI()) faults|=SD_WAIT_BASEPRI;
+    if (__get_FAULTMASK()) faults|=SD_WAIT_FAULTMASK;
+    if (SCB->SCR&SCB_SCR_SLEEPDEEP_Msk) faults|=SD_WAIT_DEEP_SLEEP;
+    if (SCB->SCR&SCB_SCR_SLEEPONEXIT_Msk) faults|=SD_WAIT_SLEEP_ON_EXIT;
+    if ((SysTick->CTRL&tick)!=tick) faults|=SD_WAIT_SYSTICK_CTRL;
+    if (SysTick->LOAD!=399999UL) faults|=SD_WAIT_SYSTICK_LOAD;
+    if ((R->MEMLPENR&ram)!=ram) faults|=SD_WAIT_RAM_CLOCKS;
+    if ((R->AHB3LPENR&rif)!=rif) faults|=SD_WAIT_RIF_CLOCKS;
+    if (!(R->AHB5LPENR&RCC_AHB5LPENR_SDMMC2LPEN)) faults|=SD_WAIT_SD_CLOCK;
+    /* RM0486 14.6.11: both NoC paths must remain available for AXISRAM3..6. */
+    if ((R->BUSLPENR&bus)!=bus) faults|=SD_WAIT_BUS_CLOCKS;
+    /* Never read a clock-gated/reset peripheral. Debug Sleep emulation keeps
+     * CPU/peripheral clocks running (14.6.13), invalidating real-Sleep trials. */
+    if (!(R->MISCENR&RCC_MISCENR_DBGEN) || (R->MISCRSTR&RCC_MISCRSTR_DBGRST))
+        faults|=SD_WAIT_DEBUG_ACCESS;
+    else if (DBGMCU_S->CR&DBGMCU_CR_DBG_SLEEP) faults|=SD_WAIT_DEBUG_SLEEP;
+    return faults;
+}
+
+static int transfer_dma_write(sd_card_t *c, uint32_t lba,
+                              const uint8_t *buffer, uint32_t count, sd_dma_wait_t *wait)
+{
+    int result=ready(c);
+    if (result) return result;
+    /* No second owner or abandoned DMA is allowed. All fields below are only
+     * written after ready() has freshly observed an inactive host. */
+    if (X->IDMACTRL) return fault(c,SD_ERR_CONTROLLER_BUSY);
+    uint32_t start=DWT->CYCCNT, sta=0;
+    uint32_t wall_start=wait ? wait->milliseconds() : 0;
+    c->media_idle=0;
+    c->transfer_words=0;
+    c->transfer_sta=0;
+    X->DCTRL=0;
+    X->ICR=DMA_FLAGS;
+    X->DTIMER=c->clock_hz*2UL;
+    X->DLEN=count*SD_SECTOR_BYTES;
+    X->DCTRL=9UL<<SDMMC_DCTRL_DBLOCKSIZE_Pos;
+    X->IDMABASER=(uint32_t)(uintptr_t)buffer;
+    /* No CPU writes or dirty cache lines may remain unpublished before DMA. */
+    __DSB();
+    X->IDMACTRL=SDMMC_IDMA_IDMAEN;
+    result=command(c,count==1 ? 24UL : 25UL,
+                   (c->ocr&(1UL<<30)) ? lba : lba*512UL,RESP_R1,1);
+    if (!result) {
+        for (uint32_t i=0;i<POLL_LIMIT;++i) {
+            sta=X->STA;
+            c->last_sta=sta;
+            /* IDMATE can accompany DATAEND, so errors have precedence. */
+            if (sta&DMA_ERRORS) {
+                result=fault(c,(sta&SDMMC_STA_IDMATE) ? SD_ERR_DMA : SD_ERR_DATA);
+                break;
+            }
+            /* Single-buffer DATAEND means both the memory-side IDMA and DPSM
+             * are complete (RM0486 p1402). It is not merely FIFO queued. */
+            if ((sta&SDMMC_STA_DATAEND) && !(sta&SDMMC_STA_DPSMACT)) break;
+            if ((wait && (uint32_t)(wait->milliseconds()-wall_start)>=5000UL) ||
+                (uint32_t)(DWT->CYCCNT-start)>=WRITE_TIMEOUT_CYCLES) {
+                result=fault(c,SD_ERR_DATA_TIMEOUT);
+                break;
+            }
+            if (i==POLL_LIMIT-1) result=fault(c,SD_ERR_TIMER);
+            if (wait) {
+                sd_progress(); /* keep independent event servicing live */
+                uint32_t context_faults=dma_wait_context();
+                if (context_faults) {
+                    wait->context_faults|=context_faults;
+                    result=fault(c,SD_ERR_WAIT); break;
+                }
+                uint32_t before=wait->milliseconds();
+                wait->wait_calls++; __DSB(); __WFI();
+                if (wait->milliseconds()==before) wait->immediate_wakes++;
+            } else if (!(i&255UL)) sd_progress();
+        }
+    }
+    c->transfer_sta=sta;
+    c->transfer_cycles=DWT->CYCCNT-start;
+    if (wait) {
+        wait->wall_ms+=(uint32_t)(wait->milliseconds()-wall_start);
+        wait->active_cycles+=c->transfer_cycles;
+    }
+    X->CMD&=~SDMMC_CMD_CMDTRANS;
+    if (!result && (!(sta&SDMMC_STA_DATAEND) ||
+        (sta&(DMA_ERRORS|SDMMC_STA_DPSMACT)) || X->DCOUNT))
+        result=fault(c,SD_ERR_LENGTH);
+    if (result) {
+        abort_dma_write(c);
+        return result;
+    }
+    /* DPSM is inactive: release DMA ownership before any subsequent command. */
+    X->IDMACTRL=0;
+    __DSB();
+    c->transfer_words=count*128UL;
+    if (count>1) result=command(c,12,0,RESP_R1,0);
+    if (result) {
+        abort_dma_write(c);
+        return result;
+    }
+    X->DCTRL=0;
+    X->ICR=DMA_FLAGS;
+    result=ready(c);
+    if (!result) c->written_sectors+=count;
+    return result;
 }
 
 static int identify(sd_card_t *c)
@@ -457,6 +611,71 @@ int sd_read_blocks(sd_card_t *c, uint32_t lba, void *buffer, uint32_t count)
 int sd_write_blocks(sd_card_t *c, uint32_t lba, const void *buffer, uint32_t count)
 {
     return block_request(c,lba,(void *)buffer,count,1);
+}
+
+static int dma_request(sd_card_t *c, uint32_t lba, const void *buffer,
+                        uint32_t count, sd_dma_wait_t *wait)
+{
+    if (!c || !buffer || !count) return SD_ERR_ARGUMENT;
+    if (!c->initialized || !c->controller_owned) return SD_ERR_STATE;
+    if (c->error) return (int)c->error;
+    c->stage=SD_STAGE_WRITE;
+    uintptr_t address=(uintptr_t)buffer;
+    uint64_t end=(uint64_t)address+(uint64_t)count*SD_SECTOR_BYTES;
+    /* The current platform contract is secure AXI SRAM1..6. No peripherals,
+     * TCM, nonsecure aliases or external memories are accepted speculatively. */
+    if ((address&3U) || address<0x34000000UL || end>0x34400000ULL)
+        return fault(c,SD_ERR_ARGUMENT);
+    if ((uint64_t)lba+count>c->sector_count) return fault(c,SD_ERR_CAPACITY);
+    if (__get_IPSR() || (__get_CONTROL()&1U)) return fault(c,SD_ERR_STATE);
+    if (SCB->CCR&SCB_CCR_DC_Msk) return fault(c,SD_ERR_CACHE);
+    /* Do not probe a gated peripheral. RIMC is configured by the capture owner
+     * just as for DCMIPP; this API cannot broaden any SRAM/RISAF permission. */
+    if (!(R->AHB3ENR&RCC_AHB3ENR_RIFSCEN)) return fault(c,SD_ERR_SECURITY);
+    uint32_t mask=RIFSC_RIMC_ATTRx_MCID|RIFSC_RIMC_ATTRx_MSEC|RIFSC_RIMC_ATTRx_MPRIV;
+    uint32_t expected=(1UL<<RIFSC_RIMC_ATTRx_MCID_Pos)|
+        RIFSC_RIMC_ATTRx_MSEC|RIFSC_RIMC_ATTRx_MPRIV;
+    if ((RIFSC_S->RIMC_ATTRx[3]&mask)!=expected) return fault(c,SD_ERR_SECURITY);
+    /* RM0486 6.3.4, table 22: secure guard RISUP54 overrides MSEC to
+     * nonsecure when SDMMC2's configuration port is nonsecure. RISAF then
+     * returns zeros for protected SRAM reads, without an SD/IDMA bus error.
+     * Checking RIMC alone therefore cannot qualify the transfer source. */
+    if (!(RIFSC_S->RISC_SECCFGRx[1]&(1UL<<22))) return fault(c,SD_ERR_SECURITY);
+    if (wait) {
+        uint32_t context_faults=dma_wait_context();
+        if (!wait->milliseconds) context_faults|=SD_WAIT_NO_CLOCK;
+        if (context_faults) {
+            wait->context_faults|=context_faults;
+            return fault(c,SD_ERR_WAIT);
+        }
+    }
+    if (c->clock_hz!=100000UL && c->clock_hz!=12500000UL && c->clock_hz!=25000000UL)
+        return fault(c,SD_ERR_CLOCK);
+    uint32_t limit=c->clock_hz==100000UL ? 16UL : SD_DMA_MAX_TRANSFER_SECTORS;
+    const uint8_t *p=(const uint8_t *)buffer;
+    while (count) {
+        sd_progress();
+        uint32_t chunk=count>limit ? limit : count;
+        uint32_t start=DWT->CYCCNT;
+        int result=transfer_dma_write(c,lba,p,chunk,wait);
+        c->write_cycles+=(uint32_t)(DWT->CYCCNT-start);
+        sd_progress();
+        if (result) return result;
+        count-=chunk; lba+=chunk; p+=chunk*SD_SECTOR_BYTES;
+    }
+    return SD_OK;
+}
+
+int sd_write_blocks_dma(sd_card_t *c, uint32_t lba, const void *buffer, uint32_t count)
+{
+    return dma_request(c,lba,buffer,count,NULL);
+}
+
+int sd_write_blocks_dma_wait(sd_card_t *c, uint32_t lba, const void *buffer,
+                             uint32_t count, sd_dma_wait_t *wait)
+{
+    if (!wait) return SD_ERR_ARGUMENT;
+    return dma_request(c,lba,buffer,count,wait);
 }
 
 int sd_sync(sd_card_t *c)

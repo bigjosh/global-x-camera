@@ -10,13 +10,14 @@
  */
 #define SD_SECTOR_BYTES 512U
 #define SD_MAX_TRANSFER_SECTORS 64U
+#define SD_DMA_MAX_TRANSFER_SECTORS 1024U
 
 enum sd_error {
     SD_OK=0, SD_ERR_ARGUMENT, SD_ERR_STATE, SD_ERR_CLOCK, SD_ERR_GPIO,
     SD_ERR_VOLTAGE, SD_ERR_TIMER, SD_ERR_COMMAND_TIMEOUT, SD_ERR_COMMAND_CRC,
     SD_ERR_RESPONSE, SD_ERR_CARD, SD_ERR_UNSUPPORTED, SD_ERR_NOT_READY,
     SD_ERR_CAPACITY, SD_ERR_DATA, SD_ERR_DATA_TIMEOUT, SD_ERR_LENGTH,
-    SD_ERR_CONTROLLER_BUSY
+    SD_ERR_CONTROLLER_BUSY, SD_ERR_DMA, SD_ERR_CACHE, SD_ERR_SECURITY, SD_ERR_WAIT
 };
 
 enum sd_stage {
@@ -55,6 +56,57 @@ typedef struct sd_card {
 int sd_init(sd_card_t *card, uint32_t max_hz);
 int sd_read_blocks(sd_card_t *card, uint32_t lba, void *buffer, uint32_t count);
 int sd_write_blocks(sd_card_t *card, uint32_t lba, const void *buffer, uint32_t count);
+/* Zero-copy single-buffer IDMA write. This is a blocking completion API; camera
+ * DMA/interrupts may produce later bytes concurrently, but every byte in this
+ * request must already be complete and remain immutable until it returns.
+ * The buffer must be word-aligned secure AXI SRAM (0x34000000..0x343fffff), with
+ * D-cache disabled and no outstanding dirty cache aliases. The caller must set
+ * SDMMC2's RIMC master (index 3) to secure/privileged CID1, mark its configuration
+ * port secure (RISUP54, SECCFGR1 bit22), and enable the SRAM banks/RISAF access.
+ * Otherwise its secure guard silently overrides MSEC and protected reads can
+ * return zeros without an SD/IDMA error. Alignment/range, global cache state,
+ * RIMC and secure guard are checked, never changed here; SRAM bank/policy setup
+ * remains the caller's duty.
+ * Requests are split at 1024 sectors (16 at 100 kHz). No NVIC, WFI, linked list,
+ * bus-width change, cache enable, or filesystem operation is performed.
+ * Success includes DATAEND, idle DPSM, CMD12 for multiblock, and fresh card ready.
+ * Failure may leave IDMA armed if DPSM cannot be stopped: media_idle=0, and the
+ * buffer must remain valid/immutable until ownership is explicitly recovered.
+ */
+int sd_write_blocks_dma(sd_card_t *card, uint32_t lba, const void *buffer, uint32_t count);
+typedef struct {
+    uint32_t (*milliseconds)(void);
+    uint32_t wait_calls, wall_ms, active_cycles, immediate_wakes;
+    uint32_t context_faults;
+} sd_dma_wait_t;
+enum {
+    SD_WAIT_NO_CLOCK=1U, SD_WAIT_EXCEPTION=2U, SD_WAIT_PRIMASK=4U,
+    SD_WAIT_BASEPRI=8U, SD_WAIT_FAULTMASK=16U, SD_WAIT_DEEP_SLEEP=32U,
+    SD_WAIT_SLEEP_ON_EXIT=64U, SD_WAIT_SYSTICK_CTRL=128U,
+    SD_WAIT_SYSTICK_LOAD=256U, SD_WAIT_RAM_CLOCKS=512U,
+    SD_WAIT_RIF_CLOCKS=1024U, SD_WAIT_SD_CLOCK=2048U,
+    SD_WAIT_BUS_CLOCKS=4096U, SD_WAIT_DEBUG_ACCESS=8192U,
+    SD_WAIT_DEBUG_SLEEP=16384U
+};
+/* Opt-in shallow WFI during the DMA data phase only. The caller owns a working
+ * 1 ms SysTick handler and supplies its monotonic counter (e.g. HAL_GetTick).
+ * The counter must keep advancing in Sleep, wrap as uint32_t, and take no SD
+ * action. This driver does not install/modify interrupt handlers or clocks.
+ * Before use, finish all camera operations whose deadlines depend on DWT.
+ * Thread mode, unmasked interrupts, 400 MHz/1 ms SysTick, shallow sleep, and
+ * SDMMC2/RIF/RAM/interconnect sleep clocks and disabled debug Sleep emulation
+ * are checked. Invalid setup fails SD_ERR_WAIT
+ * before issuing card writes; a changed setup during DMA triggers safe abort.
+ * Counters accumulate across calls: wait_calls counts WFI instructions, not
+ * proven sleep; immediate_wakes counts returns without a tick advance. wall_ms
+ * and active_cycles cover the DMA phase including CMD24/25 launch. Existing
+ * DWT counters exclude sleeping time and must not be interpreted as wall time.
+ * context_faults accumulates SD_WAIT_* bits for refused contexts, including a
+ * missing milliseconds callback; it never clears itself across calls.
+ * Completion/timeout/error cleanup remains identical to the default DMA API.
+ */
+int sd_write_blocks_dma_wait(sd_card_t *card, uint32_t lba, const void *buffer,
+                             uint32_t count, sd_dma_wait_t *wait);
 /* Wait for ready/TRANSFER, DAT0 HIGH and idle host state. This driver never
  * enables the optional SD card cache. No cache-flush feature is assumed. */
 int sd_sync(sd_card_t *card);
@@ -67,8 +119,11 @@ int sd_deinit(sd_card_t *card);
 /* Optional monotonic-clock service hook. The weak default is empty. A caller
  * may override it to extend DWT's 32-bit count while long filesystem operations
  * run. Calls occur at command/chunk boundaries and throughout bounded waits,
- * never per FIFO word. The override must be short, nonblocking, and must not
- * mutate hardware or call back into this driver/filesystem (no reentrancy).
+ * never per FIFO word. The override must be bounded (at most 50 ms), and must not
+ * change SD registers, its clocks/pins, buffer ownership, CPU clock/cache state,
+ * or call back into this driver/filesystem (no reentrancy). It may service an
+ * independent camera completion/STOP without violating those restrictions.
+ * It must not sleep: the current deadlines use DWT, which can stop in sleep.
  */
 void sd_progress(void);
 
