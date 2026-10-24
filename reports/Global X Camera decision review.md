@@ -1,6 +1,6 @@
 # Global X Camera decision review
 
-**Control update, October 24 (D-50):** the user approved a gain slider spanning 1×–8× analog gain with digital gain fixed at 1×. This supersedes the fixed-analog-gain starting policy described below. ADC wiring and controls implementation remain pending. [Owning rationale](../docs/prototype/NOTES.md#2026-10-24--give-the-gain-slider-the-full-analog-range-while-retaining-unity-digital-gain).
+**Control update, October 24 (D-50):** the user approved a gain slider spanning 1×–8× analog gain with digital gain fixed at 1×. This supersedes the fixed-analog-gain starting policy described below. D-51 subsequently selects two 10 kΩ linear sliders, conditioned Arduino A0/A1 inputs and a shared switched 3.3 V GPIO supply. Exact drive pin, part/mechanics and firmware implementation remain pending. [Owning rationale](../docs/prototype/NOTES.md#2026-10-24--give-the-gain-slider-the-full-analog-range-while-retaining-unity-digital-gain).
 
 Consolidated review · Updated through October 17, 2026. The repository is the durable project record; Page copies are convenience views. See the [decision register](<../docs/decisions/2026-10-13-project-baseline.md>) and [project index](<../README.md>).
 
