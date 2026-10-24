@@ -6,6 +6,8 @@ An STM32N6-based, credit-card-size monochrome global-shutter camera project. Thi
 
 ## Start here
 
+Read [NOTES.md](NOTES.md) for the reasons behind decisions, rejected approaches and hard-won constraints. Its map leads to the owning folder; the [bootstrap coverage record](docs/notes-bootstrap-2026-10-24.md) explains which sources were reviewed.
+
 1. [Decision register](docs/decisions/2026-10-13-project-baseline.md) — accepted requirements, discoveries, future directions and remaining decisions, with local evidence.
 2. [Design specification](spec.md) — current prototype requirements alongside explicitly identified recovered hardware.
 3. [Power implementation study](power.md) — button/RUN/HOLD, OFF-current budget, shutdown and USB integration.
@@ -75,6 +77,7 @@ The recovered KiCad design still contains the older camera, memories and power c
 
 | Location | Purpose |
 |---|---|
+| `NOTES.md` at root and owning folders | Append-only rationale, rejected alternatives, constraints and deferrals, with evidence. See the root map; later entries supersede earlier choices. |
 | `docs/decisions/`, `spec.md`, `power.md` | Current accepted decisions and implementation obligations. Later dated user decisions take precedence over older proposals. |
 | `reports/` | Current consolidated synthesis; linked from the decision register. |
 | `docs/prototype/` | Dated shopping and camera/optics research. An order being placed does not confirm every suggested part was bought. |
@@ -91,7 +94,7 @@ Future work explicitly retained: higher-resolution VD5943 with compact/custom op
 
 ## Documentation maintenance
 
-Record new decisions in the decision register, update affected requirements and the consolidated report, and preserve superseded studies with their dates and assumptions. Record a measured result only with its setup and evidence. Keep the repository sufficient to resume work without access to a chat account. The [current-review evidence export](research_notes/Global%20X%20Camera%20decision%20review/chat_sources/2026-10-12-13-current-review.md) preserves the user approvals and assistant findings that led to this baseline.
+Read root and relevant folder `NOTES.md` before making changes. Append a dated note when rejecting an alternative, learning a non-obvious constraint, removing something or consciously deferring a choice; keep each reason in one owning folder and link from elsewhere. Update current behavior in the affected README, specification and decision register, while preserving superseded studies and immutable measurement evidence. Notes record why; they do not duplicate the implementation or every checkpoint. Record a measured result only with its setup and evidence. Keep the repository sufficient to resume work without access to a chat account. The [current-review evidence export](research_notes/Global%20X%20Camera%20decision%20review/chat_sources/2026-10-12-13-current-review.md) preserves the user approvals and assistant findings that led to this baseline.
 
 Imported Claude conversations could not be located; the user authorized proceeding without them. The coverage record identifies what was reviewed rather than claiming unavailable history was recovered.
 

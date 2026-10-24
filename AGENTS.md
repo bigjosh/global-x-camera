@@ -1,3 +1,7 @@
+# Repository notes
+
+Read [NOTES.md](NOTES.md) at the root and in the relevant owning folder before changing it. The root map identifies those homes. Append a dated entry when rejecting an alternative, learning a non-obvious constraint, removing something or consciously deferring a choice; never rewrite an existing entry. Cross-cutting reasons belong at root, current behavior in README/specification, and exact measurements in their evidence records. Read the latest bench checkpoint below before hardware work; this documentation bootstrap did not change the bench.
+
 # Instrument access
 
 **Current checkpoint — October 24, 19:02:04 UTC; supersedes earlier firmware/card/bench states below:** **v18 front-metadata RAW slots → Standby is installed**, sector `174424c6792f96c72e336fc68e442474e9da665718552d3239a772d59ba73e2e`, prefix `9401bed4076d6e9e4d2e4f9236661faf7b8f0e051cb332ea4dcbba09da336eba`. Full 64 KiB NOR readback matched; following 4 KiB unchanged. New slots contain `GXR2` + 152 reserved metadata bytes + 1,909,600 packed RAW10 bytes + final `GXRE`, still 3730 sectors and one announced CMD25. Metadata is explicitly zeroed; date/time and other field schemas remain deferred. No card erase occurred: legacy GXRS photos coexist and remain readable. Camera destination is `0x340000A0`, slot base `0x34000004`; overlapping camera/end guards use consistent words 0–7 and 1–8. Preserve this geometry and the reviewed v18 recovery allowlist; the early load and recovery instructions are unchanged.
