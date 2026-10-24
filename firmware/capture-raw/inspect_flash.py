@@ -102,7 +102,7 @@ def fresh_boot(path,receiver_sha,sector_sha,now=None):
 
 def validate_proof(p,m):
     exact=dict(magic=bench.MAGIC,schema=1,words=96,nonce=0,operation=1,state=3,result=0,
-        stage=8,terminal=bench.DONE,frame=bench.MAGIC_FRAME if m.get('magic_format') else bench.FRAME,bytes=bench.FRAME_BYTES,
+        stage=8,terminal=bench.DONE,frame=bench.frame_layout(m)['frame'],bytes=bench.FRAME_BYTES,
         width=1120,height=1364,card=m['card'],card_size=200,slots=m['slots'],slots_size=640,
         sd_error=0,media_idle=1,initialized=0,controller_owned=0,cleanup_error=0,
         control=0,ipsr=0,primask=1,cpacr=0,pattern=0,completion=0,

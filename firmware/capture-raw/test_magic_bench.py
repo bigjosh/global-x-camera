@@ -45,6 +45,16 @@ def fixture(operation=1):
     return p,m,q
 
 
+def front_fixture(operation=1):
+    p,m,q=fixture(operation)
+    m.update(magic_layout_version=2,image_offset=156,metadata_offset=4,metadata_bytes=152,
+             end_guard_word_bias=1,frame=b.FRONT_MAGIC_FRAME,slot_buffer=b.FRONT_MAGIC_BUFFER,
+             original_guard=b.FRONT_MAGIC_FRAME+b.FRAME_BYTES,
+             guard=b.FRONT_MAGIC_BUFFER+b.SLOT_BYTES)
+    p['frame']=b.FRONT_MAGIC_FRAME
+    return p,m,q
+
+
 def snapshot_data(p,m,*,erased=255):
     scr=bytearray(16);scr[1]=128 if erased else 0;struct.pack_into('<2I',scr,8,1,erased)
     slots=bytearray(576)
@@ -72,6 +82,44 @@ class FakeBench:
 
 
 class MagicFormatGuards(unittest.TestCase):
+    def test_front_geometry_is_explicit_and_cannot_reinterpret_legacy_proof(self):
+        for op in (1,2,3):
+            p,m,q=front_fixture(op)
+            b.magic_layout(m);b.validate(p,m,q)
+        p,m,q=front_fixture()
+        for update in ({'magic_layout_version':True},{'magic_layout_version':3},
+                       {'magic_layout_version':None},{'image_offset':4},
+                       {'metadata_offset':8},{'metadata_bytes':151},
+                       {'end_guard_word_bias':0},{'frame':b.MAGIC_FRAME},
+                       {'guard':m['original_guard']}):
+            with self.subTest(update=update),self.assertRaises(ValueError):
+                b.magic_layout(dict(m,**update))
+        old_p,old_m,old_q=fixture()
+        with self.assertRaises(ValueError):b.validate(old_p,m,old_q)
+        with self.assertRaises(ValueError):b.validate(p,old_m,q)
+
+    def test_front_overlap_guard_and_arbitrary_metadata(self):
+        p,m,_=front_fixture()
+        expected={
+            'frame-guard.bin':(m['guard'],struct.pack('<8I',*(0xA15A1001+i for i in range(8)))),
+            'magic-proof.bin':(m['magic_proof'],struct.pack('<8I',0x524D4732,3,0,0,0x32525847,0x45525847,152,3730)),
+            'leading-magic.bin':(b.FRONT_MAGIC_BUFFER,b'GXR2'),
+            'trailing-magic.bin':(m['original_guard'],b'GXRE'),
+            'frame-metadata.bin':(b.FRONT_MAGIC_BUFFER+4,bytes(range(152))),
+            'magic-chunk.bin':(m['chunk_trace'],struct.pack('<8I',1,2,0,3730,b.FRAME_BYTES,0x900,0,4))}
+        class ExactReads:
+            def upload(self,address,count,name):
+                want,data=expected[name]
+                if address!=want or count!=len(data):raise AssertionError('Wrong front layout read')
+                return data
+        result=b.frame_guards(ExactReads(),m,p)
+        self.assertEqual(result['metadata_hex'],bytes(range(152)).hex())
+        self.assertEqual(result['end_guard_word_bias'],1)
+        self.assertNotIn('padding_zero',result)
+        # The shifted end guard cannot be replaced with the old unshifted set.
+        expected['frame-guard.bin']=(m['guard'],struct.pack('<8I',*(0xA15A1000+i for i in range(8))))
+        with self.assertRaises(ValueError):b.frame_guards(ExactReads(),m,p)
+
     def test_new_format_request_does_not_weaken_legacy_generation(self):
         self.assertEqual(len(b.request(2,1,magic_format=True)),64)
         with self.assertRaises(ValueError):b.request(2,1)

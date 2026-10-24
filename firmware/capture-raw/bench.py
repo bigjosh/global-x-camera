@@ -27,6 +27,7 @@ READ_BUFFER, READ_MAX, FRAME_BYTES = 0x34200000, 262144, 1909600
 MAGIC, DONE = 0x52535731, 0x5253444E
 OPS = {'capture': 1, 'format': 2, 'read': 3}
 MAGIC_FRAME, MAGIC_BUFFER, SLOT_BYTES = 0x34000010, 0x3400000C, 1909760
+FRONT_MAGIC_FRAME, FRONT_MAGIC_BUFFER = 0x340000A0, 0x34000004
 DMA_WAIT_FAULTS = ('missing_clock', 'exception', 'primask', 'basepri', 'faultmask',
     'deep_sleep', 'sleep_on_exit', 'systick_control', 'systick_load',
     'ram_sleep_clocks', 'rif_sleep_clocks', 'sd_sleep_clock', 'bus_sleep_clocks',
@@ -71,11 +72,29 @@ def fields(folder):
     return [n.lower() for n in names] + ['reserved_'+str(n) for n in range(len(names), 96)]
 
 
+def magic_geometry(m):
+    """Two exact, explicit layouts; never infer a revision from RAM addresses."""
+    version=m.get('magic_layout_version')
+    if version is None:
+        return dict(version=1,frame=MAGIC_FRAME,buffer=MAGIC_BUFFER,
+                    proof_magic=0x524D4731,start_magic=b'GXRS',image_offset=4,
+                    metadata_offset=None,metadata_bytes=0,guard_word_bias=0)
+    if type(version) is not int or version!=2:
+        raise ValueError('Unreviewed magic layout version')
+    expected=dict(image_offset=156,metadata_offset=4,metadata_bytes=152,end_guard_word_bias=1)
+    if any(m.get(k)!=v for k,v in expected.items()):
+        raise ValueError('Front metadata geometry differs')
+    return dict(version=2,frame=FRONT_MAGIC_FRAME,buffer=FRONT_MAGIC_BUFFER,
+                proof_magic=0x524D4732,start_magic=b'GXR2',image_offset=156,
+                metadata_offset=4,metadata_bytes=152,guard_word_bias=1)
+
+
 def frame_layout(m):
     """Exact opt-in geometry; old manifests retain their original addresses."""
     if m.get('magic_format'):
-        return dict(frame=MAGIC_FRAME,frame_bytes=FRAME_BYTES,
-                    guard=MAGIC_BUFFER+SLOT_BYTES,guard_bytes=32,allocation_bytes=SLOT_BYTES)
+        g=magic_geometry(m)
+        return dict(frame=g['frame'],frame_bytes=FRAME_BYTES,
+                    guard=g['buffer']+SLOT_BYTES,guard_bytes=32,allocation_bytes=SLOT_BYTES)
     return dict(frame=FRAME,frame_bytes=FRAME_BYTES,
                 guard=FRAME+(SLOT_BYTES if m.get('whole_image_preerase') else FRAME_BYTES),
                 guard_bytes=32,allocation_bytes=SLOT_BYTES if m.get('whole_image_preerase') else FRAME_BYTES)
@@ -146,9 +165,10 @@ def whole_layout(m):
 
 def magic_layout(m):
     if not m.get('magic_format'): return
+    g=magic_geometry(m)
     if (m['magic_format'] is not True or m.get('whole_image_preerase') or
             m.get('transport')!='idma' or m.get('dma_sleep') or m.get('chunk_sectors')!=3730 or
-            m.get('slot_buffer')!=MAGIC_BUFFER or m.get('original_guard')!=MAGIC_FRAME+FRAME_BYTES or
+            m.get('slot_buffer')!=g['buffer'] or m.get('original_guard')!=g['frame']+FRAME_BYTES or
             any(m.get(k)!=v for k,v in frame_layout(m).items()) or
             m.get('magic_proof_words')!=8):
         raise ValueError('Magic-slot geometry/features differ')
@@ -186,25 +206,38 @@ def capture_geometry(p,m):
 
 
 def frame_guards(b,m,p):
-    expected=struct.pack('<8I',*(0xA15A1000+i for i in range(8)))
+    bias=magic_geometry(m)['guard_word_bias'] if m.get('magic_format') else 0
+    expected=struct.pack('<8I',*(0xA15A1000+i+bias for i in range(8)))
     if b.upload(m['guard'],32,'frame-guard.bin')!=expected:
         raise ValueError('Frame/post-padding guard damaged')
     if m.get('magic_format'):
         magic_layout(m)
+        g=magic_geometry(m)
         if p['chunk_count']!=1 or p['chunk_overflow']:
             raise ValueError('Magic slot must use exactly one payload call')
         raw=b.upload(m['magic_proof'],32,'magic-proof.bin')
-        if raw!=struct.pack('<8I',0x524D4731,3,0,0,0x53525847,0x45525847,152,3730):
+        if raw!=struct.pack('<8I',g['proof_magic'],3,0,0,
+                            int.from_bytes(g['start_magic'],'little'),0x45525847,152,3730):
             raise ValueError('Magic original guard/commit proof differs')
-        if (b.upload(MAGIC_BUFFER,4,'leading-magic.bin')!=b'GXRS' or
-                b.upload(MAGIC_FRAME+FRAME_BYTES,4,'trailing-magic.bin')!=b'GXRE' or
-                b.upload(MAGIC_FRAME+FRAME_BYTES+4,152,'frame-padding.bin')!=bytes(152)):
-            raise ValueError('Magic markers/padding differ')
+        if (b.upload(g['buffer'],4,'leading-magic.bin')!=g['start_magic'] or
+                b.upload(g['frame']+FRAME_BYTES,4,'trailing-magic.bin')!=b'GXRE'):
+            raise ValueError('Magic markers differ')
+        metadata=None
+        if g['version']==1:
+            if b.upload(g['frame']+FRAME_BYTES+4,152,'frame-padding.bin')!=bytes(152):
+                raise ValueError('Legacy magic padding differs')
+        else:
+            metadata=b.upload(g['buffer']+4,152,'frame-metadata.bin')
+            if len(metadata)!=152:raise ValueError('Incomplete front metadata')
         row=struct.unpack('<8I',b.upload(m['chunk_trace'],32,'magic-chunk.bin'))
         if row[2:5]!=(0,3730,FRAME_BYTES) or row[5]&0x1F00!=0x900 or row[6]:
             raise ValueError('Magic single-transaction trace differs')
-        return dict(format='magic',proof=list(struct.unpack('<8I',raw)),chunk=list(row),padding_zero=True,
+        result=dict(format='magic',proof=list(struct.unpack('<8I',raw)),chunk=list(row),
                     original_guard_checked_before_trailer=True,post_padding_guard_intact=True)
+        if g['version']==1:result['padding_zero']=True
+        else:result.update(layout_version=2,metadata_bytes=152,metadata_hex=metadata.hex(),
+                           metadata_schema=None,end_guard_word_bias=1)
+        return result
     if not m.get('whole_image_preerase'): return None
     whole_layout(m)
     if p['chunk_count']!=1 or p['chunk_overflow']:
@@ -252,7 +285,7 @@ def validate(p, m, words):
             request(words[2],words[1],*words[3:6],magic_format=bool(m.get('magic_format')))!=struct.pack('<16I',*words)):
         raise ValueError('Stored request is malformed')
     exact = dict(magic=MAGIC, schema=1, words=96, nonce=words[1],operation=words[2],
-        state=3, result=0, stage=8, terminal=DONE, frame=MAGIC_FRAME if m.get('magic_format') else FRAME, bytes=FRAME_BYTES,
+        state=3, result=0, stage=8, terminal=DONE, frame=frame_layout(m)['frame'], bytes=FRAME_BYTES,
         width=1120,height=1364,card=m['card'],card_size=200,slots=m['slots'],slots_size=640,
         sd_error=0,media_idle=1,initialized=0,controller_owned=0,cleanup_error=0,
         control=0,ipsr=0,primask=1,cpacr=0,pattern=m['pattern'],
@@ -321,8 +354,10 @@ def magic_snapshot(b,m,p,label,card):
             list(u[4:14])!=[p['slot_count'],p['slot'],p['payload_lba'],p['written_sectors'],
                 1,0,0,0,p['scan_headers'],p['formatted_slots']] or any(mirror[64:])):
         raise ValueError('Magic reporting mirror disagrees with owning object')
+    g=magic_geometry(m)
     result=dict(slots=slots,scr_wire_bytes=list(scr_raw[:8]),erased_byte=erased,
-                legacy_mirror_only=True,on_media_metadata=False)
+                legacy_mirror_only=True,on_media_metadata=g['version']==2)
+    if g['version']==2:result.update(metadata_bytes=152,metadata_schema=None,magic_layout_version=2)
     if p['operation']==1:
         sensor_raw=b.upload(0x343F4000,128,label+'-sensor-status.bin')
         if len(sensor_raw)!=128: raise ValueError('Incomplete sensor exposure status')

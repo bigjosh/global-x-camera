@@ -35,8 +35,11 @@ class MagicSlotsTest(unittest.TestCase):
         cls.temp.cleanup()
 
     def test_geometry_and_c_fixture_states(self):
-        self.assertEqual(magic.PADDING_BYTES, 152)
-        self.assertEqual(magic.OBJECT_BYTES, 1909608)
+        self.assertEqual(magic.PADDING_BYTES, 0)
+        self.assertEqual(magic.METADATA_BYTES, 152)
+        self.assertEqual(magic.IMAGE_OFFSET, 156)
+        self.assertEqual(magic.OBJECT_BYTES, 1909760)
+        self.assertEqual(magic.TRAILER_OFFSET, magic.PADDED_BYTES - 4)
         self.assertEqual(self.layout["slot_count"], 3)
         self.assertEqual([magic.read_slot(io.BytesIO(self.image), self.layout, i)["state"] for i in range(3)],
                          ["COMPLETE", "PARTIAL", "FREE"])
@@ -69,8 +72,8 @@ class MagicSlotsTest(unittest.TestCase):
         result = self.folder / "exact.raw10"
         record = magic.extract(io.BytesIO(self.image), self.layout, 0, result, kind="raw")
         self.assertEqual(record["state"], "COMPLETE")
-        self.assertTrue(record["tail_padding_zero"])
-        self.assertEqual(result.read_bytes(), self.image[4:magic.TRAILER_OFFSET])
+        self.assertNotIn("tail_padding_zero", record)
+        self.assertEqual(result.read_bytes(), self.image[magic.IMAGE_OFFSET:magic.TRAILER_OFFSET])
         values = magic.unpack_raw10(result.read_bytes(), shift=0)
         self.assertEqual(len(values), 1120 * 1364)
         self.assertTrue(all(value == (index & 1023) for index, value in enumerate(values)))
@@ -115,14 +118,70 @@ class MagicSlotsTest(unittest.TestCase):
         with self.assertRaises(magic.FormatError):
             magic.extract(io.BytesIO(self.image), self.layout, 2, self.folder / "free.raw", kind="raw", allow_partial=True)
 
-    def test_padding_damage_is_reported_without_hiding_data(self):
-        image = bytearray(self.image)
-        image[magic.OBJECT_BYTES] = 1
-        record = magic.parse_slot(image[:magic.PADDED_BYTES], erased_byte=255)
+    def test_arbitrary_metadata_is_preserved_and_not_treated_as_padding(self):
+        image = bytearray(self.image[:magic.PADDED_BYTES])
+        metadata = bytes((i ^ 0x5a) for i in range(magic.METADATA_BYTES))
+        record = magic.parse_slot(image, erased_byte=255)
+        self.assertEqual(record["state"], "COMPLETE")
+        self.assertEqual(record["metadata_hex"], metadata.hex())
+        self.assertIsNone(record["metadata_schema"])
+        self.assertNotIn("warning", record)
+        self.assertFalse(record["checksummed"])
+
+    def legacy_fixture(self):
+        image = bytearray(magic.PADDED_BYTES)
+        image[:4] = magic.LEGACY_START_MAGIC
+        image[magic.LEGACY_IMAGE_OFFSET:magic.LEGACY_TRAILER_OFFSET] = self.image[
+            magic.IMAGE_OFFSET:magic.TRAILER_OFFSET]
+        image[magic.LEGACY_TRAILER_OFFSET:magic.LEGACY_OBJECT_BYTES] = magic.END_MAGIC
+        return image
+
+    def test_mixed_format_offsets_and_legacy_extraction(self):
+        legacy = self.legacy_fixture()
+        mixed = legacy + self.image[:magic.PADDED_BYTES]
+        volume = magic.layout(len(mixed) // 512, 0)
+        old = magic.read_slot(io.BytesIO(mixed), volume, 0)
+        new = magic.read_slot(io.BytesIO(mixed), volume, 1)
+        self.assertEqual((old["state"], new["state"]), ("COMPLETE", "COMPLETE"))
+        self.assertEqual((old["image_offset"], new["image_offset"]), (4, 156))
+        self.assertEqual((old["metadata_bytes"], new["metadata_bytes"]), (0, 152))
+        self.assertEqual((old["format_revision"], new["format_revision"]), (1, 2))
+        self.assertTrue(old["tail_padding_zero"])
+        out = self.folder / "legacy.raw10"
+        magic.extract(io.BytesIO(mixed), volume, 0, out, kind="raw")
+        self.assertEqual(out.read_bytes(), self.image[magic.IMAGE_OFFSET:magic.TRAILER_OFFSET])
+        legacy[magic.LEGACY_OBJECT_BYTES] = 1
+        record = magic.parse_slot(legacy, erased_byte=0)
         self.assertEqual(record["state"], "COMPLETE")
         self.assertFalse(record["tail_padding_zero"])
         self.assertIn("damaged", record["warning"])
-        self.assertFalse(record["checksummed"])
+
+    def test_one_sector_directory_listing_never_claims_completion(self):
+        class Counted(io.BytesIO):
+            def __init__(self, data):
+                super().__init__(data)
+                self.read_calls = []
+
+            def read(self, size=-1):
+                self.read_calls.append(size)
+                return super().read(size)
+
+        for first in (self.image[:512], self.legacy_fixture()[:512]):
+            source = Counted(first)
+            record = magic.read_header(source, self.layout, 0)
+            self.assertEqual(source.read_calls, [512])
+            self.assertEqual(record["state"], "OCCUPIED")
+            self.assertFalse(record["completion_checked"])
+            self.assertIsNone(record["completion_marker_valid"])
+        record = magic.read_header(io.BytesIO(self.image[:512]), self.layout, 0)
+        self.assertEqual(len(bytes.fromhex(record["metadata_hex"])), 152)
+
+    def test_unknown_magic_cannot_guess_an_extraction_offset(self):
+        image = bytearray(self.image)
+        image[:4] = b"bad!"
+        with self.assertRaisesRegex(magic.FormatError, "offset"):
+            magic.extract(io.BytesIO(image), self.layout, 0,
+                          self.folder / "unknown.raw10", kind="raw", allow_partial=True)
 
     def test_bad_geometry_indexes_and_reads_fail(self):
         for capacity, erased in ((3729, 0), (1 << 33, 255), (3730, 1)):

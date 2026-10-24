@@ -1,7 +1,9 @@
 #include "magic_slots.h"
 #include <stddef.h>
 
-_Static_assert(MAGIC_SLOTS_PADDING_BYTES==152U,"magic slot padding");
+_Static_assert(MAGIC_SLOTS_METADATA_BYTES==152U,"magic slot metadata capacity");
+_Static_assert(MAGIC_SLOTS_IMAGE_OFFSET==156U,"magic slot image offset");
+_Static_assert(MAGIC_SLOTS_PADDING_BYTES==0U,"magic slot has no trailing padding");
 _Static_assert(MAGIC_SLOTS_PADDED_BYTES==1909760U,"magic slot extent");
 
 static uint32_t get32(const uint8_t *p)
@@ -61,8 +63,6 @@ int magic_slots_write(magic_slots_t *f,const void *buffer,
     if(get32(p)!=MAGIC_SLOTS_START_MAGIC ||
        get32(p+MAGIC_SLOTS_TRAILER_OFFSET)!=MAGIC_SLOTS_END_MAGIC)
         return fault(f,MAGIC_SLOTS_ERR_MARKER);
-    for(uint32_t i=MAGIC_SLOTS_OBJECT_BYTES;i<MAGIC_SLOTS_PADDED_BYTES;++i)
-        if(p[i]) return fault(f,MAGIC_SLOTS_ERR_MARKER);
     f->written_sectors=MAGIC_SLOTS_STRIDE;f->write_sectors+=MAGIC_SLOTS_STRIDE;
     f->active=0;return 0;
 }

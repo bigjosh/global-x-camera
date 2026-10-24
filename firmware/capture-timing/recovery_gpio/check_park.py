@@ -30,6 +30,11 @@ VCP_FIELDS = (
     'reserved30 reserved31').split()
 # An unknown/self-consistent build is insufficient authorization to halt.
 APPROVED = {
+    # RAW v18 front metadata: exact v17d recovery instructions and all20
+    # referenced literals retained; only the two receiver CRC words differ.
+    '9401bed4076d6e9e4d2e4f9236661faf7b8f0e051cb332ea4dcbba09da336eba':
+        {'bytes': 5140, 'park': 0x3418078C, 'vcp': True,
+         'sector': '174424c6792f96c72e336fc68e442474e9da665718552d3239a772d59ba73e2e'},
     # RAW v17c/v17d magic format: entire v16 prefix differs only at two CRC words.
     # v17d's erase-only fix is unreachable in flash; these exact pairs are unchanged.
     # Recovery code/literals and metadata are exact; admission is not qualification.

@@ -84,7 +84,7 @@ class MagicIntegrationTests(unittest.TestCase):
                            if "uint8_t raw_frame_allocation[" in line)
         alias = next(line for line in self.source.splitlines() if line.startswith("#define g_frame "))
         addresses = "\n".join(line for line in (HERE / "runtime.h").read_text().splitlines()
-                              if line.startswith(("#define RAW_FRAME_ADDRESS 0x34000010",
+                              if line.startswith(("#define RAW_FRAME_ADDRESS 0x340000A0",
                                                   "#define RAW_SLOT_BUFFER_ADDRESS ")))
         program = '#include "magic_slots.h"\n' + addresses + "\n" + declaration + "\n" + alias + r'''
 const uint32_t layout[] = {
@@ -92,7 +92,8 @@ const uint32_t layout[] = {
     sizeof(raw_frame_allocation), RAW_FRAME_ADDRESS, RAW_SLOT_BUFFER_ADDRESS,
     RAW_FRAME_ADDRESS+MAGIC_SLOTS_IMAGE_BYTES,
     RAW_SLOT_BUFFER_ADDRESS+MAGIC_SLOTS_PADDED_BYTES,
-    MAGIC_SLOTS_PADDING_BYTES
+    MAGIC_SLOTS_PADDING_BYTES, MAGIC_SLOTS_IMAGE_OFFSET,
+    MAGIC_SLOTS_METADATA_BYTES
 };
 '''
         linker = "SECTIONS { . = 0x34000000; .frame (NOLOAD) : { *(.psram_bss) } " \
@@ -110,15 +111,18 @@ const uint32_t layout[] = {
             data = directory / "layout.bin"
             subprocess.run([str(self.builder.TC / "arm-none-eabi-objcopy.exe"),
                             "-O", "binary", "--only-section=.rodata", str(executable), str(data)], check=True)
-            base, frame, size, expected_frame, slot, original, tail, padding = struct.unpack("<8I", data.read_bytes())
+            base, frame, size, expected_frame, slot, original, tail, padding, image_offset, metadata = struct.unpack("<10I", data.read_bytes())
             self.assertEqual((base, frame, expected_frame, slot),
-                             (0x34000000, 0x34000010, 0x34000010, 0x3400000C))
+                             (0x34000000, 0x340000A0, 0x340000A0, 0x34000004))
             self.assertEqual(frame % 16, 0)
             self.assertEqual(slot % 4, 0)
             self.assertEqual(original, frame + 1909600)
             self.assertEqual(tail, slot + 3730 * 512)
             self.assertEqual(base + size, tail + 32)
-            self.assertEqual(padding, 152)
+            self.assertEqual((padding, image_offset, metadata), (0, 156, 152))
+            self.assertEqual(frame, slot + image_offset)
+            self.assertEqual(tail, original + 4)
+            self.assertLessEqual(4 + metadata, 512)
 
     def test_transform_rejects_drift_and_exposure_bounds(self):
         with self.assertRaises(ValueError):
@@ -177,8 +181,8 @@ HARNESS = r'''
 #define HEIGHT MAGIC_SLOTS_HEIGHT
 #define BYTES MAGIC_SLOTS_IMAGE_BYTES
 #define RAW_SLOTS_PAYLOAD_BYTES MAGIC_SLOTS_IMAGE_BYTES
-#define RAW_FRAME_ADDRESS 0x34000010U
-#define RAW_SLOT_BUFFER_ADDRESS 0x3400000CU
+#define RAW_FRAME_ADDRESS 0x340000A0U
+#define RAW_SLOT_BUFFER_ADDRESS 0x34000004U
 #define g_frame ((uint8_t *)RAW_FRAME_ADDRESS)
 #define SHUTDOWN ((volatile uint32_t *)0x343F8900U)
 #define CPROF ((volatile uint32_t *)CAPTURE_PROFILE_ADDRESS)
@@ -250,6 +254,13 @@ static volatile uint32_t *original_guard(void) {
 static volatile uint32_t *end_guard(void) {
     return (volatile uint32_t *)(RAW_SLOT_BUFFER_ADDRESS+MAGIC_SLOTS_PADDED_BYTES);
 }
+static volatile uint8_t *metadata(void) {
+    return (volatile uint8_t *)(RAW_SLOT_BUFFER_ADDRESS+4U);
+}
+static void assert_metadata_unchanged(void) {
+    for(unsigned i=0;i<MAGIC_SLOTS_METADATA_BYTES;i++)
+        assert(metadata()[i]==(uint8_t)(i*37U+19U));
+}
 static void reset_capture(void) {
     memset((void *)0x34000000U,0,4U*1024U*1024U);
     memset(TRACE,0,sizeof(TRACE));memset(FAST,0,sizeof(FAST));
@@ -266,7 +277,16 @@ static void reset_capture(void) {
     RCC->APB5ENR=3;RCC->DIVENR=3;CSI->PRCR=1;CSI->PCR=15;
     DCMIPP->P0DCCNTR=BYTES;DWT->CYCCNT=1000;
     raw_producer_init(&raw_producer,1);raw_producer_frame(&raw_producer,999);
+    /* Startup must actively initialize metadata, including after a warm
+     * restart with retained, arbitrary SRAM contents. */
+    memset((void *)RAW_SLOT_BUFFER_ADDRESS,0xCD,MAGIC_SLOTS_IMAGE_OFFSET);
     seed_guards();
+    assert(*(volatile uint32_t *)RAW_SLOT_BUFFER_ADDRESS==MAGIC_SLOTS_START_MAGIC);
+    for(unsigned i=0;i<MAGIC_SLOTS_METADATA_BYTES;i++) {
+        assert(metadata()[i]==0);
+        metadata()[i]=(uint8_t)(i*37U+19U);
+    }
+    for(unsigned i=0;i<9;i++) assert(original_guard()[i]==0xA15A1000U+i);
     raw_magic_proof[1]=1U;sensor.ctx.is_streaming=1;
 }
 static void assert_footer_absent(void) {
@@ -283,9 +303,12 @@ int main(void) {
 #endif
     assert(memory==(void *)0x34000000U);
     assert(RAW_SLOT_BUFFER_ADDRESS%4U==0 && RAW_FRAME_ADDRESS%16U==0);
-    assert(RAW_FRAME_ADDRESS==RAW_SLOT_BUFFER_ADDRESS+4U);
-    assert(MAGIC_SLOTS_TRAILER_OFFSET==4U+BYTES);
-    assert(MAGIC_SLOTS_PADDING_BYTES==152 && MAGIC_SLOTS_STRIDE==3730);
+    assert(RAW_FRAME_ADDRESS==RAW_SLOT_BUFFER_ADDRESS+MAGIC_SLOTS_IMAGE_OFFSET);
+    assert(MAGIC_SLOTS_IMAGE_OFFSET==156U && MAGIC_SLOTS_METADATA_BYTES==152U);
+    assert(MAGIC_SLOTS_TRAILER_OFFSET==156U+BYTES);
+    assert(MAGIC_SLOTS_PADDING_BYTES==0 && MAGIC_SLOTS_STRIDE==3730);
+    assert(MAGIC_SLOTS_TRAILER_OFFSET+4U==MAGIC_SLOTS_PADDED_BYTES);
+    assert((uint8_t *)end_guard()==(uint8_t *)original_guard()+4U);
     reset_capture();frames=0;raw_producer_init(&raw_producer,1);
     uint32_t available=0xFFFFFFFFU;
     assert(!magic_publish(0,&available) && available==0);
@@ -293,8 +316,9 @@ int main(void) {
     for(uint32_t line=1;line<=22;line++) {
         raw_producer_line(&raw_producer,line*1000U,0);
         assert(!magic_publish(0,&available));
-        assert(available==(4U+raw_producer.available_bytes)/512U*512U);
+        assert(available==(MAGIC_SLOTS_IMAGE_OFFSET+raw_producer.available_bytes)/512U*512U);
         assert(available<=1792000U && !capture_ready && !reads);assert_footer_absent();
+        assert_metadata_unchanged();
     }
     /* FRAME validates the image but async sensor STOP has not completed: even
      * full image publication cannot expose the trailing magic sector yet. */
@@ -309,10 +333,10 @@ int main(void) {
     assert(!magic_publish(0,&available) && available==MAGIC_SLOTS_PADDED_BYTES);
     assert(capture_sensor_stopped && !capture_stop_pending && stop_events==1);
     assert(raw_magic_proof[1]==2 && original_guard()[0]==MAGIC_SLOTS_END_MAGIC);
-    for(unsigned i=0;i<MAGIC_SLOTS_PADDING_BYTES;i++)
-        assert(*(uint8_t *)(uintptr_t)(RAW_SLOT_BUFFER_ADDRESS+MAGIC_SLOTS_OBJECT_BYTES+i)==0);
-    for(unsigned i=0;i<8;i++) assert(end_guard()[i]==0xA15A1000U+i);
+    assert_metadata_unchanged();
+    for(unsigned i=0;i<8;i++) assert(end_guard()[i]==0xA15A1001U+i);
     assert(!magic_publish(0,&available) && available==MAGIC_SLOTS_PADDED_BYTES);
+    assert_metadata_unchanged();
     assert(ready_events==1 && writes==1 && hal_stops==1);
     /* Each failure is executed in the returning validator. None may call the
      * original parking helpers, mark ready, or make a completion marker. */
@@ -349,10 +373,11 @@ int main(void) {
         assert(raw_capture_fault() && !capture_ready && !ready_events);
         assert(magic_publish(0,&available));assert_footer_absent();
     }
-    /* Corruption discovered only at final publication also withholds GXRE. */
-    for(unsigned which=0;which<16;which++) {
+    /* The original/end guards share seven words. Corrupt every distinct word
+     * in the combined 36-byte region after validation; all withhold GXRE. */
+    for(unsigned which=0;which<9;which++) {
         reset_capture();raw_capture_poll();assert(capture_ready);
-        if(which<8) original_guard()[which]^=1;else end_guard()[which-8]^=1;
+        original_guard()[which]^=1;
         DWT->CYCCNT+=400000U;
         assert(magic_publish(0,&available)==2);assert_footer_absent();
     }

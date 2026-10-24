@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Read/extract fixed GXRS + RAW10 + GXRE slots; never modify the source.
+"""Read/extract fixed GXR2 metadata/RAW10/GXRE slots; never modify the source.
 
 The erased byte must come from the card's SCR, or its recorded commissioning
 result. There is no superblock to identify the capacity or format automatically.
-Legacy version-1 images remain supported by the separate raw_slots.py utility.
+The previous GXRS/tail-padding slots can coexist at the same stride. The older
+superblock-based version-1 images use the separate raw_slots.py utility.
 """
 from __future__ import annotations
 
@@ -27,12 +28,32 @@ STRIDE = 3730
 WIDTH, HEIGHT = 1120, 1364
 ROW_BYTES = 1400
 IMAGE_BYTES = PAYLOAD_BYTES = 1909600
-IMAGE_OFFSET = 4
+METADATA_OFFSET, METADATA_BYTES = 4, 152
+IMAGE_OFFSET = METADATA_OFFSET + METADATA_BYTES
 TRAILER_OFFSET = IMAGE_OFFSET + IMAGE_BYTES
 OBJECT_BYTES = TRAILER_OFFSET + 4
 PADDED_BYTES = STRIDE * SECTOR
 PADDING_BYTES = PADDED_BYTES - OBJECT_BYTES
-START_MAGIC, END_MAGIC = b"GXRS", b"GXRE"
+START_MAGIC, END_MAGIC = b"GXR2", b"GXRE"
+LEGACY_START_MAGIC = b"GXRS"
+LEGACY_IMAGE_OFFSET = 4
+LEGACY_TRAILER_OFFSET = LEGACY_IMAGE_OFFSET + IMAGE_BYTES
+LEGACY_OBJECT_BYTES = LEGACY_TRAILER_OFFSET + 4
+LEGACY_PADDING_BYTES = PADDED_BYTES - LEGACY_OBJECT_BYTES
+
+
+def _format(first_word):
+    if first_word == START_MAGIC:
+        return {"format": "GXR2_METADATA_RAW10_GXRE", "format_revision": 2,
+                "image_offset": IMAGE_OFFSET, "trailer_offset": TRAILER_OFFSET,
+                "metadata_offset": METADATA_OFFSET, "metadata_bytes": METADATA_BYTES,
+                "padding_bytes": PADDING_BYTES}
+    if first_word == LEGACY_START_MAGIC:
+        return {"format": "GXRS_RAW10_GXRE", "format_revision": 1,
+                "image_offset": LEGACY_IMAGE_OFFSET, "trailer_offset": LEGACY_TRAILER_OFFSET,
+                "metadata_offset": None, "metadata_bytes": 0,
+                "padding_bytes": LEGACY_PADDING_BYTES}
+    return None
 
 
 def layout(sector_count, erased_byte):
@@ -40,46 +61,69 @@ def layout(sector_count, erased_byte):
         raise FormatError("erased byte must be SCR-reported 0x00 or 0xff")
     if not isinstance(sector_count, int) or not STRIDE <= sector_count <= (1 << 32):
         raise FormatError("capacity must contain a slot and be at most 2^32 sectors")
-    return {"format": "GXRS_RAW10_GXRE", "sector_count": sector_count,
+    return {"format": "GXR2_METADATA_RAW10_GXRE", "sector_count": sector_count,
             "slot_count": sector_count // STRIDE, "erased_byte": erased_byte,
             "first_lba": FIRST_LBA, "slot_sectors": STRIDE, "width": WIDTH,
             "height": HEIGHT, "image_bytes": IMAGE_BYTES, "image_offset": IMAGE_OFFSET,
             "trailer_offset": TRAILER_OFFSET, "padding_bytes": PADDING_BYTES,
+            "metadata_offset": METADATA_OFFSET, "metadata_bytes": METADATA_BYTES,
+            "supported_slot_formats": ["GXR2_METADATA_RAW10_GXRE", "GXRS_RAW10_GXRE"],
             "packing": "MIPI_RAW10", "checksummed": False}
 
 
-def parse_probe(first_sector, last_sector, *, index, erased_byte):
-    """Classify occupancy from first word; the trailing marker describes completion.
+def parse_header(first_sector, *, index, erased_byte):
+    """One-sector directory record: occupancy and opaque metadata, not completion.
 
-    COMPLETE means both markers exist, not that pixel data passed a checksum or
-    that an interrupted write was atomic. Any non-erased first word is occupied.
+    No timestamp schema is assigned yet. metadata_hex preserves all reserved
+    bytes; zero bytes do not imply a valid capture date or other field.
     """
     if erased_byte not in (0, 255) or index < 0:
         raise FormatError("invalid erased byte or slot index")
     if len(first_sector) != SECTOR:
         raise FormatError("short first-sector read; occupancy is unknown")
     record = {"index": index, "slot_lba": index * STRIDE, "slot_sectors": STRIDE,
-              "image_offset": IMAGE_OFFSET, "image_bytes": IMAGE_BYTES,
-              "start_magic_valid": first_sector[:4] == START_MAGIC,
-              "completion_marker_valid": False, "checksummed": False}
+              "image_bytes": IMAGE_BYTES, "start_magic_valid": False,
+              "completion_marker_valid": None, "completion_checked": False,
+              "checksummed": False}
     if first_sector[:4] == bytes([erased_byte]) * 4:
         record.update(state="FREE", occupied=False)
         return record
     record["occupied"] = True
+    detected = _format(first_sector[:4])
+    record["state"] = "OCCUPIED"
+    if detected:
+        record.update(detected)
+        record["start_magic_valid"] = True
+        if detected["metadata_bytes"]:
+            record["metadata_hex"] = bytes(first_sector[METADATA_OFFSET:IMAGE_OFFSET]).hex()
+            record["metadata_schema"] = None
+    else:
+        record.update(format=None, warning="Unknown or damaged leading magic; occupied, not free.")
+    return record
+
+
+def parse_probe(first_sector, last_sector, *, index, erased_byte):
+    """Inspect both markers. COMPLETE is not a checksum or an atomicity claim."""
+    record = parse_header(first_sector, index=index, erased_byte=erased_byte)
+    if not record["occupied"]:
+        return record
     if last_sector is None or len(last_sector) != SECTOR:
         record.update(state="PARTIAL" if record["start_magic_valid"] else "OCCUPIED",
                       warning="Missing final sector; this occupied slot is not complete.")
         return record
-    tail = TRAILER_OFFSET % SECTOR
-    record["completion_marker_valid"] = last_sector[tail:tail + 4] == END_MAGIC
-    record["tail_padding_zero"] = not any(last_sector[tail + 4:])
     if not record["start_magic_valid"]:
         record.update(state="OCCUPIED", warning="Unknown or damaged leading magic; occupied, not free.")
-    elif not record["completion_marker_valid"]:
+        return record
+    tail = record["trailer_offset"] % SECTOR
+    record["completion_checked"] = True
+    record["completion_marker_valid"] = last_sector[tail:tail + 4] == END_MAGIC
+    if record["padding_bytes"]:
+        record["tail_padding_zero"] = not any(last_sector[tail + 4:])
+    if not record["completion_marker_valid"]:
         record.update(state="PARTIAL", warning="No completion marker; image may be incomplete or damaged.")
     else:
         record["state"] = "COMPLETE"
-        if not record["tail_padding_zero"]:
+        if record.get("tail_padding_zero") is False:
             record["warning"] = "Completion markers exist but padding is damaged; no payload checksum is stored."
     return record
 
@@ -93,6 +137,14 @@ def parse_slot(data, *, index=0, erased_byte):
     if len(data) != PADDED_BYTES:
         result["warning"] = "Slot dump is truncated or has the wrong extent; completion is not established."
     return result
+
+
+def read_header(source, volume, index):
+    """Directory listing requires exactly one logical-sector read per slot."""
+    if not 0 <= index < volume["slot_count"]:
+        raise FormatError("slot index outside supplied capacity")
+    first = read_sectors(source, index * STRIDE)
+    return parse_header(first, index=index, erased_byte=volume["erased_byte"])
 
 
 def read_slot(source, volume, index):
@@ -112,11 +164,13 @@ def extract(source, volume, index, output, *, kind="png", allow_partial=False):
     record = parse_slot(data, index=index, erased_byte=volume["erased_byte"])
     if record["state"] == "FREE" or (record["state"] != "COMPLETE" and not allow_partial):
         raise FormatError(f"slot {index} is {record['state']}; not extracting")
+    if not record["start_magic_valid"]:
+        raise FormatError(f"slot {index} has unknown magic; image offset cannot be determined safely")
     if kind not in ("png", "raw"):
         raise FormatError("output kind must be png or raw")
     if record["state"] != "COMPLETE":
         record["warning"] = "Recovered occupied slot: pixels can be missing, erased, or corrupt."
-    image = data[IMAGE_OFFSET:TRAILER_OFFSET]
+    image = data[record["image_offset"]:record["trailer_offset"]]
     encoded = image if kind == "raw" else png16(image, record)
     with open(output, "xb") as target:
         target.write(encoded)
@@ -134,6 +188,8 @@ def main(argv=None):
     listing = commands.add_parser("list")
     listing.add_argument("--all", action="store_true")
     listing.add_argument("--limit", type=int)
+    listing.add_argument("--check-completion", action="store_true",
+                         help="also read occupied slots' last sector; default reads only their first sector")
     extraction = commands.add_parser("extract")
     extraction.add_argument("slot", type=int)
     extraction.add_argument("output", type=Path)
@@ -157,7 +213,8 @@ def main(argv=None):
                 count = volume["slot_count"] if args.limit is None else min(volume["slot_count"], max(0, args.limit))
                 for index in range(count):
                     try:
-                        record = read_slot(source, volume, index)
+                        reader = read_slot if args.check_completion else read_header
+                        record = reader(source, volume, index)
                     except (OSError, FormatError) as exc:
                         record = {"index": index, "state": "UNKNOWN", "error": str(exc)}
                     if args.all or record["state"] != "FREE":

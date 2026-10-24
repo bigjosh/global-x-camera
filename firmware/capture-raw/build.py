@@ -202,7 +202,7 @@ def main():
     p.add_argument('--transport',choices=('pio','idma'),default='idma')
     p.add_argument('--chunk-sectors',type=int,default=1024)
     p.add_argument('--whole-image-preerase',action='store_true',help='One CMD55/ACMD23 + CMD25 for all3730 padded payload sectors')
-    p.add_argument('--magic-format',action='store_true',help='Erased append-only GXRS + packedRAW + GXRE slots; one progressive CMD25')
+    p.add_argument('--magic-format',action='store_true',help='GXR2 + front metadata + packedRAW + GXRE slots; one progressive CMD25')
     p.add_argument('--exposure-coarse',type=int,default=1428,help='RAM diagnostic exposure in sensor lines')
     p.add_argument('--flash',action='store_true')
     p.add_argument('--standby',action='store_true')
@@ -313,11 +313,15 @@ def main():
         proof=0x343FD100,proof_words=96,read_buffer=0x34200000,read_buffer_bytes=262144,
         abort_address=0x343FD300,abort_words=16,
         chunk_trace=0x343FE000,chunk_trace_capacity=128,chunk_trace_words=8,
-        frame=0x34000010 if a.magic_format else 0x34000000,frame_bytes=1909600,width=1120,height=1364,
-        guard=(0x3400000C if a.magic_format else 0x34000000)+(1909760 if a.whole_image_preerase or a.magic_format else 1909600),guard_bytes=32,
+        frame=0x340000A0 if a.magic_format else 0x34000000,frame_bytes=1909600,width=1120,height=1364,
+        guard=(0x34000004 if a.magic_format else 0x34000000)+(1909760 if a.whole_image_preerase or a.magic_format else 1909600),guard_bytes=32,
         allocation_bytes=1909760 if a.whole_image_preerase or a.magic_format else 1909600,
-        original_guard=(0x34000010 if a.magic_format else 0x34000000)+1909600,whole_image_preerase=a.whole_image_preerase,
-        magic_format=a.magic_format,slot_buffer=0x3400000C if a.magic_format else None,
+        original_guard=(0x340000A0 if a.magic_format else 0x34000000)+1909600,whole_image_preerase=a.whole_image_preerase,
+        magic_format=a.magic_format,slot_buffer=0x34000004 if a.magic_format else None,
+        magic_layout_version=2 if a.magic_format else None,
+        image_offset=156 if a.magic_format else 0,
+        metadata_offset=4 if a.magic_format else None,metadata_bytes=152 if a.magic_format else 0,
+        end_guard_word_bias=1 if a.magic_format else 0,
         magic_slots=symbol('raw_magic_slots',a.magic_format),magic_slots_bytes=576,
         magic_proof=symbol('raw_magic_proof',a.magic_format),magic_proof_words=8,
         sd_scr=symbol('raw_scr',a.magic_format),sd_scr_bytes=16,

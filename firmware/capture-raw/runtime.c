@@ -579,10 +579,10 @@ int raw_storage_shutdown_ready(void)
 {
     return
 #if RAW_MAGIC_FORMAT
-        raw_magic_proof[0]==0x524D4731U && raw_magic_proof[1]==3U &&
+        raw_magic_proof[0]==0x524D4732U && raw_magic_proof[1]==3U &&
         !raw_magic_proof[2] && !raw_magic_proof[3] &&
         raw_magic_proof[4]==MAGIC_SLOTS_START_MAGIC && raw_magic_proof[5]==MAGIC_SLOTS_END_MAGIC &&
-        raw_magic_proof[6]==152U && raw_magic_proof[7]==3730U &&
+        raw_magic_proof[6]==MAGIC_SLOTS_METADATA_BYTES && raw_magic_proof[7]==3730U &&
         raw_scr.valid && raw_magic_slots.opened && !raw_magic_slots.active &&
         !raw_magic_slots.error && raw_magic_slots.written_sectors==3730U &&
         raw_card.written_sectors==3730U &&

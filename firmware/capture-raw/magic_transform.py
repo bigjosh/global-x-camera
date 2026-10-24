@@ -1,4 +1,4 @@
-"""Opt-in four-byte slot prefix and returning validation for active SD writes."""
+"""Front metadata slot prefix and returning validation for active SD writes."""
 import re
 
 def once(text, old, new):
@@ -9,13 +9,20 @@ def once(text, old, new):
 def transform(text):
     text=once(text,
         'uint8_t g_frame[RAW_WHOLE_IMAGE_PREERASE?RAW_SLOTS_PADDED_BYTES+32U:BYTES];',
-        'uint8_t raw_frame_allocation[12U+MAGIC_SLOTS_PADDED_BYTES+32U];\n'
-        '#define g_frame (raw_frame_allocation+16U)')
+        'uint8_t raw_frame_allocation[4U+MAGIC_SLOTS_PADDED_BYTES+32U];\n'
+        '#define g_frame (raw_frame_allocation+160U)')
     text=text.replace('0x34000000U+BYTES','RAW_FRAME_ADDRESS+BYTES')
     text=text.replace('0x34000000U+offset','RAW_FRAME_ADDRESS+offset')
     text=once(text,'#if RAW_WHOLE_IMAGE_PREERASE\n  volatile uint32_t *pad_guard=(volatile uint32_t *)(0x34000000U+RAW_SLOTS_PADDED_BYTES);',
         '#if RAW_MAGIC_FORMAT\n  *(volatile uint32_t *)RAW_SLOT_BUFFER_ADDRESS=MAGIC_SLOTS_START_MAGIC;\n'
+        '  volatile uint32_t *metadata=(volatile uint32_t *)(RAW_SLOT_BUFFER_ADDRESS+MAGIC_SLOTS_METADATA_OFFSET);\n'
+        '  for(unsigned i=0;i<MAGIC_SLOTS_METADATA_BYTES/4U;++i) metadata[i]=0;\n'
         '  volatile uint32_t *pad_guard=(volatile uint32_t *)(RAW_SLOT_BUFFER_ADDRESS+MAGIC_SLOTS_PADDED_BYTES);')
+    # GXRE occupies the final word of the slot. The original camera guard and
+    # persistent end guard overlap: sequence [0..7] then [1..8], not two
+    # independent sequences. Publishing GXRE replaces only sequence word 0.
+    text=once(text,'  for(unsigned i=0;i<8;++i) pad_guard[i]=0xA15A1000U+i;',
+        '  for(unsigned i=0;i<8;++i) pad_guard[i]=0xA15A1000U+i+1U;')
     # This helper has four guarded failure exits. It must return to the SD
     # owner rather than park with a live CMD25 if validation fails.
     start=text.index('static void fast_shutdown_data_off(void)')

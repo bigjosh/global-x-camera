@@ -14,15 +14,21 @@
 #define MAGIC_SLOTS_HEIGHT 1364U
 #define MAGIC_SLOTS_ROW_BYTES 1400U
 #define MAGIC_SLOTS_IMAGE_BYTES 1909600U
-#define MAGIC_SLOTS_PREFIX_BYTES 4U
+#define MAGIC_SLOTS_MARKER_BYTES 4U
+#define MAGIC_SLOTS_METADATA_OFFSET MAGIC_SLOTS_MARKER_BYTES
+#define MAGIC_SLOTS_METADATA_BYTES 152U
+#define MAGIC_SLOTS_PREFIX_BYTES (MAGIC_SLOTS_MARKER_BYTES+MAGIC_SLOTS_METADATA_BYTES)
 #define MAGIC_SLOTS_IMAGE_OFFSET MAGIC_SLOTS_PREFIX_BYTES
 #define MAGIC_SLOTS_TRAILER_OFFSET (MAGIC_SLOTS_IMAGE_OFFSET+MAGIC_SLOTS_IMAGE_BYTES)
 #define MAGIC_SLOTS_TRAILER_BYTES 4U
 #define MAGIC_SLOTS_OBJECT_BYTES (MAGIC_SLOTS_TRAILER_OFFSET+MAGIC_SLOTS_TRAILER_BYTES)
 #define MAGIC_SLOTS_PADDED_BYTES (MAGIC_SLOTS_STRIDE*SD_SECTOR_BYTES)
 #define MAGIC_SLOTS_PADDING_BYTES (MAGIC_SLOTS_PADDED_BYTES-MAGIC_SLOTS_OBJECT_BYTES)
-#define MAGIC_SLOTS_START_MAGIC 0x53525847U /* bytes GXRS */
+#define MAGIC_SLOTS_START_MAGIC 0x32525847U /* bytes GXR2: front metadata */
 #define MAGIC_SLOTS_END_MAGIC 0x45525847U   /* bytes GXRE */
+#define MAGIC_SLOTS_LEGACY_START_MAGIC 0x53525847U /* GXRS: tail padding */
+#define MAGIC_SLOTS_LEGACY_IMAGE_OFFSET 4U
+#define MAGIC_SLOTS_LEGACY_TRAILER_OFFSET (MAGIC_SLOTS_LEGACY_IMAGE_OFFSET+MAGIC_SLOTS_IMAGE_BYTES)
 #define MAGIC_SLOTS_NO_SLOT 0xFFFFFFFFU
 
 enum magic_slots_error {
@@ -57,10 +63,12 @@ int magic_slots_open(magic_slots_t *slots, sd_card_t *card, uint32_t erased_byte
  * including unknown/torn magic; read failure stops allocation, never frees it.
  * Search starts at zero and returns the first FREE slot or ERR_FULL. */
 int magic_slots_find_free(magic_slots_t *slots);
-/* The caller has prepared GXRS at buffer[0..3]; image DMA may still be active.
- * The writer must withhold the final sector until frame validation and GXRE /
- * 152-byte zero padding preparation have completed. Buffer is word-aligned;
- * camera image destination buffer+4 separately must be 16-byte aligned.
+/* The caller has prepared GXR2 at buffer[0..3] and all 152 metadata bytes at
+ * buffer[4..155]; image DMA may still be active. Metadata bytes are opaque and
+ * may be nonzero. They must be immutable before publication to the writer.
+ * Withhold the final sector until frame validation and GXRE preparation finish.
+ * Buffer is word-aligned; camera destination buffer+156 separately must be
+ * 16-byte aligned. No trailing padding remains in this format.
  * This call performs no separate sector write and no full-frame software scan.
  * A successful return records 3730 written sectors and releases slot ownership.
  * Failure keeps active=1 if a write was attempted, even when transport is idle.

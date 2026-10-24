@@ -5,13 +5,18 @@
 #define MAGIC_LATE
 #endif
 
+_Static_assert(RAW_FRAME_ADDRESS==RAW_SLOT_BUFFER_ADDRESS+MAGIC_SLOTS_IMAGE_OFFSET,
+               "front metadata camera address");
+_Static_assert(RAW_SLOT_BUFFER_ADDRESS+MAGIC_SLOTS_PADDED_BYTES==
+               RAW_FRAME_ADDRESS+MAGIC_SLOTS_IMAGE_BYTES+4U,"overlapping guard geometry");
+
 MAGIC_LATE static int magic_publish(void *context,uint32_t *available)
 {
     (void)context;
     raw_capture_poll();
     if(raw_capture_fault()) return 1;
     if(!raw_capture_frame_validated() || !raw_capture_sensor_stopped()) {
-        *available=(4U+raw_capture_available())&~511U;
+        *available=(MAGIC_SLOTS_IMAGE_OFFSET+raw_capture_available())&~511U;
         return 0;
     }
     if(raw_magic_proof[1]<2U) {
@@ -19,14 +24,13 @@ MAGIC_LATE static int magic_publish(void *context,uint32_t *available)
         volatile uint32_t *end=(volatile uint32_t *)(RAW_SLOT_BUFFER_ADDRESS+MAGIC_SLOTS_PADDED_BYTES);
         for(uint32_t i=0;i<8U;i++) {
             if(guard[i]!=(0xA15A1000U+i)) raw_magic_proof[2]|=1U<<i;
-            if(end[i]!=(0xA15A1000U+i)) raw_magic_proof[3]|=1U<<i;
+            if(end[i]!=(0xA15A1000U+i+1U)) raw_magic_proof[3]|=1U<<i;
         }
         if(raw_magic_proof[2] || raw_magic_proof[3]) return 2;
         /* Camera has drained and its original guard passed. Only now replace
-         * that guard with the trailing completion marker and final padding. */
+         * the first guard word with GXRE, the final word of the slot. The
+         * remaining overlapping guard words stay outside the stored object. */
         *(volatile uint32_t *)(RAW_SLOT_BUFFER_ADDRESS+MAGIC_SLOTS_TRAILER_OFFSET)=MAGIC_SLOTS_END_MAGIC;
-        volatile uint8_t *pad=(volatile uint8_t *)(RAW_SLOT_BUFFER_ADDRESS+MAGIC_SLOTS_OBJECT_BYTES);
-        for(uint32_t i=0;i<MAGIC_SLOTS_PADDING_BYTES;i++) pad[i]=0;
         __DSB(); raw_magic_proof[1]=2U;
     }
     *available=MAGIC_SLOTS_PADDED_BYTES;
@@ -61,9 +65,9 @@ MAGIC_LATE static void raw_magic_execute(void)
     SD_OPERATION(r,magic_slots_find_free(&raw_magic_slots));
     if(r) complete_storage(0x320U|(uint32_t)r);
     P[RP_SCAN_DONE]=DWT->CYCCNT;
-    raw_magic_proof[0]=0x524D4731U;raw_magic_proof[1]=1U;
+    raw_magic_proof[0]=0x524D4732U;raw_magic_proof[1]=1U;
     raw_magic_proof[4]=MAGIC_SLOTS_START_MAGIC;raw_magic_proof[5]=MAGIC_SLOTS_END_MAGIC;
-    raw_magic_proof[6]=MAGIC_SLOTS_PADDING_BYTES;raw_magic_proof[7]=MAGIC_SLOTS_STRIDE;
+    raw_magic_proof[6]=MAGIC_SLOTS_METADATA_BYTES;raw_magic_proof[7]=MAGIC_SLOTS_STRIDE;
     raw_stream.publish=magic_publish;raw_stream.context=0;
     /* Wait only for the first safely published complete sector, not FRAME.
      * Exposure duration can exceed card initialization by a large margin. */
@@ -84,7 +88,7 @@ MAGIC_LATE static void raw_magic_execute(void)
     }
     volatile uint32_t *guard=(volatile uint32_t *)(RAW_SLOT_BUFFER_ADDRESS+MAGIC_SLOTS_PADDED_BYTES);
     for(uint32_t i=0;i<8U;i++)
-        if(guard[i]!=(0xA15A1000U+i)) raw_magic_proof[3]|=1U<<i;
+        if(guard[i]!=(0xA15A1000U+i+1U)) raw_magic_proof[3]|=1U<<i;
     if(raw_magic_proof[3] || raw_capture_fault()) complete_storage(0x506U);
     capture_active=0;raw_magic_proof[1]=3U;__DSB();
     P[RP_COMMIT_DONE]=DWT->CYCCNT;P[RP_STAGE]=8U;

@@ -6,9 +6,108 @@ the existing UART recovery mechanism. It uses the container in
 [raw-slots](../raw-slots/README.md); there is no FAT filesystem, image conversion,
 compression or full-frame CPU checksum in the normal save path.
 
-## Current prototype: v17d magic slots
+## Selected layout: v18 front metadata slots
 
-The selected prototype is **v17d capture → magic RAW slot → Standby**, using
+The selected format moves the former 152 trailing padding bytes immediately
+after the leading magic. It keeps the same **3730 sectors per image** and one
+announced CMD25. The user prefers this simple fixed-slot format for its expected
+mapping to future NAND storage, independently of the current SD timing result.
+
+**V18 capture → front-metadata RAW slot → Standby is installed.** Its complete
+64 KiB NOR sector readback matched
+`174424c6792f96c72e336fc68e442474e9da665718552d3239a772d59ba73e2e`;
+the following 4 KiB remained unchanged. Its exact recovery prefix is
+`9401bed4076d6e9e4d2e4f9236661faf7b8f0e051cb332ea4dcbba09da336eba`.
+
+| Slot byte offset | Contents | Bytes |
+| ---: | --- | ---: |
+| 0 | Leading `GXR2` magic | 4 |
+| 4 | Reserved photo metadata | 152 |
+| 156 | Unchanged 1120 × 1364 packed RAW10 image | 1,909,600 |
+| 1,909,756 | Trailing `GXRE` completion magic | 4 |
+| | Total | 1,909,760 |
+
+The first sector therefore contains occupancy, all 152 metadata bytes and the
+first 356 image bytes. A directory listing can read just this sector to obtain
+occupancy and metadata. Completion remains unknown until the last sector is
+read; a leading magic is not a successful-save indication. The metadata region
+is opaque and explicitly zeroed before acquisition for now. Timestamp, date,
+orientation and other field schemas remain deferred; zeros are not a valid
+capture date.
+
+`GXR2` identifies the new image offset. The host utility also recognizes the
+previous `GXRS` format, whose image begins at offset 4. Both formats have the
+same stride and may coexist on the card: allocation skips every non-erased
+first word, including both markers and unknown values. This transition requires
+**no erase or rewrite of existing photos**. The
+[format and directory/extraction utility](../raw-slots/README.md#front-metadata-magic-slots-selected-october-24)
+document the read behavior.
+
+Camera DMA now writes at `0x340000A0`, 156 bytes after the word-aligned slot
+buffer at `0x34000004`. No image copy is introduced. Metadata is prepared before
+any prefix can be sent and remains unchanged through saving. Producer
+publication includes the 156-byte prefix, but still withholds the final sector
+until validated FRAME, successful sensor STOP and guard checks. The one-CMD25
+PIO/IDMA choices and conservative 64-line holdback remain unchanged.
+
+The trailer is now the final word of the slot. Consequently, the original
+32-byte camera guard and persistent 32-byte end guard overlap by 28 bytes.
+They use a consistent nine-word sequence: original guard words 0–7, end guard
+words 1–8. Publishing `GXRE` replaces only word 0; the end guard remains intact.
+Two independently initialized guards at these addresses would corrupt each
+other.
+
+**Qualification checkpoint:** The four generated capture/integration tests
+pass, including ARM-linked allocation geometry, nonzero retained-SRAM metadata
+initialization, arbitrary metadata preservation, final-sector withholding and
+corruption of every distinct overlapping guard word. All twenty format/host
+tests pass, including mixed-format extraction and one-sector directory reads.
+
+The new RAM builds also passed full SD readback against original camera RAM:
+
+| Path | Verified result |
+| --- | --- |
+| Deterministic capture, slot 7 | All 1,909,600 image bytes matched RAM; GXR2, 152 zero metadata bytes and final GXRE were valid |
+| Long-exposure capture, slot 8 | The same full comparison passed; progressive PIO started before FRAME, and twenty immediate LINE snapshots matched final RAM |
+| Existing GXRS photo, slot 0 | Full readback after the new captures remained byte-identical to its original deterministic image |
+| Installed flash capture, slot 9 | Normal cold boot, first-attempt warm UART recovery, exact early park and independent SBF=1 passed; the complete saved scene reconstructed and was visually inspected |
+
+Both deterministic payloads have SHA-256
+`5edaa1705f76b8434993271c86e71d5d83bce1c0ec7272caeec9564594279c1e`.
+The 230.597 ms exposure test submitted its first write **9.447 ms before FRAME**;
+SD was ready 213.383 ms before FRAME. The twenty LINE snapshots cover 10,240
+bytes and provide sampled memory-visibility evidence, not a hardware AXI-drain
+guarantee. This run did not exhaust its published prefix, so it does not qualify
+prolonged physical FIFO starvation. The card was not erased for the layout
+change.
+
+The slot-9 readback contains the expected markers and zero metadata, and
+independent PNG decoding agrees with the saved RAW bytes. The image shows the
+lit panel, cables and notebook. Original camera RAM was lost in Standby, so
+this cold test does not claim the original-RAM equality provided by slots 7–8.
+The UART recovery detector recorded nine good pulses and zero bad pulses;
+Standby was established independently without an intervening power-off.
+
+A separate directory test read exactly one sector each for slots 0, 7, 8 and 9
+before the cold capture: old slot 0 and new slots 7–8 were occupied, all new
+metadata bytes were available, and slot 9 was free. Completion correctly
+remained unchecked by those first-sector reads.
+
+See the [front-metadata evidence](evidence/2026-10-24-front-metadata/README.md)
+for exact builds, readbacks and final bench state. This is functional layout
+qualification, not a fresh time/energy comparison. The v17d measurements below
+remain historical results, not a v18 speed or energy baseline.
+
+The final extra normal cold boot left the target powered at the low-current
+plateau, **4.892723 V / 8.078679 mA**, at 19:02:04.963439 UTC. Its expected
+slot 10 and SBF were not reread. Events 1–9 decoded and the final pulse remained
+unidentified; this handoff is not another image/Standby-qualified sample.
+JS110 stopped cleanly and restored range 128, COM8 was closed and BREAK
+released, Logic 2 was left running, and no bench helper remained active.
+
+## Historical prototype and measurements: v17d magic slots
+
+The preceding prototype was **v17d capture → magic RAW slot → Standby**, using
 one announced multiblock write and the existing PE6 UART recovery guard. Its
 installed 64 KiB sector is
 `2ad7168302fe05b928b2b1aa62ef9732dfeab0d61e6092de2c086412d4485880`.
@@ -38,7 +137,7 @@ formats, and a full card preserves existing images. The
 [format and extraction utility](../raw-slots/README.md#magic-slot-format-selected-october-24)
 retain support for the older header-based format.
 
-The current capture/save sequence is:
+Its capture/save sequence was:
 
 1. Put `GXRS` at `0x3400000C`; arm camera DMA at the 16-byte-aligned
    `0x34000010`, immediately after it. Seed separate image-boundary and
@@ -124,8 +223,8 @@ The final extra normal cold boot returned to the low-current plateau at
 **4.892311 V / 8.075647 mA** at 17:56:22.939300 UTC. Its expected slot 6 and SBF
 were not reread, so it is not another qualified comparison sample. JS110 stopped
 cleanly and restored range 128, leaving target power on; COM8 was closed and
-BREAK released. The v17d image remains installed. The tables below retain the
-earlier firmware measurements as historical evidence.
+BREAK released. The v17d image remained installed at that checkpoint. The tables
+below retain the earlier firmware measurements as historical evidence.
 
 The two magic words are completion markers, **not a payload checksum or a
 power-loss guarantee**. Logical erase and ACMD23 do not expose or reserve

@@ -31,6 +31,11 @@ SECTOR_SHA="7fda9d00cc7ffb3fbb9e6aac6695cf18545754b5dbfce1520cf30b2da39c4e63"
 # command-line opt-in for unknown firmware. This table does not broaden the
 # bridge or READ-module identities, and check_park still verifies live code.
 APPROVED_RECOVERY={
+    # RAW v18 front metadata: separately reviewed exact recovery prefix/sector.
+    # No generic layout admission; current live code/status checks still apply.
+    '9401bed4076d6e9e4d2e4f9236661faf7b8f0e051cb332ea4dcbba09da336eba':
+        dict(name="raw-v18-front-metadata-standby",sector_sha256=
+             '174424c6792f96c72e336fc68e442474e9da665718552d3239a772d59ba73e2e'),
     # RAW v17c/v17d magic format, reviewed unchanged recovery code and literals.
     # v17d's erase-only fix leaves both complete flash sectors byte-identical.
     # Only the exact pairs are admitted; this is not hardware qualification.

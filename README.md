@@ -20,9 +20,44 @@ An STM32N6-based, credit-card-size monochrome global-shutter camera project. Thi
 
 ## Current position
 
-**Latest, October 24:** the prototype captures packed RAW10 directly into fixed SD slots, using native one-bit SDMMC2 at 25 MHz. Each slot contains `GXRS`, 1,909,600 image bytes, `GXRE` and 152 padding bytes, occupying 3730 sectors. There is no on-camera PNG conversion, compression, allocation table or separate header rewrite. The [RAW implementation](firmware/capture-raw/README.md), [slot format and host extraction utility](firmware/raw-slots/README.md), and [decision record](docs/decisions/raw-sd-slots-2026-10-24.md) describe the current path and its qualification. The card was explicitly erased and reports an erased byte of `0x00`; it is no longer a FAT32 drive. PNG reconstruction happens on the host. The prior [PNG/FAT32 firmware](firmware/capture-sd/README.md) remains archived for comparison.
+**Latest, October 24:** installed v18 captures packed RAW10 directly
+into fixed SD slots, with all reserved photo metadata in the first sector.
+Each 3730-sector slot contains `GXR2`, 152 metadata bytes, 1,909,600 image bytes
+and trailing `GXRE`. The metadata bytes are zero for now; date/time and other
+field schemas remain deferred. One sector read obtains occupancy and metadata;
+checking completion requires the last sector too. The host also recognizes the
+previous `GXRS` layout, so old and new photos may coexist without erasing the
+card. This simple layout is preferred for its future NAND mapping even without
+a current SD speed gain. See the [RAW implementation](firmware/capture-raw/README.md),
+[format and host utility](firmware/raw-slots/README.md), and
+[decision record](docs/decisions/raw-sd-slots-2026-10-24.md).
 
-Full SD readback matched deterministic packed patterns and an awake cold-captured scene byte for byte. Installed v17d announces all 3730 sectors with CMD55/ACMD23 and uses one CMD25, followed by card-ready checks, controller deinitialization, peripheral teardown and MCU Standby. Complete frames use hardware IDMA; frames still arriving use progressive PIO with hardware flow control. A 230.597 ms exposure test began writing 9.451 ms before FRAME; first safe publication is presently 89,600 bytes, not 512 bytes. The trailing marker is withheld until capture validation and sensor STOP. Warm UART recovery and the boot-freshness guard remain intact. Fresh three-run medians were **998.118 ms / 536.883 mJ**, versus **997.516 ms / 549.897 mJ** for header-format v16 on the same measured Nucleo branch. No speed gain is established; the observed 2.37% energy reduction is confounded by card state, the intervening erase and the small sample. All six comparison cycles passed recovery, independent Standby checks and complete image readback. CPU sleep during active DMA remains disabled. Markers are not a payload checksum; power-loss protection and isolated DUT/battery energy remain unqualified. See the [latest comparison](firmware/capture-raw/evidence/2026-10-24-magic-slots/README.md), [earlier preerase comparison](firmware/capture-raw/evidence/2026-10-24-preerase/README.md), and latest `AGENTS.md` checkpoint before operating the shared bench. Older checkpoints below describe their dated experiments, not the current programmed image or wiring.
+Normal and 230.597 ms long-exposure RAM tests each matched every SD image byte
+to original camera RAM. The long test began writing 9.447 ms before FRAME and
+checked twenty immediate LINE snapshots. Full readback of original GXRS slot 0
+remained byte-identical after the new captures. A normal installed cold boot
+saved slot 9, passed first-attempt warm UART recovery and an independent
+Standby check, and passed complete image readback and visual inspection.
+Its original RAM was lost in Standby; the two RAM tests supply that comparison.
+A directory test retrieved each slot's occupancy and metadata with one sector
+read, leaving completion unchecked. The layout change performed no erase.
+Native one-bit SDMMC2 at 25 MHz still sends CMD55/ACMD23 and one CMD25 per image;
+complete objects use IDMA and arriving objects use progressive PIO with hardware
+flow control. The final sector remains withheld until capture validation and
+sensor STOP. First safe publication remains 89,600 bytes. There is no on-camera
+PNG conversion, compression, allocation table or separate header rewrite;
+host extraction reconstructs PNG. CPU sleep during active DMA stays disabled.
+
+The historical v17d comparison measured medians of **998.118 ms / 536.883 mJ**,
+versus **997.516 ms / 549.897 mJ** for header-format v16. These are not v18
+measurements. No speed gain was established; the observed 2.37% energy reduction
+was confounded by card state, an intervening erase and three samples per build.
+The [front-metadata qualification](firmware/capture-raw/evidence/2026-10-24-front-metadata/README.md)
+is separate from that [earlier comparison](firmware/capture-raw/evidence/2026-10-24-magic-slots/README.md).
+Markers are not payload checksums; arbitrary power loss and isolated
+DUT/battery energy remain unqualified. Consult the latest `AGENTS.md` checkpoint
+before operating the shared bench. Older checkpoints below describe their dated
+experiments, not the current programmed image or wiring.
 
 **Startup optimization follow-up, October 17:** CH5 now measures main MCU VDDIO. The first marker remains about 23 ms from the measured 5 V rise; fixed JS110 range provided no useful improvement. The tiny original payload already contains no HAL or camera application. Experimental post-marker diagnostics are being tested; exact NOR-sector restoration is preserved. See the [measurements, hypotheses and current firmware state](firmware/boot-timing/optimization-results-2026-10-17.md).
 

@@ -8,7 +8,7 @@
 #define TEST_SECTORS (3U*MAGIC_SLOTS_STRIDE+13U)
 static uint8_t disk[TEST_SECTORS*512U];
 static uint8_t storage[MAGIC_SLOTS_PADDED_BYTES+32U] __attribute__((aligned(32)));
-static uint8_t *object=storage+12; /* camera at+4 is16B-aligned, SD at12mod16 */
+static uint8_t *object=storage+4; /* camera at+156 is16B-aligned, SD at4mod16 */
 static sd_card_t card;
 static magic_slots_t slots;
 static uint32_t reads, fail_read, writes, progresses, writer_mode;
@@ -44,7 +44,7 @@ static int writer(sd_card_t *c,uint32_t lba,const void *buffer,uint32_t count,vo
     }
     /* Model a streaming producer: footer is absent before writer entry. */
     if(writer_mode!=2) put32(object+MAGIC_SLOTS_TRAILER_OFFSET,MAGIC_SLOTS_END_MAGIC);
-    if(writer_mode==5) object[MAGIC_SLOTS_OBJECT_BYTES]=1;
+    if(writer_mode==5) object[0]^=1;
     memcpy(disk+(size_t)lba*512U,buffer,(size_t)count*512U);
     c->written_sectors+=count-(writer_mode==3?1U:0U);
     c->media_idle=writer_mode==4?0U:1U;return 0;
@@ -53,12 +53,15 @@ static void prepare(void)
 {
     memset(storage,0xcc,sizeof(storage));memset(object,0,MAGIC_SLOTS_PADDED_BYTES);
     put32(object,MAGIC_SLOTS_START_MAGIC);
+    for(uint32_t i=0;i<MAGIC_SLOTS_METADATA_BYTES;++i)
+        object[MAGIC_SLOTS_METADATA_OFFSET+i]=(uint8_t)(i^0x5a);
     for(uint32_t i=0;i<MAGIC_SLOTS_IMAGE_BYTES;i+=5) {
         uint32_t pixel=(i/5)*4;uint8_t low=0;
         for(uint32_t j=0;j<4;j++) {
-            uint32_t v=(pixel+j)&1023;object[4+i+j]=(uint8_t)(v>>2);low|=(v&3)<<(2*j);
+            uint32_t v=(pixel+j)&1023;
+            object[MAGIC_SLOTS_IMAGE_OFFSET+i+j]=(uint8_t)(v>>2);low|=(v&3)<<(2*j);
         }
-        object[4+i+4]=low;
+        object[MAGIC_SLOTS_IMAGE_OFFSET+i+4]=low;
     }
 }
 static void select(void) { assert(magic_slots_find_free(&slots)==0); }
@@ -66,8 +69,10 @@ static int save(void) { return magic_slots_write(&slots,object,writer,&writer_mo
 
 int main(int argc,char **argv)
 {
-    assert(MAGIC_SLOTS_OBJECT_BYTES==1909608U && MAGIC_SLOTS_PADDING_BYTES==152U);
-    assert(((uintptr_t)object&3U)==0 && (((uintptr_t)object+4U)&15U)==0);
+    assert(MAGIC_SLOTS_OBJECT_BYTES==1909760U && MAGIC_SLOTS_PADDING_BYTES==0U);
+    assert(MAGIC_SLOTS_METADATA_BYTES==152U && MAGIC_SLOTS_IMAGE_OFFSET==156U);
+    assert(MAGIC_SLOTS_TRAILER_OFFSET==MAGIC_SLOTS_PADDED_BYTES-4U);
+    assert(((uintptr_t)object&3U)==0 && (((uintptr_t)object+MAGIC_SLOTS_IMAGE_OFFSET)&15U)==0);
     fresh(0xff);
     assert(magic_slots_open(NULL,&card,255)==MAGIC_SLOTS_ERR_ARGUMENT);
     assert(magic_slots_open(&slots,&card,1)==MAGIC_SLOTS_ERR_ARGUMENT);
@@ -88,7 +93,7 @@ int main(int argc,char **argv)
         }
         /* Unknown marker is occupied even if its first byte is erased. */
         memset(slot(0),erased,512);slot(0)[1]=0x5a;
-        memcpy(slot(1),"bad!",4);reopen((uint8_t)erased);select();
+        put32(slot(1),MAGIC_SLOTS_LEGACY_START_MAGIC);reopen((uint8_t)erased);select();
         assert(slots.selected_slot==2 && reads==3);
         memcpy(slot(2),"used",4);reopen((uint8_t)erased);
         assert(magic_slots_find_free(&slots)==MAGIC_SLOTS_ERR_FULL && !slots.selected_valid);
@@ -117,8 +122,8 @@ int main(int argc,char **argv)
     assert(writes==1 && !slots.active && slots.written_sectors==3730 && slots.write_sectors==3730);
     assert(card.written_sectors==3730 && !memcmp(slot(0),object,MAGIC_SLOTS_PADDED_BYTES));
     for(size_t i=MAGIC_SLOTS_PADDED_BYTES;i<sizeof(disk);++i) assert(disk[i]==255);
-    for(unsigned i=0;i<12;++i) assert(storage[i]==0xcc);
-    for(unsigned i=12+MAGIC_SLOTS_PADDED_BYTES;i<sizeof(storage);++i) assert(storage[i]==0xcc);
+    for(unsigned i=0;i<4;++i) assert(storage[i]==0xcc);
+    for(unsigned i=4+MAGIC_SLOTS_PADDED_BYTES;i<sizeof(storage);++i) assert(storage[i]==0xcc);
     reopen(255);select();assert(slots.selected_slot==1);prepare();writer_mode=1;
     assert(save()==MAGIC_SLOTS_ERR_IO);reopen(255);select();assert(slots.selected_slot==2);
     assert(argc==2);FILE *out=fopen(argv[1],"wb");assert(out);
