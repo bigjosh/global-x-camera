@@ -30,6 +30,14 @@ VCP_FIELDS = (
     'reserved30 reserved31').split()
 # An unknown/self-consistent build is insufficient authorization to halt.
 APPROVED = {
+    # v60c awake / v61b Standby PD12 timing overlays, independently reviewed.
+    # Exact early guard/literals are unchanged; hardware timing is unqualified.
+    'e14913fa5c47f9d03e6680ca3ab8499afee0bf73f6654ef7d892c7303fa0ba42':
+        {'bytes': 5140, 'park': 0x3418078C, 'vcp': True,
+         'sector': '20444827100b1a33826c5b7e3362a396a0ce31f27f0c3db7fea12fb755320f7e'},
+    '73ec49d0f6b011ca615813886709d429e9dd8e5604af04b5d03447ef5ca7b51e':
+        {'bytes': 5140, 'park': 0x3418078C, 'vcp': True,
+         'sector': 'cc49159990ecd7aab9b0ab9c9055b3c230cc2ef639b1c295c511bea4a8be943f'},
     # v57/v58/v59 qualify nCS after GPIO takeover; all earlier guards retained.
     '67278231209a8eec1201d1b596cc862a41a288c237a3c2214ec3834c56995d23':
         {'bytes': 5140, 'park': 0x3418078C, 'vcp': True,

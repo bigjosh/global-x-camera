@@ -1,0 +1,112 @@
+{
+  "schema": 1,
+  "recording": "D:\\Github\\global-x-camera\\tmp\\bringup\\sd-baseline-20261023\\repeat-03\\raw",
+  "manifest_sha256": "1f2f92b570f66473ea82b30f2e3d9dd6469d083f9284292995da83c8c5c17f5e",
+  "sample_rate_hz": 2000000,
+  "decimate_factor": 1,
+  "starting_measurement_settings": {
+    "s/i/range/select": 128,
+    "s/v/range/select": 0,
+    "s/i/range/mode": 2,
+    "s/i/range/pre": 1,
+    "s/i/range/win": 2,
+    "s/i/range/win_sz": 10,
+    "s/i/range/post": 1,
+    "s/i/lsb_src": 2,
+    "s/v/lsb_src": 3
+  },
+  "range_commands": [
+    {
+      "state": "off",
+      "retained_range": 0,
+      "command_start": {
+        "utc": "2026-10-23T23:39:14.182654+00:00",
+        "monotonic_ns": 364163984000000
+      },
+      "command_end": {
+        "utc": "2026-10-23T23:39:14.192671+00:00",
+        "monotonic_ns": 364163984000000
+      },
+      "scope": "host diagnostics only; not physical sample boundaries"
+    },
+    {
+      "state": "auto",
+      "retained_range": 128,
+      "command_start": {
+        "utc": "2026-10-23T23:39:29.381884+00:00",
+        "monotonic_ns": 364179187000000
+      },
+      "command_end": {
+        "utc": "2026-10-23T23:39:29.408357+00:00",
+        "monotonic_ns": 364179203000000
+      },
+      "scope": "host diagnostics only; not physical sample boundaries"
+    }
+  ],
+  "uses_host_utc_alignment": false,
+  "unqualified_plateau_mode_enabled": true,
+  "cycles": [
+    {
+      "name": "repeat-03 (unverified plateau)",
+      "terminal_evidence": "D:\\Github\\global-x-camera\\tmp\\bringup\\sd-baseline-20261023\\repeat-03\\measurement-context.json",
+      "terminal_evidence_sha256": "deba2c352609af2af53fd7b8fb84075d4b68684e5dd71cad61a200d777b57267",
+      "terminal_state_qualified": false,
+      "completion_boundary_qualified": false,
+      "onset_to_plateau_energy_is_complete_cycle": false,
+      "terminal_state_qualification": "Unqualified current plateau only; evidence records context, not firmware completion, SBF or file verification.",
+      "window": {
+        "start_sample_id": 9624192,
+        "end_sample_id": 48126166
+      },
+      "boundaries": {
+        "current_onset_sample_id": 35868816,
+        "first_activity_above_off_threshold_sample_id": 35868816,
+        "integration_start_sample_id": 35668816,
+        "terminal_plateau_start_sample_id": 41238166,
+        "integration_end_sample_id": 43238166,
+        "sample_interval_s": 5e-07,
+        "plateau_boundary_bin_s": 0.001
+      },
+      "onset_to_plateau_s": 2.684675,
+      "integration_duration_s": 3.784675,
+      "pretrigger_energy_j": 0.0,
+      "onset_to_plateau_energy_j": 1.278877252662483,
+      "plateau_confirmation_energy_j": 0.040071532965799794,
+      "pretrigger_through_confirmed_plateau_energy_j": 1.3189487856282829,
+      "whole_window_energy_j": 1.4168782893505352,
+      "baseline_power_w": 0.0,
+      "conditional_baseline_subtracted_energy_j": 1.3189487856282829,
+      "peak_current_a": 7.4626054763793945,
+      "minimum_source_voltage_v": 1.936966061592102,
+      "plateau": {
+        "observed_s": 3.444,
+        "mean_current_a": 0.00819100540031884,
+        "mean_power_w": 0.0400699874239408,
+        "bin_mean_span_a": 5.2103774156420785e-05,
+        "peak_abs_current_a": 0.010372013784945011
+      },
+      "criteria": {
+        "bin_s": 0.001,
+        "off_baseline_s": 0.5,
+        "off_abs_max_a": 0.0001,
+        "onset_a": 0.12,
+        "pretrigger_s": 0.1,
+        "plateau_min_s": 1.0,
+        "plateau_mean_min_a": 0.007,
+        "plateau_mean_max_a": 0.01,
+        "plateau_peak_abs_max_a": 0.0105,
+        "plateau_mean_span_a": 0.002,
+        "current_valid_abs_max_a": 9.5
+      },
+      "limits": [
+        "Boundaries are measured-current thresholds, not physical target-rail edges.",
+        "Pretrigger includes measured startup charge only if activity begins inside its window.",
+        "Subthreshold charge before pretrigger is not proven absent; whole-window energy is also reported.",
+        "Plateau classification and firmware completion require the external qualification.",
+        "Explicit unqualified-plateau mode: energy/time describe the observed signature only; do not label them a verified complete capture/save cycle or Standby entry.",
+        "Baseline subtraction assumes stationary background; raw energy is the primary result.",
+        "No analog calibration, saturation detection, suppression interpolation, or CN8 bypass correction is inferred."
+      ]
+    }
+  ]
+}

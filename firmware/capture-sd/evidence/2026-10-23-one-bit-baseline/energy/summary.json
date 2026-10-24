@@ -1,0 +1,108 @@
+{
+  "schema": 1,
+  "recordings": 3,
+  "scope": "Observed current-onset to low-current plateau, unchanged-v59 one-bit SD cold-cycle signatures; no individual SBF or saved-file verification is inferred.",
+  "terminal_state_qualified": false,
+  "completion_boundary_qualified": false,
+  "input_boundary": "JS110-fed Nucleo branch; remaining CN8/debugger paths are outside this measurement",
+  "latest_verified_sector_sha256": "7fda9d00cc7ffb3fbb9e6aac6695cf18545754b5dbfce1520cf30b2da39c4e63",
+  "configuration": "One-bit SDMMC2 at 25 MHz / 3.3 V; selected v8b fast-none cached -Os; unchanged v59 flash",
+  "sample_rate_hz": 2000000,
+  "uses_host_utc_alignment": false,
+  "instrument_settings": {
+    "s/i/range/select": 128,
+    "s/v/range/select": 0,
+    "s/i/range/mode": 2,
+    "s/i/range/pre": 1,
+    "s/i/range/win": 2,
+    "s/i/range/win_sz": 10,
+    "s/i/range/post": 1,
+    "s/i/lsb_src": 2,
+    "s/v/lsb_src": 3
+  },
+  "cycles": [
+    {
+      "name": "repeat-01",
+      "onset_to_plateau_s": 2.7146239999999997,
+      "onset_to_plateau_energy_j": 1.2910827574464105,
+      "pretrigger_energy_j": 0.0,
+      "plateau_confirmation_energy_j": 0.04002454087482765,
+      "plateau_mean_current_ma": 8.180408450823196,
+      "plateau_mean_power_mw": 40.01779469746987,
+      "peak_current_a": 7.450227737426758,
+      "minimum_source_voltage_v": 1.8098535537719727,
+      "terminal_state_qualified": false,
+      "completion_boundary_qualified": false,
+      "raw_manifest_sha256": "984b364a3a5024d8e4282414d1e0200c1ec37441cedc23940af6175b40ee2ab6",
+      "analysis_sha256": "482f5f20368bc1387c09f52689062f8cf0a2204e6589e3883ed7a0743c882227",
+      "compact_file": "repeat-01-compact.json.gz",
+      "compact_sha256": "a8360111454344bf51ecc97851916aa96d53adf2991681f57c86af53abfee358"
+    },
+    {
+      "name": "repeat-02",
+      "onset_to_plateau_s": 2.7214544999999997,
+      "onset_to_plateau_energy_j": 1.2889484328311933,
+      "pretrigger_energy_j": 4.848885051906108e-07,
+      "plateau_confirmation_energy_j": 0.040053846067575734,
+      "plateau_mean_current_ma": 8.186540826039527,
+      "plateau_mean_power_mw": 40.04876081118717,
+      "peak_current_a": 7.456416606903076,
+      "minimum_source_voltage_v": 1.9346961975097656,
+      "terminal_state_qualified": false,
+      "completion_boundary_qualified": false,
+      "raw_manifest_sha256": "9029e1721eadbd86f9d734d7276ad81ce4602e7ad625279a64cc9f101253cea4",
+      "analysis_sha256": "60b1b24c3bc50a7c0dcda771f572088dd089a49b2b251511ed01d386f2541107",
+      "compact_file": "repeat-02-compact.json.gz",
+      "compact_sha256": "a024a0bc81170186ce487e7e451622428b63ecc7cdb41888bfaf9ff33d7901e6"
+    },
+    {
+      "name": "repeat-03",
+      "onset_to_plateau_s": 2.684675,
+      "onset_to_plateau_energy_j": 1.278877252662483,
+      "pretrigger_energy_j": 0.0,
+      "plateau_confirmation_energy_j": 0.040071532965799794,
+      "plateau_mean_current_ma": 8.19100540031884,
+      "plateau_mean_power_mw": 40.0699874239408,
+      "peak_current_a": 7.4626054763793945,
+      "minimum_source_voltage_v": 1.936966061592102,
+      "terminal_state_qualified": false,
+      "completion_boundary_qualified": false,
+      "raw_manifest_sha256": "1f2f92b570f66473ea82b30f2e3d9dd6469d083f9284292995da83c8c5c17f5e",
+      "analysis_sha256": "79bae67d83917ebbd54ffd57cc0bf3b0092ad5bbf625ae75e5af3082d75af9ba",
+      "compact_file": "repeat-03-compact.json.gz",
+      "compact_sha256": "45e680218583a3447e554a06cba22ae27f6c6d5b99fa72a8735318a7a7a6174d"
+    }
+  ],
+  "statistics": {
+    "onset_to_plateau_s": {
+      "median": 2.7146239999999997,
+      "minimum": 2.684675,
+      "maximum": 2.7214544999999997
+    },
+    "onset_to_plateau_energy_j": {
+      "median": 1.2889484328311933,
+      "minimum": 1.278877252662483,
+      "maximum": 1.2910827574464105
+    },
+    "plateau_mean_current_ma": {
+      "median": 8.186540826039527,
+      "minimum": 8.180408450823196,
+      "maximum": 8.19100540031884
+    },
+    "plateau_mean_power_mw": {
+      "median": 40.04876081118717,
+      "minimum": 40.01779469746987,
+      "maximum": 40.0699874239408
+    }
+  },
+  "limitations": [
+    "No per-cycle SBF, physical WFI timestamp or file-integrity claim is inferred from current alone.",
+    "The plateau boundary may include analog settling and uses 1 ms bins; onset uses a measured-current threshold, not power-good.",
+    "Energy excludes the separately reported 1 s plateau confirmation tail; pretrigger and whole-window values remain in each original analysis.",
+    "Autorange suppression configuration is preserved; finite delivered samples do not guarantee unsuppressed or perfectly calibrated analog peaks.",
+    "Scene differs from October 20; do not interpret the difference as a storage, wiring or power optimization.",
+    "Only three fresh recordings; median/min/max are descriptive, not population tail guarantees.",
+    "The earlier five-cycle raw recording failed coverage and is excluded, without filling its gap.",
+    "Compact bins preserve sample sums/extrema and checked integral terms, but not raw within-bin sample order."
+  ]
+}

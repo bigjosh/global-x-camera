@@ -16,6 +16,16 @@ the helper's normal settings-restoration path. Preserve the session log too.
 The files are local bench data; do not automatically add multi-GB raw captures
 to the public repository.
 
+`--raw-queue-chunks 1024` optionally increases the copied-packet queue from its
+unchanged default of 64. With the observed 65,394-sample float32 packets and
+three signals, 1024 packets hold about 256 MiB and 11 seconds of stream data;
+these are approximate packet-dependent values, not a memory or stall guarantee.
+The option is bounded to 1–1024 and changes neither the device settings nor
+the sample rate. It buffers temporary worker/disk stalls, not a sustained
+throughput deficit. Queue overflow still invalidates the entire recording.
+Record short individual cycles, finalize and inspect coverage before starting
+the next one; preserve failed recordings without filling their gaps.
+
 ## Measurement procedure
 
 1. First qualify the exact firmware's completed save, idle storage and terminal

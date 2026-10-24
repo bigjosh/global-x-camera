@@ -237,7 +237,9 @@ class Statistics:
 class StreamLog:
     """Log off the USB thread, distinguishing logging from signal coverage."""
 
-    def __init__(self, path, include_power=False):
+    def __init__(self, path, include_power=False, *, queue_chunks=64):
+        if type(queue_chunks) is not int or not 1 <= queue_chunks <= 1024:
+            raise ValueError("Stream queue size must be an integer between 1 and 1024")
         import numpy as np
         self.np = np
         self.include_power = include_power
@@ -246,7 +248,7 @@ class StreamLog:
             self.topics["s/p/!data"] = ("power", "W")
         path.parent.mkdir(parents=True, exist_ok=True)
         self.file = path.open("a", encoding="utf-8", buffering=1)
-        self.queue = queue.Queue(maxsize=64)
+        self.queue = queue.Queue(maxsize=queue_chunks)
         self.lock = threading.Lock()
         self.error = None
         self.dropped_chunks = 0
@@ -482,7 +484,8 @@ def run_session(args, driver_factory, driver_version):
             if raw_path is not None:
                 from js110_raw import make_raw_stream
                 stream = make_raw_stream(StreamLog, raw_path,
-                    max_bytes=getattr(args, "raw_max_mib", 4096) * 1024**2)
+                    max_bytes=getattr(args, "raw_max_mib", 4096) * 1024**2,
+                    queue_chunks=getattr(args, "raw_queue_chunks", 64))
             elif power_path is not None:
                 stream = StreamLog(power_path, include_power=True)
             elif stream_path is not None:
@@ -698,6 +701,10 @@ def main():
                          help="New directory for native-rate raw i/v/p samples and summary index.")
     parser.add_argument("--raw-max-mib", type=int, default=4096,
                         help="Raw sample byte budget in MiB (default 4096; about 179 s at 2 MHz).")
+    parser.add_argument("--raw-queue-chunks", type=int, default=64,
+                        help="Raw logging queue capacity, 1..1024 packets (default 64). "
+                             "1024 uses about 256 MiB / 11 s at the observed packet size; "
+                             "requires --cycle-raw-dir when nondefault.")
     parser.add_argument("--recovery-output", action="store_true",
                         help="Own OUT0 for recovery; release initially and restore on exit. "
                              "If shared I/O voltage starts off, other rear GPIO pins must be disconnected.")
@@ -713,6 +720,10 @@ def main():
         parser.error("--duration must be >0 and <=1800 seconds")
     if not 1 <= args.raw_max_mib <= 16384:
         parser.error("--raw-max-mib must be between 1 and 16384")
+    if not 1 <= args.raw_queue_chunks <= 1024:
+        parser.error("--raw-queue-chunks must be between 1 and 1024")
+    if args.raw_queue_chunks != 64 and args.cycle_raw_dir is None:
+        parser.error("Nondefault --raw-queue-chunks requires --cycle-raw-dir")
     paths = [args.control, args.response, args.log]
     if args.stream_log is not None:
         paths.append(args.stream_log)

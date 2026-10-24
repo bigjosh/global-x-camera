@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "scope": "Completed NOR maintenance incident; not SD/camera benchmark data. Root was the sole hardware owner. This archive was assembled and independently checked offline.",
+  "initial_operation": {
+    "sequence": 231002,
+    "before_sha256": "7fda9d00cc7ffb3fbb9e6aac6695cf18545754b5dbfce1520cf30b2da39c4e63",
+    "desired_sha256": "cc49159990ecd7aab9b0ab9c9055b3c230cc2ef639b1c295c511bea4a8be943f",
+    "helper_sha256": "2dd98e8facd32426b622cb4dc023f4efac5315a7f5d336379066bda43db06909"
+  },
+  "failure": {
+    "result": 16,
+    "meaning": "WEL_FAILURE: post-program WEL-clear check in write_finished()",
+    "failure_stage": 8,
+    "failure_stage_name": "ST_PROGRAM",
+    "failure_address": "0x4200",
+    "last_operation_before_check": "0x2B security-register read",
+    "cleanup_result": 0,
+    "flags": 47,
+    "decoded_flags": [
+      "controller idle",
+      "flash confirmed idle",
+      "ROM configuration restored",
+      "write attempted",
+      "DWT restored"
+    ],
+    "uncertain_flag": false,
+    "note": "Final status/security0 are cleanup results; they do not preserve the earlier WEL observation. Failure stays recorded rather than accepted as success."
+  },
+  "diagnosis": {
+    "fresh_info_sequence": 231003,
+    "fresh_info_result": 0,
+    "fresh_info_flags": 39,
+    "fresh_info_status": 0,
+    "fresh_info_security": 0,
+    "partial_sha256": "f2e96514b8fb1a0b7af1ab0c50229bae8e1007c873b4a4c932f13ef7dab87dbf",
+    "partial_crc32": 224917082,
+    "sectors0_to3_equal_desired": true,
+    "sector4_partial": true,
+    "page4200_matches_desired": true,
+    "page4200_non_ff_bytes": 252,
+    "first_difference_in_sector4": "0x4300",
+    "offset5000_onward_equals_previous": true,
+    "interpretation": "Readback proves the reported page bytes are correct; it does not prove why WEL was observed set. No timing, power or device-defect cause is established."
+  },
+  "repair": {
+    "sequence": 231006,
+    "explicit_current_source": "operations/partial-nor-read/nor.bin",
+    "expected_current_sha256": "f2e96514b8fb1a0b7af1ab0c50229bae8e1007c873b4a4c932f13ef7dab87dbf",
+    "expected_current_crc32": 224917082,
+    "result": 0,
+    "cleanup_result": 0,
+    "flags": 47,
+    "changed_erased_completed_mask": 24560,
+    "pages_programmed": 154,
+    "full_host_readback_equals_desired": true,
+    "independent_read_sequence": 231007,
+    "independent_read_sha256": "cc49159990ecd7aab9b0ab9c9055b3c230cc2ef639b1c295c511bea4a8be943f",
+    "following_guard_before_after_equal": true,
+    "following_guard_bytes": 4096,
+    "following_guard_sha256": "01cc465d3a7581d9d003b09e5db684eb7bec8e8512e12ce3565154c3aced816f",
+    "policy": "One explicitly authorized repair from freshly read actual partial contents. The same frozen helper and all CRC/idle/WEL/readback guards remained unchanged. No automatic retry or reset was used."
+  },
+  "limits": [
+    "The controller/helper completed and restored known idle configuration before diagnosis; no uncertain or active operation was treated as safe.",
+    "Parent bench owner reports no reset/power interruption during diagnosis/repair; archived CLI calls contain no reset or power command.",
+    "Success establishes exact programmed bytes and unchanged following guard, not the cause of the transient WEL observation or immunity to recurrence."
+  ]
+}

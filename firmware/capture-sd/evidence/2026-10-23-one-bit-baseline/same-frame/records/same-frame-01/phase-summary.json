@@ -1,0 +1,156 @@
+{
+  "schema": 1,
+  "marker_channel": 1,
+  "marker_pin": "PD12 / CN15.21 / Arduino D8",
+  "sequence": "storage",
+  "expected_event_ids": [
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
+  "nominal_step_s": 5e-07,
+  "tolerance_s": 1.5e-07,
+  "pulses": [
+    {
+      "start_s": 8.25676435,
+      "end_s": 8.25676688,
+      "width_s": 2.5300000014993884e-06,
+      "complete": true,
+      "index": 0,
+      "event_id": 5,
+      "event": "sd_init_complete",
+      "width_error_s": 3.000000149938864e-08
+    },
+    {
+      "start_s": 8.28361092,
+      "end_s": 8.28361365,
+      "width_s": 2.7300000002838942e-06,
+      "complete": true,
+      "index": 1,
+      "event_id": null,
+      "event": null,
+      "error": "unknown_pulse_width"
+    },
+    {
+      "start_s": 8.28475685,
+      "end_s": 8.28475992,
+      "width_s": 3.069999999993911e-06,
+      "complete": true,
+      "index": 2,
+      "event_id": 6,
+      "event": "mount_complete",
+      "width_error_s": 6.999999999391086e-08
+    },
+    {
+      "start_s": 9.89396983,
+      "end_s": 9.8939734,
+      "width_s": 3.570000000507889e-06,
+      "complete": true,
+      "index": 3,
+      "event_id": 7,
+      "event": "png_encode_complete",
+      "width_error_s": 7.000000050788918e-08
+    },
+    {
+      "start_s": 9.92513227,
+      "end_s": 9.92513633,
+      "width_s": 4.060000000194464e-06,
+      "complete": true,
+      "index": 4,
+      "event_id": 8,
+      "event": "file_commit_close_complete",
+      "width_error_s": 6.000000019446379e-08
+    },
+    {
+      "start_s": 10.37009427,
+      "end_s": 10.37009908,
+      "width_s": 4.8100000000772525e-06,
+      "complete": true,
+      "index": 5,
+      "event_id": null,
+      "event": null,
+      "error": "unknown_pulse_width"
+    }
+  ],
+  "cycles": [],
+  "errors": [
+    {
+      "pulse_index": 1,
+      "error": "unknown_pulse_width"
+    },
+    {
+      "pulse_index": 5,
+      "error": "unknown_pulse_width"
+    },
+    {
+      "pulse_index": 0,
+      "error": "event_before_sequence_start"
+    },
+    {
+      "pulse_index": 2,
+      "error": "event_before_sequence_start"
+    },
+    {
+      "pulse_index": 3,
+      "error": "event_before_sequence_start"
+    },
+    {
+      "pulse_index": 4,
+      "error": "event_before_sequence_start"
+    }
+  ],
+  "decode_passed": false,
+  "actual_standby_verified": false,
+  "image_integrity_verified": false,
+  "limitations": [
+    "Event timestamps are observed GPIO rising edges after their software checkpoints.",
+    "First STROBE/frame IRQ observations include interrupt latency.",
+    "Event 9 precedes final COMPLETE/terminal report publication and return to the receiver.",
+    "Event 10 is pre-WFI intent or awake diagnostic completion, not proof of Standby.",
+    "Power channel is a digital threshold crossing, not an analog power-good guarantee.",
+    "Missing edges are not invented for channels initially HIGH.",
+    "Host UTC/monotonic times do not synchronize independent instruments.",
+    "Pulse calls and code-layout changes can perturb the measured firmware."
+  ],
+  "input_files": {
+    "0": {
+      "path": "D:\\Github\\global-x-camera\\tmp\\bringup\\sd-baseline-20261023\\same-frame-01\\phase\\binary\\digital_0.bin",
+      "bytes": 44,
+      "sha256": "5e49571e74066e1f85dd0395d065c3e9cd749e70017e6fc38f3340eb32203965",
+      "format_version": 0,
+      "initial_state": 1,
+      "begin_s": 0.0,
+      "end_s": 12.73430016
+    },
+    "1": {
+      "path": "D:\\Github\\global-x-camera\\tmp\\bringup\\sd-baseline-20261023\\same-frame-01\\phase\\binary\\digital_1.bin",
+      "bytes": 140,
+      "sha256": "56e2591ee49fe53ef8a6eb1a3e18dbf6aa95c69d67b98d6caeea9537db36fd39",
+      "format_version": 0,
+      "initial_state": 0,
+      "begin_s": 0.0,
+      "end_s": 12.73430016
+    },
+    "4": {
+      "path": "D:\\Github\\global-x-camera\\tmp\\bringup\\sd-baseline-20261023\\same-frame-01\\phase\\binary\\digital_4.bin",
+      "bytes": 44,
+      "sha256": "5e49571e74066e1f85dd0395d065c3e9cd749e70017e6fc38f3340eb32203965",
+      "format_version": 0,
+      "initial_state": 1,
+      "begin_s": 0.0,
+      "end_s": 12.73430016
+    },
+    "6": {
+      "path": "D:\\Github\\global-x-camera\\tmp\\bringup\\sd-baseline-20261023\\same-frame-01\\phase\\binary\\digital_6.bin",
+      "bytes": 44,
+      "sha256": "5e49571e74066e1f85dd0395d065c3e9cd749e70017e6fc38f3340eb32203965",
+      "format_version": 0,
+      "initial_state": 1,
+      "begin_s": 0.0,
+      "end_s": 12.73430016
+    }
+  }
+}

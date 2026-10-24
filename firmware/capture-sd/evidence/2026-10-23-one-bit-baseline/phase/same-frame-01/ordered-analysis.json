@@ -1,0 +1,217 @@
+{
+  "ordered_structure_valid": true,
+  "width_qualification": false,
+  "event_assignment": "inferred from source call order; not decoded from pulse widths",
+  "marker_initial_state": 0,
+  "marker_final_state": 0,
+  "transition_count": 12,
+  "complete_pulse_count": 6,
+  "observed_reset_release_s": null,
+  "observed_power_threshold_s": null,
+  "all_marker_edges_s": [
+    8.25676435,
+    8.25676688,
+    8.28361092,
+    8.28361365,
+    8.28475685,
+    8.28475992,
+    9.89396983,
+    9.8939734,
+    9.92513227,
+    9.92513633,
+    10.37009427,
+    10.37009908
+  ],
+  "events": [
+    {
+      "ordinal": 1,
+      "inferred_event_id": 4,
+      "inferred_checkpoint": "SAVE module entry",
+      "assignment_basis": "inferred from source call order",
+      "rising_edge_s": 8.25676435,
+      "falling_edge_s": 8.25676688,
+      "width_us": 2.5300000014993884,
+      "nominal_width_us": 2.0,
+      "width_error_us": 0.5300000014993884,
+      "from_save_entry_ms": 0.0,
+      "from_previous_marker_ms": null
+    },
+    {
+      "ordinal": 2,
+      "inferred_event_id": 5,
+      "inferred_checkpoint": "SD initialization complete",
+      "assignment_basis": "inferred from source call order",
+      "rising_edge_s": 8.28361092,
+      "falling_edge_s": 8.28361365,
+      "width_us": 2.7300000002838942,
+      "nominal_width_us": 2.5,
+      "width_error_us": 0.23000000028389422,
+      "from_save_entry_ms": 26.846570000000014,
+      "from_previous_marker_ms": 26.846570000000014
+    },
+    {
+      "ordinal": 3,
+      "inferred_event_id": 6,
+      "inferred_checkpoint": "FAT32 mount complete",
+      "assignment_basis": "inferred from source call order",
+      "rising_edge_s": 8.28475685,
+      "falling_edge_s": 8.28475992,
+      "width_us": 3.069999999993911,
+      "nominal_width_us": 3.0,
+      "width_error_us": 0.06999999999391093,
+      "from_save_entry_ms": 27.99250000000164,
+      "from_previous_marker_ms": 1.145930000001627
+    },
+    {
+      "ordinal": 4,
+      "inferred_event_id": 7,
+      "inferred_checkpoint": "PNG encode complete",
+      "assignment_basis": "inferred from source call order",
+      "rising_edge_s": 9.89396983,
+      "falling_edge_s": 9.8939734,
+      "width_us": 3.570000000507889,
+      "nominal_width_us": 3.5,
+      "width_error_us": 0.07000000050788913,
+      "from_save_entry_ms": 1637.2054800000005,
+      "from_previous_marker_ms": 1609.2129799999989
+    },
+    {
+      "ordinal": 5,
+      "inferred_event_id": 8,
+      "inferred_checkpoint": "File close/rename/card-ready complete",
+      "assignment_basis": "inferred from source call order",
+      "rising_edge_s": 9.92513227,
+      "falling_edge_s": 9.92513633,
+      "width_us": 4.060000000194464,
+      "nominal_width_us": 4.0,
+      "width_error_us": 0.06000000019446361,
+      "from_save_entry_ms": 1668.3679200000015,
+      "from_previous_marker_ms": 31.162440000001013
+    },
+    {
+      "ordinal": 6,
+      "inferred_event_id": 9,
+      "inferred_checkpoint": "Cache cleanup, uncached frame validation and snapshots complete",
+      "assignment_basis": "inferred from source call order",
+      "rising_edge_s": 10.37009427,
+      "falling_edge_s": 10.37009908,
+      "width_us": 4.8100000000772525,
+      "nominal_width_us": 4.5,
+      "width_error_us": 0.3100000000772525,
+      "from_save_entry_ms": 2113.32992,
+      "from_previous_marker_ms": 444.9619999999985
+    }
+  ],
+  "intervals": [
+    {
+      "from_inferred_event": 4,
+      "to_inferred_event": 5,
+      "interval_ms": 26.846570000000014,
+      "assignment_basis": "inferred from source call order"
+    },
+    {
+      "from_inferred_event": 5,
+      "to_inferred_event": 6,
+      "interval_ms": 1.145930000001627,
+      "assignment_basis": "inferred from source call order"
+    },
+    {
+      "from_inferred_event": 6,
+      "to_inferred_event": 7,
+      "interval_ms": 1609.2129799999989,
+      "assignment_basis": "inferred from source call order"
+    },
+    {
+      "from_inferred_event": 7,
+      "to_inferred_event": 8,
+      "interval_ms": 31.162440000001013,
+      "assignment_basis": "inferred from source call order"
+    },
+    {
+      "from_inferred_event": 8,
+      "to_inferred_event": 9,
+      "interval_ms": 444.9619999999985,
+      "assignment_basis": "inferred from source call order"
+    }
+  ],
+  "schema": 1,
+  "sequence": "storage",
+  "firmware_sector_sha256": "20444827100b1a33826c5b7e3362a396a0ce31f27f0c3db7fea12fb755320f7e",
+  "module_sha256": "51c067de2859588fc87cf1249fdff4186b17a4e0ab85585c72fc9b5dc94379f5",
+  "frame_sha256": "0e5f5620a9596609ebce747f6756020dd3cff9159436d166da55e425af7a0f6c",
+  "source_review": {
+    "reviewed_calls": true,
+    "receiver_ids": [
+      1,
+      2,
+      3
+    ],
+    "save_ids": [
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "awake_ids": [
+      10
+    ],
+    "note": "Source hash identity is frozen; labels remain inferred."
+  },
+  "original_width_decode_passed": false,
+  "image_integrity_verified": false,
+  "successful_save_report_verified": true,
+  "saved_name": "IMG00062.PNG",
+  "png_bytes": 1458185,
+  "target_complete_ms": 2102.0614975,
+  "target_total_ms": 1720.87145,
+  "limitations": [
+    "Every phase label is inferred from source call order; pulse-width qualification remains false.",
+    "No missing pulse is synthesized, and the original strict decoder result remains unchanged.",
+    "Event 7 precedes any buffered-tail flush; event 9 precedes COMPLETE/terminal publication.",
+    "Cold event 10 is an awake checkpoint, not Standby or WFI.",
+    "Interrupt latency, marker execution and extra code loading perturb the path.",
+    "A matching completed SAVE report does not itself verify stored PNG bytes; see separate readback evidence.",
+    "Host monotonic brackets bind a storage operation to its recording window, not cross-instrument sample clocks.",
+    "No Joulescope/Saleae synchronization or phase-specific energy is inferred."
+  ],
+  "input_files": {
+    "0": {
+      "bytes": 44,
+      "sha256": "5e49571e74066e1f85dd0395d065c3e9cd749e70017e6fc38f3340eb32203965",
+      "format_version": 0,
+      "initial_state": 1,
+      "begin_s": 0.0,
+      "end_s": 12.73430016,
+      "path": "binary/digital_0.bin"
+    },
+    "1": {
+      "bytes": 140,
+      "sha256": "56e2591ee49fe53ef8a6eb1a3e18dbf6aa95c69d67b98d6caeea9537db36fd39",
+      "format_version": 0,
+      "initial_state": 0,
+      "begin_s": 0.0,
+      "end_s": 12.73430016,
+      "path": "binary/digital_1.bin"
+    },
+    "4": {
+      "bytes": 44,
+      "sha256": "5e49571e74066e1f85dd0395d065c3e9cd749e70017e6fc38f3340eb32203965",
+      "format_version": 0,
+      "initial_state": 1,
+      "begin_s": 0.0,
+      "end_s": 12.73430016,
+      "path": "binary/digital_4.bin"
+    },
+    "6": {
+      "bytes": 44,
+      "sha256": "5e49571e74066e1f85dd0395d065c3e9cd749e70017e6fc38f3340eb32203965",
+      "format_version": 0,
+      "initial_state": 1,
+      "begin_s": 0.0,
+      "end_s": 12.73430016,
+      "path": "binary/digital_6.bin"
+    }
+  }
+}

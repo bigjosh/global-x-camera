@@ -1,0 +1,47 @@
+{
+  "schema": 1,
+  "scope": "Failed recording diagnostic only; no energy estimates and no repaired archive",
+  "manifest_sha256": "bf13e88a1b018c249f5b7362b197b2d6dd8d347fa5efd12ad5885b8e912ccadb",
+  "recording_finalized": false,
+  "dropped_chunks": 513,
+  "gaps": [
+    {
+      "signal": "current",
+      "start_sample_id": 313760412,
+      "end_sample_id": 324942786,
+      "missing_native_samples": 11182374,
+      "seconds": 5.591187,
+      "before_chunk_sample_utc": "2026-10-23T23:17:12.767783+00:00",
+      "after_chunk_sample_utc": "2026-10-23T23:17:18.392586+00:00",
+      "before_mean": 0.0,
+      "after_mean": 0.0
+    },
+    {
+      "signal": "voltage",
+      "start_sample_id": 313768476,
+      "end_sample_id": 324950850,
+      "missing_native_samples": 11182374,
+      "seconds": 5.591187,
+      "before_chunk_sample_utc": "2026-10-23T23:17:12.771815+00:00",
+      "after_chunk_sample_utc": "2026-10-23T23:17:18.396618+00:00",
+      "before_mean": 4.89299429045229,
+      "after_mean": 4.892947675853883
+    },
+    {
+      "signal": "power",
+      "start_sample_id": 313768476,
+      "end_sample_id": 324950850,
+      "missing_native_samples": 11182374,
+      "seconds": 5.591187,
+      "before_chunk_sample_utc": "2026-10-23T23:17:12.771815+00:00",
+      "after_chunk_sample_utc": "2026-10-23T23:17:18.396618+00:00",
+      "before_mean": 0.0,
+      "after_mean": 0.0
+    }
+  ],
+  "strict_analyzer_result": "ValueError: Raw recording is not finalized with complete coverage",
+  "gap_placement": "All three signal gaps fall during the commanded off interval before cycle 5; no observed active capture/save interval overlaps, but global coverage fails.",
+  "mechanism": "513 queue.Full losses; 171 packets per signal. The 64-packet worker queue holds about 0.70 s at 3 x 2 MHz / 65394 samples per packet.",
+  "cause": "A worker/disk/scheduling stall is consistent; no per-write latency was logged, so exact cause is unproven.",
+  "recommendation": "Repeat short individual recordings, finalize and require zero drops/contiguous coverage before the next run; preserve original invalid archive without filling gaps."
+}

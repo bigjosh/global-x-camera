@@ -1,0 +1,65 @@
+{
+  "schema": 1,
+  "frame_sha256": "0e5f5620a9596609ebce747f6756020dd3cff9159436d166da55e425af7a0f6c",
+  "stream_log_sha256": "5a660f9ef4de5b185a8a10cc90ded7cf226d03dfca324e53b7d1ff9ba1a51f53",
+  "recording_finalized": true,
+  "runs": [
+    {
+      "result": "D:\\Github\\global-x-camera\\tmp\\bringup\\sd-baseline-20261023\\same-frame-02\\save\\result.json",
+      "result_sha256": "77447290294860e123d3477084331db9c41d26977f9643c065720955be6f7adb",
+      "module_sha256": "51c067de2859588fc87cf1249fdff4186b17a4e0ab85585c72fc9b5dc94379f5",
+      "mode": "fast-none",
+      "png_bytes": 1458185,
+      "cpu_hz": 400000000,
+      "sd_hz": 25000000,
+      "cache_evidence": {
+        "cache_enabled": 1,
+        "initial_mpu_ctrl": 4,
+        "final_ccr": 513
+      },
+      "card_identity": {
+        "cid0": 83,
+        "cid1": 1146433824,
+        "cid2": 269787418,
+        "cid3": 1979815748,
+        "sector_count": 122507264
+      },
+      "fixed_duration_analysis": {
+        "schema": 1,
+        "status": "all feasible fixed-duration placements bounded",
+        "fixed_duration_s": 2.1041292375,
+        "feasible_start_sample_ids": [
+          47233252.366760254,
+          49479753.680273436
+        ],
+        "containing_sample_ids": [
+          47233252.366760254,
+          53688012.15527344
+        ],
+        "energy_bounds_j": [
+          0.9461203645611034,
+          1.021940713468042
+        ],
+        "mean_power_bounds_w": [
+          0.44964935979180953,
+          0.48568343391409297
+        ],
+        "critical_positions_evaluated": 207,
+        "power_chunks_considered": 99,
+        "numeric_slack_j": 1e-09,
+        "driver_utc_mapping_max_residual_s": 0.005641937255859375,
+        "physical_alignment_verified": false,
+        "scope_notes": [
+          "All continuous starts within the enlarged host bracket are included.",
+          "Fixed duration assumes the reported CPU clock is accurate and continuous.",
+          "COMPLETE excludes entry setup and final return; its firmware-defined scope remains unchanged.",
+          "No sample ordering inside a chunk was retained; extrema and sums bound partial overlaps.",
+          "No baseline subtraction, waveform alignment or preferred placement is used.",
+          "Bounds exclude calibration, clipping and power paths bypassing the Joulescope."
+        ]
+      }
+    }
+  ],
+  "scope": "Secondary containment analysis; no electrical synchronization established",
+  "configuration_policy": "Rows retain module/card/cache/clock identity; distinct builds are not pooled"
+}

@@ -1,5 +1,16 @@
 # Capture → PNG16 → FAT32 prototype
 
+**October 23 baseline completed; original v59 restored.** Three unchanged-v59
+cold power signatures measured median **2.714624 s / 1.288948 J** on the
+JS110-fed board branch. Temporary instrumented firmware measured repeated
+same-frame saves at **2.099228–2.104129 s**, with median SD driver write
+throughput **2.64996 MB/s**. IMG61–64 passed full PNG readback and every pixel
+matched the retained RAW frame. Original v59 was independently read back after
+restoration, UART recovery passed, and the final cold boot returned to about
+8.07 mA. That final image and SBF were not reread. See the
+[baseline report, phase inference limits and final bench state](evidence/2026-10-23-one-bit-baseline/README.md).
+The SD wiring remains native one-bit; four-bit operation has not been tested.
+
 **October 20: autonomous cold capture → PNG16 → SD → Standby is installed.**
 The installed **v59 Standby image** has verified first-sector SHA-256
 `7fda9d00cc7ffb3fbb9e6aac6695cf18545754b5dbfce1520cf30b2da39c4e63`.

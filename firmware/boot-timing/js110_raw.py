@@ -18,9 +18,11 @@ MEASUREMENT_TOPICS = (
 )
 
 
-def make_raw_stream(base_class, directory, max_bytes=4 * 1024**3):
+def make_raw_stream(base_class, directory, max_bytes=4 * 1024**3, *, queue_chunks=64):
     if type(max_bytes) is not int or max_bytes <= 0:
         raise ValueError("Raw byte budget must be a positive integer")
+    if type(queue_chunks) is not int or not 1 <= queue_chunks <= 1024:
+        raise ValueError("Raw queue size must be an integer between 1 and 1024")
 
     class RawStream(base_class):
         def __init__(self):
@@ -38,7 +40,8 @@ def make_raw_stream(base_class, directory, max_bytes=4 * 1024**3):
                     self.raw_files[signal] = (self.raw_root / (signal + ".f32")).open("xb")
                     self.raw_hashes[signal] = hashlib.sha256()
                     self.raw_bytes[signal] = 0
-                super().__init__(self.raw_root / "chunks.jsonl", include_power=True)
+                super().__init__(self.raw_root / "chunks.jsonl", include_power=True,
+                                 queue_chunks=queue_chunks)
             except BaseException:
                 for output in self.raw_files.values():
                     output.close()
@@ -59,6 +62,7 @@ def make_raw_stream(base_class, directory, max_bytes=4 * 1024**3):
         def _write(self, record):
             if record.get("event") == "stream_start":
                 record.update(raw_schema=1, raw_dtype="<f4", raw_max_bytes=max_bytes,
+                              raw_queue_chunks=queue_chunks,
                               aggregation="Exact float32 samples plus per-chunk summaries",
                               raw_signal_files={s: s + ".f32" for s in self.raw_files})
             return super()._write(record)
@@ -103,6 +107,7 @@ def make_raw_stream(base_class, directory, max_bytes=4 * 1024**3):
                 manifest = {
                     "schema": 1,
                     "dtype": "<f4",
+                    "raw_queue_chunks": queue_chunks,
                     "sample_ids": "native ticks, shared current/voltage/power timeline",
                     "finalized": result["complete"] and result["coverage"]["passed"],
                     "status": result,

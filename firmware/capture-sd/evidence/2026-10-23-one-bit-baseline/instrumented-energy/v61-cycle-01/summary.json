@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "recording": "v61-cycle-01",
+  "firmware_sector_sha256": "cc49159990ecd7aab9b0ab9c9055b3c230cc2ef639b1c295c511bea4a8be943f",
+  "configuration": "Instrumented PD12 build; native one-bit SDMMC2, not pooled with unchanged-v59 baseline",
+  "input_boundary": "JS110-fed branch; remaining CN8/debugger bypass paths are outside this measurement",
+  "terminal_state_qualified": false,
+  "completion_boundary_qualified": false,
+  "image_integrity_verified": false,
+  "phase_width_qualified": false,
+  "sample_rate_hz": 2000000,
+  "uses_host_utc_alignment": false,
+  "onset_to_plateau_s": 2.734223,
+  "onset_to_plateau_energy_j": 1.3025425149725065,
+  "pretrigger_energy_j": 0.0,
+  "plateau_confirmation_energy_j": 0.04000462343541905,
+  "plateau_mean_current_ma": 8.176738591725593,
+  "plateau_mean_power_mw": 40.00122266563839,
+  "peak_current_a": 7.437849998474121,
+  "minimum_source_voltage_v": 1.8075836896896362,
+  "raw_manifest_sha256": "62a4e0984a5a948d54fbc30edf418089851a82a89a869d22824ec50664da983c",
+  "analysis_sha256": "1aa7b6dfdc2aff67095e88ae0150b4a43d4460639782700cd4227036bdd75a61",
+  "compact_sha256": "7eebaf98f64d4c9345dea3a2baa9fb8869ea1115ce6deddea8de34bafb05ce2d",
+  "limitations": [
+    "Only one instrumented trial; do not attribute differences from unchanged v59 to marker overhead.",
+    "Current onset is not physical power-good; the 1 ms selected plateau boundary includes possible analog settling.",
+    "Energy excludes the separately reported 1 s confirmation tail; no current-level boundary is asserted to be exact WFI.",
+    "Finite native delivered samples retain the instrument range/suppression behavior; peaks are not independently analog-qualified.",
+    "Saleae and JS clocks are not synchronized; no phase-specific energy is inferred from host UTC or aligned curve shapes.",
+    "The failed strict pulse-width decode remains preserved; ordered edges, if separately qualified, are a different timing analysis."
+  ]
+}
