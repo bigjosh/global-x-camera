@@ -1,0 +1,68 @@
+D:\Github\global-x-camera\tmp\bringup\raw10-packed-20261024\experiment\native10-diagonal-v4\capture.c: In function 'ready_force_observe':
+D:\Github\global-x-camera\tmp\bringup\raw10-packed-20261024\experiment\native10-diagonal-v4\capture.c:201:3: warning: this 'if' clause does not guard... [-Wmisleading-indentation]
+  201 |   if(at!=6U) ready_force_stop_seen(FORCE[at+2U],FORCE[at]); __DMB();
+      |   ^~
+D:\Github\global-x-camera\tmp\bringup\raw10-packed-20261024\experiment\native10-diagonal-v4\capture.c:201:61: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the 'if'
+  201 |   if(at!=6U) ready_force_stop_seen(FORCE[at+2U],FORCE[at]); __DMB();
+      |                                                             ^~~~~
+D:\Github\global-x-camera\tmp\bringup\raw10-packed-20261024\experiment\native10-diagonal-v4\bus.c:569:17: warning: 'I2C_GetTiming' defined but not used [-Wunused-function]
+  569 | static uint32_t I2C_GetTiming(uint32_t clock_src_freq, uint32_t i2c_freq)
+      |                 ^~~~~~~~~~~~~
+D:\Github\global-x-camera\tmp\bringup\raw10-packed-20261024\experiment\native10-diagonal-v4\vd6g.c: In function 'display_error':
+D:\Github\global-x-camera\tmp\bringup\raw10-packed-20261024\experiment\native10-diagonal-v4\vd6g.c:306:7: warning: variable 'ret' set but not used [-Wunused-but-set-variable]
+  306 |   int ret;
+      |       ^~~
+D:\Github\global-x-camera\tmp\bringup\raw10-packed-20261024\experiment\native10-diagonal-v4\vd6g.c: In function 'VD6G_ComputeClocks':
+D:\Github\global-x-camera\tmp\bringup\raw10-packed-20261024\experiment\native10-diagonal-v4\vd6g.c:677:17: warning: comparison of integer expressions of different signedness: 'int' and 'unsigned int' [-Wsign-compare]
+  677 |   for (i = 0; i < ARRAY_SIZE(predivs); i++) {
+      |                 ^
+D:\Github\global-x-camera\tmp\bringup\raw10-packed-20261024\experiment\native10-diagonal-v4\vd6g.c: In function 'VD6G_SetExposureTime':
+D:\Github\global-x-camera\tmp\bringup\raw10-packed-20261024\experiment\native10-diagonal-v4\vd6g.c:124:52: warning: comparison of integer expressions of different signedness: 'int' and 'uint32_t' {aka 'long unsigned int'} [-Wsign-compare]
+  124 | #define CHECK_RANGE(x, min, max)             (((x) >= (min) && (x) <= (max)) ? 0 : -1)
+      |                                                    ^~
+D:\Github\global-x-camera\tmp\bringup\raw10-packed-20261024\experiment\native10-diagonal-v4\vd6g.c:1334:9: note: in expansion of macro 'CHECK_RANGE'
+ 1334 |   ret = CHECK_RANGE(exposure_us, exp_min, exp_max);
+      |         ^~~~~~~~~~~
+D:\Github\global-x-camera\tmp\bringup\raw10-packed-20261024\experiment\native10-diagonal-v4\vd6g.c:124:68: warning: comparison of integer expressions of different signedness: 'int' and 'uint32_t' {aka 'long unsigned int'} [-Wsign-compare]
+  124 | #define CHECK_RANGE(x, min, max)             (((x) >= (min) && (x) <= (max)) ? 0 : -1)
+      |                                                                    ^~
+D:\Github\global-x-camera\tmp\bringup\raw10-packed-20261024\experiment\native10-diagonal-v4\vd6g.c:1334:9: note: in expansion of macro 'CHECK_RANGE'
+ 1334 |   ret = CHECK_RANGE(exposure_us, exp_min, exp_max);
+      |         ^~~~~~~~~~~
+D:\Github\global-x-camera\tmp\bringup\raw10-packed-20261024\experiment\native10-diagonal-v4\vd6g.c:125:53: warning: comparison of integer expressions of different signedness: 'long unsigned int' and 'int' [-Wsign-compare]
+  125 | #define CEIL(num)                            ((num) == (int)(num) ? (int)(num) : (num) > 0 ? (int)((num) + 1) : (int)(num))
+      |                                                     ^~
+D:\Github\global-x-camera\tmp\bringup\raw10-packed-20261024\experiment\native10-diagonal-v4\vd6g.c:1342:55: note: in expansion of macro 'CEIL'
+ 1342 |   ret = ctx->write16(ctx, VD6G_REG_MANUAL_COARSE_EXP, CEIL(exposure_us / line_time_in_us));
+      |                                                       ^~~~
+D:\Github\global-x-camera\tmp\bringup\raw10-packed-20261024\experiment\native10-diagonal-v4\vd6g.c: At top level:
+D:\Github\global-x-camera\tmp\bringup\raw10-packed-20261024\experiment\native10-diagonal-v4\vd6g.c:483:12: warning: 'VD6G_ApplyVtPatchSlowBoot' defined but not used [-Wunused-function]
+  483 | static int VD6G_ApplyVtPatchSlowBoot(VD6G_Ctx_t *ctx)
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~~
+D:\Github\global-x-camera\tmp\bringup\raw10-packed-20261024\experiment\native10-diagonal-v4\vd6g.c:406:12: warning: 'VD6G_ApplyPatchSlowBoot' defined but not used [-Wunused-function]
+  406 | static int VD6G_ApplyPatchSlowBoot(VD6G_Ctx_t *ctx)
+      |            ^~~~~~~~~~~~~~~~~~~~~~~
+D:\Github\global-x-camera\tmp\bringup\raw10-packed-20261024\experiment\native10-diagonal-v4\hal_dcmipp.c: In function 'HAL_DCMIPP_PIPE_GetISPBadPixelRemovalConfig':
+D:\Github\global-x-camera\tmp\bringup\raw10-packed-20261024\experiment\native10-diagonal-v4\hal_dcmipp.c:4927:100: warning: unused parameter 'Pipe' [-Wunused-parameter]
+ 4927 | uint32_t HAL_DCMIPP_PIPE_GetISPBadPixelRemovalConfig(const DCMIPP_HandleTypeDef *hdcmipp, uint32_t Pipe)
+      |                                                                                           ~~~~~~~~~^~~~
+D:\Github\global-x-camera\tmp\bringup\raw10-packed-20261024\experiment\native10-diagonal-v4\hal_dcmipp.c: In function 'HAL_DCMIPP_PIPE_GetISPRemovedBadPixelCounter':
+D:\Github\global-x-camera\tmp\bringup\raw10-packed-20261024\experiment\native10-diagonal-v4\hal_dcmipp.c:4963:110: warning: unused parameter 'Pipe' [-Wunused-parameter]
+ 4963 | HAL_StatusTypeDef HAL_DCMIPP_PIPE_GetISPRemovedBadPixelCounter(const DCMIPP_HandleTypeDef *hdcmipp, uint32_t Pipe,
+      |                                                                                                     ~~~~~~~~~^~~~
+D:\Github\global-x-camera\tmp\bringup\raw10-packed-20261024\experiment\native10-diagonal-v4\hal_dcmipp.c: In function 'HAL_DCMIPP_PIPE_ResetFrameCounter':
+D:\Github\global-x-camera\tmp\bringup\raw10-packed-20261024\experiment\native10-diagonal-v4\hal_dcmipp.c:7128:93: warning: unused parameter 'Pipe' [-Wunused-parameter]
+ 7128 | HAL_StatusTypeDef HAL_DCMIPP_PIPE_ResetFrameCounter(DCMIPP_HandleTypeDef *hdcmipp, uint32_t Pipe)
+      |                                                                                    ~~~~~~~~~^~~~
+D:\Github\global-x-camera\tmp\bringup\raw10-packed-20261024\experiment\native10-diagonal-v4\hal_dcmipp.c: In function 'HAL_DCMIPP_PIPE_ReadFrameCounter':
+D:\Github\global-x-camera\tmp\bringup\raw10-packed-20261024\experiment\native10-diagonal-v4\hal_dcmipp.c:7160:98: warning: unused parameter 'Pipe' [-Wunused-parameter]
+ 7160 | HAL_StatusTypeDef HAL_DCMIPP_PIPE_ReadFrameCounter(const DCMIPP_HandleTypeDef *hdcmipp, uint32_t Pipe,
+      |                                                                                         ~~~~~~~~~^~~~
+D:\Github\global-x-camera\tmp\bringup\raw10-packed-20261024\experiment\native10-diagonal-v4\hal_dcmipp.c: In function 'HAL_DCMIPP_PIPE_GetDataCounter':
+D:\Github\global-x-camera\tmp\bringup\raw10-packed-20261024\experiment\native10-diagonal-v4\hal_dcmipp.c:7203:96: warning: unused parameter 'Pipe' [-Wunused-parameter]
+ 7203 | HAL_StatusTypeDef HAL_DCMIPP_PIPE_GetDataCounter(const DCMIPP_HandleTypeDef *hdcmipp, uint32_t Pipe,
+      |                                                                                       ~~~~~~~~~^~~~
+D:\Github\global-x-camera\tmp\bringup\raw10-packed-20261024\experiment\native10-diagonal-v4\hal_dcmipp.c: In function 'HAL_DCMIPP_PIPE_IsEnabledISPRemovalStatistic':
+D:\Github\global-x-camera\tmp\bringup\raw10-packed-20261024\experiment\native10-diagonal-v4\hal_dcmipp.c:7619:101: warning: unused parameter 'Pipe' [-Wunused-parameter]
+ 7619 | uint32_t HAL_DCMIPP_PIPE_IsEnabledISPRemovalStatistic(const DCMIPP_HandleTypeDef *hdcmipp, uint32_t Pipe)
+      |                                                                                            ~~~~~~~~~^~~~

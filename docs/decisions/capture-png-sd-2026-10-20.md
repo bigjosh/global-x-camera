@@ -841,3 +841,41 @@ decoder still failed its strict check and was not used to claim completion.
 
 See the [MCU measurements, exact builds and final bench checkpoint](../../firmware/png-encoder/evidence/2026-10-24-mcu-tuning/README.md)
 and [integration requirements](../../firmware/png-encoder/evidence/2026-10-24-mcu-tuning/integration-proposal.md).
+
+## October 24 — packed RAW10 capture demonstrated
+
+The user requested a test of capturing ten-bit packed sensor data directly,
+with the intention of writing RAW to SD without encoding or pixel conversion.
+The RAM experiment now establishes that capture capability on the current
+CAM-6G3-073CLR / NUCLEO-N657X0-Q hardware.
+
+The sensor's ten-bit depth remains unchanged. Its image packet data type changes
+from RAW10 `0x2B` to user-defined `0x30`; CSI is configured for eight-bit opaque
+bytes and DCMIPP Pipe0 filters `0x30`. This avoids the standard RAW10 path's
+expansion into sixteen-bit memory words. The resulting frame is **1,909,600
+bytes**, saving **1,145,760 bytes / 37.5%** relative to the existing buffer format.
+
+Two separately restarted packed test-pattern captures were byte-identical.
+Both decoded to exactly the native padded16 control's **1,527,680 samples**,
+including the low two bits, with two independent host decoders. The real-scene
+packed capture was recognizable and also passed counts, camera-error checks,
+both guard boundaries, and two complete identical RAM reads. CPU unpacking was
+performed only on the host for verification, never on the MCU capture path.
+
+Keep a contiguous packed frame as the initial RAW-storage design. The sensor
+readout envelope is about 22 ms, whereas packed RAW would need about 721 ms at
+the measured one-bit SD throughput. Tiny double buffers cannot bridge that
+rate difference; approximately 1.85 MB would remain queued even with ideal
+early writing. Pipe0's double buffering is frame-based, and the card's DAT0 busy
+intervals must still be respected. SDMMC IDMA can consume completed memory
+without copying pixels, but concurrent capture-prefix ownership must be tested.
+
+The next storage experiment should save retained packed RAW and verify it,
+then introduce IDMA and overlap. RAW container/metadata layout, SD busy behavior,
+DMA bus contention, cold timing and total energy remain open. The candidate
+avoids compression CPU time but sends more bytes than the optimized PNG from
+the earlier fixed-frame test; an overall performance or energy winner is not
+yet established. This experiment did not install a new default image format
+or modify the v66c firmware in NOR.
+
+See [the packed-capture configuration, evidence and integration constraints](../../firmware/capture-packed/README.md).
