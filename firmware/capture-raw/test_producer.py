@@ -93,6 +93,8 @@ class ProducerTests(unittest.TestCase):
 static volatile uint32_t retained_marker;
 static unsigned barriers;
 #define __DSB() (++barriers)
+#define cycle_trace_init() ((void)0)
+#define CYCLE_MARK(name) ((void)0)
 static void boot_prelude(void) {
 """ + prelude + """}
 int main(void) {

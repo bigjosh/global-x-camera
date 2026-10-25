@@ -7,6 +7,13 @@
 #include "status_leds.h"
 #include "phase_gpio.h"
 #include "runtime.h"
+#if RAW_CYCLE_TRACE
+#include "cycle_trace.h"
+#else
+#define CYCLE_MARK(name) ((void)0)
+#define cycle_trace_init() ((void)0)
+#define cycle_trace_finish(result) ((void)0)
+#endif
 #define Q ((volatile const uint32_t *)RAW_REQUEST_ADDRESS)
 #define P ((volatile uint32_t *)RAW_PROOF_ADDRESS)
 #define TRACE ((volatile const uint32_t *)0x343F0000U)
@@ -218,6 +225,7 @@ static void configure_sd_master(void)
 
 __attribute__((noreturn,noinline,used)) static void terminal(uint32_t result)
 {
+    CYCLE_MARK(TERMINAL_BEGIN);
     if(result) abort_camera(result);
     snapshot(); P[RP_RESULT]=result; P[RP_END]=DWT->CYCCNT;
     capture_active=0;
@@ -243,6 +251,8 @@ __attribute__((noreturn,noinline,used)) static void terminal(uint32_t result)
     P[RP_FPCCR]=FPU->FPCCR; P[RP_CPACR]=SCB->CPACR; P[RP_SYSTICK]=SysTick->CTRL;
     P[RP_STATE]=result?15U:3U;
     __DSB(); P[RP_TERMINAL]=RAW_PROOF_TERMINAL; __DSB(); __ISB();
+    CYCLE_MARK(TERMINAL_READY);
+    cycle_trace_finish(result);
 #if RAW_STANDBY
     if(!result && operation==RAW_OP_CAPTURE) status_led_complete_sleep();
 #endif
@@ -271,7 +281,9 @@ static void init_card(void)
 {
     P[RP_STAGE]=2U; P[RP_SD_BEGIN]=DWT->CYCCNT;
     if(operation==RAW_OP_CAPTURE) (void)phase_gpio_emit(4U);
+    CYCLE_MARK(SD_MASTER_BEGIN);
     configure_sd_master();
+    CYCLE_MARK(SD_MASTER_DONE);
     int r; SD_OPERATION(r,sd_init(&raw_card,RAW_SD_CLOCK_HZ));
     if(r) complete_storage(0x200U|(uint32_t)r);
     P[RP_SD_READY]=DWT->CYCCNT;
@@ -305,6 +317,8 @@ static void sensor_reset_start(void)
 
 void raw_runtime_dispatch(void)
 {
+    cycle_trace_init();
+    CYCLE_MARK(RUNTIME_BEGIN);
 #if RAW_FLASH
     /* Fixed diagnostic SRAM is outside .bss and may survive a warm reset.
      * Revoke the previous boot's late-code authority before any early failure.
@@ -354,7 +368,7 @@ void raw_runtime_dispatch(void)
         for(uint32_t i=0;i<RAW_SLOTS_PAYLOAD_BYTES/4U;i++) frame[i]=0xA5A5A5A5U;
         __DSB();
 #endif
-        sensor_reset_start(); return;
+        sensor_reset_start(); CYCLE_MARK(RUNTIME_READY); return;
     }
     SystemCoreClockUpdate();
     init_card();

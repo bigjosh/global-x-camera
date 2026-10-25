@@ -30,6 +30,11 @@ VCP_FIELDS = (
     'reserved30 reserved31').split()
 # An unknown/self-consistent build is insufficient authorization to halt.
 APPROVED = {
+    # Fixed-slot trace awake diagnostic: entire prefix matches promoted25awake
+    # except the two independently reviewed receiver-CRC data words.
+    '0e37d33e1ede9008525feffb7f20c81112daf2169171f7130f68798366a4eec0':
+        {'bytes': 5140, 'park': 0x3418078C, 'vcp': True,
+         'sector': '9c9b65f023bb0c36e5c5149fddf8fbe2922c07294d25e859511b4cff9139810b'},
     # Explicit 25 MHz/NEGEDGE/speed3 admission for guarded cold qualification.
     # Independent byte/disassembly review: only the two receiver CRC words differ
     # from v23; all recovery instructions and literals are unchanged.

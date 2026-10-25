@@ -82,6 +82,9 @@ def compile_with_late(out,sources,flags,linker,name,libc=True):
     text=capture.read_text()
     text=replace(text,'  raw_capture_armed();',
                  '  raw_capture_armed();\n  extern int raw_late_load(void);\n  check(0xAF,raw_late_load());')
+    if '-DRAW_CYCLE_TRACE=1' in flags:
+        text=replace(text,'  check(0xAF,raw_late_load());',
+            '  CYCLE_MARK(LATE_LOAD_BEGIN);\n  check(0xAF,raw_late_load());\n  CYCLE_MARK(LATE_LOAD_DONE);')
     # Full-frame validation and sensor STOP are serviced only by the storage
     # coordinator after this load. IRQ callbacks remain in the early range.
     text=replace(text,'void raw_capture_poll(void)\n{',

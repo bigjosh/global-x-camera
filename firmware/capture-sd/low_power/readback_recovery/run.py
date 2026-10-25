@@ -31,6 +31,11 @@ SECTOR_SHA="7fda9d00cc7ffb3fbb9e6aac6695cf18545754b5dbfce1520cf30b2da39c4e63"
 # command-line opt-in for unknown firmware. This table does not broaden the
 # bridge or READ-module identities, and check_park still verifies live code.
 APPROVED_RECOVERY={
+    # Fixed-slot logger awake build; independently reviewed CRC-only prefix
+    # change and exact hardware early park passed before this READ admission.
+    '0e37d33e1ede9008525feffb7f20c81112daf2169171f7130f68798366a4eec0':
+        dict(name='raw-cycle-trace-awake-v1',sector_sha256=
+             '9c9b65f023bb0c36e5c5149fddf8fbe2922c07294d25e859511b4cff9139810b'),
     # Exact independently reviewed pairs for guarded 25 MHz phase qualification.
     # Admission is not a hardware reliability result; preserve the selected pair.
     '0752c9f4186ccada85f8d242163316d730dd1d22522c831f6382da9f125ed4b7':

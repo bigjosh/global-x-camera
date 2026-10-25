@@ -1,4 +1,10 @@
 #include "producer.h"
+#if RAW_CYCLE_TRACE
+#include "cycle_trace.h"
+#else
+#define CYCLE_MARK(name) ((void)0)
+#define CYCLE_COUNT(name) ((void)0)
+#endif
 
 volatile raw_producer_t raw_producer;
 
@@ -36,7 +42,8 @@ void raw_producer_line(volatile raw_producer_t *p,uint32_t cycle,
         raw_producer_fault(p,RAW_PRODUCER_ERR_LINES);return;
     }
     p->line_events=event;p->last_line_cycle=cycle;
-    if(event==1U) p->first_line_cycle=cycle;
+    CYCLE_COUNT(LINE_IRQS);
+    if(event==1U) { p->first_line_cycle=cycle; CYCLE_MARK(FIRST_LINE_IRQ); }
     /* Event 22 can represent only the final20 lines, not another64. Cap before
      * subtracting the holdback so the final partial group never overpublishes.
      * Coalesced/missed IRQs can only underpublish; FRAME releases the remainder.
@@ -54,7 +61,7 @@ void raw_producer_line(volatile raw_producer_t *p,uint32_t cycle,
             p->snapshots[n][0]=offset;p->snapshots[n][1]=RAW_PRODUCER_SNAPSHOT_BYTES;
             p->snapshot_count=n+1U;
         }
-        if(!p->available_bytes) p->first_prefix_cycle=cycle;
+        if(!p->available_bytes) { p->first_prefix_cycle=cycle; CYCLE_MARK(FIRST_PREFIX_PUBLISHED); }
         p->max_prefinal_bytes=bytes;
         barrier();p->available_bytes=bytes;
     }

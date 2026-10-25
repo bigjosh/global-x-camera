@@ -15,6 +15,19 @@
 #include <stddef.h>
 #include "stm32n657xx.h"
 
+/* Opt-in diagnostic builds only. The default driver has no trace dependency
+ * and no extra instructions; marks are fixed stores, never FIFO/poll logging.
+ * The capture owner initializes the RAM record after enabling its SRAM bank. */
+#ifndef RAW_CYCLE_TRACE
+#define RAW_CYCLE_TRACE 0
+#endif
+#if RAW_CYCLE_TRACE
+#include "cycle_trace.h"
+#else
+#define CYCLE_MARK(name) ((void)0)
+#define CYCLE_COUNT(name) ((void)0)
+#endif
+
 #define X SDMMC2_S
 #define R RCC_S
 #define C GPIOC_S
@@ -88,6 +101,8 @@ __attribute__((weak)) void sd_progress(void)
 
 static int fault(sd_card_t *c, uint32_t error)
 {
+    CYCLE_MARK(SD_LAST_ERROR);
+    CYCLE_COUNT(SD_ERROR_CALLS);
     if (!c->error) {
         c->error=error;
         c->error_stage=c->stage;
@@ -268,6 +283,9 @@ static void store_word(uint8_t *p, uint32_t v)
 static int transfer(sd_card_t *c, uint32_t lba, uint8_t *buffer,
                     uint32_t count, uint32_t writing)
 {
+#if RAW_CYCLE_TRACE
+    if (!writing) { CYCLE_MARK(SD_READ_LATEST_BEGIN); CYCLE_COUNT(SD_READ_TRANSFERS); }
+#endif
     int result=ready(c);
     if (result) return result;
     uint32_t start=DWT->CYCCNT, words=0, total=count*128UL, sta=0;
@@ -281,11 +299,17 @@ static int transfer(sd_card_t *c, uint32_t lba, uint8_t *buffer,
     X->DCTRL=(9UL<<SDMMC_DCTRL_DBLOCKSIZE_Pos)|
         (writing ? 0 : SDMMC_DCTRL_DTDIR);
     uint32_t index=writing ? (count==1 ? 24UL : 25UL) : (count==1 ? 17UL : 18UL);
+#if RAW_CYCLE_TRACE
+    if (!writing) CYCLE_MARK(SD_READ_CMD_BEGIN_LATEST);
+#endif
     result=command(c,index,(c->ocr&(1UL<<30)) ? lba : lba*512UL,RESP_R1,1);
     if (result) {
         abort_transfer(c,!writing);
         return result;
     }
+#if RAW_CYCLE_TRACE
+    if (!writing) CYCLE_MARK(SD_READ_CMD_DONE_LATEST);
+#endif
     for (uint32_t i=0;i<POLL_LIMIT;++i) {
         sta=X->STA;
         c->last_sta=sta;
@@ -293,7 +317,12 @@ static int transfer(sd_card_t *c, uint32_t lba, uint8_t *buffer,
         /* Table220: DATAEND is final complete/CRC-good; TX also includes the
          * last block's busy completion. DBCKEND is not required at final end.
          * Do not read an inactive FIFO merely because RXFIFOE has deasserted. */
-        if ((sta&SDMMC_STA_DATAEND) && !(sta&SDMMC_STA_DPSMACT)) break;
+        if ((sta&SDMMC_STA_DATAEND) && !(sta&SDMMC_STA_DPSMACT)) {
+#if RAW_CYCLE_TRACE
+            if (!writing) CYCLE_MARK(SD_READ_DATAEND_LATEST);
+#endif
+            break;
+        }
         if (writing) {
             if ((sta&SDMMC_STA_TXFIFOHE) && words<total) {
                 /* N6 has a 256-word FIFO. HALF-empty is a refill trigger,
@@ -340,6 +369,9 @@ static int transfer(sd_card_t *c, uint32_t lba, uint8_t *buffer,
     if (result) return result;
     if (writing) c->written_sectors+=count;
     else c->read_sectors+=count;
+#if RAW_CYCLE_TRACE
+    if (!writing) CYCLE_MARK(SD_READ_LATEST_DONE);
+#endif
     return SD_OK;
 }
 
@@ -409,12 +441,15 @@ static uint32_t dma_wait_context(void)
 
 static int preannounce(sd_card_t *c,uint32_t count)
 {
+    CYCLE_MARK(SD_PREANNOUNCE_BEGIN);
+    CYCLE_COUNT(SD_PREANNOUNCE_CALLS);
     int result=command(c,55,c->rca,RESP_R1,0);
     if(result) return result;
     if(!(c->last_r1&(1UL<<5))) return fault(c,SD_ERR_UNSUPPORTED);
     result=command(c,23,count,RESP_R1,0);
     if(result) return result;
     if(!(c->last_r1&(1UL<<5))) return fault(c,SD_ERR_UNSUPPORTED);
+    CYCLE_MARK(SD_PREANNOUNCE_DONE);
     return SD_OK;
 }
 
@@ -422,8 +457,12 @@ static int transfer_dma_write(sd_card_t *c, uint32_t lba,
                               const uint8_t *buffer, uint32_t count, sd_dma_wait_t *wait,
                               uint32_t preerase)
 {
+    CYCLE_COUNT(SD_WRITE_TRANSFERS);
+    CYCLE_COUNT(SD_IDMA_TRANSFERS);
+    CYCLE_MARK(SD_WRITE_READY_BEGIN);
     int result=ready(c);
     if (result) return result;
+    CYCLE_MARK(SD_WRITE_READY_DONE);
     /* No second owner or abandoned DMA is allowed. All fields below are only
      * written after ready() has freshly observed an inactive host. */
     if (X->IDMACTRL) return fault(c,SD_ERR_CONTROLLER_BUSY);
@@ -440,6 +479,7 @@ static int transfer_dma_write(sd_card_t *c, uint32_t lba,
          * ACMD23 does not terminate the write: CMD12 is still required. */
         if ((result=preannounce(c,count))) return result;
     }
+    CYCLE_MARK(SD_WRITE_SETUP_BEGIN);
     X->DCTRL=0;
     X->ICR=DMA_FLAGS;
     X->DTIMER=c->clock_hz*2UL;
@@ -449,9 +489,15 @@ static int transfer_dma_write(sd_card_t *c, uint32_t lba,
     /* No CPU writes or dirty cache lines may remain unpublished before DMA. */
     __DSB();
     X->IDMACTRL=SDMMC_IDMA_IDMAEN;
+#if RAW_CYCLE_TRACE
+    if (count>1) { CYCLE_MARK(SD_CMD25_BEGIN); CYCLE_COUNT(SD_CMD25_CALLS); }
+#endif
     result=command(c,count==1 ? 24UL : 25UL,
                    (c->ocr&(1UL<<30)) ? lba : lba*512UL,RESP_R1,1);
     if (!result) {
+#if RAW_CYCLE_TRACE
+        if (count>1) CYCLE_MARK(SD_CMD25_DONE);
+#endif
         for (uint32_t i=0;i<POLL_LIMIT;++i) {
             sta=X->STA;
             c->last_sta=sta;
@@ -462,7 +508,10 @@ static int transfer_dma_write(sd_card_t *c, uint32_t lba,
             }
             /* Single-buffer DATAEND means both the memory-side IDMA and DPSM
              * are complete (RM0486 p1402). It is not merely FIFO queued. */
-            if ((sta&SDMMC_STA_DATAEND) && !(sta&SDMMC_STA_DPSMACT)) break;
+            if ((sta&SDMMC_STA_DATAEND) && !(sta&SDMMC_STA_DPSMACT)) {
+                CYCLE_MARK(SD_DATAEND);
+                break;
+            }
             if ((wait && (uint32_t)(wait->milliseconds()-wall_start)>=5000UL) ||
                 (uint32_t)(DWT->CYCCNT-start)>=WRITE_TIMEOUT_CYCLES) {
                 result=fault(c,SD_ERR_DATA_TIMEOUT);
@@ -496,19 +545,31 @@ static int transfer_dma_write(sd_card_t *c, uint32_t lba,
         abort_dma_write(c);
         return result;
     }
+    CYCLE_MARK(SD_WRITE_CLEANUP_BEGIN);
     /* DPSM is inactive: release DMA ownership before any subsequent command. */
     X->IDMACTRL=0;
     __DSB();
+    CYCLE_MARK(SD_IDMA_RELEASED);
     c->transfer_words=count*128UL;
-    if (count>1) result=command(c,12,0,RESP_R1,0);
+    if (count>1) {
+        CYCLE_MARK(SD_CMD12_BEGIN);
+        CYCLE_COUNT(SD_CMD12_WRITE_CALLS);
+        result=command(c,12,0,RESP_R1,0);
+        if (!result) CYCLE_MARK(SD_CMD12_DONE);
+    }
     if (result) {
         abort_dma_write(c);
         return result;
     }
     X->DCTRL=0;
     X->ICR=DMA_FLAGS;
+    CYCLE_MARK(SD_WRITE_FINAL_READY_BEGIN);
     result=ready(c);
     if (!result) c->written_sectors+=count;
+    if (!result) {
+        CYCLE_MARK(SD_WRITE_FINAL_READY_DONE);
+        CYCLE_MARK(SD_WRITE_DONE);
+    }
     return result;
 }
 
@@ -516,11 +577,17 @@ static int identify(sd_card_t *c)
 {
     int result;
     c->stage=SD_STAGE_IDENTIFY;
-    if ((result=command(c,0,0,RESP_NONE,0)) ||
-        (result=command(c,8,0x1AAUL,RESP_R7,0))) return result;
+    CYCLE_MARK(SD_CMD0_BEGIN);
+    if ((result=command(c,0,0,RESP_NONE,0))) return result;
+    CYCLE_MARK(SD_CMD0_DONE);
+    CYCLE_MARK(SD_CMD8_BEGIN);
+    if ((result=command(c,8,0x1AAUL,RESP_R7,0))) return result;
+    CYCLE_MARK(SD_CMD8_DONE);
     if ((X->RESP1&0xFFFUL)!=0x1AAUL) return fault(c,SD_ERR_UNSUPPORTED);
     uint32_t start=DWT->CYCCNT;
+    CYCLE_MARK(SD_ACMD41_BEGIN);
     for (uint32_t i=0;i<2000;++i) {
+        CYCLE_COUNT(SD_ACMD41_ATTEMPTS);
         if ((result=command(c,55,0,RESP_R1,0))) return result;
         if (!(X->RESP1&(1UL<<5))) return fault(c,SD_ERR_RESPONSE);
         /* HCS, 3.2-3.4 V. No S18R, XPC, cache enabling or mode switching. */
@@ -531,6 +598,8 @@ static int identify(sd_card_t *c)
             return fault(c,SD_ERR_NOT_READY);
         if ((result=delay_us(c,1000))) return result;
     }
+    CYCLE_MARK(SD_ACMD41_DONE);
+    CYCLE_MARK(SD_IDENTIFY_REGS_BEGIN);
     if ((result=command(c,2,0,RESP_R2,0))) return result;
     c->cid[0]=X->RESP1; c->cid[1]=X->RESP2;
     c->cid[2]=X->RESP3; c->cid[3]=X->RESP4;
@@ -552,9 +621,12 @@ static int identify(sd_card_t *c)
     } else return fault(c,SD_ERR_UNSUPPORTED);
     if (!c->sector_count || c->sector_count>(1ULL<<32))
         return fault(c,SD_ERR_CAPACITY);
+    CYCLE_MARK(SD_IDENTIFY_REGS_DONE);
     c->stage=SD_STAGE_SELECT;
+    CYCLE_MARK(SD_SELECT_BEGIN);
     if ((result=command(c,7,c->rca,RESP_R1,0)) || (result=ready(c))) return result;
     if (!(c->ocr&(1UL<<30)) && (result=command(c,16,512,RESP_R1,0))) return result;
+    CYCLE_MARK(SD_SELECT_DONE);
     return SD_OK;
 }
 
@@ -562,6 +634,8 @@ int sd_init(sd_card_t *c, uint32_t max_hz)
 {
     if (!c) return SD_ERR_ARGUMENT;
     if (c->initialized || c->controller_owned) return SD_ERR_STATE;
+    CYCLE_MARK(SD_INIT_BEGIN);
+    CYCLE_COUNT(SD_INIT_CALLS);
 #if SD_BUS_WIDTH == 4
     volatile uint8_t *width_clear=(volatile uint8_t *)&sd_bus_width_proof;
     for (size_t i=0;i<sizeof(sd_bus_width_proof);++i) width_clear[i]=0;
@@ -625,6 +699,7 @@ int sd_init(sd_card_t *c, uint32_t max_hz)
     int result=delay_us(c,1);
     if (result) return result;
     c->stage=SD_STAGE_GPIO;
+    CYCLE_MARK(SD_GPIO_BEGIN);
 #if SD_GPIO_SPEED != 3
     sd_gpio_proof.c_before=C->OSPEEDR;
     sd_gpio_proof.e_before=E->OSPEEDR;
@@ -676,7 +751,9 @@ int sd_init(sd_card_t *c, uint32_t max_hz)
     if (sd_compensation_proof.after!=0x287U) return fault(c,SD_ERR_GPIO);
     sd_compensation_proof.applied=1U;
 #endif
+    CYCLE_MARK(SD_GPIO_SETTLE_BEGIN);
     if ((result=delay_us(c,1000))) return result;
+    CYCLE_MARK(SD_GPIO_SETTLE_DONE);
     c->gpioc_idr=C->IDR; c->gpioe_idr=E->IDR;
     if ((c->gpioc_idr&C_IDLE_PINS)!=C_IDLE_PINS ||
         !(c->gpioe_idr&(1UL<<4))) return fault(c,SD_ERR_GPIO);
@@ -698,7 +775,10 @@ int sd_init(sd_card_t *c, uint32_t max_hz)
         return fault(c,SD_ERR_GPIO);
     X->POWER=SDMMC_POWER_PWRCTRL;
     c->clock_hz=100000UL;
-    if ((result=delay_us(c,10000)) || (result=identify(c))) return result;
+    CYCLE_MARK(SD_CLOCK_TRAIN_BEGIN);
+    if ((result=delay_us(c,10000))) return result;
+    CYCLE_MARK(SD_CLOCK_TRAIN_DONE);
+    if ((result=identify(c))) return result;
 #if SD_CLOCK_NEGEDGE
     /* RM0486 Rev4 p1433: change only with both state machines idle. Leave
      * 100 kHz identification unchanged; this changes only the run-clock
@@ -706,6 +786,7 @@ int sd_init(sd_card_t *c, uint32_t max_hz)
     if (X->STA&(SDMMC_STA_DPSMACT|SDMMC_STA_CPSMACT))
         return fault(c,SD_ERR_CONTROLLER_BUSY);
 #endif
+    CYCLE_MARK(SD_CLOCK_SWITCH_BEGIN);
     X->CLKCR=(HCLK_HZ/(2*max_hz))|SDMMC_CLKCR_HWFC_EN|PHASE_BITS;
 #if SD_CLOCK_NEGEDGE
     if (X->CLKCR!=((HCLK_HZ/(2*max_hz))|SDMMC_CLKCR_HWFC_EN|PHASE_BITS))
@@ -713,12 +794,15 @@ int sd_init(sd_card_t *c, uint32_t max_hz)
 #endif
     c->clock_hz=max_hz;
     if ((result=delay_us(c,1000)) || (result=ready(c))) return result;
+    CYCLE_MARK(SD_CLOCK_SWITCH_DONE);
 #if SD_BUS_WIDTH == 4
     /* SCR data is still received on DAT0. Require both mandatory one-bit and
      * requested four-bit capability; never silently run a four-bit build in
      * one-bit mode. CMD6 here is ACMD6 (argument2), not high-speed CMD6. */
     sd_scr_t scr;
+    CYCLE_MARK(SD_WIDTH_BEGIN);
     if ((result=read_scr_selected(c,&scr))) return result;
+    CYCLE_MARK(SD_WIDTH_SCR_DONE);
     c->stage=SD_STAGE_BUS_WIDTH;
     sd_bus_width_proof.scr_widths=scr.bytes[1]&15U;
     if ((scr.bytes[1]&5U)!=5U) return fault(c,SD_ERR_UNSUPPORTED);
@@ -730,6 +814,7 @@ int sd_init(sd_card_t *c, uint32_t max_hz)
     if (result) return result;
     if (!(c->last_r1&(1UL<<5))) return fault(c,SD_ERR_UNSUPPORTED);
     sd_bus_width_proof.acmd6_accepted=1U;
+    CYCLE_MARK(SD_WIDTH_ACMD6_DONE);
     if ((X->STA&(SDMMC_STA_DPSMACT|SDMMC_STA_CPSMACT)) || X->IDMACTRL)
         return fault(c,SD_ERR_CONTROLLER_BUSY);
     /* An uncertain ACMD6 response retains ownership and does not guess which
@@ -754,6 +839,7 @@ int sd_init(sd_card_t *c, uint32_t max_hz)
     if ((X->CLKCR&SDMMC_CLKCR_WIDBUS)!=WIDTH_BITS) return fault(c,SD_ERR_CLOCK);
     if ((result=ready(c))) return result;
     sd_bus_width_proof.negotiated_width=4U;
+    CYCLE_MARK(SD_WIDTH_DONE);
 #endif
 #if SD_GPIO_SPEED != 3
     sd_gpio_proof.c_after=C->OSPEEDR; sd_gpio_proof.e_after=E->OSPEEDR;
@@ -766,6 +852,7 @@ int sd_init(sd_card_t *c, uint32_t max_hz)
 #endif
     c->initialized=1;
     c->init_cycles=DWT->CYCCNT-start;
+    CYCLE_MARK(SD_INIT_DONE);
     return SD_OK;
 }
 
@@ -907,6 +994,8 @@ int sd_read_scr(sd_card_t *c,sd_scr_t *scr)
     if(c->error) return (int)c->error;
 #endif
     c->stage=SD_STAGE_SCR;
+    CYCLE_MARK(SD_SCR_LATEST_BEGIN);
+    CYCLE_COUNT(SD_SCR_READS);
     int result=ready(c);
     if(result) return result;
     if(X->IDMACTRL) return fault(c,SD_ERR_CONTROLLER_BUSY);
@@ -946,6 +1035,7 @@ int sd_read_scr(sd_card_t *c,sd_scr_t *scr)
     result=ready(c);if(result) return result;
     if(scr->bytes[0]>>4) return fault(c,SD_ERR_UNSUPPORTED);
     scr->erased_byte=(scr->bytes[1]&0x80U)?255U:0U;scr->valid=1U;
+    CYCLE_MARK(SD_SCR_LATEST_DONE);
     return SD_OK;
 }
 
@@ -1058,6 +1148,7 @@ int sd_write_blocks_stream_preerase(sd_card_t *c,uint32_t lba,const void *buffer
         SDMMC_CLKCR_SELCLKRX|SDMMC_CLKCR_DDR|SDMMC_CLKCR_WIDBUS|PHASE_BITS;
     if((X->CLKCR&flow_mask)!=(SDMMC_CLKCR_HWFC_EN|WIDTH_BITS|PHASE_BITS)) return fault(c,SD_ERR_CLOCK);
     uint32_t api_start=DWT->CYCCNT,bytes=count*512U;
+    CYCLE_MARK(SD_PRODUCER_WAIT_BEGIN);
     if((result=stream_publish(c,s,bytes,api_start))) return result;
     s->initial_available_bytes=s->published_bytes;
     for(uint32_t i=0;s->published_bytes<512U;i++) {
@@ -1067,28 +1158,42 @@ int sd_write_blocks_stream_preerase(sd_card_t *c,uint32_t lba,const void *buffer
         if((result=stream_publish(c,s,bytes,api_start))) return result;
     }
     s->producer_wait_cycles=DWT->CYCCNT-api_start;
+    CYCLE_MARK(SD_PRODUCER_WAIT_DONE);
     s->max_wait_cycles=s->producer_wait_cycles;
     if(s->published_bytes==bytes) {
         s->mode=SD_STREAM_IDMA;
+        CYCLE_MARK(SD_IDMA_SELECTED);
         result=sd_write_blocks_dma_preerase(c,lba,buffer,count);
         if(!result) s->queued_bytes=bytes;
         return result;
     }
     s->mode=SD_STREAM_PIO;
+    CYCLE_MARK(SD_PIO_SELECTED);
+    CYCLE_COUNT(SD_WRITE_TRANSFERS);
+    CYCLE_COUNT(SD_PIO_TRANSFERS);
+    CYCLE_MARK(SD_WRITE_READY_BEGIN);
     result=ready(c);if(result) return result;
+    CYCLE_MARK(SD_WRITE_READY_DONE);
     if(X->IDMACTRL) return fault(c,SD_ERR_CONTROLLER_BUSY);
     c->media_idle=0;
     if((result=preannounce(c,count))) return result;
     uint32_t start=DWT->CYCCNT,words=0,total=count*128U,sta=0;
     uint32_t waiting=0,wait_start=0;
     c->transfer_words=0;c->transfer_sta=0;
+    CYCLE_MARK(SD_WRITE_SETUP_BEGIN);
     X->DCTRL=0;X->ICR=DATA_FLAGS;X->DTIMER=c->clock_hz*2U;X->DLEN=bytes;
     X->DCTRL=9U<<SDMMC_DCTRL_DBLOCKSIZE_Pos;
+    CYCLE_MARK(SD_CMD25_BEGIN);
+    CYCLE_COUNT(SD_CMD25_CALLS);
     result=command(c,25,(c->ocr&(1UL<<30))?lba:lba*512U,RESP_R1,1);
+    if(!result) CYCLE_MARK(SD_CMD25_DONE);
     if(!result) for(uint32_t i=0;i<POLL_LIMIT;i++) {
         sta=X->STA;c->last_sta=sta;
         if(sta&DATA_ERRORS) {result=fault(c,SD_ERR_DATA);break;}
-        if((sta&SDMMC_STA_DATAEND) && !(sta&SDMMC_STA_DPSMACT)) break;
+        if((sta&SDMMC_STA_DATAEND) && !(sta&SDMMC_STA_DPSMACT)) {
+            CYCLE_MARK(SD_DATAEND);
+            break;
+        }
         if(s->published_bytes<bytes) {
             sd_progress();
             if((result=stream_publish(c,s,bytes,api_start))) break;
@@ -1127,10 +1232,21 @@ int sd_write_blocks_stream_preerase(sd_card_t *c,uint32_t lba,const void *buffer
     X->CMD&=~SDMMC_CMD_CMDTRANS;
     if(!result && (words!=total || s->published_bytes!=bytes || !(sta&SDMMC_STA_DATAEND) ||
        (sta&(DATA_ERRORS|SDMMC_STA_DPSMACT)) || X->DCOUNT)) result=fault(c,SD_ERR_LENGTH);
-    if(!result) result=command(c,12,0,RESP_R1,0);
+    if(!result) {
+        CYCLE_MARK(SD_WRITE_CLEANUP_BEGIN);
+        CYCLE_MARK(SD_CMD12_BEGIN);
+        CYCLE_COUNT(SD_CMD12_WRITE_CALLS);
+        result=command(c,12,0,RESP_R1,0);
+        if(!result) CYCLE_MARK(SD_CMD12_DONE);
+    }
     if(result) {abort_transfer(c,0);return result;}
     X->DCTRL=0;X->ICR=DATA_FLAGS;
+    CYCLE_MARK(SD_WRITE_FINAL_READY_BEGIN);
     result=ready(c);if(!result) c->written_sectors+=count;
+    if(!result) {
+        CYCLE_MARK(SD_WRITE_FINAL_READY_DONE);
+        CYCLE_MARK(SD_WRITE_DONE);
+    }
     return result;
 }
 
@@ -1139,16 +1255,23 @@ int sd_sync(sd_card_t *c)
     if (!c) return SD_ERR_ARGUMENT;
     if (!c->initialized || !c->controller_owned) return SD_ERR_STATE;
     c->stage=SD_STAGE_SYNC;
-    return ready(c);
+    CYCLE_MARK(SD_SYNC_LATEST_BEGIN);
+    CYCLE_COUNT(SD_SYNC_CALLS);
+    int result=ready(c);
+    if (!result) CYCLE_MARK(SD_SYNC_LATEST_DONE);
+    return result;
 }
 
 int sd_deinit(sd_card_t *c)
 {
     if (!c) return SD_ERR_ARGUMENT;
     if (!c->initialized || !c->controller_owned) return SD_ERR_STATE;
+    CYCLE_MARK(SD_DEINIT_BEGIN);
+    CYCLE_COUNT(SD_DEINIT_CALLS);
     int result=sd_sync(c);
     if (result) return result;
     c->stage=SD_STAGE_DEINIT;
+    CYCLE_MARK(SD_DEINIT_RELEASE_BEGIN);
     X->MASK=0; X->DCTRL=0; X->CMD=0; X->IDMACTRL=0; X->POWER=0;
     R->AHB5RSTSR=RCC_AHB5RSTSR_SDMMC2RSTS;
     R->AHB5RSTCR=RCC_AHB5RSTCR_SDMMC2RSTC;
@@ -1165,5 +1288,6 @@ int sd_deinit(sd_card_t *c)
         CoreDebug->DEMCR=c->saved_demcr;
     }
     c->initialized=0; c->controller_owned=0; c->timer_owned=0;
+    CYCLE_MARK(SD_DEINIT_DONE);
     return SD_OK;
 }

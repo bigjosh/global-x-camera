@@ -14,6 +14,7 @@ import zlib
 from producer_transform import transform as transform_producer
 from phase_protocol import PHASE_PROTOCOL
 from magic_transform import transform as transform_magic, sensor_exposure
+from cycle_trace_transform import transform as transform_cycle_trace
 
 HERE=Path(__file__).resolve().parent
 ROOT=HERE.parents[1]
@@ -216,6 +217,7 @@ def main():
     p.add_argument('--exposure-coarse',type=int,default=1428,help='RAM diagnostic exposure in sensor lines')
     p.add_argument('--flash',action='store_true')
     p.add_argument('--standby',action='store_true')
+    p.add_argument('--cycle-trace',action='store_true',help='Fixed RAM timestamps; awake diagnostic completion preserves logs for ST-LINK')
     p.add_argument('--async-stop',action='store_true')
     p.add_argument('--dma-sleep',action='store_true',help='Experimental shallow WFI during SD DMA, after sensor STOP')
     p.add_argument('--line-stream',action='store_true',help='Experimental conservative 64-line producer')
@@ -223,6 +225,8 @@ def main():
     p.add_argument('--snapshot',action='store_true',help='RAM diagnostic: copy the last 512 B at each published prefix')
     p.add_argument('--poison',action='store_true',help='RAM diagnostic: fill the frame with A5 before sensor start')
     a=p.parse_args()
+    if a.cycle_trace and (a.standby or not a.magic_format):
+        p.error('Cycle trace currently requires magic format and awake completion; Standby loses log SRAM')
     if a.sd_gpio_speed!=3 and (a.flash or a.standby):
         p.error('Nondefault SD GPIO speed is RAM diagnostic only')
     if a.sd_gpio_speed in (1,2) and (a.sd_clock_hz!=25000000 or a.sd_bus_width!=4 or a.sd_fixed_compensation):
@@ -259,7 +263,9 @@ def main():
         data=src.read_bytes()
         if src.name=='capture.c':
             capture=transform_capture(data.decode().replace('\r\n','\n'))
-            dst.write_text(transform_magic(capture) if a.magic_format else capture,newline='\n')
+            capture=transform_magic(capture) if a.magic_format else capture
+            if a.cycle_trace: capture=transform_cycle_trace(capture)
+            dst.write_text(capture,newline='\n')
         elif src.name=='phase_gpio.c':
             # RAW protocol v2: retain bounded GPIO writes but separate IDs by
             # 2 us, well above the measured ~0.24 us output/call overhead.
@@ -284,6 +290,9 @@ def main():
                 dst=out/name
                 dst.write_text((ROOT/'firmware'/folder/name).read_text().replace('../sd-storage/sd_card.h','sd_card.h'),newline='\n')
                 if dst.suffix=='.c': compiled.append(dst)
+    if a.cycle_trace:
+        for name in ('cycle_trace.h','cycle_trace_events.h','cycle_trace_sd.h'):
+            (out/name).write_bytes((HERE/name).read_bytes())
     if not a.flash:
         sensor=sensor_source((pbase/'stage1_sensor.c').read_text())
         if a.exposure_coarse!=1428: sensor=sensor_exposure(sensor,a.exposure_coarse)
@@ -301,6 +310,7 @@ def main():
             if name.endswith('.c'): compiled.append(out/name)
     flags=[f for f in m['compile_flags'] if f!='-I'+str(rbase)]
     flags.insert(0,'-I'+str(out))
+    if a.cycle_trace: flags.append('-DRAW_CYCLE_TRACE=1')
     flags += [f'-DRAW_PATTERN={int(a.pattern=="diagonal")}',f'-DRAW_FLASH={int(a.flash)}',
               f'-DSD_BUS_WIDTH={a.sd_bus_width}',
               f'-DRAW_SD_CLOCK_HZ={a.sd_clock_hz}U',
@@ -389,6 +399,10 @@ def main():
     if late_meta:
         manifest['late_load']=late_meta
         manifest['immutable_ranges']=late_meta['immutable_ranges']
+    if a.cycle_trace:
+        manifest['cycle_trace']=dict(address=0x343FB000,words=256,schema=1,
+            clock_hz=400000000,headers=['cycle_trace_events.h','cycle_trace_sd.h'],
+            completion='awake terminal; no Standby entry timing')
     (out/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
     if a.flash:
         pd=out/'staged'; pd.mkdir(); sources=[]

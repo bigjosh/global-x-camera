@@ -20,6 +20,8 @@ ROOT=HERE.parents[1]
 spec=importlib.util.spec_from_file_location('raw_flash_shared_bench',HERE/'bench.py')
 bench=importlib.util.module_from_spec(spec);spec.loader.exec_module(bench)
 sha=bench.sha
+_trace_spec=importlib.util.spec_from_file_location('raw_cycle_trace_decoder',HERE/'cycle_trace.py')
+cycle_trace=importlib.util.module_from_spec(_trace_spec);_trace_spec.loader.exec_module(cycle_trace)
 
 
 def checked_build(folder,receiver_sha,sector_sha):
@@ -213,6 +215,33 @@ def inspect(b,folder,m,code,*,download_frame=False):
         slots=slots,loader_words=loader,sd_payload_integrity_verified=False,
         binary_sha256=sha(code),halt_after_success_idle_only=True,whole_image=whole)
     result['camera_telemetry']=camera_telemetry(b,folder,m)
+    if m.get('cycle_trace'):
+        expected=dict(address=0x343FB000,words=256,schema=1,clock_hz=400000000,
+            headers=['cycle_trace_events.h','cycle_trace_sd.h'],
+            completion='awake terminal; no Standby entry timing')
+        if m['cycle_trace']!=expected or '-DRAW_CYCLE_TRACE=1' not in m['flags']:
+            raise ValueError('Unreviewed cycle trace layout/configuration')
+        paths=[folder/name for name in expected['headers']]
+        definitions=cycle_trace.load_definitions(paths,
+            {str(path):m['source_hashes'][path.name] for path in paths})
+        raw=b.upload(expected['address'],1024,'cycle-trace.bin')
+        (b.output.parent/'cycle-trace.bin').write_bytes(raw)
+        trace=cycle_trace.decode(raw,definitions,require_complete=True)
+        if trace['result']!=p['result']:
+            raise ValueError('Cycle trace and successful storage result differ')
+        result['cycle_trace']=trace
+        bench.dump(b.output.parent/'cycle-trace.json',trace)
+        header=b.upload(0x343F0000,256,'prefix-trace-header.bin')
+        count=struct.unpack('<64I',header)[2]
+        if count>200: raise ValueError('Prefix trace count outside retained buffer')
+        event_bytes=b.upload(0x343F0100,count*16,'prefix-trace-events.bin') if count else b''
+        sensor=b.upload(0x343F4000,128,'prefix-sensor.bin')
+        loader=b.upload(0x343F3000,256,'prefix-loader.bin')
+        for name,data in [('prefix-trace-header.bin',header),('prefix-trace-events.bin',event_bytes),
+                          ('prefix-sensor.bin',sensor),('prefix-loader.bin',loader)]:
+            (b.output.parent/name).write_bytes(data)
+        result['prefix_telemetry']=cycle_trace.decode_prefix(header,event_bytes,sensor,loader)
+        bench.dump(b.output.parent/'prefix-telemetry.json',result['prefix_telemetry'])
     chunks=b.upload(m['chunk_trace'],p['chunk_count']*32,'chunks.bin')
     (b.output.parent/'chunks.bin').write_bytes(chunks)
     if m.get('line_stream'):

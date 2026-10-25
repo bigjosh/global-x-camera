@@ -202,6 +202,7 @@ HARNESS = r'''
 #define CSI_PCR_DL0EN 4U
 #define CSI_PCR_DL1EN 8U
 #define __DSB() ((void)0)
+#define CYCLE_MARK(name) ((void)0)
 #define __DMB() ((void)0)
 #define CLEAR_BIT(reg, bits) do { if(!stuck_clear) (reg)&=~(bits); } while(0)
 static struct { uint32_t APB5ENR, DIVENR, APB5RSTR; } mock_rcc;

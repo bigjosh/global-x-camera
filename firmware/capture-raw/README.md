@@ -6,6 +6,12 @@ the existing UART recovery mechanism. It uses the container in
 [raw-slots](../raw-slots/README.md); there is no FAT filesystem, image conversion,
 compression or full-frame CPU checksum in the normal save path.
 
+For fine phase timing, the optional [`--cycle-trace` profile](CYCLE_TRACE.md)
+stores cycle-counter timestamps in fixed RAM slots. Its first qualified cold
+run captured 101 events, including 203.689 ms in ACMD41 negotiation and
+159.403 ms in the multiblock data phase. The diagnostic completion stays awake
+for guarded ST-LINK retrieval; normal Standby firmware was restored afterward.
+
 ## Installed profile: four-bit SDMMC2 at 25 MHz
 
 The current PZSSD001/SanDisk Extreme 32 GB setup uses **four-bit SDMMC2,
