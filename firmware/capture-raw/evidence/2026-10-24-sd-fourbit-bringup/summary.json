@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "status": "provisional_initial_bringup_failure",
+  "local_date": "2026-10-24",
+  "utc_date": "2026-10-25",
+  "installed_flash_sector_sha256": "174424c6792f96c72e336fc68e442474e9da665718552d3239a772d59ba73e2e",
+  "installed_prefix_sha256": "9401bed4076d6e9e4d2e4f9236661faf7b8f0e051cb332ea4dcbba09da336eba",
+  "four_bit_ram_sha256": "9a541fbe00de3a2c3d92b5fbe48aafe7f3ed4b770aedc3da1275a0c2ca662a52",
+  "one_bit_control_ram_sha256": "1b96bf02555a33035a6ca4b4fd641409d9e2129274f9dfbf326ae1aa26d51b2f",
+  "requested_operation": "read one sector at LBA0; initialization failed before data read",
+  "same_observed_failure": {
+    "command": 8,
+    "argument": 426,
+    "command_clock_hz": 100000,
+    "command_count": 2,
+    "command_crc_error": 8,
+    "error_sta": 1,
+    "response_register": 1989,
+    "response_register_hex": "0x000007C5",
+    "expected_cmd8_echo_hex": "0x000001AA"
+  },
+  "successful_four_bit_negotiation": false,
+  "successful_sector_reads": 0,
+  "saved_images": 0,
+  "new_cold_capture_energy_results": 0,
+  "nor_programming_performed": false,
+  "sd_data_write_or_erase_command_performed": false,
+  "interpretation": "The new four-bit build and frozen one-bit control fail at the same one-bit CMD8 identification step. Four-bit data negotiation and DAT1-DAT3 transfers were not reached. Wiring/contact/signal integrity is a hypothesis, not an established root cause.",
+  "owner_reported_final_state": "JS110 deliberately left OFF, range0; user physical wiring check pending",
+  "limits": [
+    "Failed RAM records retain media_idle=0/controller_owned=1 and are not successful idle proofs.",
+    "Explicit existing user reset/erase and experimental-board clobber authorization covered controlled recovery and final power-off.",
+    "No fresh NOR-sector readback or card identification/preservation readback was completed.",
+    "No private pixel data, raw sector/SRAM dump, native instrument array or instrument capture is published."
+  ]
+}

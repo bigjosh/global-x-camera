@@ -17,9 +17,13 @@ additional PC0/PC5/PE4 connections and failure handling.
 
 The reviewed v19b candidate preserves the 15,804-byte early load, recovery
 instructions, RAW layout and exposure. It is **not yet installed or hardware
-qualified**: the replacement carrier is reported wired, but the latest power
-check found zero JS load current. No four-bit image or time/energy result exists
-yet. Follow the latest [bench checkpoint](../../AGENTS.md) before proceeding.
+qualified**. After the user restored target power, both the four-bit RAM reader
+and the frozen, previously working one-bit reader failed at CMD8 during the
+initial 100 kHz handshake, before width negotiation. Both received the same
+invalid response with a command CRC error. A physical hookup/card check is
+pending; the JS output is intentionally off. No four-bit image or time/energy
+result exists yet. See [initial diagnostic evidence](evidence/2026-10-24-sd-fourbit-bringup/README.md)
+and the latest [bench checkpoint](../../AGENTS.md) before proceeding.
 
 ## October 24 replacement-card baseline
 
