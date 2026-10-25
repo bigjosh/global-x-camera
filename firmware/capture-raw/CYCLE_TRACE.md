@@ -143,6 +143,36 @@ initialization-to-finalization interval is **406.0759425 ms**. These figures
 exclude the earlier power/reset/ROM/recovery interval and are not
 power-on-to-Standby measurements. This trace has no new energy result.
 
+## Derived per-sector transfer and wait breakdown
+
+The same slot-12 write contains **3,730 sectors of 512 bytes**, or 1,909,760
+bytes. At the configured four-bit, nominal 25 MHz SD clock, payload
+serialization requires `512 × 8 / (4 × 25,000,000)` seconds per sector.
+The table separates that calculation from the measured whole-transfer envelope:
+
+| Quantity | Per 512-byte sector | All 3,730 sectors | Basis |
+|---|---:|---:|---|
+| Payload serialization | 40.960000 µs | 152.780800 ms | Calculated from bus width and clock; excludes protocol framing and pauses |
+| Remaining data-phase envelope | 1.775355 µs average | 6.622075 ms | Measured envelope minus calculated payload time |
+| Complete data-phase envelope | 42.735355 µs average | 159.402875 ms | `SD_CMD25_DONE` → `SD_DATAEND`; only the whole interval is measured |
+
+Payload serialization accounts for approximately **95.846%** of this data-phase
+envelope. The remainder combines framing, CRC, card acceptance/busy handling,
+controller stalls and software observation overhead. **It is not a separately
+measured card wait**, and no individual sector's transfer or busy timestamps
+were retained. A collapsed repeated-block diagram can show these averages,
+but must not imply that each block has an identical 1.775355 µs wait. Card
+internal programming may also overlap later data reception.
+
+After this repeated data phase, the separately measured **CMD12 interval is
+0.0258325 ms**, followed by **2.164930 ms of final readiness checking**. The
+driver's `ready()` checks CMD13, DAT0 HIGH and inactive host/IDMA state, with
+1 ms delays between unsuccessful polls. That final interval includes polling
+quantization and service work; it is neither a per-sector wait nor an isolated
+measurement of internal programming latency. The full enclosing slot-write
+call remains **161.8030475 ms**. See [`transfer_dma_write()` and `ready()`](../sd-storage/sd_card.c)
+for the logged boundaries and readiness checks.
+
 ## Interpreting concurrency, repeats and missing events
 
 The hardware receives the image while the CPU loads late code and initializes
