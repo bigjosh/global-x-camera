@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "stage": "post-readback early recovery, before GPIO-speed diagnostic",
+  "sources": [
+    {
+      "path": "slew-pattern-park/result.json",
+      "sha256": "8957f3b9be46f0b9c8296f342759766d7bb0cdc2931e2109cd4e633e6cf22a11",
+      "bytes": 1953
+    },
+    {
+      "path": "slew-pattern-recovery/events.json",
+      "sha256": "35fec9cee3bb85f9f9fcc0259aa6cabe7ca2e81260f894747326b684dca89fea",
+      "bytes": 1362
+    }
+  ],
+  "stimulus_times": [
+    {
+      "name": "capture_started",
+      "utc": "2026-10-25T03:47:22.723219+00:00"
+    },
+    {
+      "name": "break_api_asserted",
+      "utc": "2026-10-25T03:47:23.350636+00:00"
+    },
+    {
+      "name": "break_api_released",
+      "utc": "2026-10-25T03:47:23.451766+00:00"
+    }
+  ],
+  "passed": true,
+  "prefix_sha256": "9401bed4076d6e9e4d2e4f9236661faf7b8f0e051cb332ea4dcbba09da336eba",
+  "good_pulses": 9,
+  "bad_pulses": 0,
+  "source_bits": 2,
+  "context": {
+    "PC": 873990028,
+    "XPSR": 1627389952,
+    "PRIMASK": 1,
+    "FAULTMASK": 0,
+    "CONTROL": 0
+  },
+  "ram_writes": false,
+  "nor_commands": false,
+  "limits": "Exact v18 early park observed for this request; not a new image, Standby, power or all-state-recovery qualification."
+}

@@ -29,7 +29,7 @@ def fixture():
     for field in ('begin','arm','frame_done','camera_stop','first_write','commit_done','deinit_done','end'): p[field]=100
     values={name:0 for name in f.bench.sd.CARD_QWORDS+f.bench.sd.CARD_WORDS}
     values.update(sector_count=122507264,read_sectors=p['card_read_lo'],written_sectors=3732,
-        media_idle=1,stage=9,last_ready_r1=0x900)
+        media_idle=1,stage=9,last_ready_r1=0x900,clock_hz=25000000)
     card=struct.pack('<6Q38I',*(values[n] for n in f.bench.sd.CARD_QWORDS+f.bench.sd.CARD_WORDS))
     slots=bytearray(640);gen=p['generation_lo']|(p['generation_hi']<<32)
     struct.pack_into('<IIQ12I',slots,0,m['card'],m['late_load']['late_address']|1,gen,
@@ -50,6 +50,15 @@ def fixture():
 
 
 class FlashGuards(unittest.TestCase):
+    def test_flash_clock_matches_explicit_fallback_build(self):
+        p,m,_,_=fixture()
+        m.update(sd_clock_hz=12500000,flags=['-DRAW_SD_CLOCK_HZ=12500000U'])
+        with self.assertRaises(ValueError):f.validate_proof(p,m)
+        p['clock_hz']=12500000
+        f.validate_proof(p,m)
+        m['flags']=[]
+        with self.assertRaises(ValueError):f.validate_proof(p,m)
+
     def test_loader_checks_every_fifo_level_bit(self):
         _,m,_,data=fixture();f.validate_loader(data['late-loader.bin'],m)
         for bit in range(8,15):

@@ -153,10 +153,25 @@ def checked_build(folder, digest):
     whole_layout(m)
     magic_layout(m)
     width_layout(m)
+    gpio_layout(m)
+    compensation_layout(m)
     return m, code
 
 
+def clock_layout(m):
+    """Bind the compile-time SD frequency; frozen old builds are 25 MHz."""
+    hz=m.get('sd_clock_hz',25000000)
+    if type(hz) is not int or hz not in (12500000,25000000):
+        raise ValueError('Unsupported native SD clock')
+    flags=[f for f in m.get('flags',[]) if f.startswith('-DRAW_SD_CLOCK_HZ=')]
+    if 'sd_clock_hz' in m or flags:
+        if flags!=[f'-DRAW_SD_CLOCK_HZ={hz}U']:
+            raise ValueError('SD clock manifest/compiler flag differs')
+    return hz
+
+
 def width_layout(m):
+    clock_layout(m)
     width=m.get('sd_bus_width',1)
     if type(width) is not int or width not in (1,4):
         raise ValueError('Unsupported native SD width')
@@ -181,9 +196,87 @@ def width_snapshot(b,m,label):
     if (proof['requested_width']!=4 or proof['scr_widths']&5!=5 or
             proof['acmd6_r1']&0xFDFFE008 or not proof['acmd6_r1']&0x20 or
             proof['acmd6_accepted']!=1 or
-            proof['configured_clkcr']&0xC000!=0x4000 or
+            proof['configured_clkcr']!=(150000000//(2*clock_layout(m))|0x24000) or
             proof['negotiated_width']!=4):
         raise ValueError('Four-bit negotiation proof incomplete or inconsistent')
+    return proof
+
+
+def gpio_layout(m):
+    speed=m.get('sd_gpio_speed',3)
+    if type(speed) is not int or speed not in (0,3):
+        raise ValueError('Unsupported SD GPIO speed')
+    flags=[f for f in m.get('flags',[]) if f.startswith('-DSD_GPIO_SPEED=')]
+    if 'sd_gpio_speed' in m or flags:
+        if flags!=[f'-DSD_GPIO_SPEED={speed}']:
+            raise ValueError('GPIO speed manifest/compiler flag differs')
+        masks=dict(c=0xFF3 if m.get('sd_bus_width',1)==4 else 0x3F0,
+                   e=0x300 if m.get('sd_bus_width',1)==4 else 0)
+        comp=m.get('sd_fixed_compensation',False)
+        if (type(comp) is not bool or (comp and speed!=3) or m.get('sd_gpio_masks')!=masks or
+                m.get('sd_compensation_modified') is not comp):
+            raise ValueError('GPIO speed experiment mask/compensation scope differs')
+    if speed==0:
+        address=m.get('sd_gpio_proof')
+        if (m.get('flash') or m.get('standby') or type(address) is not int or
+                m.get('sd_gpio_proof_bytes')!=32 or
+                not m['bss_start']<=address<=m['bss_end']-32):
+            raise ValueError('GPIO speed diagnostic layout/build differs')
+    elif m.get('sd_gpio_proof') is not None or m.get('sd_gpio_proof_bytes',0):
+        raise ValueError('Unexpected GPIO speed telemetry in default build')
+    return speed
+
+
+def gpio_snapshot(b,m,label):
+    if gpio_layout(m)==3:
+        return None
+    raw=b.upload(m['sd_gpio_proof'],32,label+'-sd-gpio.bin')
+    if len(raw)!=32:raise ValueError('Incomplete GPIO speed telemetry')
+    names=('requested_speed','c_mask','c_before','c_after','e_mask','e_before','e_after','applied')
+    proof=dict(zip(names,struct.unpack('<8I',raw)))
+    masks=m['sd_gpio_masks']
+    if (proof['requested_speed'] or proof['applied']!=1 or
+            proof['c_mask']!=masks['c'] or proof['e_mask']!=masks['e'] or
+            proof['c_after']&masks['c'] or proof['e_after']&masks['e'] or
+            (proof['c_before']^proof['c_after'])&~masks['c'] or
+            (proof['e_before']^proof['e_after'])&~masks['e']):
+        raise ValueError('GPIO speed application proof incomplete or inconsistent')
+    return proof
+
+
+def compensation_layout(m):
+    enabled=m.get('sd_fixed_compensation',False)
+    if type(enabled) is not bool:
+        raise ValueError('Unsupported SD compensation selection')
+    flags=[f for f in m.get('flags',[]) if f.startswith('-DSD_FIXED_COMPENSATION=')]
+    if 'sd_fixed_compensation' in m or flags:
+        if flags!=[f'-DSD_FIXED_COMPENSATION={int(enabled)}']:
+            raise ValueError('Compensation manifest/compiler flag differs')
+        if m.get('sd_compensation_modified') is not enabled:
+            raise ValueError('Compensation scope differs')
+    if enabled:
+        address=m.get('sd_compensation_proof')
+        if (m.get('flash') or m.get('standby') or clock_layout(m)!=25000000 or
+                m.get('sd_gpio_speed',3)!=3 or type(address) is not int or
+                m.get('sd_compensation_proof_bytes')!=32 or
+                not m['bss_start']<=address<=m['bss_end']-32):
+            raise ValueError('Fixed compensation diagnostic layout/build differs')
+    elif m.get('sd_compensation_proof') is not None or m.get('sd_compensation_proof_bytes',0):
+        raise ValueError('Unexpected compensation proof in default build')
+    return enabled
+
+
+def compensation_snapshot(b,m,label):
+    if not compensation_layout(m):
+        return None
+    raw=b.upload(m['sd_compensation_proof'],32,label+'-sd-compensation.bin')
+    if len(raw)!=32:raise ValueError('Incomplete compensation telemetry')
+    names=('clock_before','clock_after','reset','svmcr2','svmcr3','before','after','applied')
+    proof=dict(zip(names,struct.unpack('<8I',raw)))
+    if (proof['clock_after']!=(proof['clock_before']|1) or proof['reset']&1 or
+            not proof['svmcr2']&0x100 or not proof['svmcr3']&0x200 or
+            proof['after']!=0x287 or proof['applied']!=1):
+        raise ValueError('Fixed compensation application proof incomplete or inconsistent')
     return proof
 
 
@@ -322,7 +415,7 @@ def validate(p, m, words):
         sd_error=0,media_idle=1,initialized=0,controller_owned=0,cleanup_error=0,
         control=0,ipsr=0,primask=1,cpacr=0,pattern=m['pattern'],
         transport=int(m['transport']=='idma'),chunk_sectors=m['chunk_sectors'],completion=0,
-        flags=m.get('expected_flags',0))
+        flags=m.get('expected_flags',0),clock_hz=clock_layout(m))
     if any(p.get(k) != v for k,v in exact.items()):
         raise ValueError('RAW terminal proof rejected: '+str(p))
     if p['ccr'] & 0x30000 or p['fpccr'] & 1 or p['systick'] & 3:
@@ -455,6 +548,8 @@ def card_snapshot(b,m,p,label):
         'transfer_words transfer_sta transfer_cycles init_cycles gpioc_idr gpioe_idr '
         'vddio5_control saved_sdmmc_mux saved_demcr saved_dwt timer_owned').split()
     c=dict(zip(names,values))
+    if c['clock_hz']!=clock_layout(m) or p.get('clock_hz')!=c['clock_hz']:
+        raise ValueError('Live card, terminal proof, and requested SD clock differ')
     if (any(c[k] for k in ('initialized','controller_owned','error','cleanup_error','timer_owned')) or
             c['media_idle']!=1 or c['stage']!=9 or c['last_ready_r1']&0x1f00!=0x900 or
             c['written_sectors']!=(p['card_write_hi']<<32|p['card_write_lo']) or
@@ -467,6 +562,10 @@ def card_snapshot(b,m,p,label):
         raise ValueError('Magic slot count does not cover full card geometry')
     width=width_snapshot(b,m,label)
     if width is not None:c['bus_width_proof']=width
+    gpio=gpio_snapshot(b,m,label)
+    if gpio is not None:c['gpio_speed_proof']=gpio
+    comp=compensation_snapshot(b,m,label)
+    if comp is not None:c['compensation_proof']=comp
     return c
 
 

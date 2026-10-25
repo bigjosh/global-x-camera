@@ -82,6 +82,8 @@ def checked_build(folder,receiver_sha,sector_sha):
     bench.whole_layout(m)
     bench.magic_layout(m)
     bench.width_layout(m)
+    bench.gpio_layout(m)
+    bench.compensation_layout(m)
     return m,p,code
 
 
@@ -110,6 +112,7 @@ def validate_proof(p,m):
         transport=int(m['transport']=='idma'),chunk_sectors=m['chunk_sectors'],flags=m['expected_flags'],
         camera_ready=bench.FRAME_BYTES,dma_bytes=bench.FRAME_BYTES,frames=1,errors=0,
         canary=0,format=10,data_type=0x30,vc0cfgr1=0x201,written_sectors=3730,capture_error=0)
+    exact['clock_hz']=bench.clock_layout(m)
     if any(p.get(k)!=v for k,v in exact.items()): raise ValueError('Flash capture is not successful/complete/idle')
     if (p['ccr']&0x30000 or p['fpccr']&1 or p['systick']&3 or p['last_ready']&0x1F00!=0x900 or
         not p['slot_count']>p['slot'] or p['p0fctcr']&8 or p['cmsr1']&0x8000 or p['csi_sr0']&0x20000 or

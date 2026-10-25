@@ -239,6 +239,31 @@ class Tests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 r.checked_recovery_result(dict(passed=True,prefix_sha256=old_prefix),identity)
 
+    def test_v23_fourbit_125_exact_pair_in_both_gates(self):
+        prefix='09fb59cfed0f715927e76f32d5f74187e4c2f1702a70ce192e0d17dcee2f822a'
+        sector='bb31867394a4e0d0fb9ab3f9fa96d0d16ffc7256e2a274db74be4f11f9cfdc14'
+        old_prefix='9401bed4076d6e9e4d2e4f9236661faf7b8f0e051cb332ea4dcbba09da336eba'
+        old_sector='174424c6792f96c72e336fc68e442474e9da665718552d3239a772d59ba73e2e'
+        spec=importlib.util.spec_from_file_location('v23_check_park',
+            r.ROOT/'firmware/capture-timing/recovery_gpio/check_park.py')
+        park=importlib.util.module_from_spec(spec);spec.loader.exec_module(park)
+        self.assertEqual(r.APPROVED_RECOVERY[prefix],
+            dict(name='raw-v23-fourbit-125-standby',sector_sha256=sector))
+        self.assertEqual(park.APPROVED[prefix],
+            dict(bytes=5140,park=0x3418078C,vcp=True,sector=sector))
+        with tempfile.TemporaryDirectory() as folder:
+            work=Path(folder)
+            (work/'stage1.bin').write_bytes(bytes(5140))
+            (work/'capture_sector_0.bin').write_bytes(bytes(65536))
+            with mock.patch.object(r.sd,'sha',side_effect=[prefix,sector]):
+                identity=r.checked_recovery(work)
+            r.checked_recovery_result(dict(passed=True,prefix_sha256=prefix),identity)
+            for pair in ([prefix,old_sector],[old_prefix,sector]):
+                with mock.patch.object(r.sd,'sha',side_effect=pair):
+                    with self.assertRaises(ValueError):r.checked_recovery(work)
+            with self.assertRaises(ValueError):
+                r.checked_recovery_result(dict(passed=True,prefix_sha256=old_prefix),identity)
+
     def test_stale_or_failed_boot_rejected(self):
         words=[0x52425231,1,23,14,0,3,0x201,0,0,1,0,0,4,0x33330000,
                0x00100000,0x2020,0,0,0,0x55,1,32,0x5242444e]

@@ -16,6 +16,7 @@ SDMMC_TypeDef test_sd{};
 MockRcc test_rcc{};
 MockGpio test_gpio_c{},test_gpio_e{};
 MockPwr test_pwr{};
+MockSyscfg test_syscfg{};
 MockDwt test_dwt{};
 MockDebug test_debug{};
 MockDbgMcu test_dbgmcu{};
@@ -30,6 +31,8 @@ static uint32_t data_error_at, busy_polls, command_error, late_card_error;
 static uint32_t app_prefix_r1, app_preerase_r1;
 static uint32_t app_width_r1,app_prefix_count,app_prefix_fail_at,card_width;
 static bool drop_width_write,busy_after_width,not_ready_after_width;
+static uint32_t bad_gpio_speed_write;
+static uint32_t bad_compensation_gate,compensation_reads,compensation_writes;
 static uint32_t erase_busy_polls;
 static bool erase_active,erase_host_timeout;
 static uint64_t modeled_cycles,erase_start_cycles;
@@ -150,6 +153,18 @@ static void command_write(uint32_t value)
 
 MockReg::operator uint32_t() const
 {
+#if SD_FIXED_COMPENSATION
+    if(this==&test_pwr.SVMCR2 || this==&test_pwr.SVMCR3)
+        assert(test_rcc.AHB4ENR.value&RCC_AHB4ENR_PWREN);
+#endif
+    if(this==&test_syscfg.VDDIO5CCCR) {
+        assert(test_rcc.AHB4ENR.value&RCC_AHB4ENR_PWREN);
+        assert(test_pwr.SVMCR2.value&PWR_SVMCR2_VDDIO5SV);
+        assert(test_pwr.SVMCR3.value&PWR_SVMCR3_VDDIO3SV);
+        assert(test_rcc.APB4ENR2.value&RCC_APB4ENR2_SYSCFGEN);
+        assert(!(test_rcc.APB4RSTR2.value&RCC_APB4RSTR2_SYSCFGRST));
+        ++compensation_reads;
+    }
     if (this==&test_dbgmcu.CR) {
         assert(test_rcc.MISCENR.value&RCC_MISCENR_DBGEN);
         assert(!(test_rcc.MISCRSTR.value&RCC_MISCRSTR_DBGRST));
@@ -243,9 +258,20 @@ MockReg::operator uint32_t() const
 
 MockReg& MockReg::operator=(uint32_t input)
 {
+    if(this==&test_syscfg.VDDIO5CCCR) {
+        (void)uint32_t(*this); /* Require every access prerequisite before write. */
+        assert(input==0x287U && !(test_rcc.AHB5ENR.value&RCC_AHB5ENR_SDMMC2EN));
+        ++compensation_writes;
+    }
+    assert(this!=&test_pwr.SVMCR3); /* Diagnostic must never invent SV3. */
     if(this==&test_sd.DTIMER || this==&test_sd.CLKCR || this==&test_sd.DLEN)
         assert(!(uint32_t(test_sd.STA)&(SDMMC_STA_DPSMACT|SDMMC_STA_CPSMACT)));
     value=input;
+    if(this==&test_syscfg.VDDIO5CCCR && bad_compensation_gate==6) value=0x78;
+    if(this==&test_pwr.SVMCR2 && bad_compensation_gate==2) value&=~PWR_SVMCR2_VDDIO5SV;
+    if(this==&test_gpio_c.OSPEEDR && bad_gpio_speed_write==1U) value|=1U<<4;
+    if(this==&test_gpio_e.OSPEEDR && bad_gpio_speed_write==2U) value|=1U<<8;
+    if(this==&test_gpio_c.OSPEEDR && bad_gpio_speed_write==3U) value^=1U<<2;
     if(this==&test_sd.CLKCR && drop_width_write) value&=~SDMMC_CLKCR_WIDBUS;
     if (this==&test_sd.ICR) test_sd.STA.value&=~input;
     else if (this==&test_sd.CMD) {
@@ -272,7 +298,13 @@ MockReg& MockReg::operator=(uint32_t input)
         assert(!operation || words==expected_words); /* IDMAEN writable only idle. */
     } else if (this==&test_rcc.AHB5ENCR) test_rcc.AHB5ENR.value&=~input;
     else if(this==&test_rcc.AHB5ENSR) test_rcc.AHB5ENR.value|=input;
-    else if(this==&test_rcc.AHB4ENSR) test_rcc.AHB4ENR.value|=input;
+    else if(this==&test_rcc.AHB4ENSR) {
+        test_rcc.AHB4ENR.value|=input;
+        if(bad_compensation_gate==1) test_rcc.AHB4ENR.value&=~RCC_AHB4ENR_PWREN;
+    } else if(this==&test_rcc.APB4ENSR2) {
+        assert(input==RCC_APB4ENSR2_SYSCFGENS);
+        if(bad_compensation_gate!=5) test_rcc.APB4ENR2.value|=input;
+    }
     return *this;
 }
 MockReg& MockReg::operator|=(uint32_t input) {return *this=uint32_t(*this)|input;}
@@ -285,7 +317,7 @@ extern "C" {
 static sd_card_t reset_model()
 {
     test_sd={}; test_rcc={}; test_gpio_c={}; test_gpio_e={};
-    test_pwr={}; test_dwt={}; test_debug={}; test_dbgmcu={};
+    test_pwr={}; test_syscfg={}; test_dwt={}; test_debug={}; test_dbgmcu={};
     test_scb={}; test_rif={};
     test_systick={}; test_primask=test_basepri=test_faultmask=0;
     milliseconds=wfi_calls=0; sleep_model=wfi_immediate=wfi_change_context=false;
@@ -295,6 +327,8 @@ static sd_card_t reset_model()
     app_prefix_r1=app_preerase_r1=0x920U;
     app_width_r1=0x920U;app_prefix_count=0;app_prefix_fail_at=0xFFFFFFFFU;
     card_width=SD_BUS_WIDTH;drop_width_write=busy_after_width=not_ready_after_width=false;
+    bad_gpio_speed_write=0;
+    bad_compensation_gate=compensation_reads=compensation_writes=0;
     erase_busy_polls=0;
     erase_active=erase_host_timeout=false;modeled_cycles=erase_start_cycles=0;
     erase_hz=erase_timer=0;
@@ -340,6 +374,11 @@ static sd_card_t reset_init_model()
     test_gpio_c.MODER.value=1U<<2;
     test_gpio_c.PUPDR.value=2U<<2;
     test_gpio_c.AFR[0].value=7U<<4;
+    test_gpio_c.OSPEEDR.value=0xA5A5A5A5U;
+    test_gpio_e.OSPEEDR.value=0x5A5A5A5AU;
+    test_pwr.SVMCR3.value=PWR_SVMCR3_VDDIO3SV;
+    test_rcc.APB4ENR2.value=0x80U;
+    test_syscfg.VDDIO5CCCR.value=0x78U;
     return sd_card_t{};
 }
 
@@ -386,6 +425,37 @@ int main()
     uint8_t *unaligned=bytes.data()+1;
     for(uint32_t i=0;i<65U*512U;++i) unaligned[i]=uint8_t(i*7U+3U);
 
+#if SD_FIXED_COMPENSATION
+    for(unsigned scenario=0;scenario<3;++scenario) {
+        auto c=reset_init_model();
+        if(scenario==1) test_rcc.APB4ENR2.value|=RCC_APB4ENR2_SYSCFGEN;
+        if(scenario==2) test_syscfg.VDDIO5CCCR.value=0x287U;
+        assert(sd_init(&c,25000000U)==SD_OK);
+        assert(sd_compensation_proof.clock_before==(scenario==1?0x81U:0x80U));
+        assert(sd_compensation_proof.clock_after==0x81U && sd_compensation_proof.reset==0);
+        assert(sd_compensation_proof.svmcr2&PWR_SVMCR2_VDDIO5SV);
+        assert(sd_compensation_proof.svmcr3==PWR_SVMCR3_VDDIO3SV);
+        assert(sd_compensation_proof.before==(scenario==2?0x287U:0x78U));
+        assert(sd_compensation_proof.after==0x287U && sd_compensation_proof.applied==1);
+        assert(compensation_writes==1 && test_rcc.APB4ENR2.value==0x81U);
+        assert(sd_deinit(&c)==SD_OK && sd_compensation_proof.applied==1);
+    }
+    for(unsigned gate=1;gate<=6;++gate) {
+        auto c=reset_init_model();bad_compensation_gate=gate;
+        if(gate==3) test_pwr.SVMCR3.value=0;
+        if(gate==4) test_rcc.APB4RSTR2.value=RCC_APB4RSTR2_SYSCFGRST;
+        int expected=(gate==2 || gate==3)?SD_ERR_VOLTAGE:gate==6?SD_ERR_GPIO:SD_ERR_CLOCK;
+        assert(sd_init(&c,25000000U)==expected && !c.initialized && commands.empty());
+        assert(sd_compensation_proof.applied==0);
+        if(gate!=6) assert(!compensation_reads && !compensation_writes);
+        if(gate==3) assert(test_pwr.SVMCR3.value==0);
+    }
+    for(uint32_t hz:{100000U,12500000U}) {
+        auto c=reset_init_model();assert(sd_init(&c,hz)==SD_ERR_ARGUMENT);
+        assert(!compensation_reads && !compensation_writes && commands.empty());
+    }
+#endif
+
     { auto c=reset_init_model();
       assert(sd_init(&c,25000000U)==SD_OK && c.initialized && c.controller_owned && c.media_idle);
       assert(c.clock_hz==25000000U && card_width==SD_BUS_WIDTH);
@@ -393,6 +463,15 @@ int main()
       assert((test_gpio_c.MODER.value&(3U<<2))==(1U<<2));
       assert((test_gpio_c.PUPDR.value&(3U<<2))==(2U<<2));
       assert((test_gpio_c.AFR[0].value&(15U<<4))==(7U<<4));
+      assert((test_gpio_c.OSPEEDR.value&C_MASK)==(SD_GPIO_SPEED==3?C_MASK:0U));
+      assert((test_gpio_c.OSPEEDR.value&~C_MASK)==(0xA5A5A5A5U&~C_MASK));
+#if SD_GPIO_SPEED == 0
+      assert(sd_gpio_proof.requested_speed==0 && sd_gpio_proof.applied==1U);
+      assert(sd_gpio_proof.c_mask==C_MASK && sd_gpio_proof.c_before==0xA5A5A5A5U);
+      assert(sd_gpio_proof.c_after==test_gpio_c.OSPEEDR.value);
+      assert(sd_gpio_proof.e_mask==(SD_BUS_WIDTH==4?0x300U:0U));
+      assert(sd_gpio_proof.e_before==0x5A5A5A5AU && sd_gpio_proof.e_after==test_gpio_e.OSPEEDR.value);
+#endif
 #if SD_BUS_WIDTH == 4
       const std::vector<uint32_t> expected={0,8,55,41,2,3,9,7,13,13,13,55,51,13,55,6,13};
       assert(commands==expected && arguments[15]==2U && app_prefix_count==3U);
@@ -405,6 +484,8 @@ int main()
       }
       assert(((test_gpio_e.MODER.value>>8)&3U)==2U);
       assert(((test_gpio_e.AFR[0].value>>16)&15U)==11U);
+      assert((test_gpio_e.OSPEEDR.value&0x300U)==(SD_GPIO_SPEED==3?0x300U:0U));
+      assert((test_gpio_e.OSPEEDR.value&~0x300U)==(0x5A5A5A5AU&~0x300U));
 #else
       assert(!number_of(51) && !number_of(6));
       assert(!(test_gpio_c.MODER.value&((3U<<0)|(3U<<10))));
@@ -423,6 +504,17 @@ int main()
       assert(card_width==SD_BUS_WIDTH && c.initialized && c.media_idle);
       assert(sd_deinit(&c)==SD_OK);
     }
+#if SD_GPIO_SPEED == 0
+    for(uint32_t failure:{1U,2U,3U}) {
+      if(failure==2U && SD_BUS_WIDTH!=4) continue;
+      auto c=reset_init_model();bad_gpio_speed_write=failure;
+      assert(sd_init(&c,25000000U)==SD_ERR_GPIO);
+      assert(!c.initialized && !sd_gpio_proof.applied);
+      assert(!number_of(24) && !number_of(25) && !number_of(38));
+      if(failure==1U || failure==3U) assert(commands.empty());
+      if(failure==2U) assert(number_of(6)==1U && c.controller_owned);
+    }
+#endif
 #if SD_BUS_WIDTH == 4
     for(uint32_t missing:{0U,5U}) {
       auto c=reset_init_model();test_gpio_c.IDR.value&=~(1U<<missing);

@@ -169,7 +169,7 @@ class TerminalProofGuards(unittest.TestCase):
                  "vddio5_control saved_sdmmc_mux saved_demcr saved_dwt timer_owned").split()
         base = {name: 0 for name in names}
         base.update(sector_count=8 + 3 * 3731, read_sectors=3, written_sectors=3732,
-                    media_idle=1, stage=9, last_ready_r1=0x900)
+                    media_idle=1, stage=9, last_ready_r1=0x900,clock_hz=25000000)
         class FakeBench:
             def __init__(self, state):
                 self.state = state

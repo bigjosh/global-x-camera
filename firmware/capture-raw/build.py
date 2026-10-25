@@ -202,6 +202,12 @@ def main():
     p.add_argument('--transport',choices=('pio','idma'),default='idma')
     p.add_argument('--sd-bus-width',type=int,choices=(1,4),default=1,
                    help='Native SDMMC data width; four-bit requires the full-pin carrier')
+    p.add_argument('--sd-clock-hz',type=int,choices=(12500000,25000000),default=25000000,
+                   help='Native SD clock; explicitly select 12.5 MHz for the qualified fallback')
+    p.add_argument('--sd-gpio-speed',type=int,choices=(0,3),default=3,
+                   help='SD GPIO OSPEEDR encoding; nondefault slew is RAM diagnostic only')
+    p.add_argument('--sd-fixed-compensation',action='store_true',
+                   help='RAM-only ES0620 VDDIO5 fixed-code test at 25 MHz and GPIO speed3')
     p.add_argument('--chunk-sectors',type=int,default=1024)
     p.add_argument('--whole-image-preerase',action='store_true',help='One CMD55/ACMD23 + CMD25 for all3730 padded payload sectors')
     p.add_argument('--magic-format',action='store_true',help='GXR2 + front metadata + packedRAW + GXRE slots; one progressive CMD25')
@@ -215,6 +221,10 @@ def main():
     p.add_argument('--snapshot',action='store_true',help='RAM diagnostic: copy the last 512 B at each published prefix')
     p.add_argument('--poison',action='store_true',help='RAM diagnostic: fill the frame with A5 before sensor start')
     a=p.parse_args()
+    if a.sd_gpio_speed!=3 and (a.flash or a.standby):
+        p.error('Nondefault SD GPIO speed is RAM diagnostic only')
+    if a.sd_fixed_compensation and (a.flash or a.standby or a.sd_clock_hz!=25000000 or a.sd_gpio_speed!=3):
+        p.error('Fixed compensation is an isolated 25 MHz RAM diagnostic only')
     if a.magic_format and (a.transport!='idma' or a.dma_sleep or a.whole_image_preerase or not a.line_stream):
         p.error('Magic format requires LINE producer and polling IDMA/flow-controlled stream, without legacy whole-image option')
     if not 1<=a.exposure_coarse<=63000 or (a.flash and a.exposure_coarse!=1428):
@@ -286,6 +296,9 @@ def main():
     flags.insert(0,'-I'+str(out))
     flags += [f'-DRAW_PATTERN={int(a.pattern=="diagonal")}',f'-DRAW_FLASH={int(a.flash)}',
               f'-DSD_BUS_WIDTH={a.sd_bus_width}',
+              f'-DRAW_SD_CLOCK_HZ={a.sd_clock_hz}U',
+              f'-DSD_GPIO_SPEED={a.sd_gpio_speed}',
+              f'-DSD_FIXED_COMPENSATION={int(a.sd_fixed_compensation)}',
               f'-DRAW_STANDBY={int(a.standby)}',f'-DRAW_DMA={int(a.transport=="idma")}',
               f'-DRAW_ASYNC_STOP={int(a.async_stop)}',
               f'-DRAW_DMA_SLEEP={int(a.dma_sleep)}',
@@ -332,12 +345,21 @@ def main():
         sd_stream=symbol('raw_stream',a.magic_format),sd_stream_bytes=44,
         sd_width_proof=symbol('sd_bus_width_proof',a.sd_bus_width==4),
         sd_width_proof_bytes=24 if a.sd_bus_width==4 else 0,
+        sd_gpio_proof=symbol('sd_gpio_proof',a.sd_gpio_speed==0),
+        sd_gpio_proof_bytes=32 if a.sd_gpio_speed==0 else 0,
+        sd_compensation_proof=symbol('sd_compensation_proof',a.sd_fixed_compensation),
+        sd_compensation_proof_bytes=32 if a.sd_fixed_compensation else 0,
         exposure_coarse=a.exposure_coarse,
         whole_proof=symbol('raw_whole_proof',a.whole_image_preerase),whole_proof_words=8,
         bss_start=symbol('_sbss'),bss_end=symbol('_ebss'),data_start=symbol('_sdata'),
         data_end=symbol('_edata'),immutable_bytes=symbol('_sdata')-0x34300000,
         system_core_clock=symbol('SystemCoreClock'),card=symbol('raw_card'),slots=symbol('raw_slots'),
         pattern=int(a.pattern=='diagonal'),transport=a.transport,sd_bus_width=a.sd_bus_width,
+        sd_clock_hz=a.sd_clock_hz,sd_gpio_speed=a.sd_gpio_speed,
+        sd_gpio_masks=dict(c=0xFF3 if a.sd_bus_width==4 else 0x3F0,
+                           e=0x300 if a.sd_bus_width==4 else 0),
+        sd_fixed_compensation=a.sd_fixed_compensation,
+        sd_compensation_modified=a.sd_fixed_compensation,
         chunk_sectors=3730 if a.whole_image_preerase or a.magic_format else a.chunk_sectors,
         flash=a.flash,standby=a.standby,async_stop=a.async_stop,line_stream=a.line_stream,
         dma_sleep=a.dma_sleep,dma_wait=symbol('raw_dma_wait',a.dma_sleep),dma_wait_bytes=24,

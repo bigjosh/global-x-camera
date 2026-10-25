@@ -183,3 +183,47 @@ mandatory stop/ready error handling. They do not access hardware:
 ```powershell
 python -m unittest discover -s firmware/sd-storage -p "test_*.py"
 ```
+
+## Isolated GPIO slew diagnostic
+
+`SD_GPIO_SPEED` defaults to `3` (OSPEEDR `11`), preserving historical binaries.
+The opt-in value `0` selects OSPEEDR `00` on the pins used by this transport:
+PC2/PC3/PC4 in one-bit mode, plus PC0/PC5/PE4 in four-bit mode. Only `0` and
+`3` are accepted. `capture-raw/build.py --sd-gpio-speed 0` is restricted to RAM
+diagnostics; flash and Standby builds reject the nondefault setting.
+
+Speed-zero builds expose a separate 32-byte `sd_gpio_proof`, leaving `sd_card_t`
+unchanged. Its words are `requested_speed`, `c_mask`, `c_before`, `c_after`,
+`e_mask`, `e_before`, `e_after`, `applied`. Fresh init clears the proof. The
+`applied` flag becomes one only after successful initialization and register
+readback; deinit preserves the SRAM record. Four-bit masks are `0xFF3` for C
+and `0x300` for E, with all masked post-init bits zero. One-bit masks are
+`0x3F0` and zero. The driver verifies unrelated OSPEEDR bits are preserved.
+Default builds allocate no new GPIO proof and retain their previous behavior.
+
+The experiment does not read or modify GPIO compensation. In particular, it
+does not silently combine a slew change with an ES0620 compensation workaround.
+Register-model tests verify both widths/speeds, refused register writes and
+preservation of unrelated pins; real wiring, loading and reliability still
+require separate hardware qualification.
+
+## Isolated fixed-compensation diagnostic
+
+`SD_FIXED_COMPENSATION` defaults to zero. The opt-in
+`capture-raw/build.py --sd-fixed-compensation` is limited to awake RAM builds at
+25 MHz and GPIO speed 3. It applies the ES0620 section 2.2.20 fixed VDDIO5 code
+`0x287` (EN=0, CS=1, RANSRC=7, RAPSRC=8), without automatic compensation or an
+HSI-ready wait. It proves the PWR clock before reading PWR, requires the existing
+VDDIO3SV and enabled VDDIO5SV, and checks SYSCFG reset and clock before accessing
+the secure VDDIO5CCCR register. A missing VDDIO3SV is an error; it is never set by
+this diagnostic. Only the SYSCFG clock bit may be enabled, using its set register.
+No other compensation register, voltage selection, RIF or OTP is changed.
+
+The separate 32-byte `sd_compensation_proof` contains `clock_before`,
+`clock_after`, `reset`, `svmcr2`, `svmcr3`, `before`, `after`, `applied`. It is
+cleared on fresh init and retained on deinit. `applied=1` proves the exact
+VDDIO5CCCR write/readback, independently of whether subsequent SD initialization
+succeeds. The inherited code can already be `0x287`; no reset-value assumption is
+made. This test can also enable a previously disabled SYSCFG clock, which is
+recorded and must be considered when interpreting energy. Default builds add no
+proof or register accesses and remain byte-identical to the prior default build.

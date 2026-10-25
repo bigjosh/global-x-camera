@@ -31,6 +31,11 @@ SECTOR_SHA="7fda9d00cc7ffb3fbb9e6aac6695cf18545754b5dbfce1520cf30b2da39c4e63"
 # command-line opt-in for unknown firmware. This table does not broaden the
 # bridge or READ-module identities, and check_park still verifies live code.
 APPROVED_RECOVERY={
+    # RAW v23 four-bit/12.5 MHz: exact independently reviewed recovery pair.
+    # Clock-only fallback admission does not establish hardware qualification.
+    '09fb59cfed0f715927e76f32d5f74187e4c2f1702a70ce192e0d17dcee2f822a':
+        dict(name="raw-v23-fourbit-125-standby",sector_sha256=
+             'bb31867394a4e0d0fb9ab3f9fa96d0d16ffc7256e2a274db74be4f11f9cfdc14'),
     # RAW v19b four-bit: exact v18 recovery instructions/literals; two CRC words.
     # This permits qualification of this exact build, not generic new firmware.
     '666282fb6ebdf19b1a2c4492770580d3f6278b52c76d6605eeb65b30fdb18a97':

@@ -68,6 +68,15 @@ volatile sd_width_proof_t sd_bus_width_proof;
 _Static_assert(sizeof(sd_width_proof_t)==24U,"bus-width proof ABI");
 #endif
 
+#if SD_GPIO_SPEED == 0
+volatile sd_gpio_proof_t sd_gpio_proof;
+_Static_assert(sizeof(sd_gpio_proof_t)==32U,"GPIO speed proof ABI");
+#endif
+#if SD_FIXED_COMPENSATION
+volatile sd_compensation_proof_t sd_compensation_proof;
+_Static_assert(sizeof(sd_compensation_proof_t)==32U,"compensation proof ABI");
+#endif
+
 __attribute__((weak)) void sd_progress(void)
 {
 }
@@ -553,11 +562,27 @@ int sd_init(sd_card_t *c, uint32_t max_hz)
     for (size_t i=0;i<sizeof(sd_bus_width_proof);++i) width_clear[i]=0;
     sd_bus_width_proof.requested_width=4U;
 #endif
+#if SD_GPIO_SPEED == 0
+    volatile uint8_t *gpio_clear=(volatile uint8_t *)&sd_gpio_proof;
+    for (size_t i=0;i<sizeof(sd_gpio_proof);++i) gpio_clear[i]=0;
+    sd_gpio_proof.requested_speed=SD_GPIO_SPEED;
+    sd_gpio_proof.c_mask=C_MASK;
+#if SD_BUS_WIDTH == 4
+    sd_gpio_proof.e_mask=3UL<<8;
+#endif
+#endif
+#if SD_FIXED_COMPENSATION
+    volatile uint8_t *comp_clear=(volatile uint8_t *)&sd_compensation_proof;
+    for (size_t i=0;i<sizeof(sd_compensation_proof);++i) comp_clear[i]=0;
+#endif
     volatile uint8_t *p=(volatile uint8_t *)c;
     for (size_t i=0;i<sizeof(*c);++i) p[i]=0;
     c->stage=SD_STAGE_PREFLIGHT;
     if (max_hz!=100000UL && max_hz!=12500000UL && max_hz!=25000000UL)
         return fault(c,SD_ERR_ARGUMENT);
+#if SD_FIXED_COMPENSATION
+    if (max_hz!=25000000UL) return fault(c,SD_ERR_ARGUMENT);
+#endif
     if (__get_IPSR() || (__get_CONTROL()&1U)) return fault(c,SD_ERR_STATE);
     if (R->CFGR1!=0x33330000UL || R->CFGR2!=0x00100000UL ||
         R->PLL1CFGR1!=0x00404B00UL || R->PLL1CFGR2 ||
@@ -569,6 +594,10 @@ int sd_init(sd_card_t *c, uint32_t max_hz)
     if (R->AHB5ENR&RCC_AHB5ENR_SDMMC2EN) return fault(c,SD_ERR_CONTROLLER_BUSY);
     R->AHB4ENSR=RCC_AHB4ENSR_PWRENS|RCC_AHB4ENSR_GPIOCENS|RCC_AHB4ENSR_GPIOEENS;
     (void)R->AHB4ENR;
+#if SD_FIXED_COMPENSATION
+    /* Prove this clock before any PWR register read. No supply is enabled here. */
+    if (!(R->AHB4ENR&RCC_AHB4ENR_PWREN)) return fault(c,SD_ERR_CLOCK);
+#endif
     if (P->SVMCR2&PWR_SVMCR2_VDDIO5VRSEL) return fault(c,SD_ERR_VOLTAGE);
 #if SD_BUS_WIDTH == 4
     for (uint32_t pin=0;pin<=5;++pin) {
@@ -591,15 +620,57 @@ int sd_init(sd_card_t *c, uint32_t max_hz)
     int result=delay_us(c,1);
     if (result) return result;
     c->stage=SD_STAGE_GPIO;
+#if SD_GPIO_SPEED == 0
+    sd_gpio_proof.c_before=C->OSPEEDR;
+    sd_gpio_proof.e_before=E->OSPEEDR;
+#endif
     C->BSRR=1UL<<(2+16);
     C->OTYPER&=~C_PINS;
     C->MODER&=~C_MASK;
     C->PUPDR=(C->PUPDR&~C_MASK)|C_PULLS;
+#if SD_GPIO_SPEED == 3
     C->OSPEEDR=(C->OSPEEDR&~C_MASK)|C_MASK;
+#else
+    C->OSPEEDR&=~C_MASK;
+    sd_gpio_proof.c_after=C->OSPEEDR;
+    if ((sd_gpio_proof.c_after&C_MASK) ||
+            ((sd_gpio_proof.c_before^sd_gpio_proof.c_after)&~C_MASK))
+        return fault(c,SD_ERR_GPIO);
+#endif
     E->MODER&=~(3UL<<8);
     E->PUPDR=(E->PUPDR&~(3UL<<8))|(1UL<<8);
     P->SVMCR2|=PWR_SVMCR2_VDDIO5SV;
     c->vddio5_control=P->SVMCR2;
+#if SD_FIXED_COMPENSATION
+    /* ES0620 2.2.20 fixed code: EN=0, CS=1, RANSRC=7, RAPSRC=8.
+     * ES0620 2.2.19 and RM0486 require both independent supplies valid before
+     * accessing this SYSCFG register. Do not manufacture missing VDDIO3SV.
+     * Change only VDDIO5CCCR; no automatic compensation/HSI-ready wait.
+     */
+    sd_compensation_proof.svmcr2=P->SVMCR2;
+    sd_compensation_proof.svmcr3=P->SVMCR3;
+    if (!(sd_compensation_proof.svmcr2&PWR_SVMCR2_VDDIO5SV) ||
+            !(sd_compensation_proof.svmcr3&PWR_SVMCR3_VDDIO3SV))
+        return fault(c,SD_ERR_VOLTAGE);
+    sd_compensation_proof.clock_before=R->APB4ENR2;
+    sd_compensation_proof.reset=R->APB4RSTR2;
+    if (sd_compensation_proof.reset&RCC_APB4RSTR2_SYSCFGRST)
+        return fault(c,SD_ERR_CLOCK);
+    if (!(sd_compensation_proof.clock_before&RCC_APB4ENR2_SYSCFGEN))
+        R->APB4ENSR2=RCC_APB4ENSR2_SYSCFGENS;
+    __DSB();
+    sd_compensation_proof.clock_after=R->APB4ENR2;
+    sd_compensation_proof.reset=R->APB4RSTR2;
+    if (sd_compensation_proof.clock_after!=(sd_compensation_proof.clock_before|RCC_APB4ENR2_SYSCFGEN) ||
+            (sd_compensation_proof.reset&RCC_APB4RSTR2_SYSCFGRST))
+        return fault(c,SD_ERR_CLOCK);
+    sd_compensation_proof.before=SYSCFG_S->VDDIO5CCCR;
+    SYSCFG_S->VDDIO5CCCR=0x287U;
+    __DSB();
+    sd_compensation_proof.after=SYSCFG_S->VDDIO5CCCR;
+    if (sd_compensation_proof.after!=0x287U) return fault(c,SD_ERR_GPIO);
+    sd_compensation_proof.applied=1U;
+#endif
     if ((result=delay_us(c,1000))) return result;
     c->gpioc_idr=C->IDR; c->gpioe_idr=E->IDR;
     if ((c->gpioc_idr&C_IDLE_PINS)!=C_IDLE_PINS ||
@@ -648,7 +719,15 @@ int sd_init(sd_card_t *c, uint32_t max_hz)
     /* An uncertain ACMD6 response retains ownership and does not guess which
      * width the card selected. Only successful negotiation reaches this. */
     E->OTYPER&=~(1UL<<4);
+#if SD_GPIO_SPEED == 3
     E->OSPEEDR=(E->OSPEEDR&~(3UL<<8))|(3UL<<8);
+#else
+    E->OSPEEDR&=~(3UL<<8);
+    sd_gpio_proof.e_after=E->OSPEEDR;
+    if ((sd_gpio_proof.e_after&(3UL<<8)) ||
+            ((sd_gpio_proof.e_before^sd_gpio_proof.e_after)&~(3UL<<8)))
+        return fault(c,SD_ERR_GPIO);
+#endif
     E->AFR[0]=(E->AFR[0]&~(15UL<<16))|(11UL<<16);
     E->MODER=(E->MODER&~(3UL<<8))|(2UL<<8);
     if ((E->MODER&(3UL<<8))!=(2UL<<8) ||
@@ -659,6 +738,15 @@ int sd_init(sd_card_t *c, uint32_t max_hz)
     if ((X->CLKCR&SDMMC_CLKCR_WIDBUS)!=WIDTH_BITS) return fault(c,SD_ERR_CLOCK);
     if ((result=ready(c))) return result;
     sd_bus_width_proof.negotiated_width=4U;
+#endif
+#if SD_GPIO_SPEED == 0
+    sd_gpio_proof.c_after=C->OSPEEDR; sd_gpio_proof.e_after=E->OSPEEDR;
+    if ((sd_gpio_proof.c_after&sd_gpio_proof.c_mask) ||
+            (sd_gpio_proof.e_after&sd_gpio_proof.e_mask) ||
+            ((sd_gpio_proof.c_before^sd_gpio_proof.c_after)&~sd_gpio_proof.c_mask) ||
+            ((sd_gpio_proof.e_before^sd_gpio_proof.e_after)&~sd_gpio_proof.e_mask))
+        return fault(c,SD_ERR_GPIO);
+    sd_gpio_proof.applied=1U;
 #endif
     c->initialized=1;
     c->init_cycles=DWT->CYCCNT-start;

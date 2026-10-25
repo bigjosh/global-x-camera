@@ -17,6 +17,38 @@
 #if SD_BUS_WIDTH != 1 && SD_BUS_WIDTH != 4
 #error "SD_BUS_WIDTH must be 1 or 4"
 #endif
+#ifndef SD_GPIO_SPEED
+#define SD_GPIO_SPEED 3
+#endif
+#if SD_GPIO_SPEED != 0 && SD_GPIO_SPEED != 3
+#error "SD_GPIO_SPEED must be 0 or 3"
+#endif
+#ifndef SD_FIXED_COMPENSATION
+#define SD_FIXED_COMPENSATION 0
+#endif
+#if SD_FIXED_COMPENSATION != 0 && SD_FIXED_COMPENSATION != 1
+#error "SD_FIXED_COMPENSATION must be 0 or 1"
+#endif
+#if SD_FIXED_COMPENSATION && SD_GPIO_SPEED != 3
+#error "Fixed compensation diagnostic requires unchanged GPIO speed 3"
+#endif
+#if SD_FIXED_COMPENSATION
+typedef struct {
+    uint32_t clock_before, clock_after, reset, svmcr2, svmcr3;
+    uint32_t before, after, applied;
+} sd_compensation_proof_t;
+extern volatile sd_compensation_proof_t sd_compensation_proof;
+#endif
+#if SD_GPIO_SPEED == 0
+/* Diagnostic-only proof, separate from sd_card_t and absent in default builds.
+ * Captured after pin configuration and before sd_init() returns; retained on
+ * deinit. This does not inspect or change I/O compensation configuration. */
+typedef struct {
+    uint32_t requested_speed, c_mask, c_before, c_after;
+    uint32_t e_mask, e_before, e_after, applied;
+} sd_gpio_proof_t;
+extern volatile sd_gpio_proof_t sd_gpio_proof;
+#endif
 #if SD_BUS_WIDTH == 4
 /* Separate debugger evidence, preserving sd_card_t's existing ABI. Reset at
  * fresh init, retained through deinit. negotiated_width becomes4 only after

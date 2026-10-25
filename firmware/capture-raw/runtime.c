@@ -35,6 +35,18 @@
 #ifndef RAW_DMA_SLEEP
 #define RAW_DMA_SLEEP 0
 #endif
+#ifndef RAW_SD_CLOCK_HZ
+#define RAW_SD_CLOCK_HZ 25000000U
+#endif
+#if RAW_SD_CLOCK_HZ != 12500000U && RAW_SD_CLOCK_HZ != 25000000U
+#error Unsupported RAW SD clock
+#endif
+#if SD_GPIO_SPEED != 3 && (RAW_FLASH || RAW_STANDBY)
+#error Nondefault SD GPIO speed is RAM diagnostic only
+#endif
+#if SD_FIXED_COMPENSATION && (RAW_FLASH || RAW_STANDBY || RAW_SD_CLOCK_HZ != 25000000U)
+#error Fixed compensation is an isolated 25 MHz RAM diagnostic only
+#endif
 sd_card_t raw_card;
 raw_slots_t raw_slots;
 #if RAW_MAGIC_FORMAT
@@ -254,7 +266,7 @@ static void init_card(void)
     P[RP_STAGE]=2U; P[RP_SD_BEGIN]=DWT->CYCCNT;
     if(operation==RAW_OP_CAPTURE) (void)phase_gpio_emit(4U);
     configure_sd_master();
-    int r; SD_OPERATION(r,sd_init(&raw_card,25000000U));
+    int r; SD_OPERATION(r,sd_init(&raw_card,RAW_SD_CLOCK_HZ));
     if(r) complete_storage(0x200U|(uint32_t)r);
     P[RP_SD_READY]=DWT->CYCCNT;
     if(operation==RAW_OP_CAPTURE) (void)phase_gpio_emit(5U);

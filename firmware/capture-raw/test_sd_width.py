@@ -23,7 +23,7 @@ class WidthGuards(unittest.TestCase):
         self.manifest=dict(sd_bus_width=4,sd_width_proof=0x34308000,
             sd_width_proof_bytes=24,bss_start=0x34307000,bss_end=0x34309000,
             flags=['-DSD_BUS_WIDTH=4'])
-        self.proof=[4,5,0x920,1,0x4003,4]
+        self.proof=[4,5,0x920,1,0x24003,4]
 
     def test_legacy_one_bit_needs_no_new_read(self):
         fake=FakeRead(self.proof)
@@ -32,7 +32,7 @@ class WidthGuards(unittest.TestCase):
 
     def test_success_retains_actual_negotiation(self):
         result=bench.width_snapshot(FakeRead(self.proof),self.manifest,'ok')
-        self.assertEqual(result['configured_clkcr'],0x4003)
+        self.assertEqual(result['configured_clkcr'],0x24003)
         self.assertEqual(result['negotiated_width'],4)
 
     def test_missing_card_or_host_transition_is_rejected(self):

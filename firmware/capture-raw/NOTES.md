@@ -48,3 +48,17 @@
 **Rejected:** copying the frame to obtain alignment, seeding conflicting independent guards, or writing the trailer before FRAME/STOP validation. Metadata must be initialized before publication, including on retained nonzero SRAM.
 **Evidence:** commit `18299c29`; [geometry and hardware qualification](README.md#selected-layout-v18-front-metadata-slots); `test_magic_integration.py`; [format rationale](../raw-slots/NOTES.md#2026-10-24--put-all-reserved-metadata-in-the-first-sector-and-distinguish-the-new-layout).
 **Provenance:** migrated 2026-10-24 from the layout implementation, all-nine-word corruption tests and complete SD/RAM comparisons.
+
+## 2026-10-24  Isolate SD clock experiments in RAM and bind the measured frequency
+
+**Why:** the replacement four-bit carrier initialized and read existing data successfully at 25 MHz, but its first progressive write reported a data-CRC error. A RAM-only 12.5 MHz option changes the clock without changing the SD driver, GPIO slew, card width, capture geometry or cleanup policy. The default remains 25 MHz and rebuilds byte-identically; manifest, compiler flag, terminal/card clock and the negotiated CLKCR divider must agree before accepting a result.
+**Rejected:** changing several electrical/protocol variables at once, treating read success as write qualification, weakening CRC/idle checks, or silently promoting a diagnostic lower frequency to flash/Standby. A lower-clock result alone would not identify the underlying electrical cause.
+**Evidence:** `build.py --sd-clock-hz`, `runtime.c` compile-time restrictions, `bench.py` clock binding, `test_sd_clock.py`; private `tmp/bringup/sd-fourbit-20261024/pattern-fault-status/diagnostic.json` and `ram-pattern125-v20/manifest.json`. Durable hardware measurements remain the responsibility of the owning experiment record.
+**Provenance:** recorded during replacement-carrier qualification; no lower-clock hardware result was established when this entry was added.
+
+## 2026-10-24  Admit the explicit 12.5 MHz fallback for four-bit flash qualification
+
+**Why:** the 12.5 MHz/default-slew pattern save passed full camera-RAM equality, while separate 25 MHz default-slew, low-slew and fixed-compensation trials failed CRC checks. The bench owner selected 12.5 MHz with unchanged speed-three pins and no compensation modification for the final comparison. Builds may now explicitly select this clock for flash/Standby; the prior 25 MHz default and exact frequency/compiler/divider checks remain. This supersedes the earlier RAM-only clock restriction, not the separate RAM-only slew and compensation restrictions.
+**Rejected:** extending the experiment with further electrical variables before completing the requested comparison, disabling CRC/idle guards, making the lower frequency an implicit default, or treating a single pattern equality result as complete cold-cycle qualification. Exact recovery-prefix review and hardware scene/long-exposure/Standby verification remain separate gates.
+**Evidence:** `build.py`, `runtime.c`, `bench.py`, `inspect_flash.py`, `test_sd_clock.py`, `test_inspect_flash.py`; frozen `tmp/bringup/sd-fourbit-20261024/flash125-v23`, `ram-scene125-v23`, `ram-long125-v23`. Owning hardware evidence records the trial outcomes; this change performs no programming or bench operations.
+**Provenance:** recorded under the exclusive bench owner's request to qualify the lower-clock fallback after the bounded compensation trial failed.
