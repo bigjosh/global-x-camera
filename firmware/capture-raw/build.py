@@ -200,6 +200,8 @@ def main():
     p.add_argument('--base',type=Path,default=BASE)
     p.add_argument('--pattern',choices=('scene','diagonal'),default='scene')
     p.add_argument('--transport',choices=('pio','idma'),default='idma')
+    p.add_argument('--sd-bus-width',type=int,choices=(1,4),default=1,
+                   help='Native SDMMC data width; four-bit requires the full-pin carrier')
     p.add_argument('--chunk-sectors',type=int,default=1024)
     p.add_argument('--whole-image-preerase',action='store_true',help='One CMD55/ACMD23 + CMD25 for all3730 padded payload sectors')
     p.add_argument('--magic-format',action='store_true',help='GXR2 + front metadata + packedRAW + GXRE slots; one progressive CMD25')
@@ -283,6 +285,7 @@ def main():
     flags=[f for f in m['compile_flags'] if f!='-I'+str(rbase)]
     flags.insert(0,'-I'+str(out))
     flags += [f'-DRAW_PATTERN={int(a.pattern=="diagonal")}',f'-DRAW_FLASH={int(a.flash)}',
+              f'-DSD_BUS_WIDTH={a.sd_bus_width}',
               f'-DRAW_STANDBY={int(a.standby)}',f'-DRAW_DMA={int(a.transport=="idma")}',
               f'-DRAW_ASYNC_STOP={int(a.async_stop)}',
               f'-DRAW_DMA_SLEEP={int(a.dma_sleep)}',
@@ -327,12 +330,15 @@ def main():
         sd_scr=symbol('raw_scr',a.magic_format),sd_scr_bytes=16,
         sd_erase=symbol('raw_erase',a.magic_format and not a.flash),sd_erase_bytes=32,
         sd_stream=symbol('raw_stream',a.magic_format),sd_stream_bytes=44,
+        sd_width_proof=symbol('sd_bus_width_proof',a.sd_bus_width==4),
+        sd_width_proof_bytes=24 if a.sd_bus_width==4 else 0,
         exposure_coarse=a.exposure_coarse,
         whole_proof=symbol('raw_whole_proof',a.whole_image_preerase),whole_proof_words=8,
         bss_start=symbol('_sbss'),bss_end=symbol('_ebss'),data_start=symbol('_sdata'),
         data_end=symbol('_edata'),immutable_bytes=symbol('_sdata')-0x34300000,
         system_core_clock=symbol('SystemCoreClock'),card=symbol('raw_card'),slots=symbol('raw_slots'),
-        pattern=int(a.pattern=='diagonal'),transport=a.transport,chunk_sectors=3730 if a.whole_image_preerase or a.magic_format else a.chunk_sectors,
+        pattern=int(a.pattern=='diagonal'),transport=a.transport,sd_bus_width=a.sd_bus_width,
+        chunk_sectors=3730 if a.whole_image_preerase or a.magic_format else a.chunk_sectors,
         flash=a.flash,standby=a.standby,async_stop=a.async_stop,line_stream=a.line_stream,
         dma_sleep=a.dma_sleep,dma_wait=symbol('raw_dma_wait',a.dma_sleep),dma_wait_bytes=24,
         dma_wait_clock=(symbol('HAL_GetTick')|1) if a.dma_sleep else None,

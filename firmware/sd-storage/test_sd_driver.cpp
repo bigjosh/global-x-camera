@@ -28,6 +28,8 @@ static std::vector<uint32_t> commands, arguments, output;
 static uint32_t words, expected_words, current_lba, operation, stop_count, fifo_resets;
 static uint32_t data_error_at, busy_polls, command_error, late_card_error;
 static uint32_t app_prefix_r1, app_preerase_r1;
+static uint32_t app_width_r1,app_prefix_count,app_prefix_fail_at,card_width;
+static bool drop_width_write,busy_after_width,not_ready_after_width;
 static uint32_t erase_busy_polls;
 static bool erase_active,erase_host_timeout;
 static uint64_t modeled_cycles,erase_start_cycles;
@@ -75,7 +77,27 @@ static void command_write(uint32_t value)
         test_sd.STA.value=SDMMC_STA_CTIMEOUT;
         return;
     }
-    if (index==55) test_sd.RESP1.value=app_prefix_r1;
+    if (index==0) {
+        card_width=1;test_sd.STA.value=SDMMC_STA_CMDSENT;
+    } else if(index==8) test_sd.RESP1.value=0x1AAU;
+    else if(index==41) test_sd.RESP1.value=0xC0300000U;
+    else if(index==3) test_sd.RESP1.value=0x12340000U;
+    else if(index==9) {
+        test_sd.RESP1.value=0x40000000U;test_sd.RESP2.value=0;
+        test_sd.RESP3.value=0x7FFF0000U;test_sd.RESP4.value=0;
+    } else if (index==55) {
+        ++app_prefix_count;
+        test_sd.RESP1.value=app_prefix_count==app_prefix_fail_at?0x900U:app_prefix_r1;
+    } else if(index==6) {
+        assert(commands.size()>=2 && commands[commands.size()-2]==55);
+        assert(test_sd.ARG.value==2U && card_width==1);
+        assert(!(test_sd.CLKCR.value&SDMMC_CLKCR_WIDBUS));
+        assert(!test_sd.IDMACTRL.value && !operation);
+        test_sd.RESP1.value=app_width_r1;
+        if((app_width_r1&0xFDFFE008U)==0 && (app_width_r1&(1U<<5))) card_width=4;
+        if(busy_after_width) test_sd.STA.value|=SDMMC_STA_DPSMACT;
+        if(not_ready_after_width) permanent_busy=true;
+    }
     else if (index==23) {
         assert(commands.size()>=2 && commands[commands.size()-2]==55);
         assert(!test_sd.IDMACTRL.value && !operation);
@@ -87,6 +109,8 @@ static void command_write(uint32_t value)
         erase_timer=test_sd.DTIMER.value;
     }
     else if (index==17 || index==18 || index==24 || index==25 || index==51) {
+        assert((test_sd.CLKCR.value&SDMMC_CLKCR_WIDBUS)==
+               (card_width==4?SDMMC_CLKCR_WIDBUS_0:0U));
         assert(value&SDMMC_CMD_CMDTRANS);
         assert(!(value&SDMMC_CMD_CMDSTOP));
         operation=index; words=0; expected_words=test_sd.DLEN.value/4;
@@ -222,6 +246,7 @@ MockReg& MockReg::operator=(uint32_t input)
     if(this==&test_sd.DTIMER || this==&test_sd.CLKCR || this==&test_sd.DLEN)
         assert(!(uint32_t(test_sd.STA)&(SDMMC_STA_DPSMACT|SDMMC_STA_CPSMACT)));
     value=input;
+    if(this==&test_sd.CLKCR && drop_width_write) value&=~SDMMC_CLKCR_WIDBUS;
     if (this==&test_sd.ICR) test_sd.STA.value&=~input;
     else if (this==&test_sd.CMD) {
         command_write(input);
@@ -241,9 +266,13 @@ MockReg& MockReg::operator=(uint32_t input)
         ++fifo_resets; operation=0; abort_pending=false;
         test_sd.STA.value|=SDMMC_STA_DABORT;
         value&=~SDMMC_DCTRL_FIFORST;
+    } else if(this==&test_sd.DCTRL && !input && words==expected_words) {
+        operation=0;
     } else if (this==&test_sd.IDMACTRL) {
         assert(!operation || words==expected_words); /* IDMAEN writable only idle. */
     } else if (this==&test_rcc.AHB5ENCR) test_rcc.AHB5ENR.value&=~input;
+    else if(this==&test_rcc.AHB5ENSR) test_rcc.AHB5ENR.value|=input;
+    else if(this==&test_rcc.AHB4ENSR) test_rcc.AHB4ENR.value|=input;
     return *this;
 }
 MockReg& MockReg::operator|=(uint32_t input) {return *this=uint32_t(*this)|input;}
@@ -264,6 +293,8 @@ static sd_card_t reset_model()
     words=0; expected_words=0; current_lba=0; operation=0; stop_count=0; fifo_resets=0;
     data_error_at=0xFFFFFFFFU; busy_polls=0; command_error=0xFFFFFFFFU;
     app_prefix_r1=app_preerase_r1=0x920U;
+    app_width_r1=0x920U;app_prefix_count=0;app_prefix_fail_at=0xFFFFFFFFU;
+    card_width=SD_BUS_WIDTH;drop_width_write=busy_after_width=not_ready_after_width=false;
     erase_busy_polls=0;
     erase_active=erase_host_timeout=false;modeled_cycles=erase_start_cycles=0;
     erase_hz=erase_timer=0;
@@ -288,12 +319,28 @@ static sd_card_t reset_model()
     test_rcc.BUSLPENR.value=RCC_BUSLPENR_ACLKNLPEN|RCC_BUSLPENR_ACLKNCLPEN;
     test_rcc.MISCENR.value=RCC_MISCENR_DBGEN;
     test_gpio_c.IDR.value=1U<<4;
-    test_sd.CLKCR.value=SDMMC_CLKCR_HWFC_EN|3U;
+    test_sd.CLKCR.value=SDMMC_CLKCR_HWFC_EN|WIDTH_BITS|3U;
     sd_card_t card{};
     card.initialized=1; card.controller_owned=1; card.media_idle=1;
     card.clock_hz=25000000; card.rca=0x12340000; card.ocr=1U<<30;
     card.sector_count=122507264;
     return card;
+}
+
+static sd_card_t reset_init_model()
+{
+    reset_model();card_width=1;test_sd.CLKCR.value=0;
+    test_rcc.CFGR1.value=0x33330000U;test_rcc.CFGR2.value=0x00100000U;
+    test_rcc.PLL1CFGR1.value=0x00404B00U;test_rcc.PLL1CFGR3.value=0x49000005U;
+    test_rcc.IC1CFGR.value=0x20000U;test_rcc.IC2CFGR.value=0x30000U;
+    test_rcc.DIVENR.value=RCC_DIVENR_IC2EN;
+    test_gpio_c.IDR.value=(1U<<0)|(1U<<3)|(1U<<4)|(1U<<5);
+    test_gpio_e.IDR.value=1U<<4;
+    /* Unrelated PC1 is a live output: initialization must preserve it. */
+    test_gpio_c.MODER.value=1U<<2;
+    test_gpio_c.PUPDR.value=2U<<2;
+    test_gpio_c.AFR[0].value=7U<<4;
+    return sd_card_t{};
 }
 
 static uint32_t number_of(uint32_t command)
@@ -338,6 +385,100 @@ int main()
     std::vector<uint8_t> bytes(65U*512U+3U);
     uint8_t *unaligned=bytes.data()+1;
     for(uint32_t i=0;i<65U*512U;++i) unaligned[i]=uint8_t(i*7U+3U);
+
+    { auto c=reset_init_model();
+      assert(sd_init(&c,25000000U)==SD_OK && c.initialized && c.controller_owned && c.media_idle);
+      assert(c.clock_hz==25000000U && card_width==SD_BUS_WIDTH);
+      assert((test_sd.CLKCR.value&SDMMC_CLKCR_WIDBUS)==WIDTH_BITS);
+      assert((test_gpio_c.MODER.value&(3U<<2))==(1U<<2));
+      assert((test_gpio_c.PUPDR.value&(3U<<2))==(2U<<2));
+      assert((test_gpio_c.AFR[0].value&(15U<<4))==(7U<<4));
+#if SD_BUS_WIDTH == 4
+      const std::vector<uint32_t> expected={0,8,55,41,2,3,9,7,13,13,13,55,51,13,55,6,13};
+      assert(commands==expected && arguments[15]==2U && app_prefix_count==3U);
+      assert(sd_bus_width_proof.requested_width==4U && sd_bus_width_proof.scr_widths==5U);
+      assert(sd_bus_width_proof.acmd6_r1==0x920U && sd_bus_width_proof.acmd6_accepted==1U);
+      assert(sd_bus_width_proof.configured_clkcr==test_sd.CLKCR.value && sd_bus_width_proof.negotiated_width==4U);
+      for(uint32_t pin:{0U,2U,3U,4U,5U}) {
+          assert(((test_gpio_c.MODER.value>>(2U*pin))&3U)==2U);
+          assert(((test_gpio_c.AFR[0].value>>(4U*pin))&15U)==11U);
+      }
+      assert(((test_gpio_e.MODER.value>>8)&3U)==2U);
+      assert(((test_gpio_e.AFR[0].value>>16)&15U)==11U);
+#else
+      assert(!number_of(51) && !number_of(6));
+      assert(!(test_gpio_c.MODER.value&((3U<<0)|(3U<<10))));
+      assert(!(test_gpio_c.PUPDR.value&((3U<<0)|(3U<<10))));
+#endif
+      /* A real data transaction checks card/host agreement in the model. */
+      assert(sd_read_blocks(&c,0,unaligned,1)==SD_OK);
+      assert(sd_deinit(&c)==SD_OK && !c.initialized && !c.controller_owned);
+      assert(!(test_gpio_c.MODER.value&C_MASK) && !(test_gpio_e.MODER.value&(3U<<8)));
+      assert((test_gpio_c.PUPDR.value&C_MASK)==((2U<<4)|C_PULLS));
+      assert((test_gpio_e.PUPDR.value&(3U<<8))==(1U<<8));
+      assert(!(test_rcc.AHB5ENR.value&RCC_AHB5ENR_SDMMC2EN));
+      /* Reinit does not power-cycle the card. CMD0 must restore one-bit before
+       * the next SCR read and ACMD6, even after a completed four-bit session. */
+      assert(sd_init(&c,25000000U)==SD_OK && number_of(0)==2U);
+      assert(card_width==SD_BUS_WIDTH && c.initialized && c.media_idle);
+      assert(sd_deinit(&c)==SD_OK);
+    }
+#if SD_BUS_WIDTH == 4
+    for(uint32_t missing:{0U,5U}) {
+      auto c=reset_init_model();test_gpio_c.IDR.value&=~(1U<<missing);
+      assert(sd_init(&c,25000000U)==SD_ERR_GPIO && commands.empty());
+    }
+    for(uint32_t claimed:{0U,5U}) {
+      auto c=reset_init_model();test_gpio_c.MODER.value|=2U<<(2U*claimed);
+      assert(sd_init(&c,25000000U)==SD_ERR_GPIO && commands.empty());
+    }
+    { auto c=reset_init_model();test_gpio_e.IDR.value&=~(1U<<4);
+      assert(sd_init(&c,25000000U)==SD_ERR_GPIO && commands.empty());
+    }
+    for(unsigned scenario=0;scenario<9;scenario++) {
+      auto c=reset_init_model();
+      const int expected[]={SD_ERR_UNSUPPORTED,SD_ERR_UNSUPPORTED,SD_ERR_UNSUPPORTED,
+        SD_ERR_CARD,SD_ERR_COMMAND_TIMEOUT,SD_ERR_DATA,SD_ERR_CLOCK,
+        SD_ERR_CONTROLLER_BUSY,SD_ERR_UNSUPPORTED};
+      switch(scenario) {
+      case 0: scr_bytes[1]=1U;break; /* no four-bit support */
+      case 1: app_prefix_fail_at=3U;break; /* width APP_CMD not accepted */
+      case 2: app_width_r1=0x900U;break; /* ACMD6 missing APP_CMD */
+      case 3: app_width_r1|=1U<<22;break; /* illegal ACMD6 */
+      case 4: command_error=6;break;
+      case 5: data_error_at=1U;break; /* SCR CRC failure */
+      case 6: drop_width_write=true;break;
+      case 7: busy_after_width=true;break;
+      case 8: scr_bytes[1]=4U;break; /* malformed capability, no one-bit */
+      }
+      assert(sd_init(&c,25000000U)==expected[scenario]);
+      assert(!c.initialized && c.controller_owned && c.error==uint32_t(expected[scenario]));
+      assert(sd_bus_width_proof.requested_width==4U && !sd_bus_width_proof.negotiated_width);
+      assert(!(test_sd.CLKCR.value&SDMMC_CLKCR_WIDBUS));
+      assert(!number_of(24) && !number_of(25) && !number_of(38));
+      if(scenario==0 || scenario==1 || scenario==5 || scenario==8) assert(!number_of(6));
+      else assert(number_of(6)==1U);
+      if(scenario!=0 && scenario!=5 && scenario!=8) assert(!c.media_idle);
+      auto before=commands.size();
+      assert(sd_init(&c,25000000U)==SD_ERR_STATE && commands.size()==before);
+      assert(sd_read_blocks(&c,0,unaligned,1)==SD_ERR_STATE);
+    }
+    { auto c=reset_init_model();not_ready_after_width=true;
+      assert(sd_init(&c,25000000U)==SD_ERR_NOT_READY);
+      assert(card_width==4U && (test_sd.CLKCR.value&SDMMC_CLKCR_WIDBUS)==WIDTH_BITS);
+      assert(!c.initialized && c.controller_owned && !c.media_idle);
+      assert(sd_bus_width_proof.acmd6_accepted && !sd_bus_width_proof.negotiated_width);
+      assert(sd_bus_width_proof.configured_clkcr==test_sd.CLKCR.value);
+      assert(number_of(6)==1U && !number_of(24) && !number_of(25));
+    }
+    { auto c=reset_model();
+      test_sd.CLKCR.value&=~SDMMC_CLKCR_WIDBUS;
+      StreamSource source{2048U,2048U,0xFFFFFFFFU,0xFFFFFFFFU,0xFFFFFFFFU,false};
+      sd_stream_t stream{};stream.publish=publish_stream;stream.context=&source;
+      assert(sd_write_blocks_stream_preerase(&c,0,stream_memory+12U,4,&stream)==SD_ERR_CLOCK);
+      assert(commands.empty() && !stream.publication_calls);
+    }
+#endif
 
     { auto c=reset_model();
       unsigned hook_before=sd_hook_calls;
@@ -680,7 +821,7 @@ int main()
       assert(proof.started && proof.completed && c.media_idle && proof.last_lba==c.sector_count-1);
       assert(!number_of(12) && !number_of(24) && !number_of(25) && !c.written_sectors);
       assert(erase_hz==100000U && erase_timer==1100000U && !erase_host_timeout);
-      assert(c.clock_hz==25000000U && test_sd.CLKCR.value==(SDMMC_CLKCR_HWFC_EN|3U));
+      assert(c.clock_hz==25000000U && test_sd.CLKCR.value==(SDMMC_CLKCR_HWFC_EN|WIDTH_BITS|3U));
       assert(test_sd.DTIMER.value==50000000U && test_sd.DLEN.value==0);
     }
     { auto c=reset_model();sd_erase_t proof{};c.ocr=0;c.sector_count=4096;
@@ -699,7 +840,7 @@ int main()
       assert(sd_erase_all(&c,1000,&proof)==SD_ERR_NOT_READY);
       assert(proof.started && !proof.completed && !c.media_idle && proof.elapsed_ms>=1000);
       assert(!number_of(12)); /* Do not abort/reset an uncertain erase. */
-      assert(c.clock_hz==100000U && test_sd.CLKCR.value==(SDMMC_CLKCR_HWFC_EN|750U));
+      assert(c.clock_hz==100000U && test_sd.CLKCR.value==(SDMMC_CLKCR_HWFC_EN|WIDTH_BITS|750U));
       assert(test_sd.DTIMER.value==200000U); /* no restore while busy */
     }
     { auto c=reset_model();sd_erase_t proof{};command_error=38;

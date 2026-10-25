@@ -83,7 +83,7 @@ def mock_header():
 
 
 class SdDriverTests(unittest.TestCase):
-    def test_scripted_register_protocol_and_failures(self):
+    def run_scripted_register_protocol_and_failures(self, width):
         compiler = shutil.which('clang++') or shutil.which('g++')
         self.assertIsNotNone(compiler, 'Native C++ compiler required')
         with tempfile.TemporaryDirectory(prefix='sd-driver-') as temp:
@@ -94,7 +94,7 @@ class SdDriverTests(unittest.TestCase):
                             'void sd_progress(void) { ++sd_hook_calls; } }\n')
             executable = temp / 'sd-driver-test.exe'
             subprocess.run([compiler, '-std=c++17', '-O2', '-Wall', '-Wextra',
-                            '-Werror', '-I', str(temp), '-I', str(HERE),
+                            '-Werror', f'-DSD_BUS_WIDTH={width}', '-I', str(temp), '-I', str(HERE),
                             str(HERE/'test_sd_driver.cpp'), str(hook),
                             '-o', str(executable)],
                            check=True)
@@ -102,17 +102,25 @@ class SdDriverTests(unittest.TestCase):
             self.assertEqual(completed.returncode, 0, completed.stdout+completed.stderr)
             self.assertIn('protocol cases passed', completed.stdout)
 
+    def test_one_bit_protocol_and_failures(self):
+        self.run_scripted_register_protocol_and_failures(1)
+
+    def test_four_bit_protocol_and_failures(self):
+        self.run_scripted_register_protocol_and_failures(4)
+
     def test_arm_c_compile_with_real_cmsis(self):
         compiler = Path('D:/ST/STM32CubeIDE_1.15.1/STM32CubeIDE/plugins/') / (
             'com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.'
             '12.3.rel1.win32_1.0.200.202406191623/tools/bin/arm-none-eabi-gcc.exe')
         self.assertTrue(compiler.is_file(), 'Pinned ARM toolchain required')
         with tempfile.TemporaryDirectory(prefix='sd-driver-arm-') as temp:
-            subprocess.run([str(compiler), '-std=c11', '-Os', '-Wall', '-Wextra',
-                '-Werror', '-mcpu=cortex-m55', '-mthumb', '-DSTM32N657xx',
-                '-DCPU_IN_SECURE_STATE', '-I'+str(CMSIS/'Include'),
-                '-I'+str(CMSIS/'Device/ST/STM32N6xx/Include'),
-                '-c', str(HERE/'sd_card.c'), '-o', str(Path(temp)/'sd_card.o')], check=True)
+            for width in (1, 4):
+                subprocess.run([str(compiler), '-std=c11', '-Os', '-Wall', '-Wextra',
+                    '-Werror', '-mcpu=cortex-m55', '-mthumb', '-DSTM32N657xx',
+                    f'-DSD_BUS_WIDTH={width}',
+                    '-DCPU_IN_SECURE_STATE', '-I'+str(CMSIS/'Include'),
+                    '-I'+str(CMSIS/'Device/ST/STM32N6xx/Include'),
+                    '-c', str(HERE/'sd_card.c'), '-o', str(Path(temp)/'sd_card.o')], check=True)
 
 
 if __name__ == '__main__':

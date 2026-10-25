@@ -81,6 +81,7 @@ def checked_build(folder,receiver_sha,sector_sha):
         raise ValueError('Feature flags differ')
     bench.whole_layout(m)
     bench.magic_layout(m)
+    bench.width_layout(m)
     return m,p,code
 
 

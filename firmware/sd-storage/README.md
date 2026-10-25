@@ -1,10 +1,56 @@
 # Native SD storage driver
 
 `sd_card.c` provides synchronous, single-owner block access through native
-one-bit SDMMC2 at 3.3 V. PIO and hardware IDMA share the same card-ready and
+SDMMC2 at 3.3 V. Builds default to one bit; `-DSD_BUS_WIDTH=4` explicitly selects
+four-bit negotiation. PIO and hardware IDMA share the same card-ready and
 ownership checks. The normal `sd_write_blocks_dma()` API retains its existing
 chunked behavior: at most 1024 sectors per transaction, reduced to 16 at 100 kHz.
 It does not send ACMD23.
+
+## Explicit four-bit build
+
+The default `SD_BUS_WIDTH=1` retains the existing one-bit protocol and leaves
+PC0/PC5 untouched. A four-bit build reserves PC0/PC5 as well and uses:
+
+| Signal | MCU pin | Function |
+|---|---|---|
+| CLK | PC2 | AF11 SDMMC2_CK |
+| CMD | PC3 | AF11 SDMMC2_CMD |
+| DAT0 | PC4 | AF11 SDMMC2_D0 |
+| DAT1 | PC5 | AF11 SDMMC2_D1 |
+| DAT2 | PC0 | AF11 SDMMC2_D2 |
+| DAT3 | PE4 | AF11 SDMMC2_D3 |
+
+Initialization starts in one-bit mode, including CMD0, card identification and
+selection. It reads SCR on DAT0, requires both one-bit and four-bit support in
+`SD_BUS_WIDTHS`, then sends `CMD55(RCA)` and **ACMD6(2)**. Both application
+responses must acknowledge `APP_CMD` and contain no card errors. Only after
+accepted ACMD6 and idle host checks does the driver connect PE4 to AF11 and set
+`CLKCR.WIDBUS=01`. It checks the register readback and fresh READY/TRANSFER before
+reporting initialized. The selected clock remains 25 MHz in the capture build;
+this is not high-speed CMD6, UHS, DDR or a voltage switch.
+
+Unsupported capability or any uncertain response fails without a one-bit
+fallback. Controller ownership is retained; failed initialization is not
+permission to reset or remove card power. Normal deinit requires fresh idle,
+releases all six pins, keeps CMD/DAT inputs pulled up and CLK pulled down, and
+disables SDMMC2. The next init sends CMD0 before reading SCR or negotiating
+again. Streaming and explicit erase clock changes retain the configured width.
+
+Four-bit builds export the separate **24-byte `sd_bus_width_proof`** object:
+requested width, SCR width mask, ACMD6 R1, ACMD6 acceptance, configured CLKCR and
+successfully negotiated width, in that order. It clears at fresh initialization
+and survives deinit; `negotiated_width=4` requires the entire negotiation and
+final-ready sequence. It does not enlarge `sd_card_t` and does not exist in a
+one-bit build. Like other SRAM evidence, it is lost in Standby; qualify the
+exact firmware and an awake transaction separately before measured cold cycles.
+
+The offline register model checks both builds, including SCR/data failures,
+missing/rejected/lost application responses, failed host width readback,
+non-idle host, final readiness failure, pin ownership and deinit/reinitialization.
+The model checks card/host width agreement on each data command. These tests do
+not establish electrical integrity of the additional wires or real-card
+throughput; those require the corresponding hardware evidence.
 
 ## Opt-in whole transaction with preannouncement
 
@@ -54,7 +100,7 @@ padding must not be published until the producer has validated the image.
 
 When the full buffer is already published at launch, the existing IDMA path
 handles the write. Otherwise the CPU feeds the FIFO using PIO. With the
-cycle-aligned, one-bit configuration and `HWFC_EN` set,
+cycle-aligned configuration, explicitly selected bus width and `HWFC_EN` set,
 [RM0486 section 30.7.1](https://www.st.com/resource/en/reference_manual/dm00769900.pdf)
 specifies that an empty transmit FIFO stops SDMMC_CK and freezes the card-side
 state machines while the AHB FIFO interface stays available. More published
@@ -92,8 +138,9 @@ covers 3.1-second callbacks both before CMD25 and after a partial prefix was sen
 `sd_read_scr(card, &scr)` is a read-only CMD55/ACMD51 operation. It returns
 the eight SCR bytes in wire order and decodes `DATA_STAT_AFTER_ERASE` (bit55)
 to an erased byte value of `0x00` or `0xFF`. It validates SCR structure and both
-application acknowledgments. It does not change the normal card block length,
-run automatically during initialization, or prove that any sector was erased.
+application acknowledgments. It does not change the normal card block length or
+prove that any sector was erased. Four-bit initialization uses the same internal
+read before ACMD6 negotiation; one-bit initialization does not read SCR.
 
 `sd_erase_all(card, timeout_ms, &proof)` explicitly destroys the entire card
 using CMD32(start0), CMD33(last address), and ordinary CMD38(0). No initialization,

@@ -6,6 +6,21 @@ the existing UART recovery mechanism. It uses the container in
 [raw-slots](../raw-slots/README.md); there is no FAT filesystem, image conversion,
 compression or full-frame CPU checksum in the normal save path.
 
+## Four-bit candidate: prepared, hardware qualification pending
+
+`build.py --sd-bus-width 4` selects native four-bit SDMMC2 on the full-pin
+carrier at the same 25 MHz. The default remains one bit. Separate 24-byte
+negotiation telemetry records SCR support, accepted ACMD6, host CLKCR and
+selected width; the RAM/awake bench rejects incomplete evidence. The
+[driver contract](../sd-storage/README.md#explicit-four-bit-build) describes the
+additional PC0/PC5/PE4 connections and failure handling.
+
+The reviewed v19b candidate preserves the 15,804-byte early load, recovery
+instructions, RAW layout and exposure. It is **not yet installed or hardware
+qualified**: the replacement carrier is reported wired, but the latest power
+check found zero JS load current. No four-bit image or time/energy result exists
+yet. Follow the latest [bench checkpoint](../../AGENTS.md) before proceeding.
+
 ## October 24 replacement-card baseline
 
 The user-labelled SanDisk Extreme 32 GB has completed three cold capture/save

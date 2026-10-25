@@ -30,6 +30,11 @@ VCP_FIELDS = (
     'reserved30 reserved31').split()
 # An unknown/self-consistent build is insufficient authorization to halt.
 APPROVED = {
+    # RAW v19b four-bit: v18 prefix differs only at the two reviewed CRC words.
+    # Admission supports bench qualification; it is not a hardware result.
+    '666282fb6ebdf19b1a2c4492770580d3f6278b52c76d6605eeb65b30fdb18a97':
+        {'bytes': 5140, 'park': 0x3418078C, 'vcp': True,
+         'sector': 'd7a9abb92faec3fb02cd6eed797bc38c799b998ea8067c1895e9234103ada806'},
     # RAW v18 front metadata: exact v17d recovery instructions and all20
     # referenced literals retained; only the two receiver CRC words differ.
     '9401bed4076d6e9e4d2e4f9236661faf7b8f0e051cb332ea4dcbba09da336eba':

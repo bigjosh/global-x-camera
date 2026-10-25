@@ -3,12 +3,30 @@
 
 #include <stdint.h>
 
-/* Native SDMMC2, one bit, 3.3 V. No card cache, UHS, bus-width or trim commands
- * are enabled. Erase is an explicit opt-in API, never part of initialization.
+/* Native SDMMC2, 3.3 V. Historical builds default to one bit. Four-bit builds
+ * must explicitly define SD_BUS_WIDTH=4; init negotiates the card before changing
+ * the host width. No card cache, UHS or trim commands are enabled.
+ * Erase is an explicit opt-in API, never part of initialization.
  * All APIs are synchronous and require one owner.
  * The caller must place this object and its buffers outside the capture frame.
  * Zero-initialize the object before its first sd_init().
  */
+#ifndef SD_BUS_WIDTH
+#define SD_BUS_WIDTH 1
+#endif
+#if SD_BUS_WIDTH != 1 && SD_BUS_WIDTH != 4
+#error "SD_BUS_WIDTH must be 1 or 4"
+#endif
+#if SD_BUS_WIDTH == 4
+/* Separate debugger evidence, preserving sd_card_t's existing ABI. Reset at
+ * fresh init, retained through deinit. negotiated_width becomes4 only after
+ * accepted ACMD6, host-width readback and final fresh READY/TRANSFER proof. */
+typedef struct {
+    uint32_t requested_width, scr_widths, acmd6_r1, acmd6_accepted;
+    uint32_t configured_clkcr, negotiated_width;
+} sd_width_proof_t;
+extern volatile sd_width_proof_t sd_bus_width_proof;
+#endif
 #define SD_SECTOR_BYTES 512U
 #define SD_MAX_TRANSFER_SECTORS 64U
 #define SD_DMA_MAX_TRANSFER_SECTORS 1024U
@@ -26,7 +44,8 @@ enum sd_error {
 enum sd_stage {
     SD_STAGE_NONE=0, SD_STAGE_PREFLIGHT, SD_STAGE_GPIO, SD_STAGE_IDENTIFY,
     SD_STAGE_SELECT, SD_STAGE_READ, SD_STAGE_WRITE, SD_STAGE_SYNC,
-    SD_STAGE_ABORT, SD_STAGE_DEINIT, SD_STAGE_SCR, SD_STAGE_ERASE
+    SD_STAGE_ABORT, SD_STAGE_DEINIT, SD_STAGE_SCR, SD_STAGE_ERASE,
+    SD_STAGE_BUS_WIDTH
 };
 
 typedef struct sd_card {
@@ -95,7 +114,8 @@ typedef struct {
     uint8_t bytes[8]; /* SCR wire order: bytes[0] holds bits63..56. */
     uint32_t valid, erased_byte; /* DATA_STAT_AFTER_ERASE: 0x00 or0xFF. */
 } sd_scr_t;
-/* Explicit readonly ACMD51. This does not alter sd_card_t or run at init.
+/* Explicit readonly ACMD51. This does not alter sd_card_t. Four-bit init also
+ * reads SCR internally before width negotiation; one-bit init does not.
  * Success validates SCR_STRUCTURE=0 and decodes bit55 from bytes[1]. */
 int sd_read_scr(sd_card_t *card, sd_scr_t *scr);
 typedef struct {
@@ -179,7 +199,8 @@ int sd_write_blocks_dma_wait(sd_card_t *card, uint32_t lba, const void *buffer,
  * enables the optional SD card cache. No cache-flush feature is assumed. */
 int sd_sync(sd_card_t *card);
 /* Refuses to disable the controller unless card idle is freshly verified.
- * Leaves CLK input/pull-down and CMD/DAT0/DAT3 input/pull-up while card is powered.
+ * Leaves CLK input/pull-down and CMD/used DAT pins input/pull-up while powered.
+ * The one-bit build also retains the unused DAT3 input/pull-up.
  * GPIO/PWR clocks and VDDIO5 supply-valid remain enabled for other users.
  */
 int sd_deinit(sd_card_t *card);

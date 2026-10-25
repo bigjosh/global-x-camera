@@ -4,8 +4,8 @@
 
 The user selected [Amazon B08FB3GC34](https://www.amazon.com/dp/B08FB3GC34),
 identified as **Pzsmocn PZSSD001**, to replace the seven-pin carrier. This is the
-requested wiring plan; physical installation and four-bit operation have **not**
-been confirmed. The installed v18 RAW-slot firmware still uses **one-bit native
+requested wiring plan. The user subsequently reports it **wired**; electrical
+operation and four-bit transfers remain unqualified. The installed v18 RAW-slot firmware still uses **one-bit native
 SDMMC2 at 3.3 V**. Current firmware and qualified measurements are tracked in
 [the RAW capture README](../../firmware/capture-raw/README.md); the October 19–20
 status statements below are historical.

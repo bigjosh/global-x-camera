@@ -152,7 +152,39 @@ def checked_build(folder, digest):
         raise ValueError('Snapshot layout differs')
     whole_layout(m)
     magic_layout(m)
+    width_layout(m)
     return m, code
+
+
+def width_layout(m):
+    width=m.get('sd_bus_width',1)
+    if type(width) is not int or width not in (1,4):
+        raise ValueError('Unsupported native SD width')
+    if width==4:
+        address=m.get('sd_width_proof')
+        if (type(address) is not int or m.get('sd_width_proof_bytes')!=24 or
+                not m['bss_start']<=address<=m['bss_end']-24 or
+                '-DSD_BUS_WIDTH=4' not in m.get('flags',[])):
+            raise ValueError('Four-bit width proof layout/build differs')
+    elif m.get('sd_width_proof') is not None or m.get('sd_width_proof_bytes',0):
+        raise ValueError('Unexpected width telemetry in one-bit build')
+
+
+def width_snapshot(b,m,label):
+    width_layout(m)
+    if m.get('sd_bus_width',1)==1:
+        return None
+    raw=b.upload(m['sd_width_proof'],24,label+'-sd-width.bin')
+    names=('requested_width','scr_widths','acmd6_r1','acmd6_accepted',
+           'configured_clkcr','negotiated_width')
+    proof=dict(zip(names,struct.unpack('<6I',raw)))
+    if (proof['requested_width']!=4 or proof['scr_widths']&5!=5 or
+            proof['acmd6_r1']&0xFDFFE008 or not proof['acmd6_r1']&0x20 or
+            proof['acmd6_accepted']!=1 or
+            proof['configured_clkcr']&0xC000!=0x4000 or
+            proof['negotiated_width']!=4):
+        raise ValueError('Four-bit negotiation proof incomplete or inconsistent')
+    return proof
 
 
 def whole_layout(m):
@@ -433,6 +465,8 @@ def card_snapshot(b,m,p,label):
         raise ValueError('Slot volume exceeds card capacity')
     if m.get('magic_format') and p['slot_count'] and p['slot_count']!=c['sector_count']//3730:
         raise ValueError('Magic slot count does not cover full card geometry')
+    width=width_snapshot(b,m,label)
+    if width is not None:c['bus_width_proof']=width
     return c
 
 

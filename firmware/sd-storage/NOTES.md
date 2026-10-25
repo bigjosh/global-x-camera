@@ -55,3 +55,10 @@
 **Rejected:** diagnosing the 600-second software timeout as a ten-minute physical erase; merely polling longer, blind reset/re-erase, or restoring fast clocks while ownership is uncertain. Ordinary erase is not secure sanitization.
 **Evidence:** commit `14d05d9a`; [R1b constraint and corrected operation](README.md#scr-and-explicit-whole-card-erase); [failed erase, bounded recovery and sampled verification](../capture-raw/evidence/2026-10-24-magic-slots/README.md).
 **Provenance:** migrated 2026-10-24 from preserved failure/recovery records and the corrected hardware test.
+
+## 2026-10-24  Negotiate four-bit mode explicitly and keep historical builds one-bit
+
+**Why:** the replacement carrier exposes DAT1/DAT2/DAT3, and the user requested a four-bit comparison against the completed one-bit SanDisk baseline. Host width alone cannot change the card's transfer protocol. The opt-in build first reads SCR in one-bit mode, validates capability, obtains CMD55/ACMD6(2) acknowledgments, then changes the idle host to four bits and proves readiness. Separate bounded telemetry preserves the existing card-status ABI and records which steps completed.
+**Rejected:** silently enabling four-bit mode in historical builds; merely setting host WIDBUS; falling back after an ambiguous ACMD6 response; changing SD clock, voltage or high-speed mode at the same time. Erase and streaming checks must preserve the selected width instead of resetting it to one bit. A successful software model does not qualify the physical wiring.
+**Evidence:** `sd_card.c` initialization, width telemetry, erase and streaming guards; `test_sd_driver.cpp` actual-driver model for both widths, including failed negotiation and deinit/CMD0/reinitialization; [build and pin contract](README.md#explicit-four-bit-build). Hardware results belong in the capture evidence, separately from these offline checks.
+**Provenance:** recorded during the user-authorized replacement-carrier bring-up; the earlier one-bit choice remains the default when `SD_BUS_WIDTH` is omitted.

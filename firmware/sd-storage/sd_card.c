@@ -1,5 +1,6 @@
 /* CMSIS-only native SDMMC2 storage driver, derived from the qualified read-only
- * smoke helper. PC2/3/4 AF11 = CLK/CMD/DAT0; PE4 = unused DAT3 input/pull-up.
+ * smoke helper. PC2/3/4 AF11 = CLK/CMD/DAT0. Optional four-bit builds add
+ * PC5/PC0/PE4 AF11 = DAT1/DAT2/DAT3; one-bit builds leave PE4 input/pull-up.
  *
  * Sources: RM0486 Rev4 Table220 and section30.6.2; pinned CubeN6 HAL_SD_ReadBlocks,
  * HAL_SD_WriteBlocks and LL SDMMC_CmdStopTransfer. Open-ended CMD18/CMD25 use
@@ -32,9 +33,26 @@
 #define DMA_ERRORS (DATA_ERRORS|SDMMC_STA_IDMATE)
 #define DMA_FLAGS (DATA_FLAGS|SDMMC_STA_IDMATE|SDMMC_STA_IDMABTC)
 #define R1_ERRORS 0xFDFFE008UL
+#define DAT0 (1UL<<4)
+#if SD_BUS_WIDTH == 4
+#define C_MASK ((3UL<<0)|(3UL<<4)|(3UL<<6)|(3UL<<8)|(3UL<<10))
+#define C_PINS ((1UL<<0)|(1UL<<2)|(1UL<<3)|(1UL<<4)|(1UL<<5))
+#define C_PULLS ((1UL<<0)|(1UL<<6)|(1UL<<8)|(1UL<<10))
+#define C_MODES ((2UL<<0)|(2UL<<4)|(2UL<<6)|(2UL<<8)|(2UL<<10))
+#define C_AF_MASK ((15UL<<0)|(0xFFFFUL<<8))
+#define C_AF_BITS ((11UL<<0)|(0xBBBBUL<<8))
+#define C_IDLE_PINS ((1UL<<0)|(1UL<<3)|(1UL<<4)|(1UL<<5))
+#define WIDTH_BITS SDMMC_CLKCR_WIDBUS_0
+#else
 #define C_MASK ((3UL<<4)|(3UL<<6)|(3UL<<8))
 #define C_PINS ((1UL<<2)|(1UL<<3)|(1UL<<4))
-#define DAT0 (1UL<<4)
+#define C_PULLS ((1UL<<6)|(1UL<<8))
+#define C_MODES ((2UL<<4)|(2UL<<6)|(2UL<<8))
+#define C_AF_MASK (0xFFFUL<<8)
+#define C_AF_BITS (0xBBBUL<<8)
+#define C_IDLE_PINS ((1UL<<3)|DAT0)
+#define WIDTH_BITS 0UL
+#endif
 
 _Static_assert(SDMMC2_BASE_S==0x58026800UL, "SDMMC2 address");
 _Static_assert(offsetof(SDMMC_TypeDef,FIFO)==0x80, "FIFO offset");
@@ -43,6 +61,12 @@ _Static_assert(SD_DMA_MAX_TRANSFER_SECTORS*SD_SECTOR_BYTES<=0x1FFFFFFUL, "IDMA D
 _Static_assert(SD_DMA_PREERASE_MAX_SECTORS*SD_SECTOR_BYTES<=0x1FFFFFFUL, "preerase IDMA DLEN");
 
 enum response { RESP_NONE, RESP_R1, RESP_R2, RESP_R3, RESP_R6, RESP_R7 };
+
+#if SD_BUS_WIDTH == 4
+static int read_scr_selected(sd_card_t *c,sd_scr_t *scr);
+volatile sd_width_proof_t sd_bus_width_proof;
+_Static_assert(sizeof(sd_width_proof_t)==24U,"bus-width proof ABI");
+#endif
 
 __attribute__((weak)) void sd_progress(void)
 {
@@ -524,6 +548,11 @@ int sd_init(sd_card_t *c, uint32_t max_hz)
 {
     if (!c) return SD_ERR_ARGUMENT;
     if (c->initialized || c->controller_owned) return SD_ERR_STATE;
+#if SD_BUS_WIDTH == 4
+    volatile uint8_t *width_clear=(volatile uint8_t *)&sd_bus_width_proof;
+    for (size_t i=0;i<sizeof(sd_bus_width_proof);++i) width_clear[i]=0;
+    sd_bus_width_proof.requested_width=4U;
+#endif
     volatile uint8_t *p=(volatile uint8_t *)c;
     for (size_t i=0;i<sizeof(*c);++i) p[i]=0;
     c->stage=SD_STAGE_PREFLIGHT;
@@ -541,7 +570,12 @@ int sd_init(sd_card_t *c, uint32_t max_hz)
     R->AHB4ENSR=RCC_AHB4ENSR_PWRENS|RCC_AHB4ENSR_GPIOCENS|RCC_AHB4ENSR_GPIOEENS;
     (void)R->AHB4ENR;
     if (P->SVMCR2&PWR_SVMCR2_VDDIO5VRSEL) return fault(c,SD_ERR_VOLTAGE);
+#if SD_BUS_WIDTH == 4
+    for (uint32_t pin=0;pin<=5;++pin) {
+        if (!(C_PINS&(1UL<<pin))) continue;
+#else
     for (uint32_t pin=2;pin<=4;++pin) {
+#endif
         uint32_t mode=(C->MODER>>(2*pin))&3UL;
         if (mode==1 || mode==2) return fault(c,SD_ERR_GPIO);
     }
@@ -560,7 +594,7 @@ int sd_init(sd_card_t *c, uint32_t max_hz)
     C->BSRR=1UL<<(2+16);
     C->OTYPER&=~C_PINS;
     C->MODER&=~C_MASK;
-    C->PUPDR=(C->PUPDR&~C_MASK)|(1UL<<6)|(1UL<<8);
+    C->PUPDR=(C->PUPDR&~C_MASK)|C_PULLS;
     C->OSPEEDR=(C->OSPEEDR&~C_MASK)|C_MASK;
     E->MODER&=~(3UL<<8);
     E->PUPDR=(E->PUPDR&~(3UL<<8))|(1UL<<8);
@@ -568,7 +602,7 @@ int sd_init(sd_card_t *c, uint32_t max_hz)
     c->vddio5_control=P->SVMCR2;
     if ((result=delay_us(c,1000))) return result;
     c->gpioc_idr=C->IDR; c->gpioe_idr=E->IDR;
-    if ((c->gpioc_idr&((1UL<<3)|DAT0))!=((1UL<<3)|DAT0) ||
+    if ((c->gpioc_idr&C_IDLE_PINS)!=C_IDLE_PINS ||
         !(c->gpioe_idr&(1UL<<4))) return fault(c,SD_ERR_GPIO);
     c->saved_sdmmc_mux=R->CCIPR8&RCC_CCIPR8_SDMMC2SEL;
     R->CCIPR8&=~RCC_CCIPR8_SDMMC2SEL;
@@ -580,10 +614,10 @@ int sd_init(sd_card_t *c, uint32_t max_hz)
     c->controller_owned=1;
     X->MASK=0; X->POWER=0; X->DCTRL=0; X->IDMACTRL=0; X->CMD=0;
     X->CLKCR=750UL|SDMMC_CLKCR_HWFC_EN;
-    C->AFR[0]=(C->AFR[0]&~(0xFFFUL<<8))|(0xBBBUL<<8);
-    C->MODER=(C->MODER&~C_MASK)|(2UL<<4)|(2UL<<6)|(2UL<<8);
-    if ((C->MODER&C_MASK)!=((2UL<<4)|(2UL<<6)|(2UL<<8)) ||
-        (C->AFR[0]&(0xFFFUL<<8))!=(0xBBBUL<<8) ||
+    C->AFR[0]=(C->AFR[0]&~C_AF_MASK)|C_AF_BITS;
+    C->MODER=(C->MODER&~C_MASK)|C_MODES;
+    if ((C->MODER&C_MASK)!=C_MODES ||
+        (C->AFR[0]&C_AF_MASK)!=C_AF_BITS ||
         (E->MODER&(3UL<<8)) || (E->PUPDR&(3UL<<8))!=(1UL<<8))
         return fault(c,SD_ERR_GPIO);
     X->POWER=SDMMC_POWER_PWRCTRL;
@@ -592,6 +626,40 @@ int sd_init(sd_card_t *c, uint32_t max_hz)
     X->CLKCR=(HCLK_HZ/(2*max_hz))|SDMMC_CLKCR_HWFC_EN;
     c->clock_hz=max_hz;
     if ((result=delay_us(c,1000)) || (result=ready(c))) return result;
+#if SD_BUS_WIDTH == 4
+    /* SCR data is still received on DAT0. Require both mandatory one-bit and
+     * requested four-bit capability; never silently run a four-bit build in
+     * one-bit mode. CMD6 here is ACMD6 (argument2), not high-speed CMD6. */
+    sd_scr_t scr;
+    if ((result=read_scr_selected(c,&scr))) return result;
+    c->stage=SD_STAGE_BUS_WIDTH;
+    sd_bus_width_proof.scr_widths=scr.bytes[1]&15U;
+    if ((scr.bytes[1]&5U)!=5U) return fault(c,SD_ERR_UNSUPPORTED);
+    c->media_idle=0;
+    if ((result=command(c,55,c->rca,RESP_R1,0))) return result;
+    if (!(c->last_r1&(1UL<<5))) return fault(c,SD_ERR_UNSUPPORTED);
+    result=command(c,6,2,RESP_R1,0);
+    sd_bus_width_proof.acmd6_r1=c->last_r1;
+    if (result) return result;
+    if (!(c->last_r1&(1UL<<5))) return fault(c,SD_ERR_UNSUPPORTED);
+    sd_bus_width_proof.acmd6_accepted=1U;
+    if ((X->STA&(SDMMC_STA_DPSMACT|SDMMC_STA_CPSMACT)) || X->IDMACTRL)
+        return fault(c,SD_ERR_CONTROLLER_BUSY);
+    /* An uncertain ACMD6 response retains ownership and does not guess which
+     * width the card selected. Only successful negotiation reaches this. */
+    E->OTYPER&=~(1UL<<4);
+    E->OSPEEDR=(E->OSPEEDR&~(3UL<<8))|(3UL<<8);
+    E->AFR[0]=(E->AFR[0]&~(15UL<<16))|(11UL<<16);
+    E->MODER=(E->MODER&~(3UL<<8))|(2UL<<8);
+    if ((E->MODER&(3UL<<8))!=(2UL<<8) ||
+        (E->AFR[0]&(15UL<<16))!=(11UL<<16)) return fault(c,SD_ERR_GPIO);
+    X->CLKCR|=WIDTH_BITS;
+    __DSB();
+    sd_bus_width_proof.configured_clkcr=X->CLKCR;
+    if ((X->CLKCR&SDMMC_CLKCR_WIDBUS)!=WIDTH_BITS) return fault(c,SD_ERR_CLOCK);
+    if ((result=ready(c))) return result;
+    sd_bus_width_proof.negotiated_width=4U;
+#endif
     c->initialized=1;
     c->init_cycles=DWT->CYCCNT-start;
     return SD_OK;
@@ -719,13 +787,21 @@ int sd_write_blocks_dma_wait(sd_card_t *c, uint32_t lba, const void *buffer,
     return dma_request(c,lba,buffer,count,wait,0);
 }
 
+#if SD_BUS_WIDTH == 4
+static int read_scr_selected(sd_card_t *c,sd_scr_t *scr)
+#else
 int sd_read_scr(sd_card_t *c,sd_scr_t *scr)
+#endif
 {
+#if SD_BUS_WIDTH == 1
     if(!c || !scr) return SD_ERR_ARGUMENT;
+#endif
     scr->valid=0;scr->erased_byte=0;
     for(unsigned n=0;n<8;n++) scr->bytes[n]=0;
+#if SD_BUS_WIDTH == 1
     if(!c->initialized || !c->controller_owned) return SD_ERR_STATE;
     if(c->error) return (int)c->error;
+#endif
     c->stage=SD_STAGE_SCR;
     int result=ready(c);
     if(result) return result;
@@ -769,6 +845,18 @@ int sd_read_scr(sd_card_t *c,sd_scr_t *scr)
     return SD_OK;
 }
 
+#if SD_BUS_WIDTH == 4
+int sd_read_scr(sd_card_t *c,sd_scr_t *scr)
+{
+    if(!c || !scr) return SD_ERR_ARGUMENT;
+    scr->valid=0;scr->erased_byte=0;
+    for(unsigned n=0;n<8;n++) scr->bytes[n]=0;
+    if(!c->initialized || !c->controller_owned) return SD_ERR_STATE;
+    if(c->error) return (int)c->error;
+    return read_scr_selected(c,scr);
+}
+#endif
+
 int sd_erase_all(sd_card_t *c,uint32_t timeout_ms,sd_erase_t *proof)
 {
     if(!c || !proof || timeout_ms<1000U || timeout_ms>600000U) return SD_ERR_ARGUMENT;
@@ -787,14 +875,14 @@ int sd_erase_all(sd_card_t *c,uint32_t timeout_ms,sd_erase_t *proof)
     const uint32_t previous_hz=c->clock_hz,previous_clkcr=X->CLKCR;
     const uint32_t previous_timer=X->DTIMER;
     if((previous_hz!=100000U && previous_hz!=12500000U && previous_hz!=25000000U) ||
-       previous_clkcr!=((HCLK_HZ/(2U*previous_hz))|SDMMC_CLKCR_HWFC_EN))
+       previous_clkcr!=((HCLK_HZ/(2U*previous_hz))|SDMMC_CLKCR_HWFC_EN|WIDTH_BITS))
         return fault(c,SD_ERR_CLOCK);
     /* CMD38 returns R1b: its busy detector uses DTIMER even with CMDTRANS=0.
      * A previous SCR/read timer is only 2 s; timeout leaves DPSM stuck in Busy
      * awaiting CPSM Abort (RM0486 Table220). At 25 MHz, even UINT32_MAX cannot
      * represent 600 s. Use the qualified 100 kHz divider while idle and a
      * hardware bound 1 s beyond the software limit. Never rewrite it busy. */
-    X->CLKCR=750U|SDMMC_CLKCR_HWFC_EN;c->clock_hz=100000U;
+    X->CLKCR=750U|SDMMC_CLKCR_HWFC_EN|WIDTH_BITS;c->clock_hz=100000U;
     X->DCTRL=0;X->DLEN=0;X->ICR=DATA_FLAGS;
     X->DTIMER=(timeout_ms+1000U)*100U;
     if((result=delay_us(c,1000))) return result;
@@ -864,7 +952,7 @@ int sd_write_blocks_stream_preerase(sd_card_t *c,uint32_t lba,const void *buffer
     if(c->clock_hz!=12500000U && c->clock_hz!=25000000U) return fault(c,SD_ERR_CLOCK);
     const uint32_t flow_mask=SDMMC_CLKCR_HWFC_EN|SDMMC_CLKCR_BUSSPEED|
         SDMMC_CLKCR_SELCLKRX|SDMMC_CLKCR_DDR|SDMMC_CLKCR_WIDBUS;
-    if((X->CLKCR&flow_mask)!=SDMMC_CLKCR_HWFC_EN) return fault(c,SD_ERR_CLOCK);
+    if((X->CLKCR&flow_mask)!=(SDMMC_CLKCR_HWFC_EN|WIDTH_BITS)) return fault(c,SD_ERR_CLOCK);
     uint32_t api_start=DWT->CYCCNT,bytes=count*512U;
     if((result=stream_publish(c,s,bytes,api_start))) return result;
     s->initial_available_bytes=s->published_bytes;
@@ -963,7 +1051,11 @@ int sd_deinit(sd_card_t *c)
     R->AHB5ENCR=RCC_AHB5ENCR_SDMMC2ENC;
     R->CCIPR8=(R->CCIPR8&~RCC_CCIPR8_SDMMC2SEL)|c->saved_sdmmc_mux;
     C->MODER&=~C_MASK;
-    C->PUPDR=(C->PUPDR&~C_MASK)|(2UL<<4)|(1UL<<6)|(1UL<<8);
+    C->PUPDR=(C->PUPDR&~C_MASK)|(2UL<<4)|C_PULLS;
+#if SD_BUS_WIDTH == 4
+    E->MODER&=~(3UL<<8);
+    E->PUPDR=(E->PUPDR&~(3UL<<8))|(1UL<<8);
+#endif
     if (c->timer_owned) {
         DWT->CTRL=c->saved_dwt;
         CoreDebug->DEMCR=c->saved_demcr;
