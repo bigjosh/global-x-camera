@@ -172,6 +172,7 @@ def clock_layout(m):
 
 def width_layout(m):
     clock_layout(m)
+    phase_layout(m)
     width=m.get('sd_bus_width',1)
     if type(width) is not int or width not in (1,4):
         raise ValueError('Unsupported native SD width')
@@ -196,15 +197,33 @@ def width_snapshot(b,m,label):
     if (proof['requested_width']!=4 or proof['scr_widths']&5!=5 or
             proof['acmd6_r1']&0xFDFFE008 or not proof['acmd6_r1']&0x20 or
             proof['acmd6_accepted']!=1 or
-            proof['configured_clkcr']!=(150000000//(2*clock_layout(m))|0x24000) or
+            proof['configured_clkcr']!=(150000000//(2*clock_layout(m))|0x24000|phase_layout(m)) or
             proof['negotiated_width']!=4):
         raise ValueError('Four-bit negotiation proof incomplete or inconsistent')
     return proof
 
 
+def phase_layout(m):
+    """Bind the isolated launch-phase experiment; frozen builds retain bit16=0."""
+    enabled=m.get('sd_clock_negedge',False)
+    if type(enabled) is not bool:
+        raise ValueError('Unsupported SD clock phase selection')
+    flags=[f for f in m.get('flags',[]) if f.startswith('-DSD_CLOCK_NEGEDGE=')]
+    if 'sd_clock_negedge' in m or flags:
+        if flags!=[f'-DSD_CLOCK_NEGEDGE={int(enabled)}']:
+            raise ValueError('Clock phase manifest/compiler flag differs')
+    speed=m.get('sd_gpio_speed',3)
+    if enabled and (m.get('flash') or m.get('standby') or clock_layout(m)!=25000000 or
+            m.get('sd_bus_width',1)!=4 or type(speed) is not int or speed not in (1,2,3) or
+            m.get('sd_fixed_compensation',False) is not False or
+            m.get('sd_compensation_modified',False) is not False):
+        raise ValueError('Clock phase must be an isolated 25 MHz four-bit RAM diagnostic')
+    return 0x10000 if enabled else 0
+
+
 def gpio_layout(m):
     speed=m.get('sd_gpio_speed',3)
-    if type(speed) is not int or speed not in (0,3):
+    if type(speed) is not int or speed not in (0,1,2,3):
         raise ValueError('Unsupported SD GPIO speed')
     flags=[f for f in m.get('flags',[]) if f.startswith('-DSD_GPIO_SPEED=')]
     if 'sd_gpio_speed' in m or flags:
@@ -216,7 +235,11 @@ def gpio_layout(m):
         if (type(comp) is not bool or (comp and speed!=3) or m.get('sd_gpio_masks')!=masks or
                 m.get('sd_compensation_modified') is not comp):
             raise ValueError('GPIO speed experiment mask/compensation scope differs')
-    if speed==0:
+    if speed in (1,2) and (clock_layout(m)!=25000000 or m.get('sd_bus_width',1)!=4 or
+            m.get('sd_fixed_compensation',False) is not False or
+            m.get('sd_compensation_modified',False) is not False):
+        raise ValueError('Intermediate GPIO speed must be an isolated 25 MHz four-bit diagnostic')
+    if speed!=3:
         address=m.get('sd_gpio_proof')
         if (m.get('flash') or m.get('standby') or type(address) is not int or
                 m.get('sd_gpio_proof_bytes')!=32 or
@@ -228,16 +251,18 @@ def gpio_layout(m):
 
 
 def gpio_snapshot(b,m,label):
-    if gpio_layout(m)==3:
+    speed=gpio_layout(m)
+    if speed==3:
         return None
     raw=b.upload(m['sd_gpio_proof'],32,label+'-sd-gpio.bin')
     if len(raw)!=32:raise ValueError('Incomplete GPIO speed telemetry')
     names=('requested_speed','c_mask','c_before','c_after','e_mask','e_before','e_after','applied')
     proof=dict(zip(names,struct.unpack('<8I',raw)))
     masks=m['sd_gpio_masks']
-    if (proof['requested_speed'] or proof['applied']!=1 or
+    if (proof['requested_speed']!=speed or proof['applied']!=1 or
             proof['c_mask']!=masks['c'] or proof['e_mask']!=masks['e'] or
-            proof['c_after']&masks['c'] or proof['e_after']&masks['e'] or
+            (proof['c_after']&masks['c'])!=masks['c']//3*speed or
+            (proof['e_after']&masks['e'])!=masks['e']//3*speed or
             (proof['c_before']^proof['c_after'])&~masks['c'] or
             (proof['e_before']^proof['e_after'])&~masks['e']):
         raise ValueError('GPIO speed application proof incomplete or inconsistent')

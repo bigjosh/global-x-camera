@@ -31,6 +31,7 @@ static uint32_t data_error_at, busy_polls, command_error, late_card_error;
 static uint32_t app_prefix_r1, app_preerase_r1;
 static uint32_t app_width_r1,app_prefix_count,app_prefix_fail_at,card_width;
 static bool drop_width_write,busy_after_width,not_ready_after_width;
+static bool drop_negedge_write;
 static uint32_t bad_gpio_speed_write;
 static uint32_t bad_compensation_gate,compensation_reads,compensation_writes;
 static uint32_t erase_busy_polls;
@@ -81,6 +82,7 @@ static void command_write(uint32_t value)
         return;
     }
     if (index==0) {
+        assert(!(test_sd.CLKCR.value&SDMMC_CLKCR_NEGEDGE));
         card_width=1;test_sd.STA.value=SDMMC_STA_CMDSENT;
     } else if(index==8) test_sd.RESP1.value=0x1AAU;
     else if(index==41) test_sd.RESP1.value=0xC0300000U;
@@ -269,10 +271,11 @@ MockReg& MockReg::operator=(uint32_t input)
     value=input;
     if(this==&test_syscfg.VDDIO5CCCR && bad_compensation_gate==6) value=0x78;
     if(this==&test_pwr.SVMCR2 && bad_compensation_gate==2) value&=~PWR_SVMCR2_VDDIO5SV;
-    if(this==&test_gpio_c.OSPEEDR && bad_gpio_speed_write==1U) value|=1U<<4;
-    if(this==&test_gpio_e.OSPEEDR && bad_gpio_speed_write==2U) value|=1U<<8;
+    if(this==&test_gpio_c.OSPEEDR && bad_gpio_speed_write==1U) value^=1U<<4;
+    if(this==&test_gpio_e.OSPEEDR && bad_gpio_speed_write==2U) value^=1U<<8;
     if(this==&test_gpio_c.OSPEEDR && bad_gpio_speed_write==3U) value^=1U<<2;
     if(this==&test_sd.CLKCR && drop_width_write) value&=~SDMMC_CLKCR_WIDBUS;
+    if(this==&test_sd.CLKCR && drop_negedge_write) value&=~SDMMC_CLKCR_NEGEDGE;
     if (this==&test_sd.ICR) test_sd.STA.value&=~input;
     else if (this==&test_sd.CMD) {
         command_write(input);
@@ -327,6 +330,7 @@ static sd_card_t reset_model()
     app_prefix_r1=app_preerase_r1=0x920U;
     app_width_r1=0x920U;app_prefix_count=0;app_prefix_fail_at=0xFFFFFFFFU;
     card_width=SD_BUS_WIDTH;drop_width_write=busy_after_width=not_ready_after_width=false;
+    drop_negedge_write=false;
     bad_gpio_speed_write=0;
     bad_compensation_gate=compensation_reads=compensation_writes=0;
     erase_busy_polls=0;
@@ -353,7 +357,7 @@ static sd_card_t reset_model()
     test_rcc.BUSLPENR.value=RCC_BUSLPENR_ACLKNLPEN|RCC_BUSLPENR_ACLKNCLPEN;
     test_rcc.MISCENR.value=RCC_MISCENR_DBGEN;
     test_gpio_c.IDR.value=1U<<4;
-    test_sd.CLKCR.value=SDMMC_CLKCR_HWFC_EN|WIDTH_BITS|3U;
+    test_sd.CLKCR.value=SDMMC_CLKCR_HWFC_EN|WIDTH_BITS|PHASE_BITS|3U;
     sd_card_t card{};
     card.initialized=1; card.controller_owned=1; card.media_idle=1;
     card.clock_hz=25000000; card.rca=0x12340000; card.ocr=1U<<30;
@@ -459,14 +463,15 @@ int main()
     { auto c=reset_init_model();
       assert(sd_init(&c,25000000U)==SD_OK && c.initialized && c.controller_owned && c.media_idle);
       assert(c.clock_hz==25000000U && card_width==SD_BUS_WIDTH);
+      assert((test_sd.CLKCR.value&SDMMC_CLKCR_NEGEDGE)==PHASE_BITS);
       assert((test_sd.CLKCR.value&SDMMC_CLKCR_WIDBUS)==WIDTH_BITS);
       assert((test_gpio_c.MODER.value&(3U<<2))==(1U<<2));
       assert((test_gpio_c.PUPDR.value&(3U<<2))==(2U<<2));
       assert((test_gpio_c.AFR[0].value&(15U<<4))==(7U<<4));
-      assert((test_gpio_c.OSPEEDR.value&C_MASK)==(SD_GPIO_SPEED==3?C_MASK:0U));
+      assert((test_gpio_c.OSPEEDR.value&C_MASK)==(C_MASK/3U*SD_GPIO_SPEED));
       assert((test_gpio_c.OSPEEDR.value&~C_MASK)==(0xA5A5A5A5U&~C_MASK));
-#if SD_GPIO_SPEED == 0
-      assert(sd_gpio_proof.requested_speed==0 && sd_gpio_proof.applied==1U);
+#if SD_GPIO_SPEED != 3
+      assert(sd_gpio_proof.requested_speed==SD_GPIO_SPEED && sd_gpio_proof.applied==1U);
       assert(sd_gpio_proof.c_mask==C_MASK && sd_gpio_proof.c_before==0xA5A5A5A5U);
       assert(sd_gpio_proof.c_after==test_gpio_c.OSPEEDR.value);
       assert(sd_gpio_proof.e_mask==(SD_BUS_WIDTH==4?0x300U:0U));
@@ -484,7 +489,7 @@ int main()
       }
       assert(((test_gpio_e.MODER.value>>8)&3U)==2U);
       assert(((test_gpio_e.AFR[0].value>>16)&15U)==11U);
-      assert((test_gpio_e.OSPEEDR.value&0x300U)==(SD_GPIO_SPEED==3?0x300U:0U));
+      assert((test_gpio_e.OSPEEDR.value&0x300U)==(uint32_t(SD_GPIO_SPEED)<<8));
       assert((test_gpio_e.OSPEEDR.value&~0x300U)==(0x5A5A5A5AU&~0x300U));
 #else
       assert(!number_of(51) && !number_of(6));
@@ -504,7 +509,7 @@ int main()
       assert(card_width==SD_BUS_WIDTH && c.initialized && c.media_idle);
       assert(sd_deinit(&c)==SD_OK);
     }
-#if SD_GPIO_SPEED == 0
+#if SD_GPIO_SPEED != 3
     for(uint32_t failure:{1U,2U,3U}) {
       if(failure==2U && SD_BUS_WIDTH!=4) continue;
       auto c=reset_init_model();bad_gpio_speed_write=failure;
@@ -513,6 +518,13 @@ int main()
       assert(!number_of(24) && !number_of(25) && !number_of(38));
       if(failure==1U || failure==3U) assert(commands.empty());
       if(failure==2U) assert(number_of(6)==1U && c.controller_owned);
+    }
+#endif
+#if SD_GPIO_SPEED == 1 || SD_GPIO_SPEED == 2
+    for(uint32_t hz:{100000U,12500000U}) {
+      auto c=reset_init_model();
+      assert(sd_init(&c,hz)==SD_ERR_ARGUMENT && commands.empty());
+      assert(!sd_gpio_proof.applied);
     }
 #endif
 #if SD_BUS_WIDTH == 4
@@ -569,6 +581,29 @@ int main()
       sd_stream_t stream{};stream.publish=publish_stream;stream.context=&source;
       assert(sd_write_blocks_stream_preerase(&c,0,stream_memory+12U,4,&stream)==SD_ERR_CLOCK);
       assert(commands.empty() && !stream.publication_calls);
+    }
+#endif
+
+#if SD_CLOCK_NEGEDGE
+    { auto c=reset_init_model();drop_negedge_write=true;
+      assert(sd_init(&c,25000000U)==SD_ERR_CLOCK && !c.initialized);
+      assert(!sd_bus_width_proof.negotiated_width && !number_of(6));
+      assert(!number_of(24) && !number_of(25) && !number_of(38));
+    }
+    for(uint32_t hz:{100000U,12500000U}) {
+      auto c=reset_init_model();
+      assert(sd_init(&c,hz)==SD_ERR_ARGUMENT && commands.empty());
+    }
+    { auto c=reset_model();test_sd.CLKCR.value&=~SDMMC_CLKCR_NEGEDGE;
+      StreamSource source{2048U,2048U,0xFFFFFFFFU,0xFFFFFFFFU,0xFFFFFFFFU,false};
+      sd_stream_t stream{};stream.publish=publish_stream;stream.context=&source;
+      assert(sd_write_blocks_stream_preerase(&c,0,stream_memory+12U,4,&stream)==SD_ERR_CLOCK);
+      assert(commands.empty() && !stream.publication_calls);
+    }
+    { auto c=reset_model();sd_erase_t proof{};
+      test_sd.CLKCR.value&=~SDMMC_CLKCR_NEGEDGE;
+      assert(sd_erase_all(&c,10000,&proof)==SD_ERR_CLOCK && !proof.started);
+      assert(!number_of(32) && !number_of(33) && !number_of(38));
     }
 #endif
 
@@ -913,7 +948,7 @@ int main()
       assert(proof.started && proof.completed && c.media_idle && proof.last_lba==c.sector_count-1);
       assert(!number_of(12) && !number_of(24) && !number_of(25) && !c.written_sectors);
       assert(erase_hz==100000U && erase_timer==1100000U && !erase_host_timeout);
-      assert(c.clock_hz==25000000U && test_sd.CLKCR.value==(SDMMC_CLKCR_HWFC_EN|WIDTH_BITS|3U));
+      assert(c.clock_hz==25000000U && test_sd.CLKCR.value==(SDMMC_CLKCR_HWFC_EN|WIDTH_BITS|PHASE_BITS|3U));
       assert(test_sd.DTIMER.value==50000000U && test_sd.DLEN.value==0);
     }
     { auto c=reset_model();sd_erase_t proof{};c.ocr=0;c.sector_count=4096;
@@ -932,7 +967,7 @@ int main()
       assert(sd_erase_all(&c,1000,&proof)==SD_ERR_NOT_READY);
       assert(proof.started && !proof.completed && !c.media_idle && proof.elapsed_ms>=1000);
       assert(!number_of(12)); /* Do not abort/reset an uncertain erase. */
-      assert(c.clock_hz==100000U && test_sd.CLKCR.value==(SDMMC_CLKCR_HWFC_EN|WIDTH_BITS|750U));
+      assert(c.clock_hz==100000U && test_sd.CLKCR.value==(SDMMC_CLKCR_HWFC_EN|WIDTH_BITS|PHASE_BITS|750U));
       assert(test_sd.DTIMER.value==200000U); /* no restore while busy */
     }
     { auto c=reset_model();sd_erase_t proof{};command_error=38;

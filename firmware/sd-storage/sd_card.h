@@ -20,8 +20,11 @@
 #ifndef SD_GPIO_SPEED
 #define SD_GPIO_SPEED 3
 #endif
-#if SD_GPIO_SPEED != 0 && SD_GPIO_SPEED != 3
-#error "SD_GPIO_SPEED must be 0 or 3"
+#if SD_GPIO_SPEED < 0 || SD_GPIO_SPEED > 3
+#error "SD_GPIO_SPEED must be in 0..3"
+#endif
+#if (SD_GPIO_SPEED == 1 || SD_GPIO_SPEED == 2) && SD_BUS_WIDTH != 4
+#error "Intermediate GPIO speed diagnostics require four-bit mode"
 #endif
 #ifndef SD_FIXED_COMPENSATION
 #define SD_FIXED_COMPENSATION 0
@@ -32,6 +35,15 @@
 #if SD_FIXED_COMPENSATION && SD_GPIO_SPEED != 3
 #error "Fixed compensation diagnostic requires unchanged GPIO speed 3"
 #endif
+#ifndef SD_CLOCK_NEGEDGE
+#define SD_CLOCK_NEGEDGE 0
+#endif
+#if SD_CLOCK_NEGEDGE != 0 && SD_CLOCK_NEGEDGE != 1
+#error "SD_CLOCK_NEGEDGE must be 0 or 1"
+#endif
+#if SD_CLOCK_NEGEDGE && (SD_BUS_WIDTH != 4 || SD_GPIO_SPEED == 0 || SD_FIXED_COMPENSATION)
+#error "Clock phase diagnostic requires four bits, speed 1..3 and unchanged compensation"
+#endif
 #if SD_FIXED_COMPENSATION
 typedef struct {
     uint32_t clock_before, clock_after, reset, svmcr2, svmcr3;
@@ -39,7 +51,7 @@ typedef struct {
 } sd_compensation_proof_t;
 extern volatile sd_compensation_proof_t sd_compensation_proof;
 #endif
-#if SD_GPIO_SPEED == 0
+#if SD_GPIO_SPEED != 3
 /* Diagnostic-only proof, separate from sd_card_t and absent in default builds.
  * Captured after pin configuration and before sd_init() returns; retained on
  * deinit. This does not inspect or change I/O compensation configuration. */

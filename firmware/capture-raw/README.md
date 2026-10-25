@@ -8,6 +8,12 @@ compression or full-frame CPU checksum in the normal save path.
 
 ## Installed v23: four-bit SDMMC2 at 12.5 MHz
 
+The [October 25 CRC investigation](evidence/2026-10-25-sd25-crc/CHECKPOINT.md)
+has promising RAM-only 25 MHz results after a 27-ohm series clock resistor.
+Two complete images matched original RAM and a fresh pattern write passed;
+probe-free and complete cold-cycle qualification are still pending. The
+installed profile and baseline below remain unchanged.
+
 The full-pin PZSSD001 carrier now runs **native four-bit SDMMC2 at 12.5 MHz,
 3.3 V, GPIO speed 3, with no compensation modification**. Build this profile
 explicitly with `--sd-bus-width 4 --sd-clock-hz 12500000`; omitted options

@@ -34,6 +34,11 @@
 #define DMA_FLAGS (DATA_FLAGS|SDMMC_STA_IDMATE|SDMMC_STA_IDMABTC)
 #define R1_ERRORS 0xFDFFE008UL
 #define DAT0 (1UL<<4)
+#if SD_CLOCK_NEGEDGE
+#define PHASE_BITS SDMMC_CLKCR_NEGEDGE
+#else
+#define PHASE_BITS 0UL
+#endif
 #if SD_BUS_WIDTH == 4
 #define C_MASK ((3UL<<0)|(3UL<<4)|(3UL<<6)|(3UL<<8)|(3UL<<10))
 #define C_PINS ((1UL<<0)|(1UL<<2)|(1UL<<3)|(1UL<<4)|(1UL<<5))
@@ -68,7 +73,7 @@ volatile sd_width_proof_t sd_bus_width_proof;
 _Static_assert(sizeof(sd_width_proof_t)==24U,"bus-width proof ABI");
 #endif
 
-#if SD_GPIO_SPEED == 0
+#if SD_GPIO_SPEED != 3
 volatile sd_gpio_proof_t sd_gpio_proof;
 _Static_assert(sizeof(sd_gpio_proof_t)==32U,"GPIO speed proof ABI");
 #endif
@@ -562,7 +567,7 @@ int sd_init(sd_card_t *c, uint32_t max_hz)
     for (size_t i=0;i<sizeof(sd_bus_width_proof);++i) width_clear[i]=0;
     sd_bus_width_proof.requested_width=4U;
 #endif
-#if SD_GPIO_SPEED == 0
+#if SD_GPIO_SPEED != 3
     volatile uint8_t *gpio_clear=(volatile uint8_t *)&sd_gpio_proof;
     for (size_t i=0;i<sizeof(sd_gpio_proof);++i) gpio_clear[i]=0;
     sd_gpio_proof.requested_speed=SD_GPIO_SPEED;
@@ -580,7 +585,7 @@ int sd_init(sd_card_t *c, uint32_t max_hz)
     c->stage=SD_STAGE_PREFLIGHT;
     if (max_hz!=100000UL && max_hz!=12500000UL && max_hz!=25000000UL)
         return fault(c,SD_ERR_ARGUMENT);
-#if SD_FIXED_COMPENSATION
+#if SD_FIXED_COMPENSATION || SD_CLOCK_NEGEDGE || SD_GPIO_SPEED == 1 || SD_GPIO_SPEED == 2
     if (max_hz!=25000000UL) return fault(c,SD_ERR_ARGUMENT);
 #endif
     if (__get_IPSR() || (__get_CONTROL()&1U)) return fault(c,SD_ERR_STATE);
@@ -620,7 +625,7 @@ int sd_init(sd_card_t *c, uint32_t max_hz)
     int result=delay_us(c,1);
     if (result) return result;
     c->stage=SD_STAGE_GPIO;
-#if SD_GPIO_SPEED == 0
+#if SD_GPIO_SPEED != 3
     sd_gpio_proof.c_before=C->OSPEEDR;
     sd_gpio_proof.e_before=E->OSPEEDR;
 #endif
@@ -631,9 +636,9 @@ int sd_init(sd_card_t *c, uint32_t max_hz)
 #if SD_GPIO_SPEED == 3
     C->OSPEEDR=(C->OSPEEDR&~C_MASK)|C_MASK;
 #else
-    C->OSPEEDR&=~C_MASK;
+    C->OSPEEDR=(C->OSPEEDR&~C_MASK)|(C_MASK/3U*SD_GPIO_SPEED);
     sd_gpio_proof.c_after=C->OSPEEDR;
-    if ((sd_gpio_proof.c_after&C_MASK) ||
+    if ((sd_gpio_proof.c_after&C_MASK)!=(C_MASK/3U*SD_GPIO_SPEED) ||
             ((sd_gpio_proof.c_before^sd_gpio_proof.c_after)&~C_MASK))
         return fault(c,SD_ERR_GPIO);
 #endif
@@ -694,7 +699,18 @@ int sd_init(sd_card_t *c, uint32_t max_hz)
     X->POWER=SDMMC_POWER_PWRCTRL;
     c->clock_hz=100000UL;
     if ((result=delay_us(c,10000)) || (result=identify(c))) return result;
-    X->CLKCR=(HCLK_HZ/(2*max_hz))|SDMMC_CLKCR_HWFC_EN;
+#if SD_CLOCK_NEGEDGE
+    /* RM0486 Rev4 p1433: change only with both state machines idle. Leave
+     * 100 kHz identification unchanged; this changes only the run-clock
+     * launch edge, not SELCLKRX, BUSSPEED, GPIO speed or compensation. */
+    if (X->STA&(SDMMC_STA_DPSMACT|SDMMC_STA_CPSMACT))
+        return fault(c,SD_ERR_CONTROLLER_BUSY);
+#endif
+    X->CLKCR=(HCLK_HZ/(2*max_hz))|SDMMC_CLKCR_HWFC_EN|PHASE_BITS;
+#if SD_CLOCK_NEGEDGE
+    if (X->CLKCR!=((HCLK_HZ/(2*max_hz))|SDMMC_CLKCR_HWFC_EN|PHASE_BITS))
+        return fault(c,SD_ERR_CLOCK);
+#endif
     c->clock_hz=max_hz;
     if ((result=delay_us(c,1000)) || (result=ready(c))) return result;
 #if SD_BUS_WIDTH == 4
@@ -722,9 +738,9 @@ int sd_init(sd_card_t *c, uint32_t max_hz)
 #if SD_GPIO_SPEED == 3
     E->OSPEEDR=(E->OSPEEDR&~(3UL<<8))|(3UL<<8);
 #else
-    E->OSPEEDR&=~(3UL<<8);
+    E->OSPEEDR=(E->OSPEEDR&~(3UL<<8))|((uint32_t)SD_GPIO_SPEED<<8);
     sd_gpio_proof.e_after=E->OSPEEDR;
-    if ((sd_gpio_proof.e_after&(3UL<<8)) ||
+    if ((sd_gpio_proof.e_after&(3UL<<8))!=((uint32_t)SD_GPIO_SPEED<<8) ||
             ((sd_gpio_proof.e_before^sd_gpio_proof.e_after)&~(3UL<<8)))
         return fault(c,SD_ERR_GPIO);
 #endif
@@ -739,10 +755,10 @@ int sd_init(sd_card_t *c, uint32_t max_hz)
     if ((result=ready(c))) return result;
     sd_bus_width_proof.negotiated_width=4U;
 #endif
-#if SD_GPIO_SPEED == 0
+#if SD_GPIO_SPEED != 3
     sd_gpio_proof.c_after=C->OSPEEDR; sd_gpio_proof.e_after=E->OSPEEDR;
-    if ((sd_gpio_proof.c_after&sd_gpio_proof.c_mask) ||
-            (sd_gpio_proof.e_after&sd_gpio_proof.e_mask) ||
+    if ((sd_gpio_proof.c_after&sd_gpio_proof.c_mask)!=(sd_gpio_proof.c_mask/3U*SD_GPIO_SPEED) ||
+            (sd_gpio_proof.e_after&sd_gpio_proof.e_mask)!=(sd_gpio_proof.e_mask/3U*SD_GPIO_SPEED) ||
             ((sd_gpio_proof.c_before^sd_gpio_proof.c_after)&~sd_gpio_proof.c_mask) ||
             ((sd_gpio_proof.e_before^sd_gpio_proof.e_after)&~sd_gpio_proof.e_mask))
         return fault(c,SD_ERR_GPIO);
@@ -963,14 +979,14 @@ int sd_erase_all(sd_card_t *c,uint32_t timeout_ms,sd_erase_t *proof)
     const uint32_t previous_hz=c->clock_hz,previous_clkcr=X->CLKCR;
     const uint32_t previous_timer=X->DTIMER;
     if((previous_hz!=100000U && previous_hz!=12500000U && previous_hz!=25000000U) ||
-       previous_clkcr!=((HCLK_HZ/(2U*previous_hz))|SDMMC_CLKCR_HWFC_EN|WIDTH_BITS))
+       previous_clkcr!=((HCLK_HZ/(2U*previous_hz))|SDMMC_CLKCR_HWFC_EN|WIDTH_BITS|PHASE_BITS))
         return fault(c,SD_ERR_CLOCK);
     /* CMD38 returns R1b: its busy detector uses DTIMER even with CMDTRANS=0.
      * A previous SCR/read timer is only 2 s; timeout leaves DPSM stuck in Busy
      * awaiting CPSM Abort (RM0486 Table220). At 25 MHz, even UINT32_MAX cannot
      * represent 600 s. Use the qualified 100 kHz divider while idle and a
      * hardware bound 1 s beyond the software limit. Never rewrite it busy. */
-    X->CLKCR=750U|SDMMC_CLKCR_HWFC_EN|WIDTH_BITS;c->clock_hz=100000U;
+    X->CLKCR=750U|SDMMC_CLKCR_HWFC_EN|WIDTH_BITS|PHASE_BITS;c->clock_hz=100000U;
     X->DCTRL=0;X->DLEN=0;X->ICR=DATA_FLAGS;
     X->DTIMER=(timeout_ms+1000U)*100U;
     if((result=delay_us(c,1000))) return result;
@@ -1039,8 +1055,8 @@ int sd_write_blocks_stream_preerase(sd_card_t *c,uint32_t lba,const void *buffer
     if(count<2U || count>SD_DMA_PREERASE_MAX_SECTORS) return fault(c,SD_ERR_ARGUMENT);
     if(c->clock_hz!=12500000U && c->clock_hz!=25000000U) return fault(c,SD_ERR_CLOCK);
     const uint32_t flow_mask=SDMMC_CLKCR_HWFC_EN|SDMMC_CLKCR_BUSSPEED|
-        SDMMC_CLKCR_SELCLKRX|SDMMC_CLKCR_DDR|SDMMC_CLKCR_WIDBUS;
-    if((X->CLKCR&flow_mask)!=(SDMMC_CLKCR_HWFC_EN|WIDTH_BITS)) return fault(c,SD_ERR_CLOCK);
+        SDMMC_CLKCR_SELCLKRX|SDMMC_CLKCR_DDR|SDMMC_CLKCR_WIDBUS|PHASE_BITS;
+    if((X->CLKCR&flow_mask)!=(SDMMC_CLKCR_HWFC_EN|WIDTH_BITS|PHASE_BITS)) return fault(c,SD_ERR_CLOCK);
     uint32_t api_start=DWT->CYCCNT,bytes=count*512U;
     if((result=stream_publish(c,s,bytes,api_start))) return result;
     s->initial_available_bytes=s->published_bytes;

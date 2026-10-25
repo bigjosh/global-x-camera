@@ -204,10 +204,12 @@ def main():
                    help='Native SDMMC data width; four-bit requires the full-pin carrier')
     p.add_argument('--sd-clock-hz',type=int,choices=(12500000,25000000),default=25000000,
                    help='Native SD clock; explicitly select 12.5 MHz for the qualified fallback')
-    p.add_argument('--sd-gpio-speed',type=int,choices=(0,3),default=3,
+    p.add_argument('--sd-gpio-speed',type=int,choices=(0,1,2,3),default=3,
                    help='SD GPIO OSPEEDR encoding; nondefault slew is RAM diagnostic only')
     p.add_argument('--sd-fixed-compensation',action='store_true',
                    help='RAM-only ES0620 VDDIO5 fixed-code test at 25 MHz and GPIO speed3')
+    p.add_argument('--sd-clock-negedge',action='store_true',
+                   help='RAM-only 25 MHz four-bit launch-phase test; identification stays unchanged')
     p.add_argument('--chunk-sectors',type=int,default=1024)
     p.add_argument('--whole-image-preerase',action='store_true',help='One CMD55/ACMD23 + CMD25 for all3730 padded payload sectors')
     p.add_argument('--magic-format',action='store_true',help='GXR2 + front metadata + packedRAW + GXRE slots; one progressive CMD25')
@@ -223,8 +225,13 @@ def main():
     a=p.parse_args()
     if a.sd_gpio_speed!=3 and (a.flash or a.standby):
         p.error('Nondefault SD GPIO speed is RAM diagnostic only')
+    if a.sd_gpio_speed in (1,2) and (a.sd_clock_hz!=25000000 or a.sd_bus_width!=4 or a.sd_fixed_compensation):
+        p.error('Intermediate GPIO speed is a four-bit 25 MHz RAM diagnostic without compensation changes')
     if a.sd_fixed_compensation and (a.flash or a.standby or a.sd_clock_hz!=25000000 or a.sd_gpio_speed!=3):
         p.error('Fixed compensation is an isolated 25 MHz RAM diagnostic only')
+    if a.sd_clock_negedge and (a.flash or a.standby or a.sd_clock_hz!=25000000 or
+            a.sd_bus_width!=4 or a.sd_gpio_speed==0 or a.sd_fixed_compensation):
+        p.error('Clock phase is an isolated 25 MHz four-bit RAM diagnostic only')
     if a.magic_format and (a.transport!='idma' or a.dma_sleep or a.whole_image_preerase or not a.line_stream):
         p.error('Magic format requires LINE producer and polling IDMA/flow-controlled stream, without legacy whole-image option')
     if not 1<=a.exposure_coarse<=63000 or (a.flash and a.exposure_coarse!=1428):
@@ -299,6 +306,7 @@ def main():
               f'-DRAW_SD_CLOCK_HZ={a.sd_clock_hz}U',
               f'-DSD_GPIO_SPEED={a.sd_gpio_speed}',
               f'-DSD_FIXED_COMPENSATION={int(a.sd_fixed_compensation)}',
+              f'-DSD_CLOCK_NEGEDGE={int(a.sd_clock_negedge)}',
               f'-DRAW_STANDBY={int(a.standby)}',f'-DRAW_DMA={int(a.transport=="idma")}',
               f'-DRAW_ASYNC_STOP={int(a.async_stop)}',
               f'-DRAW_DMA_SLEEP={int(a.dma_sleep)}',
@@ -345,8 +353,8 @@ def main():
         sd_stream=symbol('raw_stream',a.magic_format),sd_stream_bytes=44,
         sd_width_proof=symbol('sd_bus_width_proof',a.sd_bus_width==4),
         sd_width_proof_bytes=24 if a.sd_bus_width==4 else 0,
-        sd_gpio_proof=symbol('sd_gpio_proof',a.sd_gpio_speed==0),
-        sd_gpio_proof_bytes=32 if a.sd_gpio_speed==0 else 0,
+        sd_gpio_proof=symbol('sd_gpio_proof',a.sd_gpio_speed!=3),
+        sd_gpio_proof_bytes=32 if a.sd_gpio_speed!=3 else 0,
         sd_compensation_proof=symbol('sd_compensation_proof',a.sd_fixed_compensation),
         sd_compensation_proof_bytes=32 if a.sd_fixed_compensation else 0,
         exposure_coarse=a.exposure_coarse,
@@ -356,6 +364,7 @@ def main():
         system_core_clock=symbol('SystemCoreClock'),card=symbol('raw_card'),slots=symbol('raw_slots'),
         pattern=int(a.pattern=='diagonal'),transport=a.transport,sd_bus_width=a.sd_bus_width,
         sd_clock_hz=a.sd_clock_hz,sd_gpio_speed=a.sd_gpio_speed,
+        sd_clock_negedge=a.sd_clock_negedge,
         sd_gpio_masks=dict(c=0xFF3 if a.sd_bus_width==4 else 0x3F0,
                            e=0x300 if a.sd_bus_width==4 else 0),
         sd_fixed_compensation=a.sd_fixed_compensation,

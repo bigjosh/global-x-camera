@@ -84,7 +84,7 @@ def mock_header():
 
 
 class SdDriverTests(unittest.TestCase):
-    def run_scripted_register_protocol_and_failures(self, width, speed=3, compensation=0):
+    def run_scripted_register_protocol_and_failures(self, width, speed=3, compensation=0, negedge=0):
         compiler = shutil.which('clang++') or shutil.which('g++')
         self.assertIsNotNone(compiler, 'Native C++ compiler required')
         with tempfile.TemporaryDirectory(prefix='sd-driver-') as temp:
@@ -97,6 +97,7 @@ class SdDriverTests(unittest.TestCase):
             subprocess.run([compiler, '-std=c++17', '-O2', '-Wall', '-Wextra',
                             '-Werror', f'-DSD_BUS_WIDTH={width}', f'-DSD_GPIO_SPEED={speed}',
                             f'-DSD_FIXED_COMPENSATION={compensation}',
+                            f'-DSD_CLOCK_NEGEDGE={negedge}',
                             '-I', str(temp), '-I', str(HERE),
                             str(HERE/'test_sd_driver.cpp'), str(hook),
                             '-o', str(executable)],
@@ -120,17 +121,34 @@ class SdDriverTests(unittest.TestCase):
     def test_fixed_compensation_protocol_and_failure_gates(self):
         self.run_scripted_register_protocol_and_failures(4,3,1)
 
+    def test_negedge_protocol_and_failure_gates(self):
+        self.run_scripted_register_protocol_and_failures(4,negedge=1)
+
+    def test_medium_slew_protocol_and_failure_gates(self):
+        self.run_scripted_register_protocol_and_failures(4,speed=1)
+
+    def test_high_slew_protocol_and_failure_gates(self):
+        self.run_scripted_register_protocol_and_failures(4,speed=2)
+
+    def test_negedge_medium_slew_protocol_and_failure_gates(self):
+        self.run_scripted_register_protocol_and_failures(4,speed=1,negedge=1)
+
+    def test_negedge_high_slew_protocol_and_failure_gates(self):
+        self.run_scripted_register_protocol_and_failures(4,speed=2,negedge=1)
+
     def test_arm_c_compile_with_real_cmsis(self):
         compiler = Path('D:/ST/STM32CubeIDE_1.15.1/STM32CubeIDE/plugins/') / (
             'com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.'
             '12.3.rel1.win32_1.0.200.202406191623/tools/bin/arm-none-eabi-gcc.exe')
         self.assertTrue(compiler.is_file(), 'Pinned ARM toolchain required')
         with tempfile.TemporaryDirectory(prefix='sd-driver-arm-') as temp:
-            for width,speed,compensation in ((1,3,0),(4,3,0),(1,0,0),(4,0,0),(4,3,1)):
+            for width,speed,compensation,negedge in ((1,3,0,0),(4,3,0,0),(1,0,0,0),(4,0,0,0),(4,3,1,0),
+                    (4,3,0,1),(4,1,0,0),(4,2,0,0),(4,1,0,1),(4,2,0,1)):
                 subprocess.run([str(compiler), '-std=c11', '-Os', '-Wall', '-Wextra',
                     '-Werror', '-mcpu=cortex-m55', '-mthumb', '-DSTM32N657xx',
                     f'-DSD_BUS_WIDTH={width}',f'-DSD_GPIO_SPEED={speed}',
                     f'-DSD_FIXED_COMPENSATION={compensation}',
+                    f'-DSD_CLOCK_NEGEDGE={negedge}',
                     '-DCPU_IN_SECURE_STATE', '-I'+str(CMSIS/'Include'),
                     '-I'+str(CMSIS/'Device/ST/STM32N6xx/Include'),
                     '-c', str(HERE/'sd_card.c'), '-o', str(Path(temp)/'sd_card.o')], check=True)

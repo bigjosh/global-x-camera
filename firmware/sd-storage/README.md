@@ -187,17 +187,18 @@ python -m unittest discover -s firmware/sd-storage -p "test_*.py"
 ## Isolated GPIO slew diagnostic
 
 `SD_GPIO_SPEED` defaults to `3` (OSPEEDR `11`), preserving historical binaries.
-The opt-in value `0` selects OSPEEDR `00` on the pins used by this transport:
-PC2/PC3/PC4 in one-bit mode, plus PC0/PC5/PE4 in four-bit mode. Only `0` and
-`3` are accepted. `capture-raw/build.py --sd-gpio-speed 0` is restricted to RAM
-diagnostics; flash and Standby builds reject the nondefault setting.
+The opt-in values `0`, `1`, and `2` select the corresponding OSPEEDR encoding
+on the pins used by this transport: PC2/PC3/PC4 in one-bit mode, plus
+PC0/PC5/PE4 in four-bit mode. Nondefault settings are RAM diagnostics only;
+flash and Standby builds reject them. Intermediate speeds `1` and `2` require
+four-bit/25 MHz operation and unchanged compensation.
 
-Speed-zero builds expose a separate 32-byte `sd_gpio_proof`, leaving `sd_card_t`
+Nondefault-speed builds expose a separate 32-byte `sd_gpio_proof`, leaving `sd_card_t`
 unchanged. Its words are `requested_speed`, `c_mask`, `c_before`, `c_after`,
 `e_mask`, `e_before`, `e_after`, `applied`. Fresh init clears the proof. The
 `applied` flag becomes one only after successful initialization and register
 readback; deinit preserves the SRAM record. Four-bit masks are `0xFF3` for C
-and `0x300` for E, with all masked post-init bits zero. One-bit masks are
+and `0x300` for E, with each two-bit field equal to the requested speed. One-bit masks are
 `0x3F0` and zero. The driver verifies unrelated OSPEEDR bits are preserved.
 Default builds allocate no new GPIO proof and retain their previous behavior.
 
@@ -206,6 +207,20 @@ does not silently combine a slew change with an ES0620 compensation workaround.
 Register-model tests verify both widths/speeds, refused register writes and
 preservation of unrelated pins; real wiring, loading and reliability still
 require separate hardware qualification.
+
+## SD transmit launch-phase diagnostic
+
+`capture-raw/build.py --sd-clock-negedge` selects `CLKCR.NEGEDGE` only after
+unchanged 100 kHz identification and proof that both state machines are idle.
+At the 150 MHz kernel / 25 MHz bus setting it moves outgoing CMD/DAT changes
+to the falling SD-clock edge. It does not change receive-clock selection,
+bus speed mode, voltage, or compensation. The exact four-bit clock proof is
+`0x34003`, rather than `0x24003` with the historical phase.
+
+The option currently requires an awake RAM build, four-bit/25 MHz operation,
+GPIO speed 1, 2 or 3, and unchanged compensation. Default executable bytes are
+preserved. Erase preserves the selected phase; progressive writes check it.
+Successful initialization or one write does not establish wiring reliability.
 
 ## Isolated fixed-compensation diagnostic
 

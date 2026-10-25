@@ -1,0 +1,183 @@
+{
+  "schema": 1,
+  "scope": "27 ohm midpoint CLK resistor, observed read and write",
+  "resistor_placement": "User-reported series resistor in CLK wire, approximately midpoint",
+  "firmware": "Four-bit 25 MHz, NEGEDGE experiment, GPIO speed 3, no compensation modification",
+  "analyzer_sample_rate": 250000000,
+  "command_probe_valid": false,
+  "command_probe_limit": "CH3 was constant LOW with zero edges after resistor insertion; no independent CMD framing claim",
+  "sources": {
+    "r27-read01": {
+      "firmware_binary_sha256": "f95fe25e33618e7537c3b4c258848becdcbc94cd6e0b236883bdf5de9054d7cd",
+      "capture_metadata_sha256": "e8d084fdd8b48dba1bd7b9505379ab12d10941574b6f312f3961efb99c06f11d",
+      "raw_binary_files": {
+        "digital_1.bin": {
+          "bytes": 2099164,
+          "sha256": "36d6d326d7c2214a776b54d3040fe62bfb01ecc7dec96199cd14bd835b6b7f82"
+        },
+        "digital_2.bin": {
+          "bytes": 12246236,
+          "sha256": "40a1cce35a6af566976a5de16d617e4462ceacc038c213ef2148cc0bc0d65a26"
+        },
+        "digital_3.bin": {
+          "bytes": 44,
+          "sha256": "1fe490386e9fedebed5c144ab928171033d389ea8c4d924ae071920b047451a8"
+        },
+        "digital_4.bin": {
+          "bytes": 2067212,
+          "sha256": "db38008ced63ddb664a156fcbd1f5e0e644f078e7baeeb3e9da1baab633d0554"
+        },
+        "digital_5.bin": {
+          "bytes": 1729260,
+          "sha256": "dcdc8ecaa6adeba5a233a9c6a109a3c71c09cdd7ee7caf67638d2e93ed14a6d7"
+        },
+        "digital_7.bin": {
+          "bytes": 1700540,
+          "sha256": "a8378fe8367bd50e6bcaffa2f752e3fcd8f419def482563d5a3252da6063e0c0"
+        }
+      },
+      "data_only_summary_sha256": "c95e86b4a54bd9ca676606fd33193a4c05e5a0ceb80937cac3885f6b8281fdf5"
+    },
+    "r27-write01": {
+      "firmware_binary_sha256": "f95fe25e33618e7537c3b4c258848becdcbc94cd6e0b236883bdf5de9054d7cd",
+      "capture_metadata_sha256": "67c1cf6251a1e32197374c93421c6ac5ae23d91c9d06c2f82c41578a4a81e349",
+      "raw_binary_files": {
+        "digital_1.bin": {
+          "bytes": 6767852,
+          "sha256": "a56520f532b1c610e9dca8407cdd741c31d2ff558d96161fbf5a9070c0cde650"
+        },
+        "digital_2.bin": {
+          "bytes": 67534348,
+          "sha256": "7122c30c0aeea45cce7a541c1fc8ff2e5409f204efd8788a3e02414e30544836"
+        },
+        "digital_3.bin": {
+          "bytes": 44,
+          "sha256": "e855438ef4bb582e4c5ee0cafa80b60089b08e6e66be94ff1c6667b17f426bd9"
+        },
+        "digital_4.bin": {
+          "bytes": 6927532,
+          "sha256": "259faa101465215bd10f143ee405490ced259505774db44b8fbf2a892dbee77b"
+        },
+        "digital_5.bin": {
+          "bytes": 6171196,
+          "sha256": "4135273c7afd5a54bf390665c952e4e53ef1e836de70c25a622c81a174b789be"
+        },
+        "digital_7.bin": {
+          "bytes": 5808492,
+          "sha256": "05f5b6d5c7d41974343bf4de6e04993de902e5512620359327c39777a3994cd2"
+        }
+      },
+      "data_only_summary_sha256": "9d2f2984a513d0cbeeed82bc9a363fd534e2ab9ad4476230c6e56f162e874986"
+    }
+  },
+  "write": {
+    "mode_attribution": "Firmware proof and final GXR2 signature after scan; CMD unavailable",
+    "clock_pulsewidth_counts_ns": {
+      "4": 0,
+      "8": 0,
+      "12": 0,
+      "16": 437954,
+      "20": 6834787,
+      "24": 680384,
+      "28": 0
+    },
+    "offsets": {
+      "-4": {
+        "write_first_packet_s": 0.412527552,
+        "write_last_packet_s": 0.621771676,
+        "packet_count": 3730,
+        "all4CRCgood": 3614,
+        "expected_payload_matches": 3618,
+        "first_crc_status_accepted": 3730,
+        "first_crc_status_rejected": 0,
+        "first_status_three_clocks_after_end": true
+      },
+      "0": {
+        "write_first_packet_s": 0.412527552,
+        "write_last_packet_s": 0.621771676,
+        "packet_count": 3730,
+        "all4CRCgood": 3730,
+        "expected_payload_matches": 3730,
+        "first_crc_status_accepted": 3730,
+        "first_crc_status_rejected": 0,
+        "first_status_three_clocks_after_end": true
+      },
+      "4": {
+        "write_first_packet_s": 0.412527552,
+        "write_last_packet_s": 0.621771676,
+        "packet_count": 3730,
+        "all4CRCgood": 3730,
+        "expected_payload_matches": 3730,
+        "first_crc_status_accepted": 3730,
+        "first_crc_status_rejected": 0,
+        "first_status_three_clocks_after_end": true
+      }
+    },
+    "status_token_limit": "Later token-shaped bit sequences in the64-clock diagnostic tail are not additional card responses; only the first token 3 clocks after the end is attributed.",
+    "wire_payload_expected_bytes": 1909760,
+    "source_frame_sha256": "5edaa1705f76b8434993271c86e71d5d83bce1c0ec7272caeec9564594279c1e"
+  },
+  "read": {
+    "mode_attribution": "Firmware proof and pattern signature; CMD unavailable",
+    "offsets": {
+      "-4": {
+        "decoded_candidate_count": 587,
+        "all4CRCgood_count": 578,
+        "expected_sectors_observed": 511,
+        "missing_expected_sectors": [
+          477
+        ],
+        "caveat": "CMD missing; partialaborttail candidates included and not classified as physicalCRCerrors"
+      },
+      "0": {
+        "decoded_candidate_count": 587,
+        "all4CRCgood_count": 579,
+        "expected_sectors_observed": 512,
+        "missing_expected_sectors": [],
+        "caveat": "CMD missing; partialaborttail candidates included and not classified as physicalCRCerrors"
+      },
+      "4": {
+        "decoded_candidate_count": 587,
+        "all4CRCgood_count": 579,
+        "expected_sectors_observed": 512,
+        "missing_expected_sectors": [],
+        "caveat": "CMD missing; partialaborttail candidates included and not classified as physicalCRCerrors"
+      }
+    }
+  },
+  "prior_slot_readbacks": [
+    {
+      "source_capture": "control01",
+      "slot": 3,
+      "original_ram_bytes_equal": true,
+      "bytes": 1909600,
+      "slot_bytes": 1909760,
+      "source_frame_sha256": "5edaa1705f76b8434993271c86e71d5d83bce1c0ec7272caeec9564594279c1e",
+      "read_frame_sha256": "5edaa1705f76b8434993271c86e71d5d83bce1c0ec7272caeec9564594279c1e",
+      "read_slot_sha256": "5f0b5ee09b06d606dbce4f5fdb505393b3eb03f466036874639956340740811d",
+      "private_validation_sha256": "f7c99bdf0520ed4446adcfd113eff4259075809e7859fae891f55834039714be"
+    },
+    {
+      "source_capture": "phase01",
+      "slot": 4,
+      "original_ram_bytes_equal": true,
+      "bytes": 1909600,
+      "slot_bytes": 1909760,
+      "source_frame_sha256": "5edaa1705f76b8434993271c86e71d5d83bce1c0ec7272caeec9564594279c1e",
+      "read_frame_sha256": "5edaa1705f76b8434993271c86e71d5d83bce1c0ec7272caeec9564594279c1e",
+      "read_slot_sha256": "5f0b5ee09b06d606dbce4f5fdb505393b3eb03f466036874639956340740811d",
+      "private_validation_sha256": "70a0e036c2d46f88381c202cc3cefc4e1a0f3440e54920356be56ea29e53c952"
+    }
+  ],
+  "limits": [
+    "Digital waveform evidence is not analog signal-integrity or PVT qualification.",
+    "Effective CMD-probe loading may also have changed after resistor insertion.",
+    "Negative four-nanosecond sampling shows edge ambiguity; zero/positive offsets are not substituted for hardware results.",
+    "Subsequent no-probe/coldboot tests are separate evidence.",
+    "This report does not establish long-term reliability, card retention or arbitrary power-loss safety."
+  ],
+  "analysis_sources": {
+    "decode_sd4.py": "1013a7a3b2705e6ad51510f1cada8f828631b47867b80fa9f1bb585e3cbda8b2",
+    "build_post_resistor_report.py": "7d51ffd7f02c5eca7659b0661903bead284bfcf3412b2d25c90894542f77d87c"
+  }
+}

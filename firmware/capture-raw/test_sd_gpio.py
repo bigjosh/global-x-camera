@@ -66,15 +66,46 @@ class GpioGuards(unittest.TestCase):
         words[6]^=0x100
         with self.assertRaises(ValueError):bench.gpio_snapshot(self.reader(words),m,'bad')
 
+    def test_intermediate_slew_requires_exact_encoding_and_unrelated_pin_preservation(self):
+        for speed in (1,2):
+            m=copy.deepcopy(self.manifest)
+            m.update(sd_gpio_speed=speed,flags=[f'-DSD_GPIO_SPEED={speed}'])
+            words=self.words.copy();words[0]=speed
+            words[3]=(words[2]&~words[1])|words[1]//3*speed
+            words[6]=(words[5]&~words[4])|words[4]//3*speed
+            self.assertEqual(bench.gpio_snapshot(self.reader(words),m,'ok')['requested_speed'],speed)
+            for index in (0,3,6,7):
+                bad=words.copy();bad[index]^=1 if index!=3 else 0x10
+                with self.subTest(speed=speed,index=index),self.assertRaises(ValueError):
+                    bench.gpio_snapshot(self.reader(bad),m,'bad')
+            for changes in (dict(sd_bus_width=1),dict(sd_clock_hz=12500000,
+                    flags=[f'-DSD_GPIO_SPEED={speed}','-DRAW_SD_CLOCK_HZ=12500000U']),
+                    dict(sd_fixed_compensation=True,sd_compensation_modified=True)):
+                bad=copy.deepcopy(m);bad.update(changes)
+                with self.subTest(speed=speed,changes=changes),self.assertRaises(ValueError):
+                    bench.gpio_snapshot(self.reader(words),bad,'bad')
+
     def test_builder_rejects_slew_flash_before_output(self):
         with tempfile.TemporaryDirectory(prefix='sd-gpio-options-') as root:
             out=Path(root)/'never-created'
-            for mode in ('--flash','--standby'):
-                run=subprocess.run([sys.executable,str(HERE/'build.py'),'--out',str(out),
-                                    '--sd-gpio-speed','0',mode],capture_output=True,text=True)
-                self.assertEqual(run.returncode,2)
-                self.assertIn('Nondefault SD GPIO speed is RAM diagnostic only',run.stderr)
-                self.assertFalse(out.exists())
+            for speed in (0,1,2):
+                for mode in ('--flash','--standby'):
+                    run=subprocess.run([sys.executable,str(HERE/'build.py'),'--out',str(out),
+                                        '--sd-gpio-speed',str(speed),mode],capture_output=True,text=True)
+                    self.assertEqual(run.returncode,2)
+                    self.assertIn('Nondefault SD GPIO speed is RAM diagnostic only',run.stderr)
+                    self.assertFalse(out.exists())
+
+    def test_intermediate_builder_rejects_other_clock_width_or_compensation(self):
+        with tempfile.TemporaryDirectory(prefix='sd-gpio-options-') as root:
+            out=Path(root)/'never-created'
+            for speed in (1,2):
+                for options in (['--sd-bus-width','1'],['--sd-clock-hz','12500000'],['--sd-fixed-compensation']):
+                    run=subprocess.run([sys.executable,str(HERE/'build.py'),'--out',str(out),
+                        '--sd-bus-width','4','--sd-gpio-speed',str(speed),*options],capture_output=True,text=True)
+                    self.assertEqual(run.returncode,2)
+                    self.assertIn('Intermediate GPIO speed',run.stderr)
+                    self.assertFalse(out.exists())
 
 
 if __name__=='__main__':unittest.main()
