@@ -4,11 +4,12 @@
 
 The user selected [Amazon B08FB3GC34](https://www.amazon.com/dp/B08FB3GC34),
 identified as **Pzsmocn PZSSD001**, to replace the seven-pin carrier. This is the
-requested wiring plan. The user subsequently reports it **wired**; electrical
-operation and four-bit transfers remain unqualified. The installed v18 RAW-slot firmware still uses **one-bit native
-SDMMC2 at 3.3 V**. Current firmware and qualified measurements are tracked in
-[the RAW capture README](../../firmware/capture-raw/README.md); the October 19–20
-status statements below are historical.
+current wiring plan. The replacement is wired and the installed **v23 RAW-slot
+firmware uses native four-bit SDMMC2 at 12.5 MHz and 3.3 V**, with GPIO speed
+`3` (OSPEEDR `11`) and no compensation modification. The pin assignments below
+are unchanged. Current firmware, final image verification and time/energy
+comparisons are tracked in [the RAW capture README](../../firmware/capture-raw/README.md);
+the October 19–20 status statements below are historical.
 
 Move the existing wires at the breakout end only. New-board pin numbers follow
 [the supplier's pin diagram](https://www.cqrobot.com/image/cache/catalog/Pzsmocn/PZSSD001/PZSSD001-2-550x550.jpg)
@@ -25,7 +26,7 @@ avoid reversing the header when viewed from the solder side.
 | GND | GND | 2 | CN3.19 |
 | CD (previously unused) | CD | 9 | Leave disconnected |
 
-Add two wires for the forthcoming four-bit mode:
+The two additional wires used by native four-bit mode are:
 
 | New breakout label | New pin | Nucleo end | Peripheral function |
 |---|---:|---|---|
@@ -38,13 +39,16 @@ and SB23; no voltage conversion or Nucleo solder modification is needed.
 Power down before moving the supply and signal wires. Keep the leads short
 and retain socket decoupling.
 
-Four-bit operation requires a separately tested firmware change: configure
-PC0/PC5/PE4 as AF11 with appropriate CMD/data pull-ups, check the card's supported
-width, and negotiate matching card/controller width. The installed one-bit
-firmware instead leaves PE4 as an input/pull-up and does not configure the two
-new data pins. Its operation on this replacement carrier remains to smoke-test.
+The installed firmware initializes the card at 100 kHz in one-bit mode, checks
+SCR support, then negotiates four-bit card/controller width using CMD55/ACMD6.
+All six SD signals use AF11 during four-bit transfers, including PC0/PC5/PE4,
+with CMD/data pull-ups retained. Pattern and long-exposure tests at 12.5 MHz
+passed complete SD-to-original-camera-RAM equality. Separate 25 MHz trials
+reported CRC errors; neither the low-slew nor fixed-compensation trial resolved
+them. The cause remains unresolved, so 12.5 MHz with the original slew and
+compensation settings is the selected operating point for this comparison.
 The module listing/pin diagram does not qualify the delivered board's reset-time
-pull-up/decoupling network; check that during bring-up. This interface is native
+pull-up/decoupling network. This interface is native
 four-bit SDMMC, not QSPI.
 
 The user confirmed the old carrier was intact and the **SanDisk Extreme 32 GB
@@ -54,9 +58,11 @@ three-cycle baseline is complete** on that carrier, unchanged v18, one-bit
 All three slots were read back and decoded; frames were near black. See
 [the measurements and comparison](../../firmware/capture-raw/evidence/2026-10-24-sandisk-extreme32/README.md).
 The explicit test-card reset/erase permission was used before these runs. The
-replacement carrier and four-bit firmware have not been tested yet. The target
-was left powered in an idle RAM READ park after retrieval; power down before
-rewiring, then recheck ownership and connections before the next experiment.
+baseline remains a separate result for the old carrier at one bit/25 MHz;
+the replacement-carrier comparison also changes the selected clock to 12.5 MHz.
+Use the RAW capture README linked above for the final comparison and its
+verification limits, and [the bench checkpoint](../../AGENTS.md) for current
+ownership and target state.
 
 ## Historical one-bit bring-up record
 

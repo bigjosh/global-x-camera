@@ -1,0 +1,352 @@
+{
+  "schema": 1,
+  "created_utc": "2026-10-25T04:08:45.725962+00:00",
+  "hardware_access": false,
+  "scope": "Follow-up failed 25 MHz RAM diagnostics; separate from successful final-candidate qualification and energy comparison.",
+  "records": [
+    {
+      "name": "ospeed00-25mhz-first-header-failure",
+      "source": {
+        "path": "slew-fault-status/diagnostic.json",
+        "sha256": "9ba4f1633a964aa3ce1fc5d31a6a75805a6e4edf1f0f953e727b2ee2c10bbeee",
+        "bytes": 3455
+      },
+      "request_source": {
+        "path": "pattern25-slew0-capture/plan.json",
+        "sha256": "4e1c6cc34e51b34b510509861b08ddfc8a8097e6543fe91902d91567412963cb",
+        "bytes": 505
+      },
+      "manifest_source": {
+        "path": "ram-pattern25-slew0-v21/manifest.json",
+        "sha256": "9f0f3201764138c8863f6f25a4f8c30b240d97c65d8580b4acb628bc8f8a4dab",
+        "bytes": 9914
+      },
+      "offline_validation_source": {
+        "path": "slew-v21-offline-validation.json",
+        "sha256": "e877afb84b7c6e8b6050220e8852d9e590b2a7bb4b9816587b0f79454a723ae0",
+        "bytes": 2645
+      },
+      "binary_sha256": "a89efdf32f9f9a318ccf5b9230e157c694a7b64157b03a2d4dd0e34c9f52b1a0",
+      "binary_bytes": 27792,
+      "request_words": [
+        1381191985,
+        2853400984,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "request_scope": {
+        "reset": false,
+        "power_switch": false,
+        "nor_commands": false
+      },
+      "profile": {
+        "sd_bus_width": 4,
+        "sd_clock_hz": 25000000,
+        "sd_gpio_speed": 0,
+        "sd_fixed_compensation": false,
+        "pattern": 1
+      },
+      "proof": {
+        "nonce": 2853400984,
+        "operation": 1,
+        "state": 15,
+        "result": 804,
+        "stage": 3,
+        "terminal": 1381188686,
+        "sd_error": 14,
+        "media_idle": 1,
+        "initialized": 0,
+        "controller_owned": 0,
+        "cleanup_error": 10,
+        "slot": 4294967295,
+        "written_sectors": 0,
+        "card_read_lo": 0,
+        "card_read_hi": 0,
+        "card_write_lo": 0,
+        "card_write_hi": 0,
+        "clock_hz": 25000000,
+        "transport": 1,
+        "pattern": 1,
+        "frames": 1,
+        "errors": 0,
+        "camera_ready": 1909600,
+        "capture_error": 0,
+        "first_write": 0,
+        "payload_done": 0,
+        "commit_done": 0,
+        "deinit_done": 1252144514,
+        "flags": 131
+      },
+      "card": {
+        "read_sectors": 0,
+        "written_sectors": 0,
+        "clock_hz": 25000000,
+        "initialized": 0,
+        "controller_owned": 0,
+        "media_idle": 1,
+        "error": 14,
+        "error_stage": 5,
+        "error_command": 17,
+        "error_sta": 2,
+        "stage": 9,
+        "last_command": 13,
+        "last_sta": 64,
+        "last_r1": 2304,
+        "command_count": 32,
+        "last_ready_r1": 2304,
+        "last_stop_r1": 2304,
+        "cleanup_error": 10,
+        "transfer_words": 128,
+        "transfer_sta": 2,
+        "transfer_cycles": 202415
+      },
+      "width_proof": {
+        "requested_width": 4,
+        "scr_widths": 5,
+        "acmd6_r1": 2336,
+        "acmd6_accepted": 1,
+        "configured_clkcr": 147459,
+        "negotiated_width": 4
+      },
+      "successful_capture": false,
+      "successful_idle_qualification": false,
+      "cold_cycle_or_energy_result": false,
+      "gpio_proof": {
+        "requested_speed": 0,
+        "c_mask": 4083,
+        "c_before": 0,
+        "c_after": 0,
+        "e_mask": 768,
+        "e_before": 0,
+        "e_after": 0,
+        "applied": 1
+      },
+      "interpretation": {
+        "failed_phase": "First slot-header CMD17 read; DCRCFAIL in error STA 0x00000002, before slot allocation/write launch.",
+        "scope": "Zero write counters plus first_write=0; no new-image write was launched by this diagnostic.",
+        "qualification": "Nonzero result and cleanup_error=10 remain failures despite media_idle=1 and deinitialized flags.",
+        "root_cause": "Unproven; this one failed trial does not establish that GPIO slew caused prior failures."
+      }
+    },
+    {
+      "name": "fixed-compensation-25mhz-pio-write-failure",
+      "source": {
+        "path": "comp-fault-status/diagnostic.json",
+        "sha256": "2cd13b74d69b04a8d167305d7b74c9a7e37a59f5ec95f9ca6205f6a14cc1df96",
+        "bytes": 3512
+      },
+      "request_source": {
+        "path": "pattern25-comp-capture/plan.json",
+        "sha256": "31196fa51e0c9c1dd0b0a877238e10bbdbb3f4bda66366dd69cbcb93286a1170",
+        "bytes": 504
+      },
+      "manifest_source": {
+        "path": "ram-pattern25-comp-v22/manifest.json",
+        "sha256": "bd7a0dfa5f4c667470a3d98cdcf19e03172ddb5999e423ef7463fb1f9cf332e6",
+        "bytes": 10050
+      },
+      "offline_validation_source": {
+        "path": "compensation-v22-offline-validation.json",
+        "sha256": "0cc33644d38f90854e2c02697a65b57dd63d865b141b333ddf25b017f8f4d3cb",
+        "bytes": 1240
+      },
+      "binary_sha256": "ac64f84aec1ffd1399fa7b42cce3fb488be57ca823bb26abf1686ff1de793d90",
+      "binary_bytes": 27756,
+      "request_words": [
+        1381191985,
+        4200095281,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "request_scope": {
+        "reset": false,
+        "power_switch": false,
+        "nor_commands": false
+      },
+      "profile": {
+        "sd_bus_width": 4,
+        "sd_clock_hz": 25000000,
+        "sd_gpio_speed": 3,
+        "sd_fixed_compensation": true,
+        "pattern": 1
+      },
+      "proof": {
+        "nonce": 4200095281,
+        "operation": 1,
+        "state": 15,
+        "result": 820,
+        "stage": 5,
+        "terminal": 1381188686,
+        "sd_error": 14,
+        "media_idle": 0,
+        "initialized": 1,
+        "controller_owned": 1,
+        "cleanup_error": 10,
+        "slot": 5,
+        "written_sectors": 0,
+        "card_read_lo": 6,
+        "card_read_hi": 0,
+        "card_write_lo": 0,
+        "card_write_hi": 0,
+        "clock_hz": 25000000,
+        "transport": 1,
+        "pattern": 1,
+        "frames": 1,
+        "errors": 0,
+        "camera_ready": 1909600,
+        "capture_error": 0,
+        "first_write": 1054459279,
+        "payload_done": 0,
+        "commit_done": 0,
+        "deinit_done": 0,
+        "flags": 131
+      },
+      "card": {
+        "read_sectors": 6,
+        "written_sectors": 0,
+        "clock_hz": 25000000,
+        "initialized": 1,
+        "controller_owned": 1,
+        "media_idle": 0,
+        "error": 14,
+        "error_stage": 6,
+        "error_command": 25,
+        "error_sta": 20482,
+        "stage": 7,
+        "last_command": 13,
+        "last_sta": 20546,
+        "last_r1": 2304,
+        "command_count": 1965,
+        "last_ready_r1": 2304,
+        "last_stop_r1": 8391680,
+        "cleanup_error": 10,
+        "transfer_words": 405,
+        "transfer_sta": 20482,
+        "transfer_cycles": 245012
+      },
+      "width_proof": {
+        "requested_width": 4,
+        "scr_widths": 5,
+        "acmd6_r1": 2336,
+        "acmd6_accepted": 1,
+        "configured_clkcr": 147459,
+        "negotiated_width": 4
+      },
+      "successful_capture": false,
+      "successful_idle_qualification": false,
+      "cold_cycle_or_energy_result": false,
+      "compensation_proof": {
+        "clock_before": 3,
+        "clock_after": 3,
+        "reset": 0,
+        "svmcr2": 256,
+        "svmcr3": 768,
+        "before": 120,
+        "after": 647,
+        "applied": 1
+      },
+      "compensation_register_hex": {
+        "before": "0x00000078",
+        "after": "0x00000287",
+        "clock_before": "0x00000003",
+        "clock_after": "0x00000003",
+        "reset": "0x00000000",
+        "svmcr2": "0x00000100",
+        "svmcr3": "0x00000300"
+      },
+      "compensation_application_gate_passed": true,
+      "interpretation": {
+        "failed_phase": "CMD25 write in the progressive PIO trial; error STA 0x00005002 contains DCRCFAIL.",
+        "stop_response": "Last STOP R1 0x00800C00 includes COM_CRC_ERROR; later CMD13 R1 0x00000900 does not supersede the non-idle ownership/failure record.",
+        "scope": "The write was launched at slot 5. Zero completed-sector counters do not prove that its target media was untouched; partial modification was possible.",
+        "qualification": "media_idle=0, initialized=1, controller_owned=1 and cleanup_error=10; no safe-idle or successful-save claim.",
+        "compensation": "The gated register proof records before 0x78 and applied after 0x287. Successful register application did not qualify 25 MHz data transfer.",
+        "root_cause": "Unproven; the compensation trial failed and does not isolate signal integrity, breakout wiring or receiver timing."
+      }
+    }
+  ],
+  "sources": [
+    {
+      "path": "slew-fault-status/diagnostic.json",
+      "sha256": "9ba4f1633a964aa3ce1fc5d31a6a75805a6e4edf1f0f953e727b2ee2c10bbeee",
+      "bytes": 3455
+    },
+    {
+      "path": "pattern25-slew0-capture/plan.json",
+      "sha256": "4e1c6cc34e51b34b510509861b08ddfc8a8097e6543fe91902d91567412963cb",
+      "bytes": 505
+    },
+    {
+      "path": "ram-pattern25-slew0-v21/manifest.json",
+      "sha256": "9f0f3201764138c8863f6f25a4f8c30b240d97c65d8580b4acb628bc8f8a4dab",
+      "bytes": 9914
+    },
+    {
+      "path": "slew-v21-offline-validation.json",
+      "sha256": "e877afb84b7c6e8b6050220e8852d9e590b2a7bb4b9816587b0f79454a723ae0",
+      "bytes": 2645
+    },
+    {
+      "path": "comp-fault-status/diagnostic.json",
+      "sha256": "2cd13b74d69b04a8d167305d7b74c9a7e37a59f5ec95f9ca6205f6a14cc1df96",
+      "bytes": 3512
+    },
+    {
+      "path": "pattern25-comp-capture/plan.json",
+      "sha256": "31196fa51e0c9c1dd0b0a877238e10bbdbb3f4bda66366dd69cbcb93286a1170",
+      "bytes": 504
+    },
+    {
+      "path": "ram-pattern25-comp-v22/manifest.json",
+      "sha256": "bd7a0dfa5f4c667470a3d98cdcf19e03172ddb5999e423ef7463fb1f9cf332e6",
+      "bytes": 10050
+    },
+    {
+      "path": "compensation-v22-offline-validation.json",
+      "sha256": "0cc33644d38f90854e2c02697a65b57dd63d865b141b333ddf25b017f8f4d3cb",
+      "bytes": 1240
+    }
+  ],
+  "bench_conditions": {
+    "carrier": "New PZSSD001",
+    "bus_width": 4,
+    "clock_hz": 25000000,
+    "added_probes": [
+      "CH2 CLK",
+      "CH3 CMD"
+    ],
+    "CH5_moved": false,
+    "power_led": "User reported illuminated; its unknown draw is included in the JS-fed board branch."
+  },
+  "limits": [
+    "No successful image, full cold-cycle time or energy result is claimed for these failed trials.",
+    "Both recorded RAM requests specify no reset, no power switch and no NOR command; later v23 installation is a separate event.",
+    "Initial bringup and existing public diagnostics archives remain unchanged.",
+    "No card identifiers, absolute filesystem paths, private pixels, sector bytes or SRAM byte arrays are included.",
+    "These failures do not establish a unique physical root cause."
+  ]
+}

@@ -6,24 +6,48 @@ the existing UART recovery mechanism. It uses the container in
 [raw-slots](../raw-slots/README.md); there is no FAT filesystem, image conversion,
 compression or full-frame CPU checksum in the normal save path.
 
-## Four-bit candidate: prepared, hardware qualification pending
+## Installed v23: four-bit SDMMC2 at 12.5 MHz
 
-`build.py --sd-bus-width 4` selects native four-bit SDMMC2 on the full-pin
-carrier at the same 25 MHz. The default remains one bit. Separate 24-byte
-negotiation telemetry records SCR support, accepted ACMD6, host CLKCR and
-selected width; the RAM/awake bench rejects incomplete evidence. The
-[driver contract](../sd-storage/README.md#explicit-four-bit-build) describes the
-additional PC0/PC5/PE4 connections and failure handling.
+The full-pin PZSSD001 carrier now runs **native four-bit SDMMC2 at 12.5 MHz,
+3.3 V, GPIO speed 3, with no compensation modification**. Build this profile
+explicitly with `--sd-bus-width 4 --sd-clock-hz 12500000`; omitted options
+retain the historical one-bit/25 MHz defaults. SCR support, accepted ACMD6,
+host CLKCR and selected width must agree. The
+[driver contract](../sd-storage/README.md#explicit-four-bit-build) and
+[wiring guide](../../docs/prototype/sd-breakout-benchmark.md#october-24-replacement-pzsmocn-pzssd001-full-pin-breakout)
+describe the pins and negotiation.
 
-The reviewed v19b candidate preserves the 15,804-byte early load, recovery
-instructions, RAW layout and exposure. It is **not yet installed or hardware
-qualified**. After the user restored target power, both the four-bit RAM reader
-and the frozen, previously working one-bit reader failed at CMD8 during the
-initial 100 kHz handshake, before width negotiation. Both received the same
-invalid response with a command CRC error. A physical hookup/card check is
-pending; the JS output is intentionally off. No four-bit image or time/energy
-result exists yet. See [initial diagnostic evidence](evidence/2026-10-24-sd-fourbit-bringup/README.md)
-and the latest [bench checkpoint](../../AGENTS.md) before proceeding.
+Three cold capture/save cycles on the same SanDisk Extreme 32 GB passed
+complete slot readback, independent PNG decoding, recognizable scene inspection,
+warm UART recovery and an independently attributed Standby flag. Median cycle
+time is **578.942 ms**, energy **309.532 mJ**, and first payload submission to
+full-slot commit **327.321 ms (5.834 MB/s image payload)**. Compared with
+the original carrier at one bit/25 MHz, the measured medians are **34.4% less
+cycle time, 31.3% less energy and 48.3% less storage time**. This compares two
+carrier/clock configurations; the added LED and CLK/CMD probes are not isolated.
+Energy is the JS-fed Nucleo branch, not production battery energy.
+
+Separate deterministic and 230.597 ms exposure captures matched every saved
+image byte to original camera RAM. The long exposure began writing 4.711 ms
+before FRAME, and twenty immediate LINE snapshots matched final RAM. Original
+camera RAM was lost in Standby during the three measured cycles, so those
+readbacks are not original-RAM comparisons.
+
+25 MHz remains unresolved: reads passed, but default-slew and fixed-compensation
+writes failed CRC checks; a low-slew trial failed its first header read. Initial
+CMD8 failures disappeared after attaching CLK/CMD probes, without an established
+cause. No CRC/idle checks were relaxed. See the
+[complete results, diagnostics and verification record](evidence/2026-10-25-sd-fourbit/README.md).
+
+The installed 64 KiB sector fully read back as
+`bb31867394a4e0d0fb9ab3f9fa96d0d16ffc7256e2a274db74be4f11f9cfdc14`;
+the following 4 KiB remained unchanged. Prefix
+`09fb59cfed0f715927e76f32d5f74187e4c2f1702a70ce192e0d17dcee2f822a`
+keeps the reviewed recovery instructions and 15,804-byte early load. The
+on-media format and exposure remain unchanged. After verification the target
+was left powered in an idle **awake RAM READ park**, not Standby; the next
+normal cold boot uses v23. Check the [current bench checkpoint](../../AGENTS.md)
+before hardware work.
 
 ## October 24 replacement-card baseline
 
@@ -51,7 +75,7 @@ after the leading magic. It keeps the same **3730 sectors per image** and one
 announced CMD25. The user prefers this simple fixed-slot format for its expected
 mapping to future NAND storage, independently of the current SD timing result.
 
-**V18 capture → front-metadata RAW slot → Standby is installed.** Its complete
+**V18 established this front-metadata format; installed v23 retains it.** The historical v18 complete
 64 KiB NOR sector readback matched
 `174424c6792f96c72e336fc68e442474e9da665718552d3239a772d59ba73e2e`;
 the following 4 KiB remained unchanged. Its exact recovery prefix is

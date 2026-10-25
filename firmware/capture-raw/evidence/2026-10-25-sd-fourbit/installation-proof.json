@@ -1,0 +1,81 @@
+{
+  "schema": 1,
+  "passed": true,
+  "validation": "Offline byte comparison of existing recorded NOR installation; no new hardware operation.",
+  "sector_sha256": "bb31867394a4e0d0fb9ab3f9fa96d0d16ffc7256e2a274db74be4f11f9cfdc14",
+  "prefix_sha256": "09fb59cfed0f715927e76f32d5f74187e4c2f1702a70ce192e0d17dcee2f822a",
+  "full_sector": {
+    "bytes": 65536,
+    "byte_for_byte_match": true,
+    "expected_sha256": "bb31867394a4e0d0fb9ab3f9fa96d0d16ffc7256e2a274db74be4f11f9cfdc14",
+    "readback_sha256": "bb31867394a4e0d0fb9ab3f9fa96d0d16ffc7256e2a274db74be4f11f9cfdc14"
+  },
+  "following_region": {
+    "flash_offset": 65536,
+    "bytes": 4096,
+    "byte_for_byte_match": true,
+    "reference_sha256": "01cc465d3a7581d9d003b09e5db684eb7bec8e8512e12ce3565154c3aced816f",
+    "readback_sha256": "01cc465d3a7581d9d003b09e5db684eb7bec8e8512e12ce3565154c3aced816f",
+    "read_result": 0,
+    "read_count": 4096
+  },
+  "write_completion": {
+    "sequence": 2302,
+    "result": 0,
+    "cleanup_result": 0,
+    "completed_mask": 1023,
+    "changed_mask": 1023,
+    "erased_mask": 1023,
+    "pages_programmed": 145,
+    "first_mismatch": 4294967295,
+    "pending_operations": 0,
+    "first_failure_result": 0,
+    "final_status": 0,
+    "wip_wel_clear": true
+  },
+  "source_artifacts": {
+    "built-sector.bin": {
+      "sha256": "bb31867394a4e0d0fb9ab3f9fa96d0d16ffc7256e2a274db74be4f11f9cfdc14",
+      "bytes": 65536
+    },
+    "nor-readback.bin": {
+      "sha256": "bb31867394a4e0d0fb9ab3f9fa96d0d16ffc7256e2a274db74be4f11f9cfdc14",
+      "bytes": 65536
+    },
+    "write-verified.json": {
+      "sha256": "7458b244fa5dfaa7dea129121fb07ce515f4b00106db7307afc6923735903911",
+      "bytes": 241
+    },
+    "write-request.json": {
+      "sha256": "cc66fbf45cfd0d97b12d54f82e25013c97ce882bcfe8aea7dea4b20273fc63df",
+      "bytes": 725
+    },
+    "write-status.json": {
+      "sha256": "d3ce92fdc001d449a30563111f4e11ed8a28bccd7b79f2c9ac83dbd68acc5f99",
+      "bytes": 1326
+    },
+    "completion-diagnostic.json": {
+      "sha256": "eb56a0301e339dff40051df80ffd3b2fd14555be1af9497b5c25bcd90d89d636",
+      "bytes": 707
+    },
+    "following-status.json": {
+      "sha256": "68b05cfbf3c22f6a8cef8c900cf8e2faebcc2e84372a1ce45247c9156d4d7057",
+      "bytes": 515
+    },
+    "following-readback.bin": {
+      "sha256": "01cc465d3a7581d9d003b09e5db684eb7bec8e8512e12ce3565154c3aced816f",
+      "bytes": 4096
+    },
+    "following-reference.bin": {
+      "sha256": "01cc465d3a7581d9d003b09e5db684eb7bec8e8512e12ce3565154c3aced816f",
+      "bytes": 4096
+    }
+  },
+  "source_artifact_labels": "Logical labels only; no local filesystem paths are published.",
+  "private_bytes_published": false,
+  "limits": [
+    "Private NOR bytes were compared locally and are not included.",
+    "Only the following 4096-byte region was checked unchanged; this does not prove all remaining NOR unchanged.",
+    "Installation proof is separate from image integrity, Standby attribution and energy measurements."
+  ]
+}
