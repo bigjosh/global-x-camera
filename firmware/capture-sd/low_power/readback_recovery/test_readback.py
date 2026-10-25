@@ -264,6 +264,39 @@ class Tests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 r.checked_recovery_result(dict(passed=True,prefix_sha256=old_prefix),identity)
 
+    def test_phase25_qualification_pairs_and_cross_pair_rejection(self):
+        candidates=(
+            ('0752c9f4186ccada85f8d242163316d730dd1d22522c831f6382da9f125ed4b7',
+             '109a71a99cf69e9061dfe6867003da3316df93e38021bc84c5d03ea401a2a95a',
+             'raw-25-negedge-speed3-awake-qualification'),
+            ('6858d267f89814ba87326dde34e3c763b0fb6a2c5c82ab437ea3bf19a0eaf5b7',
+             '79c7c4ef3fb7d06baf3c2fb16dccaae4cd7f585c2319af7065f939bd006a39cd',
+             'raw-25-negedge-speed3-standby-qualification'))
+        spec=importlib.util.spec_from_file_location('phase25_check_park',
+            r.ROOT/'firmware/capture-timing/recovery_gpio/check_park.py')
+        park=importlib.util.module_from_spec(spec);spec.loader.exec_module(park)
+        with tempfile.TemporaryDirectory() as folder:
+            work=Path(folder)
+            (work/'stage1.bin').write_bytes(bytes(5140))
+            (work/'capture_sector_0.bin').write_bytes(bytes(65536))
+            for prefix,sector,name in candidates:
+                with self.subTest(name=name):
+                    self.assertEqual(r.APPROVED_RECOVERY[prefix],
+                        dict(name=name,sector_sha256=sector))
+                    self.assertEqual(park.APPROVED[prefix],
+                        dict(bytes=5140,park=0x3418078C,vcp=True,sector=sector))
+                    with mock.patch.object(r.sd,'sha',side_effect=[prefix,sector]):
+                        identity=r.checked_recovery(work)
+                    r.checked_recovery_result(dict(passed=True,prefix_sha256=prefix),identity)
+                    for other_prefix,other in r.APPROVED_RECOVERY.items():
+                        if other_prefix==prefix:continue
+                        for pair in ([prefix,other['sector_sha256']],[other_prefix,sector]):
+                            with mock.patch.object(r.sd,'sha',side_effect=pair):
+                                with self.assertRaises(ValueError):r.checked_recovery(work)
+                        with self.assertRaises(ValueError):
+                            r.checked_recovery_result(
+                                dict(passed=True,prefix_sha256=other_prefix),identity)
+
     def test_stale_or_failed_boot_rejected(self):
         words=[0x52425231,1,23,14,0,3,0x201,0,0,1,0,0,4,0x33330000,
                0x00100000,0x2020,0,0,0,0x55,1,32,0x5242444e]

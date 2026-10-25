@@ -6,15 +6,56 @@ the existing UART recovery mechanism. It uses the container in
 [raw-slots](../raw-slots/README.md); there is no FAT filesystem, image conversion,
 compression or full-frame CPU checksum in the normal save path.
 
-## Installed v23: four-bit SDMMC2 at 12.5 MHz
+## Installed profile: four-bit SDMMC2 at 25 MHz
 
-The [October 25 CRC investigation](evidence/2026-10-25-sd25-crc/CHECKPOINT.md)
-has promising RAM-only 25 MHz results after a 27-ohm series clock resistor.
-Two complete images matched original RAM and a fresh pattern write passed;
-probe-free and complete cold-cycle qualification are still pending. The
-installed profile and baseline below remain unchanged.
+The current PZSSD001/SanDisk Extreme 32 GB setup uses **four-bit SDMMC2,
+25 MHz, NEGEDGE launch phase, GPIO speed 3 and unchanged compensation**, with
+**27 ohms in series with CLK midway along the jumper wire**. The six SD signal
+probes have been removed; only NRST, recovery UART and analyzer ground remain.
+Select the profile explicitly; historical build defaults remain unchanged:
 
-The full-pin PZSSD001 carrier now runs **native four-bit SDMMC2 at 12.5 MHz,
+```powershell
+python firmware/capture-raw/build.py --out tmp/bringup/raw-flash25-standby `
+  --flash --standby --magic-format --async-stop --line-stream `
+  --sd-bus-width 4 --sd-clock-hz 25000000 --sd-clock-negedge
+```
+
+See the
+[qualification record](evidence/2026-10-25-sd25-crc/QUALIFICATION.md) for the
+complete results, installation hashes and measurement limits.
+
+Three cold capture/save/Standby cycles measured a median **419.518 ms /
+229.913 mJ**, versus **578.942 ms / 309.532 mJ** at four-bit/12.5 MHz:
+**27.5% less total time and 25.7% less energy**. Each passed first-attempt warm
+UART recovery, an independently attributed Standby flag, full slot readback,
+independent PNG decoding and recognizable scene inspection. Original capture
+RAM was lost in Standby, so these three readbacks are not source-RAM comparisons.
+This is current-onset-to-stable-plateau energy for the JS-fed Nucleo branch,
+not isolated MCU or battery energy. Resistor/probe/launch-phase and slot-position
+differences prevent attributing the complete improvement to frequency alone.
+
+Probe-free tests passed complete SD-to-original-RAM comparisons for a retained
+pattern image, a fresh normal scene, a 230.597 ms exposure and a cold flash
+capture. The long exposure used progressive PIO and began writing 9.434 ms
+before FRAME; all twenty immediate LINE snapshots matched final RAM. The cold
+awake capture used IDMA and saved the complete slot in **169.826 ms** from first
+submission to payload completion. That single counter result is separate from
+the complete-cycle measurements and does not isolate card programming time.
+
+Installed 64 KiB sector SHA-256:
+`79c7c4ef3fb7d06baf3c2fb16dccaae4cd7f585c2319af7065f939bd006a39cd`.
+The full NOR readback matched and the following 4 KiB remained unchanged.
+Exact recovery prefix:
+`6858d267f89814ba87326dde34e3c763b0fb6a2c5c82ab437ea3bf19a0eaf5b7`.
+Every recovery instruction and literal and the 15,804-byte early load are
+preserved; only the two reviewed receiver-CRC data words differ from v23.
+CRC, width, clock, ownership and idle checks remain enabled. The on-media
+format and exposure are unchanged. Check [the current bench state](../../AGENTS.md)
+before any hardware work.
+
+## Historical v23 fallback: four-bit SDMMC2 at 12.5 MHz
+
+The earlier full-pin PZSSD001 baseline ran **native four-bit SDMMC2 at 12.5 MHz,
 3.3 V, GPIO speed 3, with no compensation modification**. Build this profile
 explicitly with `--sd-bus-width 4 --sd-clock-hz 12500000`; omitted options
 retain the historical one-bit/25 MHz defaults. SCR support, accepted ACMD6,
@@ -39,21 +80,21 @@ before FRAME, and twenty immediate LINE snapshots matched final RAM. Original
 camera RAM was lost in Standby during the three measured cycles, so those
 readbacks are not original-RAM comparisons.
 
-25 MHz remains unresolved: reads passed, but default-slew and fixed-compensation
+At this earlier checkpoint 25 MHz was unresolved: reads passed, but default-slew and fixed-compensation
 writes failed CRC checks; a low-slew trial failed its first header read. Initial
 CMD8 failures disappeared after attaching CLK/CMD probes, without an established
 cause. No CRC/idle checks were relaxed. See the
 [complete results, diagnostics and verification record](evidence/2026-10-25-sd-fourbit/README.md).
 
-The installed 64 KiB sector fully read back as
+The historical v23 64 KiB sector fully read back as
 `bb31867394a4e0d0fb9ab3f9fa96d0d16ffc7256e2a274db74be4f11f9cfdc14`;
 the following 4 KiB remained unchanged. Prefix
 `09fb59cfed0f715927e76f32d5f74187e4c2f1702a70ce192e0d17dcee2f822a`
 keeps the reviewed recovery instructions and 15,804-byte early load. The
 on-media format and exposure remain unchanged. After verification the target
 was left powered in an idle **awake RAM READ park**, not Standby; the next
-normal cold boot uses v23. Check the [current bench checkpoint](../../AGENTS.md)
-before hardware work.
+normal cold boot then used v23. The 25 MHz profile above supersedes that
+installed-image checkpoint.
 
 ### Write-time budget at 12.5 MHz
 
@@ -105,7 +146,7 @@ after the leading magic. It keeps the same **3730 sectors per image** and one
 announced CMD25. The user prefers this simple fixed-slot format for its expected
 mapping to future NAND storage, independently of the current SD timing result.
 
-**V18 established this front-metadata format; installed v23 retains it.** The historical v18 complete
+**V18 established this front-metadata format; the current 25 MHz profile retains it.** The historical v18 complete
 64 KiB NOR sector readback matched
 `174424c6792f96c72e336fc68e442474e9da665718552d3239a772d59ba73e2e`;
 the following 4 KiB remained unchanged. Its exact recovery prefix is

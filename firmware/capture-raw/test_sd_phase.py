@@ -39,7 +39,7 @@ class PhaseGuards(unittest.TestCase):
 
     def test_manifest_scope_and_compiler_mismatch_rejected_before_read(self):
         changes=[dict(sd_clock_negedge=1),dict(sd_clock_negedge='true'),dict(flags=[]),
-            dict(flags=['-DSD_CLOCK_NEGEDGE=1']*2),dict(flash=True),dict(standby=True),
+            dict(flags=['-DSD_CLOCK_NEGEDGE=1']*2),dict(standby=True),
             dict(sd_bus_width=1),dict(sd_gpio_speed=0),dict(sd_fixed_compensation=True),
             dict(sd_compensation_modified=True),dict(sd_clock_hz=12500000)]
         for change in changes:
@@ -56,10 +56,22 @@ class PhaseGuards(unittest.TestCase):
             m=copy.deepcopy(self.manifest);m['sd_gpio_speed']=speed
             with self.assertRaises(ValueError):bench.phase_layout(m)
 
-    def test_build_refuses_combined_or_flash_phase_before_creating_output(self):
+    def test_flash_phase_accepts_only_the_selected_electrical_profile(self):
+        for standby in (False,True):
+            m=copy.deepcopy(self.manifest);m.update(flash=True,standby=standby)
+            self.assertEqual(bench.phase_layout(m),0x10000)
+            for changes in (dict(sd_gpio_speed=0),dict(sd_gpio_speed=1),
+                    dict(sd_gpio_speed=2),dict(sd_fixed_compensation=True),
+                    dict(sd_compensation_modified=True),dict(sd_bus_width=1),
+                    dict(sd_clock_hz=12500000)):
+                bad=copy.deepcopy(m);bad.update(changes)
+                with self.subTest(standby=standby,changes=changes),self.assertRaises(ValueError):
+                    bench.phase_layout(bad)
+
+    def test_build_refuses_unreviewed_clock_width_or_compensation_before_output(self):
         with tempfile.TemporaryDirectory(prefix='sd-phase-options-') as root:
             out=Path(root)/'never-created'
-            for options in (['--flash'],['--standby'],['--sd-clock-hz','12500000'],
+            for options in (['--sd-clock-hz','12500000'],
                     ['--sd-bus-width','1'],['--sd-gpio-speed','0'],['--sd-fixed-compensation']):
                 run=subprocess.run([sys.executable,str(HERE/'build.py'),'--out',str(out),
                     '--sd-bus-width','4','--sd-clock-negedge',*options],capture_output=True,text=True)

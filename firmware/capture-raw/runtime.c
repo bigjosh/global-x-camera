@@ -50,8 +50,8 @@
 #if SD_FIXED_COMPENSATION && (RAW_FLASH || RAW_STANDBY || RAW_SD_CLOCK_HZ != 25000000U)
 #error Fixed compensation is an isolated 25 MHz RAM diagnostic only
 #endif
-#if SD_CLOCK_NEGEDGE && (RAW_FLASH || RAW_STANDBY || RAW_SD_CLOCK_HZ != 25000000U)
-#error Clock phase is an isolated 25 MHz RAM diagnostic only
+#if SD_CLOCK_NEGEDGE && RAW_SD_CLOCK_HZ != 25000000U
+#error Clock phase requires 25 MHz
 #endif
 sd_card_t raw_card;
 raw_slots_t raw_slots;

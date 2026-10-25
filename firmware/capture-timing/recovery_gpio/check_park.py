@@ -30,6 +30,15 @@ VCP_FIELDS = (
     'reserved30 reserved31').split()
 # An unknown/self-consistent build is insufficient authorization to halt.
 APPROVED = {
+    # Explicit 25 MHz/NEGEDGE/speed3 admission for guarded cold qualification.
+    # Independent byte/disassembly review: only the two receiver CRC words differ
+    # from v23; all recovery instructions and literals are unchanged.
+    '0752c9f4186ccada85f8d242163316d730dd1d22522c831f6382da9f125ed4b7':
+        {'bytes': 5140, 'park': 0x3418078C, 'vcp': True,
+         'sector': '109a71a99cf69e9061dfe6867003da3316df93e38021bc84c5d03ea401a2a95a'},
+    '6858d267f89814ba87326dde34e3c763b0fb6a2c5c82ab437ea3bf19a0eaf5b7':
+        {'bytes': 5140, 'park': 0x3418078C, 'vcp': True,
+         'sector': '79c7c4ef3fb7d06baf3c2fb16dccaae4cd7f585c2319af7065f939bd006a39cd'},
     # RAW v23 four-bit 12.5 MHz: independent v18 prefix review retained all
     # recovery instructions/literals; only the two receiver CRC words differ.
     '09fb59cfed0f715927e76f32d5f74187e4c2f1702a70ce192e0d17dcee2f822a':

@@ -59,6 +59,26 @@ class FlashGuards(unittest.TestCase):
         m['flags']=[]
         with self.assertRaises(ValueError):f.validate_proof(p,m)
 
+    def test_flash_negedge_requires_exact_live_clock_phase_before_halt(self):
+        _,m,code,payloads=fixture()
+        m.update(flash=True,standby=False,sd_clock_negedge=True,sd_clock_hz=25000000,
+            sd_bus_width=4,sd_width_proof=0x34308000,sd_width_proof_bytes=24,
+            bss_start=0x34307000,bss_end=0x34309000,
+            flags=['-DSD_CLOCK_NEGEDGE=1','-DSD_BUS_WIDTH=4','-DRAW_SD_CLOCK_HZ=25000000U'])
+        for clkcr,accepted in ((0x34003,True),(0x24003,False),(0x34006,False)):
+            data=dict(payloads);data['before-sd-width.bin']=struct.pack('<6I',4,5,0x920,1,clkcr,4)
+            with self.subTest(clkcr=clkcr),tempfile.TemporaryDirectory() as directory:
+                class B:
+                    output=Path(directory)/'inspection'
+                    def upload(self,address,count,name):return data[name]
+                with patch.object(f.bench.sd,'context_proof',return_value={'test':True}) as context, \
+                     patch.object(f,'camera_telemetry',return_value={'test':True}):
+                    if accepted:
+                        self.assertTrue(f.inspect(B(),HERE,m,code)['passed']);context.assert_called_once()
+                    else:
+                        with self.assertRaises(ValueError):f.inspect(B(),HERE,m,code)
+                        context.assert_not_called()
+
     def test_loader_checks_every_fifo_level_bit(self):
         _,m,_,data=fixture();f.validate_loader(data['late-loader.bin'],m)
         for bit in range(8,15):

@@ -7,6 +7,18 @@ ownership checks. The normal `sd_write_blocks_dma()` API retains its existing
 chunked behavior: at most 1024 sectors per transaction, reduced to 16 at 100 kHz.
 It does not send ACMD23.
 
+The current camera configuration explicitly selects **four bits, 25 MHz,
+`SD_CLOCK_NEGEDGE=1`, GPIO speed3 and unchanged compensation**. Its PZSSD001
+carrier has a **27-ohm series CLK resistor fitted midspan**, with all six SD
+signal probes removed. The installed Standby sector SHA-256 is
+`79c7c4ef3fb7d06baf3c2fb16dccaae4cd7f585c2319af7065f939bd006a39cd`.
+See the [current qualification and its limits](../capture-raw/evidence/2026-10-25-sd25-crc/QUALIFICATION.md)
+and [wiring](../../docs/prototype/sd-breakout-benchmark.md). The earlier
+[12.5 MHz four-bit comparison](../capture-raw/evidence/2026-10-25-sd-fourbit/README.md)
+remains a historical result under its recorded wiring/probe conditions.
+These explicit choices do not change the driver's default width, phase,
+GPIO speed or compensation behavior.
+
 ## Explicit four-bit build
 
 The default `SD_BUS_WIDTH=1` retains the existing one-bit protocol and leaves
@@ -208,7 +220,7 @@ Register-model tests verify both widths/speeds, refused register writes and
 preservation of unrelated pins; real wiring, loading and reliability still
 require separate hardware qualification.
 
-## SD transmit launch-phase diagnostic
+## SD transmit launch-phase selection
 
 `capture-raw/build.py --sd-clock-negedge` selects `CLKCR.NEGEDGE` only after
 unchanged 100 kHz identification and proof that both state machines are idle.
@@ -217,10 +229,19 @@ to the falling SD-clock edge. It does not change receive-clock selection,
 bus speed mode, voltage, or compensation. The exact four-bit clock proof is
 `0x34003`, rather than `0x24003` with the historical phase.
 
-The option currently requires an awake RAM build, four-bit/25 MHz operation,
-GPIO speed 1, 2 or 3, and unchanged compensation. Default executable bytes are
-preserved. Erase preserves the selected phase; progressive writes check it.
-Successful initialization or one write does not establish wiring reliability.
+The option requires four-bit/25 MHz operation and unchanged compensation.
+Awake RAM diagnostics permit GPIO speed 1, 2 or 3; flash and Standby admit only
+the explicit **speed3** profile. Nondefault slew and fixed-compensation options
+remain RAM-only. Standby still requires a flash build. Default phase is zero,
+and existing default/v23 executables rebuild byte-identically.
+
+Build/compiler/manifest binding and the live width proof must agree on the
+phase. Erase preserves it, progressive writes check it, and awake-flash
+inspection refuses a missing or mismatched phase before halting. The separate
+exact recovery-prefix/sector admissions do not relax storage ownership checks.
+The [25 MHz qualification](../capture-raw/evidence/2026-10-25-sd25-crc/QUALIFICATION.md)
+covers the selected resistor and probe configuration; successful initialization
+or one write alone does not establish wiring reliability.
 
 ## Isolated fixed-compensation diagnostic
 

@@ -204,7 +204,7 @@ def width_snapshot(b,m,label):
 
 
 def phase_layout(m):
-    """Bind the isolated launch-phase experiment; frozen builds retain bit16=0."""
+    """Bind explicit launch phase; flash allows only speed3/default compensation."""
     enabled=m.get('sd_clock_negedge',False)
     if type(enabled) is not bool:
         raise ValueError('Unsupported SD clock phase selection')
@@ -213,11 +213,14 @@ def phase_layout(m):
         if flags!=[f'-DSD_CLOCK_NEGEDGE={int(enabled)}']:
             raise ValueError('Clock phase manifest/compiler flag differs')
     speed=m.get('sd_gpio_speed',3)
-    if enabled and (m.get('flash') or m.get('standby') or clock_layout(m)!=25000000 or
+    if enabled and (clock_layout(m)!=25000000 or
             m.get('sd_bus_width',1)!=4 or type(speed) is not int or speed not in (1,2,3) or
             m.get('sd_fixed_compensation',False) is not False or
             m.get('sd_compensation_modified',False) is not False):
-        raise ValueError('Clock phase must be an isolated 25 MHz four-bit RAM diagnostic')
+        raise ValueError('Clock phase requires 25 MHz four-bit mode without compensation changes')
+    if enabled and ((m.get('flash') or m.get('standby')) and speed!=3 or
+            m.get('standby') and not m.get('flash')):
+        raise ValueError('Flash clock phase requires speed3; Standby requires flash')
     return 0x10000 if enabled else 0
 
 

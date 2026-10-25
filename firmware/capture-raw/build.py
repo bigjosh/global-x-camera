@@ -209,7 +209,7 @@ def main():
     p.add_argument('--sd-fixed-compensation',action='store_true',
                    help='RAM-only ES0620 VDDIO5 fixed-code test at 25 MHz and GPIO speed3')
     p.add_argument('--sd-clock-negedge',action='store_true',
-                   help='RAM-only 25 MHz four-bit launch-phase test; identification stays unchanged')
+                   help='Explicit 25 MHz four-bit launch phase; flash requires default speed3 and compensation')
     p.add_argument('--chunk-sectors',type=int,default=1024)
     p.add_argument('--whole-image-preerase',action='store_true',help='One CMD55/ACMD23 + CMD25 for all3730 padded payload sectors')
     p.add_argument('--magic-format',action='store_true',help='GXR2 + front metadata + packedRAW + GXRE slots; one progressive CMD25')
@@ -229,9 +229,9 @@ def main():
         p.error('Intermediate GPIO speed is a four-bit 25 MHz RAM diagnostic without compensation changes')
     if a.sd_fixed_compensation and (a.flash or a.standby or a.sd_clock_hz!=25000000 or a.sd_gpio_speed!=3):
         p.error('Fixed compensation is an isolated 25 MHz RAM diagnostic only')
-    if a.sd_clock_negedge and (a.flash or a.standby or a.sd_clock_hz!=25000000 or
+    if a.sd_clock_negedge and (a.sd_clock_hz!=25000000 or
             a.sd_bus_width!=4 or a.sd_gpio_speed==0 or a.sd_fixed_compensation):
-        p.error('Clock phase is an isolated 25 MHz four-bit RAM diagnostic only')
+        p.error('Clock phase requires 25 MHz four-bit mode without compensation changes')
     if a.magic_format and (a.transport!='idma' or a.dma_sleep or a.whole_image_preerase or not a.line_stream):
         p.error('Magic format requires LINE producer and polling IDMA/flow-controlled stream, without legacy whole-image option')
     if not 1<=a.exposure_coarse<=63000 or (a.flash and a.exposure_coarse!=1428):

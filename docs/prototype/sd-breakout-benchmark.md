@@ -4,12 +4,17 @@
 
 The user selected [Amazon B08FB3GC34](https://www.amazon.com/dp/B08FB3GC34),
 identified as **Pzsmocn PZSSD001**, to replace the seven-pin carrier. This is the
-current wiring plan. The replacement is wired and the installed **v23 RAW-slot
-firmware uses native four-bit SDMMC2 at 12.5 MHz and 3.3 V**, with GPIO speed
-`3` (OSPEEDR `11`) and no compensation modification. The pin assignments below
-are unchanged. Current firmware, final image verification and time/energy
-comparisons are tracked in [the RAW capture README](../../firmware/capture-raw/README.md);
-the October 19–20 status statements below are historical.
+current wiring plan. The replacement is wired and the installed RAW-slot
+Standby firmware uses **native four-bit SDMMC2 at 25 MHz and 3.3 V**, with
+**NEGEDGE enabled**, GPIO speed `3` (OSPEEDR `11`) and no compensation
+modification. A **27-ohm series resistor is fitted midway along CLK**, and all
+six Saleae probes on CLK, CMD and DAT0–DAT3 have been removed. The header pin
+assignments below are unchanged. The installed 64 KiB sector SHA-256 is
+`79c7c4ef3fb7d06baf3c2fb16dccaae4cd7f585c2319af7065f939bd006a39cd`.
+See [the 25 MHz qualification and its limits](../../firmware/capture-raw/evidence/2026-10-25-sd25-crc/QUALIFICATION.md)
+and [the RAW capture README](../../firmware/capture-raw/README.md) for current
+image verification and time/energy results. The earlier 12.5 MHz comparison
+and the October 19–20 status statements below are historical.
 
 Move the existing wires at the breakout end only. New-board pin numbers follow
 [the supplier's pin diagram](https://www.cqrobot.com/image/cache/catalog/Pzsmocn/PZSSD001/PZSSD001-2-550x550.jpg)
@@ -18,7 +23,7 @@ avoid reversing the header when viewed from the solder side.
 
 | Wire from old breakout | New breakout label | New pin | Existing Nucleo end |
 |---|---|---:|---|
-| SCK | CLK | 5 | CN3.3 / PC2 |
+| SCK | CLK | 5 | CN3.3 / PC2, through the fitted 27-ohm series resistor |
 | DI | CMD | 4 | CN3.25 / PC3 |
 | DO | D0 (data zero) | 3 | CN3.13 / PC4 |
 | CS | D3 | 6 | CN3.21 / PE4 |
@@ -39,14 +44,34 @@ and SB23; no voltage conversion or Nucleo solder modification is needed.
 Power down before moving the supply and signal wires. Keep the leads short
 and retain socket decoupling.
 
+The tested clock wiring is:
+
+```text
+CN3.3 / PC2 ---- jumper ---- 27 ohms ---- jumper ---- CLK / breakout pin 5
+                            midspan
+```
+
+Source-end placement is the usual series-termination recommendation, but that
+is not the resistor placement tested here. Preserve the recorded placement
+when reproducing these results. SD probe loading affected earlier outcomes;
+the selected configuration has no probes on any of the six SD signal lines.
+
 The installed firmware initializes the card at 100 kHz in one-bit mode, checks
 SCR support, then negotiates four-bit card/controller width using CMD55/ACMD6.
 All six SD signals use AF11 during four-bit transfers, including PC0/PC5/PE4,
-with CMD/data pull-ups retained. Pattern and long-exposure tests at 12.5 MHz
-passed complete SD-to-original-camera-RAM equality. Separate 25 MHz trials
-reported CRC errors; neither the low-slew nor fixed-compensation trial resolved
-them. The cause remains unresolved, so 12.5 MHz with the original slew and
-compensation settings is the selected operating point for this comparison.
+with CMD/data pull-ups retained. The selected launch phase is applied only
+after identification and idle command/data state checks. Its configured
+`CLKCR` proof is `0x34003`. NEGEDGE changes outgoing CMD/data timing; it does
+not request a receive-clock, voltage or high-speed-mode change.
+
+Earlier 25 MHz trials reported CRC errors; neither phase selection alone nor
+the separate slew/compensation trials established reliable reads. The initial
+12.5 MHz comparison passed pattern and long-exposure SD-to-original-RAM checks,
+but a later read also failed at 12.5 MHz after probe loading changed. After the
+27-ohm CLK resistor was added and all SD probes removed, normal and long-exposure
+RAM captures and a cold awake-flash capture passed full original-RAM equality
+at 25 MHz. The evidence supports the selected physical setup; it does not
+isolate the analog cause or establish reliability across cards and wiring.
 The module listing/pin diagram does not qualify the delivered board's reset-time
 pull-up/decoupling network. This interface is native
 four-bit SDMMC, not QSPI.
@@ -58,9 +83,12 @@ three-cycle baseline is complete** on that carrier, unchanged v18, one-bit
 All three slots were read back and decoded; frames were near black. See
 [the measurements and comparison](../../firmware/capture-raw/evidence/2026-10-24-sandisk-extreme32/README.md).
 The explicit test-card reset/erase permission was used before these runs. The
-baseline remains a separate result for the old carrier at one bit/25 MHz;
-the replacement-carrier comparison also changes the selected clock to 12.5 MHz.
-Use the RAW capture README linked above for the final comparison and its
+baseline remains a separate result for the old carrier at one bit/25 MHz.
+The initial replacement-carrier comparison used four bits at 12.5 MHz and
+measured a median **578.942 ms / 309.532 mJ**; preserve it as the
+[historical fallback result](../../firmware/capture-raw/evidence/2026-10-25-sd-fourbit/README.md).
+The current 25 MHz runs additionally change phase, clock wiring and probe
+loading. Use the qualification record and RAW capture README linked above for their comparison and
 verification limits, and [the bench checkpoint](../../AGENTS.md) for current
 ownership and target state.
 
@@ -79,7 +107,7 @@ The user confirms the configurable GPIO banks are **still at 3.3 V**; the planne
 
 **Subsequent October 19 bench update:** the user reports these SD connections attached, ST-LINK USB connected, and target power through JS110. The JS110 recovery-output wire no longer reaches; the user prefers replacing it with ST-LINK-controlled recovery. Actual rails, source routing and probes still need rechecking. The [proposed VCP recovery detector](../../firmware/capture-timing/recovery_gpio/README.md#october-19-proposed-st-link-vcp-recovery) is not installed, so do not assume the current PE1 guard can be selected remotely.
 
-## Current connection plan
+## Historical one-bit connection plan
 
 Use short jumper wires to **CN3's odd-numbered row** for CLK/CMD/DAT0, the unused DAT3 bias connection and ground, plus Arduino **CN5.4 / 3V3** for power. Count CN3 from its marked pin 1 in steps of two. CLK/CMD/DAT0 use **AF11**; PE4 stays a **GPIO input with pull-up**, not an AF data output or a driven chip select. These pins belong to **VDDIO5**, which must remain at **3.3 V** with stock **SB23 fitted**. Do not apply the historical 1.8 V VDDIO5 NAND conversion. No Nucleo soldering, bank change or AREF jumper is needed.
 

@@ -31,6 +31,14 @@ SECTOR_SHA="7fda9d00cc7ffb3fbb9e6aac6695cf18545754b5dbfce1520cf30b2da39c4e63"
 # command-line opt-in for unknown firmware. This table does not broaden the
 # bridge or READ-module identities, and check_park still verifies live code.
 APPROVED_RECOVERY={
+    # Exact independently reviewed pairs for guarded 25 MHz phase qualification.
+    # Admission is not a hardware reliability result; preserve the selected pair.
+    '0752c9f4186ccada85f8d242163316d730dd1d22522c831f6382da9f125ed4b7':
+        dict(name='raw-25-negedge-speed3-awake-qualification',sector_sha256=
+             '109a71a99cf69e9061dfe6867003da3316df93e38021bc84c5d03ea401a2a95a'),
+    '6858d267f89814ba87326dde34e3c763b0fb6a2c5c82ab437ea3bf19a0eaf5b7':
+        dict(name='raw-25-negedge-speed3-standby-qualification',sector_sha256=
+             '79c7c4ef3fb7d06baf3c2fb16dccaae4cd7f585c2319af7065f939bd006a39cd'),
     # RAW v23 four-bit/12.5 MHz: exact independently reviewed recovery pair.
     # Clock-only fallback admission does not establish hardware qualification.
     '09fb59cfed0f715927e76f32d5f74187e4c2f1702a70ce192e0d17dcee2f822a':

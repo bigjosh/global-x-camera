@@ -1,5 +1,10 @@
 # 25 MHz CRC investigation checkpoint
 
+**Historical checkpoint:** probe-free PIO/IDMA and three cold Standby cycles
+have since passed, and the selected 25 MHz firmware is installed. See the
+[completed qualification](QUALIFICATION.md). The original observations below
+retain their status at the time they were recorded.
+
 October 25, 2026, approximately 05:04 UTC. This is an experimental result,
 not promotion of a new installed firmware profile.
 

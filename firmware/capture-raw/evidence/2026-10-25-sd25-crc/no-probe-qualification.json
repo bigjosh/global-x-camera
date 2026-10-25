@@ -1,0 +1,775 @@
+{
+  "schema": 1,
+  "date": "2026-10-25",
+  "status": "Passed the recorded RAM, awake-cold IDMA, and three normal cold Standby trials; not a production reliability qualification",
+  "scope": "Four-bit 25 MHz operation with the 27-ohm midpoint CLK resistor and all six SD signal probes removed",
+  "hardware_access_by_report_generator": false,
+  "physical_setup": {
+    "clk_series_resistor_ohms": 27,
+    "resistor_location": "Approximately midpoint of the CLK wire; not the recommended source-end placement",
+    "removed_probes": [
+      "CH1 DAT3",
+      "CH2 CLK",
+      "CH3 CMD",
+      "CH4 DAT1",
+      "CH5 DAT2",
+      "CH7 DAT0"
+    ],
+    "remaining_probes": [
+      "CH0 NRST",
+      "CH6 PE6/UART",
+      "GND"
+    ],
+    "phase_probe_present": false,
+    "power_probe_present": false,
+    "provenance": "User-confirmed physical changes relayed by the bench owner; not inferred from logic traces.",
+    "unchanged_resistor_for_all_reported_reads": true
+  },
+  "sd_configuration": {
+    "bus_width": 4,
+    "clock_hz": 25000000,
+    "clock_negedge": true,
+    "configured_clkcr": "0x00034003",
+    "gpio_speed": 3,
+    "fixed_compensation_override": false,
+    "compensation_modified": false,
+    "crc_checks_relaxed": false,
+    "idle_guards_relaxed": false
+  },
+  "cases": [
+    {
+      "slot": 5,
+      "capture_kind": "pattern",
+      "write_with_sd_signal_probes_attached": true,
+      "read_with_sd_signal_probes_attached": false,
+      "ram_binary_sha256": "f95fe25e33618e7537c3b4c258848becdcbc94cd6e0b236883bdf5de9054d7cd",
+      "exposure_coarse_lines": 1428,
+      "exposure_us": 10976,
+      "write_stream": {
+        "mode": 2,
+        "meaning": "progressive PIO with hardware flow control",
+        "initial_available_bytes": 1909248,
+        "published_bytes": 1909760,
+        "queued_bytes": 1909760,
+        "producer_error": 0,
+        "starved_polls": 0
+      },
+      "timing": {
+        "origin": "RAM diagnostic begin, not reset or target power arrival",
+        "clock_hz": 400000000,
+        "elapsed_ms": {
+          "arm": 14.0689575,
+          "frame_done": 36.00329,
+          "camera_stop": 72.24674,
+          "sd_begin": 14.4137175,
+          "sd_ready": 51.0229875,
+          "scan_done": 54.49659,
+          "first_write": 54.507675,
+          "payload_done": 264.9809475,
+          "commit_done": 264.9858275,
+          "deinit_done": 265.04518,
+          "end": 265.07374
+        },
+        "first_write_to_payload_done_ms": 210.4732725,
+        "first_write_before_frame_ms": -18.504385,
+        "sd_ready_before_frame_ms": -15.0196975,
+        "interpretation": "Positive before-frame values establish overlap; negative values mean the event followed FRAME."
+      },
+      "full_readback": {
+        "passed": true,
+        "sectors": 3730,
+        "slot_bytes": 1909760,
+        "image_bytes": 1909600,
+        "read_operations": 8,
+        "each_operation_idle_deinitialized": true,
+        "original_camera_ram_byte_equality": true,
+        "start_and_completion_markers_valid": true,
+        "metadata_zero": true,
+        "png_samples_match_retrieved_raw": true,
+        "original_camera_ram_sha256": "5edaa1705f76b8434993271c86e71d5d83bce1c0ec7272caeec9564594279c1e",
+        "slot_sha256": "5f0b5ee09b06d606dbce4f5fdb505393b3eb03f466036874639956340740811d"
+      },
+      "source_hashes": {
+        "build_manifest": {
+          "private_record": "ram-pattern25-negedge/manifest.json",
+          "sha256": "ac91054739dc40f82d2a3d0cc0a19f755abb4db80cd7f339430e068899d7c444"
+        },
+        "capture_verified": {
+          "private_record": "r27-write01/capture/verified.json",
+          "sha256": "ba14d93bb12402de6b7e026cb4d1af29bfacd4960eea602cf174db41d07d2b1c"
+        },
+        "readback_validation": {
+          "private_record": "no-probes-slot5/readback-validation.json",
+          "sha256": "5eabc1f126f5e9a4feb6fdf3c6606e3432cf481de7cb5d62d42cd83178bbf78e"
+        },
+        "read_chunks": [
+          {
+            "private_record": "no-probes-slot5/payload-0000/verified.json",
+            "sha256": "4b4b70813bb50d902ee9bb21f201481fcf042b9827aa033e49c4906ff18c5b03"
+          },
+          {
+            "private_record": "no-probes-slot5/payload-0512/verified.json",
+            "sha256": "4f79489c04e847ccc0510930280269942ea60c657ad63090007aff6ed7fb8e06"
+          },
+          {
+            "private_record": "no-probes-slot5/payload-1024/verified.json",
+            "sha256": "111acf06f80175c799374670434254c62a01a786764797e5a02262e45832a3c7"
+          },
+          {
+            "private_record": "no-probes-slot5/payload-1536/verified.json",
+            "sha256": "fbb0d8d4c40bb9dc4b609d004849ec24b399ddacbf224a57d9b4216818934097"
+          },
+          {
+            "private_record": "no-probes-slot5/payload-2048/verified.json",
+            "sha256": "eb2c69be1fcb8e9283c4e4ca061c593edd6d96ae69022e18593ec3f346fb194a"
+          },
+          {
+            "private_record": "no-probes-slot5/payload-2560/verified.json",
+            "sha256": "012f9b4b26e9c57487c87e1e6fe42f00ad62775c77c5b7a094a06938ecf48645"
+          },
+          {
+            "private_record": "no-probes-slot5/payload-3072/verified.json",
+            "sha256": "efbbc278256958ff5ed89373794e476e11f4d190c8337082846167c6f65c59c3"
+          },
+          {
+            "private_record": "no-probes-slot5/payload-3584/verified.json",
+            "sha256": "bf15663a737006c091a6a4b6f3820039ab8c48931db88629696d1979db978c65"
+          }
+        ]
+      }
+    },
+    {
+      "slot": 6,
+      "capture_kind": "normal_exposure_scene",
+      "write_with_sd_signal_probes_attached": false,
+      "read_with_sd_signal_probes_attached": false,
+      "ram_binary_sha256": "654349a643a1b9dfa6a87b4bd6a072b3c6008baf91f82cef92e9ab08243d1923",
+      "exposure_coarse_lines": 1428,
+      "exposure_us": 10976,
+      "write_stream": {
+        "mode": 2,
+        "meaning": "progressive PIO with hardware flow control",
+        "initial_available_bytes": 1909248,
+        "published_bytes": 1909760,
+        "queued_bytes": 1909760,
+        "producer_error": 0,
+        "starved_polls": 0
+      },
+      "timing": {
+        "origin": "RAM diagnostic begin, not reset or target power arrival",
+        "clock_hz": 400000000,
+        "elapsed_ms": {
+          "arm": 13.9836475,
+          "frame_done": 35.93965,
+          "camera_stop": 71.47682,
+          "sd_begin": 14.3254375,
+          "sd_ready": 50.2499475,
+          "scan_done": 54.29619,
+          "first_write": 54.307305,
+          "payload_done": 265.30237,
+          "commit_done": 265.30722,
+          "deinit_done": 265.36656,
+          "end": 265.3942
+        },
+        "first_write_to_payload_done_ms": 210.995065,
+        "first_write_before_frame_ms": -18.367655,
+        "sd_ready_before_frame_ms": -14.3102975,
+        "interpretation": "Positive before-frame values establish overlap; negative values mean the event followed FRAME."
+      },
+      "full_readback": {
+        "passed": true,
+        "sectors": 3730,
+        "slot_bytes": 1909760,
+        "image_bytes": 1909600,
+        "read_operations": 8,
+        "each_operation_idle_deinitialized": true,
+        "original_camera_ram_byte_equality": true,
+        "start_and_completion_markers_valid": true,
+        "metadata_zero": true,
+        "png_samples_match_retrieved_raw": true,
+        "original_camera_ram_sha256": "194bf722cad79bbd0a6d3fcd0f07f9ea5513cd11e8a8215b41d367810d10f38a",
+        "slot_sha256": "630b6cc03da429edda054922491e8b551cb11a6b82005a279a507bcfab3c1571"
+      },
+      "source_hashes": {
+        "build_manifest": {
+          "private_record": "ram-scene25-negedge/manifest.json",
+          "sha256": "92baeffe40f9b106a867f3821ec813ad93a2e417c814f024df8175af7e278a7d"
+        },
+        "capture_verified": {
+          "private_record": "no-probes-scene01/capture/verified.json",
+          "sha256": "4083c8fff86a6d58fb26b9a057c29d016987497a517a358ecbd259bbce3be129"
+        },
+        "readback_validation": {
+          "private_record": "no-probes-scene01/readback/readback-validation.json",
+          "sha256": "7765db5d3566ca70ad004ae868c09074bc08d60114237f2438247fd1661aaecb"
+        },
+        "read_chunks": [
+          {
+            "private_record": "no-probes-scene01/readback/payload-0000/verified.json",
+            "sha256": "4bb066b053bbabac93e00eb3c9ff86e86360bfee44e95dd350d71a0b8463d2bb"
+          },
+          {
+            "private_record": "no-probes-scene01/readback/payload-0512/verified.json",
+            "sha256": "6976c3efaaebc40cc29bfd78cc6b64bde989d1716672c266e26a1f0f87b4d787"
+          },
+          {
+            "private_record": "no-probes-scene01/readback/payload-1024/verified.json",
+            "sha256": "2a867f2d0afdcc4b40388b29923cff4534f89922f535c3f22c67a30115aaebf9"
+          },
+          {
+            "private_record": "no-probes-scene01/readback/payload-1536/verified.json",
+            "sha256": "651c866ab39cea011ede499cc757ce9b25ba49202e285240bb3dabcf15f1fc49"
+          },
+          {
+            "private_record": "no-probes-scene01/readback/payload-2048/verified.json",
+            "sha256": "3d33be53ddd2c813baf361e8438ca3ed029ed0cb87b096c62abdbe6b05c329e4"
+          },
+          {
+            "private_record": "no-probes-scene01/readback/payload-2560/verified.json",
+            "sha256": "18dd1018e1d73b24403f52be0963530c778ec3cf45e7552bd524e3bc80a07777"
+          },
+          {
+            "private_record": "no-probes-scene01/readback/payload-3072/verified.json",
+            "sha256": "7d978b39bd6e0afa778d06c7a6359caec1fc421a302f4f0337a6e78c095eae9e"
+          },
+          {
+            "private_record": "no-probes-scene01/readback/payload-3584/verified.json",
+            "sha256": "a2abcfde6fa77bb347428e75250cd07de659b3c9db6352b6f3caaeb7d798ca40"
+          }
+        ]
+      }
+    },
+    {
+      "slot": 7,
+      "capture_kind": "long_exposure_scene",
+      "write_with_sd_signal_probes_attached": false,
+      "read_with_sd_signal_probes_attached": false,
+      "ram_binary_sha256": "c3a9fecdbf1ef2625898eccaefc91605b8f8962a7210f547d5b3dba111dc0b47",
+      "exposure_coarse_lines": 30000,
+      "exposure_us": 230597,
+      "write_stream": {
+        "mode": 2,
+        "meaning": "progressive PIO with hardware flow control",
+        "initial_available_bytes": 89600,
+        "published_bytes": 1909760,
+        "queued_bytes": 1909760,
+        "producer_error": 0,
+        "starved_polls": 0
+      },
+      "timing": {
+        "origin": "RAM diagnostic begin, not reset or target power arrival",
+        "clock_hz": 400000000,
+        "elapsed_ms": {
+          "arm": 20.0180225,
+          "frame_done": 260.3087725,
+          "camera_stop": 507.0758775,
+          "sd_begin": 20.3615025,
+          "sd_ready": 56.406745,
+          "scan_done": 60.6287725,
+          "first_write": 250.87494,
+          "payload_done": 509.3309625,
+          "commit_done": 509.335675,
+          "deinit_done": 509.3951825,
+          "end": 509.422825
+        },
+        "first_write_to_payload_done_ms": 258.4560225,
+        "first_write_before_frame_ms": 9.4338325,
+        "sd_ready_before_frame_ms": 203.9020275,
+        "interpretation": "Positive before-frame values establish overlap; negative values mean the event followed FRAME."
+      },
+      "full_readback": {
+        "passed": true,
+        "sectors": 3730,
+        "slot_bytes": 1909760,
+        "image_bytes": 1909600,
+        "read_operations": 8,
+        "each_operation_idle_deinitialized": true,
+        "original_camera_ram_byte_equality": true,
+        "start_and_completion_markers_valid": true,
+        "metadata_zero": true,
+        "png_samples_match_retrieved_raw": true,
+        "original_camera_ram_sha256": "10a33220c8ebec3b4a6306abb0ab12cc2dda522b5d537ec45781b5202d21e10b",
+        "slot_sha256": "1996aa27319649af2cfecd2849ced9caf673884bce3820cdc63edd8275ac58f5"
+      },
+      "source_hashes": {
+        "build_manifest": {
+          "private_record": "ram-long25-negedge/manifest.json",
+          "sha256": "d8751660e1a4c590ac4a924831828bc0f2fb3c7fa08558ed005dd35dc5be19a7"
+        },
+        "capture_verified": {
+          "private_record": "no-probes-long01/capture/verified.json",
+          "sha256": "cb2014f10e47696e5642af0173dccbfce61761ac6e8eab25cb1eeca60be56a1e"
+        },
+        "readback_validation": {
+          "private_record": "no-probes-long01/readback/readback-validation.json",
+          "sha256": "47fefbe26d96a0ac3f383b84e18debfddc9218471180f8205ef2cc79e0705d6f"
+        },
+        "read_chunks": [
+          {
+            "private_record": "no-probes-long01/readback/payload-0000/verified.json",
+            "sha256": "e4b2324ac9c069a0ed544018e74da855a7301880fe18799394860ceae50294b9"
+          },
+          {
+            "private_record": "no-probes-long01/readback/payload-0512/verified.json",
+            "sha256": "be32bbecde37d9587b1ad155cc86ffacd1d71933c197db1ea05e438ebaa0636c"
+          },
+          {
+            "private_record": "no-probes-long01/readback/payload-1024/verified.json",
+            "sha256": "14cf92b4762dd7325b38e15746242db48d9d7b90bd538be675a33b29b4793e96"
+          },
+          {
+            "private_record": "no-probes-long01/readback/payload-1536/verified.json",
+            "sha256": "7bc62a85df254a9348a86587fceb9e4164e8925cb0e6f9b77575a348afa40c45"
+          },
+          {
+            "private_record": "no-probes-long01/readback/payload-2048/verified.json",
+            "sha256": "4026fed0bb5e97d71bd6a643c3fb7f55b45f493b61f7b5051d34f37956ca9964"
+          },
+          {
+            "private_record": "no-probes-long01/readback/payload-2560/verified.json",
+            "sha256": "c9f64d68d05ecf2c9c25a5df03619b5849668394e55abcda28fe3c2219a27e5e"
+          },
+          {
+            "private_record": "no-probes-long01/readback/payload-3072/verified.json",
+            "sha256": "02df61244e466c3107e9e06f80c60595a88f7fc3c3b3b121ee7ab3b0bf4117d8"
+          },
+          {
+            "private_record": "no-probes-long01/readback/payload-3584/verified.json",
+            "sha256": "f6525fe909bf89a9e4722465c27936483412798d440619d8b092f6da70ddb8c8"
+          }
+        ]
+      }
+    }
+  ],
+  "long_capture_snapshot_check": {
+    "passed": true,
+    "slot": 7,
+    "snapshot_count": 20,
+    "bytes_compared": 10240,
+    "poison_enabled": true,
+    "comparison": "Immediate 512-byte published LINE tails against retained final camera RAM",
+    "source_hashes": [
+      {
+        "private_record": "no-probes-long01/snapshots-reviewed.json",
+        "sha256": "5c0dc4e02340f68113fa2db88d47d55dfa1d8e097d3e4475e51770439c7e99af"
+      },
+      {
+        "private_record": "no-probes-long01/overlap-reviewed.json",
+        "sha256": "323e4fd6e1ffda560c0f313e7a79864c35e32682ef9607b2fb6baad52dd42abf"
+      },
+      {
+        "private_record": "long_scene_snapshot_report.py",
+        "sha256": "1d475e8e4f6779bbd956c4bc839dd8965043d677ac9065c820fe2c2a2754a799"
+      }
+    ]
+  },
+  "pending": {},
+  "limits": [
+    "Slot 5 was written with SD probes attached and read after removal; slots 6 and 7 establish RAM write plus read without SD probes.",
+    "RAM captures used progressive PIO mode 2; separate awake cold flash capture used observed IDMA mode 1. High-SRAM stream-mode telemetry is lost in Standby.",
+    "DWT phase timings in RAM/awake diagnostics are relative to runtime begin. Cold comparison time uses native Joulescope branch-current onset to the SBF-qualified plateau.",
+    "The resistor, launch phase, clock, probe loading, scene, card state and allocation position differ from earlier baselines; the comparison does not isolate any one cause.",
+    "Three normal cold cycles are observed passes, not long-run reliability, electrical margin, other-card, temperature or production qualification.",
+    "The midpoint resistor location is the actual tested setup. No source-end resistor placement, analog edge shape or definitive root cause is established here.",
+    "Only NRST and PE6 logic probes plus ground remained. No PD12 phase, SD signal or power-rail trace was acquired during the cold trials.",
+    "Standby images were fully retrieved and independently reconstructed, but original camera RAM was lost; no Standby SD-to-original-RAM equality is claimed.",
+    "SBF attribution depends on the exact recovered firmware, reviewed CSSF source and bench-owner chronology; the low-current plateau alone is insufficient.",
+    "The 20 LINE-tail snapshots demonstrate empirical visibility, not an AXI-drain guarantee.",
+    "GXR2/GXRE markers are completion indicators, not on-media pixel checksums or arbitrary power-loss atomicity.",
+    "JS-fed Nucleo-branch energy includes board overhead and omits unmeasured bypass paths; it is not isolated MCU or production battery energy.",
+    "No card/instrument identifiers, host absolute paths, images or bulk waveforms are included."
+  ],
+  "revision": 3,
+  "extends_sha256": "a8a3c45abcbdf11be99d1b8bd6650d5e340f0eb719bad2b7f508fbd9ee730466",
+  "awake_cold_idma": {
+    "passed": true,
+    "slot": 8,
+    "cold_flash_boot": true,
+    "standby_requested": false,
+    "source_binary_sha256": "e34e0ad01fdff6cafbd23cf495a1ec683bee87eafd7e70e087a484c4384cbec7",
+    "sector_sha256": "109a71a99cf69e9061dfe6867003da3316df93e38021bc84c5d03ea401a2a95a",
+    "prefix_sha256": "0752c9f4186ccada85f8d242163316d730dd1d22522c831f6382da9f125ed4b7",
+    "sd_signal_probes_present": false,
+    "gpio_speed": 3,
+    "clock_hz": 25000000,
+    "clock_negedge": true,
+    "configured_clkcr": "0x00034003",
+    "write_stream_mode": 1,
+    "write_stream_meaning": "IDMA, full complete slot available before launch",
+    "initial_available_bytes": 1909760,
+    "publication_calls": 1,
+    "exposure_us": 10976,
+    "write_sectors": 3730,
+    "original_camera_ram_byte_equality": true,
+    "original_camera_ram_sha256": "c491dc33f5b80d17a505cfefaba2816f18dc512ca76843bca67155697a2b22c8",
+    "slot_sha256": "6fe07595cbf9825b4cc7fc1f162e7acc4e6a108154b25c5d465b319b321053e7",
+    "png_samples_match_retrieved_raw": true,
+    "terminal_state_and_integrity_evidence": "Post-cycle exact flash inspection and complete readback, separately from the current-only recording",
+    "power_sequence": {
+      "controlled_off_seconds": 15.0,
+      "off_current_samples_zero": 3,
+      "no_debugger_or_uart_commands_during_cycle": true,
+      "observation_seconds_after_on_command": 10.079000000027008,
+      "phase_or_rail_probe_timing_available": false,
+      "energy_compared_here": false,
+      "limit": "Joulescope off command and zero measured branch current establish this controlled cycle; no target-rail analog discharge trace was acquired."
+    },
+    "timing": {
+      "origin": "Flash capture runtime begin, not target power arrival or reset release",
+      "clock_hz": 400000000,
+      "elapsed_ms": {
+        "arm": 1.05703,
+        "frame_done": 22.94866,
+        "camera_stop": 58.3394025,
+        "sd_begin": 4.85288,
+        "sd_ready": 225.693465,
+        "scan_done": 235.7401325,
+        "first_write": 235.7552275,
+        "payload_done": 405.5807675,
+        "commit_done": 405.585255,
+        "deinit_done": 405.64633,
+        "end": 405.67406
+      },
+      "first_write_to_payload_done_ms": 169.82554
+    },
+    "source_hashes": {
+      "cold_result": {
+        "private_record": "cold-awake01/result.json",
+        "sha256": "db1c034070ab4508434df8bd6dec3b031d6a4e06b7c2e7b74a91303a1068c3ec"
+      },
+      "cycle_events": {
+        "private_record": "cold-awake01/cycle.jsonl",
+        "sha256": "903007c73babb5586ea98efd05dc2309b7cead765a1a57b53a36acea9aaf5ef0"
+      },
+      "original_boot_proof": {
+        "private_record": "awake-boot-proof.json",
+        "sha256": "848de97920892dd555612b5c02ea7ce5f420d5f123af0cbc5bc4e6df0fc4d4a1"
+      },
+      "reserialized_boot_proof_copy": {
+        "private_record": "awake-inspection/fresh-boot.json",
+        "sha256": "3715ab2f83dcd41732ea62b13771becb4f8060a691cf6f6221e643b578bda50d"
+      },
+      "flash_inspection": {
+        "private_record": "awake-inspection/verified.json",
+        "sha256": "2b7d72adc52aa4691492af404b53cce92dce51f9224e1c8d8bb1f339e4ca9298"
+      },
+      "build_manifest": {
+        "private_record": "promoted-flash25-awake/manifest.json",
+        "sha256": "1879cb3bd0f3d1712cdeb5a665518b712499f0c128bf945949d45f2d17e9fb4b"
+      },
+      "readback_validation": {
+        "private_record": "awake-readback/readback-validation.json",
+        "sha256": "81742778b159b9d4455ff93fdfe0b5dfcb3e3ca4db9041af5d03aa3e7d9dff79"
+      },
+      "read_chunks": [
+        {
+          "private_record": "awake-readback/payload-0000/verified.json",
+          "sha256": "d42abf9b6ec7eaed60a3bbd888141dc9350c1d1eabdb6e411c15b4412a8ae6b0"
+        },
+        {
+          "private_record": "awake-readback/payload-0512/verified.json",
+          "sha256": "ba3477f3af0a8f21e7bf0da51fa4fdafb7398c959238f25e2d103a30325440fb"
+        },
+        {
+          "private_record": "awake-readback/payload-1024/verified.json",
+          "sha256": "cc1643f90d631825fb8d88c373cbd87793c5f72779d9a1ca8eab3207678cf895"
+        },
+        {
+          "private_record": "awake-readback/payload-1536/verified.json",
+          "sha256": "ad203511fe88a94d1837f9f63ef2c192fe05729690cb083dddf360f9fae1aa93"
+        },
+        {
+          "private_record": "awake-readback/payload-2048/verified.json",
+          "sha256": "17bba0bbe924a4235fbd2588807f5a2ccabfe0562d1c203a9b16b683483b661d"
+        },
+        {
+          "private_record": "awake-readback/payload-2560/verified.json",
+          "sha256": "d4a7cf04c541b0a41299f1164175f0f05989c434ee251893ccbc7470974eb5b9"
+        },
+        {
+          "private_record": "awake-readback/payload-3072/verified.json",
+          "sha256": "93f3ad6b0b98253a3583a85de7ec26a75fcbb690855029d480d0ede9619caa12"
+        },
+        {
+          "private_record": "awake-readback/payload-3584/verified.json",
+          "sha256": "9ddfafd53c3da2f08d1fcb4d69c07b6f48c6ad2d66613cb315eac723f81defc9"
+        }
+      ]
+    },
+    "boot_proof_serialization": {
+      "semantic_contents_identical": true,
+      "inspector_binds_original_input": true,
+      "copy_has_different_byte_hash": true,
+      "explanation": "The inspector writes a reserialized copy; its boot_proof_sha256 refers to the original input file."
+    }
+  },
+  "pre_standby_free_slots": {
+    "slots": [
+      9,
+      10,
+      11
+    ],
+    "first_sectors_all_zero": true,
+    "one_sector_per_slot": true,
+    "scope": "First-sector occupancy precheck before the three recorded Standby cycles; not a full-slot erase verification.",
+    "source_hashes": [
+      {
+        "private_record": "pre-cold-free/summary.json",
+        "sha256": "e93ad38d90d401bf1120dec18a4263a5036c165f7b6c7f134230a55a658e5684"
+      },
+      {
+        "private_record": "pre-cold-free/slot-9/verified.json",
+        "sha256": "c74edc705936a384d51667d5643fcbbb33a5d9aed5d70bd76602322c33d9129a"
+      },
+      {
+        "private_record": "pre-cold-free/slot-10/verified.json",
+        "sha256": "00c23ff3489428150f7577ffba6d1f93200648ef8d2216c5f3e27a48e1b77027"
+      },
+      {
+        "private_record": "pre-cold-free/slot-11/verified.json",
+        "sha256": "e9310ac5974d7597a59e58b7e28cd6b687c88125ca77133ed276d54cb6cef865"
+      }
+    ]
+  },
+  "report_generator_sha256": "f8c0c08a0c541cef8aa570a0a2c542098108c74b7db5ba1efb23d1613803a149",
+  "selected_firmware": {
+    "capture_sha256": "29b8ad5823ad45b7acce77222747b43b7077e1f82ec46059dea1c12eb3a82cd7",
+    "sector_sha256": "79c7c4ef3fb7d06baf3c2fb16dccaae4cd7f585c2319af7065f939bd006a39cd",
+    "prefix_sha256": "6858d267f89814ba87326dde34e3c763b0fb6a2c5c82ab437ea3bf19a0eaf5b7",
+    "prefix_bytes": 5140,
+    "early_load_bytes": 15804,
+    "standby_enabled": true,
+    "configured_idma": true,
+    "progressive_pio_fallback_retained": true,
+    "dma_sleep_enabled": false,
+    "full_64kib_program_readback_matched": true,
+    "following_4kib_unchanged_from_preceding_awake_install": true,
+    "recovery_instructions_unchanged_from_v23": true,
+    "changed_prefix_crc_literal_offsets": [
+      3228,
+      4948
+    ],
+    "offline_tests_passed": 158,
+    "source_hashes": [
+      {
+        "private_record": "promotion-proposal/applied-validation.json",
+        "sha256": "fdcf010b964a6eecbde52647f50db06f6429bf8ac0ff511941831c4ec15e6e3c"
+      },
+      {
+        "private_record": "promoted-flash25-standby/manifest.json",
+        "sha256": "e7fd25cada874ea0a9c12b3e7aff96b6a9b9deb20bd2b77c29e667ad4e6ad76d"
+      },
+      {
+        "private_record": "promoted-flash25-standby/staged/manifest.json",
+        "sha256": "14081762749d4b46a48f21ef589e8806bd6d24a32c05eef8a42867d53d0b927d"
+      },
+      {
+        "private_record": "install-standby-write/verified.json",
+        "sha256": "cd2f021638d8cfa31ba86e693447ddb5eb31e462533785089d860ee54e55bd8f"
+      },
+      {
+        "private_record": "install-standby-write/readback.bin",
+        "sha256": "79c7c4ef3fb7d06baf3c2fb16dccaae4cd7f585c2319af7065f939bd006a39cd"
+      },
+      {
+        "private_record": "install-standby-following/following-sector.bin",
+        "sha256": "01cc465d3a7581d9d003b09e5db684eb7bec8e8512e12ce3565154c3aced816f"
+      }
+    ]
+  },
+  "standby_cycles": [
+    {
+      "cycle": "cold01",
+      "slot": 9,
+      "passed": true,
+      "sbf_set": true,
+      "sbf_attributed_to_cycle": true,
+      "exact_early_recovery_park_passed": true,
+      "warm_pe6_recovery_succeeded": true,
+      "full_slot_readback_sectors": 3730,
+      "full_slot_read_operations": 8,
+      "all_read_operations_idle_deinitialized": true,
+      "png_samples_match_retrieved_raw": true,
+      "original_sensor_frame_comparison": false,
+      "original_ram_lost_in_standby": true,
+      "start_and_completion_markers_valid": true,
+      "reserved_metadata_zero": true,
+      "retrieved_raw_sha256": "9f28f881e765da18084e720c36bab02cc98547e65e6eef342b1c7b7eb622fb7e",
+      "slot_sha256": "705981d266b0c6d197f77c814651d6703f2d70a9e820969df39895ac234b7144",
+      "current_onset_to_plateau_ms": 419.91599999999994,
+      "current_onset_to_plateau_energy_mj": 230.0229699666542,
+      "plateau_mean_current_ma": 8.190447834622045,
+      "source_hashes": {
+        "qualification": {
+          "private_record": "cold01-qualified.json",
+          "sha256": "174f0dca097aec1ed72d77f779fe4f5e760d070e0275823b5eaa6c096dc1804b"
+        },
+        "sbf": {
+          "private_record": "cold01-sbf/result.json",
+          "sha256": "cca45dd186b21e1e5ffb12f5c93e29587a3f65cdfb6d9217d96f238e6bedeba0"
+        },
+        "early_park": {
+          "private_record": "cold01-park/result.json",
+          "sha256": "598a84175d3d186a64f2434173c1e9b03b6b29ba84b47b85b02629ce1332b5c4"
+        },
+        "image_validation": {
+          "private_record": "cold01-image/readback-validation.json",
+          "sha256": "e6489e5904a3e2970474bce29251c7636000515ce6a1fcca0a94aab2312dfd2c"
+        }
+      }
+    },
+    {
+      "cycle": "cold02",
+      "slot": 10,
+      "passed": true,
+      "sbf_set": true,
+      "sbf_attributed_to_cycle": true,
+      "exact_early_recovery_park_passed": true,
+      "warm_pe6_recovery_succeeded": true,
+      "full_slot_readback_sectors": 3730,
+      "full_slot_read_operations": 8,
+      "all_read_operations_idle_deinitialized": true,
+      "png_samples_match_retrieved_raw": true,
+      "original_sensor_frame_comparison": false,
+      "original_ram_lost_in_standby": true,
+      "start_and_completion_markers_valid": true,
+      "reserved_metadata_zero": true,
+      "retrieved_raw_sha256": "400e996c0d1673fcc9c56dfc56ec1c1b0a4beab2e6836f116c3679a22b991e91",
+      "slot_sha256": "29ebd0dee683ba51950d677eaf14bb5e8a0517323233e2712068b080f48ec692",
+      "current_onset_to_plateau_ms": 410.282,
+      "current_onset_to_plateau_energy_mj": 225.65342296253283,
+      "plateau_mean_current_ma": 8.089065754934106,
+      "source_hashes": {
+        "qualification": {
+          "private_record": "cold02-qualified.json",
+          "sha256": "7fd7c50cc56e971ba973e8cc5393583cbc999c37e56fc764058407c382c51a63"
+        },
+        "sbf": {
+          "private_record": "cold02-sbf/result.json",
+          "sha256": "c60d3707a6a56d2ebd8cd0b49305841a05bf8e279c2429227a4410ace792aa2f"
+        },
+        "early_park": {
+          "private_record": "cold02-park/result.json",
+          "sha256": "a77b56fd3e6d2a305fecd190e5bdeb24f7c0e3cb0d426ce0afb32ec7c08bcf71"
+        },
+        "image_validation": {
+          "private_record": "cold02-image/readback-validation.json",
+          "sha256": "e865b84384993ab5df679a60d52d094252f7d4e265c4e1112abe2f4711df36a0"
+        }
+      }
+    },
+    {
+      "cycle": "cold03",
+      "slot": 11,
+      "passed": true,
+      "sbf_set": true,
+      "sbf_attributed_to_cycle": true,
+      "exact_early_recovery_park_passed": true,
+      "warm_pe6_recovery_succeeded": true,
+      "full_slot_readback_sectors": 3730,
+      "full_slot_read_operations": 8,
+      "all_read_operations_idle_deinitialized": true,
+      "png_samples_match_retrieved_raw": true,
+      "original_sensor_frame_comparison": false,
+      "original_ram_lost_in_standby": true,
+      "start_and_completion_markers_valid": true,
+      "reserved_metadata_zero": true,
+      "retrieved_raw_sha256": "77941a587edbee2f1cc0d0b6aa073720f231498aa4500de40ec956c8ef60b3c9",
+      "slot_sha256": "7920403e4c2fd19647262515603655115c1c97cefb000df3822be9bcf984db5f",
+      "current_onset_to_plateau_ms": 419.5175,
+      "current_onset_to_plateau_energy_mj": 229.91317930419322,
+      "plateau_mean_current_ma": 8.192161900713524,
+      "source_hashes": {
+        "qualification": {
+          "private_record": "cold03-qualified.json",
+          "sha256": "58a6869943a727ba01be1ecb6920042c71e28c406fe0f40c59e6884ad183029f"
+        },
+        "sbf": {
+          "private_record": "cold03-sbf/result.json",
+          "sha256": "430daa2ce07d218d23527dda118802709287e89f4abca5434c8a5585c4694e2d"
+        },
+        "early_park": {
+          "private_record": "cold03-park/result.json",
+          "sha256": "2eb591a5ee3cffb10b115229698a4a83b613dc6417c0cf78eb8e6b752dddd6a5"
+        },
+        "image_validation": {
+          "private_record": "cold03-image/readback-validation.json",
+          "sha256": "5c30cd0472c2772876faa1819e08e81d1b25aaf2a1bf4c8dbde3d5a535851402"
+        }
+      }
+    }
+  ],
+  "standby_attribution": {
+    "method": "Exact early recovery prefix plus SBF=1, reviewed CSSF clear before successful Standby entry, and explicit bench-owner chronology",
+    "no_intervening_poweroff_before_each_sbf_read": true,
+    "live_pre_wfi_flag_observation_claimed": false,
+    "current_signature_alone_used_as_standby_proof": false,
+    "full_slot_read_after_each_cycle": true,
+    "actual_per_cycle_stream_mode_retained": false,
+    "stream_mode_limit": "Separate awake cold run proves mode 1 IDMA; Standby loses per-cycle high-SRAM telemetry, so no per-cycle stream-mode observation is claimed."
+  },
+  "energy_comparison": {
+    "source": {
+      "private_record": "public-cold-draft/energy-summary.json",
+      "sha256": "3697224357f0fd03ca5e2a17205ff2a525f7baee3aa78d022ddc3405115fad7c"
+    },
+    "public_artifact": "cold-cycles/energy-summary.json",
+    "boundary": "Native JS110 branch-current onset to SBF-qualified terminal plateau; excludes separate one-second confirmation",
+    "summary": {
+      "cycle_s": {
+        "n": 3,
+        "minimum": 0.410282,
+        "median": 0.4195175,
+        "maximum": 0.41991599999999996
+      },
+      "energy_j": {
+        "n": 3,
+        "minimum": 0.22565342296253282,
+        "median": 0.22991317930419322,
+        "maximum": 0.2300229699666542
+      }
+    },
+    "comparisons": [
+      {
+        "baseline": "four-bit 12.5 MHz, pre-resistor, SD CLK/CMD probes attached",
+        "n": 3,
+        "baseline_median_cycle_s": 0.578942,
+        "baseline_median_energy_j": 0.30953209064672516,
+        "new_median_cycle_s": 0.4195175,
+        "new_median_energy_j": 0.22991317930419322,
+        "observed_time_reduction_fraction": 0.275372144359884,
+        "observed_energy_reduction_fraction": 0.25722344709454537
+      },
+      {
+        "baseline": "one-bit 25 MHz, old carrier",
+        "n": 3,
+        "baseline_median_cycle_s": 0.8826265,
+        "baseline_median_energy_j": 0.45078775403078786,
+        "new_median_cycle_s": 0.4195175,
+        "new_median_energy_j": 0.22991317930419322,
+        "observed_time_reduction_fraction": 0.5246941939767273,
+        "observed_energy_reduction_fraction": 0.48997465603626267
+      }
+    ],
+    "per_phase_durations_or_energy_available": false,
+    "scope": "JS-fed Nucleo branch; not isolated MCU or production battery energy"
+  },
+  "final_target_state": {
+    "observed_utc": "2026-10-25T05:40:21Z",
+    "source": "Bench-owner final state report and last successful slot-11 RAM READ proof",
+    "powered": true,
+    "mode": "awake idle RAM READ terminal after slot 11, not Standby",
+    "fourth_normal_cold_boot_performed": false,
+    "joulescope_range": 128,
+    "joulescope_session_closed": true,
+    "com_port_closed": true,
+    "break_released": true,
+    "cn10_connected": true,
+    "active_hardware_helpers": false,
+    "logic2_running": true,
+    "idle_read_proof": {
+      "private_record": "cold03-image/payload-3584/verified.json",
+      "sha256": "173fd85fd6359904ea1a5b759ebe43663ecf74a95331e7ddbb1a60498d19e2c4"
+    }
+  }
+}

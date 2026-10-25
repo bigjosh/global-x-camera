@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "uses_host_utc_alignment": false,
+  "sample_rate_hz": 2000000,
+  "decimate_factor": 1,
+  "manifest_sha256": "fc4a20c56e473811a58fe1d88031ad09f9c1a52edd9f2b4fd5f21383b2022259",
+  "cycles": [
+    {
+      "name": "cold01",
+      "terminal_evidence": "qualification-context.json",
+      "terminal_evidence_sha256": "231c3d3475020d20a04b7204fa22e3c607144d76f67a485b657f25796844a1ae",
+      "terminal_state_qualified": true,
+      "terminal_state_qualification": "caller attestation; analyzer does not interpret firmware proof",
+      "window": {
+        "start_sample_id": 10016128,
+        "end_sample_id": 48522348
+      },
+      "boundaries": {
+        "current_onset_sample_id": 36664516,
+        "first_activity_above_off_threshold_sample_id": 36664509,
+        "integration_start_sample_id": 36464516,
+        "terminal_plateau_start_sample_id": 37504348,
+        "integration_end_sample_id": 39504348,
+        "sample_interval_s": 5e-07,
+        "plateau_boundary_bin_s": 0.001
+      },
+      "onset_to_plateau_s": 0.41991599999999996,
+      "integration_duration_s": 1.5199159999999998,
+      "pretrigger_energy_j": 4.825395941734314e-07,
+      "onset_to_plateau_energy_j": 0.2300229699666542,
+      "plateau_confirmation_energy_j": 0.040084418959252535,
+      "pretrigger_through_confirmed_plateau_energy_j": 0.2701078714655009,
+      "whole_window_energy_j": 0.4507519255386391,
+      "baseline_power_w": 0.0,
+      "conditional_baseline_subtracted_energy_j": 0.2701078714655009,
+      "peak_current_a": 7.388338565826416,
+      "minimum_source_voltage_v": 1.8597906827926636,
+      "plateau": {
+        "observed_s": 5.5089999999999995,
+        "mean_current_a": 0.008190447834622045,
+        "mean_power_w": 0.04006688564755685,
+        "bin_mean_span_a": 4.3144761584699987e-05,
+        "peak_abs_current_a": 0.009289883077144623
+      },
+      "criteria": {
+        "bin_s": 0.001,
+        "off_baseline_s": 0.5,
+        "off_abs_max_a": 0.0001,
+        "onset_a": 0.12,
+        "pretrigger_s": 0.1,
+        "plateau_min_s": 1.0,
+        "plateau_mean_min_a": 0.007,
+        "plateau_mean_max_a": 0.01,
+        "plateau_peak_abs_max_a": 0.0105,
+        "plateau_mean_span_a": 0.002,
+        "current_valid_abs_max_a": 9.5
+      },
+      "limits": [
+        "Boundaries are measured-current thresholds, not physical target-rail edges.",
+        "Pretrigger includes measured startup charge only if activity begins inside its window.",
+        "Subthreshold charge before pretrigger is not proven absent; whole-window energy is also reported.",
+        "Plateau classification and firmware completion require the external qualification.",
+        "Baseline subtraction assumes stationary background; raw energy is the primary result.",
+        "No analog calibration, saturation detection, suppression interpolation, or CN8 bypass correction is inferred."
+      ]
+    }
+  ]
+}
