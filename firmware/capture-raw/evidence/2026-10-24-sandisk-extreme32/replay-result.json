@@ -1,0 +1,127 @@
+{
+  "schema": 1,
+  "passed": true,
+  "hardware_access": false,
+  "card_identity": {
+    "sector_count": 62333952,
+    "cid0": 55788627,
+    "cid1": 1160983111,
+    "cid2": 2158087493,
+    "cid3": 3674316012
+  },
+  "scr_wire_bytes": [
+    2,
+    53,
+    132,
+    67,
+    0,
+    0,
+    0,
+    0
+  ],
+  "erased_byte": 0,
+  "cycles": [
+    {
+      "name": "cycle01",
+      "slot": 0,
+      "read_sectors": 3730,
+      "recorded_raw_sha256": "627f70679e497e5e79198c5ae189c648e7de40b0e6c0222337616f728509cbb3",
+      "current_onset_to_plateau_s": 0.8648105,
+      "energy_intervals_j": {
+        "pretrigger_energy_j": 0.0,
+        "onset_to_plateau_energy_j": 0.44206421454175515,
+        "plateau_confirmation_energy_j": 0.040110760827372784,
+        "pretrigger_through_confirmed_plateau_energy_j": 0.48217497536912796
+      },
+      "strict_phase_decode": false,
+      "sbf_attributed": true,
+      "recorded_image_validation": true,
+      "pixels_redecoded": false
+    },
+    {
+      "name": "cycle02",
+      "slot": 1,
+      "read_sectors": 3730,
+      "recorded_raw_sha256": "755202cd07589db80efa5700bd3b54196ce7a21f3b66c8a1af8ed7d0d9053d75",
+      "current_onset_to_plateau_s": 0.8826265,
+      "energy_intervals_j": {
+        "pretrigger_energy_j": 0.0,
+        "onset_to_plateau_energy_j": 0.45078775403078786,
+        "plateau_confirmation_energy_j": 0.04010443168236781,
+        "pretrigger_through_confirmed_plateau_energy_j": 0.4908921857131557
+      },
+      "strict_phase_decode": false,
+      "sbf_attributed": true,
+      "recorded_image_validation": true,
+      "pixels_redecoded": false
+    },
+    {
+      "name": "cycle03",
+      "slot": 2,
+      "read_sectors": 3730,
+      "recorded_raw_sha256": "112897e5b2071ca3b7b65c8b8bbfec2cdb45664a10605ebf04645246050ced58",
+      "current_onset_to_plateau_s": 0.892197,
+      "energy_intervals_j": {
+        "pretrigger_energy_j": 0.0,
+        "onset_to_plateau_energy_j": 0.45540594577980087,
+        "plateau_confirmation_energy_j": 0.04010992425999045,
+        "pretrigger_through_confirmed_plateau_energy_j": 0.49551587003979136
+      },
+      "strict_phase_decode": false,
+      "sbf_attributed": true,
+      "recorded_image_validation": true,
+      "pixels_redecoded": false
+    }
+  ],
+  "energy_j": {
+    "n": 3,
+    "median": 0.45078775403078786,
+    "minimum": 0.44206421454175515,
+    "maximum": 0.45540594577980087
+  },
+  "current_onset_to_plateau_s": {
+    "n": 3,
+    "median": 0.8826265,
+    "minimum": 0.8648104999999999,
+    "maximum": 0.8921969999999999
+  },
+  "visual_observations": {
+    "schema": 1,
+    "reviewer": "root",
+    "image01": {
+      "scene_png_viewed": true,
+      "coherent_illuminated_scene_verified": false,
+      "observation": "Near-black displayed image; no recognizable illuminated scene confirmed.",
+      "minimum_sample": 62,
+      "maximum_sample": 74,
+      "mean_sample": 66.30473986698784,
+      "scope": "Full-slot length/markers and independent PNG sample decoding pass; original sensor RAM lost in Standby."
+    },
+    "workload_note": "Fixed-size uncompressed packed RAW, so pixel brightness does not change bytes sent; card/controller and electrical data-pattern effects are not separately isolated.",
+    "image02": {
+      "scene_png_viewed": true,
+      "coherent_illuminated_scene_verified": false,
+      "observation": "Near-black displayed image; no recognizable illuminated scene confirmed.",
+      "minimum_sample": 62,
+      "maximum_sample": 74,
+      "mean_sample": 66.09187526183494,
+      "scope": "Full-slot length/markers and independent PNG sample decoding pass; original sensor RAM lost in Standby."
+    },
+    "image03": {
+      "scene_png_viewed": true,
+      "coherent_illuminated_scene_verified": false,
+      "observation": "Near-black displayed image; no recognizable illuminated scene confirmed.",
+      "minimum_sample": 62,
+      "maximum_sample": 74,
+      "mean_sample": 66.29334219208211,
+      "scope": "Full-slot length/markers and independent PNG sample decoding pass; original sensor RAM lost in Standby."
+    }
+  },
+  "limits": [
+    "Original images, sector data, SRAM bytes and native instrument arrays are excluded.",
+    "Image validation is a hash-bound recorded result; pixels cannot be decoded from this archive.",
+    "Energy sums reproduce selected native intervals; onset/plateau classification cannot be rerun.",
+    "Build artifacts were checked locally; no new physical NOR verification is implied.",
+    "JS110 board branch energy is not isolated DUT or production battery energy."
+  ]
+}

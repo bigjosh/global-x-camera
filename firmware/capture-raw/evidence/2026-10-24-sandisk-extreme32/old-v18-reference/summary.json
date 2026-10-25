@@ -1,0 +1,101 @@
+{
+  "schema": 1,
+  "sector_sha256": "174424c6792f96c72e336fc68e442474e9da665718552d3239a772d59ba73e2e",
+  "prefix_sha256": "9401bed4076d6e9e4d2e4f9236661faf7b8f0e051cb332ea4dcbba09da336eba",
+  "cycles": [
+    {
+      "name": "candidate01",
+      "onset_to_plateau_s": 0.780173,
+      "onset_to_plateau_energy_j": 0.411752536000784,
+      "plateau_confirmation_energy_j": 0.040038083589453245,
+      "plateau_mean_current_a": 0.008181565645395988,
+      "peak_current_a": 7.372866630554199,
+      "phase": {
+        "strict_decode_passed": false,
+        "interval_ms": {
+          "receiver_to_strobe": 1.278079999999987,
+          "strobe_to_frame": 21.862570000000026,
+          "sd_initialize": 116.16427999999998,
+          "sd_ready_to_first_payload": 6.450630000000013,
+          "payload_through_padded_tail_ready": 626.04863,
+          "full_commit": 0.022069999999985157,
+          "deinitialize": 0.06108000000004665,
+          "deinitialize_to_pre_wfi": null
+        },
+        "since_reset_ms": {
+          "1": 21.952150000000003,
+          "2": 23.23022999999999,
+          "4": 27.888650000000016,
+          "3": 45.09280000000002,
+          "5": 144.05293,
+          "6": 150.50356000000002,
+          "7": 776.55219,
+          "8": 776.57426,
+          "9": 776.63534
+        },
+        "capture_sd_init_overlap_ms": 17.204150000000002,
+        "unknown_pulse_count": 1,
+        "interpretation": "Independent width-decoded events only; overlapping intervals are not additive"
+      },
+      "terminal_state_qualified": true,
+      "owner_attestation": "Root attributes actual slot9 to candidate01: directory immediately before installed v18 cold boot proved slot9 FREE, no other capture occurred before full readback. Both GXR2/GXRE markers and all3730 sectors retrieved, PNG pixels independently agree with saved RAW, coherent lit-panel scene visually inspected. Original camera RAM lost in Standby; no source-RAM equality claim. Same power history/SBF evidence as candidate01-qualified, with no intervening power off before SBF.",
+      "qualification_sha256": "bd02aeeb4ceef5fe1968ddbed7c6425fa7eae1324ed994a18510c040ad898a63",
+      "sbf_evidence_sha256": "6444eec0e0bc120d6c8a34f19b9af191b4cd7390d4711195dccab00e4807b187",
+      "image_integrity_verified": true,
+      "image_evidence_sha256": "ea814e541935543869eee46051e478501842f3c575fc9ae80d04de3c2a385968",
+      "slot": 9,
+      "image_qualification": "Owner attests complete slot readback; report hashed, schema not reinterpreted"
+    }
+  ],
+  "terminal_state_qualified": true,
+  "image_integrity_verified": true,
+  "energy_j": {
+    "n": 1,
+    "median": 0.411752536000784,
+    "minimum": 0.411752536000784,
+    "maximum": 0.411752536000784
+  },
+  "current_onset_to_plateau_s": {
+    "n": 1,
+    "median": 0.780173,
+    "minimum": 0.780173,
+    "maximum": 0.780173
+  },
+  "same_boundary_criteria": {
+    "bin_s": 0.001,
+    "off_baseline_s": 0.5,
+    "off_abs_max_a": 0.0001,
+    "onset_a": 0.12,
+    "pretrigger_s": 0.1,
+    "plateau_min_s": 1.0,
+    "plateau_mean_min_a": 0.007,
+    "plateau_mean_max_a": 0.01,
+    "plateau_peak_abs_max_a": 0.0105,
+    "plateau_mean_span_a": 0.002,
+    "current_valid_abs_max_a": 9.5
+  },
+  "v66c_baseline_sha256": "3e1bcca11c5ff8ef1153d427699d3821824ca2b535b3a7b91d9b8d33bf112399",
+  "energy_analyzer_sha256": "f27c99858edc83fb55636767386b476c474f10a14ba3847f1b0dac81bc4e8e9c",
+  "v66c_energy_j": {
+    "median": 1.061502985215054,
+    "minimum": 0.9929034955938332,
+    "maximum": 1.0804637747700465,
+    "n": 3
+  },
+  "v66c_current_onset_to_plateau_s": {
+    "median": 2.0578019999999997,
+    "minimum": 1.9334324999999999,
+    "maximum": 2.0828245,
+    "n": 3
+  },
+  "limits": [
+    "Native JS current boundaries and Saleae markers use independent clocks; no per-phase energy is inferred.",
+    "One-second plateau confirmation energy is reported separately and excluded from the headline energy.",
+    "Measured JS board-branch energy includes Nucleo overhead and omits unmeasured bypass paths.",
+    "Different scenes, formats and card latencies prevent isolating a single cause of improvement.",
+    "SBF evidence needs root attribution; stored image integrity is a separate readback test.",
+    "A failed strict pulse remains unknown; intervals use only unique directly decoded endpoints."
+  ],
+  "observed_median_energy_reduction_fraction": 0.6121042128606304,
+  "observed_median_time_reduction_fraction": 0.6208707154527013
+}

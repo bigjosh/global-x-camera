@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "generated_utc": "2026-10-25T02:31:51.373947+00:00",
+  "analysis_kind": "New offline derivation of a historical v18 one-cycle recording; no new hardware measurement",
+  "original_capture_power_on_utc": "2026-10-24T18:58:02.195687+00:00",
+  "cycle": "candidate01",
+  "slot": 9,
+  "hardware_access": false,
+  "original_evidence_edited": false,
+  "criteria_or_guard_changes": false,
+  "sample_count_cycles": 1,
+  "one_cycle_spec_supported_by_unmodified_tool": true,
+  "method": "Unchanged firmware/capture-raw/summarize_cycles.py with frozen v66c analyzer and exact original root qualification; fixed window skips initial five seconds then uses native 2 MHz samples, not host UTC. Replays original phase decoding and frozen build hashes. Compact export replay passed all four intervals.",
+  "source": "D:\\Github\\global-x-camera\\tmp\\bringup\\raw-frontmeta-20261024\\bench\\candidate01",
+  "qualification": "D:\\Github\\global-x-camera\\tmp\\bringup\\raw-frontmeta-20261024\\bench\\candidate01-qualification.json",
+  "result": {
+    "onset_to_plateau_s": 0.780173,
+    "onset_to_plateau_energy_j": 0.411752536000784,
+    "plateau_confirmation_energy_j_excluded": 0.040038083589453245,
+    "plateau_current_a": 0.008181565645395988
+  },
+  "limits": [
+    "One historical sample is not a repeatability characterization.",
+    "Same v18 firmware as planned replacement-card comparison; scene, scan position and card internal state may differ.",
+    "JS-fed board-branch energy includes Nucleo overhead and omits unmeasured bypass paths.",
+    "Startup recorded peak7.372866630554199A and minimum source1.9392359256744385V are retained without calibration/saturation/suppression correction; unchanged9.5A criterion passed.",
+    "Original sensor RAM was lost in Standby; bound full slot readback/PNG decode and visual scene verification are separate from original-RAM equality.",
+    "Strict phase decode remains false due unknown final pulse; independent SBF attribution qualifies Standby.",
+    "Separate clocks prevent per-phase energy attribution."
+  ],
+  "files": {
+    "tmp/bringup/sandisk-extreme32-20261024/old-v18-spec.json": "411bdef4bbe72b31002afe012739781a8722724d757a078f6fcff63131130acd",
+    "tmp/bringup/sandisk-extreme32-20261024/old-v18-analysis/manifest.json": "b1bbad137853247ab2a8f9f58849b46fe0649e9d8b69fef7b18426bae4b41934",
+    "tmp/bringup/sandisk-extreme32-20261024/old-v18-analysis/summary.json": "b19ef13f1bd6ab10601217df56109a73fa9f8df5ad18ca2a2ff160f5c465e79f",
+    "tmp/bringup/sandisk-extreme32-20261024/old-v18-analysis/candidate01/energy.json": "d9631af06345f4433f78a66798c02a8a80fea9682b7d0bb5d7097e2423c2afd8",
+    "tmp/bringup/sandisk-extreme32-20261024/old-v18-energy-compact/manifest.json": "161db6c8b0b611fe17539938e157c688ec642ca36ecf45d8413cf405f26f97f1",
+    "tmp/bringup/raw-frontmeta-20261024/bench/candidate01-qualification.json": "bd02aeeb4ceef5fe1968ddbed7c6425fa7eae1324ed994a18510c040ad898a63",
+    "tmp/bringup/raw-frontmeta-20261024/bench/candidate01/result.json": "6a880e5edaa43c29eaa49d690798e8873d920cb28f8a4d8d8896e926b9691aa8",
+    "tmp/bringup/raw-frontmeta-20261024/bench/candidate01/raw/manifest.json": "6f63db9a02790c84842ef51669f84a53e00dce0675addcdf61940aa35cf3104a",
+    "tmp/bringup/raw-frontmeta-20261024/bench/candidate01/phase-summary.json": "894023b4319345e552afd99c2fafb01386c0858a826f9844b8c272c94329c831",
+    "firmware/capture-raw/summarize_cycles.py": "98e4011d74df704bf461d0d74cf1d42f1e0047d993908b5dc1fb6c30d778a74c",
+    "firmware/capture-raw/phase_decode.py": "b33f471bcd96b7ef37a5b7f681dc75fc60b589c40d4686397386fb0c4ec53b6d",
+    "firmware/capture-raw/energy_compacts.py": "aba24a42d59ed47ce162b1990cd2c2a0ecab3a18ec12125cb0a018545a532b77"
+  }
+}

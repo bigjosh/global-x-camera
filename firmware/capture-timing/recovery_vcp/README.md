@@ -1,5 +1,14 @@
 # ST-LINK VCP recovery prefix
 
+**October 24 troubleshooting follow-up:** host UART write success did not prove
+that C0 pulses reached PE6. During the SanDisk baseline, a measured bytes-only
+115200-baud reconfiguration followed by 1 Mbaud restored the waveform and exact
+v18 recovery without a jumper change. Use physical pulse evidence and a bounded
+retry from a safe/explicitly authorized state; the cause is unproven. See the
+[owning decision and evidence](../NOTES.md#2026-10-24--verify-the-physical-uart-stimulus-before-blaming-the-recovery-detector).
+The v45b installation statements below describe the historical first qualification;
+[AGENTS.md](../../../AGENTS.md) identifies the current firmware and bench state.
+
 The installed v45b image adds a PE6 pulse detector to the previous v44 image while
 retaining PE1 recovery, the existing debug-unlock sequence, the early awake
 park, cache handling, and the **byte-identical v44 camera receiver**. This

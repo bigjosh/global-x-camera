@@ -1,0 +1,255 @@
+{
+  "schema": 2,
+  "protocol": {
+    "schema": 2,
+    "pin": "PD12",
+    "idle_level": 0,
+    "nominal_cpu_hz": 400000000,
+    "pulse_high_cycles_per_id": 800,
+    "nominal_high_us_per_id": 2.0,
+    "pulse_width_tolerance_us": 0.4,
+    "events": {
+      "1": "receiver_entry",
+      "2": "first_strobe_irq_observed",
+      "3": "first_frame_complete_irq_observed",
+      "4": "sd_initialization_begin",
+      "5": "sd_initialization_complete",
+      "6": "first_payload_submission",
+      "7": "padded_payload_ready",
+      "8": "full_slot_commit_complete",
+      "9": "sd_deinitialization_complete",
+      "10": "pre_standby_wfi"
+    }
+  },
+  "decode_passed": false,
+  "pulses": [
+    {
+      "start_s": 0.14124971,
+      "end_s": 0.14125196,
+      "width_s": 2.250000000009189e-06,
+      "complete": true,
+      "index": 0,
+      "event_id": 1,
+      "event": "receiver_entry",
+      "width_error_s": 2.500000000091892e-07
+    },
+    {
+      "start_s": 0.14252779,
+      "end_s": 0.14253206,
+      "width_s": 4.270000000000662e-06,
+      "complete": true,
+      "index": 1,
+      "event_id": 2,
+      "event": "first_strobe_irq_observed",
+      "width_error_s": 2.7000000000066234e-07
+    },
+    {
+      "start_s": 0.14718621,
+      "end_s": 0.14719452,
+      "width_s": 8.309999999983608e-06,
+      "complete": true,
+      "index": 2,
+      "event_id": 4,
+      "event": "sd_initialization_begin",
+      "width_error_s": 3.0999999998360864e-07
+    },
+    {
+      "start_s": 0.16439036,
+      "end_s": 0.16439665,
+      "width_s": 6.289999999992135e-06,
+      "complete": true,
+      "index": 3,
+      "event_id": 3,
+      "event": "first_frame_complete_irq_observed",
+      "width_error_s": 2.8999999999213506e-07
+    },
+    {
+      "start_s": 0.26335049,
+      "end_s": 0.26336077,
+      "width_s": 1.0280000000029155e-05,
+      "complete": true,
+      "index": 4,
+      "event_id": 5,
+      "event": "sd_initialization_complete",
+      "width_error_s": 2.800000000291556e-07
+    },
+    {
+      "start_s": 0.26980112,
+      "end_s": 0.26981343,
+      "width_s": 1.2310000000015364e-05,
+      "complete": true,
+      "index": 5,
+      "event_id": 6,
+      "event": "first_payload_submission",
+      "width_error_s": 3.100000000153639e-07
+    },
+    {
+      "start_s": 0.89584975,
+      "end_s": 0.89586407,
+      "width_s": 1.43200000000121e-05,
+      "complete": true,
+      "index": 6,
+      "event_id": 7,
+      "event": "padded_payload_ready",
+      "width_error_s": 3.2000000001210104e-07
+    },
+    {
+      "start_s": 0.89587182,
+      "end_s": 0.89588816,
+      "width_s": 1.6340000000059085e-05,
+      "complete": true,
+      "index": 7,
+      "event_id": 8,
+      "event": "full_slot_commit_complete",
+      "width_error_s": 3.4000000005908576e-07
+    },
+    {
+      "start_s": 0.8959329,
+      "end_s": 0.89595125,
+      "width_s": 1.83499999999448e-05,
+      "complete": true,
+      "index": 8,
+      "event_id": 9,
+      "event": "sd_deinitialization_complete",
+      "width_error_s": 3.499999999447989e-07
+    },
+    {
+      "start_s": 0.89623456,
+      "end_s": 0.89625509,
+      "width_s": 2.053000000001859e-05,
+      "complete": true,
+      "index": 9,
+      "event_id": null,
+      "event": null,
+      "error": "unknown_pulse_width"
+    }
+  ],
+  "event_ids": [
+    1,
+    2,
+    4,
+    3,
+    5,
+    6,
+    7,
+    8,
+    9,
+    null
+  ],
+  "errors": [
+    {
+      "pulse_index": 9,
+      "error": "unknown_pulse_width"
+    },
+    {
+      "error": "expected_each_raw_event_once"
+    }
+  ],
+  "expected_event_ids": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "expected_precedence": [
+    [
+      1,
+      2
+    ],
+    [
+      2,
+      3
+    ],
+    [
+      1,
+      4
+    ],
+    [
+      4,
+      5
+    ],
+    [
+      5,
+      6
+    ],
+    [
+      6,
+      7
+    ],
+    [
+      3,
+      7
+    ],
+    [
+      7,
+      8
+    ],
+    [
+      8,
+      9
+    ],
+    [
+      9,
+      10
+    ]
+  ],
+  "input_files": {
+    "0": {
+      "path": "D:\\Github\\global-x-camera\\tmp\\bringup\\raw-frontmeta-20261024\\bench\\candidate01\\phase\\binary\\digital_0.bin",
+      "bytes": 52,
+      "sha256": "c9b091dffaaf7a108c77f2c3d0e31ab33f404ed84476b0e9018ead8822bdd648",
+      "format_version": 0,
+      "initial_state": 0,
+      "begin_s": 7.04817499999999e-05,
+      "end_s": 10.09683328
+    },
+    "1": {
+      "path": "D:\\Github\\global-x-camera\\tmp\\bringup\\raw-frontmeta-20261024\\bench\\candidate01\\phase\\binary\\digital_1.bin",
+      "bytes": 204,
+      "sha256": "f3db099f9e85dbe86b54d3b24a81c888c21773d918297601afcbf4ba0cf89b9d",
+      "format_version": 0,
+      "initial_state": 0,
+      "begin_s": 7.04817499999999e-05,
+      "end_s": 10.09683328
+    },
+    "4": {
+      "path": "D:\\Github\\global-x-camera\\tmp\\bringup\\raw-frontmeta-20261024\\bench\\candidate01\\phase\\binary\\digital_4.bin",
+      "bytes": 52,
+      "sha256": "bc93d3207e6fe6bec76c7dc685123b3421b01c04e1393afc33c4e04e6141f572",
+      "format_version": 0,
+      "initial_state": 0,
+      "begin_s": 7.04817499999999e-05,
+      "end_s": 10.09683328
+    },
+    "6": {
+      "path": "D:\\Github\\global-x-camera\\tmp\\bringup\\raw-frontmeta-20261024\\bench\\candidate01\\phase\\binary\\digital_6.bin",
+      "bytes": 44,
+      "sha256": "132fdf531e04f4402aa6e4ae2c32cf23322b004d9db3159ae0887543dbaf6acc",
+      "format_version": 0,
+      "initial_state": 1,
+      "begin_s": 7.04817499999999e-05,
+      "end_s": 10.09683328
+    }
+  },
+  "reset_rises_s": [
+    0.11929756
+  ],
+  "power_rises_s": [
+    0.11767326
+  ],
+  "actual_standby_verified": false,
+  "image_integrity_verified": false,
+  "limitations": [
+    "Strict widths identify events; failed widths are never relabeled by source order.",
+    "Sensor and storage events overlap and need not appear in numeric order.",
+    "GPIO edges include software and interrupt latency; event10 is pre-WFI intent only.",
+    "Rail edges are input threshold crossings, not precision power-good measurements.",
+    "Host timestamps do not synchronize independent instruments."
+  ]
+}

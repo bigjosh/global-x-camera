@@ -6,6 +6,25 @@ the existing UART recovery mechanism. It uses the container in
 [raw-slots](../raw-slots/README.md); there is no FAT filesystem, image conversion,
 compression or full-frame CPU checksum in the normal save path.
 
+## October 24 replacement-card baseline
+
+The user-labelled SanDisk Extreme 32 GB has completed three cold capture/save
+cycles on the **original seven-pin carrier, one-bit SDMMC2 at 25 MHz**, with
+unchanged v18. Median complete cycle: **882.627 ms / 450.788 mJ**, current onset
+to qualified Standby plateau on the JS-fed Nucleo branch. Median payload-to-card
+ready was **632.854 ms (3.017 MB/s image payload)**. The old 64 GB card's same-v18
+single recorded cycle was 780.173 ms / 411.753 mJ; its 116.164 ms initialization
+was shorter than the SanDisk's 220.053 ms median. These small samples do not
+establish general card rankings.
+
+All three fresh slots 0-2 passed complete readback, markers/front metadata and
+independent PNG decoding, with SBF=1 attributed to each cycle. Frames were near
+black; original capture RAM was lost in Standby. Full results, reproducible
+compact energy sums, recovery findings and limitations are in the
+[SanDisk baseline archive](evidence/2026-10-24-sandisk-extreme32/README.md).
+No NOR programming or four-bit change occurred. After readback, the board was
+left powered at an idle RAM READ terminal, rather than another normal capture.
+
 ## Selected layout: v18 front metadata slots
 
 The selected format moves the former 152 trailing padding bytes immediately

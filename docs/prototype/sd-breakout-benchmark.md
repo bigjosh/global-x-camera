@@ -1,4 +1,65 @@
-# SD breakout comparison: one-bit hardware SDMMC2
+# SD breakout wiring and comparison
+
+## October 24 replacement: Pzsmocn PZSSD001 full-pin breakout
+
+The user selected [Amazon B08FB3GC34](https://www.amazon.com/dp/B08FB3GC34),
+identified as **Pzsmocn PZSSD001**, to replace the seven-pin carrier. This is the
+requested wiring plan; physical installation and four-bit operation have **not**
+been confirmed. The installed v18 RAW-slot firmware still uses **one-bit native
+SDMMC2 at 3.3 V**. Current firmware and qualified measurements are tracked in
+[the RAW capture README](../../firmware/capture-raw/README.md); the October 19–20
+status statements below are historical.
+
+Move the existing wires at the breakout end only. New-board pin numbers follow
+[the supplier's pin diagram](https://www.cqrobot.com/image/cache/catalog/Pzsmocn/PZSSD001/PZSSD001-2-550x550.jpg)
+for [PZSSD001](https://cqrobot.com/product/PZSSD001); use the printed labels to
+avoid reversing the header when viewed from the solder side.
+
+| Wire from old breakout | New breakout label | New pin | Existing Nucleo end |
+|---|---|---:|---|
+| SCK | CLK | 5 | CN3.3 / PC2 |
+| DI | CMD | 4 | CN3.25 / PC3 |
+| DO | D0 (data zero) | 3 | CN3.13 / PC4 |
+| CS | D3 | 6 | CN3.21 / PE4 |
+| VCC | 3.3V | 1 | CN5.4 / 3V3 |
+| GND | GND | 2 | CN3.19 |
+| CD (previously unused) | CD | 9 | Leave disconnected |
+
+Add two wires for the forthcoming four-bit mode:
+
+| New breakout label | New pin | Nucleo end | Peripheral function |
+|---|---:|---|---|
+| D1 | 8 | CN3.15 / PC5 | SDMMC2_D1 / AF11 |
+| D2 | 7 | CN3.17 / PC0 | SDMMC2_D2 / AF11 |
+
+The old CS wire already supplies the fourth data connection, D3. CD is the
+mechanical detect switch and remains unused. Preserve the 3.3 V VDDIO5 bank
+and SB23; no voltage conversion or Nucleo solder modification is needed.
+Power down before moving the supply and signal wires. Keep the leads short
+and retain socket decoupling.
+
+Four-bit operation requires a separately tested firmware change: configure
+PC0/PC5/PE4 as AF11 with appropriate CMD/data pull-ups, check the card's supported
+width, and negotiate matching card/controller width. The installed one-bit
+firmware instead leaves PE4 as an input/pull-up and does not configure the two
+new data pins. Its operation on this replacement carrier remains to smoke-test.
+The module listing/pin diagram does not qualify the delivered board's reset-time
+pull-up/decoupling network; check that during bring-up. This interface is native
+four-bit SDMMC, not QSPI.
+
+The user confirmed the old carrier was intact and the **SanDisk Extreme 32 GB
+three-cycle baseline is complete** on that carrier, unchanged v18, one-bit
+25 MHz. Median current onset to confirmed Standby plateau: **882.627 ms /
+450.788 mJ** on the JS-fed board branch; median payload-to-ready: **632.854 ms**.
+All three slots were read back and decoded; frames were near black. See
+[the measurements and comparison](../../firmware/capture-raw/evidence/2026-10-24-sandisk-extreme32/README.md).
+The explicit test-card reset/erase permission was used before these runs. The
+replacement carrier and four-bit firmware have not been tested yet. The target
+was left powered in an idle RAM READ park after retrieval; power down before
+rewiring, then recheck ownership and connections before the next experiment.
+
+## Historical one-bit bring-up record
+
 
 **Latest follow-up, October 20:** D-49 now authorizes capture → PNG16 → FAT32 on this card, with compression tuned for total time/energy and power-loss protection unqualified. The [new software](../../firmware/capture-sd/README.md) is offline-tested only. Following a normal boot, MCU debug access could not be restored through the measured VCP requests; a BOOT1 development-mode change is pending. V45b is unchanged in NOR, and no SD write/format was performed. The previous awake-park statement below is historical. See the [current checkpoint](../decisions/capture-png-sd-2026-10-20.md) before bench work.
 
