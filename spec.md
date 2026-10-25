@@ -57,6 +57,8 @@ These selections do not establish a completed circuit or measured performance. T
 
 **FD-06 — Photographic flash, deferred October 14:** retain illumination as a future direction after evaluating prototype low-light images. Establish working distance, brightness/coverage, pulse and recharge timing, energy source, physical fit and capture timing before choosing components. No flash hardware or alternate battery system is selected for this prototype.
 
+**FD-07 - Bulb mode, deferred October 24:** retain a future B region in the upper 10% of exposure-slider travel, with one continuous exposure while the shutter is held and exposure ending on release. Sensor support remains unqualified; frame accumulation is not selected as a substitute. Current prototype controls keep the full travel for manual timed exposure, with the existing fastest-supported-to-1 s target. See [deferral and qualification scope](docs/prototype/NOTES.md#2026-10-24--defer-bulb-mode-to-future-feature-fd-07).
+
 ## 1. WHAT: Product definition
 
 Global X Camera is an ultra-thin, credit-card-size monochrome digital camera optimized for instantaneous single-frame capture and extremely low battery drain between captures. A shutter press physically starts the main power system. The STM32N657 initializes the camera, captures one full-resolution, full-bit-depth global-shutter image, timestamps and orientation-tags it, stores it in raw NAND, and then deliberately removes main-system power. USB-C provides independent processor power for image download without relying on the coin-cell stack.

@@ -134,8 +134,9 @@ These are explicitly retained for reevaluation, outside the locked prototype bas
 | **FD-04 — Allocation table outside image NAND** | Compare FRAM or another suitable nonvolatile medium for startup, energy, retention, transaction integrity, area and BOM. No alternative device/medium is selected; the NAND journal remains provisional. |
 | **FD-05 — State inside each image slot** | Investigate allocation/completion records and supported bad-block-marker use. A first-page FF read alone does not prove safe FREE after interrupted erase. Preserve retained objects, factory markers, permanent retirement and immutable mapping. Exact page/block format and recovery remain open. |
 | **FD-06 — Photographic flash** | Deferred from the prototype, which uses ambient light. Revisit after low-light image testing; establish working distance, brightness/coverage, pulse/recharge timing, energy source, thickness and capture timing before selecting illumination hardware. |
+| **FD-07 - Bulb exposure** | Deferred October 24: upper 10% of exposure-slider travel would select continuous exposure while the shutter is held, ending on release. Qualify sensor support and power/timing implications before adoption; stacking is not selected. Full slider travel remains timed exposure in the current prototype plan. [Owning note](../docs/prototype/NOTES.md#2026-10-24--defer-bulb-mode-to-future-feature-fd-07). |
 
-Source: explicit user decisions in this project review conversation, October 12–14, 2026.
+Source: explicit user decisions in this project review conversation, October 12–24, 2026.
 
 ## Conflicts and superseded directions
 
