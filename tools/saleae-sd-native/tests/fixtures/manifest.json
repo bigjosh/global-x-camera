@@ -1,0 +1,144 @@
+{
+  "schema": 1,
+  "source_recording": "2026-10-25 phase01, pre-resistor NEGEDGE pattern write",
+  "sample_rate_hz": 250000000,
+  "sample_time_origin": "Absolute source-capture time; seconds = sample / sample_rate_hz",
+  "columns": [
+    "sample",
+    "clk",
+    "cmd",
+    "d0",
+    "d1",
+    "d2",
+    "d3"
+  ],
+  "channel_map": {
+    "clk": 2,
+    "cmd": 3,
+    "d0": 7,
+    "d1": 4,
+    "d2": 5,
+    "d3": 1
+  },
+  "source_binary_files": {
+    "digital_2.bin": {
+      "bytes": 69951020,
+      "sha256": "65196d8c95211f0cf8176c9e69b7180caee5e12dd5b5f3acd0e48fe1be09caff"
+    },
+    "digital_3.bin": {
+      "bytes": 243404,
+      "sha256": "c26222c981dde9f8641e5f33667cdaa62804cf9062a558a6e1214d2310326b9e"
+    },
+    "digital_7.bin": {
+      "bytes": 5954348,
+      "sha256": "6885119c9c561fed0c824e5efc9f6503c9bc2edacb62f382f2cdff91d3f547e1"
+    },
+    "digital_4.bin": {
+      "bytes": 7264588,
+      "sha256": "64fecb897bfb6cf68dea8cec4a709d0230700576330619fbdd980e97fe212222"
+    },
+    "digital_5.bin": {
+      "bytes": 6885884,
+      "sha256": "1159d0f15a73ae7a19b8c2dcf5a4c9ed21b917356caedbce14fe676c6322e88a"
+    },
+    "digital_1.bin": {
+      "bytes": 7036428,
+      "sha256": "be5f85c192a4f820f7d81fec732d92946dbfb2a88154d8903a6e011d09db6f57"
+    }
+  },
+  "sample_offset_ns": 0,
+  "default_data_width": 4,
+  "filtering": "None: every recorded transition in each selected interval is retained",
+  "fixtures": {
+    "first-write": {
+      "path": "first-write.csv.gz",
+      "first_sample": 105637500,
+      "last_sample": 105765725,
+      "window_seconds": [
+        0.42255,
+        0.4230629
+      ],
+      "event_rows": 26198,
+      "transitions": {
+        "clk": 25502,
+        "cmd": 136,
+        "d0": 412,
+        "d1": 512,
+        "d2": 538,
+        "d3": 466
+      },
+      "uncompressed_bytes": 576383,
+      "uncompressed_sha256": "5fb66ade6aff308c53e0e951f65a7fd1ff4b4dabe145741b998069c59bb1856c",
+      "gzip_bytes": 60251,
+      "gzip_sha256": "0a5f371368395ff2c5a3bc1c331e3fe0e65b423f639185b86d883b2c49fbd90c"
+    },
+    "final-stop": {
+      "path": "final-stop.csv.gz",
+      "first_sample": 159915000,
+      "last_sample": 160200000,
+      "window_seconds": [
+        0.63966,
+        0.6408
+      ],
+      "event_rows": 56698,
+      "transitions": {
+        "clk": 56655,
+        "cmd": 86,
+        "d0": 2,
+        "d1": 0,
+        "d2": 0,
+        "d3": 0
+      },
+      "uncompressed_bytes": 1247383,
+      "uncompressed_sha256": "2e95da9a3d150fcc3b395a5dfe37470d0f19bf5fa31333dd3e350aed29ac8988",
+      "gzip_bytes": 125496,
+      "gzip_sha256": "ccf50004c8ca93cec4312af0000b23090806806f0872b287cc6173c81579a9ec"
+    }
+  },
+  "expected": {
+    "first-write": {
+      "host_commands": [
+        13,
+        55,
+        23,
+        25
+      ],
+      "acmd23_blocks": 3730,
+      "cmd25_lba": 14920,
+      "complete_data_blocks": 1,
+      "first_payload_sha256": "edaa20b916c05736099950fe1a98748051a712a2233738d79398c288dbcdf53a",
+      "first_payload_prefix_hex": "47585232000000000000000000000000",
+      "data_crc_received": [
+        56679,
+        53491,
+        54883,
+        61273
+      ],
+      "accepted_tokens": 1,
+      "busy_edge_start_sample": 105704624,
+      "busy_edge_end_sample": 105765650,
+      "busy_edge_duration_samples": 61026,
+      "busy_edge_duration_us": 244.104
+    },
+    "final-stop": {
+      "host_commands": [
+        12,
+        13,
+        13
+      ],
+      "r1_status_words": [
+        3072,
+        3584,
+        2304
+      ],
+      "busy_edge_start_sample": 159918394,
+      "busy_edge_end_sample": 160132045,
+      "busy_edge_duration_samples": 213651,
+      "busy_edge_duration_us": 854.604,
+      "cmd12_response_start_sample": 159918457,
+      "busy_precedes_cmd12_response": true,
+      "last_r1_current_state": "TRAN",
+      "last_r1_ready_for_data": true
+    }
+  }
+}

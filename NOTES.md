@@ -29,6 +29,7 @@ at this bootstrap.
 | Native SD transport, DMA and card completion | [SD storage](firmware/sd-storage/NOTES.md) |
 | Earlier PNG/FAT32 integration and low-power qualification | [Capture to SD](firmware/capture-sd/NOTES.md) |
 | Encoder choices and rejected compression candidates | [PNG encoder](firmware/png-encoder/NOTES.md) |
+| Native SD logic decoding and raw DAT0 busy timing | [Saleae SD analyzer](tools/saleae-sd-native/NOTES.md) |
 
 The [bootstrap coverage record](docs/notes-bootstrap-2026-10-24.md) identifies
 reviewed histories, related repos/chats, exclusions and gaps. Notes are curated
