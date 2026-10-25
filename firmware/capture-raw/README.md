@@ -49,6 +49,30 @@ was left powered in an idle **awake RAM READ park**, not Standby; the next
 normal cold boot uses v23. Check the [current bench checkpoint](../../AGENTS.md)
 before hardware work.
 
+### Write-time budget at 12.5 MHz
+
+For the measured four-bit profile, 1,909,760 slot bytes at 6.25 MB/s require
+**305.562 ms of payload clocking**. Each of the 3,730 packets also has start,
+CRC16 and end bits on each parallel data line: 18 clocks per packet, or
+**5.371 ms**. Against the measured **327.321 ms** median first-submission-to-commit
+interval, **16.389 ms remains** for CRC responses, turnarounds, command/status
+handling, card-busy pauses and host gaps. This is a calculated budget using the
+configured clock, not a direct measurement of DAT0 busy. Card busy alone cannot
+be assigned all of that residual.
+
+The old one-bit/25 MHz payload clocking requirement was 611.123 ms, with a
+632.876 ms measured write interval. Nonpayload time is therefore about 21.75 ms
+in both configurations; the observed speed gain nearly equals the serialization
+gain. The separate approximately 216 ms SD initialization is excluded here.
+
+One preannounced CMD25 lets the card accept successive blocks whenever ready.
+The SD protocol permits programming earlier data while buffering later data;
+the amount of internal overlap is not exposed by our counters. While DAT0 is
+busy the host must wait. See the SD Association's
+[data packet framing](https://www.sdcard.org/cms/wp-content/themes/sdcard-org/dl.php?f=Part1_Physical_Layer_Simplified_Specification_Ver6.00.pdf)
+and [write buffering rules](https://www.sdcard.org/cms/wp-content/themes/sdcard-org/dl.php?f=Part1_Physical_Layer_Simplified_Specification_Ver5.10.pdf),
+and the [counter interpretation constraint](../sd-storage/NOTES.md#2026-10-25--do-not-treat-driver-timing-counters-as-isolated-card-programming-time).
+
 ## October 24 replacement-card baseline
 
 The user-labelled SanDisk Extreme 32 GB has completed three cold capture/save
