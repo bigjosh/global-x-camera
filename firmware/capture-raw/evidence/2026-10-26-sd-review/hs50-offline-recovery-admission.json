@@ -1,0 +1,114 @@
+{
+  "admission": {
+    "flash-awake": {
+      "park_passed": true,
+      "read_passed": true,
+      "bytes": 5140,
+      "park": {
+        "bytes": 5140,
+        "park": 873990028,
+        "vcp": true,
+        "sector": "1faea44570f9284fa239a50db8bb5d1856d7c15645828df6869070bca9b135eb"
+      },
+      "read": {
+        "name": "raw-50-reviewed-awake-unqualified",
+        "sector_sha256": "1faea44570f9284fa239a50db8bb5d1856d7c15645828df6869070bca9b135eb",
+        "prefix_sha256": "005230cf308432650a0967d68e2c292c77aaa5aae6a7cab0f8b2d8c865529dee"
+      }
+    },
+    "flash-standby": {
+      "park_passed": true,
+      "read_passed": true,
+      "bytes": 5140,
+      "park": {
+        "bytes": 5140,
+        "park": 873990028,
+        "vcp": true,
+        "sector": "cc8a35dba9d7c9692424e3f904e3ef8fd8a2b6fc4713730e71767653ea37bed5"
+      },
+      "read": {
+        "name": "raw-50-reviewed-standby-unqualified",
+        "sector_sha256": "cc8a35dba9d7c9692424e3f904e3ef8fd8a2b6fc4713730e71767653ea37bed5",
+        "prefix_sha256": "1c5e443b23ea34a6474fbf35d2c43964684b7e4315500d5bd6b4a3143ffbe95d"
+      }
+    },
+    "limits": [
+      "Offline exact-pair admission only. These candidates are not installed or qualified; real50MHz read CRC failures remain unresolved.",
+      "No hardware or instrument APIs are accessed by this script."
+    ]
+  },
+  "awake_prefix_review": {
+    "passed": true,
+    "hardware_accessed": false,
+    "allowlist_modified": false,
+    "reviewer": "/root/phase125_recovery",
+    "build": "tmp\\bringup\\sd50-reviewed-20261026\\flash-awake",
+    "baseline_prefix_sha256": "09fb59cfed0f715927e76f32d5f74187e4c2f1702a70ce192e0d17dcee2f822a",
+    "baseline_sector_sha256": "bb31867394a4e0d0fb9ab3f9fa96d0d16ffc7256e2a274db74be4f11f9cfdc14",
+    "binary_sha256": "2df4ce98e06c3a7b55d559d6e90a66e41ecda0f1563b72df8285045c919ae14a",
+    "prefix_sha256": "005230cf308432650a0967d68e2c292c77aaa5aae6a7cab0f8b2d8c865529dee",
+    "sector_sha256": "1faea44570f9284fa239a50db8bb5d1856d7c15645828df6869070bca9b135eb",
+    "prefix_bytes": 5140,
+    "early_load_bytes": 15804,
+    "recovery_literal_count": 20,
+    "compared_listing_rows": 1774,
+    "recovery_schema_unchanged": true,
+    "changed_prefix_bytes": [
+      3228,
+      3229,
+      3230,
+      3231,
+      4948,
+      4949,
+      4950,
+      4951
+    ],
+    "crc_literal_offsets": [
+      3228,
+      4948
+    ],
+    "early_crc32": "0xe742659",
+    "park_address": "0x3418078c",
+    "limits": "Exact-pair admission only. 50 MHz remains unqualified after a real read CRC failure; no installation/promotion or hardware access is authorized by this review."
+  },
+  "standby_prefix_review": {
+    "passed": true,
+    "hardware_accessed": false,
+    "allowlist_modified": false,
+    "reviewer": "/root/phase125_recovery",
+    "build": "tmp\\bringup\\sd50-reviewed-20261026\\flash-standby",
+    "baseline_prefix_sha256": "09fb59cfed0f715927e76f32d5f74187e4c2f1702a70ce192e0d17dcee2f822a",
+    "baseline_sector_sha256": "bb31867394a4e0d0fb9ab3f9fa96d0d16ffc7256e2a274db74be4f11f9cfdc14",
+    "binary_sha256": "2e18f4c7b3eb96fa5e3d1d6d58981a0cc1bf4ce38c295636fe72616375749d40",
+    "prefix_sha256": "1c5e443b23ea34a6474fbf35d2c43964684b7e4315500d5bd6b4a3143ffbe95d",
+    "sector_sha256": "cc8a35dba9d7c9692424e3f904e3ef8fd8a2b6fc4713730e71767653ea37bed5",
+    "prefix_bytes": 5140,
+    "early_load_bytes": 15804,
+    "recovery_literal_count": 20,
+    "compared_listing_rows": 1774,
+    "recovery_schema_unchanged": true,
+    "changed_prefix_bytes": [
+      3228,
+      3229,
+      3230,
+      3231,
+      4948,
+      4949,
+      4950,
+      4951
+    ],
+    "crc_literal_offsets": [
+      3228,
+      4948
+    ],
+    "early_crc32": "0x7b3e2ddf",
+    "park_address": "0x3418078c",
+    "limits": "Exact-pair admission only. 50 MHz remains unqualified after a real read CRC failure; no installation/promotion or hardware access is authorized by this review."
+  },
+  "test_results": {
+    "recovery_park": 8,
+    "readback": 14,
+    "result": "passed"
+  },
+  "qualification": "Offline only; neither50MHz flash candidate is qualified or installed."
+}

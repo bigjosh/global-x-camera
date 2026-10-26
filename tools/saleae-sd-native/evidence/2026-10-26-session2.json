@@ -1,0 +1,99 @@
+{
+  "date": "2026-10-26",
+  "scope": "Saved-capture replay only; no live hardware operation",
+  "source": {
+    "path": "Global X SD card with 27ohm on clkSession 2.sal",
+    "bytes": 101579,
+    "sha256": "450923ae650f4e3432cc441494699d9a930f7332601d1badc70d5204bebec154"
+  },
+  "sample_rate_hz": 250000000,
+  "clock_edge": "Rising",
+  "sample_offset": 3,
+  "channels": {
+    "CLK": 1,
+    "CMD": 0,
+    "DAT0": 2,
+    "DAT1": 3,
+    "DAT2": 4,
+    "DAT3": 5
+  },
+  "exports": [
+    {
+      "path": "tmp\\sd-analyzer-fresh-20261026\\offset0.csv",
+      "bytes": 104655,
+      "sha256": "b87631daf0d16d6c8edeeac55fe1c0efa8a5a101e179d1487e671d363f1108eb"
+    },
+    {
+      "path": "tmp\\sd-analyzer-fresh-20261026\\offset3.csv",
+      "bytes": 109526,
+      "sha256": "6b13c7f16f7fbdd7122e9757e236e5588d9d1d167cb247e513f435cf54421755"
+    },
+    {
+      "path": "tmp\\sd-analyzer-fresh-20261026\\corrected\\sd-analyzed.sal",
+      "bytes": 102073,
+      "sha256": "7e8fda4f11663a0d84a24f2be5de339b03a8491aeb44c1ff9f33b2985671842a"
+    }
+  ],
+  "event_counts": {
+    "command": 194,
+    "response": 192,
+    "transfer": 18,
+    "data_block": 20,
+    "bus_width": 1,
+    "write_status": 3,
+    "busy": 4
+  },
+  "actual_acmd41_polls": 61,
+  "slot_header_reads": 15,
+  "write_slot": 14,
+  "write_lba": 52220,
+  "announced_sectors": 3730,
+  "observed_data_blocks": 3,
+  "actual_write_result": "Block 3 CRC-reject token 0 101 1; host CMD12 abort; later CMD13 TRAN/ready",
+  "independent_raw_check": "All four outgoing lane CRC16s pass on each of the three blocks. Block 3 negative status unchanged at offsets -4 through +16 ns. Analyzer cannot prove analog signal quality at card.",
+  "startup_limitation": "One invalid CMD63 annotation before genuine CMD0; initial-low framing across startup clock gap.",
+  "raw_cmd25_start_s": 0.26634194,
+  "raw_cmd12_start_s": 0.266697384,
+  "raw_final_busy_start_s": 0.26669946,
+  "raw_final_busy_end_s": 0.267690712,
+  "raw_final_busy_us": 991.252,
+  "replay_command": "python tools/saleae-sd-native/replay_in_logic.py SOURCE.sal NEW_EMPTY_DIR --port 10431 --width auto --clk 1 --cmd 0 --dat0 2 --dat1 3 --dat2 4 --dat3 5 --offset 3",
+  "write_status_events": [
+    {
+      "start_sample": "6165547675",
+      "end_sample": "6165547715",
+      "start_s": "0.266389104",
+      "end_s": "0.266389264",
+      "duration_us": "0.16",
+      "signal": "DAT",
+      "type": "write_status",
+      "error": "false",
+      "description": "Block 1 accepted",
+      "fields": "block=1; status=2; token_end=1"
+    },
+    {
+      "start_sample": "6165609772",
+      "end_sample": "6165609812",
+      "start_s": "0.266637492",
+      "end_s": "0.266637652",
+      "duration_us": "0.16",
+      "signal": "DAT",
+      "type": "write_status",
+      "error": "false",
+      "description": "Block 2 accepted",
+      "fields": "block=2; status=2; token_end=1"
+    },
+    {
+      "start_sample": "6165620474",
+      "end_sample": "6165620515",
+      "start_s": "0.2666803",
+      "end_s": "0.266680464",
+      "duration_us": "0.164",
+      "signal": "DAT",
+      "type": "write_status",
+      "error": "true",
+      "description": "Block 3 rejected: CRC error",
+      "fields": "block=3; status=5; token_end=1"
+    }
+  ]
+}

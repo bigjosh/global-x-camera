@@ -35,6 +35,12 @@
 #define P PWR_S
 #define CPU_CYCLES_US 400UL
 #define HCLK_HZ 150000000UL
+#if SD_HIGH_SPEED
+#define SD_KERNEL_HZ 100000000UL
+#include "sd_clock_profile.h"
+#else
+#define SD_KERNEL_HZ HCLK_HZ
+#endif
 #define CMD_TIMEOUT_CYCLES 100000000UL  /* 250 ms */
 #define READY_TIMEOUT_CYCLES 800000000UL /* 2 s */
 #define READ_TIMEOUT_CYCLES 800000000UL
@@ -51,6 +57,17 @@
 #define PHASE_BITS SDMMC_CLKCR_NEGEDGE
 #else
 #define PHASE_BITS 0UL
+#endif
+/* Default-Speed initialization uses the requested falling launch. At 50 MHz,
+ * the High-Speed datasheet output delay is referenced to rising SDCLK:
+ * NEGEDGE=0 launches on the following 100 MHz kernel falling edge (~5 ns). */
+#define INIT_PHASE_BITS PHASE_BITS
+#if SD_HIGH_SPEED
+#define RUN_PHASE_BITS 0UL
+#define RUN_PHASE_MASK SDMMC_CLKCR_NEGEDGE
+#else
+#define RUN_PHASE_BITS PHASE_BITS
+#define RUN_PHASE_MASK PHASE_BITS
 #endif
 #if SD_BUS_WIDTH == 4
 #define C_MASK ((3UL<<0)|(3UL<<4)|(3UL<<6)|(3UL<<8)|(3UL<<10))
@@ -85,6 +102,10 @@ static int read_scr_selected(sd_card_t *c,sd_scr_t *scr);
 volatile sd_width_proof_t sd_bus_width_proof;
 _Static_assert(sizeof(sd_width_proof_t)==24U,"bus-width proof ABI");
 #endif
+#if SD_HIGH_SPEED
+volatile sd_high_speed_proof_t sd_high_speed_proof;
+_Static_assert(sizeof(sd_high_speed_proof_t)==184U,"high-speed proof ABI");
+#endif
 
 #if SD_GPIO_SPEED != 3
 volatile sd_gpio_proof_t sd_gpio_proof;
@@ -94,6 +115,22 @@ _Static_assert(sizeof(sd_gpio_proof_t)==32U,"GPIO speed proof ABI");
 volatile sd_compensation_proof_t sd_compensation_proof;
 _Static_assert(sizeof(sd_compensation_proof_t)==32U,"compensation proof ABI");
 #endif
+#if SD_STARTUP_OPT
+volatile sd_startup_proof_t sd_startup_proof;
+_Static_assert(sizeof(sd_startup_proof_t)==64U,"startup proof ABI");
+static sd_scr_t startup_scr;
+static sd_card_t *startup_scr_owner;
+static void startup_scr_invalidate(void)
+{
+    startup_scr.valid=0; startup_scr_owner=NULL;
+    sd_startup_proof.scr_valid=0; sd_startup_proof.cache_owner=0;
+}
+#endif
+
+#if SD_EARLY_RUN_CLOCK
+volatile sd_early_clock_proof_t sd_early_clock_proof;
+_Static_assert(sizeof(sd_early_clock_proof_t)==64U,"early clock proof ABI");
+#endif
 
 __attribute__((weak)) void sd_progress(void)
 {
@@ -101,6 +138,13 @@ __attribute__((weak)) void sd_progress(void)
 
 static int fault(sd_card_t *c, uint32_t error)
 {
+#if SD_EARLY_RUN_CLOCK
+    if(!sd_early_clock_proof.result) sd_early_clock_proof.result=error;
+#endif
+#if SD_STARTUP_OPT
+    startup_scr_invalidate();
+    if(!sd_startup_proof.result) sd_startup_proof.result=error;
+#endif
     CYCLE_MARK(SD_LAST_ERROR);
     CYCLE_COUNT(SD_ERROR_CALLS);
     if (!c->error) {
@@ -111,6 +155,29 @@ static int fault(sd_card_t *c, uint32_t error)
     }
     return (int)error;
 }
+
+#if SD_HIGH_SPEED
+static int high_speed_host_guard(sd_card_t *c)
+{
+    if (!(R->AHB5ENR&RCC_AHB5ENR_SDMMC2EN) || !sd_review_clock_proof.owned ||
+            (R->CCIPR8&RCC_CCIPR8_SDMMC2SEL)!=SD_REVIEW_MUX_BITS ||
+            !(R->DIVENR&RCC_DIVENR_IC5EN) ||
+            (R->IC5CFGR&SD_REVIEW_IC5_MASK)!=SD_REVIEW_IC5_BITS ||
+            !sd_review_clock_sources()) return fault(c,SD_ERR_CLOCK);
+    uint32_t phase=(sd_high_speed_proof.qualified || c->clock_hz==50000000U)?RUN_PHASE_BITS:INIT_PHASE_BITS;
+    if ((c->clock_hz!=100000U && c->clock_hz!=25000000U && c->clock_hz!=50000000U) ||
+            SD_KERNEL_HZ%(2U*c->clock_hz) ||
+            X->CLKCR!=((SD_KERNEL_HZ/(2U*c->clock_hz))|SDMMC_CLKCR_HWFC_EN|
+                ((sd_bus_width_proof.configured_clkcr&SDMMC_CLKCR_WIDBUS)==WIDTH_BITS?WIDTH_BITS:0U)|phase))
+        return fault(c,SD_ERR_CLOCK);
+    return SD_OK;
+}
+#define SD_HOST_GUARD(card) do {int guard=high_speed_host_guard(card);if(guard)return guard;} while(0)
+#elif SD_STARTUP_OPT
+#define SD_HOST_GUARD(card) do {if(!(R->AHB5ENR&RCC_AHB5ENR_SDMMC2EN))return fault(card,SD_ERR_CLOCK);} while(0)
+#else
+#define SD_HOST_GUARD(card) ((void)0)
+#endif
 
 static int delay_us(sd_card_t *c, uint32_t us)
 {
@@ -134,8 +201,14 @@ static void sample_response(sd_card_t *c, uint32_t sta)
     c->command_count++;
 }
 
+#if SD_REVIEW_PROFILE
+static int command_checked(sd_card_t *c, uint32_t index, uint32_t argument,
+                           enum response response, uint32_t data,
+                           uint32_t completed_read_at_media_end)
+#else
 static int command(sd_card_t *c, uint32_t index, uint32_t argument,
                    enum response response, uint32_t data)
+#endif
 {
     sd_progress();
     uint32_t start=DWT->CYCCNT, sta=0;
@@ -177,11 +250,26 @@ static int command(sd_card_t *c, uint32_t index, uint32_t argument,
     uint32_t errors=R1_ERRORS;
     /* As in ST's LL stop helper: the card may flag the address beyond its last
      * sector while an open-ended read is being stopped at the end of media. */
+#if SD_REVIEW_PROFILE
+    /* Only a complete, CRC-good read whose owned extent ends at the last
+     * sector may excuse an extra open-ended read address. A write or failed
+     * read must never hide the card's OUT_OF_RANGE status. */
+    if (index==12 && completed_read_at_media_end) errors&=~(1UL<<31);
+#else
     if (index==12) errors&=~(1UL<<31);
+#endif
     if (response==RESP_R1 && (X->RESP1&errors)) return fault(c,SD_ERR_CARD);
     if (response==RESP_R6 && (X->RESP1&0xE000UL)) return fault(c,SD_ERR_CARD);
     return SD_OK;
 }
+
+#if SD_REVIEW_PROFILE
+static int command(sd_card_t *c, uint32_t index, uint32_t argument,
+                   enum response response, uint32_t data)
+{
+    return command_checked(c,index,argument,response,data,0);
+}
+#endif
 
 static int ready(sd_card_t *c)
 {
@@ -213,6 +301,24 @@ static int ready(sd_card_t *c)
     return fault(c,SD_ERR_NOT_READY);
 }
 
+#if SD_REVIEW_PROFILE
+static int ready_after_transfer(sd_card_t *c)
+{
+    int result=ready(c);
+    if (result) return result;
+    /* R1b after CMD12 can expose a late timeout or data error. CMD13 does
+     * not clear these sticky flags, so inspect them before cleanup clears
+     * DATA_FLAGS. DABORT alone is expected from our deliberate CMD12 only
+     * after the caller has proved DATAEND, full length and no earlier error. */
+    uint32_t sta=X->STA;
+    if (sta&DMA_ERRORS) {
+        c->last_sta=sta;
+        return fault(c,(sta&SDMMC_STA_IDMATE)?SD_ERR_DMA:SD_ERR_DATA);
+    }
+    return SD_OK;
+}
+#endif
+
 /* Error recovery does not report the original operation as successful. It only
  * attempts to establish a quiescent device. RM0486 section 30.6.2 permits CMD12
  * to abort all data read/write commands. After CMDREND, drain receive data and
@@ -237,7 +343,15 @@ static void abort_transfer(sd_card_t *c, uint32_t reading)
             /* A stopped transfer has at most the remaining FIFO contents.
              * The finite word bound also prevents a faulty model/peripheral
              * from turning error cleanup into another unbounded read. */
-            for (uint32_t n=0;n<64;++n) {
+#if SD_REVIEW_PROFILE
+            /* RM0486 30.6.2: after CMDREND the remaining receive FIFO must
+             * be drained before FIFORST. N6's FIFO holds 256 words, not64.
+             * No further card data enters after this completed CMD12. */
+            const uint32_t drain_words=256U;
+#else
+            const uint32_t drain_words=64U;
+#endif
+            for (uint32_t n=0;n<drain_words;++n) {
                 uint32_t sta=X->STA;
                 if (!(sta&SDMMC_STA_DPSMACT) || (sta&SDMMC_STA_RXFIFOE)) break;
                 uint32_t discarded=X->FIFO;
@@ -358,15 +472,34 @@ static int transfer(sd_card_t *c, uint32_t lba, uint8_t *buffer,
     X->CMD&=~SDMMC_CMD_CMDTRANS;
     if (!result && (words!=total || !(sta&SDMMC_STA_DATAEND) ||
         (sta&(DATA_ERRORS|SDMMC_STA_DPSMACT)))) result=fault(c,SD_ERR_LENGTH);
-    if (!result && count>1) result=command(c,12,0,RESP_R1,0);
+    if (!result && count>1) {
+#if SD_REVIEW_PROFILE
+        result=command_checked(c,12,0,RESP_R1,0,
+            !writing && (uint64_t)lba+count==c->sector_count);
+#else
+        result=command(c,12,0,RESP_R1,0);
+#endif
+    }
     if (result) {
         abort_transfer(c,!writing);
         return result;
     }
+#if !SD_REVIEW_PROFILE
     X->DCTRL=0;
     X->ICR=DATA_FLAGS;
+#endif
+#if SD_REVIEW_PROFILE
+    result=ready_after_transfer(c);
+#else
     result=ready(c);
+#endif
     if (result) return result;
+#if SD_REVIEW_PROFILE
+    /* CMD12's R1b busy can reactivate DPSM after DATAEND. DBLOCKSIZE,
+     * DTDIR and DTMODE are only writable again after fresh idle proof. */
+    X->DCTRL=0;
+    X->ICR=DATA_FLAGS;
+#endif
     if (writing) c->written_sectors+=count;
     else c->read_sectors+=count;
 #if RAW_CYCLE_TRACE
@@ -561,10 +694,19 @@ static int transfer_dma_write(sd_card_t *c, uint32_t lba,
         abort_dma_write(c);
         return result;
     }
+#if !SD_REVIEW_PROFILE
     X->DCTRL=0;
     X->ICR=DMA_FLAGS;
+#endif
     CYCLE_MARK(SD_WRITE_FINAL_READY_BEGIN);
+#if SD_REVIEW_PROFILE
+    result=ready_after_transfer(c);
+#else
     result=ready(c);
+#endif
+#if SD_REVIEW_PROFILE
+    if (!result) { X->DCTRL=0; X->ICR=DMA_FLAGS; }
+#endif
     if (!result) c->written_sectors+=count;
     if (!result) {
         CYCLE_MARK(SD_WRITE_FINAL_READY_DONE);
@@ -573,7 +715,151 @@ static int transfer_dma_write(sd_card_t *c, uint32_t lba,
     return result;
 }
 
+#if SD_HIGH_SPEED
+static int high_speed_status_valid(const uint8_t *status)
+{
+    /* SD Physical Layer section 4.3.10, 512-bit switch-function status.
+     * Wire bytes are MSB first. No UHS/current-limit/driver-strength group is
+     * changed: all groups except access mode are requested as 0xF. */
+    uint32_t current=((uint32_t)status[0]<<8)|status[1];
+    uint32_t support=((uint32_t)status[12]<<8)|status[13];
+    if(!current || current>200U || status[17]>1U || !(support&2U) ||
+            (status[16]&15U)!=1U) return SD_ERR_UNSUPPORTED;
+    for(unsigned n=14;n<=16;++n)
+        if((status[n]&15U)==15U || (status[n]>>4)==15U) return SD_ERR_UNSUPPORTED;
+    if(status[17]==1U && (status[29]&2U)) return SD_ERR_NOT_READY;
+    return SD_OK;
+}
+
+static int high_speed_status_read(sd_card_t *c,uint32_t switching)
+{
+    int result=ready(c);
+    if(result) return result;
+    if(X->IDMACTRL || c->clock_hz!=25000000U)
+        return fault(c,SD_ERR_CLOCK);
+    c->stage=SD_STAGE_SWITCH;c->media_idle=0;
+    uint8_t status[64];uint32_t words=0,sta=0,start=DWT->CYCCNT;
+    X->DCTRL=0;X->ICR=DATA_FLAGS;X->DTIMER=c->clock_hz*2U;
+    X->DLEN=64U;
+    X->DCTRL=(6U<<SDMMC_DCTRL_DBLOCKSIZE_Pos)|SDMMC_DCTRL_DTDIR;
+    result=command(c,6,switching?0x80FFFFF1U:0x00FFFFF1U,RESP_R1,1);
+    uint32_t r1=c->last_r1;
+    if(!result) for(uint32_t i=0;i<POLL_LIMIT;i++) {
+        sta=X->STA;c->last_sta=sta;
+        if(sta&DATA_ERRORS) {result=fault(c,SD_ERR_DATA);break;}
+        if(words<16U && !(sta&SDMMC_STA_RXFIFOE)) {
+            store_word(status+words*4U,X->FIFO);words++;
+        }
+        if((sta&SDMMC_STA_DATAEND) && !(sta&SDMMC_STA_DPSMACT) && words==16U) break;
+        if((uint32_t)(DWT->CYCCNT-start)>=READ_TIMEOUT_CYCLES) {
+            result=fault(c,SD_ERR_DATA_TIMEOUT);break;
+        }
+        if(i==POLL_LIMIT-1U) result=fault(c,SD_ERR_TIMER);
+        if(!(i&255U)) sd_progress();
+    }
+    c->transfer_words=words;c->transfer_sta=sta;c->transfer_cycles=DWT->CYCCNT-start;
+    X->CMD&=~SDMMC_CMD_CMDTRANS;
+    if(!result && (words!=16U || !(sta&SDMMC_STA_DATAEND) ||
+            (sta&(DATA_ERRORS|SDMMC_STA_DPSMACT)) || X->DCOUNT))
+        result=fault(c,SD_ERR_LENGTH);
+    if(result) {abort_transfer(c,1);return result;}
+    X->DCTRL=0;X->ICR=DATA_FLAGS;
+    volatile uint8_t *saved=switching?sd_high_speed_proof.switch_status:sd_high_speed_proof.check_status;
+    for(uint32_t i=0;i<64U;i++) saved[i]=status[i];
+    if(switching) {sd_high_speed_proof.switch_r1=r1;sd_high_speed_proof.switch_sta=sta;}
+    else {sd_high_speed_proof.check_r1=r1;sd_high_speed_proof.check_sta=sta;}
+    if((result=ready(c))) return result;
+    result=high_speed_status_valid(status);
+    if(result) return fault(c,result);
+    if(switching) sd_high_speed_proof.switch_done=1U;
+    else sd_high_speed_proof.check_done=1U;
+    return SD_OK;
+}
+
+static int high_speed_enable(sd_card_t *c)
+{
+    int result=high_speed_status_read(c,0);
+    if(result) return result;
+    result=high_speed_status_read(c,1);
+    if(result) return result;
+    /* A function switch takes effect within eight clocks after its status
+     * data block. Keep 25 MHz running for at least 1 us before accelerating. */
+    if((result=delay_us(c,1))) return result;
+    if((X->STA&(SDMMC_STA_DPSMACT|SDMMC_STA_CPSMACT)) || X->IDMACTRL)
+        return fault(c,SD_ERR_CONTROLLER_BUSY);
+    X->CLKCR=(SD_KERNEL_HZ/(2U*50000000U))|SDMMC_CLKCR_HWFC_EN|WIDTH_BITS|RUN_PHASE_BITS;
+    sd_high_speed_proof.configured_clkcr=X->CLKCR;
+    if(X->CLKCR!=(1U|SDMMC_CLKCR_HWFC_EN|WIDTH_BITS|RUN_PHASE_BITS))
+        return fault(c,SD_ERR_CLOCK);
+    c->clock_hz=50000000U;
+    if((result=ready(c))) return result;
+    sd_bus_width_proof.configured_clkcr=X->CLKCR;
+    sd_high_speed_proof.qualified=1U;
+    return SD_OK;
+}
+#endif
+
+#if SD_EARLY_RUN_CLOCK
+/* CSD bits103:96 encode a decimal multiplier and transfer-rate unit, not a
+ * binary frequency. Keep decoding integral and reject every reserved value.
+ * Maximum valid product is800 MHz, which fits uint32_t. This does not negotiate
+ * High Speed: the admitted requested rate remains <=25 MHz Default Speed. */
+static uint32_t csd_transfer_hz(uint32_t encoded)
+{
+    static const uint8_t tenths[16]={0,10,12,13,15,20,25,30,35,40,45,50,55,60,70,80};
+    static const uint32_t units[4]={100000U,1000000U,10000000U,100000000U};
+    uint32_t unit=encoded&7U,multiplier=(encoded>>3)&15U;
+    if((encoded&~0x7FU) || unit>3U || !multiplier) return 0;
+    return (units[unit]/10U)*tenths[multiplier];
+}
+
+static int early_run_clock(sd_card_t *c,uint32_t run_hz)
+{
+    sd_early_clock_proof.csd_tran_speed=c->csd[0]&255U;
+    sd_early_clock_proof.csd_max_hz=csd_transfer_hz(c->csd[0]&255U);
+    sd_early_clock_proof.csd_command_count=c->command_count;
+    if(!sd_early_clock_proof.csd_max_hz || sd_early_clock_proof.csd_max_hz<run_hz)
+        return fault(c,SD_ERR_UNSUPPORTED);
+    if((run_hz!=12500000U && run_hz!=25000000U) || c->clock_hz!=100000U ||
+            SD_KERNEL_HZ%(2U*run_hz) || c->last_command!=9U)
+        return fault(c,SD_ERR_CLOCK);
+    SD_HOST_GUARD(c);
+    CYCLE_MARK(SD_CLOCK_SWITCH_BEGIN);
+    sd_early_clock_proof.switch_begin_cycles=DWT->CYCCNT;
+    if((X->STA&(SDMMC_STA_DPSMACT|SDMMC_STA_CPSMACT)) || X->IDMACTRL)
+        return fault(c,SD_ERR_CONTROLLER_BUSY);
+    const uint32_t initial=(SD_KERNEL_HZ/(2U*100000U))|SDMMC_CLKCR_HWFC_EN|INIT_PHASE_BITS;
+    const uint32_t desired=(SD_KERNEL_HZ/(2U*run_hz))|SDMMC_CLKCR_HWFC_EN|INIT_PHASE_BITS;
+    sd_early_clock_proof.clock_before=X->CLKCR;
+    sd_early_clock_proof.timer_before=X->DTIMER;
+    if(sd_early_clock_proof.clock_before!=initial) return fault(c,SD_ERR_CLOCK);
+    if(sd_early_clock_proof.timer_before!=200000U) return fault(c,SD_ERR_TIMER);
+    sd_early_clock_proof.switch_command_count=c->command_count;
+    X->CLKCR=desired;
+    __DSB();
+    sd_early_clock_proof.clock_after=X->CLKCR;
+    if(sd_early_clock_proof.clock_after!=desired) return fault(c,SD_ERR_CLOCK);
+    c->clock_hz=run_hz;
+    /* CMD7 is R1b. Preserve a two-second hardware busy bound in the NEW clock
+     * domain before any command can assert busy. No ready()/CMD13 while STBY. */
+    X->DTIMER=run_hz*2U;
+    __DSB();
+    sd_early_clock_proof.timer_after=X->DTIMER;
+    if(sd_early_clock_proof.timer_after!=run_hz*2U) return fault(c,SD_ERR_TIMER);
+    sd_startup_proof.run_hz=run_hz;
+    uint32_t settle_begin=DWT->CYCCNT;
+    int result=delay_us(c,1);
+    if(result) return result;
+    sd_startup_proof.run_settle_cycles=(uint32_t)(DWT->CYCCNT-settle_begin);
+    sd_early_clock_proof.switch_end_cycles=DWT->CYCCNT;
+    CYCLE_MARK(SD_CLOCK_SWITCH_DONE);
+    return SD_OK;
+}
+
+static int identify(sd_card_t *c,uint32_t run_hz)
+#else
 static int identify(sd_card_t *c)
+#endif
 {
     int result;
     c->stage=SD_STAGE_IDENTIFY;
@@ -622,18 +908,46 @@ static int identify(sd_card_t *c)
     if (!c->sector_count || c->sector_count>(1ULL<<32))
         return fault(c,SD_ERR_CAPACITY);
     CYCLE_MARK(SD_IDENTIFY_REGS_DONE);
+#if SD_EARLY_RUN_CLOCK
+    if((result=early_run_clock(c,run_hz))) return result;
+#endif
     c->stage=SD_STAGE_SELECT;
     CYCLE_MARK(SD_SELECT_BEGIN);
+#if SD_EARLY_RUN_CLOCK
+    sd_early_clock_proof.select_begin_cycles=DWT->CYCCNT;
+    if((result=command(c,7,c->rca,RESP_R1,0))) return result;
+    sd_early_clock_proof.select_command_count=c->command_count;
+    if((result=ready(c))) return result;
+#else
     if ((result=command(c,7,c->rca,RESP_R1,0)) || (result=ready(c))) return result;
+#endif
     if (!(c->ocr&(1UL<<30)) && (result=command(c,16,512,RESP_R1,0))) return result;
     CYCLE_MARK(SD_SELECT_DONE);
     return SD_OK;
 }
 
+#if SD_HIGH_SPEED
+static int sd_init_attempt(sd_card_t *c, uint32_t max_hz)
+#else
 int sd_init(sd_card_t *c, uint32_t max_hz)
+#endif
 {
     if (!c) return SD_ERR_ARGUMENT;
     if (c->initialized || c->controller_owned) return SD_ERR_STATE;
+#if SD_EARLY_RUN_CLOCK
+    volatile uint8_t *early_clear=(volatile uint8_t *)&sd_early_clock_proof;
+    for(size_t i=0;i<sizeof(sd_early_clock_proof);i++) early_clear[i]=0;
+    sd_early_clock_proof.magic=0x314B4345U; /* ECK1 */
+    sd_early_clock_proof.version=1U;
+    sd_early_clock_proof.requested_hz=max_hz;
+#endif
+#if SD_STARTUP_OPT
+    startup_scr_invalidate();
+    volatile uint8_t *startup_clear=(volatile uint8_t *)&sd_startup_proof;
+    for(size_t i=0;i<sizeof(sd_startup_proof);i++) startup_clear[i]=0;
+    sd_startup_proof.magic=0x31504F53U; /* SOP1 */
+    sd_startup_proof.version=1U;
+#endif
     CYCLE_MARK(SD_INIT_BEGIN);
     CYCLE_COUNT(SD_INIT_CALLS);
 #if SD_BUS_WIDTH == 4
@@ -657,10 +971,24 @@ int sd_init(sd_card_t *c, uint32_t max_hz)
     volatile uint8_t *p=(volatile uint8_t *)c;
     for (size_t i=0;i<sizeof(*c);++i) p[i]=0;
     c->stage=SD_STAGE_PREFLIGHT;
+#if SD_STARTUP_OPT
+    if(max_hz==100000U) return fault(c,SD_ERR_ARGUMENT);
+#endif
+#if SD_HIGH_SPEED
+    volatile uint8_t *hs_clear=(volatile uint8_t *)&sd_high_speed_proof;
+    for(size_t i=0;i<sizeof(sd_high_speed_proof);++i) hs_clear[i]=0;
+    sd_high_speed_proof.requested_hz=max_hz;
+    sd_high_speed_proof.kernel_hz=SD_KERNEL_HZ;
+    if(max_hz!=50000000UL) return fault(c,SD_ERR_ARGUMENT);
+#else
     if (max_hz!=100000UL && max_hz!=12500000UL && max_hz!=25000000UL)
         return fault(c,SD_ERR_ARGUMENT);
-#if SD_FIXED_COMPENSATION || SD_CLOCK_NEGEDGE || SD_GPIO_SPEED == 1 || SD_GPIO_SPEED == 2
+#if SD_FIXED_COMPENSATION || (SD_CLOCK_NEGEDGE && !SD_CLOCK_NEGEDGE_INIT) || SD_GPIO_SPEED == 1 || SD_GPIO_SPEED == 2
     if (max_hz!=25000000UL) return fault(c,SD_ERR_ARGUMENT);
+#endif
+#if SD_CLOCK_NEGEDGE_INIT
+    if (max_hz!=12500000UL && max_hz!=25000000UL) return fault(c,SD_ERR_ARGUMENT);
+#endif
 #endif
     if (__get_IPSR() || (__get_CONTROL()&1U)) return fault(c,SD_ERR_STATE);
     if (R->CFGR1!=0x33330000UL || R->CFGR2!=0x00100000UL ||
@@ -708,7 +1036,14 @@ int sd_init(sd_card_t *c, uint32_t max_hz)
     C->OTYPER&=~C_PINS;
     C->MODER&=~C_MASK;
     C->PUPDR=(C->PUPDR&~C_MASK)|C_PULLS;
-#if SD_GPIO_SPEED == 3
+#if SD_HIGH_SPEED
+    sd_high_speed_proof.gpio_c_before=C->OSPEEDR;
+    sd_high_speed_proof.gpio_e_before=E->OSPEEDR;
+#endif
+#if SD_HIGH_SPEED_MIXED_SLEW
+    /* DS14791 HS table: CLK=01, CMD/DAT=00. PC1 and other pins untouched. */
+    C->OSPEEDR=(C->OSPEEDR&~C_MASK)|(1UL<<4);
+#elif SD_GPIO_SPEED == 3
     C->OSPEEDR=(C->OSPEEDR&~C_MASK)|C_MASK;
 #else
     C->OSPEEDR=(C->OSPEEDR&~C_MASK)|(C_MASK/3U*SD_GPIO_SPEED);
@@ -752,21 +1087,54 @@ int sd_init(sd_card_t *c, uint32_t max_hz)
     sd_compensation_proof.applied=1U;
 #endif
     CYCLE_MARK(SD_GPIO_SETTLE_BEGIN);
+#if SD_STARTUP_OPT
+    uint32_t startup_begin=DWT->CYCCNT;
+#endif
     if ((result=delay_us(c,1000))) return result;
+#if SD_STARTUP_OPT
+    sd_startup_proof.gpio_settle_cycles=(uint32_t)(DWT->CYCCNT-startup_begin);
+#endif
     CYCLE_MARK(SD_GPIO_SETTLE_DONE);
     c->gpioc_idr=C->IDR; c->gpioe_idr=E->IDR;
     if ((c->gpioc_idr&C_IDLE_PINS)!=C_IDLE_PINS ||
         !(c->gpioe_idr&(1UL<<4))) return fault(c,SD_ERR_GPIO);
     c->saved_sdmmc_mux=R->CCIPR8&RCC_CCIPR8_SDMMC2SEL;
+#if SD_HIGH_SPEED
+    if(!sd_review_clock_acquire()) {
+        c->controller_owned=sd_review_clock_proof.owned;
+        if(c->controller_owned)c->cleanup_error=SD_ERR_CLOCK;
+        return fault(c,SD_ERR_CLOCK);
+    }
+#else
     R->CCIPR8&=~RCC_CCIPR8_SDMMC2SEL;
+#endif
     R->AHB5ENSR=RCC_AHB5ENSR_SDMMC2ENS;
+#if SD_HIGH_SPEED
+    if (!(R->AHB5ENR&RCC_AHB5ENR_SDMMC2EN)) {
+        if(!sd_review_clock_release()) {c->cleanup_error=SD_ERR_CLOCK;c->controller_owned=1;}
+        return fault(c,SD_ERR_CLOCK);
+    }
+#elif SD_STARTUP_OPT
+    if(!(R->AHB5ENR&RCC_AHB5ENR_SDMMC2EN)) return fault(c,SD_ERR_CLOCK);
+#else
     (void)R->AHB5ENR;
+#endif
     R->AHB5RSTSR=RCC_AHB5RSTSR_SDMMC2RSTS;
     R->AHB5RSTCR=RCC_AHB5RSTCR_SDMMC2RSTC;
     __DSB();
     c->controller_owned=1;
     X->MASK=0; X->POWER=0; X->DCTRL=0; X->IDMACTRL=0; X->CMD=0;
+#if SD_CLOCK_NEGEDGE_INIT
+    /* Configure before enabling the controller clock output. The input clock
+     * remains SELCLKRX=0; only host CMD/DAT launch changes to falling edge. */
+    if (X->STA&(SDMMC_STA_DPSMACT|SDMMC_STA_CPSMACT))
+        return fault(c,SD_ERR_CONTROLLER_BUSY);
+    X->CLKCR=(SD_KERNEL_HZ/(2U*100000U))|SDMMC_CLKCR_HWFC_EN|INIT_PHASE_BITS;
+    if (X->CLKCR!=((SD_KERNEL_HZ/(2U*100000U))|SDMMC_CLKCR_HWFC_EN|INIT_PHASE_BITS))
+        return fault(c,SD_ERR_CLOCK);
+#else
     X->CLKCR=750UL|SDMMC_CLKCR_HWFC_EN;
+#endif
     C->AFR[0]=(C->AFR[0]&~C_AF_MASK)|C_AF_BITS;
     C->MODER=(C->MODER&~C_MASK)|C_MODES;
     if ((C->MODER&C_MASK)!=C_MODES ||
@@ -775,26 +1143,73 @@ int sd_init(sd_card_t *c, uint32_t max_hz)
         return fault(c,SD_ERR_GPIO);
     X->POWER=SDMMC_POWER_PWRCTRL;
     c->clock_hz=100000UL;
+#if SD_REVIEW_PROFILE
+    /* CMD7 can return R1b during identification, before the first data API
+     * otherwise initializes DTIMER. Its reset value0 can latch a Busy
+     * timeout on a legitimate select-card response. Set the two-second
+     * identification-clock bound while both state machines are idle. */
+    if (X->STA&(SDMMC_STA_DPSMACT|SDMMC_STA_CPSMACT))
+        return fault(c,SD_ERR_CONTROLLER_BUSY);
+    X->DTIMER=c->clock_hz*2UL;
+#endif
     CYCLE_MARK(SD_CLOCK_TRAIN_BEGIN);
+#if SD_STARTUP_OPT
+    /* The fixed Nucleo/card wiring supplies VCC from the already running
+     * target3.3V rail, valid before the retained1ms GPIO settle interval.
+     * VDDIO5SV alone is not supply evidence. SD4.4/6.4.1 then permits1ms
+     * of continuous100kHz clocks (100 >=74), with CMD held high. This profile
+     * must not be used for a separately switched/ramping card supply. */
+    if(X->POWER!=SDMMC_POWER_PWRCTRL ||
+       X->CLKCR!=((SD_KERNEL_HZ/(2U*100000U))|SDMMC_CLKCR_HWFC_EN|INIT_PHASE_BITS))
+        return fault(c,SD_ERR_CLOCK);
+    sd_startup_proof.train_hz=100000U;sd_startup_proof.train_min_cycles=400000U;
+    startup_begin=DWT->CYCCNT;
+    if((result=delay_us(c,1000))) return result;
+    sd_startup_proof.train_cycles=(uint32_t)(DWT->CYCCNT-startup_begin);
+#else
     if ((result=delay_us(c,10000))) return result;
+#endif
     CYCLE_MARK(SD_CLOCK_TRAIN_DONE);
+#if SD_EARLY_RUN_CLOCK
+    if((result=identify(c,max_hz))) return result;
+#else
     if ((result=identify(c))) return result;
 #if SD_CLOCK_NEGEDGE
-    /* RM0486 Rev4 p1433: change only with both state machines idle. Leave
-     * 100 kHz identification unchanged; this changes only the run-clock
-     * launch edge, not SELCLKRX, BUSSPEED, GPIO speed or compensation. */
+    /* RM0486 Rev4 p1433: change only with both state machines idle. Historical
+     * profiles leave 100 kHz identification unchanged; the explicit INIT
+     * option applies the same launch phase there. Neither changes SELCLKRX,
+     * BUSSPEED, GPIO speed or compensation. */
     if (X->STA&(SDMMC_STA_DPSMACT|SDMMC_STA_CPSMACT))
         return fault(c,SD_ERR_CONTROLLER_BUSY);
 #endif
     CYCLE_MARK(SD_CLOCK_SWITCH_BEGIN);
-    X->CLKCR=(HCLK_HZ/(2*max_hz))|SDMMC_CLKCR_HWFC_EN|PHASE_BITS;
+#if SD_HIGH_SPEED
+    const uint32_t run_hz=25000000U;
+#else
+    const uint32_t run_hz=max_hz;
+#endif
+    X->CLKCR=(SD_KERNEL_HZ/(2*run_hz))|SDMMC_CLKCR_HWFC_EN|INIT_PHASE_BITS;
 #if SD_CLOCK_NEGEDGE
-    if (X->CLKCR!=((HCLK_HZ/(2*max_hz))|SDMMC_CLKCR_HWFC_EN|PHASE_BITS))
+    if (X->CLKCR!=((SD_KERNEL_HZ/(2*run_hz))|SDMMC_CLKCR_HWFC_EN|INIT_PHASE_BITS))
         return fault(c,SD_ERR_CLOCK);
 #endif
-    c->clock_hz=max_hz;
+    c->clock_hz=run_hz;
+#if SD_STARTUP_OPT
+    /* No PLL/source changes here: only an idle SD divider. One microsecond
+     * supplies >=12 clocks at supported run rates; the following fresh CMD13
+     * also preserves readiness. CMD6's later8-clock switch delay is separate. */
+    __DSB();
+    if(X->CLKCR!=((SD_KERNEL_HZ/(2U*run_hz))|SDMMC_CLKCR_HWFC_EN|INIT_PHASE_BITS))
+        return fault(c,SD_ERR_CLOCK);
+    sd_startup_proof.run_hz=run_hz;startup_begin=DWT->CYCCNT;
+    if((result=delay_us(c,1))) return result;
+    sd_startup_proof.run_settle_cycles=(uint32_t)(DWT->CYCCNT-startup_begin);
+    if((result=ready(c))) return result;
+#else
     if ((result=delay_us(c,1000)) || (result=ready(c))) return result;
+#endif
     CYCLE_MARK(SD_CLOCK_SWITCH_DONE);
+#endif
 #if SD_BUS_WIDTH == 4
     /* SCR data is still received on DAT0. Require both mandatory one-bit and
      * requested four-bit capability; never silently run a four-bit build in
@@ -806,6 +1221,10 @@ int sd_init(sd_card_t *c, uint32_t max_hz)
     c->stage=SD_STAGE_BUS_WIDTH;
     sd_bus_width_proof.scr_widths=scr.bytes[1]&15U;
     if ((scr.bytes[1]&5U)!=5U) return fault(c,SD_ERR_UNSUPPORTED);
+#if SD_HIGH_SPEED
+    /* SD_SPEC 1 (v1.10) introduced the native CMD6 switch function. */
+    if (!(scr.bytes[0]&15U)) return fault(c,SD_ERR_UNSUPPORTED);
+#endif
     c->media_idle=0;
     if ((result=command(c,55,c->rca,RESP_R1,0))) return result;
     if (!(c->last_r1&(1UL<<5))) return fault(c,SD_ERR_UNSUPPORTED);
@@ -820,7 +1239,9 @@ int sd_init(sd_card_t *c, uint32_t max_hz)
     /* An uncertain ACMD6 response retains ownership and does not guess which
      * width the card selected. Only successful negotiation reaches this. */
     E->OTYPER&=~(1UL<<4);
-#if SD_GPIO_SPEED == 3
+#if SD_HIGH_SPEED_MIXED_SLEW
+    E->OSPEEDR&=~(3UL<<8);
+#elif SD_GPIO_SPEED == 3
     E->OSPEEDR=(E->OSPEEDR&~(3UL<<8))|(3UL<<8);
 #else
     E->OSPEEDR=(E->OSPEEDR&~(3UL<<8))|((uint32_t)SD_GPIO_SPEED<<8);
@@ -850,17 +1271,57 @@ int sd_init(sd_card_t *c, uint32_t max_hz)
         return fault(c,SD_ERR_GPIO);
     sd_gpio_proof.applied=1U;
 #endif
+#if SD_HIGH_SPEED
+    sd_high_speed_proof.gpio_c_after=C->OSPEEDR;
+    sd_high_speed_proof.gpio_e_after=E->OSPEEDR;
+#if SD_HIGH_SPEED_MIXED_SLEW
+    const uint32_t wanted_c_speed=1UL<<4,wanted_e_speed=0;
+#else
+    const uint32_t wanted_c_speed=C_MASK,wanted_e_speed=3UL<<8;
+#endif
+    if((C->OSPEEDR&C_MASK)!=wanted_c_speed || (E->OSPEEDR&(3UL<<8))!=wanted_e_speed ||
+            ((C->OSPEEDR^sd_high_speed_proof.gpio_c_before)&~C_MASK) ||
+            ((E->OSPEEDR^sd_high_speed_proof.gpio_e_before)&~(3UL<<8)))
+        return fault(c,SD_ERR_GPIO);
+    if((result=high_speed_enable(c))) return result;
+#endif
     c->initialized=1;
     c->init_cycles=DWT->CYCCNT-start;
     CYCLE_MARK(SD_INIT_DONE);
     return SD_OK;
 }
 
+#if SD_HIGH_SPEED
+int sd_init(sd_card_t *c,uint32_t max_hz)
+{
+    if(!c) return SD_ERR_ARGUMENT;
+    if(c->initialized || c->controller_owned) return SD_ERR_STATE;
+    int result=sd_init_attempt(c,max_hz);
+    if(result && c && c->controller_owned) {
+        /* Failed negotiation never becomes success. A fresh idle proof permits
+         * restoring the nondefault RCC mux before later ROM recovery. If the
+         * host/card remains ambiguous, preserve ownership for cold recovery. */
+        if((R->AHB5ENR&RCC_AHB5ENR_SDMMC2EN) &&
+                !(X->STA&(SDMMC_STA_DPSMACT|SDMMC_STA_CPSMACT)) && !X->IDMACTRL) {
+            int cleanup=ready(c);
+            if(!cleanup) {
+                c->initialized=1;
+                cleanup=sd_deinit(c);
+                if(cleanup)c->initialized=0;
+            }
+            c->cleanup_error=(uint32_t)cleanup;
+        } else if(!c->cleanup_error) c->cleanup_error=SD_ERR_CONTROLLER_BUSY;
+    }
+    return result;
+}
+#endif
+
 static int block_request(sd_card_t *c, uint32_t lba, void *buffer,
                          uint32_t count, uint32_t writing)
 {
     if (!c || !buffer || !count) return SD_ERR_ARGUMENT;
     if (!c->initialized || !c->controller_owned) return SD_ERR_STATE;
+    SD_HOST_GUARD(c);
     if (c->error) return (int)c->error;
     c->stage=writing ? SD_STAGE_WRITE : SD_STAGE_READ;
     if ((uint64_t)lba+count>c->sector_count) return fault(c,SD_ERR_CAPACITY);
@@ -883,9 +1344,16 @@ static int block_request(sd_card_t *c, uint32_t lba, void *buffer,
     return SD_OK;
 }
 
+#if SD_IDMA_READ
+static int dma_read_request(sd_card_t *c,uint32_t lba,void *buffer,uint32_t count);
+#endif
 int sd_read_blocks(sd_card_t *c, uint32_t lba, void *buffer, uint32_t count)
 {
+#if SD_IDMA_READ
+    return dma_read_request(c,lba,buffer,count);
+#else
     return block_request(c,lba,buffer,count,0);
+#endif
 }
 
 int sd_write_blocks(sd_card_t *c, uint32_t lba, const void *buffer, uint32_t count)
@@ -897,6 +1365,7 @@ static int dma_source_checks(sd_card_t *c,uint32_t lba,const void *buffer,uint32
 {
     if (!c || !buffer || !count) return SD_ERR_ARGUMENT;
     if (!c->initialized || !c->controller_owned) return SD_ERR_STATE;
+    SD_HOST_GUARD(c);
     if (c->error) return (int)c->error;
     c->stage=SD_STAGE_WRITE;
     uintptr_t address=(uintptr_t)buffer;
@@ -923,6 +1392,119 @@ static int dma_source_checks(sd_card_t *c,uint32_t lba,const void *buffer,uint32
     return SD_OK;
 }
 
+#if SD_IDMA_READ
+static int dma_destination_checks(sd_card_t *c,uint32_t lba,void *buffer,uint32_t count)
+{
+    if(!c || !buffer || !count) return SD_ERR_ARGUMENT;
+    if(!c->initialized || !c->controller_owned) return SD_ERR_STATE;
+    if(!(R->AHB5ENR&RCC_AHB5ENR_SDMMC2EN)) return fault(c,SD_ERR_CLOCK);
+    SD_HOST_GUARD(c);
+    if(c->error) return (int)c->error;
+    c->stage=SD_STAGE_READ;
+    uintptr_t address=(uintptr_t)buffer;
+    uint64_t end=(uint64_t)address+(uint64_t)count*SD_SECTOR_BYTES;
+    if((address&3U) || address<0x34000000UL || end>0x34400000ULL)
+        return fault(c,SD_ERR_ARGUMENT);
+    if((uint64_t)lba+count>c->sector_count) return fault(c,SD_ERR_CAPACITY);
+    if(__get_IPSR() || (__get_CONTROL()&1U)) return fault(c,SD_ERR_STATE);
+    if(SCB->CCR&SCB_CCR_DC_Msk) return fault(c,SD_ERR_CACHE);
+    if(!(R->AHB3ENR&RCC_AHB3ENR_RIFSCEN)) return fault(c,SD_ERR_SECURITY);
+    const uint32_t mask=RIFSC_RIMC_ATTRx_MCID|RIFSC_RIMC_ATTRx_MSEC|RIFSC_RIMC_ATTRx_MPRIV;
+    const uint32_t expected=(1UL<<RIFSC_RIMC_ATTRx_MCID_Pos)|
+        RIFSC_RIMC_ATTRx_MSEC|RIFSC_RIMC_ATTRx_MPRIV;
+    if((RIFSC_S->RIMC_ATTRx[3]&mask)!=expected ||
+       !(RIFSC_S->RISC_SECCFGRx[1]&(1UL<<22))) return fault(c,SD_ERR_SECURITY);
+    /* As with writes, the owner must enable SRAM/RISAF destination access.
+     * This routine never broadens policy or touches another owner's buffer. */
+    return SD_OK;
+}
+
+static int transfer_dma_read(sd_card_t *c,uint32_t lba,uint8_t *buffer,uint32_t count)
+{
+    CYCLE_MARK(SD_READ_LATEST_BEGIN);
+    CYCLE_COUNT(SD_READ_TRANSFERS); CYCLE_COUNT(SD_IDMA_TRANSFERS);
+    int result=ready(c);
+    if(result) return result;
+    if(X->IDMACTRL) return fault(c,SD_ERR_CONTROLLER_BUSY);
+    uint32_t start=DWT->CYCCNT,sta=0;
+    c->media_idle=0; c->transfer_words=0; c->transfer_sta=0;
+    X->DCTRL=0; X->ICR=DMA_FLAGS;
+    X->DTIMER=c->clock_hz*2UL; X->DLEN=count*SD_SECTOR_BYTES;
+    X->DCTRL=(9UL<<SDMMC_DCTRL_DBLOCKSIZE_Pos)|SDMMC_DCTRL_DTDIR;
+    X->IDMABASER=(uint32_t)(uintptr_t)buffer;
+    __DSB(); X->IDMACTRL=SDMMC_IDMA_IDMAEN;
+    CYCLE_MARK(SD_READ_CMD_BEGIN_LATEST);
+    result=command(c,count==1U?17U:18U,
+        (c->ocr&(1UL<<30))?lba:lba*512UL,RESP_R1,1);
+    if(!result) {
+        CYCLE_MARK(SD_READ_CMD_DONE_LATEST);
+        for(uint32_t i=0;i<POLL_LIMIT;i++) {
+            sta=X->STA; c->last_sta=sta;
+            if(sta&DMA_ERRORS) {
+                result=fault(c,(sta&SDMMC_STA_IDMATE)?SD_ERR_DMA:SD_ERR_DATA); break;
+            }
+            /* RM0486 p1402: single-buffer DATAEND includes memory transfer.
+             * Do not touch FIFO or consume destination bytes before this. */
+            if((sta&SDMMC_STA_DATAEND) && !(sta&SDMMC_STA_DPSMACT)) {
+                CYCLE_MARK(SD_READ_DATAEND_LATEST); break;
+            }
+            if((uint32_t)(DWT->CYCCNT-start)>=READ_TIMEOUT_CYCLES) {
+                result=fault(c,SD_ERR_DATA_TIMEOUT); break;
+            }
+            if(i==POLL_LIMIT-1U) result=fault(c,SD_ERR_TIMER);
+            if(!(i&255U)) sd_progress();
+        }
+    }
+    c->transfer_sta=sta; c->transfer_cycles=(uint32_t)(DWT->CYCCNT-start);
+    X->CMD&=~SDMMC_CMD_CMDTRANS;
+    if(!result && (!(sta&SDMMC_STA_DATAEND) ||
+       (sta&(DMA_ERRORS|SDMMC_STA_DPSMACT)) || X->DCOUNT))
+        result=fault(c,SD_ERR_LENGTH);
+    if(result) {
+        /* The same IDMA abort sequence applies to RX (RM 30.6.2): hardware
+         * drains/discards its FIFO; CPU must not reset it or disable active DMA.
+         * A failed abort retains ownership and the first read error. */
+        abort_dma_write(c); return result;
+    }
+    X->IDMACTRL=0; __DSB();
+    c->transfer_words=count*128UL;
+    if(count>1U) result=command_checked(c,12,0,RESP_R1,0,
+        (uint64_t)lba+count==c->sector_count);
+    if(result) { abort_dma_write(c); return result; }
+    result=ready_after_transfer(c);
+    if(result) return result;
+    X->DCTRL=0; X->ICR=DMA_FLAGS; __DSB();
+    c->read_sectors+=count;
+    CYCLE_MARK(SD_READ_LATEST_DONE);
+    return SD_OK;
+}
+
+static int dma_read_request(sd_card_t *c,uint32_t lba,void *buffer,uint32_t count)
+{
+    int checked=dma_destination_checks(c,lba,buffer,count);
+    if(checked) return checked;
+#if SD_HIGH_SPEED
+    if(c->clock_hz!=50000000UL || !sd_high_speed_proof.qualified)
+#else
+    if(c->clock_hz!=100000UL && c->clock_hz!=12500000UL && c->clock_hz!=25000000UL)
+#endif
+        return fault(c,SD_ERR_CLOCK);
+    const uint32_t limit=c->clock_hz==100000UL?16U:512U;
+    uint8_t *destination=(uint8_t *)buffer;
+    while(count) {
+        sd_progress();
+        uint32_t chunk=count>limit?limit:count;
+        uint32_t start=DWT->CYCCNT;
+        int result=transfer_dma_read(c,lba,destination,chunk);
+        c->read_cycles+=(uint32_t)(DWT->CYCCNT-start);
+        sd_progress();
+        if(result) return result;
+        count-=chunk; lba+=chunk; destination+=chunk*SD_SECTOR_BYTES;
+    }
+    return SD_OK;
+}
+#endif
+
 static int dma_request(sd_card_t *c, uint32_t lba, const void *buffer,
                         uint32_t count, sd_dma_wait_t *wait, uint32_t preerase)
 {
@@ -936,7 +1518,11 @@ static int dma_request(sd_card_t *c, uint32_t lba, const void *buffer,
             return fault(c,SD_ERR_WAIT);
         }
     }
+#if SD_HIGH_SPEED
+    if(c->clock_hz!=50000000UL || !sd_high_speed_proof.qualified)
+#else
     if (c->clock_hz!=100000UL && c->clock_hz!=12500000UL && c->clock_hz!=25000000UL)
+#endif
         return fault(c,SD_ERR_CLOCK);
     if (preerase && (count<2 || count>SD_DMA_PREERASE_MAX_SECTORS))
         return fault(c,SD_ERR_ARGUMENT);
@@ -991,9 +1577,14 @@ int sd_read_scr(sd_card_t *c,sd_scr_t *scr)
     for(unsigned n=0;n<8;n++) scr->bytes[n]=0;
 #if SD_BUS_WIDTH == 1
     if(!c->initialized || !c->controller_owned) return SD_ERR_STATE;
+    SD_HOST_GUARD(c);
     if(c->error) return (int)c->error;
 #endif
     c->stage=SD_STAGE_SCR;
+#if SD_STARTUP_OPT
+    startup_scr_invalidate();
+    ++sd_startup_proof.scr_reads;
+#endif
     CYCLE_MARK(SD_SCR_LATEST_BEGIN);
     CYCLE_COUNT(SD_SCR_READS);
     int result=ready(c);
@@ -1035,6 +1626,12 @@ int sd_read_scr(sd_card_t *c,sd_scr_t *scr)
     result=ready(c);if(result) return result;
     if(scr->bytes[0]>>4) return fault(c,SD_ERR_UNSUPPORTED);
     scr->erased_byte=(scr->bytes[1]&0x80U)?255U:0U;scr->valid=1U;
+#if SD_STARTUP_OPT
+    for(unsigned n=0;n<8;n++) startup_scr.bytes[n]=scr->bytes[n];
+    startup_scr.erased_byte=scr->erased_byte;startup_scr.valid=1U;
+    startup_scr_owner=c;sd_startup_proof.scr_valid=1U;
+    sd_startup_proof.cache_owner=(uint32_t)(uintptr_t)c;
+#endif
     CYCLE_MARK(SD_SCR_LATEST_DONE);
     return SD_OK;
 }
@@ -1046,9 +1643,27 @@ int sd_read_scr(sd_card_t *c,sd_scr_t *scr)
     scr->valid=0;scr->erased_byte=0;
     for(unsigned n=0;n<8;n++) scr->bytes[n]=0;
     if(!c->initialized || !c->controller_owned) return SD_ERR_STATE;
+    SD_HOST_GUARD(c);
     if(c->error) return (int)c->error;
+#if SD_STARTUP_OPT
+    if(startup_scr_owner==c && startup_scr.valid) {
+        c->stage=SD_STAGE_SCR;
+        for(unsigned n=0;n<8;n++) scr->bytes[n]=startup_scr.bytes[n];
+        scr->erased_byte=startup_scr.erased_byte;scr->valid=1U;
+        ++sd_startup_proof.scr_hits;
+        return SD_OK;
+    }
+#endif
     return read_scr_selected(c,scr);
 }
+#if SD_STARTUP_OPT
+int sd_read_scr_fresh(sd_card_t *c,sd_scr_t *scr)
+{
+    if(!c || !scr) return SD_ERR_ARGUMENT;
+    startup_scr_invalidate();
+    return sd_read_scr(c,scr);
+}
+#endif
 #endif
 
 int sd_erase_all(sd_card_t *c,uint32_t timeout_ms,sd_erase_t *proof)
@@ -1058,6 +1673,7 @@ int sd_erase_all(sd_card_t *c,uint32_t timeout_ms,sd_erase_t *proof)
     for(unsigned i=0;i<sizeof(*proof);i++) clear[i]=0;
     proof->timeout_ms=timeout_ms;
     if(!c->initialized || !c->controller_owned) return SD_ERR_STATE;
+    SD_HOST_GUARD(c);
     if(c->error) return (int)c->error;
     c->stage=SD_STAGE_ERASE;
     if(!c->sector_count || c->sector_count>(1ULL<<32) ||
@@ -1068,15 +1684,19 @@ int sd_erase_all(sd_card_t *c,uint32_t timeout_ms,sd_erase_t *proof)
     if(X->IDMACTRL) return fault(c,SD_ERR_CONTROLLER_BUSY);
     const uint32_t previous_hz=c->clock_hz,previous_clkcr=X->CLKCR;
     const uint32_t previous_timer=X->DTIMER;
+#if SD_HIGH_SPEED
+    if(previous_hz!=50000000U || !sd_high_speed_proof.qualified ||
+#else
     if((previous_hz!=100000U && previous_hz!=12500000U && previous_hz!=25000000U) ||
-       previous_clkcr!=((HCLK_HZ/(2U*previous_hz))|SDMMC_CLKCR_HWFC_EN|WIDTH_BITS|PHASE_BITS))
+#endif
+       previous_clkcr!=((SD_KERNEL_HZ/(2U*previous_hz))|SDMMC_CLKCR_HWFC_EN|WIDTH_BITS|RUN_PHASE_BITS))
         return fault(c,SD_ERR_CLOCK);
     /* CMD38 returns R1b: its busy detector uses DTIMER even with CMDTRANS=0.
      * A previous SCR/read timer is only 2 s; timeout leaves DPSM stuck in Busy
      * awaiting CPSM Abort (RM0486 Table220). At 25 MHz, even UINT32_MAX cannot
      * represent 600 s. Use the qualified 100 kHz divider while idle and a
      * hardware bound 1 s beyond the software limit. Never rewrite it busy. */
-    X->CLKCR=750U|SDMMC_CLKCR_HWFC_EN|WIDTH_BITS|PHASE_BITS;c->clock_hz=100000U;
+    X->CLKCR=(SD_KERNEL_HZ/(2U*100000U))|SDMMC_CLKCR_HWFC_EN|WIDTH_BITS|RUN_PHASE_BITS;c->clock_hz=100000U;
     X->DCTRL=0;X->DLEN=0;X->ICR=DATA_FLAGS;
     X->DTIMER=(timeout_ms+1000U)*100U;
     if((result=delay_us(c,1000))) return result;
@@ -1143,10 +1763,14 @@ int sd_write_blocks_stream_preerase(sd_card_t *c,uint32_t lba,const void *buffer
     int result=dma_source_checks(c,lba,buffer,count);
     if(result) return result;
     if(count<2U || count>SD_DMA_PREERASE_MAX_SECTORS) return fault(c,SD_ERR_ARGUMENT);
+#if SD_HIGH_SPEED
+    if(c->clock_hz!=50000000UL || !sd_high_speed_proof.qualified) return fault(c,SD_ERR_CLOCK);
+#else
     if(c->clock_hz!=12500000U && c->clock_hz!=25000000U) return fault(c,SD_ERR_CLOCK);
+#endif
     const uint32_t flow_mask=SDMMC_CLKCR_HWFC_EN|SDMMC_CLKCR_BUSSPEED|
-        SDMMC_CLKCR_SELCLKRX|SDMMC_CLKCR_DDR|SDMMC_CLKCR_WIDBUS|PHASE_BITS;
-    if((X->CLKCR&flow_mask)!=(SDMMC_CLKCR_HWFC_EN|WIDTH_BITS|PHASE_BITS)) return fault(c,SD_ERR_CLOCK);
+        SDMMC_CLKCR_SELCLKRX|SDMMC_CLKCR_DDR|SDMMC_CLKCR_WIDBUS|RUN_PHASE_MASK;
+    if((X->CLKCR&flow_mask)!=(SDMMC_CLKCR_HWFC_EN|WIDTH_BITS|RUN_PHASE_BITS)) return fault(c,SD_ERR_CLOCK);
     uint32_t api_start=DWT->CYCCNT,bytes=count*512U;
     CYCLE_MARK(SD_PRODUCER_WAIT_BEGIN);
     if((result=stream_publish(c,s,bytes,api_start))) return result;
@@ -1240,9 +1864,19 @@ int sd_write_blocks_stream_preerase(sd_card_t *c,uint32_t lba,const void *buffer
         if(!result) CYCLE_MARK(SD_CMD12_DONE);
     }
     if(result) {abort_transfer(c,0);return result;}
+#if !SD_REVIEW_PROFILE
     X->DCTRL=0;X->ICR=DATA_FLAGS;
+#endif
     CYCLE_MARK(SD_WRITE_FINAL_READY_BEGIN);
-    result=ready(c);if(!result) c->written_sectors+=count;
+#if SD_REVIEW_PROFILE
+    result=ready_after_transfer(c);
+#else
+    result=ready(c);
+#endif
+#if SD_REVIEW_PROFILE
+    if(!result) { X->DCTRL=0;X->ICR=DATA_FLAGS; }
+#endif
+    if(!result) c->written_sectors+=count;
     if(!result) {
         CYCLE_MARK(SD_WRITE_FINAL_READY_DONE);
         CYCLE_MARK(SD_WRITE_DONE);
@@ -1254,6 +1888,7 @@ int sd_sync(sd_card_t *c)
 {
     if (!c) return SD_ERR_ARGUMENT;
     if (!c->initialized || !c->controller_owned) return SD_ERR_STATE;
+    SD_HOST_GUARD(c);
     c->stage=SD_STAGE_SYNC;
     CYCLE_MARK(SD_SYNC_LATEST_BEGIN);
     CYCLE_COUNT(SD_SYNC_CALLS);
@@ -1265,7 +1900,11 @@ int sd_sync(sd_card_t *c)
 int sd_deinit(sd_card_t *c)
 {
     if (!c) return SD_ERR_ARGUMENT;
+#if SD_STARTUP_OPT
+    startup_scr_invalidate();
+#endif
     if (!c->initialized || !c->controller_owned) return SD_ERR_STATE;
+    SD_HOST_GUARD(c);
     CYCLE_MARK(SD_DEINIT_BEGIN);
     CYCLE_COUNT(SD_DEINIT_CALLS);
     int result=sd_sync(c);
@@ -1276,7 +1915,11 @@ int sd_deinit(sd_card_t *c)
     R->AHB5RSTSR=RCC_AHB5RSTSR_SDMMC2RSTS;
     R->AHB5RSTCR=RCC_AHB5RSTCR_SDMMC2RSTC;
     R->AHB5ENCR=RCC_AHB5ENCR_SDMMC2ENC;
+#if SD_HIGH_SPEED
+    if(!sd_review_clock_release()) return fault(c,SD_ERR_CLOCK);
+#else
     R->CCIPR8=(R->CCIPR8&~RCC_CCIPR8_SDMMC2SEL)|c->saved_sdmmc_mux;
+#endif
     C->MODER&=~C_MASK;
     C->PUPDR=(C->PUPDR&~C_MASK)|(2UL<<4)|C_PULLS;
 #if SD_BUS_WIDTH == 4

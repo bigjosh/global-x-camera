@@ -27,6 +27,12 @@
 #ifndef RAW_STANDBY
 #define RAW_STANDBY 0
 #endif
+#if SD_IDMA_READ && (RAW_FLASH || RAW_STANDBY)
+#error IDMA receive is a RAM read-only diagnostic
+#endif
+#if RAW_DMA_TAIL_WAIT && !RAW_MAGIC_FORMAT
+#error DMA tail wait requires magic format
+#endif
 #ifndef RAW_PATTERN
 #define RAW_PATTERN 0
 #endif
@@ -45,8 +51,34 @@
 #ifndef RAW_SD_CLOCK_HZ
 #define RAW_SD_CLOCK_HZ 25000000U
 #endif
-#if RAW_SD_CLOCK_HZ != 12500000U && RAW_SD_CLOCK_HZ != 25000000U
+#if SD_EARLY_RUN_CLOCK && (RAW_FLASH || RAW_STANDBY || !SD_REVIEW_PROFILE || !SD_STARTUP_OPT || \
+    SD_BUS_WIDTH != 4 || RAW_SD_CLOCK_HZ != 12500000U || !SD_CLOCK_NEGEDGE || !SD_CLOCK_NEGEDGE_INIT || \
+    SD_GPIO_SPEED != 3 || SD_FIXED_COMPENSATION || SD_HIGH_SPEED || SD_HIGH_SPEED_MIXED_SLEW || \
+    SD_HIGH_SPEED_FIXED_COMPENSATION || SD_HIGH_SPEED_COMBINED_ELECTRICAL || SD_IDMA_READ || \
+    RAW_DMA_TAIL_WAIT || RAW_DMA_SLEEP || !RAW_MAGIC_FORMAT || !RAW_LINE_STREAM || !RAW_ASYNC_STOP || \
+    !RAW_DMA || RAW_PATTERN || RAW_EXPOSURE_COARSE != 1428U || RAW_PREINIT || RAW_LINE_SNAPSHOTS || \
+    RAW_LINE_POISON || RAW_WHOLE_IMAGE_PREERASE)
+#error Early run clock requires the exact reviewed startup 12.5 MHz no-tail RAM scene profile
+#endif
+#if SD_STARTUP_OPT && (RAW_FLASH || RAW_STANDBY) && \
+    (!RAW_FLASH || !SD_REVIEW_PROFILE || SD_BUS_WIDTH != 4 || \
+     (RAW_SD_CLOCK_HZ != 12500000U && RAW_SD_CLOCK_HZ != 25000000U) || \
+     !SD_CLOCK_NEGEDGE || !SD_CLOCK_NEGEDGE_INIT || SD_GPIO_SPEED != 3 || SD_FIXED_COMPENSATION || \
+     SD_HIGH_SPEED || SD_HIGH_SPEED_MIXED_SLEW || SD_HIGH_SPEED_FIXED_COMPENSATION || \
+     SD_HIGH_SPEED_COMBINED_ELECTRICAL || SD_IDMA_READ || RAW_DMA_TAIL_WAIT || RAW_DMA_SLEEP || \
+     !RAW_MAGIC_FORMAT || !RAW_LINE_STREAM || !RAW_ASYNC_STOP || !RAW_DMA || RAW_PATTERN || \
+     RAW_PREINIT || RAW_LINE_SNAPSHOTS || RAW_LINE_POISON || RAW_WHOLE_IMAGE_PREERASE || \
+     RAW_EXPOSURE_COARSE != 1428U || RAW_CYCLE_TRACE)
+#error Startup flash requires an exact reviewed 12.5/25 MHz no-tail capture profile
+#endif
+#if RAW_SD_CLOCK_HZ != 12500000U && RAW_SD_CLOCK_HZ != 25000000U && RAW_SD_CLOCK_HZ != 50000000U
 #error Unsupported RAW SD clock
+#endif
+#if (RAW_SD_CLOCK_HZ == 50000000U) != SD_HIGH_SPEED
+#error 50 MHz requires explicit High Speed protocol and 100 MHz kernel profile
+#endif
+#if SD_HIGH_SPEED_MIXED_SLEW && (RAW_FLASH || RAW_STANDBY || RAW_SD_CLOCK_HZ != 50000000U)
+#error Mixed High Speed slew is a 50 MHz RAM diagnostic only
 #endif
 #if SD_GPIO_SPEED != 3 && (RAW_FLASH || RAW_STANDBY)
 #error Nondefault SD GPIO speed is RAM diagnostic only
@@ -54,11 +86,14 @@
 #if (SD_GPIO_SPEED == 1 || SD_GPIO_SPEED == 2) && RAW_SD_CLOCK_HZ != 25000000U
 #error Intermediate GPIO speed is a 25 MHz diagnostic only
 #endif
-#if SD_FIXED_COMPENSATION && (RAW_FLASH || RAW_STANDBY || RAW_SD_CLOCK_HZ != 25000000U)
+#if SD_FIXED_COMPENSATION && (RAW_FLASH || RAW_STANDBY || (RAW_SD_CLOCK_HZ != 25000000U && !SD_HIGH_SPEED_FIXED_COMPENSATION))
 #error Fixed compensation is an isolated 25 MHz RAM diagnostic only
 #endif
-#if SD_CLOCK_NEGEDGE && RAW_SD_CLOCK_HZ != 25000000U
-#error Clock phase requires 25 MHz
+#if SD_CLOCK_NEGEDGE && RAW_SD_CLOCK_HZ == 12500000U && SD_GPIO_SPEED != 3
+#error 12.5 MHz clock phase requires GPIO speed3
+#endif
+#if SD_CLOCK_NEGEDGE && RAW_SD_CLOCK_HZ == 12500000U && !SD_CLOCK_NEGEDGE_INIT
+#error 12.5 MHz clock phase requires falling-edge identification
 #endif
 sd_card_t raw_card;
 raw_slots_t raw_slots;

@@ -1,0 +1,840 @@
+{
+  "schema": 1,
+  "hardware_access": false,
+  "complete_runs": 6,
+  "runs": [
+    {
+      "run": "control01",
+      "completed": true,
+      "binary_sha256": "2829eae05cd96f5f7bfe36ac852d6904341c513aba51639a0e800bb171b735f5",
+      "sources": {
+        "capture": {
+          "path": "D:\\Github\\global-x-camera\\tmp\\bringup\\sd-early-clock-20261026\\control01\\capture\\verified.json",
+          "sha256": "2eb46033f2c837b5cd2ff3f6d9c8dd0b045c0e1137cb96d563d60f1138cf0982"
+        },
+        "trace": {
+          "path": "D:\\Github\\global-x-camera\\tmp\\bringup\\sd-early-clock-20261026\\control01\\trace\\cycle-trace.json",
+          "sha256": "de7fc081030dc61fd2035110acacac049a21f7b519cea875eec26af11c0dcbf1"
+        }
+      },
+      "nominal_dwt_hz": 400000000,
+      "transfer_clock_hz": 12500000,
+      "clock_switched_before_select": false,
+      "observed_order": [
+        {
+          "event": "SD_IDENTIFY_REGS_DONE",
+          "since_trace_init_ms": 217.4317775
+        },
+        {
+          "event": "SD_SELECT_BEGIN",
+          "since_trace_init_ms": 217.4319625
+        },
+        {
+          "event": "SD_SELECT_DONE",
+          "since_trace_init_ms": 219.833375
+        },
+        {
+          "event": "SD_CLOCK_SWITCH_BEGIN",
+          "since_trace_init_ms": 219.8343675
+        },
+        {
+          "event": "SD_CLOCK_SWITCH_DONE",
+          "since_trace_init_ms": 219.9180025
+        },
+        {
+          "event": "SD_WIDTH_BEGIN",
+          "since_trace_init_ms": 219.9180075
+        }
+      ],
+      "durations_ms": {
+        "csd_ready_to_width_begin": 2.48623,
+        "csd_ready_to_init_done": 4.679305,
+        "identify_registers": 5.27063,
+        "select": 2.4014125,
+        "clock_switch": 0.083635,
+        "width_negotiation": 2.1928825,
+        "sd_init": 207.62743,
+        "acmd41": 193.8483725,
+        "slot_scan": 22.0810175,
+        "slot_write": 319.9274075,
+        "cmd25_data_envelope": 318.57917,
+        "write_final_ready": 1.1122,
+        "runtime_to_terminal": 564.1694725,
+        "select_plus_clock_switch": 2.4850475000000003,
+        "csd_ready_to_width_begin_minus_fully_nested_frame_validation": 2.48623,
+        "csd_ready_to_init_done_minus_fully_nested_frame_validation": 4.679305
+      },
+      "missing_intervals": [],
+      "nested_frame_validation_adjustment": {
+        "csd_ready_to_width_begin": {
+          "classification": "outside",
+          "frame_validation_ms": 0.3983775,
+          "subtracted_ms": 0.0
+        },
+        "csd_ready_to_init_done": {
+          "classification": "outside",
+          "frame_validation_ms": 0.3983775,
+          "subtracted_ms": 0.0
+        }
+      },
+      "slot": 31,
+      "scan_headers": 32,
+      "written_sectors": 3730,
+      "card_command_count": 237,
+      "counters": {
+        "SD_INIT_CALLS": 1,
+        "SD_ACMD41_ATTEMPTS": 59,
+        "SD_READ_TRANSFERS": 32,
+        "SD_SCR_READS": 1,
+        "SD_WRITE_TRANSFERS": 1,
+        "SD_IDMA_TRANSFERS": 1,
+        "SD_PIO_TRANSFERS": 0,
+        "SD_PREANNOUNCE_CALLS": 1,
+        "SD_CMD25_CALLS": 1,
+        "SD_CMD12_WRITE_CALLS": 1,
+        "SD_SYNC_CALLS": 1,
+        "SD_DEINIT_CALLS": 1,
+        "SD_ERROR_CALLS": 0,
+        "START_ACK_READS": 4,
+        "STREAMING_STATE_READS": 1,
+        "SENSOR_STOP_POLLS": 32,
+        "LINE_IRQS": 21
+      },
+      "transport_observed": "IDMA"
+    },
+    {
+      "run": "early01",
+      "completed": true,
+      "binary_sha256": "4e69833f4e4813c659329226574ff68e6b7accf6da1af6cbb19726bfb3d450f5",
+      "sources": {
+        "capture": {
+          "path": "D:\\Github\\global-x-camera\\tmp\\bringup\\sd-early-clock-20261026\\early01\\capture\\verified.json",
+          "sha256": "6d778cc763f092846433b5a6ca3a394ea510e5927f938279304d4ce4ace6fca4"
+        },
+        "trace": {
+          "path": "D:\\Github\\global-x-camera\\tmp\\bringup\\sd-early-clock-20261026\\early01\\trace\\cycle-trace.json",
+          "sha256": "840280f68b68a95271dc10ae2659c052d24ceb0dfef95f30689a98f1ef3ca5d9"
+        }
+      },
+      "nominal_dwt_hz": 400000000,
+      "transfer_clock_hz": 12500000,
+      "clock_switched_before_select": true,
+      "observed_order": [
+        {
+          "event": "SD_IDENTIFY_REGS_DONE",
+          "since_trace_init_ms": 35.6915675
+        },
+        {
+          "event": "SD_CLOCK_SWITCH_BEGIN",
+          "since_trace_init_ms": 35.6946375
+        },
+        {
+          "event": "SD_CLOCK_SWITCH_DONE",
+          "since_trace_init_ms": 35.728055
+        },
+        {
+          "event": "SD_SELECT_BEGIN",
+          "since_trace_init_ms": 35.7287575
+        },
+        {
+          "event": "SD_SELECT_DONE",
+          "since_trace_init_ms": 35.800895
+        },
+        {
+          "event": "SD_WIDTH_BEGIN",
+          "since_trace_init_ms": 35.801445
+        }
+      ],
+      "durations_ms": {
+        "csd_ready_to_width_begin": 0.1098775,
+        "csd_ready_to_init_done": 1.05662,
+        "identify_registers": 5.2705025,
+        "select": 0.0721375,
+        "clock_switch": 0.0334175,
+        "width_negotiation": 0.9465525,
+        "sd_init": 22.2341975,
+        "acmd41": 12.0893175,
+        "slot_scan": 18.5654775,
+        "slot_write": 321.4765075,
+        "cmd25_data_envelope": 319.097365,
+        "write_final_ready": 2.1690725,
+        "runtime_to_terminal": 376.8832225,
+        "select_plus_clock_switch": 0.105555,
+        "csd_ready_to_width_begin_minus_fully_nested_frame_validation": 0.1098775,
+        "csd_ready_to_init_done_minus_fully_nested_frame_validation": 0.6605099999999999
+      },
+      "missing_intervals": [],
+      "nested_frame_validation_adjustment": {
+        "csd_ready_to_width_begin": {
+          "classification": "outside",
+          "frame_validation_ms": 0.39611,
+          "subtracted_ms": 0.0
+        },
+        "csd_ready_to_init_done": {
+          "classification": "fully_inside",
+          "frame_validation_ms": 0.39611,
+          "subtracted_ms": 0.39611
+        }
+      },
+      "slot": 32,
+      "scan_headers": 33,
+      "written_sectors": 3730,
+      "card_command_count": 130,
+      "counters": {
+        "SD_INIT_CALLS": 1,
+        "SD_ACMD41_ATTEMPTS": 4,
+        "SD_READ_TRANSFERS": 33,
+        "SD_SCR_READS": 1,
+        "SD_WRITE_TRANSFERS": 1,
+        "SD_IDMA_TRANSFERS": 0,
+        "SD_PIO_TRANSFERS": 1,
+        "SD_PREANNOUNCE_CALLS": 1,
+        "SD_CMD25_CALLS": 1,
+        "SD_CMD12_WRITE_CALLS": 1,
+        "SD_SYNC_CALLS": 1,
+        "SD_DEINIT_CALLS": 1,
+        "SD_ERROR_CALLS": 0,
+        "START_ACK_READS": 4,
+        "STREAMING_STATE_READS": 1,
+        "SENSOR_STOP_POLLS": 34,
+        "LINE_IRQS": 21
+      },
+      "transport_observed": "PIO"
+    },
+    {
+      "run": "control02",
+      "completed": true,
+      "binary_sha256": "2829eae05cd96f5f7bfe36ac852d6904341c513aba51639a0e800bb171b735f5",
+      "sources": {
+        "capture": {
+          "path": "D:\\Github\\global-x-camera\\tmp\\bringup\\sd-early-clock-20261026\\control02\\capture\\verified.json",
+          "sha256": "c431cbd44b52be589024285d974b0c0adb2fe70cfae5fcd43de1cb598c724e34"
+        },
+        "trace": {
+          "path": "D:\\Github\\global-x-camera\\tmp\\bringup\\sd-early-clock-20261026\\control02\\trace\\cycle-trace.json",
+          "sha256": "106487fa7e24d435bc7782a02a642628d7ddec248e359261501ef1afd34440c2"
+        }
+      },
+      "nominal_dwt_hz": 400000000,
+      "transfer_clock_hz": 12500000,
+      "clock_switched_before_select": false,
+      "observed_order": [
+        {
+          "event": "SD_IDENTIFY_REGS_DONE",
+          "since_trace_init_ms": 35.628745
+        },
+        {
+          "event": "SD_SELECT_BEGIN",
+          "since_trace_init_ms": 35.628925
+        },
+        {
+          "event": "SD_SELECT_DONE",
+          "since_trace_init_ms": 38.4302975
+        },
+        {
+          "event": "SD_CLOCK_SWITCH_BEGIN",
+          "since_trace_init_ms": 38.43128
+        },
+        {
+          "event": "SD_CLOCK_SWITCH_DONE",
+          "since_trace_init_ms": 38.5786625
+        },
+        {
+          "event": "SD_WIDTH_BEGIN",
+          "since_trace_init_ms": 38.57867
+        }
+      ],
+      "durations_ms": {
+        "csd_ready_to_width_begin": 2.949925,
+        "csd_ready_to_init_done": 5.39687,
+        "identify_registers": 5.2704025,
+        "select": 2.8013725,
+        "clock_switch": 0.1473825,
+        "width_negotiation": 2.446755,
+        "sd_init": 26.5342625,
+        "acmd41": 12.08885,
+        "slot_scan": 19.15837,
+        "slot_write": 319.33904,
+        "cmd25_data_envelope": 318.019025,
+        "write_final_ready": 1.110025,
+        "runtime_to_terminal": 379.5711975,
+        "select_plus_clock_switch": 2.948755,
+        "csd_ready_to_width_begin_minus_fully_nested_frame_validation": 2.552455,
+        "csd_ready_to_init_done_minus_fully_nested_frame_validation": 4.9994
+      },
+      "missing_intervals": [],
+      "nested_frame_validation_adjustment": {
+        "csd_ready_to_width_begin": {
+          "classification": "fully_inside",
+          "frame_validation_ms": 0.39747,
+          "subtracted_ms": 0.39747
+        },
+        "csd_ready_to_init_done": {
+          "classification": "fully_inside",
+          "frame_validation_ms": 0.39747,
+          "subtracted_ms": 0.39747
+        }
+      },
+      "slot": 33,
+      "scan_headers": 34,
+      "written_sectors": 3730,
+      "card_command_count": 133,
+      "counters": {
+        "SD_INIT_CALLS": 1,
+        "SD_ACMD41_ATTEMPTS": 4,
+        "SD_READ_TRANSFERS": 34,
+        "SD_SCR_READS": 1,
+        "SD_WRITE_TRANSFERS": 1,
+        "SD_IDMA_TRANSFERS": 0,
+        "SD_PIO_TRANSFERS": 1,
+        "SD_PREANNOUNCE_CALLS": 1,
+        "SD_CMD25_CALLS": 1,
+        "SD_CMD12_WRITE_CALLS": 1,
+        "SD_SYNC_CALLS": 1,
+        "SD_DEINIT_CALLS": 1,
+        "SD_ERROR_CALLS": 0,
+        "START_ACK_READS": 4,
+        "STREAMING_STATE_READS": 1,
+        "SENSOR_STOP_POLLS": 33,
+        "LINE_IRQS": 21
+      },
+      "transport_observed": "PIO"
+    },
+    {
+      "run": "early02",
+      "completed": true,
+      "binary_sha256": "4e69833f4e4813c659329226574ff68e6b7accf6da1af6cbb19726bfb3d450f5",
+      "sources": {
+        "capture": {
+          "path": "D:\\Github\\global-x-camera\\tmp\\bringup\\sd-early-clock-20261026\\early02\\capture\\verified.json",
+          "sha256": "008391410cc820444b07f214cb407bd29d27fcb836b5a37dc7cb2e65b962257f"
+        },
+        "trace": {
+          "path": "D:\\Github\\global-x-camera\\tmp\\bringup\\sd-early-clock-20261026\\early02\\trace\\cycle-trace.json",
+          "sha256": "3f7e4256dd2384e4008c62bcea46953dd5f9ae72f0a1a9a636c70f09a6eb0d74"
+        }
+      },
+      "nominal_dwt_hz": 400000000,
+      "transfer_clock_hz": 12500000,
+      "clock_switched_before_select": true,
+      "observed_order": [
+        {
+          "event": "SD_IDENTIFY_REGS_DONE",
+          "since_trace_init_ms": 39.2385375
+        },
+        {
+          "event": "SD_CLOCK_SWITCH_BEGIN",
+          "since_trace_init_ms": 39.241655
+        },
+        {
+          "event": "SD_CLOCK_SWITCH_DONE",
+          "since_trace_init_ms": 39.2780925
+        },
+        {
+          "event": "SD_SELECT_BEGIN",
+          "since_trace_init_ms": 39.278805
+        },
+        {
+          "event": "SD_SELECT_DONE",
+          "since_trace_init_ms": 39.3570975
+        },
+        {
+          "event": "SD_WIDTH_BEGIN",
+          "since_trace_init_ms": 39.35765
+        }
+      ],
+      "durations_ms": {
+        "csd_ready_to_width_begin": 0.1191125,
+        "csd_ready_to_init_done": 2.3016225,
+        "identify_registers": 5.590735,
+        "select": 0.0782925,
+        "clock_switch": 0.0364375,
+        "width_negotiation": 2.18232,
+        "sd_init": 27.0299525,
+        "acmd41": 15.3692325,
+        "slot_scan": 19.8967075,
+        "slot_write": 319.3312225,
+        "cmd25_data_envelope": 318.0077725,
+        "write_final_ready": 1.1110925,
+        "runtime_to_terminal": 380.861435,
+        "select_plus_clock_switch": 0.11473,
+        "csd_ready_to_width_begin_minus_fully_nested_frame_validation": 0.1191125,
+        "csd_ready_to_init_done_minus_fully_nested_frame_validation": 2.3016225
+      },
+      "missing_intervals": [],
+      "nested_frame_validation_adjustment": {
+        "csd_ready_to_width_begin": {
+          "classification": "outside",
+          "frame_validation_ms": 0.39752,
+          "subtracted_ms": 0.0
+        },
+        "csd_ready_to_init_done": {
+          "classification": "outside",
+          "frame_validation_ms": 0.39752,
+          "subtracted_ms": 0.0
+        }
+      },
+      "slot": 34,
+      "scan_headers": 35,
+      "written_sectors": 3730,
+      "card_command_count": 137,
+      "counters": {
+        "SD_INIT_CALLS": 1,
+        "SD_ACMD41_ATTEMPTS": 5,
+        "SD_READ_TRANSFERS": 35,
+        "SD_SCR_READS": 1,
+        "SD_WRITE_TRANSFERS": 1,
+        "SD_IDMA_TRANSFERS": 0,
+        "SD_PIO_TRANSFERS": 1,
+        "SD_PREANNOUNCE_CALLS": 1,
+        "SD_CMD25_CALLS": 1,
+        "SD_CMD12_WRITE_CALLS": 1,
+        "SD_SYNC_CALLS": 1,
+        "SD_DEINIT_CALLS": 1,
+        "SD_ERROR_CALLS": 0,
+        "START_ACK_READS": 4,
+        "STREAMING_STATE_READS": 1,
+        "SENSOR_STOP_POLLS": 32,
+        "LINE_IRQS": 21
+      },
+      "transport_observed": "PIO"
+    },
+    {
+      "run": "control03",
+      "completed": true,
+      "binary_sha256": "2829eae05cd96f5f7bfe36ac852d6904341c513aba51639a0e800bb171b735f5",
+      "sources": {
+        "capture": {
+          "path": "D:\\Github\\global-x-camera\\tmp\\bringup\\sd-early-clock-20261026\\control03\\capture\\verified.json",
+          "sha256": "9e883baf3df801aa168dcceaedf0b5f1875543d1d87b21f3f9783ead7ce36296"
+        },
+        "trace": {
+          "path": "D:\\Github\\global-x-camera\\tmp\\bringup\\sd-early-clock-20261026\\control03\\trace\\cycle-trace.json",
+          "sha256": "53834722b85aaf787ba7c50a9b41771228925e8fde318679ef37dcc707a424a2"
+        }
+      },
+      "nominal_dwt_hz": 400000000,
+      "transfer_clock_hz": 12500000,
+      "clock_switched_before_select": false,
+      "observed_order": [
+        {
+          "event": "SD_IDENTIFY_REGS_DONE",
+          "since_trace_init_ms": 35.6763525
+        },
+        {
+          "event": "SD_SELECT_BEGIN",
+          "since_trace_init_ms": 35.6765375
+        },
+        {
+          "event": "SD_SELECT_DONE",
+          "since_trace_init_ms": 38.477745
+        },
+        {
+          "event": "SD_CLOCK_SWITCH_BEGIN",
+          "since_trace_init_ms": 38.4787425
+        },
+        {
+          "event": "SD_CLOCK_SWITCH_DONE",
+          "since_trace_init_ms": 38.6290625
+        },
+        {
+          "event": "SD_WIDTH_BEGIN",
+          "since_trace_init_ms": 38.62907
+        }
+      ],
+      "durations_ms": {
+        "csd_ready_to_width_begin": 2.9527175,
+        "csd_ready_to_init_done": 5.406525,
+        "identify_registers": 5.2706375,
+        "select": 2.8012075,
+        "clock_switch": 0.15032,
+        "width_negotiation": 2.453615,
+        "sd_init": 26.5753475,
+        "acmd41": 12.0887525,
+        "slot_scan": 20.5757825,
+        "slot_write": 321.1140625,
+        "cmd25_data_envelope": 318.726955,
+        "write_final_ready": 2.17309,
+        "runtime_to_terminal": 382.8198675,
+        "select_plus_clock_switch": 2.9515275,
+        "csd_ready_to_width_begin_minus_fully_nested_frame_validation": 2.5505325,
+        "csd_ready_to_init_done_minus_fully_nested_frame_validation": 5.00434
+      },
+      "missing_intervals": [],
+      "nested_frame_validation_adjustment": {
+        "csd_ready_to_width_begin": {
+          "classification": "fully_inside",
+          "frame_validation_ms": 0.402185,
+          "subtracted_ms": 0.402185
+        },
+        "csd_ready_to_init_done": {
+          "classification": "fully_inside",
+          "frame_validation_ms": 0.402185,
+          "subtracted_ms": 0.402185
+        }
+      },
+      "slot": 35,
+      "scan_headers": 36,
+      "written_sectors": 3730,
+      "card_command_count": 140,
+      "counters": {
+        "SD_INIT_CALLS": 1,
+        "SD_ACMD41_ATTEMPTS": 4,
+        "SD_READ_TRANSFERS": 36,
+        "SD_SCR_READS": 1,
+        "SD_WRITE_TRANSFERS": 1,
+        "SD_IDMA_TRANSFERS": 0,
+        "SD_PIO_TRANSFERS": 1,
+        "SD_PREANNOUNCE_CALLS": 1,
+        "SD_CMD25_CALLS": 1,
+        "SD_CMD12_WRITE_CALLS": 1,
+        "SD_SYNC_CALLS": 1,
+        "SD_DEINIT_CALLS": 1,
+        "SD_ERROR_CALLS": 0,
+        "START_ACK_READS": 4,
+        "STREAMING_STATE_READS": 1,
+        "SENSOR_STOP_POLLS": 33,
+        "LINE_IRQS": 21
+      },
+      "transport_observed": "PIO"
+    },
+    {
+      "run": "early03",
+      "completed": true,
+      "binary_sha256": "4e69833f4e4813c659329226574ff68e6b7accf6da1af6cbb19726bfb3d450f5",
+      "sources": {
+        "capture": {
+          "path": "D:\\Github\\global-x-camera\\tmp\\bringup\\sd-early-clock-20261026\\early03\\capture\\verified.json",
+          "sha256": "955321eb319a536445c169f050431c03f51625cc61f01c6fd32af0c04b0e0114"
+        },
+        "trace": {
+          "path": "D:\\Github\\global-x-camera\\tmp\\bringup\\sd-early-clock-20261026\\early03\\trace\\cycle-trace.json",
+          "sha256": "7ac42efd055b88a865e1648f1b2a6c2b1642e7d88c51cbbc390a53a95ce153a7"
+        }
+      },
+      "nominal_dwt_hz": 400000000,
+      "transfer_clock_hz": 12500000,
+      "clock_switched_before_select": true,
+      "observed_order": [
+        {
+          "event": "SD_IDENTIFY_REGS_DONE",
+          "since_trace_init_ms": 35.6709375
+        },
+        {
+          "event": "SD_CLOCK_SWITCH_BEGIN",
+          "since_trace_init_ms": 35.6740075
+        },
+        {
+          "event": "SD_CLOCK_SWITCH_DONE",
+          "since_trace_init_ms": 35.707425
+        },
+        {
+          "event": "SD_SELECT_BEGIN",
+          "since_trace_init_ms": 35.7081275
+        },
+        {
+          "event": "SD_SELECT_DONE",
+          "since_trace_init_ms": 35.780265
+        },
+        {
+          "event": "SD_WIDTH_BEGIN",
+          "since_trace_init_ms": 35.780815
+        }
+      ],
+      "durations_ms": {
+        "csd_ready_to_width_begin": 0.1098775,
+        "csd_ready_to_init_done": 1.055,
+        "identify_registers": 5.2705625,
+        "select": 0.0721375,
+        "clock_switch": 0.0334175,
+        "width_negotiation": 0.9449325,
+        "sd_init": 22.2226375,
+        "acmd41": 12.08927,
+        "slot_scan": 20.7492775,
+        "slot_write": 320.3898275,
+        "cmd25_data_envelope": 318.010685,
+        "write_final_ready": 2.1690725,
+        "runtime_to_terminal": 377.9580925,
+        "select_plus_clock_switch": 0.105555,
+        "csd_ready_to_width_begin_minus_fully_nested_frame_validation": 0.1098775,
+        "csd_ready_to_init_done_minus_fully_nested_frame_validation": 0.6588999999999999
+      },
+      "missing_intervals": [],
+      "nested_frame_validation_adjustment": {
+        "csd_ready_to_width_begin": {
+          "classification": "outside",
+          "frame_validation_ms": 0.3961,
+          "subtracted_ms": 0.0
+        },
+        "csd_ready_to_init_done": {
+          "classification": "fully_inside",
+          "frame_validation_ms": 0.3961,
+          "subtracted_ms": 0.3961
+        }
+      },
+      "slot": 36,
+      "scan_headers": 37,
+      "written_sectors": 3730,
+      "card_command_count": 142,
+      "counters": {
+        "SD_INIT_CALLS": 1,
+        "SD_ACMD41_ATTEMPTS": 4,
+        "SD_READ_TRANSFERS": 37,
+        "SD_SCR_READS": 1,
+        "SD_WRITE_TRANSFERS": 1,
+        "SD_IDMA_TRANSFERS": 0,
+        "SD_PIO_TRANSFERS": 1,
+        "SD_PREANNOUNCE_CALLS": 1,
+        "SD_CMD25_CALLS": 1,
+        "SD_CMD12_WRITE_CALLS": 1,
+        "SD_SYNC_CALLS": 1,
+        "SD_DEINIT_CALLS": 1,
+        "SD_ERROR_CALLS": 0,
+        "START_ACK_READS": 4,
+        "STREAMING_STATE_READS": 1,
+        "SENSOR_STOP_POLLS": 34,
+        "LINE_IRQS": 21
+      },
+      "transport_observed": "PIO"
+    }
+  ],
+  "groups_by_observed_clock_order": {
+    "control": {
+      "n": 3,
+      "runs": [
+        "control01",
+        "control02",
+        "control03"
+      ],
+      "durations_ms": {
+        "acmd41": {
+          "n": 3,
+          "median": 12.08885,
+          "min": 12.0887525,
+          "max": 193.8483725
+        },
+        "clock_switch": {
+          "n": 3,
+          "median": 0.1473825,
+          "min": 0.083635,
+          "max": 0.15032
+        },
+        "cmd25_data_envelope": {
+          "n": 3,
+          "median": 318.57917,
+          "min": 318.019025,
+          "max": 318.726955
+        },
+        "csd_ready_to_init_done": {
+          "n": 3,
+          "median": 5.39687,
+          "min": 4.679305,
+          "max": 5.406525
+        },
+        "csd_ready_to_init_done_minus_fully_nested_frame_validation": {
+          "n": 3,
+          "median": 4.9994,
+          "min": 4.679305,
+          "max": 5.00434
+        },
+        "csd_ready_to_width_begin": {
+          "n": 3,
+          "median": 2.949925,
+          "min": 2.48623,
+          "max": 2.9527175
+        },
+        "csd_ready_to_width_begin_minus_fully_nested_frame_validation": {
+          "n": 3,
+          "median": 2.5505325,
+          "min": 2.48623,
+          "max": 2.552455
+        },
+        "identify_registers": {
+          "n": 3,
+          "median": 5.27063,
+          "min": 5.2704025,
+          "max": 5.2706375
+        },
+        "runtime_to_terminal": {
+          "n": 3,
+          "median": 382.8198675,
+          "min": 379.5711975,
+          "max": 564.1694725
+        },
+        "sd_init": {
+          "n": 3,
+          "median": 26.5753475,
+          "min": 26.5342625,
+          "max": 207.62743
+        },
+        "select": {
+          "n": 3,
+          "median": 2.8012075,
+          "min": 2.4014125,
+          "max": 2.8013725
+        },
+        "select_plus_clock_switch": {
+          "n": 3,
+          "median": 2.948755,
+          "min": 2.4850475000000003,
+          "max": 2.9515275
+        },
+        "slot_scan": {
+          "n": 3,
+          "median": 20.5757825,
+          "min": 19.15837,
+          "max": 22.0810175
+        },
+        "slot_write": {
+          "n": 3,
+          "median": 319.9274075,
+          "min": 319.33904,
+          "max": 321.1140625
+        },
+        "width_negotiation": {
+          "n": 3,
+          "median": 2.446755,
+          "min": 2.1928825,
+          "max": 2.453615
+        },
+        "write_final_ready": {
+          "n": 3,
+          "median": 1.1122,
+          "min": 1.110025,
+          "max": 2.17309
+        }
+      }
+    },
+    "early": {
+      "n": 3,
+      "runs": [
+        "early01",
+        "early02",
+        "early03"
+      ],
+      "durations_ms": {
+        "acmd41": {
+          "n": 3,
+          "median": 12.0893175,
+          "min": 12.08927,
+          "max": 15.3692325
+        },
+        "clock_switch": {
+          "n": 3,
+          "median": 0.0334175,
+          "min": 0.0334175,
+          "max": 0.0364375
+        },
+        "cmd25_data_envelope": {
+          "n": 3,
+          "median": 318.010685,
+          "min": 318.0077725,
+          "max": 319.097365
+        },
+        "csd_ready_to_init_done": {
+          "n": 3,
+          "median": 1.05662,
+          "min": 1.055,
+          "max": 2.3016225
+        },
+        "csd_ready_to_init_done_minus_fully_nested_frame_validation": {
+          "n": 3,
+          "median": 0.6605099999999999,
+          "min": 0.6588999999999999,
+          "max": 2.3016225
+        },
+        "csd_ready_to_width_begin": {
+          "n": 3,
+          "median": 0.1098775,
+          "min": 0.1098775,
+          "max": 0.1191125
+        },
+        "csd_ready_to_width_begin_minus_fully_nested_frame_validation": {
+          "n": 3,
+          "median": 0.1098775,
+          "min": 0.1098775,
+          "max": 0.1191125
+        },
+        "identify_registers": {
+          "n": 3,
+          "median": 5.2705625,
+          "min": 5.2705025,
+          "max": 5.590735
+        },
+        "runtime_to_terminal": {
+          "n": 3,
+          "median": 377.9580925,
+          "min": 376.8832225,
+          "max": 380.861435
+        },
+        "sd_init": {
+          "n": 3,
+          "median": 22.2341975,
+          "min": 22.2226375,
+          "max": 27.0299525
+        },
+        "select": {
+          "n": 3,
+          "median": 0.0721375,
+          "min": 0.0721375,
+          "max": 0.0782925
+        },
+        "select_plus_clock_switch": {
+          "n": 3,
+          "median": 0.105555,
+          "min": 0.105555,
+          "max": 0.11473
+        },
+        "slot_scan": {
+          "n": 3,
+          "median": 19.8967075,
+          "min": 18.5654775,
+          "max": 20.7492775
+        },
+        "slot_write": {
+          "n": 3,
+          "median": 320.3898275,
+          "min": 319.3312225,
+          "max": 321.4765075
+        },
+        "width_negotiation": {
+          "n": 3,
+          "median": 0.9465525,
+          "min": 0.9449325,
+          "max": 2.18232
+        },
+        "write_final_ready": {
+          "n": 3,
+          "median": 2.1690725,
+          "min": 1.1110925,
+          "max": 2.1690725
+        }
+      }
+    }
+  },
+  "control_minus_early_median_ms": {
+    "acmd41": -0.0004674999999991769,
+    "clock_switch": 0.113965,
+    "cmd25_data_envelope": 0.5684849999999528,
+    "csd_ready_to_init_done": 4.34025,
+    "csd_ready_to_init_done_minus_fully_nested_frame_validation": 4.338889999999999,
+    "csd_ready_to_width_begin": 2.8400475,
+    "csd_ready_to_width_begin_minus_fully_nested_frame_validation": 2.440655,
+    "identify_registers": 6.750000000010914e-05,
+    "runtime_to_terminal": 4.861774999999966,
+    "sd_init": 4.341149999999999,
+    "select": 2.7290699999999997,
+    "select_plus_clock_switch": 2.8432,
+    "slot_scan": 0.6790749999999974,
+    "slot_write": -0.4624200000000087,
+    "width_negotiation": 1.5002024999999999,
+    "write_final_ready": -1.0568724999999999
+  },
+  "limits": [
+    "Warm RAM trials; no cold power/Standby or new total-energy qualification.",
+    "ACMD41 card-state variation and growing slot scan confound whole-cycle comparisons.",
+    "The early candidate changes clock order and removes the redundant post-switch CMD13.",
+    "Trace intervals are software observations at nominal 400 MHz, not physical wire edges.",
+    "Original image bytes and PNGs stay private; their hashes and comparison reports are retained."
+  ]
+}

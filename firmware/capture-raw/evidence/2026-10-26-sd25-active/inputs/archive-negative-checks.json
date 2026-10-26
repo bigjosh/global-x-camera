@@ -1,0 +1,36 @@
+{
+  "hardware_access": false,
+  "passed": true,
+  "checks": [
+    {
+      "test": "physical NOR byte mismatch",
+      "passed": true,
+      "rejection": "Physical NOR readback differs: nor-after"
+    },
+    {
+      "test": "following sector byte changed",
+      "passed": true,
+      "rejection": "Physical NOR readback differs: following-after"
+    },
+    {
+      "test": "source camera RAM byte changed",
+      "passed": true,
+      "rejection": "Original camera frame binding differs"
+    },
+    {
+      "test": "unmeasured cold interval",
+      "passed": true,
+      "rejection": "Cold off interval is too short"
+    },
+    {
+      "test": "SD payload byte changed",
+      "passed": true,
+      "rejection": "SD chunk extent/hash differs"
+    },
+    {
+      "test": "incomplete evidence freeze",
+      "passed": true,
+      "rejection": "Promotion evidence is incomplete or failed"
+    }
+  ]
+}

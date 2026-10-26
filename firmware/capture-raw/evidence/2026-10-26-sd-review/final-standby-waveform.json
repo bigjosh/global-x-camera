@@ -1,0 +1,191 @@
+{
+  "schema": 1,
+  "passed": true,
+  "hardware_access": false,
+  "slot": 28,
+  "lba": 104440,
+  "profile": "reviewed startup, four-bit12.5MHz, falling launch, Standby; no tail wait",
+  "host_commands": {
+    "count": 237,
+    "crc7_all_valid": true,
+    "counts": {
+      "0": 1,
+      "8": 1,
+      "55": 66,
+      "41": 63,
+      "2": 1,
+      "3": 1,
+      "9": 1,
+      "7": 1,
+      "13": 68,
+      "51": 1,
+      "6": 1,
+      "17": 29,
+      "23": 1,
+      "25": 1,
+      "12": 1
+    },
+    "order_validated": true,
+    "all_application_prefixes_valid": true,
+    "acmd23_sectors": 3730,
+    "cmd25_lba": 104440,
+    "slot_header_reads": 29,
+    "sample_offset_agreement": [
+      {
+        "offset_ns": 0,
+        "crc_valid_host_commands": 237
+      },
+      {
+        "offset_ns": 8,
+        "crc_valid_host_commands": 237
+      },
+      {
+        "offset_ns": 16,
+        "crc_valid_host_commands": 237
+      },
+      {
+        "offset_ns": 24,
+        "crc_valid_host_commands": 237
+      },
+      {
+        "offset_ns": 32,
+        "crc_valid_host_commands": 237
+      }
+    ],
+    "sequence_sha256": "933b04d0ac352cf15924cdce4e5750bd356f7e6d2ee88cc8f02f33727f85898c"
+  },
+  "initial_clocks": {
+    "CMD_high_rising_edges_before_CMD0": 108,
+    "excluded_preclock_rising_edges": 1,
+    "first_train_rising_to_CMD0_ms": 1.087255999999981
+  },
+  "write": {
+    "blocks": 3730,
+    "lane_crc16_checked": 14920,
+    "all_lane_crc16_valid": true,
+    "accepted_status_tokens": 3730,
+    "all_start_end_bits_valid": true,
+    "bytes": 1909760,
+    "wire_equals_retrieved_SD_slot": true,
+    "slot_sha256": "9d8fbd5e82e2692fef219b5073a0e4b4a19202be854d211a9ab22ec6c358f037",
+    "original_camera_ram_comparison": false,
+    "metadata_zero": true,
+    "markers_valid": true,
+    "payload_clock_period_ns": {
+      "count": 3882930,
+      "min": 75.99999984897465,
+      "median": 79.99999995789153,
+      "max": 84.00000017783071
+    }
+  },
+  "final_responses": [
+    {
+      "command": 12,
+      "r1": 3072,
+      "start_s": 0.847867972,
+      "end_s": 0.84787176
+    },
+    {
+      "command": 13,
+      "r1": 3584,
+      "start_s": 0.84791692,
+      "end_s": 0.847920704
+    },
+    {
+      "command": 13,
+      "r1": 3584,
+      "start_s": 0.848982296,
+      "end_s": 0.84898608
+    },
+    {
+      "command": 13,
+      "r1": 2304,
+      "start_s": 0.850048156,
+      "end_s": 0.850051944
+    },
+    {
+      "command": 13,
+      "r1": 2304,
+      "start_s": 0.85014804,
+      "end_s": 0.85015182
+    }
+  ],
+  "cmd12_busy": {
+    "start_s": 0.847867216,
+    "end_s": 0.84970122,
+    "duration_us": 1834.0040000000001
+  },
+  "timing": {
+    "origin": "Saved analyzer capture; no reset/power reference inferred",
+    "cmd25_start_s": 0.527009384,
+    "first_data_start_s": 0.527018492,
+    "last_data_end_s": 0.847847612,
+    "cmd12_start_s": 0.847863232,
+    "first_ready_response_end_s": 0.850051944,
+    "cmd25_to_first_ready_ms": 323.04256,
+    "data_packet_window_ms": 320.8291200000001,
+    "sum_packet_spans_ms": 312.4862239999995
+  },
+  "sources": {
+    "replay": {
+      "path": "tmp/bringup/sd50-reviewed-20261026/analyze_final_standby.py",
+      "sha256": "5df2a6e37117e825f668ddec326e83e5d4393588f103eda11c825e1237c28a92"
+    },
+    "boot_proof": {
+      "path": "tmp/bringup/sd50-reviewed-20261026/final-standby-cold/boot-proof.json",
+      "sha256": "1af21d66d29208b74c6e1f440db3756d7d9d9255466b5bd6ea8aa6a2b3e3f185"
+    },
+    "readback": {
+      "path": "tmp/bringup/sd50-reviewed-20261026/final-standby-readback/readback-validation.json",
+      "sha256": "03ba8d2f993cc0809013e216973cc86f291f43fd11e79f06d175af6d87d26465"
+    },
+    "slot": {
+      "path": "tmp/bringup/sd50-reviewed-20261026/final-standby-readback/slot.bin",
+      "sha256": "9d8fbd5e82e2692fef219b5073a0e4b4a19202be854d211a9ab22ec6c358f037"
+    },
+    "waveforms": [
+      {
+        "path": "tmp/bringup/sd50-reviewed-20261026/final-standby-cold/binary/digital_0.bin",
+        "sha256": "f2842de19eaceecb74a2bee93aeb889add6c228dfb7a9b6327aabb2aa642ce0a"
+      },
+      {
+        "path": "tmp/bringup/sd50-reviewed-20261026/final-standby-cold/binary/digital_1.bin",
+        "sha256": "7ca5ced0ef57338f6757730bf388f5dc13159c18b1b2113cbad325cdc9b8f45e"
+      },
+      {
+        "path": "tmp/bringup/sd50-reviewed-20261026/final-standby-cold/binary/digital_2.bin",
+        "sha256": "fda0aea69d9ee7ae506830399ba6cc51c1c0520246b928ddc4c43ebe77c448fc"
+      },
+      {
+        "path": "tmp/bringup/sd50-reviewed-20261026/final-standby-cold/binary/digital_3.bin",
+        "sha256": "e086621b15d510893ecda8977c68859a68b93e23afadd057f4660fc11b8a6009"
+      },
+      {
+        "path": "tmp/bringup/sd50-reviewed-20261026/final-standby-cold/binary/digital_4.bin",
+        "sha256": "9496e130a9a8e640f1ddb201081a4514fc372211e1d84029bfa26abb50a9478a"
+      },
+      {
+        "path": "tmp/bringup/sd50-reviewed-20261026/final-standby-cold/binary/digital_5.bin",
+        "sha256": "b869772513659f115bb024a759f3bf8bfc8ebaf0ba0d0abb993c2919e3cb3cac"
+      }
+    ],
+    "channel_map": {
+      "CMD": 0,
+      "CLK": 1,
+      "DAT0": 2,
+      "DAT1": 3,
+      "DAT2": 4,
+      "DAT3": 5
+    },
+    "sample_rate": 250000000,
+    "data_sample_edge": "rising",
+    "data_offset_ns": 0
+  },
+  "limits": [
+    "Original camera RAM was lost in Standby. This compares wire bytes with subsequent complete SD readback only.",
+    "Digital timing is quantized to4ns and does not establish analog setup/hold or ringing margins.",
+    "CMD12 exposed busy is not isolated internal programming time; timing intervals overlap.",
+    "No total-cycle energy or independent Standby-entry attribution is derived by this offline analysis.",
+    "Markers do not add an on-media checksum or qualify arbitrary power-loss atomicity."
+  ]
+}

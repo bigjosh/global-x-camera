@@ -297,6 +297,59 @@ class Tests(unittest.TestCase):
                             r.checked_recovery_result(
                                 dict(passed=True,prefix_sha256=other_prefix),identity)
 
+    def test_phase125_reviewed50_and_startup_pairs_and_cross_pair_rejection(self):
+        candidates=(
+            ('571660be49caafcfc167e295514c4c1863b8fe35c06192a3cdd184647e39ba38',
+             '39cdee32788c08ae81d8b3e35de6ec846d50044433f6aad6633a645585ff2bc7',
+             'raw-25-reviewed-startup-awake-qualification'),
+            ('0592a543cb1e75b176e97f715f139a0a13d8a4d791ba44efd0ec94dc4f5b6754',
+             'c68593cebeddf5b9c24f85249505ae719dd1ea73d11f309e3a8553e9c1a9fa47',
+             'raw-25-reviewed-startup-standby-qualification'),
+            ('2ff3c9b33dda25456724811d1bf7ccaeac0f6912336f92bcc41b7ee72c304d22',
+             'c85907d0c29da1bfa6905734b65f7af3a73a73db70d1f2186065405a5aeb467f',
+             'raw-125-negedge-init-speed3-awake-qualification'),
+            ('d5f17279640f5acd9642a28fa0df11bddf1825a2b9d06432908ef4a460204c60',
+             '4762bbe49e5d48bba5869892f327b8871fccaf8f543cde550ab7858252949945',
+             'raw-125-negedge-init-speed3-standby-qualification'),
+            ('005230cf308432650a0967d68e2c292c77aaa5aae6a7cab0f8b2d8c865529dee',
+             '1faea44570f9284fa239a50db8bb5d1856d7c15645828df6869070bca9b135eb',
+             'raw-50-reviewed-awake-unqualified'),
+            ('1c5e443b23ea34a6474fbf35d2c43964684b7e4315500d5bd6b4a3143ffbe95d',
+             'cc8a35dba9d7c9692424e3f904e3ef8fd8a2b6fc4713730e71767653ea37bed5',
+             'raw-50-reviewed-standby-unqualified'),
+            ('54cd99f5b2c02c6561e25d8a59fc98210ecdd799736a0a3a8c749cac57a63777',
+             'c6a9779db35a458fb2415754c480cc1274d01f662e62fb57a245882cc5db532a',
+             'raw-125-reviewed-startup-awake-qualification'),
+            ('4ef99d3b0b8ac7b790265cd1994428a5804dd3a20ad5587dd1585d2544a74b0b',
+             'c03e40c8ceea09bd9c171c179f2191a1ef9799c9e615db979a84b9c53ad66010',
+             'raw-125-reviewed-startup-standby-qualification'))
+        spec=importlib.util.spec_from_file_location('phase125_check_park',
+            r.ROOT/'firmware/capture-timing/recovery_gpio/check_park.py')
+        park=importlib.util.module_from_spec(spec);spec.loader.exec_module(park)
+        with tempfile.TemporaryDirectory() as folder:
+            work=Path(folder)
+            (work/'stage1.bin').write_bytes(bytes(5140))
+            (work/'capture_sector_0.bin').write_bytes(bytes(65536))
+            for prefix,sector,name in candidates:
+                with self.subTest(name=name):
+                    self.assertEqual(r.APPROVED_RECOVERY[prefix],
+                        dict(name=name,sector_sha256=sector))
+                    self.assertEqual(park.APPROVED[prefix],
+                        dict(bytes=5140,park=0x3418078C,vcp=True,sector=sector))
+                    with mock.patch.object(r.sd,'sha',side_effect=[prefix,sector]):
+                        identity=r.checked_recovery(work)
+                    r.checked_recovery_result(dict(passed=True,prefix_sha256=prefix),identity)
+                    with mock.patch.object(r.sd,'sha',side_effect=['0'*64]):
+                        with self.assertRaises(ValueError):r.checked_recovery(work)
+                    for other_prefix,other in r.APPROVED_RECOVERY.items():
+                        if other_prefix==prefix:continue
+                        for pair in ([prefix,other['sector_sha256']],[other_prefix,sector]):
+                            with mock.patch.object(r.sd,'sha',side_effect=pair):
+                                with self.assertRaises(ValueError):r.checked_recovery(work)
+                        with self.assertRaises(ValueError):
+                            r.checked_recovery_result(
+                                dict(passed=True,prefix_sha256=other_prefix),identity)
+
     def test_stale_or_failed_boot_rejected(self):
         words=[0x52425231,1,23,14,0,3,0x201,0,0,1,0,0,4,0x33330000,
                0x00100000,0x2020,0,0,0,0x55,1,32,0x5242444e]

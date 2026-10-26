@@ -28,6 +28,11 @@ uint32_t test_primask,test_basepri,test_faultmask;
 static std::vector<uint32_t> commands, arguments, output;
 static uint32_t words, expected_words, current_lba, operation, stop_count, fifo_resets;
 static uint32_t data_error_at, busy_polls, command_error, late_card_error;
+static uint32_t command_crc_error,command_wrong_index,command_stuck_active;
+static uint32_t stop_response_bits,stop_busy_polls,stop_hz,stop_timer,stop_completion_error;
+static uint64_t stop_start_cycles;
+static bool stop_active,stop_host_timeout;
+static uint32_t dctrl_active_writes;
 static uint32_t app_prefix_r1, app_preerase_r1;
 static uint32_t app_width_r1,app_prefix_count,app_prefix_fail_at,card_width;
 static bool drop_width_write,busy_after_width,not_ready_after_width;
@@ -37,9 +42,29 @@ static uint32_t bad_compensation_gate,compensation_reads,compensation_writes;
 static uint32_t erase_busy_polls;
 static bool erase_active,erase_host_timeout;
 static uint64_t modeled_cycles,erase_start_cycles;
+#if SD_STARTUP_OPT
+static uint64_t startup_power_cycle,startup_command0_cycle;
+#endif
+#if SD_EARLY_RUN_CLOCK
+static uint32_t early_csd_speed,early_busy_kind,early_clock_refusal;
+static bool early_timer_refusal,early_initial_clock_corrupt,early_selected;
+static uint32_t early_clock_writes,early_timer_writes;
+static std::vector<uint32_t> early_command_clocks;
+#endif
 static uint32_t erase_hz,erase_timer;
+static uint32_t select_busy_polls,select_hz,select_timer;
+static uint64_t select_start_cycles;
+static bool select_active,select_host_timeout;
 static uint8_t scr_bytes[8];
-static uint32_t abort_tail_end;
+static uint8_t hs_status[2][64];
+#if SD_HIGH_SPEED
+static constexpr uint32_t model_sd_kernel_hz=100000000U;
+#else
+static constexpr uint32_t model_sd_kernel_hz=150000000U;
+#endif
+static uint32_t hs_switching,hs_error_at,hs_command_error;
+static bool drop_controller_gate,drop_ic5_disable,hs_final_ready_error;
+static uint32_t abort_tail_end,abort_tail_words;
 static uint32_t tx_sent, tx_start_words, tx_max_occupancy;
 static bool tx_started;
 static bool waiting_for_stop, permanent_busy, abort_pending;
@@ -73,16 +98,40 @@ static void command_write(uint32_t value)
 {
     if (!(value&SDMMC_CMD_CPSMEN)) return;
     uint32_t index=value&63U;
+#if SD_EARLY_RUN_CLOCK
+    early_command_clocks.push_back(test_sd.CLKCR.value);
+    if(index==13) assert(early_selected); /* No READY/TRAN polling in STBY. */
+    if(index==7) {
+        early_selected=true;
+        assert(early_clock_writes==1U && early_timer_writes==1U);
+        assert(test_sd.DTIMER.value==2U*model_sd_kernel_hz/(2U*(test_sd.CLKCR.value&SDMMC_CLKCR_CLKDIV)));
+    }
+#endif
     commands.push_back(index); arguments.push_back(test_sd.ARG.value);
-    test_sd.RESPCMD.value=index;
+    test_sd.RESPCMD.value=index==command_wrong_index ? (index+1U)&63U : index;
     test_sd.RESP1.value=0x900;
     test_sd.STA.value|=SDMMC_STA_CMDREND;
+    if(index==13 && hs_final_ready_error && (test_sd.CLKCR.value&SDMMC_CLKCR_CLKDIV)==1U) {
+        hs_final_ready_error=false;test_sd.STA.value=SDMMC_STA_CCRCFAIL;return;
+    }
     if (index==command_error) {
         test_sd.STA.value=SDMMC_STA_CTIMEOUT;
         return;
     }
     if (index==0) {
+#if SD_STARTUP_OPT
+        startup_command0_cycle=modeled_cycles;
+        assert(startup_power_cycle && modeled_cycles-startup_power_cycle>=400000U);
+        assert(test_sd.POWER.value==SDMMC_POWER_PWRCTRL);
+        assert(!(test_sd.CLKCR.value&SDMMC_CLKCR_PWRSAV));
+        assert(model_sd_kernel_hz/(2U*(test_sd.CLKCR.value&SDMMC_CLKCR_CLKDIV))==100000U);
+#endif
+#if SD_CLOCK_NEGEDGE_INIT
+        assert((test_sd.CLKCR.value&SDMMC_CLKCR_NEGEDGE)==SDMMC_CLKCR_NEGEDGE);
+        assert(!(test_sd.CLKCR.value&SDMMC_CLKCR_SELCLKRX));
+#else
         assert(!(test_sd.CLKCR.value&SDMMC_CLKCR_NEGEDGE));
+#endif
         card_width=1;test_sd.STA.value=SDMMC_STA_CMDSENT;
     } else if(index==8) test_sd.RESP1.value=0x1AAU;
     else if(index==41) test_sd.RESP1.value=0xC0300000U;
@@ -90,9 +139,31 @@ static void command_write(uint32_t value)
     else if(index==9) {
         test_sd.RESP1.value=0x40000000U;test_sd.RESP2.value=0;
         test_sd.RESP3.value=0x7FFF0000U;test_sd.RESP4.value=0;
+#if SD_EARLY_RUN_CLOCK
+        test_sd.RESP1.value|=early_csd_speed;
+        if(early_initial_clock_corrupt) test_sd.CLKCR.value^=SDMMC_CLKCR_SELCLKRX_0;
+#endif
+    } else if(index==7 && select_busy_polls) {
+        /* CMD7 is R1b even before the first data operation. Model a real busy
+         * interval and the host's independent DTIMER timeout latch. */
+        select_active=true;select_host_timeout=false;
+        select_start_cycles=modeled_cycles;busy_polls=select_busy_polls;
+        select_hz=model_sd_kernel_hz/(2U*(test_sd.CLKCR.value&SDMMC_CLKCR_CLKDIV));
+        select_timer=test_sd.DTIMER.value;
+        test_gpio_c.IDR.value&=~(1U<<4);
     } else if (index==55) {
         ++app_prefix_count;
         test_sd.RESP1.value=app_prefix_count==app_prefix_fail_at?0x900U:app_prefix_r1;
+    } else if(index==6 && (test_sd.ARG.value==0x00FFFFF1U || test_sd.ARG.value==0x80FFFFF1U)) {
+        assert(card_width==4 && (value&SDMMC_CMD_CMDTRANS));
+        assert(test_sd.DLEN.value==64U);
+        assert((test_sd.DCTRL.value&SDMMC_DCTRL_DBLOCKSIZE)==(6U<<SDMMC_DCTRL_DBLOCKSIZE_Pos));
+        hs_switching=test_sd.ARG.value>>31;
+        if(hs_command_error==hs_switching+1U) {
+            test_sd.STA.value=SDMMC_STA_CCRCFAIL;return;
+        }
+        operation=6;words=0;expected_words=16;test_sd.DCOUNT.value=64;
+        data_error_at=hs_error_at;waiting_for_stop=false;
     } else if(index==6) {
         assert(commands.size()>=2 && commands[commands.size()-2]==55);
         assert(test_sd.ARG.value==2U && card_width==1);
@@ -110,7 +181,7 @@ static void command_write(uint32_t value)
     } else if (index==38) {
         busy_polls=erase_busy_polls;erase_active=true;erase_host_timeout=false;
         erase_start_cycles=modeled_cycles;
-        erase_hz=150000000U/(2U*(test_sd.CLKCR.value&SDMMC_CLKCR_CLKDIV));
+        erase_hz=model_sd_kernel_hz/(2U*(test_sd.CLKCR.value&SDMMC_CLKCR_CLKDIV));
         erase_timer=test_sd.DTIMER.value;
     }
     else if (index==17 || index==18 || index==24 || index==25 || index==51) {
@@ -135,26 +206,43 @@ static void command_write(uint32_t value)
         } else if (operation && words<expected_words) {
             /* Pending TX data deliberately keeps DPSM active until FIFORST. */
             abort_pending=true;
-            abort_tail_end=words+16U;
+            abort_tail_end=words+abort_tail_words;
             if (abort_tail_end>expected_words) abort_tail_end=expected_words;
             test_sd.STA.value=SDMMC_STA_CMDREND;
         } else {
             operation=0;
             test_sd.STA.value=SDMMC_STA_CMDREND|SDMMC_STA_DABORT;
         }
+        test_sd.RESP1.value|=stop_response_bits;
+        if(stop_busy_polls) {
+            stop_active=true;stop_host_timeout=false;
+            stop_start_cycles=modeled_cycles;busy_polls=stop_busy_polls;
+            stop_hz=model_sd_kernel_hz/(2U*(test_sd.CLKCR.value&SDMMC_CLKCR_CLKDIV));
+            stop_timer=test_sd.DTIMER.value;
+            test_gpio_c.IDR.value&=~(1U<<4);
+        }
     } else if (index==13) {
         if (permanent_busy || busy_polls || waiting_for_stop) {
             test_sd.RESP1.value=0xE00;
             if (busy_polls) --busy_polls;
-            if(erase_active) test_gpio_c.IDR.value&=~(1U<<4);
+            if(erase_active || select_active || stop_active) test_gpio_c.IDR.value&=~(1U<<4);
         } else if (late_card_error && !output.empty())
             test_sd.RESP1.value=0x900|(1U<<19);
-        else if(erase_active) test_gpio_c.IDR.value|=1U<<4;
+        else if(erase_active || select_active || stop_active) test_gpio_c.IDR.value|=1U<<4;
     }
+    if(index==command_crc_error)
+        test_sd.STA.value=(test_sd.STA.value&~SDMMC_STA_CMDREND)|SDMMC_STA_CCRCFAIL;
+    if(index==command_stuck_active) test_sd.STA.value|=SDMMC_STA_CPSMACT;
 }
 
 MockReg::operator uint32_t() const
 {
+#if SD_HIGH_SPEED || SD_STARTUP_OPT
+    const uintptr_t reg_address=reinterpret_cast<uintptr_t>(this);
+    if(reg_address>=reinterpret_cast<uintptr_t>(&test_sd) && reg_address<reinterpret_cast<uintptr_t>(&test_sd)+sizeof(test_sd))
+        assert(test_rcc.AHB5ENR.value&RCC_AHB5ENR_SDMMC2EN);
+#endif
+
 #if SD_FIXED_COMPENSATION
     if(this==&test_pwr.SVMCR2 || this==&test_pwr.SVMCR3)
         assert(test_rcc.AHB4ENR.value&RCC_AHB4ENR_PWREN);
@@ -172,6 +260,13 @@ MockReg::operator uint32_t() const
         assert(!(test_rcc.MISCRSTR.value&RCC_MISCRSTR_DBGRST));
     }
     if (this==&test_dwt.CYCCNT) {
+#if SD_EARLY_RUN_CLOCK
+        if(!commands.empty() && commands.back()==9U && early_busy_kind) {
+            if(early_busy_kind==1U) test_sd.STA.value|=SDMMC_STA_CPSMACT;
+            if(early_busy_kind==2U) test_sd.STA.value|=SDMMC_STA_DPSMACT;
+            if(early_busy_kind==3U) test_sd.IDMACTRL.value=1U;
+        }
+#endif
         /* Active DMA wait uses 1us reads; WFI advances wall time only. */
         uint32_t increment=((sleep_model && test_sd.IDMACTRL.value)||stream_time)?400U:400000U;
         test_dwt.CYCCNT.value+=increment;modeled_cycles+=increment;
@@ -179,6 +274,26 @@ MockReg::operator uint32_t() const
     }
     if (this==&test_sd.STA) {
         uint32_t state=value;
+        if(stop_active) {
+            if((modeled_cycles-stop_start_cycles)*stop_hz/400000000ULL>=stop_timer)
+                stop_host_timeout=true;
+            if(stop_host_timeout)
+                return state|SDMMC_STA_DPSMACT|SDMMC_STA_BUSYD0|SDMMC_STA_DTIMEOUT;
+            if(busy_polls)
+                return state|SDMMC_STA_DPSMACT|SDMMC_STA_BUSYD0;
+            stop_active=false;test_gpio_c.IDR.value|=1U<<4;
+            test_sd.STA.value|=stop_completion_error;
+            state|=SDMMC_STA_BUSYD0END|stop_completion_error;
+        }
+        if(select_active) {
+            if((modeled_cycles-select_start_cycles)*select_hz/400000000ULL>=select_timer)
+                select_host_timeout=true;
+            if(select_host_timeout)
+                return state|SDMMC_STA_DPSMACT|SDMMC_STA_BUSYD0|SDMMC_STA_DTIMEOUT;
+            if(busy_polls)
+                return state|SDMMC_STA_DPSMACT|SDMMC_STA_BUSYD0;
+            select_active=false;test_gpio_c.IDR.value|=1U<<4;state|=SDMMC_STA_BUSYD0END;
+        }
         if(erase_active) {
             /* R1b timeout latches the host in Busy even after physical DAT0
              * rises and CMD13 reports TRANSFER. This matches RM0486 Table220. */
@@ -192,16 +307,26 @@ MockReg::operator uint32_t() const
         }
         if (operation) {
             if (test_sd.IDMACTRL.value) {
-                assert(operation==24 || operation==25);
+                assert(operation==17 || operation==18 || operation==24 || operation==25);
                 if (dma_abort_stuck && abort_pending) return state|SDMMC_STA_DPSMACT;
                 if (words>=dma_error_at) return state|SDMMC_STA_IDMATE|SDMMC_STA_TXUNDERR|SDMMC_STA_DPSMACT;
+                if (words>=data_error_at) return state|SDMMC_STA_DCRCFAIL|SDMMC_STA_DPSMACT;
                 if (dma_stalled) return state|SDMMC_STA_DPSMACT;
                 uint32_t offset=test_sd.IDMABASER.value-0x34000000U;
-                assert(offset+expected_words*4<=dma_memory.size());
+                bool receiving=operation==17 || operation==18;
+                assert(receiving ? (offset+expected_words*4<=4U*1024U*1024U) :
+                                   (offset+expected_words*4<=dma_memory.size()));
+                assert(bool(test_sd.DCTRL.value&SDMMC_DCTRL_DTDIR)==receiving);
                 for(unsigned n=0;n<256 && words<expected_words;++n) {
-                    uint32_t v=0;
-                    for(unsigned b=0;b<4;++b) v|=uint32_t(dma_memory[offset+words*4+b])<<(b*8);
-                    output.push_back(v); ++words;
+                    if(receiving) {
+                        uint32_t v=data_word(current_lba,words);
+                        for(unsigned b=0;b<4;++b) stream_memory[offset+words*4+b]=uint8_t(v>>(b*8));
+                    } else {
+                        uint32_t v=0;
+                        for(unsigned b=0;b<4;++b) v|=uint32_t(dma_memory[offset+words*4+b])<<(b*8);
+                        output.push_back(v);
+                    }
+                    ++words;
                 }
                 test_sd.DCOUNT.value=(expected_words-words)*4+dma_residual;
                 if (words==expected_words) return state|SDMMC_STA_DATAEND|dma_final_error;
@@ -209,7 +334,7 @@ MockReg::operator uint32_t() const
             }
             if (abort_pending) {
                 state|=SDMMC_STA_DPSMACT;
-                if ((operation==17 || operation==18 || operation==51) && words>=abort_tail_end)
+                if ((operation==17 || operation==18 || operation==51 || operation==6) && words>=abort_tail_end)
                     state|=SDMMC_STA_RXFIFOE;
                 return state;
             }
@@ -246,13 +371,16 @@ MockReg::operator uint32_t() const
     if (this==&test_sd.FIFO) {
         if (test_sd.IDMACTRL.value) ++dma_fifo_accesses;
         assert(!test_sd.IDMACTRL.value);
-        assert(operation==17 || operation==18 || operation==51);
+        assert(operation==17 || operation==18 || operation==51 || operation==6);
         assert(words<expected_words); /* catches any read after DATAEND */
         uint32_t v=data_word(current_lba,words);
         if(operation==51) {
             v=0;for(unsigned b=0;b<4;b++) v|=uint32_t(scr_bytes[words*4+b])<<(8*b);
+        } else if(operation==6) {
+            v=0;for(unsigned b=0;b<4;b++) v|=uint32_t(hs_status[hs_switching][words*4+b])<<(8*b);
         }
         ++words;
+        test_sd.DCOUNT.value=(expected_words-words)*4U;
         return v;
     }
     return value;
@@ -260,6 +388,29 @@ MockReg::operator uint32_t() const
 
 MockReg& MockReg::operator=(uint32_t input)
 {
+#if SD_EARLY_RUN_CLOCK
+    if(!commands.empty() && commands.back()==9U) {
+        if(this==&test_sd.CLKCR) {
+            ++early_clock_writes;
+            if(early_clock_refusal==1U) return *this;
+            if(early_clock_refusal==2U) input^=SDMMC_CLKCR_NEGEDGE;
+            if(early_clock_refusal==3U) input^=SDMMC_CLKCR_SELCLKRX_0;
+        }
+        if(this==&test_sd.DTIMER) {
+            ++early_timer_writes;
+            assert(early_clock_writes==1U);
+            assert(input==2U*model_sd_kernel_hz/(2U*(test_sd.CLKCR.value&SDMMC_CLKCR_CLKDIV)));
+            if(early_timer_refusal) return *this;
+        }
+    }
+#endif
+#if SD_STARTUP_OPT
+    if(this==&test_sd.POWER && input==SDMMC_POWER_PWRCTRL)
+        startup_power_cycle=modeled_cycles;
+#endif
+    if(this==&test_sd.DCTRL && ((input^value)&0xFFU) &&
+       (uint32_t(test_sd.STA)&SDMMC_STA_DPSMACT))
+        ++dctrl_active_writes;
     if(this==&test_syscfg.VDDIO5CCCR) {
         (void)uint32_t(*this); /* Require every access prerequisite before write. */
         assert(input==0x287U && !(test_rcc.AHB5ENR.value&RCC_AHB5ENR_SDMMC2EN));
@@ -300,7 +451,9 @@ MockReg& MockReg::operator=(uint32_t input)
     } else if (this==&test_sd.IDMACTRL) {
         assert(!operation || words==expected_words); /* IDMAEN writable only idle. */
     } else if (this==&test_rcc.AHB5ENCR) test_rcc.AHB5ENR.value&=~input;
-    else if(this==&test_rcc.AHB5ENSR) test_rcc.AHB5ENR.value|=input;
+    else if(this==&test_rcc.AHB5ENSR) {if(!drop_controller_gate)test_rcc.AHB5ENR.value|=input;}
+    else if(this==&test_rcc.DIVENSR) test_rcc.DIVENR.value|=input;
+    else if(this==&test_rcc.DIVENCR) {if(!drop_ic5_disable)test_rcc.DIVENR.value&=~input;}
     else if(this==&test_rcc.AHB4ENSR) {
         test_rcc.AHB4ENR.value|=input;
         if(bad_compensation_gate==1) test_rcc.AHB4ENR.value&=~RCC_AHB4ENR_PWREN;
@@ -319,6 +472,10 @@ extern "C" {
 
 static sd_card_t reset_model()
 {
+#if SD_HIGH_SPEED
+    memset((void *)&sd_high_speed_proof,0,sizeof(sd_high_speed_proof));
+    memset((void *)&sd_review_clock_proof,0,sizeof(sd_review_clock_proof));
+#endif
     test_sd={}; test_rcc={}; test_gpio_c={}; test_gpio_e={};
     test_pwr={}; test_syscfg={}; test_dwt={}; test_debug={}; test_dbgmcu={};
     test_scb={}; test_rif={};
@@ -327,6 +484,10 @@ static sd_card_t reset_model()
     commands.clear(); arguments.clear(); output.clear();
     words=0; expected_words=0; current_lba=0; operation=0; stop_count=0; fifo_resets=0;
     data_error_at=0xFFFFFFFFU; busy_polls=0; command_error=0xFFFFFFFFU;
+    command_crc_error=command_wrong_index=command_stuck_active=0xFFFFFFFFU;
+    stop_response_bits=stop_busy_polls=stop_hz=stop_timer=stop_completion_error=0;stop_start_cycles=0;
+    stop_active=stop_host_timeout=false;
+    dctrl_active_writes=0;
     app_prefix_r1=app_preerase_r1=0x920U;
     app_width_r1=0x920U;app_prefix_count=0;app_prefix_fail_at=0xFFFFFFFFU;
     card_width=SD_BUS_WIDTH;drop_width_write=busy_after_width=not_ready_after_width=false;
@@ -335,13 +496,27 @@ static sd_card_t reset_model()
     bad_compensation_gate=compensation_reads=compensation_writes=0;
     erase_busy_polls=0;
     erase_active=erase_host_timeout=false;modeled_cycles=erase_start_cycles=0;
+#if SD_STARTUP_OPT
+    startup_power_cycle=startup_command0_cycle=0;
+#endif
+#if SD_EARLY_RUN_CLOCK
+    early_csd_speed=0x32U;early_busy_kind=early_clock_refusal=0;
+    early_timer_refusal=early_initial_clock_corrupt=early_selected=false;
+    early_clock_writes=early_timer_writes=0;early_command_clocks.clear();
+#endif
     erase_hz=erase_timer=0;
+    select_busy_polls=select_hz=select_timer=0;select_start_cycles=0;
+    select_active=select_host_timeout=false;
     memset(scr_bytes,0,sizeof(scr_bytes));scr_bytes[0]=2;scr_bytes[1]=0x85;
+    memset(hs_status,0,sizeof(hs_status));
+    for(unsigned n=0;n<2;n++) {hs_status[n][1]=100;hs_status[n][13]=2;hs_status[n][16]=1;hs_status[n][17]=1;}
+    hs_switching=hs_command_error=0;hs_error_at=0xFFFFFFFFU;
+    drop_controller_gate=drop_ic5_disable=hs_final_ready_error=false;
     stream_check=stream_time=false;stream_published=stream_calls=stream_modeled_gap=0;
     stream_failure_at=0xFFFFFFFFU;
     stream_slow_at=0xFFFFFFFFU;stream_words_before_slow=0;
     late_card_error=0; waiting_for_stop=false; permanent_busy=false;
-    abort_pending=false; abort_tail_end=0;
+    abort_pending=false; abort_tail_end=0;abort_tail_words=16;
     tx_sent=0; tx_started=false; tx_start_words=0; tx_max_occupancy=0;
     dma_error_at=0xFFFFFFFFU; dma_final_error=0; dma_residual=0; dma_fifo_accesses=0;
     dma_stalled=false; dma_abort_stuck=false;
@@ -372,6 +547,11 @@ static sd_card_t reset_init_model()
     test_rcc.PLL1CFGR1.value=0x00404B00U;test_rcc.PLL1CFGR3.value=0x49000005U;
     test_rcc.IC1CFGR.value=0x20000U;test_rcc.IC2CFGR.value=0x30000U;
     test_rcc.DIVENR.value=RCC_DIVENR_IC2EN;
+#if SD_HIGH_SPEED
+    test_rcc.CR.value=RCC_CR_HSION|RCC_CR_PLL1ON;
+    test_rcc.SR.value=RCC_SR_HSIRDY|RCC_SR_PLL1RDY;
+    test_rcc.DIVENR.value|=RCC_DIVENR_IC1EN;
+#endif
     test_gpio_c.IDR.value=(1U<<0)|(1U<<3)|(1U<<4)|(1U<<5);
     test_gpio_e.IDR.value=1U<<4;
     /* Unrelated PC1 is a live output: initialization must preserve it. */
@@ -428,6 +608,35 @@ int main()
     std::vector<uint8_t> bytes(65U*512U+3U);
     uint8_t *unaligned=bytes.data()+1;
     for(uint32_t i=0;i<65U*512U;++i) unaligned[i]=uint8_t(i*7U+3U);
+
+    { auto c=reset_model();command_crc_error=13U;
+      assert(command(&c,13,c.rca,RESP_R1,0)==SD_ERR_COMMAND_CRC);
+      assert(c.error==SD_ERR_COMMAND_CRC && c.error_command==13U);
+      assert(c.error_sta&SDMMC_STA_CCRCFAIL);
+    }
+    { auto c=reset_model();command_crc_error=41U;
+      /* R3 has no CRC7; the host's CCRCFAIL indication is expected here. */
+      assert(command(&c,41,0x40300000U,RESP_R3,0)==SD_OK && !c.error);
+      assert(c.last_r1==0xC0300000U);
+    }
+    for(auto response:{RESP_R1,RESP_R6,RESP_R7}) {
+      auto c=reset_model();uint32_t index=response==RESP_R1?13U:response==RESP_R6?3U:8U;
+      command_wrong_index=index;
+      assert(command(&c,index,0,response,0)==SD_ERR_RESPONSE);
+      assert(c.error==SD_ERR_RESPONSE && c.error_command==index);
+    }
+    { auto c=reset_model();command_wrong_index=2U;
+      /* Long R2 response has a reserved command-index field. */
+      assert(command(&c,2,0,RESP_R2,0)==SD_OK && !c.error);
+    }
+    { auto c=reset_model();test_sd.STA.value=SDMMC_STA_CPSMACT;
+      assert(command(&c,13,c.rca,RESP_R1,0)==SD_ERR_CONTROLLER_BUSY);
+      assert(commands.empty());
+    }
+    { auto c=reset_model();command_stuck_active=13U;
+      assert(command(&c,13,c.rca,RESP_R1,0)==SD_ERR_COMMAND_TIMEOUT);
+      assert(number_of(13)==1U && (c.error_sta&SDMMC_STA_CPSMACT));
+    }
 
 #if SD_FIXED_COMPENSATION
     for(unsigned scenario=0;scenario<3;++scenario) {
@@ -509,6 +718,28 @@ int main()
       assert(card_width==SD_BUS_WIDTH && c.initialized && c.media_idle);
       assert(sd_deinit(&c)==SD_OK);
     }
+    { auto c=reset_init_model();select_busy_polls=3U;
+#if SD_REVIEW_PROFILE
+      assert(sd_init(&c,25000000U)==SD_OK && c.initialized && c.media_idle);
+      assert(select_timer==200000U && select_hz==100000U);
+      assert(!select_active && !select_host_timeout && number_of(7)==1U);
+      assert(sd_deinit(&c)==SD_OK);
+#else
+      /* Historical reset-DTIMER behavior: the same valid CMD7 busy interval
+       * leaves the controller stuck even after the card itself is ready. */
+      assert(sd_init(&c,25000000U)==SD_ERR_NOT_READY);
+      assert(select_timer==0U && select_host_timeout);
+      assert(c.controller_owned && !c.initialized && !c.media_idle);
+#endif
+    }
+#if SD_REVIEW_PROFILE
+    { auto c=reset_init_model();select_busy_polls=3000U;
+      assert(sd_init(&c,25000000U)==SD_ERR_NOT_READY);
+      assert(select_timer==200000U && select_active);
+      assert(c.controller_owned && !c.initialized && !c.media_idle);
+      assert(!number_of(24) && !number_of(25) && !number_of(38));
+    }
+#endif
 #if SD_GPIO_SPEED != 3
     for(uint32_t failure:{1U,2U,3U}) {
       if(failure==2U && SD_BUS_WIDTH!=4) continue;
@@ -592,6 +823,14 @@ int main()
     }
     for(uint32_t hz:{100000U,12500000U}) {
       auto c=reset_init_model();
+#if SD_CLOCK_NEGEDGE_INIT
+      if(hz==12500000U) {
+          assert(sd_init(&c,hz)==SD_OK && c.clock_hz==hz);
+          assert(test_sd.CLKCR.value==(SDMMC_CLKCR_HWFC_EN|WIDTH_BITS|PHASE_BITS|6U));
+          assert(sd_deinit(&c)==SD_OK);
+          continue;
+      }
+#endif
       assert(sd_init(&c,hz)==SD_ERR_ARGUMENT && commands.empty());
     }
     { auto c=reset_model();test_sd.CLKCR.value&=~SDMMC_CLKCR_NEGEDGE;
@@ -659,6 +898,23 @@ int main()
       assert(stop_count==1 && fifo_resets==1 && words==48 && c.media_idle);
       assert(!c.read_sectors);
     }
+    for(uint32_t tail:{64U,65U,255U,256U,257U}) {
+      auto c=reset_model();data_error_at=32U;abort_tail_words=tail;
+      assert(sd_read_blocks(&c,10,unaligned,4)==SD_ERR_DATA);
+      const uint32_t bound=SD_REVIEW_PROFILE?256U:64U;
+      assert(words==32U+(tail<bound?tail:bound));
+      assert(stop_count==1U && c.error==SD_ERR_DATA && !c.read_sectors);
+      assert(c.controller_owned && c.initialized); /* Never release ownership here. */
+      if(tail<=bound) {
+          assert(c.media_idle && c.cleanup_error==SD_OK && fifo_resets==1U);
+          assert(!(uint32_t(test_sd.STA)&SDMMC_STA_DPSMACT));
+      } else {
+          /* Impossible >256 hardware occupancy models a fault: retain the
+           * bound, refuse idle and do not flush unread data speculatively. */
+          assert(!c.media_idle && c.cleanup_error==SD_ERR_LENGTH && !fifo_resets);
+          assert(uint32_t(test_sd.STA)&SDMMC_STA_DPSMACT);
+      }
+    }
     { auto c=reset_model(); data_error_at=32; command_error=12;
       assert(sd_write_blocks(&c,10,unaligned,2)==SD_ERR_DATA);
       assert(!c.media_idle && !c.written_sectors && !fifo_resets);
@@ -700,6 +956,57 @@ int main()
       assert(tx_max_occupancy==256 && c.media_idle && stop_count==1);
     }
     const void *dma_buffer=reinterpret_cast<const void *>(uintptr_t(0x34000000U));
+    for(unsigned mode=0;mode<3;++mode) for(unsigned ending=0;ending<5;++ending) {
+      auto c=reset_model();stop_busy_polls=ending==1U?3000U:3U;
+      if(ending==2U) stop_completion_error=SDMMC_STA_DCRCFAIL;
+      if(ending==3U) stop_completion_error=SDMMC_STA_DTIMEOUT;
+      if(ending==4U) stop_completion_error=SDMMC_STA_IDMATE;
+      int result;
+      if(mode==0U) result=sd_write_blocks(&c,10,unaligned,4);
+      else if(mode==1U) result=sd_write_blocks_dma(&c,10,dma_buffer,4);
+      else {
+          stream_time=stream_check=true;
+          StreamSource source{2048U,512U,5U,8U,0xFFFFFFFFU,false};
+          sd_stream_t stream{};stream.publish=publish_stream;stream.context=&source;
+          result=sd_write_blocks_stream_preerase(&c,10,stream_memory+12U,4,&stream);
+          assert(stream.mode==SD_STREAM_PIO);
+      }
+      assert(stop_count==1U && stop_timer==50000000U && stop_hz==25000000U);
+      assert(c.controller_owned && c.initialized && !test_sd.IDMACTRL.value);
+      if(ending==1U) {
+          assert(result==SD_ERR_NOT_READY && !c.media_idle && !c.written_sectors);
+          assert(stop_active && (uint32_t(test_sd.STA)&SDMMC_STA_DPSMACT));
+      } else if(SD_REVIEW_PROFILE && ending>=2U) {
+          assert(result==(ending==4U?SD_ERR_DMA:SD_ERR_DATA));
+          assert(c.error==uint32_t(result) && !c.written_sectors);
+          assert(c.error_sta&stop_completion_error);
+          assert(test_sd.STA.value&stop_completion_error); /* Not cleared as success. */
+      } else {
+          assert(result==SD_OK && c.media_idle && c.written_sectors==4U);
+          assert(!stop_active && !stop_host_timeout);
+      }
+      assert(dctrl_active_writes==(SD_REVIEW_PROFILE?0U:1U));
+    }
+#if SD_REVIEW_PROFILE
+    for(unsigned kind=0;kind<4;++kind) {
+      auto c=reset_model();stop_response_bits=1U<<31;
+      c.sector_count=kind==1U?100U:12U;
+      if(kind==3U) data_error_at=32U;
+      int result=kind==2U?sd_write_blocks(&c,10,unaligned,2):
+          sd_read_blocks(&c,10,unaligned,2);
+      if(kind==0U) {
+          assert(result==SD_OK && c.read_sectors==2U && c.media_idle);
+      } else {
+          assert(result==(kind==3U?SD_ERR_DATA:SD_ERR_CARD));
+          assert(!c.read_sectors && !c.written_sectors && !c.media_idle);
+          assert(c.controller_owned && c.initialized);
+      }
+    }
+    { auto c=reset_model();stop_response_bits=1U<<31;c.sector_count=12U;
+      assert(sd_write_blocks_dma(&c,10,dma_buffer,2)==SD_ERR_CARD);
+      assert(!c.written_sectors && !c.media_idle && c.controller_owned);
+    }
+#endif
     { auto c=reset_model();
       assert(sd_write_blocks_dma(&c,10,dma_buffer,2)==SD_OK);
       assert(number_of(25)==1 && stop_count==1 && c.written_sectors==2);
@@ -1063,4 +1370,5 @@ int main()
     assert(!munmap(stream_memory,4U*1024U*1024U));
 #endif
     std::puts("protocol cases passed");
+    return 0;
 }

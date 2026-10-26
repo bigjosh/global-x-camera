@@ -1,0 +1,11 @@
+{
+  "stage": "awake-readback host admission",
+  "initial_result": "Rejected before output-folder creation or hardware operations: SCR proof was mistakenly taken from READ operation3, while the existing guard requires completed CAPTURE/FORMAT.",
+  "evidence": "awake-readback.log",
+  "target_at_stop": "Successful idle READ terminal from awake-read-start/verified.json, result0/media_idle1/initialized0/controller_owned0/cleanup_error0",
+  "correction": "Use awake-inspect/verified.json and its independently retrieved inspection/before-scr.bin as SCR source; original prior READ terminal unchanged.",
+  "corrected_log": "awake-readback-corrected.log",
+  "reset_or_power_cycle_for_correction": false,
+  "sd_operation_retry": false,
+  "guards_relaxed": false
+}

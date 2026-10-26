@@ -3,6 +3,49 @@
 
 #include <stdint.h>
 
+/* Explicit reviewed-driver opt-in. Historical builds retain their exact
+ * executable paths until the new profile is independently qualified. */
+#ifndef SD_REVIEW_PROFILE
+#define SD_REVIEW_PROFILE 0
+#endif
+#if SD_REVIEW_PROFILE != 0 && SD_REVIEW_PROFILE != 1
+#error "SD_REVIEW_PROFILE must be 0 or 1"
+#endif
+#ifndef SD_IDMA_READ
+#define SD_IDMA_READ 0
+#endif
+#if SD_IDMA_READ != 0 && SD_IDMA_READ != 1
+#error "SD_IDMA_READ must be 0 or 1"
+#endif
+#if SD_IDMA_READ && !SD_REVIEW_PROFILE
+#error "IDMA reads require the explicit reviewed driver profile"
+#endif
+#ifndef SD_STARTUP_OPT
+#define SD_STARTUP_OPT 0
+#endif
+#if SD_STARTUP_OPT != 0 && SD_STARTUP_OPT != 1
+#error "SD_STARTUP_OPT must be 0 or 1"
+#endif
+#ifndef SD_EARLY_RUN_CLOCK
+#define SD_EARLY_RUN_CLOCK 0
+#endif
+#if SD_EARLY_RUN_CLOCK != 0 && SD_EARLY_RUN_CLOCK != 1
+#error "SD_EARLY_RUN_CLOCK must be 0 or 1"
+#endif
+
+#ifndef SD_HIGH_SPEED_COMBINED_ELECTRICAL
+#define SD_HIGH_SPEED_COMBINED_ELECTRICAL 0
+#endif
+#if SD_HIGH_SPEED_COMBINED_ELECTRICAL != 0 && SD_HIGH_SPEED_COMBINED_ELECTRICAL != 1
+#error "SD_HIGH_SPEED_COMBINED_ELECTRICAL must be 0 or 1"
+#endif
+#ifndef SD_HIGH_SPEED_FIXED_COMPENSATION
+#define SD_HIGH_SPEED_FIXED_COMPENSATION 0
+#endif
+#if SD_HIGH_SPEED_FIXED_COMPENSATION != 0 && SD_HIGH_SPEED_FIXED_COMPENSATION != 1
+#error "SD_HIGH_SPEED_FIXED_COMPENSATION must be 0 or 1"
+#endif
+
 /* Native SDMMC2, 3.3 V. Historical builds default to one bit. Four-bit builds
  * must explicitly define SD_BUS_WIDTH=4; init negotiates the card before changing
  * the host width. No card cache, UHS or trim commands are enabled.
@@ -16,6 +59,18 @@
 #endif
 #if SD_BUS_WIDTH != 1 && SD_BUS_WIDTH != 4
 #error "SD_BUS_WIDTH must be 1 or 4"
+#endif
+#if SD_STARTUP_OPT && (!SD_REVIEW_PROFILE || SD_BUS_WIDTH != 4)
+#error "Startup optimization requires the reviewed four-bit profile"
+#endif
+#if SD_STARTUP_OPT
+typedef struct {
+    uint32_t magic,version,gpio_settle_cycles,train_cycles;
+    uint32_t train_hz,train_min_cycles,run_settle_cycles,run_hz;
+    uint32_t scr_reads,scr_hits,scr_valid,cache_owner;
+    uint32_t result,reserved0,reserved1,reserved2;
+} sd_startup_proof_t;
+extern volatile sd_startup_proof_t sd_startup_proof;
 #endif
 #ifndef SD_GPIO_SPEED
 #define SD_GPIO_SPEED 3
@@ -41,8 +96,67 @@
 #if SD_CLOCK_NEGEDGE != 0 && SD_CLOCK_NEGEDGE != 1
 #error "SD_CLOCK_NEGEDGE must be 0 or 1"
 #endif
-#if SD_CLOCK_NEGEDGE && (SD_BUS_WIDTH != 4 || SD_GPIO_SPEED == 0 || SD_FIXED_COMPENSATION)
+#if SD_CLOCK_NEGEDGE && (SD_BUS_WIDTH != 4 || SD_GPIO_SPEED == 0 || (SD_FIXED_COMPENSATION && !SD_HIGH_SPEED_FIXED_COMPENSATION))
 #error "Clock phase diagnostic requires four bits, speed 1..3 and unchanged compensation"
+#endif
+#ifndef SD_CLOCK_NEGEDGE_INIT
+#define SD_CLOCK_NEGEDGE_INIT 0
+#endif
+#if SD_CLOCK_NEGEDGE_INIT != 0 && SD_CLOCK_NEGEDGE_INIT != 1
+#error "SD_CLOCK_NEGEDGE_INIT must be 0 or 1"
+#endif
+#if SD_CLOCK_NEGEDGE_INIT && (!SD_CLOCK_NEGEDGE || SD_GPIO_SPEED != 3)
+#error "Initial falling-edge launch requires run falling-edge launch and GPIO speed3"
+#endif
+#ifndef SD_HIGH_SPEED
+#define SD_HIGH_SPEED 0
+#endif
+#if SD_HIGH_SPEED != 0 && SD_HIGH_SPEED != 1
+#error "SD_HIGH_SPEED must be 0 or 1"
+#endif
+#if SD_HIGH_SPEED && (!SD_REVIEW_PROFILE || !SD_CLOCK_NEGEDGE_INIT || SD_BUS_WIDTH != 4 || SD_GPIO_SPEED != 3 || (SD_FIXED_COMPENSATION && !SD_HIGH_SPEED_FIXED_COMPENSATION))
+#error "High-speed profile requires reviewed four-bit falling-edge mode with the dedicated pin profile"
+#endif
+#ifndef SD_HIGH_SPEED_MIXED_SLEW
+#define SD_HIGH_SPEED_MIXED_SLEW 0
+#endif
+#if SD_HIGH_SPEED_MIXED_SLEW != 0 && SD_HIGH_SPEED_MIXED_SLEW != 1
+#error "SD_HIGH_SPEED_MIXED_SLEW must be 0 or 1"
+#endif
+#if SD_HIGH_SPEED_MIXED_SLEW && (!SD_HIGH_SPEED || !SD_REVIEW_PROFILE || SD_GPIO_SPEED != 3 || (SD_FIXED_COMPENSATION && !SD_HIGH_SPEED_COMBINED_ELECTRICAL))
+#error "Mixed slew requires the isolated reviewed High Speed profile and unchanged compensation"
+#endif
+#if SD_HIGH_SPEED_FIXED_COMPENSATION && (!SD_HIGH_SPEED || !SD_FIXED_COMPENSATION || (SD_HIGH_SPEED_MIXED_SLEW && !SD_HIGH_SPEED_COMBINED_ELECTRICAL))
+#error "High Speed fixed compensation requires isolated uniform-slew High Speed mode"
+#endif
+#if SD_HIGH_SPEED_COMBINED_ELECTRICAL && (!SD_HIGH_SPEED_MIXED_SLEW || !SD_HIGH_SPEED_FIXED_COMPENSATION)
+#error "Combined electrical trial requires both explicit High Speed experiments"
+#endif
+#if SD_EARLY_RUN_CLOCK && (!SD_REVIEW_PROFILE || !SD_STARTUP_OPT || SD_BUS_WIDTH != 4 || !SD_CLOCK_NEGEDGE_INIT || SD_HIGH_SPEED || SD_IDMA_READ || SD_GPIO_SPEED != 3 || SD_FIXED_COMPENSATION)
+#error "Early run clock requires the isolated reviewed startup Default-Speed profile"
+#endif
+#if SD_EARLY_RUN_CLOCK
+/* ECK1: retained across deinit; reset only by a fresh admitted init. Counts
+ * prove that the idle clock change follows CMD9 and precedes CMD7. Timestamps
+ * use the caller's 400 MHz DWT domain and require modulo-32-bit subtraction.
+ * This record is evidence, never a substitute for live storage ownership. */
+typedef struct {
+    uint32_t magic,version,requested_hz,csd_tran_speed;
+    uint32_t csd_max_hz,csd_command_count,switch_command_count,select_command_count;
+    uint32_t clock_before,clock_after,timer_before,timer_after;
+    uint32_t switch_begin_cycles,switch_end_cycles,select_begin_cycles,result;
+} sd_early_clock_proof_t;
+extern volatile sd_early_clock_proof_t sd_early_clock_proof;
+#endif
+#if SD_HIGH_SPEED
+typedef struct {
+    uint32_t requested_hz, kernel_hz, check_done, switch_done;
+    uint32_t check_r1, switch_r1, check_sta, switch_sta;
+    uint32_t configured_clkcr, qualified;
+    uint32_t gpio_c_before, gpio_c_after, gpio_e_before, gpio_e_after;
+    uint8_t check_status[64], switch_status[64];
+} sd_high_speed_proof_t;
+extern volatile sd_high_speed_proof_t sd_high_speed_proof;
 #endif
 #if SD_FIXED_COMPENSATION
 typedef struct {
@@ -89,7 +203,7 @@ enum sd_stage {
     SD_STAGE_NONE=0, SD_STAGE_PREFLIGHT, SD_STAGE_GPIO, SD_STAGE_IDENTIFY,
     SD_STAGE_SELECT, SD_STAGE_READ, SD_STAGE_WRITE, SD_STAGE_SYNC,
     SD_STAGE_ABORT, SD_STAGE_DEINIT, SD_STAGE_SCR, SD_STAGE_ERASE,
-    SD_STAGE_BUS_WIDTH
+    SD_STAGE_BUS_WIDTH, SD_STAGE_SWITCH
 };
 
 typedef struct sd_card {
@@ -120,6 +234,15 @@ typedef struct sd_card {
  * not guaranteed latency bounds for every card or maintenance condition.
  */
 int sd_init(sd_card_t *card, uint32_t max_hz);
+/* SD_IDMA_READ selects a RAM diagnostic receive path for this same API.
+ * Its destination must be word-aligned secure AXI SRAM, D-cache disabled,
+ * with the same RIFSC security prerequisites as DMA writes below. The caller
+ * owns the entire destination until completion or proven abort; it must not
+ * overlap live code, proofs or the original image retained for comparison.
+ * Requests split at 512 sectors (16 at 100 kHz), retaining HWFC, CRC checks,
+ * CMD12 and fresh readiness. No CPU FIFO access, WFI or interrupts are used.
+ * Failure can leave DMA ownership active; a failure is never valid image data.
+ */
 int sd_read_blocks(sd_card_t *card, uint32_t lba, void *buffer, uint32_t count);
 int sd_write_blocks(sd_card_t *card, uint32_t lba, const void *buffer, uint32_t count);
 /* Zero-copy single-buffer IDMA write. This is a blocking completion API; camera
@@ -162,6 +285,13 @@ typedef struct {
  * reads SCR internally before width negotiation; one-bit init does not.
  * Success validates SCR_STRUCTURE=0 and decodes bit55 from bytes[1]. */
 int sd_read_scr(sd_card_t *card, sd_scr_t *scr);
+#if SD_STARTUP_OPT
+/* Startup profile reuses a validated SCR only within the current successful
+ * initialization. Any driver fault, deinit or new init invalidates it. The
+ * caller must reinitialize after card replacement; no card-detect is inferred.
+ * This explicit diagnostic always performs a new wire read instead. */
+int sd_read_scr_fresh(sd_card_t *card, sd_scr_t *scr);
+#endif
 typedef struct {
     uint32_t started, completed, first_lba, last_lba;
     uint32_t timeout_ms, elapsed_ms, last_r1, command_count;

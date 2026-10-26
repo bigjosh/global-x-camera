@@ -1,0 +1,244 @@
+{
+  "rate_hz": 500000000,
+  "sample_offset": 8,
+  "sampling_offset_ns": 16,
+  "timestamp_note": "Decoded CMD/DAT event timestamps are rising CLK sample plus 16 ns, not raw pin transition times. Busy events preserve raw DAT0 transition times. Start/end are sample indices relative to beginning of capture; display timestamp equals index/500MHz plus display_origin_s.",
+  "display_origin_s": -6.06046626,
+  "display_end_s": 1.0922201400000007,
+  "capture_duration_s": 7.1526864,
+  "event_counts": {
+    "command": 266,
+    "response": 264,
+    "data_block": 3769,
+    "transfer": 40,
+    "bus_width": 1,
+    "write_status": 3730,
+    "busy": 3731
+  },
+  "all_errors": [
+    {
+      "start": 3030218564,
+      "end": 3045101790,
+      "start_s": 6.060437128,
+      "end_s": 6.09020358,
+      "display_start_s": -2.9131999999876257e-05,
+      "display_end_s": 0.029737319999999734,
+      "duration_us": 29766.452,
+      "type": "command",
+      "text": "CMD63 command 0xFFFFFFFF CRC BAD",
+      "track": 0,
+      "error": true,
+      "fields": {
+        "command": "63",
+        "application": "no",
+        "response_type": "",
+        "crc": "BAD",
+        "end_bit": "1",
+        "argument": "0xFFFFFFFF",
+        "crc_received": "0x7F",
+        "crc_calculated": "0x0C"
+      }
+    }
+  ],
+  "valid_host_command_count": 265,
+  "valid_response_count": 264,
+  "crc7_response_count": 200,
+  "r3_no_crc_count": 64,
+  "offset_comparison": {
+    "8": {
+      "event_count": 11801,
+      "semantic_differences": [],
+      "busy_boundaries_identical": true
+    },
+    "12": {
+      "event_count": 11801,
+      "semantic_differences": [],
+      "busy_boundaries_identical": true
+    },
+    "16": {
+      "event_count": 11801,
+      "semantic_differences": [],
+      "busy_boundaries_identical": true
+    }
+  },
+  "command_counts": {
+    "CMD0": 1,
+    "CMD8": 1,
+    "CMD55": 67,
+    "ACMD41": 64,
+    "CMD2": 1,
+    "CMD3": 1,
+    "CMD9": 1,
+    "CMD7": 1,
+    "CMD13": 85,
+    "ACMD51": 1,
+    "ACMD6": 1,
+    "CMD17": 38,
+    "ACMD23": 1,
+    "CMD25": 1,
+    "CMD12": 1
+  },
+  "write_packet_count": 3730,
+  "all_write_lane_crcs_ok": true,
+  "accepted_write_tokens": 3730,
+  "write_transfers": [
+    {
+      "start": 3169828334,
+      "end": 3334172907,
+      "start_s": 6.339656668,
+      "end_s": 6.668345814,
+      "display_start_s": 0.27919040799999983,
+      "display_end_s": 0.6078795540000002,
+      "duration_us": 328689.146,
+      "type": "transfer",
+      "text": "write transfer: 3730 blocks",
+      "track": 1,
+      "error": false,
+      "fields": {
+        "blocks": "3730",
+        "bad_data_blocks": "0",
+        "rejected_or_missing_status": "0",
+        "DAT0_busy_samples": "5879713",
+        "preerase_hint": "3730",
+        "explicit_CMD23_count": "0",
+        "completion": "observed bus transfer end; not media persistence proof"
+      }
+    }
+  ],
+  "source_sha256": "2dfa9ccb1f2e0baea4d204c01366e1e75bf3d3a5d6aab9cf506d08f6fe73b057",
+  "binary_sha256": {
+    "digital_0.bin": "24c0197e7293b4206c17a8af6aefc7b9e6ec37b7866c70d25ee8766c0c88e08d",
+    "digital_1.bin": "f529c5e616691c623c5e8cd3e74b668a2d69b8144c5fdd6f2fe238e44f0763f0",
+    "digital_2.bin": "2e5af3125fcdc7a0d3ba3ff9f21051dad0d5e7e3edeb2173ad58e0f872a4c1d3",
+    "digital_3.bin": "2e33476e82efdaaa78305798e64773d88f74acaabc07bc75ac499156bbc2c895",
+    "digital_4.bin": "7453ef373a5299e5bc26de265265f57874577b31e4280c8234d2324343126d4c",
+    "digital_5.bin": "f7793e9005776ff64272ce2437207345a8e938d84cfb6ec306f48ef532a73a65"
+  },
+  "decoder_source_sha256": "b7534ed553fcd06d9468a3fe9dc5bdc2f4cf9f82ed79a66adc855c8f711b989e",
+  "adapter_sha256": "f0b27f6905e5bf2a02f822fd356abed661eb793a040ec4937dd2aa8d0016b08b",
+  "clock_transition": {
+    "sequence": "CMD9, CMD7 and initial CMD13 ready poll use identification clock; switch precedes subsequent fast CMD13. This recording does not show the trial early-before-CMD7 transition; firmware identity is not inferred.",
+    "last_slow_ready_response_end_display_s": 0.25102613999999956,
+    "first_short_rising_period_start_display_s": 0.25104621799999993,
+    "first_short_rising_period_end_display_s": 0.2510462999999996,
+    "first_short_rising_period_ns": 82,
+    "first_short_period_previous_period_ns": 10046,
+    "clock_transition_timestamp_note": "Clock transition bounds are actual exported CLK edge timestamps, without the 16 ns decoder sample offset."
+  },
+  "key_command_clock_records": [
+    {
+      "command": "CMD2",
+      "argument": "0x00000000",
+      "display_start_s": 0.24344654799999965,
+      "display_end_s": 0.24391908399999984,
+      "sampled_clock_edges": 48,
+      "median_period_ns": 10054,
+      "mean_period_ns": 10053.95744680851,
+      "mean_frequency_hz": 99463.32131308514,
+      "min_period_ns": 10044,
+      "max_period_ns": 10072
+    },
+    {
+      "command": "CMD3",
+      "argument": "0x00000000",
+      "display_start_s": 0.24546699999999966,
+      "display_end_s": 0.24593977800000033,
+      "sampled_clock_edges": 48,
+      "median_period_ns": 10060,
+      "mean_period_ns": 10059.106382978724,
+      "mean_frequency_hz": 99412.40920685818,
+      "min_period_ns": 10032,
+      "max_period_ns": 10074
+    },
+    {
+      "command": "CMD9",
+      "argument": "0xAAAA0000",
+      "display_start_s": 0.2466535719999996,
+      "display_end_s": 0.2471262999999997,
+      "sampled_clock_edges": 48,
+      "median_period_ns": 10058,
+      "mean_period_ns": 10058.04255319149,
+      "mean_frequency_hz": 99422.92396473236,
+      "min_period_ns": 10048,
+      "max_period_ns": 10070
+    },
+    {
+      "command": "CMD7",
+      "argument": "0xAAAA0000",
+      "display_start_s": 0.24874418200000026,
+      "display_end_s": 0.24921669400000024,
+      "sampled_clock_edges": 48,
+      "median_period_ns": 10054,
+      "mean_period_ns": 10053.446808510638,
+      "mean_frequency_hz": 99468.37328999052,
+      "min_period_ns": 10040,
+      "max_period_ns": 10070
+    },
+    {
+      "command": "CMD13",
+      "argument": "0xAAAA0000",
+      "display_start_s": 0.24995060399999947,
+      "display_end_s": 0.2504231319999999,
+      "sampled_clock_edges": 48,
+      "median_period_ns": 10054,
+      "mean_period_ns": 10053.787234042553,
+      "mean_frequency_hz": 99465.00524836623,
+      "min_period_ns": 10044,
+      "max_period_ns": 10064
+    },
+    {
+      "command": "CMD13",
+      "argument": "0xAAAA0000",
+      "display_start_s": 0.25110887199999965,
+      "display_end_s": 0.25111265199999977,
+      "sampled_clock_edges": 48,
+      "median_period_ns": 80,
+      "mean_period_ns": 80.42553191489361,
+      "mean_frequency_hz": 12433862.433862435,
+      "min_period_ns": 80,
+      "max_period_ns": 82
+    },
+    {
+      "command": "CMD13",
+      "argument": "0xAAAA0000",
+      "display_start_s": 0.2511605379999997,
+      "display_end_s": 0.25116432200000016,
+      "sampled_clock_edges": 48,
+      "median_period_ns": 80,
+      "mean_period_ns": 80.51063829787235,
+      "mean_frequency_hz": 12420718.816067653,
+      "min_period_ns": 80,
+      "max_period_ns": 82
+    },
+    {
+      "command": "CMD55",
+      "argument": "0xAAAA0000",
+      "display_start_s": 0.2511883939999997,
+      "display_end_s": 0.2511921800000003,
+      "sampled_clock_edges": 48,
+      "median_period_ns": 80,
+      "mean_period_ns": 80.55319148936171,
+      "mean_frequency_hz": 12414157.422081353,
+      "min_period_ns": 80,
+      "max_period_ns": 82
+    }
+  ],
+  "clock_measurement_summary": {
+    "identification": {
+      "commands": 135,
+      "mean_of_command_mean_frequency_hz": 99472.48258218574,
+      "minimum_command_mean_frequency_hz": 99341.80768271495,
+      "maximum_command_mean_frequency_hz": 99631.99755795614,
+      "nominal_configuration_hz": 100000
+    },
+    "transfer": {
+      "commands": 130,
+      "mean_of_command_mean_frequency_hz": 12433520.108257178,
+      "minimum_command_mean_frequency_hz": 12407602.956705386,
+      "maximum_command_mean_frequency_hz": 12460233.297985153,
+      "nominal_configuration_hz": 12500000
+    }
+  },
+  "crc_scope": "All 265 genuine host commands and 200 CRC-bearing responses passed CRC7. The other 64 responses are R3, which has no CRC. One invalid startup CMD63 decoder annotation is retained and excluded from genuine command counts.",
+  "privacy": "Payload samples/previews and full recordings remain local; public evidence contains protocol and timing only."
+}

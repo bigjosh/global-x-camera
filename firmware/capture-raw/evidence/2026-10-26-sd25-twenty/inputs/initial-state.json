@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "date": "2026-10-26",
+  "user_reported_changes": ["replacement with the previously faster-initializing SD card", "LP8 probes removed"],
+  "preflight": {
+    "instrument_owner": "root",
+    "joulescope_input_voltage_v": 4.8936,
+    "initial_target_current_a": 0.0,
+    "initial_sram_read": "failed: Access port is not valid; no halt/reset/write was requested by this preflight",
+    "user_action": "user replied fixed to the target-power connection check",
+    "restored_current_a": 0.0082138,
+    "restored_current_is_idle_proof": false
+  },
+  "initial_recovery": {
+    "method": "existing UART pulse/BREAK procedure under retained explicit experimental-reset authorization",
+    "attempts": 1,
+    "exact_park_proof": "initial-park/result.json",
+    "good_pulses": 9,
+    "bad_pulses": 0,
+    "prefix_sha256": "4ef99d3b0b8ac7b790265cd1994428a5804dd3a20ad5587dd1585d2544a74b0b"
+  },
+  "scope": {
+    "planned_primary_captures": 20,
+    "normal_exposure_captures": 16,
+    "long_exposure_captures": 4,
+    "clock_hz_for_capture_and_readback": 25000000,
+    "native_bus_width": 4,
+    "ram_tests_only": true,
+    "nor_programming": false,
+    "explicit_card_erase": false,
+    "controller_power_switch_commands": false,
+    "analog_signal_measurement": false,
+    "wire_capture": false
+  },
+  "scene": "First source frame was nearly black (samples61..67). User was asked to illuminate the scene; no answer had arrived at primary run18. Two supplemental sensor-generated grayscale captures are planned for broader bit coverage.",
+  "uncertainty": "The user-restored target power could have caused an ordinary boot of the existing12.5MHz NOR firmware before recovery. It is not counted as a measured25MHz campaign image. Existing photographs were not erased."
+}

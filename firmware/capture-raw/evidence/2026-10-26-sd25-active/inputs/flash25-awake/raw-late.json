@@ -1,0 +1,65 @@
+{
+  "schema": 1,
+  "early_bytes": 15804,
+  "late_address": 875576764,
+  "late_bytes": 11900,
+  "late_flash_offset": 23996,
+  "late_crc32": 2941755503,
+  "proof": 876584448,
+  "immutable_ranges": [
+    [
+      875560960,
+      875576296
+    ],
+    [
+      875576764,
+      875588664
+    ]
+  ],
+  "loader": 875570924,
+  "after_arm": true,
+  "interrupts_enabled": true,
+  "changed_objects": [
+    "sd_card",
+    "raw_slots",
+    "magic_slots",
+    "completion",
+    "peripherals"
+  ],
+  "late_libgcc": [
+    "_aeabi_uldivmod.o",
+    "_udivmoddi4.o",
+    "_dvmd_tls.o"
+  ],
+  "late_runtime_functions": [
+    "sd_progress",
+    "configure_sd_master",
+    "complete_storage",
+    "init_card",
+    "raw_storage_execute",
+    "raw_storage_shutdown_ready",
+    "payload_transport",
+    "raw_capture_data_ready",
+    "raw_capture_stopped"
+  ],
+  "layout_audit": {
+    "vectors_early": true,
+    "early_irq_symbols": true,
+    "direct_crossings": [
+      {
+        "address": 875570210,
+        "target": 875579316,
+        "name": "complete_storage",
+        "owner": "raw_capture_fail"
+      },
+      {
+        "address": 875575498,
+        "target": 875580040,
+        "name": "raw_storage_execute",
+        "owner": "main"
+      }
+    ],
+    "loader_call": 875575180,
+    "storage_call": 875575498
+  }
+}

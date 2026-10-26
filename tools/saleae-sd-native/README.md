@@ -61,7 +61,18 @@ not a claim about the present physical wiring**.
 | DAT2 | 5 | Data lane 2 |
 | DAT3 | 1 | Data lane 3 |
 
-Use **Rising**, offset **0**, initial block bytes **512**. Use **Auto (start
+Use **Rising**, initial block bytes **512**. Offset **0** is a starting
+setting, not a qualified choice for every recording: when CMD transitions
+coincide with captured clock edges, it can produce false CRC failures and
+lose command framing. For the user's October 26 `Session 2` recording at
+250 MS/s, **offset 3 samples (+12 ns)** recovers the command sequence at both
+100 kHz and 25 MHz. That recording uses **CLK=1, CMD=0, DAT0/1/2/3=2/3/4/5**,
+not the archived map above. Its third write block is genuinely rejected by
+the card; the offset does not fix that physical transaction. See the
+[saved-capture findings](VALIDATION.md#october-26-user-recording-command-sampling-and-write-abort).
+Recheck offsets when sample rate or physical wiring changes.
+
+Use **Auto (start
 1-bit)** when the recording includes initialization/ACMD6, or force **4-bit**
 for a clip that starts after negotiation. Automatic/four-bit mode requires
 all four data channels. One-bit mode needs CLK, CMD and DAT0.
@@ -156,6 +167,11 @@ block instead of retaining every image byte.
 
 ## Scope and evidence
 
+The [October 26 Session 0 transcript](evidence/2026-10-26-session0-transcript/README.md)
+lists all 529 genuine command/response events with measured timestamps,
+start-to-start deltas and human-readable arguments/status. A separate appendix
+records all 3,730 write packets, card acceptance tokens and DAT0 busy intervals.
+
 The [validation record](VALIDATION.md) identifies the DLL and records completed
 offline, adapter and real Logic 2 integration checks.
 
@@ -173,6 +189,12 @@ implementation targets SD memory SDR, not SPI, SDIO, MMC, DDR/UHS-II or
 voltage-switching analysis. A capture beginning mid-packet may need a later
 valid command to resynchronize. After a malformed write-status token, data decoding suspends until a new
 recognized data command; it does not guess subsequent block boundaries.
+
+At power-up, the current decoder can also treat an initial CMD-low interval
+as a frame start and emit one CRC-bad phantom command across a long clock
+gap. In the October 26 recording this is `CMD63`, before the genuine CMD0.
+Treat that annotation as invalid framing; do not include it in the firmware's
+command sequence. Improved startup synchronization remains to be implemented.
 Rolling/live-export behavior is not qualified; use a completed recording for
 reproducible export. At 25 MHz, the archived
 250 MS/s capture has 4 ns edge resolution; it cannot establish analog signal

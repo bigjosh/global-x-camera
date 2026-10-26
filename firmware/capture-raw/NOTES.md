@@ -82,3 +82,79 @@
 **Why:** the first retained CTP1 trace reported 64 MHz at receiver event2, before main updates SystemCoreClock. Frozen startup initializes that variable to HSI_VALUE even though the ROM clock path remains at the checked 400 MHz. Event207 hardcodes400 MHz and event3 follows SystemCoreClockUpdate. Scaling event2 by64 MHz would fabricate a timing discontinuity.
 **Rejected:** blindly trusting a software frequency tag, accepting arbitrary clock changes, or relaxing the device's live clock/build gates. The offline decoder admits only the exact207→2→3 bracket with tick0, successful prefix and matching ROM clock-register evidence; it keeps both reported and qualified frequencies and rejects other mismatches.
 **Evidence:** `cycle_trace.py`, its strict-clock regression tests and [same-run retained prefix records](evidence/2026-10-25-cycle-trace/prefix-telemetry.json). This was a host-decoder correction; the captured firmware and original data were unchanged.
+
+## 2026-10-26  Restore the qualified 12.5 MHz profile for fully probed SD capture
+
+**Why:** the user requested a slower bus after the newly probed 25 MHz capture
+showed a real card CRC rejection. Reusing exact v23 preserves an already
+reviewed recovery prefix and storage implementation. One new cold capture
+then transmitted all3,730 sectors with matching four-lane CRCs and positive
+card status. The selected profile also restores the default clock phase;
+the builder does not admit 12.5 MHz NEGEDGE.
+
+**Rejected:** claiming this is a clock-only experiment, silently extending
+the phase/build allowlist, treating analyzer acceptance as SD readback, or
+claiming general link reliability from one successful capture. The card was
+not erased and partial earlier slots remain occupied.
+
+**Evidence:** [clock/capture record](../../tools/saleae-sd-native/evidence/2026-10-26-sd125.json),
+exact NOR installation/readback in `tmp/bringup/sd125-probed-20261026/`, and
+the updated [bench checkpoint](../../AGENTS.md).
+
+## 2026-10-26  Apply falling-edge launch during identification as well as fast SD transfers
+
+**Why:** the user requested host output changes on falling and input sampling on rising at12.5MHz. NEGEDGE is a transmit selector; SELCLKRX=00 already provides the rising feedback receive path. The new explicit init-phase option sets launch timing before POWER enables and preserves all historical default/25MHz executables. One cold awake capture and complete source-RAM/SD equality qualified this specific physical configuration.
+**Rejected:** calling NEGEDGE an RX-edge selector, leaving initialization on a different phase while describing all commands as falling-launched, inferring data integrity from card acceptance alone, or claiming analog/production reliability from digital capture.
+**Evidence:** [same-run wire, frame and readback proof](evidence/2026-10-26-sd-review/README.md). Prefix review retained all20recovery literals, instructions and15,804-byte early load; only two receiver-CRC words changed.
+
+## 2026-10-26  Bound an optional final-sector wait before selecting the SD transport
+
+**Why:** the 50 MHz warm-pattern experiment reported a fully captured image whose final sector remained withheld for sensor STOP. Selecting progressive PIO at that instant committed the whole image to the slower CPU-fed path. The opt-in RAM coordinator can spend up to 10 ms seeking complete publication only when FRAME is already validated and all but the last sector are available. Normal publication still owns STOP, guards and trailer release; a missed allowance falls back to PIO without becoming a camera failure. Long-exposure frames remain eligible for immediate progressive writing.
+
+**Rejected:** publishing the trailer before successful STOP, waiting for an incomplete frame, changing transport inside an active CMD25, adding duplicate preannouncement commands, treating a publication fault as a timeout, or silently enabling this experiment in frozen/default or flash profiles. The DWT loop is wrap-safe, but one bounded normal publication callback may straddle its deadline; actual elapsed time is retained rather than claimed to be an absolute 10 ms wall-time maximum.
+
+**Evidence:** `magic_runtime.inc`, `runtime.h`, `test_dma_tail_wait.py`, the existing `test_magic_integration.py`, and [the optimization audit and telemetry schema](evidence/2026-10-26-sd-review/OPTIMIZATION-AUDIT.md). Offline semantic and publication tests passed when recorded; hardware speed, energy and link qualification remain separate.
+
+## 2026-10-26  Bind receive-IDMA and frame-tail-wait experiments separately from normal capture
+
+**Why:** the deep SD review identified two independent experiments: remove CPU receive-FIFO service gaps during diagnostic reads, and give an already validated frame's last-sector publication up to 10 ms to complete before selecting progressive PIO. The host admits receive IDMA only for reviewed RAM READ operations; tail wait is a separate RAM capture option requiring magic slots, LINE publication, IDMA and asynchronous STOP. A full or completed tail wait must choose IDMA, while timeout retains the normal publication path and can fall back to PIO. The 64-byte tail record is checked against its exact compiler flag, layout, wrap-safe timestamps, eligibility and result; it is telemetry, never an idle proof.
+
+**Rejected:** enabling either experiment implicitly, enabling both together, allowing receive-IDMA diagnostics to format or capture through the bench helper, waiting for long-exposure frames before beginning progressive writes, weakening FRAME/STOP/guard publication, or allowing a diagnostic record to authorize recovery. Flash/Standby promotion remains separate qualification work.
+
+**Evidence:** `build.py`, `runtime.c`, `bench.py` diagnostic and telemetry admission, `test_diagnostic_profiles.py`; actual tail-helper and IDMA-read models are owned in `test_dma_tail_wait.py` and `../sd-storage/test_sd_idma_read.cpp`. Frozen fixed-compensation50 tail+trace capture SHA256 `018f15dae3a866bc0184ca4226316216f9d6869ae28976e123a8445d9cbec4e9`, separate receive-IDMA read `2093b8baeffb5bebc2d7465781d83f322184ca0619d957b419f23458d7257668`, reviewed12.5 tail+trace fallback `b668a8ddd8178b85c9f73a5cb2439aef6e5fd397df24674bd1a775f8a18f2040`. All148 capture tests passed. The fixed50 control rebuilt with both diagnostics disabled is byte-identical to SHA256 `416f854e487e545bafb2d81e0d5ca4ba0521e9daf315dfb26f9551e5d6441589`.
+
+**Provenance:** recorded during the root-owned50 MHz reliability experiments. Build/test success is not a hardware throughput, energy or read-link qualification; those measurements remain in the experiment evidence.
+
+## 2026-10-26  Select reviewed12.5 MHz startup improvements without the tail wait for cold qualification
+
+**Why:** complete RAM-source/SD comparisons passed for normal startup+tail, long-exposure progressive publication, and startup without tail. In the root-owned12.5 MHz comparison, the tail trial waited10.00455 ms and then used PIO; its321.562 ms storage phase was effectively unchanged from the no-tail trial's321.701 ms. The observed total was386.271 ms with tail versus377.752 ms without, with two additional scanned headers in the later no-tail run. Tail waiting therefore added delay at this bus rate. The separate50 MHz tail/IDMA write success does not resolve50 MHz read CRC failures or justify selecting that frequency for normal operation.
+
+**Rejected:** enabling tail wait in the selected12.5 MHz firmware, generalizing the50 MHz write result into read-link qualification, silently enabling receive-IDMA/WFI, or broadly admitting every experimental profile to flash. Builder, compiler and inspection gates admit only the exact four-bit12.5 MHz reviewed/startup profile with falling launch during identification and transfer, speed3, unchanged compensation, magic/LINE/polling-IDMA/asynchronous-STOP capture, and no tail/read-IDMA/WFI/trace/preinit/pattern diagnostics. This supersedes the prior RAM-only restriction for this exact startup profile; tail wait remains RAM-only.
+
+**Evidence:** root-reported full source comparisons for slots24/25/26 under `tmp/bringup/sd50-reviewed-20261026/`; [selected immutable identities](evidence/2026-10-26-sd-review/selected-no-tail-builds.json), exact `startup_flash_profile()` and compiler guards, `inspect_flash.py` SOP1 timing/cache validation, and153 passing capture tests. The final guarded RAM no-tail executable is `2829eae05cd96f5f7bfe36ac852d6904341c513aba51639a0e800bb171b735f5`. New awake/Standby candidates preserve15,804 early bytes and require independent exact-prefix review before root programming. Historical12.5 falling capture/prefix/sector remain byte-identical with startup disabled.
+
+**Provenance:** recorded after the bench owner reported all three complete image comparisons and selected no-tail cold qualification. At this entry's creation, the new flash builds existed offline; installation, cold image equality, Standby/SBF and energy measurements remained root-owned qualification steps. Warm RAM timings are not cold-start or battery-energy measurements.
+
+## 2026-10-26  Keep the earlier SD clock transition explicit and separate callback rescheduling from savings
+
+**Why:** three alternating RAM A/B pairs passed complete camera-source/SD equality after moving the clock transition before CMD7. The raw post-CSD window fell by 2.840048 ms at the median, but approximately 0.4 ms of frame validation moved outside that window. Subtracting only fully nested measured frame-validation intervals leaves an observed 2.440655 ms sequence improvement. ACMD41, SCR/readiness and slot scanning also varied, so this does not establish a whole-cycle or energy gain. Exact build/host admission and a separate ECK1 record keep the experiment reviewable while the installed cold-qualified firmware remains unchanged.
+
+**Rejected:** silently promoting the RAM result to flash/Standby, reporting rescheduled camera work as eliminated work, subtracting unrelated or partially overlapping intervals, or attributing card initialization variation to the divider change. The driver owns the CSD/state/timeout rationale; this entry owns experiment admission and interpretation.
+
+**Evidence:** [six-run evidence and replay](evidence/2026-10-26-sd-early-clock/README.md), `build.py --sd-early-run-clock`, `bench.py`, `test_sd_early_clock.py`, and [SD transport notes](../sd-storage/NOTES.md). The disabled-option control remains byte-identical to `2829eae05cd96f5f7bfe36ac852d6904341c513aba51639a0e800bb171b735f5`; all 160 capture tests passed. No NOR programming, card erase, cold-power cycle or new energy integration occurred in these tests.
+
+## 2026-10-26  Supplement dark-scene storage tests with sensor patterns and same-speed source comparisons
+
+**Why:** the requested twenty-image 25 MHz campaign passed complete original-camera-RAM equality, but its nearly black scene exercised only a narrow sample range. Two additional sensor-generated diagonal grayscale captures broadened the data patterns while retaining the complete MIPI-to-RAM-to-SD path. Each passed full readback at the same25MHz rate and independent PNG sample checks; the first normal slot was also reread unchanged after all later writes. Four long exposures tested progressive publication with80 immediate LINE snapshots. Firmware proof records retain clock, ownership and controller errors for every operation.
+
+**Rejected:** treating a plausible PNG or card acceptance alone as byte integrity, quietly lowering the read clock, hiding retries, calling dark frames broad data-pattern coverage, or generalizing these twenty observed RAM trials into analog signal-margin measurements, formal SD compliance, cold-flash/Standby qualification or energy savings. The current installed12.5MHz Standby build remains unchanged; this campaign intentionally measures digital storage correctness.
+
+**Evidence:** [twenty-image campaign, supplemental patterns and preservation reread](evidence/2026-10-26-sd25-twenty/README.md), independently rechecked proof/hash archive and the final live checkpoint in [AGENTS.md](../../AGENTS.md). User reported the replacement card and removal of the LP8 probes; no wire capture occurred in this campaign.
+
+## 2026-10-26  Promote the tested25 MHz startup profile to normal flash and Standby
+
+**Why:** the user explicitly selected25MHz as active firmware after twenty full source-RAM/readback comparisons, two sensor patterns, a preservation reread and an additional lit-scene image passed on the current card with probes removed. The exact reviewed startup/no-tail flash admission now allows25MHz alongside12.5MHz. Cold awake slot47 passed original-RAM equality; the normal Standby slot48 passed full readback/PNG decoding and warm recovery, with SBF=1/PDDS=1 and the flag reader's attribution limitation retained. Independent64KiB NOR readbacks and unchanged following4KiB checks passed for both images. Canonical build commands now select25MHz explicitly; historical defaults remain unchanged.
+
+**Rejected:** leaving active firmware at12.5MHz after explicit promotion, broadly admitting experimental flash profiles, enabling the earlier clock switch/tail wait/receive-IDMA/DMA-WFI/electrical experiments as part of a frequency promotion, weakening exact recovery or completion guards, or presenting warm stress tests as cold/Standby evidence. Analog margins, production reliability, power-loss behavior and a new energy baseline remain separate work.
+
+**Evidence:** [active25MHz promotion and reproducible qualification](evidence/2026-10-26-sd25-active/README.md),162 capture tests,32 SD driver/clock/trace tests and14 recovery tests. A separate12.5MHz rebuild remained byte-identical. Exact new recovery prefixes preserve all20 literals,1,774 disassembly rows and the15,804-byte early load; only receiver CRC words differ. Installed Standby sector `c68593cebeddf5b9c24f85249505ae719dd1ea73d11f309e3a8553e9c1a9fa47`.

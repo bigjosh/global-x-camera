@@ -30,6 +30,41 @@ VCP_FIELDS = (
     'reserved30 reserved31').split()
 # An unknown/self-consistent build is insufficient authorization to halt.
 APPROVED = {
+    # Exact reviewed 25 MHz startup/no-tail candidates. Fresh objcopy/objdump
+    # comparison retains all recovery instructions and 20 literals; only the
+    # two receiver CRC words differ from v23. Cold qualification is separate.
+    '571660be49caafcfc167e295514c4c1863b8fe35c06192a3cdd184647e39ba38':
+        {'bytes': 5140, 'park': 0x3418078C, 'vcp': True,
+         'sector': '39cdee32788c08ae81d8b3e35de6ec846d50044433f6aad6633a645585ff2bc7'},
+    '0592a543cb1e75b176e97f715f139a0a13d8a4d791ba44efd0ec94dc4f5b6754':
+        {'bytes': 5140, 'park': 0x3418078C, 'vcp': True,
+         'sector': 'c68593cebeddf5b9c24f85249505ae719dd1ea73d11f309e3a8553e9c1a9fa47'},
+    # Exact reviewed 12.5 MHz startup/no-tail flash candidates. The entire
+    # recovery prefix/listing matches v23 except the two receiver CRC words.
+    '54cd99f5b2c02c6561e25d8a59fc98210ecdd799736a0a3a8c749cac57a63777':
+        {'bytes': 5140, 'park': 0x3418078C, 'vcp': True,
+         'sector': 'c6a9779db35a458fb2415754c480cc1274d01f662e62fb57a245882cc5db532a'},
+    '4ef99d3b0b8ac7b790265cd1994428a5804dd3a20ad5587dd1585d2544a74b0b':
+        {'bytes': 5140, 'park': 0x3418078C, 'vcp': True,
+         'sector': 'c03e40c8ceea09bd9c171c179f2191a1ef9799c9e615db979a84b9c53ad66010'},
+    # Offline-only 50 MHz reviewed-profile candidates. Full prefix/listing
+    # comparison proves CRC-word-only differences from v23, not SD reliability.
+    # A real 50 MHz read CRC failure is unresolved; this is no promotion claim.
+    '005230cf308432650a0967d68e2c292c77aaa5aae6a7cab0f8b2d8c865529dee':
+        {'bytes': 5140, 'park': 0x3418078C, 'vcp': True,
+         'sector': '1faea44570f9284fa239a50db8bb5d1856d7c15645828df6869070bca9b135eb'},
+    '1c5e443b23ea34a6474fbf35d2c43964684b7e4315500d5bd6b4a3143ffbe95d':
+        {'bytes': 5140, 'park': 0x3418078C, 'vcp': True,
+         'sector': 'cc8a35dba9d7c9692424e3f904e3ef8fd8a2b6fc4713730e71767653ea37bed5'},
+    # Explicit 12.5 MHz falling launch at initialization and transfer speeds.
+    # Independent full prefix/disassembly review against v23: only receiver
+    # CRC words 3228/4948 differ; all recovery code, schemas and literals match.
+    '2ff3c9b33dda25456724811d1bf7ccaeac0f6912336f92bcc41b7ee72c304d22':
+        {'bytes': 5140, 'park': 0x3418078C, 'vcp': True,
+         'sector': 'c85907d0c29da1bfa6905734b65f7af3a73a73db70d1f2186065405a5aeb467f'},
+    'd5f17279640f5acd9642a28fa0df11bddf1825a2b9d06432908ef4a460204c60':
+        {'bytes': 5140, 'park': 0x3418078C, 'vcp': True,
+         'sector': '4762bbe49e5d48bba5869892f327b8871fccaf8f543cde550ab7858252949945'},
     # Fixed-slot trace awake diagnostic: entire prefix matches promoted25awake
     # except the two independently reviewed receiver-CRC data words.
     '0e37d33e1ede9008525feffb7f20c81112daf2169171f7130f68798366a4eec0':

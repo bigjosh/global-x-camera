@@ -38,6 +38,63 @@ MAGIC_LATE static int magic_publish(void *context,uint32_t *available)
     return 0;
 }
 
+#if RAW_DMA_TAIL_WAIT
+#if RAW_FLASH || RAW_STANDBY || !RAW_DMA || !RAW_LINE_STREAM || !RAW_ASYNC_STOP
+#error DMA tail wait requires the RAM magic LINE/DMA/asynchronous STOP profile
+#endif
+volatile uint32_t raw_dma_tail_wait_proof[RAW_DMA_TAIL_WAIT_WORDS];
+
+/* Publication still owns all FRAME/STOP/guard/trailer checks. Only a validated
+ * frame missing its final sector may spend this allowance seeking IDMA. Long
+ * exposure begins progressive PIO immediately. Expiry is a transport choice,
+ * not a camera timeout; errors must still return to outer failure cleanup.
+ * The DWT deadline is wrap-safe. One bounded normal publication callback may
+ * straddle it; the measured elapsed value includes that callback's time. */
+MAGIC_LATE static int magic_dma_tail_wait(uint32_t *available)
+{
+    volatile uint32_t *const proof=raw_dma_tail_wait_proof;
+    for(uint32_t i=0;i<RAW_DMA_TAIL_WAIT_WORDS;i++) proof[i]=0;
+    proof[DTW_MAGIC]=RAW_DMA_TAIL_WAIT_MAGIC; proof[DTW_VERSION]=1U;
+    proof[DTW_LIMIT]=RAW_DMA_TAIL_WAIT_CYCLES;
+    proof[DTW_AVAILABLE_BEFORE]=*available;
+    proof[DTW_AVAILABLE_AFTER]=*available;
+    proof[DTW_FRAME_BEFORE]=raw_capture_frame_validated();
+    proof[DTW_STOPPED_BEFORE]=raw_capture_sensor_stopped();
+    const uint32_t start=DWT->CYCCNT;
+    proof[DTW_START]=start; proof[DTW_END]=start;
+    if(raw_capture_fault()) {
+        proof[DTW_OUTCOME]=DTW_FAULT; proof[DTW_RESULT]=1U; return 1;
+    }
+    if(*available==MAGIC_SLOTS_PADDED_BYTES) {
+        proof[DTW_OUTCOME]=DTW_ALREADY_FULL; return 0;
+    }
+    if(!proof[DTW_FRAME_BEFORE]) {
+        proof[DTW_OUTCOME]=DTW_FRAME_PENDING; return 0;
+    }
+    if(*available<MAGIC_SLOTS_PADDED_BYTES-512U) {
+        proof[DTW_OUTCOME]=DTW_PREFIX_SHORT; return 0;
+    }
+    CYCLE_MARK(DMA_TAIL_WAIT_BEGIN);
+    int result=0;
+    uint32_t outcome=DTW_TIMEOUT_PIO;
+    while((uint32_t)(DWT->CYCCNT-start)<RAW_DMA_TAIL_WAIT_CYCLES) {
+        ++proof[DTW_POLLS];
+        result=magic_publish(0,available);
+        if(result) { outcome=DTW_FAULT; break; }
+        if(*available==MAGIC_SLOTS_PADDED_BYTES) {
+            outcome=DTW_COMPLETED; break;
+        }
+    }
+    if(!result && raw_capture_fault()) { result=1; outcome=DTW_FAULT; }
+    const uint32_t end=DWT->CYCCNT;
+    proof[DTW_END]=end; proof[DTW_ELAPSED]=(uint32_t)(end-start);
+    proof[DTW_AVAILABLE_AFTER]=*available;
+    proof[DTW_RESULT]=(uint32_t)result; proof[DTW_OUTCOME]=outcome;
+    CYCLE_MARK(DMA_TAIL_WAIT_DONE);
+    return result;
+}
+#endif
+
 MAGIC_LATE static int magic_transport(sd_card_t *card,uint32_t lba,const void *data,uint32_t count,void *context)
 {
     (void)context;
@@ -83,6 +140,10 @@ MAGIC_LATE static void raw_magic_execute(void)
         if(r || HAL_GetTick()-began>3000U) complete_storage(0x501U);
     } while(available<512U);
     CYCLE_MARK(FIRST_SECTOR_WAIT_DONE);
+#if RAW_DMA_TAIL_WAIT
+    r=magic_dma_tail_wait(&available);
+    if(r) complete_storage(0x507U);
+#endif
     P[RP_SLOT_BEGIN]=DWT->CYCCNT; P[RP_STAGE]=5U;
     status_led_set(STATUS_LED_NAND_WRITE);
     CYCLE_MARK(SLOT_WRITE_BEGIN);

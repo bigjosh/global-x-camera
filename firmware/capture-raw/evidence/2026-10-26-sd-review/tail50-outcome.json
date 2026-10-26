@@ -1,0 +1,64 @@
+{
+  "schema": 1,
+  "slot": 21,
+  "lba": 78330,
+  "write_clock_hz": 50000000,
+  "readback_clock_hz": 12500000,
+  "build_sha256": "018f15dae3a866bc0184ca4226316216f9d6869ae28976e123a8445d9cbec4e9",
+  "source_frame_sha256": "72a73248fd00a2116dd2cb082d51333e52bf55496097c5c1c1c80401c632e3a7",
+  "slot_sha256": "801a16435a4ee6fe97203ebe2a40ac4e151bfe423bac1309f6c698c953a5a654",
+  "source_equals_sd_payload": true,
+  "full_slot_bytes": 1909760,
+  "image_bytes": 1909600,
+  "tail": {
+    "magic": 827806788,
+    "version": 1,
+    "outcome": 4,
+    "start": 612539337,
+    "end": 614747797,
+    "elapsed": 2208460,
+    "limit": 4000000,
+    "available_before": 1909248,
+    "available_after": 1909760,
+    "polls": 750,
+    "result": 0,
+    "frame_before": 1,
+    "stopped_before": 0,
+    "reserved0": 0,
+    "reserved1": 0,
+    "reserved2": 0
+  },
+  "stream": {
+    "publish": 875571765,
+    "context": 0,
+    "mode": 1,
+    "initial_available_bytes": 1909760,
+    "published_bytes": 1909760,
+    "queued_bytes": 1909760,
+    "publication_calls": 1,
+    "starved_polls": 0,
+    "producer_error": 0,
+    "producer_wait_cycles": 3482,
+    "max_wait_cycles": 3482
+  },
+  "timing": {
+    "tail_wait_ms": 5.52115,
+    "first_write_to_payload_done_ms": 89.281515,
+    "first_write_boundary": "RP_FIRST_WRITE before the SD stream call",
+    "payload_done_boundary": "RP_PAYLOAD_DONE after complete slot-write return",
+    "cpu_hz": 400000000
+  },
+  "scene_inspection": "Recognizable illuminated triangular lattice/panel and surrounding dark structure; not a uniform black or white frame.",
+  "source_files": {
+    "tail50-capture/verified.json": "6b49bb44cf7543f6ac3eb801c41285750a6aa7adbd5a7f6845b37e39131be6b5",
+    "tail50-readback/readback-validation.json": "79278a1a965e3d932a61edf93e7933b97f814c9adee8c611249d226346defe01",
+    "tail50-readback/payload-3584/verified.json": "99aa6392da832cfcdde870f4bc3319dab493211a86e6521e902cc45dca3e3ffb",
+    "tail50-readback/scene.png": "99b70ac9e2d653c78779a96aec8ad5d0ace6c224702ded6d3c45467d15f3ae93"
+  },
+  "limits": [
+    "One RAM-awake capture/write and full12.5MHz readback, not50MHz read qualification.",
+    "Prior approximately205ms PIO result used a different pattern/scene/electrical configuration; this is not an isolated A/B speedup.",
+    "No cold-start, Standby, total-cycle energy or production reliability qualification is claimed.",
+    "GXR2/GXRE markers do not add an on-media checksum or establish power-loss atomicity."
+  ]
+}

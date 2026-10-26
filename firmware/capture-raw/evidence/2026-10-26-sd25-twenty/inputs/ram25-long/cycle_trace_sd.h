@@ -1,0 +1,80 @@
+/* SD-driver event allocation for cycle_trace.h. IDs are parsed by the host.
+ * Successful DONE events are absent on a failed path. LATEST events are
+ * overwritten for repeated calls; counters record their number, not duration.
+ * Write events describe the latest complete transfer, and do not isolate
+ * physical payload clocking from card busy or controller stalls.
+ */
+#ifndef RAW_CYCLE_TRACE_SD_H
+#define RAW_CYCLE_TRACE_SD_H
+
+#define CTE_SD_INIT_BEGIN 64
+#define CTE_SD_GPIO_BEGIN 65
+#define CTE_SD_GPIO_SETTLE_BEGIN 66
+#define CTE_SD_GPIO_SETTLE_DONE 67
+#define CTE_SD_CLOCK_TRAIN_BEGIN 68
+#define CTE_SD_CLOCK_TRAIN_DONE 69
+#define CTE_SD_CMD0_BEGIN 70
+#define CTE_SD_CMD0_DONE 71
+#define CTE_SD_CMD8_BEGIN 72
+#define CTE_SD_CMD8_DONE 73
+#define CTE_SD_ACMD41_BEGIN 74
+#define CTE_SD_ACMD41_DONE 75
+#define CTE_SD_IDENTIFY_REGS_BEGIN 76
+#define CTE_SD_IDENTIFY_REGS_DONE 77
+#define CTE_SD_SELECT_BEGIN 78
+#define CTE_SD_SELECT_DONE 79
+#define CTE_SD_CLOCK_SWITCH_BEGIN 80
+#define CTE_SD_CLOCK_SWITCH_DONE 81
+#define CTE_SD_WIDTH_BEGIN 82
+#define CTE_SD_WIDTH_SCR_DONE 83
+#define CTE_SD_WIDTH_ACMD6_DONE 84
+#define CTE_SD_WIDTH_DONE 85
+#define CTE_SD_INIT_DONE 86
+#define CTE_SD_SCR_LATEST_BEGIN 87
+#define CTE_SD_SCR_LATEST_DONE 88
+#define CTE_SD_WRITE_READY_BEGIN 89
+#define CTE_SD_WRITE_READY_DONE 90
+#define CTE_SD_PREANNOUNCE_BEGIN 91
+#define CTE_SD_PREANNOUNCE_DONE 92
+#define CTE_SD_WRITE_SETUP_BEGIN 93
+#define CTE_SD_CMD25_BEGIN 94
+#define CTE_SD_CMD25_DONE 95
+#define CTE_SD_DATAEND 96
+#define CTE_SD_WRITE_CLEANUP_BEGIN 97
+#define CTE_SD_CMD12_BEGIN 98
+#define CTE_SD_CMD12_DONE 99
+#define CTE_SD_WRITE_FINAL_READY_BEGIN 100
+#define CTE_SD_WRITE_FINAL_READY_DONE 101
+#define CTE_SD_WRITE_DONE 102
+#define CTE_SD_PRODUCER_WAIT_BEGIN 103
+#define CTE_SD_PRODUCER_WAIT_DONE 104
+#define CTE_SD_IDMA_SELECTED 105
+#define CTE_SD_PIO_SELECTED 106
+#define CTE_SD_SYNC_LATEST_BEGIN 107
+#define CTE_SD_SYNC_LATEST_DONE 108
+#define CTE_SD_DEINIT_BEGIN 109
+#define CTE_SD_DEINIT_RELEASE_BEGIN 110
+#define CTE_SD_DEINIT_DONE 111
+#define CTE_SD_READ_LATEST_BEGIN 112
+#define CTE_SD_READ_LATEST_DONE 113
+#define CTE_SD_READ_DATAEND_LATEST 114
+#define CTE_SD_READ_CMD_BEGIN_LATEST 115
+#define CTE_SD_READ_CMD_DONE_LATEST 116
+#define CTE_SD_LAST_ERROR 117
+#define CTE_SD_IDMA_RELEASED 118
+
+#define CTC_SD_INIT_CALLS 0
+#define CTC_SD_ACMD41_ATTEMPTS 1
+#define CTC_SD_READ_TRANSFERS 2
+#define CTC_SD_SCR_READS 3
+#define CTC_SD_WRITE_TRANSFERS 4
+#define CTC_SD_IDMA_TRANSFERS 5
+#define CTC_SD_PIO_TRANSFERS 6
+#define CTC_SD_PREANNOUNCE_CALLS 7
+#define CTC_SD_CMD25_CALLS 8
+#define CTC_SD_CMD12_WRITE_CALLS 9
+#define CTC_SD_SYNC_CALLS 10
+#define CTC_SD_DEINIT_CALLS 11
+#define CTC_SD_ERROR_CALLS 12
+
+#endif

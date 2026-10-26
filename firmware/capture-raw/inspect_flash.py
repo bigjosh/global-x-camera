@@ -86,6 +86,7 @@ def checked_build(folder,receiver_sha,sector_sha):
     bench.width_layout(m)
     bench.gpio_layout(m)
     bench.compensation_layout(m)
+    bench.diagnostic_layout(m,1)
     return m,p,code
 
 

@@ -1,0 +1,116 @@
+{
+  "schema": 1,
+  "passed": true,
+  "profile": "four-bit 12.5 MHz NEGEDGE identification+transfer, Standby",
+  "slot": 19,
+  "lba": 70870,
+  "bytes": 1909760,
+  "blocks": 3730,
+  "independent_crc16_lanes_checked": 14920,
+  "all_lane_crc16_match": true,
+  "independent_accepted_tokens": 3730,
+  "all_start_end_bits_valid": true,
+  "wire_matches_retrieved_slot": true,
+  "original_camera_ram_comparison": false,
+  "source_limit": "Original camera RAM was lost in Standby; comparator is the subsequently retrieved complete SD slot.",
+  "wire_sha256": "5a4805fd675182529c677c7b2de26c1bb068ab6344a20ce454fce964acbcb166",
+  "payload_clock_period_ns": {
+    "n": 3815790,
+    "minimum": 75.99999984897465,
+    "median": 79.99999995789153,
+    "maximum": 84.00000017783071,
+    "p01": 79.99999984686923,
+    "p99": 84.00000006680841
+  },
+  "command_phase": {
+    "identification": {
+      "commands": 127,
+      "falling_offset_ns": {
+        "n": 1477,
+        "minimum": -4.000000053405728,
+        "median": 0.0,
+        "maximum": 3.9999999978945766,
+        "p01": -3.9999999978945766,
+        "p99": 0.0
+      },
+      "rising_offset_ns": {
+        "n": 1477,
+        "minimum": -5040.000000011702,
+        "median": 5024.0000000201235,
+        "maximum": 5044.000000009596,
+        "p01": -5036.000000013807,
+        "p99": 5036.959999986657
+      }
+    },
+    "fast": {
+      "commands": 81,
+      "falling_offset_ns": {
+        "n": 1604,
+        "minimum": -4.000000108916879,
+        "median": 0.0,
+        "maximum": 0.0,
+        "p01": -3.9999999978945766,
+        "p99": 0.0
+      },
+      "rising_offset_ns": {
+        "n": 1604,
+        "minimum": -39.999999978945766,
+        "median": 39.999999978945766,
+        "maximum": 40.00000008996807,
+        "p01": -39.999999978945766,
+        "p99": 40.00000008996807
+      }
+    }
+  },
+  "timing": {
+    "origin": "Saleae capture start; not power-good or reset release",
+    "cmd0_start_s": 0.281572548,
+    "acmd23_start_s": 0.507849392,
+    "cmd25_start_s": 0.507876888,
+    "first_data_start_s": 0.50788598,
+    "last_data_end_s": 0.841785128,
+    "data_packet_window_ms": 333.8991480000001,
+    "sum_data_packet_spans_ms": 312.482992,
+    "nominal_payload_only_ms": 305.5616,
+    "block_busy_count": 3730,
+    "sum_exposed_block_busy_us": 16616.684,
+    "block_busy_us": {
+      "n": 3730,
+      "minimum": 0.56,
+      "median": 0.564,
+      "maximum": 7405.108,
+      "p01": 0.56,
+      "p99": 0.568
+    },
+    "cmd12_start_s": 0.841801708,
+    "cmd12_busy_us": 1921.9,
+    "first_final_ready_response_end_s": 0.843986832,
+    "cmd25_to_final_ready_ms": 336.10994400000004,
+    "cmd0_to_final_ready_ms": 562.4142840000001,
+    "limit": "Packet spans include start/CRC/end sampling boundaries. Busy is exposed DAT0 busy, not isolated internal card programming time; other command/gap time remains. No energy integration or total power-up-to-Standby timing is derived here."
+  },
+  "decoder_errors": [
+    {
+      "description": "CMD63 command 0xFFFFFFFF CRC BAD",
+      "start_s": 0.242754352,
+      "end_s": 0.271894596
+    }
+  ],
+  "decoder_error_classification": "Known initial framing artifact before CMD0; all actual commands, data packets and status tokens pass.",
+  "sources": {
+    "capture_sha256": "c20438b089fbc57d4ac69780627b8ac66878b47863e9de1deb2d328aa4223fe1",
+    "events_csv_sha256": "8d6819ce89624d19abe111613523fc17795a5acfbe80b49e3dfca298fe1465de",
+    "slot_sha256": "5a4805fd675182529c677c7b2de26c1bb068ab6344a20ce454fce964acbcb166",
+    "script_sha256": "6f6c32ca60f87dfbc5b2a3bf6a2e51c4afd1b8b17891cc66f0e1cbe1de0f2118",
+    "channel_map": {
+      "CMD": 0,
+      "CLK": 1,
+      "DAT0": 2,
+      "DAT1": 3,
+      "DAT2": 4,
+      "DAT3": 5
+    },
+    "sample_edge": "rising",
+    "additional_sample_offset": 0
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "schema": 1,
+  "hardware_accessed": false,
+  "profiles": [
+    {
+      "name": "ram-fixed-compensation-tail-wait",
+      "sha256": "018f15dae3a866bc0184ca4226316216f9d6869ae28976e123a8445d9cbec4e9",
+      "bytes": 31972,
+      "allowed_operation": 1,
+      "rejected_operations": [
+        2,
+        3
+      ],
+      "checked_build_passed": true,
+      "flash_standby_rejected": true,
+      "frequency_hz": 50000000,
+      "reviewed": true,
+      "idma_read": false,
+      "tail_wait": true,
+      "tail_proof_address": 875594056,
+      "tail_proof_overlaps_sd_proofs": []
+    },
+    {
+      "name": "ram-idma-read-fixed-compensation",
+      "sha256": "2093b8baeffb5bebc2d7465781d83f322184ca0619d957b419f23458d7257668",
+      "bytes": 30392,
+      "allowed_operation": 3,
+      "rejected_operations": [
+        1,
+        2
+      ],
+      "checked_build_passed": true,
+      "flash_standby_rejected": true,
+      "frequency_hz": 50000000,
+      "reviewed": true,
+      "idma_read": true,
+      "tail_wait": false,
+      "tail_proof_address": null,
+      "tail_proof_overlaps_sd_proofs": []
+    },
+    {
+      "name": "ram-reviewed125-tail-wait",
+      "sha256": "b668a8ddd8178b85c9f73a5cb2439aef6e5fd397df24674bd1a775f8a18f2040",
+      "bytes": 29456,
+      "allowed_operation": 1,
+      "rejected_operations": [
+        2,
+        3
+      ],
+      "checked_build_passed": true,
+      "flash_standby_rejected": true,
+      "frequency_hz": 12500000,
+      "reviewed": true,
+      "idma_read": false,
+      "tail_wait": true,
+      "tail_proof_address": 875591176,
+      "tail_proof_overlaps_sd_proofs": []
+    }
+  ],
+  "limits": [
+    "Host admission and frozen identity only. Hardware, image correctness, timing and reliability require separate evidence.",
+    "Tail telemetry never establishes card idle or authorizes a halt/reset; existing completion/ownership proof remains required."
+  ]
+}

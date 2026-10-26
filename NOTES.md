@@ -71,3 +71,11 @@ reasons, not another full transcript or a replacement for immutable evidence.
 **Rejected:** copying every checkpoint into notes, rewriting historical evidence to match today's design, turning unapproved research into decisions, or duplicating the same rationale in several folders. Missing sources and unqualified results remain explicit rather than filled in by inference.
 **Evidence:** this request in Consolidate project decisions - SD card sidequest, thread `01a15716-3ee1-7b01-9225-e85c60f21573`, 2026-10-24; [coverage and curation](docs/notes-bootstrap-2026-10-24.md); convention revision named above.
 **Provenance:** recorded contemporaneously. Earlier entries were reconstructed from the cited records with user-delegated vetting; future changes append a later entry when superseding a decision.
+
+## 2026-10-26  Preserve exact evidence bytes when committing measurement archives
+
+**Why:** frozen experiment manifests bind hashes to source copies, operation records and instrument logs. The repository's normal LF text policy can change CRLF source copies when staging, invalidating those hashes on a fresh checkout even though the working archive verifies. Evidence-specific `-text` attributes preserve the recorded bytes; normal source and documentation retain their existing text policy.
+
+**Rejected:** rewriting historical evidence hashes to accommodate normalization, claiming working-tree verification proves Git contains identical bytes, or disabling normalization for the whole repository.
+
+**Evidence:** the scoped rules in [.gitattributes](.gitattributes), local archive attributes and SHA256SUMS manifests in [the active25MHz evidence](firmware/capture-raw/evidence/2026-10-26-sd25-active/README.md), and staged-blob comparison during the promotion commit.

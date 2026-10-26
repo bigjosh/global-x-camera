@@ -1,0 +1,288 @@
+{
+  "schema": 1,
+  "method": "Independent raw 250 MS/s edge reconstruction and CRC16; known 12.5 MHz readback reference, no live instrument access.",
+  "limits": [
+    "Digital quantization is 4 ns. Narrow captured pulses are observations, not analog ringing, voltage or timing-margin measurements.",
+    "Offline sample offsets do not change or observe the MCU internal receive latch.",
+    "All observed wire packets include extra card packets after DLEN completes before CMD12; they are not all requested or consumed by the MCU.",
+    "Clock intervals above100ns are counted separately from the active frequency distribution; hardware flow control can pause clocks and these are not labeled clock defects.",
+    "The first64 subset is the first requested CMD18 group, successful in both trials. Analyzer errors here demonstrate why analyzer counts cannot be substituted for MCU CRC outcomes.",
+    "Different run lengths and card state preclude a controlled electrical-causality or reliability claim.",
+    "Neither tested 50 MHz slew profile is qualified: each later produced a hardware DCRCFAIL."
+  ],
+  "trials": [
+    {
+      "trace": "read-repeat",
+      "sample_rate_hz": 250000000,
+      "channels": {
+        "CMD": 0,
+        "CLK": 1,
+        "DAT0": 2,
+        "DAT1": 3,
+        "DAT2": 4,
+        "DAT3": 5
+      },
+      "source_csv_sha256": "1ccc8d022dd36f8414f9656420b2d9736d8e8d6c91cec1c0e7c7f1fe4ab3b9f7",
+      "source_binary_sha256": {
+        "0": "8c22e2d8b5155fd3b9d5909b57f6527401f5261f53ca9ae8425be9c740d77197",
+        "1": "bf74b0c3dbceed61fe4cd021ebbf9d78258c6ab617b24ae5149e9c0d39784cab",
+        "2": "5af762248036eee81c720c25b75596cde0256d1a55f0ed67e7c47d32df9bd18f",
+        "3": "d73bf892824dd7f61ccda63f5325d823c56f21c9cfdc52ef1196f14730213011",
+        "4": "ab108fd30861522533592e6207d7e8de78eaace79ca1f77968660de35a520c38",
+        "5": "83cc6e9e1fceaa56b37c9ecbaac0c1c3233fd400907204d1d551cce6eba08079"
+      },
+      "reference_slot_lba": 74600,
+      "reference_slot_sha256": "5f0b5ee09b06d606dbce4f5fdb505393b3eb03f466036874639956340740811d",
+      "host_command_count": 10,
+      "host_cmd_after_previous_rising_ns": {
+        "n": 180,
+        "min": 0.0,
+        "median": 4.0,
+        "max": 8.0
+      },
+      "host_commands_matching_crc_and_argument_by_sample_offset_ns": {
+        "0": 0,
+        "4": 8,
+        "8": 10,
+        "12": 10,
+        "16": 10
+      },
+      "packet_groups": {
+        "all_observed_packets": {
+          "packets": 116,
+          "clock_half_width_ns": {
+            "4": 959,
+            "8": 115752,
+            "12": 124729,
+            "16": 3
+          },
+          "clock_half_intervals_above_100ns": 69,
+          "clock_rising_period_ns": {
+            "16": 6281,
+            "20": 105064,
+            "24": 9342
+          },
+          "clock_rising_intervals_above_100ns": 69,
+          "unique_4ns_clock_high_pulses": 959,
+          "short_pulses_per_1000_observed_data_clocks": 7.941634370134818,
+          "alignments": {
+            "rising0_nextclock": {
+              "all_lane_crc_good": 63,
+              "exact_reference_bytes": 64
+            },
+            "rising_plus12ns": {
+              "all_lane_crc_good": 66,
+              "exact_reference_bytes": 68
+            },
+            "rising_plus8ns": {
+              "all_lane_crc_good": 1,
+              "exact_reference_bytes": 15
+            },
+            "rising_plus16ns": {
+              "all_lane_crc_good": 38,
+              "exact_reference_bytes": 42
+            },
+            "rising_minus4ns": {
+              "all_lane_crc_good": 40,
+              "exact_reference_bytes": 43
+            },
+            "rising_minus8ns": {
+              "all_lane_crc_good": 69,
+              "exact_reference_bytes": 75
+            },
+            "rising_minus12ns": {
+              "all_lane_crc_good": 0,
+              "exact_reference_bytes": 3
+            }
+          }
+        },
+        "first_64_requested_packets": {
+          "packets": 64,
+          "clock_half_width_ns": {
+            "4": 569,
+            "8": 63726,
+            "12": 68906,
+            "16": 2
+          },
+          "clock_half_intervals_above_100ns": 45,
+          "clock_rising_period_ns": {
+            "16": 3462,
+            "20": 57912,
+            "24": 5205
+          },
+          "clock_rising_intervals_above_100ns": 45,
+          "unique_4ns_clock_high_pulses": 569,
+          "short_pulses_per_1000_observed_data_clocks": 8.540465898174832,
+          "alignments": {
+            "rising0_nextclock": {
+              "all_lane_crc_good": 33,
+              "exact_reference_bytes": 33
+            },
+            "rising_plus12ns": {
+              "all_lane_crc_good": 34,
+              "exact_reference_bytes": 34
+            },
+            "rising_plus8ns": {
+              "all_lane_crc_good": 1,
+              "exact_reference_bytes": 9
+            },
+            "rising_plus16ns": {
+              "all_lane_crc_good": 19,
+              "exact_reference_bytes": 21
+            },
+            "rising_minus4ns": {
+              "all_lane_crc_good": 21,
+              "exact_reference_bytes": 23
+            },
+            "rising_minus8ns": {
+              "all_lane_crc_good": 41,
+              "exact_reference_bytes": 44
+            },
+            "rising_minus12ns": {
+              "all_lane_crc_good": 0,
+              "exact_reference_bytes": 1
+            }
+          }
+        }
+      }
+    },
+    {
+      "trace": "mixed-read",
+      "sample_rate_hz": 250000000,
+      "channels": {
+        "CMD": 0,
+        "CLK": 1,
+        "DAT0": 2,
+        "DAT1": 3,
+        "DAT2": 4,
+        "DAT3": 5
+      },
+      "source_csv_sha256": "b912d01780b206c294c0c3cc73769dd203e0e8d827f30ce8b7de0b7eabe87156",
+      "source_binary_sha256": {
+        "0": "cf546276c1f1b16446cda9f42d28d131fc1ed06f22d728f691f2606cd69ff11f",
+        "1": "0aa89cfdb577b7a7c99f867e38243f0363fd3320c44eb7dce7ef831f8661ae2d",
+        "2": "c49e5ecf09b4abef522a115d15db9df4c1ef7cab1687a2c4ddcbc72b0974b3fd",
+        "3": "0709247c58a8c2622beced4d9b1a2ac061b12283ec21e80fbb46553f45b30a2f",
+        "4": "846472f27bea5de817f1ab6bcf41ed8cb79041206c114f3dcdceb3abbdc0ccdf",
+        "5": "23fd9fe41af6efca953c6a600ceaf216f3264987362ee507fbcba7c0e68ec14d"
+      },
+      "reference_slot_lba": 74600,
+      "reference_slot_sha256": "5f0b5ee09b06d606dbce4f5fdb505393b3eb03f466036874639956340740811d",
+      "host_command_count": 34,
+      "host_cmd_after_previous_rising_ns": {
+        "n": 614,
+        "min": 0.0,
+        "median": 4.0,
+        "max": 20.0
+      },
+      "host_commands_matching_crc_and_argument_by_sample_offset_ns": {
+        "0": 0,
+        "4": 7,
+        "8": 33,
+        "12": 34,
+        "16": 33
+      },
+      "packet_groups": {
+        "all_observed_packets": {
+          "packets": 649,
+          "clock_half_width_ns": {
+            "4": 3737,
+            "8": 652896,
+            "12": 694033,
+            "16": 192
+          },
+          "clock_half_intervals_above_100ns": 360,
+          "clock_rising_period_ns": {
+            "12": 18,
+            "16": 33015,
+            "20": 593886,
+            "24": 48296,
+            "28": 34
+          },
+          "clock_rising_intervals_above_100ns": 360,
+          "unique_4ns_clock_high_pulses": 3737,
+          "short_pulses_per_1000_observed_data_clocks": 5.531305829259231,
+          "alignments": {
+            "rising0_nextclock": {
+              "all_lane_crc_good": 311,
+              "exact_reference_bytes": 323
+            },
+            "rising_plus12ns": {
+              "all_lane_crc_good": 316,
+              "exact_reference_bytes": 337
+            },
+            "rising_plus8ns": {
+              "all_lane_crc_good": 7,
+              "exact_reference_bytes": 129
+            },
+            "rising_plus16ns": {
+              "all_lane_crc_good": 210,
+              "exact_reference_bytes": 219
+            },
+            "rising_minus4ns": {
+              "all_lane_crc_good": 211,
+              "exact_reference_bytes": 218
+            },
+            "rising_minus8ns": {
+              "all_lane_crc_good": 373,
+              "exact_reference_bytes": 412
+            },
+            "rising_minus12ns": {
+              "all_lane_crc_good": 0,
+              "exact_reference_bytes": 14
+            }
+          }
+        },
+        "first_64_requested_packets": {
+          "packets": 64,
+          "clock_half_width_ns": {
+            "4": 413,
+            "8": 64059,
+            "12": 68707,
+            "16": 24
+          },
+          "clock_half_intervals_above_100ns": 45,
+          "clock_rising_period_ns": {
+            "16": 3655,
+            "20": 57522,
+            "24": 5400,
+            "28": 2
+          },
+          "clock_rising_intervals_above_100ns": 45,
+          "unique_4ns_clock_high_pulses": 413,
+          "short_pulses_per_1000_observed_data_clocks": 6.198967339097022,
+          "alignments": {
+            "rising0_nextclock": {
+              "all_lane_crc_good": 27,
+              "exact_reference_bytes": 30
+            },
+            "rising_plus12ns": {
+              "all_lane_crc_good": 28,
+              "exact_reference_bytes": 30
+            },
+            "rising_plus8ns": {
+              "all_lane_crc_good": 2,
+              "exact_reference_bytes": 9
+            },
+            "rising_plus16ns": {
+              "all_lane_crc_good": 15,
+              "exact_reference_bytes": 17
+            },
+            "rising_minus4ns": {
+              "all_lane_crc_good": 16,
+              "exact_reference_bytes": 16
+            },
+            "rising_minus8ns": {
+              "all_lane_crc_good": 41,
+              "exact_reference_bytes": 42
+            },
+            "rising_minus12ns": {
+              "all_lane_crc_good": 0,
+              "exact_reference_bytes": 0
+            }
+          }
+        }
+      }
+    }
+  ]
+}

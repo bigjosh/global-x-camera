@@ -203,14 +203,28 @@ def main():
     p.add_argument('--transport',choices=('pio','idma'),default='idma')
     p.add_argument('--sd-bus-width',type=int,choices=(1,4),default=1,
                    help='Native SDMMC data width; four-bit requires the full-pin carrier')
-    p.add_argument('--sd-clock-hz',type=int,choices=(12500000,25000000),default=25000000,
+    p.add_argument('--sd-clock-hz',type=int,choices=(12500000,25000000,50000000),default=25000000,
                    help='Native SD clock; explicitly select 12.5 MHz for the qualified fallback')
     p.add_argument('--sd-gpio-speed',type=int,choices=(0,1,2,3),default=3,
                    help='SD GPIO OSPEEDR encoding; nondefault slew is RAM diagnostic only')
     p.add_argument('--sd-fixed-compensation',action='store_true',
                    help='RAM-only ES0620 VDDIO5 fixed-code test at 25 MHz and GPIO speed3')
     p.add_argument('--sd-clock-negedge',action='store_true',
-                   help='Explicit 25 MHz four-bit launch phase; flash requires default speed3 and compensation')
+                   help='Explicit four-bit falling-edge launch; 12.5 MHz and flash require speed3/default compensation')
+    p.add_argument('--sd-clock-negedge-init',action='store_true',
+                   help='Also launch identification commands on falling edges; requires --sd-clock-negedge')
+    p.add_argument('--sd-review-profile',action='store_true',
+                   help='Opt into reviewed completion/abort guards; required for explicit 50 MHz High Speed')
+    p.add_argument('--sd-high-speed-mixed-slew',action='store_true',
+                   help='RAM50-only CLK speed1 and CMD/DAT speed0, with unchanged compensation')
+    p.add_argument('--sd-high-speed-fixed-compensation',action='store_true',
+                   help='RAM50-only uniform-speed3 ES0620 VDDIO5 fixed-code0x287 trial')
+    p.add_argument('--sd-high-speed-combined-electrical',action='store_true',
+                   help='Explicitly combine the two reviewed RAM50 slew/compensation experiments')
+    p.add_argument('--sd-idma-read',action='store_true',help='Reviewed RAM read-only diagnostic using SDMMC receive IDMA')
+    p.add_argument('--sd-startup-opt',action='store_true',help='Reviewed startup delays/SCR cache; flash admits only the exact 12.5/25 MHz no-tail profiles')
+    p.add_argument('--sd-early-run-clock',action='store_true',help='RAM experiment: validate CSD speed and switch to 12.5 MHz before CMD7')
+    p.add_argument('--raw-dma-tail-wait',action='store_true',help='RAM capture: wait up to 10 ms for validated frame tail before choosing PIO')
     p.add_argument('--chunk-sectors',type=int,default=1024)
     p.add_argument('--whole-image-preerase',action='store_true',help='One CMD55/ACMD23 + CMD25 for all3730 padded payload sectors')
     p.add_argument('--magic-format',action='store_true',help='GXR2 + front metadata + packedRAW + GXRE slots; one progressive CMD25')
@@ -225,17 +239,59 @@ def main():
     p.add_argument('--snapshot',action='store_true',help='RAM diagnostic: copy the last 512 B at each published prefix')
     p.add_argument('--poison',action='store_true',help='RAM diagnostic: fill the frame with A5 before sensor start')
     a=p.parse_args()
+    a.sd_high_speed=a.sd_clock_hz==50000000
+    if a.sd_early_run_clock and (a.flash or a.standby or not a.sd_review_profile or
+            not a.sd_startup_opt or a.sd_bus_width!=4 or a.sd_clock_hz!=12500000 or
+            not a.sd_clock_negedge or not a.sd_clock_negedge_init or a.sd_gpio_speed!=3 or
+            a.sd_fixed_compensation or a.sd_high_speed_mixed_slew or a.sd_high_speed_fixed_compensation or
+            a.sd_high_speed_combined_electrical or a.sd_idma_read or a.raw_dma_tail_wait or a.dma_sleep or
+            not a.magic_format or not a.line_stream or not a.async_stop or a.transport!='idma' or
+            a.pattern!='scene' or a.exposure_coarse!=1428 or a.preinit or a.snapshot or a.poison or
+            a.whole_image_preerase):
+        p.error('Early run clock requires the exact reviewed startup 12.5 MHz no-tail RAM scene profile')
+    reviewed_startup_flash=(a.flash and a.sd_review_profile and a.sd_bus_width==4 and
+        a.sd_clock_hz in (12500000,25000000) and a.sd_clock_negedge and a.sd_clock_negedge_init and
+        a.sd_gpio_speed==3 and not a.sd_fixed_compensation and not a.sd_high_speed_mixed_slew and
+        not a.sd_high_speed_fixed_compensation and not a.sd_high_speed_combined_electrical and
+        not a.sd_idma_read and not a.raw_dma_tail_wait and not a.dma_sleep and
+        a.magic_format and a.line_stream and a.async_stop and a.transport=='idma' and
+        a.pattern=='scene' and a.exposure_coarse==1428 and not a.preinit and not a.snapshot and
+        not a.poison and not a.whole_image_preerase and not a.cycle_trace)
+    if a.sd_startup_opt and (not a.sd_review_profile or a.sd_bus_width!=4 or
+            ((a.flash or a.standby) and not reviewed_startup_flash)):
+        p.error('Startup flash requires an exact reviewed 12.5/25 MHz no-tail capture profile')
+    if a.sd_idma_read and (not a.sd_review_profile or a.flash or a.standby or a.raw_dma_tail_wait):
+        p.error('IDMA read requires a reviewed RAM read-only profile without capture tail wait')
+    if a.raw_dma_tail_wait and (a.flash or a.standby or not a.magic_format or not a.line_stream or
+            a.transport!='idma' or not a.async_stop or a.dma_sleep):
+        p.error('DMA tail wait requires RAM magic LINE/IDMA/asynchronous STOP')
+    if a.sd_high_speed_fixed_compensation: a.sd_fixed_compensation=True
+    if a.sd_high_speed and (not a.sd_review_profile or not a.sd_clock_negedge_init or
+            not a.sd_clock_negedge or a.sd_bus_width!=4 or a.sd_gpio_speed!=3 or
+            (a.sd_fixed_compensation and not a.sd_high_speed_fixed_compensation)):
+        p.error('50 MHz requires reviewed four-bit falling-edge identification, default HS launch and unchanged base speed3/compensation')
+    if a.sd_high_speed_combined_electrical and (not a.sd_high_speed_mixed_slew or not a.sd_high_speed_fixed_compensation):
+        p.error('Combined electrical trial requires both explicit High Speed experiments')
+    if a.sd_high_speed_fixed_compensation and (not a.sd_high_speed or a.flash or a.standby or
+            (a.sd_high_speed_mixed_slew and not a.sd_high_speed_combined_electrical)):
+        p.error('High Speed fixed compensation requires an isolated uniform-slew RAM50 profile')
+    if a.sd_high_speed_mixed_slew and (not a.sd_high_speed or a.flash or a.standby):
+        p.error('Mixed High Speed slew is a 50 MHz RAM diagnostic only')
     if a.cycle_trace and (a.standby or not a.magic_format):
         p.error('Cycle trace currently requires magic format and awake completion; Standby loses log SRAM')
     if a.sd_gpio_speed!=3 and (a.flash or a.standby):
         p.error('Nondefault SD GPIO speed is RAM diagnostic only')
     if a.sd_gpio_speed in (1,2) and (a.sd_clock_hz!=25000000 or a.sd_bus_width!=4 or a.sd_fixed_compensation):
         p.error('Intermediate GPIO speed is a four-bit 25 MHz RAM diagnostic without compensation changes')
-    if a.sd_fixed_compensation and (a.flash or a.standby or a.sd_clock_hz!=25000000 or a.sd_gpio_speed!=3):
+    if a.sd_fixed_compensation and (a.flash or a.standby or (a.sd_clock_hz!=25000000 and not a.sd_high_speed_fixed_compensation) or a.sd_gpio_speed!=3):
         p.error('Fixed compensation is an isolated 25 MHz RAM diagnostic only')
-    if a.sd_clock_negedge and (a.sd_clock_hz!=25000000 or
-            a.sd_bus_width!=4 or a.sd_gpio_speed==0 or a.sd_fixed_compensation):
-        p.error('Clock phase requires 25 MHz four-bit mode without compensation changes')
+    if a.sd_clock_negedge and (a.sd_bus_width!=4 or a.sd_gpio_speed==0 or (a.sd_fixed_compensation and not a.sd_high_speed_fixed_compensation) or
+            a.sd_clock_hz==12500000 and a.sd_gpio_speed!=3):
+        p.error('Clock phase requires four-bit mode without compensation changes; 12.5 MHz requires speed3')
+    if a.sd_clock_negedge_init and (not a.sd_clock_negedge or a.sd_gpio_speed!=3):
+        p.error('Initial clock phase requires falling-edge run phase and speed3')
+    if a.sd_clock_negedge and a.sd_clock_hz==12500000 and not a.sd_clock_negedge_init:
+        p.error('12.5 MHz clock phase requires explicit falling-edge identification')
     if a.magic_format and (a.transport!='idma' or a.dma_sleep or a.whole_image_preerase or not a.line_stream):
         p.error('Magic format requires LINE producer and polling IDMA/flow-controlled stream, without legacy whole-image option')
     if not 1<=a.exposure_coarse<=63000 or (a.flash and a.exposure_coarse!=1428):
@@ -293,6 +349,8 @@ def main():
     if a.cycle_trace:
         for name in ('cycle_trace.h','cycle_trace_events.h','cycle_trace_sd.h'):
             (out/name).write_bytes((HERE/name).read_bytes())
+    if a.sd_high_speed:
+        (out/'sd_clock_profile.h').write_bytes((ROOT/'firmware/sd-storage/sd_clock_profile.h').read_bytes())
     if not a.flash:
         sensor=sensor_source((pbase/'stage1_sensor.c').read_text())
         if a.exposure_coarse!=1428: sensor=sensor_exposure(sensor,a.exposure_coarse)
@@ -317,9 +375,19 @@ def main():
               f'-DSD_GPIO_SPEED={a.sd_gpio_speed}',
               f'-DSD_FIXED_COMPENSATION={int(a.sd_fixed_compensation)}',
               f'-DSD_CLOCK_NEGEDGE={int(a.sd_clock_negedge)}',
+              f'-DSD_CLOCK_NEGEDGE_INIT={int(a.sd_clock_negedge_init)}',
+              f'-DSD_REVIEW_PROFILE={int(a.sd_review_profile)}',
+              f'-DSD_IDMA_READ={int(a.sd_idma_read)}',
+              f'-DSD_STARTUP_OPT={int(a.sd_startup_opt)}',
+              f'-DSD_EARLY_RUN_CLOCK={int(a.sd_early_run_clock)}',
+              f'-DSD_HIGH_SPEED={int(a.sd_high_speed)}',
+              f'-DSD_HIGH_SPEED_MIXED_SLEW={int(a.sd_high_speed_mixed_slew)}',
+              f'-DSD_HIGH_SPEED_FIXED_COMPENSATION={int(a.sd_high_speed_fixed_compensation)}',
+              f'-DSD_HIGH_SPEED_COMBINED_ELECTRICAL={int(a.sd_high_speed_combined_electrical)}',
               f'-DRAW_STANDBY={int(a.standby)}',f'-DRAW_DMA={int(a.transport=="idma")}',
               f'-DRAW_ASYNC_STOP={int(a.async_stop)}',
               f'-DRAW_DMA_SLEEP={int(a.dma_sleep)}',
+              f'-DRAW_DMA_TAIL_WAIT={int(a.raw_dma_tail_wait)}',
               f'-DRAW_WHOLE_IMAGE_PREERASE={int(a.whole_image_preerase)}',
               f'-DRAW_MAGIC_FORMAT={int(a.magic_format)}',
               f'-DRAW_EXPOSURE_COARSE={a.exposure_coarse}U',
@@ -375,6 +443,28 @@ def main():
         pattern=int(a.pattern=='diagonal'),transport=a.transport,sd_bus_width=a.sd_bus_width,
         sd_clock_hz=a.sd_clock_hz,sd_gpio_speed=a.sd_gpio_speed,
         sd_clock_negedge=a.sd_clock_negedge,
+        sd_clock_negedge_init=a.sd_clock_negedge_init,
+        sd_review_profile=a.sd_review_profile,sd_high_speed=a.sd_high_speed,
+        sd_idma_read=a.sd_idma_read,
+        sd_startup_opt=a.sd_startup_opt,
+        sd_startup_proof=symbol('sd_startup_proof',a.sd_startup_opt),
+        sd_startup_proof_bytes=64 if a.sd_startup_opt else 0,
+        sd_early_run_clock=a.sd_early_run_clock,
+        sd_early_clock_proof=symbol('sd_early_clock_proof',a.sd_early_run_clock),
+        sd_early_clock_proof_bytes=64 if a.sd_early_run_clock else 0,
+        sd_high_speed_mixed_slew=a.sd_high_speed_mixed_slew,
+        sd_high_speed_fixed_compensation=a.sd_high_speed_fixed_compensation,
+        sd_high_speed_combined_electrical=a.sd_high_speed_combined_electrical,
+        sd_high_speed_gpio_values=dict(c=0x10 if a.sd_high_speed_mixed_slew else 0xFF3,
+            e=0 if a.sd_high_speed_mixed_slew else 0x300) if a.sd_high_speed else None,
+        sd_kernel_hz=100000000 if a.sd_high_speed else 150000000,
+        sd_identification_clock_negedge=a.sd_clock_negedge_init,
+        sd_transfer_clock_negedge=False if a.sd_high_speed else a.sd_clock_negedge,
+        sd_switch_clock_hz=25000000 if a.sd_high_speed else None,
+        sd_high_speed_proof=symbol('sd_high_speed_proof',a.sd_high_speed),
+        sd_high_speed_proof_bytes=184 if a.sd_high_speed else 0,
+        sd_clock_profile_proof=symbol('sd_review_clock_proof',a.sd_high_speed),
+        sd_clock_profile_proof_bytes=128 if a.sd_high_speed else 0,
         sd_gpio_masks=dict(c=0xFF3 if a.sd_bus_width==4 else 0x3F0,
                            e=0x300 if a.sd_bus_width==4 else 0),
         sd_fixed_compensation=a.sd_fixed_compensation,
@@ -382,6 +472,9 @@ def main():
         chunk_sectors=3730 if a.whole_image_preerase or a.magic_format else a.chunk_sectors,
         flash=a.flash,standby=a.standby,async_stop=a.async_stop,line_stream=a.line_stream,
         dma_sleep=a.dma_sleep,dma_wait=symbol('raw_dma_wait',a.dma_sleep),dma_wait_bytes=24,
+        raw_dma_tail_wait=a.raw_dma_tail_wait,
+        raw_dma_tail_wait_proof=symbol('raw_dma_tail_wait_proof',a.raw_dma_tail_wait),
+        raw_dma_tail_wait_proof_bytes=64 if a.raw_dma_tail_wait else 0,
         dma_wait_clock=(symbol('HAL_GetTick')|1) if a.dma_sleep else None,
         dma_sleep_clocks=symbol('raw_dma_sleep_clocks',a.dma_sleep),dma_sleep_clocks_words=14,
         preinit=a.preinit,line_snapshots=a.snapshot,line_poison=a.poison,

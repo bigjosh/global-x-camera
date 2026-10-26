@@ -29,6 +29,32 @@
 #ifndef RAW_WHOLE_IMAGE_PREERASE
 #define RAW_WHOLE_IMAGE_PREERASE 0
 #endif
+#ifndef RAW_DMA_TAIL_WAIT
+#define RAW_DMA_TAIL_WAIT 0
+#endif
+#if RAW_DMA_TAIL_WAIT != 0 && RAW_DMA_TAIL_WAIT != 1
+#error DMA tail wait must be explicitly disabled or enabled
+#endif
+#if RAW_DMA_TAIL_WAIT && !RAW_MAGIC_FORMAT
+#error DMA tail wait requires the magic slot format
+#endif
+#if RAW_DMA_TAIL_WAIT
+/* Optional RAM experiment: this record is telemetry, never an idle proof. */
+#define RAW_DMA_TAIL_WAIT_MAGIC 0x31575444U /* DTW1 */
+#define RAW_DMA_TAIL_WAIT_WORDS 16U
+#define RAW_DMA_TAIL_WAIT_CYCLES 4000000U /* 10 ms at the qualified 400 MHz */
+enum {
+ DTW_MAGIC, DTW_VERSION, DTW_OUTCOME, DTW_START, DTW_END, DTW_ELAPSED,
+ DTW_LIMIT, DTW_AVAILABLE_BEFORE, DTW_AVAILABLE_AFTER, DTW_POLLS,
+ DTW_RESULT, DTW_FRAME_BEFORE, DTW_STOPPED_BEFORE,
+ DTW_RESERVED0, DTW_RESERVED1, DTW_RESERVED2
+};
+enum {
+ DTW_ALREADY_FULL=1, DTW_FRAME_PENDING=2, DTW_PREFIX_SHORT=3,
+ DTW_COMPLETED=4, DTW_TIMEOUT_PIO=5, DTW_FAULT=6
+};
+extern volatile uint32_t raw_dma_tail_wait_proof[RAW_DMA_TAIL_WAIT_WORDS];
+#endif
 #define RAW_REQUEST_ADDRESS 0x343FD000U
 #define RAW_PROOF_ADDRESS 0x343FD100U
 #define RAW_READ_ADDRESS 0x34200000U

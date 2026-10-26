@@ -1,0 +1,186 @@
+{
+  "date": "2026-10-26",
+  "purpose": "User-requested slower SD clock for accurate logic capture",
+  "profile": {
+    "build": "tmp/bringup/sd-fourbit-20261024/flash125-v23",
+    "sd_clock_hz": 12500000,
+    "sd_bus_width": 4,
+    "sd_clock_negedge": false,
+    "gpio_speed": 3,
+    "compensation": "unchanged",
+    "note": "Both clock frequency and launch phase change relative to prior25MHz/NEGEDGE firmware"
+  },
+  "firmware_verification": [
+    {
+      "path": "tmp\\bringup\\sd125-probed-20261026\\install-write\\verified.json",
+      "bytes": 241,
+      "sha256": "7458b244fa5dfaa7dea129121fb07ce515f4b00106db7307afc6923735903911"
+    },
+    {
+      "path": "tmp\\bringup\\sd125-probed-20261026\\nor-after\\verified.json",
+      "bytes": 139,
+      "sha256": "eb8173c349da3ffe76e9de6176449cdbb5eab9d00e02fb0c2d21896948fc68e0"
+    },
+    {
+      "path": "tmp\\bringup\\sd125-probed-20261026\\nor-following\\verified.json",
+      "bytes": 142,
+      "sha256": "2b402ebf2619c88495ee54a688d2f1d9903f4bbed78e4458780bf3630408552f"
+    },
+    {
+      "path": "tmp\\bringup\\sd125-probed-20261026\\park-install\\result.json",
+      "bytes": 1953,
+      "sha256": "e7e00d63e56bbb76a54ae6b218d80a545f8bb3807145142b0ad139b80e4bc009"
+    }
+  ],
+  "capture": {
+    "path": "tmp\\bringup\\sd125-probed-20261026\\cold01\\signals.sal",
+    "bytes": 2924289,
+    "sha256": "558fa1747c465aa8568317de4c6c58ab6539636d056a2a41aeb69a43a9018dc3"
+  },
+  "annotated_capture": {
+    "path": "tmp\\bringup\\sd125-probed-20261026\\decoded-offset8\\sd-analyzed.sal",
+    "bytes": 2926377,
+    "sha256": "2f01e88342ac1288de4c827aad9e67d3fd867e49057461b32f6aecb60e7ff27d"
+  },
+  "events_csv": {
+    "path": "tmp\\bringup\\sd125-probed-20261026\\decoded-offset8\\sd-all-events.csv",
+    "bytes": 2754427,
+    "sha256": "7cb092a6f55026051a8b3842350c246b278ec90cc0845dc99c87a06ecce9083d"
+  },
+  "raw_channels": [
+    {
+      "path": "tmp\\bringup\\sd125-probed-20261026\\cold01\\binary\\digital_0.bin",
+      "bytes": 85484,
+      "sha256": "4f8194fb4e56575a11e46e647a1086a2037659b386fe78f07b30078e9f170d73"
+    },
+    {
+      "path": "tmp\\bringup\\sd125-probed-20261026\\cold01\\binary\\digital_1.bin",
+      "bytes": 67562124,
+      "sha256": "eb4e197b60d4c59fb0dc37d0e7916a486317c9756b98bb43bda97aea0d4becae"
+    },
+    {
+      "path": "tmp\\bringup\\sd125-probed-20261026\\cold01\\binary\\digital_2.bin",
+      "bytes": 24751212,
+      "sha256": "a2fee2478750c39ec553d35eeba525f9197d7001e012da454c9150da790564ea"
+    },
+    {
+      "path": "tmp\\bringup\\sd125-probed-20261026\\cold01\\binary\\digital_3.bin",
+      "bytes": 4971852,
+      "sha256": "59191456c4e7359aebe788ca46e59f549854334bc6b31b245ba8d1e9a6a8e0c1"
+    },
+    {
+      "path": "tmp\\bringup\\sd125-probed-20261026\\cold01\\binary\\digital_4.bin",
+      "bytes": 6122268,
+      "sha256": "15f75e287cdd8841a3edde84046ea709e7a932c75385bfff46079655dc559241"
+    },
+    {
+      "path": "tmp\\bringup\\sd125-probed-20261026\\cold01\\binary\\digital_5.bin",
+      "bytes": 4489532,
+      "sha256": "d3c195d26644b6634cac5a6552e4be8fea5c435793f53df87ade8d1b0fe421f9"
+    }
+  ],
+  "settings": {
+    "sample_rate": 250000000,
+    "edge": "Rising",
+    "offset_samples": 8,
+    "offset_ns": 32,
+    "channels": {
+      "CMD": 0,
+      "CLK": 1,
+      "DAT0": 2,
+      "DAT1": 3,
+      "DAT2": 4,
+      "DAT3": 5
+    }
+  },
+  "event_counts": {
+    "command": 197,
+    "response": 195,
+    "transfer": 20,
+    "data_block": 3749,
+    "bus_width": 1,
+    "write_status": 3730,
+    "busy": 3731
+  },
+  "write_transfer": {
+    "start_sample": "122622125",
+    "end_sample": "202910662",
+    "start_s": "0.4904885",
+    "end_s": "0.811642648",
+    "duration_us": "321154.148",
+    "signal": "DAT",
+    "type": "transfer",
+    "error": "false",
+    "description": "write transfer: 3730 blocks",
+    "fields": "blocks=3730; bad_data_blocks=0; rejected_or_missing_status=0; DAT0_busy_samples=852463; preerase_hint=3730; explicit_CMD23_count=0; completion=observed bus transfer end; not media persistence proof"
+  },
+  "final_busy": {
+    "start_sample": "202705885",
+    "end_sample": "202910662",
+    "start_s": "0.81082354",
+    "end_s": "0.811642648",
+    "duration_us": "819.108",
+    "signal": "DAT",
+    "type": "busy",
+    "error": "false",
+    "description": "CMD12 R1b / DAT0 busy \u2192 released",
+    "fields": "block=3730; sample_duration=204777; boundary=raw DAT0 transitions; complete=yes"
+  },
+  "invalid_startup_annotation": {
+    "start_sample": "57455818",
+    "end_sample": "64810740",
+    "start_s": "0.229823272",
+    "end_s": "0.25924296",
+    "duration_us": "29419.688",
+    "signal": "CMD",
+    "type": "command",
+    "error": "true",
+    "description": "CMD63 command 0xFFFFFFFF CRC BAD",
+    "fields": "command=63; application=no; response_type=; crc=BAD; end_bit=1; argument=0xFFFFFFFF; crc_received=0x7F; crc_calculated=0x0C"
+  },
+  "independent_raw_verification": {
+    "offsets_ns": [
+      24,
+      32
+    ],
+    "blocks": 3730,
+    "all_four_lane_crc16_pass": true,
+    "all_card_tokens_accepted": true,
+    "clock_period_median_ns": 80,
+    "final_busy_us": 819.108
+  },
+  "final_statistics": {
+    "received": {
+      "utc": "2026-10-26T04:28:31.309697+00:00",
+      "monotonic_ns": 554321109000000
+    },
+    "voltage_location": "IN+ relative to IN-",
+    "voltage": {
+      "units": "V",
+      "avg": 4.8921661376953125,
+      "min": 4.886650085449219,
+      "max": 4.898002624511719
+    },
+    "current": {
+      "units": "A",
+      "avg": 0.00819619745016098,
+      "min": 0.007232636213302612,
+      "max": 0.009238466620445251
+    },
+    "power": {
+      "units": "W",
+      "avg": 0.040097137563861907,
+      "min": 0.03539228439331055,
+      "max": 0.04518699645996094
+    },
+    "sequence": 146,
+    "age_s": 0.125
+  },
+  "limits": [
+    "One successful observed bus transaction; not a reliability qualification.",
+    "No SD readback or equality with original camera RAM.",
+    "No new energy or independently attributed Standby flag measurement.",
+    "The already-known initial CMD63 decoder framing artifact remains."
+  ],
+  "final_state": "Target powered, low-current plateau; JS stopped/restored128, COM8closed/BREAKreleased; no active bench helper; corrected capture open in Logic API10431"
+}

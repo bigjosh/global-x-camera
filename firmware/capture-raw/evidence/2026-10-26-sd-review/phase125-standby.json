@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "profile": "four-bit 12.5 MHz NEGEDGE identification+transfer, Standby",
+  "nor_sector": {
+    "matches": true,
+    "bytes": 65536,
+    "offset": 0,
+    "sha256": "4762bbe49e5d48bba5869892f327b8871fccaf8f543cde550ab7858252949945"
+  },
+  "following_nor_extent": {
+    "matches": true,
+    "bytes": 4096,
+    "offset": 65536,
+    "sha256": "01cc465d3a7581d9d003b09e5db684eb7bec8e8512e12ce3565154c3aced816f"
+  },
+  "prefix_sha256": "d5f17279640f5acd9642a28fa0df11bddf1825a2b9d06432908ef4a460204c60",
+  "recovery": {
+    "exact_park_passed": true,
+    "good_pulses": 9,
+    "bad_pulses": 0,
+    "request": 1
+  },
+  "standby_flag": {
+    "passed": true,
+    "sbf": true,
+    "stopf": false,
+    "pdds": true,
+    "cpucr": 66049,
+    "observation_utc": "2026-10-26T05:37:56.778972+00:00",
+    "trial_entry_proven": false,
+    "reset_or_power_changed": false,
+    "clock_enable_write_attempted": false,
+    "cpucr_written": false
+  },
+  "last_cold_observation": {
+    "utc": "2026-10-26T05:37:35.031613+00:00",
+    "voltage_V": 4.8922882080078125,
+    "current_A": 0.00819263607263565,
+    "power_W": 0.0400806920370087
+  },
+  "sources": {
+    "standby-flag/result.json": "9c3ba5c9605dd8553c97142dd0b9babf33920f5161b827c9e0bcddb3330e66bf",
+    "park-standby/result.json": "fced9e36f29af257dd46513ea289b19c688621bebcc7da7191aa4d980241a945",
+    "cold-standby/events.json": "78d455f1ec549dab684a146b53180e3746b3c58cc4a69d26b792f951eeadc73d",
+    "standby-nor-after/verified.json": "279a02a7fb25bf8b9b86a23ee3f90b6552f3ae485520b82defd0cc84585c4de6",
+    "standby-nor-following/verified.json": "2b402ebf2619c88495ee54a688d2f1d9903f4bbed78e4458780bf3630408552f",
+    "slot19/readback-validation.json": "967317e26b7c45738ca48442cd42673384f5569f61d3d1750f0fc3ce7da6dde0"
+  },
+  "limits": [
+    "SBF reader is standalone and explicitly reports trial_entry_proven=false; no broader attribution claimed.",
+    "Original camera RAM was lost in Standby; wire bytes were compared with complete subsequent SD retrieval.",
+    "Low-current sample is not total energy or a measured full-cycle time.",
+    "This is one observed Standby cycle; no arbitrary power-loss or production reliability qualification."
+  ]
+}

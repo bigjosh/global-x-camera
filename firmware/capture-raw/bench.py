@@ -155,18 +155,219 @@ def checked_build(folder, digest):
     width_layout(m)
     gpio_layout(m)
     compensation_layout(m)
+    diagnostic_layout(m)
     return m, code
+
+
+def startup_flash_profile(m):
+    """Narrow flash admission after separate RAM source/readback tests."""
+    true_keys=('flash','sd_startup_opt','sd_review_profile','sd_clock_negedge','sd_clock_negedge_init',
+               'magic_format','line_stream','async_stop')
+    false_keys=('sd_high_speed','sd_fixed_compensation','sd_compensation_modified','sd_high_speed_mixed_slew',
+                'sd_high_speed_fixed_compensation','sd_high_speed_combined_electrical','sd_idma_read',
+                'raw_dma_tail_wait','dma_sleep','preinit','line_snapshots','line_poison','whole_image_preerase',
+                'sd_early_run_clock')
+    return (all(m.get(k) is True for k in true_keys) and
+            all(m.get(k,False) is False for k in false_keys) and
+            m.get('sd_clock_hz') in (12500000,25000000) and m.get('sd_bus_width')==4 and m.get('sd_gpio_speed')==3 and
+            m.get('transport')=='idma' and m.get('pattern')==0 and m.get('exposure_coarse')==1428 and
+            not m.get('cycle_trace'))
+
+
+def diagnostic_layout(m,operation=None):
+    """Bind the separate RAM-only receive and capture-tail experiments."""
+    for key,macro in (('sd_idma_read','SD_IDMA_READ'),('raw_dma_tail_wait','RAW_DMA_TAIL_WAIT'),
+                      ('sd_startup_opt','SD_STARTUP_OPT'),('sd_early_run_clock','SD_EARLY_RUN_CLOCK')):
+        value=m.get(key,False)
+        selected=[f for f in m.get('flags',[]) if f.startswith('-D'+macro+'=')]
+        if type(value) is not bool or ((key in m or selected) and selected!=[f'-D{macro}={int(value)}']):
+            raise ValueError('Diagnostic manifest/compiler flag differs')
+        if value and (m.get('flash') or m.get('standby')) and not (key=='sd_startup_opt' and startup_flash_profile(m)):
+            raise ValueError('Diagnostic requires RAM awake profile')
+    if m.get('sd_idma_read') and (not m.get('sd_review_profile') or m.get('raw_dma_tail_wait') or
+            operation is not None and operation!=3):
+        raise ValueError('IDMA receive is a reviewed read-only diagnostic')
+    if m.get('sd_startup_opt'):
+        if not m.get('sd_review_profile') or m.get('sd_bus_width')!=4 or operation==2:
+            raise ValueError('Startup optimization requires reviewed four-bit capture/read')
+        address=m.get('sd_startup_proof')
+        if (type(address) is not int or address%4 or m.get('sd_startup_proof_bytes')!=64 or
+                not m['bss_start']<=address<=m['bss_end']-64):
+            raise ValueError('Startup proof bounds differ')
+        for key,size in (('card',200),('slots',640),('producer',416),('magic_slots',576),('sd_stream',44),
+                         ('raw_dma_tail_wait_proof',64),('sd_high_speed_proof',184),('sd_clock_profile_proof',128),
+                         ('sd_early_clock_proof',64)):
+            other=m.get(key)
+            if other is not None and address<other+size and other<address+64:
+                raise ValueError('Startup proof overlaps another owner')
+    elif m.get('sd_startup_proof') is not None or m.get('sd_startup_proof_bytes',0):
+        raise ValueError('Unexpected startup telemetry')
+    if m.get('raw_dma_tail_wait'):
+        if (not m.get('magic_format') or not m.get('line_stream') or not m.get('async_stop') or
+                m.get('transport')!='idma' or m.get('dma_sleep') or
+                operation is not None and operation!=1):
+            raise ValueError('DMA tail wait requires a RAM magic LINE/IDMA capture')
+        address=m.get('raw_dma_tail_wait_proof')
+        if (type(address) is not int or address%4 or m.get('raw_dma_tail_wait_proof_bytes')!=64 or
+                not m['bss_start']<=address<=m['bss_end']-64):
+            raise ValueError('DMA tail wait proof bounds differ')
+        for key,size in (('card',200),('slots',640),('producer',416),('magic_slots',576),('sd_stream',44)):
+            other=m.get(key)
+            if other is not None and address<other+size and other<address+64:
+                raise ValueError('DMA tail wait proof overlaps another owner')
+    elif m.get('raw_dma_tail_wait_proof') is not None or m.get('raw_dma_tail_wait_proof_bytes',0):
+        raise ValueError('Unexpected DMA tail wait telemetry')
+    if m.get('sd_early_run_clock'):
+        true_keys=('sd_review_profile','sd_startup_opt','sd_clock_negedge','sd_clock_negedge_init',
+                   'magic_format','line_stream','async_stop')
+        false_keys=('flash','standby','sd_high_speed','sd_fixed_compensation','sd_compensation_modified',
+                    'sd_high_speed_mixed_slew','sd_high_speed_fixed_compensation','sd_high_speed_combined_electrical',
+                    'sd_idma_read','raw_dma_tail_wait','dma_sleep','preinit','line_snapshots','line_poison','whole_image_preerase')
+        if (not all(m.get(k) is True for k in true_keys) or not all(m.get(k,False) is False for k in false_keys) or
+                m.get('sd_clock_hz')!=12500000 or m.get('sd_bus_width')!=4 or m.get('sd_gpio_speed')!=3 or
+                m.get('transport')!='idma' or m.get('pattern')!=0 or m.get('exposure_coarse')!=1428 or
+                operation not in (None,1,3)):
+            raise ValueError('Early run clock requires the exact reviewed startup 12.5 MHz no-tail RAM scene profile')
+        address=m.get('sd_early_clock_proof')
+        if (type(address) is not int or address%4 or m.get('sd_early_clock_proof_bytes')!=64 or
+                not m['bss_start']<=address<=m['bss_end']-64):
+            raise ValueError('Early clock proof bounds differ')
+        for key,size in (('card',200),('slots',640),('producer',416),('magic_slots',576),('magic_proof',32),
+                         ('sd_stream',44),('sd_scr',16),('sd_erase',32),('sd_width_proof',24),
+                         ('sd_startup_proof',64),('raw_dma_tail_wait_proof',64),
+                         ('sd_high_speed_proof',184),('sd_clock_profile_proof',128)):
+            other=m.get(key)
+            if other is not None and address<other+size and other<address+64:
+                raise ValueError('Early clock proof overlaps another owner')
+    elif m.get('sd_early_clock_proof') is not None or m.get('sd_early_clock_proof_bytes',0):
+        raise ValueError('Unexpected early clock telemetry')
+
+
+def early_clock_snapshot(b,m,label,operation,card):
+    """Retain the CSD-to-CMD7 clock transition; this is not an idle proof."""
+    diagnostic_layout(m,operation)
+    if not m.get('sd_early_run_clock'):return None
+    raw=b.upload(m['sd_early_clock_proof'],64,label+'-sd-early-clock.bin')
+    if len(raw)!=64:raise ValueError('Incomplete early clock proof')
+    names=('magic version requested_hz csd_tran_speed csd_max_hz csd_command_count '
+           'switch_command_count select_command_count clock_before clock_after timer_before timer_after '
+           'switch_begin_cycles switch_end_cycles select_begin_cycles result').split()
+    p=dict(zip(names,struct.unpack('<16I',raw)))
+    rate=p['csd_tran_speed'];units=(100000,1000000,10000000,100000000)
+    multipliers=(0,10,12,13,15,20,25,30,35,40,45,50,55,60,70,80)
+    if rate>0x7f or (rate&7)>3 or not multipliers[(rate>>3)&15]:
+        raise ValueError('Reserved CSD transfer speed encoding')
+    max_hz=units[rate&7]*multipliers[(rate>>3)&15]//10
+    if ((p['magic'],p['version'],p['requested_hz'])!=(0x314B4345,1,12500000) or
+            rate!=(card['csd0']&255) or p['csd_max_hz']!=max_hz or max_hz<p['requested_hz'] or
+            not 0<p['csd_command_count']==p['switch_command_count'] or
+            p['select_command_count']!=p['switch_command_count']+1 or
+            p['clock_before']!=(0x30000|750) or p['clock_after']!=(0x30000|6) or
+            p['timer_before']!=200000 or p['timer_after']!=25000000 or p['result'] or
+            (p['switch_end_cycles']-p['switch_begin_cycles'])&0xffffffff>=0x80000000 or
+            (p['select_begin_cycles']-p['switch_end_cycles'])&0xffffffff>=0x80000000):
+        raise ValueError('Early run clock/CSD/timer/order proof differs')
+    p['switch_cycles']=(p['switch_end_cycles']-p['switch_begin_cycles'])&0xffffffff
+    return p
+
+
+def dma_tail_snapshot(b,m,label,stream):
+    diagnostic_layout(m,1)
+    names=('magic version outcome start end elapsed limit available_before available_after polls '
+           'result frame_before stopped_before reserved0 reserved1 reserved2').split()
+    raw=b.upload(m['raw_dma_tail_wait_proof'],64,label+'-dma-tail-wait.bin')
+    if len(raw)!=64:raise ValueError('Incomplete DMA tail wait proof')
+    p=dict(zip(names,struct.unpack('<16I',raw)))
+    if ((p['magic'],p['version'],p['limit'])!=(0x31575444,1,4000000) or
+            p['result'] or any(p[k] for k in ('reserved0','reserved1','reserved2')) or
+            p['outcome'] not in (1,2,3,4,5) or p['frame_before'] not in (0,1) or
+            p['stopped_before'] not in (0,1) or
+            p['elapsed']!=(p['end']-p['start'])&0xffffffff or
+            not 512<=p['available_before']<=p['available_after']<=SLOT_BYTES or
+            p['available_before']%512 or p['available_after']%512):
+        raise ValueError('DMA tail wait proof is inconsistent')
+    outcome=p['outcome']
+    if outcome in (1,2,3):
+        if p['polls'] or p['elapsed'] or p['available_before']!=p['available_after']:
+            raise ValueError('Skipped DMA tail wait changed publication')
+        if ((outcome==1 and (p['available_before']!=SLOT_BYTES or
+                            p['frame_before']!=1 or p['stopped_before']!=1)) or
+                (outcome==2 and (p['frame_before'] or p['available_before']==SLOT_BYTES)) or
+                (outcome==3 and (not p['frame_before'] or p['available_before']>=SLOT_BYTES-512))):
+            raise ValueError('DMA tail wait skip reason differs')
+    else:
+        if p['frame_before']!=1 or p['available_before']!=SLOT_BYTES-512:
+            raise ValueError('DMA tail wait lacked validated near-complete frame')
+        if outcome==4 and (not p['polls'] or p['available_after']!=SLOT_BYTES):
+            raise ValueError('DMA tail wait completion lacks full publication')
+        if outcome==5 and (p['elapsed']<p['limit'] or p['available_after']==SLOT_BYTES):
+            raise ValueError('DMA tail wait timeout did not retain PIO prefix')
+    # The transport calls publication again, so a timeout may subsequently
+    # become IDMA; a successful/full wait must always choose complete IDMA.
+    if outcome in (1,4) and stream['mode']!=1:
+        raise ValueError('Complete DMA tail wait did not select IDMA')
+    if stream['initial_available_bytes']<p['available_after']:
+        raise ValueError('DMA publication regressed after tail wait')
+    return p
+
+
+def startup_snapshot(b,m,label,operation):
+    diagnostic_layout(m,operation)
+    if not m.get('sd_startup_opt'):return None
+    raw=b.upload(m['sd_startup_proof'],64,label+'-sd-startup.bin')
+    if len(raw)!=64:raise ValueError('Incomplete startup proof')
+    names=('magic version gpio_settle_cycles train_cycles train_hz train_min_cycles run_settle_cycles '
+           'run_hz scr_reads scr_hits scr_valid cache_owner result reserved0 reserved1 reserved2').split()
+    p=dict(zip(names,struct.unpack('<16I',raw)))
+    if ((p['magic'],p['version'],p['train_hz'],p['train_min_cycles'])!=(0x31504F53,1,100000,400000) or
+            p['gpio_settle_cycles']<400000 or p['train_cycles']<400000 or p['run_settle_cycles']<400 or
+            p['run_hz']!=(25000000 if m.get('sd_high_speed') else clock_layout(m)) or
+            p['scr_reads']!=1 or p['scr_hits']!=int(operation==1 and bool(m.get('magic_format'))) or
+            any(p[k] for k in ('scr_valid','cache_owner','result','reserved0','reserved1','reserved2'))):
+        raise ValueError('Startup timing/cache proof differs')
+    return p
 
 
 def clock_layout(m):
     """Bind the compile-time SD frequency; frozen old builds are 25 MHz."""
     hz=m.get('sd_clock_hz',25000000)
-    if type(hz) is not int or hz not in (12500000,25000000):
+    if type(hz) is not int or hz not in (12500000,25000000,50000000):
         raise ValueError('Unsupported native SD clock')
     flags=[f for f in m.get('flags',[]) if f.startswith('-DRAW_SD_CLOCK_HZ=')]
     if 'sd_clock_hz' in m or flags:
         if flags!=[f'-DRAW_SD_CLOCK_HZ={hz}U']:
             raise ValueError('SD clock manifest/compiler flag differs')
+    review=m.get('sd_review_profile',False);high=m.get('sd_high_speed',False)
+    mixed=m.get('sd_high_speed_mixed_slew',False)
+    high_fixed=m.get('sd_high_speed_fixed_compensation',False)
+    combined=m.get('sd_high_speed_combined_electrical',False)
+    for key,value,macro in (('sd_review_profile',review,'SD_REVIEW_PROFILE'),('sd_high_speed',high,'SD_HIGH_SPEED'),
+            ('sd_high_speed_mixed_slew',mixed,'SD_HIGH_SPEED_MIXED_SLEW'),
+            ('sd_high_speed_fixed_compensation',high_fixed,'SD_HIGH_SPEED_FIXED_COMPENSATION'),
+            ('sd_high_speed_combined_electrical',combined,'SD_HIGH_SPEED_COMBINED_ELECTRICAL')):
+        if type(value) is not bool:raise ValueError('Invalid reviewed SD profile flag')
+        selected=[f for f in m.get('flags',[]) if f.startswith('-D'+macro+'=')]
+        if (key in m or selected) and selected!=[f'-D{macro}={int(value)}']:
+            raise ValueError('Reviewed SD manifest/compiler flag differs')
+    if combined and (not mixed or not high_fixed):
+        raise ValueError('Combined electrical trial requires both explicit High Speed experiments')
+    if high_fixed and (not high or (mixed and not combined) or m.get('flash') or m.get('standby')):
+        raise ValueError('High Speed fixed compensation requires isolated uniform-slew RAM50')
+    if mixed and (not high or m.get('flash') or m.get('standby')):
+        raise ValueError('Mixed High Speed slew is a RAM50 diagnostic only')
+    if mixed or 'sd_high_speed_gpio_values' in m:
+        values=dict(c=0x10 if mixed else 0xFF3,e=0 if mixed else 0x300) if high else None
+        if m.get('sd_high_speed_gpio_values')!=values:raise ValueError('High Speed GPIO pin values differ')
+    if high!=(hz==50000000):raise ValueError('50 MHz requires explicit High Speed protocol')
+    if high and (not review or m.get('sd_clock_negedge_init') is not True or
+            m.get('sd_clock_negedge') is not True or m.get('sd_bus_width')!=4 or
+            m.get('sd_gpio_speed')!=3 or m.get('sd_fixed_compensation') is not high_fixed):
+        raise ValueError('Unreviewed 50 MHz electrical/protocol profile')
+    if m.get('sd_kernel_hz',150000000)!=(100000000 if high else 150000000):
+        raise ValueError('SD kernel clock differs from reviewed topology')
+    if high and (m.get('sd_identification_clock_negedge') is not True or
+            m.get('sd_transfer_clock_negedge') is not False or m.get('sd_switch_clock_hz')!=25000000):
+        raise ValueError('High Speed launch-phase transition differs')
     return hz
 
 
@@ -184,6 +385,11 @@ def width_layout(m):
             raise ValueError('Four-bit width proof layout/build differs')
     elif m.get('sd_width_proof') is not None or m.get('sd_width_proof_bytes',0):
         raise ValueError('Unexpected width telemetry in one-bit build')
+    if m.get('sd_high_speed'):
+        for key,size in (('sd_high_speed_proof',184),('sd_clock_profile_proof',128)):
+            address=m.get(key)
+            if type(address) is not int or m.get(key+'_bytes')!=size or not m['bss_start']<=address<=m['bss_end']-size:
+                raise ValueError('High Speed proof bounds differ')
 
 
 def width_snapshot(b,m,label):
@@ -197,9 +403,49 @@ def width_snapshot(b,m,label):
     if (proof['requested_width']!=4 or proof['scr_widths']&5!=5 or
             proof['acmd6_r1']&0xFDFFE008 or not proof['acmd6_r1']&0x20 or
             proof['acmd6_accepted']!=1 or
-            proof['configured_clkcr']!=(150000000//(2*clock_layout(m))|0x24000|phase_layout(m)) or
+            proof['configured_clkcr']!=(m.get('sd_kernel_hz',150000000)//(2*clock_layout(m))|0x24000|phase_layout(m)) or
             proof['negotiated_width']!=4):
         raise ValueError('Four-bit negotiation proof incomplete or inconsistent')
+    if m.get('sd_high_speed'):proof['high_speed']=high_speed_snapshot(b,m,label)
+    return proof
+
+
+def high_speed_snapshot(b,m,label):
+    raw=b.upload(m['sd_high_speed_proof'],184,label+'-sd-high-speed.bin')
+    names=('requested_hz kernel_hz check_done switch_done check_r1 switch_r1 check_sta switch_sta '
+           'configured_clkcr qualified gpio_c_before gpio_c_after gpio_e_before gpio_e_after').split()
+    proof=dict(zip(names,struct.unpack('<14I',raw[:56])))
+    if (proof['requested_hz'],proof['kernel_hz'],proof['check_done'],proof['switch_done'],proof['qualified'])!=(50000000,100000000,1,1,1):
+        raise ValueError('Incomplete High Speed negotiation')
+    if proof['configured_clkcr']!=(0x24001|phase_layout(m)):
+        raise ValueError('High Speed receive/transmit/divider differs')
+    for name,offset in (('check_status',56),('switch_status',120)):
+        data=raw[offset:offset+64];current=int.from_bytes(data[:2],'big')
+        if not 0<current<=200 or data[17]>1 or not data[13]&2 or data[16]&15!=1 or data[17]==1 and data[29]&2:
+            raise ValueError('Invalid High Speed switch-function status')
+        if any((v&15)==15 or v>>4==15 for v in data[14:17]):
+            raise ValueError('A switch-function group canceled selection')
+        proof[name]=data.hex()
+    for name in ('check_r1','switch_r1'):
+        if proof[name]&0xFDFFE008:raise ValueError('High Speed command reported card error')
+    for name in ('check_sta','switch_sta'):
+        if not proof[name]&0x100 or proof[name]&0x103A:raise ValueError('High Speed status data not CRC-clean/inactive')
+    for bank,mask in (('c',0xFF3),('e',0x300)):
+        before=proof[f'gpio_{bank}_before'];after=proof[f'gpio_{bank}_after']
+        wanted=(0x10 if bank=='c' else 0) if m.get('sd_high_speed_mixed_slew') else mask
+        if after&mask!=wanted or (before^after)&~mask:raise ValueError('High Speed GPIO profile differs')
+    clockraw=b.upload(m['sd_clock_profile_proof'],128,label+'-sd-clock-profile.bin')
+    fields=('magic version state result owned stage enable_polls disable_polls cr sr cfgr1 cfgr2 hsicfgr '
+            'pll1cfgr1 pll1cfgr2 pll1cfgr3 ic1cfgr ic2cfgr ic5_before divenr_before ccipr5_before '
+            'ccipr7_before ccipr8_before ahb5_before ic5_after divenr_after ccipr8_after ahb5_after '
+            'kernel_hz cleanup_error reserved0 reserved1').split()
+    clock=dict(zip(fields,struct.unpack('<32I',clockraw)))
+    if (clock['magic'],clock['version'],clock['state'],clock['result'],clock['owned'],clock['kernel_hz'],clock['cleanup_error'])!=(0x5344434B,1,5,0,0,100000000,0):
+        raise ValueError('Clock profile was not successfully restored')
+    if (clock['ic5_after']!=clock['ic5_before'] or clock['divenr_after']!=clock['divenr_before'] or
+            clock['ccipr8_after']!=clock['ccipr8_before'] or clock['ahb5_after']!=clock['ahb5_before']):
+        raise ValueError('Clock profile restoration changed unrelated state')
+    proof['clock_profile']=clock
     return proof
 
 
@@ -212,16 +458,28 @@ def phase_layout(m):
     if 'sd_clock_negedge' in m or flags:
         if flags!=[f'-DSD_CLOCK_NEGEDGE={int(enabled)}']:
             raise ValueError('Clock phase manifest/compiler flag differs')
+    initial=m.get('sd_clock_negedge_init',False)
+    if type(initial) is not bool:
+        raise ValueError('Unsupported initial SD clock phase selection')
+    initial_flags=[f for f in m.get('flags',[]) if f.startswith('-DSD_CLOCK_NEGEDGE_INIT=')]
+    if 'sd_clock_negedge_init' in m or initial_flags:
+        if initial_flags!=[f'-DSD_CLOCK_NEGEDGE_INIT={int(initial)}']:
+            raise ValueError('Initial clock phase manifest/compiler flag differs')
     speed=m.get('sd_gpio_speed',3)
-    if enabled and (clock_layout(m)!=25000000 or
-            m.get('sd_bus_width',1)!=4 or type(speed) is not int or speed not in (1,2,3) or
-            m.get('sd_fixed_compensation',False) is not False or
-            m.get('sd_compensation_modified',False) is not False):
-        raise ValueError('Clock phase requires 25 MHz four-bit mode without compensation changes')
+    high_fixed=m.get('sd_high_speed_fixed_compensation',False)
+    if initial and (not enabled or speed!=3):
+        raise ValueError('Initial clock phase requires falling-edge run phase and speed3')
+    if enabled and clock_layout(m)==12500000 and not initial:
+        raise ValueError('12.5 MHz clock phase requires explicit falling-edge identification')
+    if enabled and (m.get('sd_bus_width',1)!=4 or type(speed) is not int or speed not in (1,2,3) or
+            clock_layout(m)==12500000 and speed!=3 or
+            m.get('sd_fixed_compensation',False) is not high_fixed or
+            m.get('sd_compensation_modified',False) is not high_fixed):
+        raise ValueError('Clock phase requires four-bit mode without compensation changes; 12.5 MHz requires speed3')
     if enabled and ((m.get('flash') or m.get('standby')) and speed!=3 or
             m.get('standby') and not m.get('flash')):
         raise ValueError('Flash clock phase requires speed3; Standby requires flash')
-    return 0x10000 if enabled else 0
+    return 0 if m.get('sd_high_speed') else (0x10000 if enabled else 0)
 
 
 def gpio_layout(m):
@@ -284,7 +542,8 @@ def compensation_layout(m):
             raise ValueError('Compensation scope differs')
     if enabled:
         address=m.get('sd_compensation_proof')
-        if (m.get('flash') or m.get('standby') or clock_layout(m)!=25000000 or
+        if (m.get('flash') or m.get('standby') or
+                (clock_layout(m)!=25000000 and not m.get('sd_high_speed_fixed_compensation')) or
                 m.get('sd_gpio_speed',3)!=3 or type(address) is not int or
                 m.get('sd_compensation_proof_bytes')!=32 or
                 not m['bss_start']<=address<=m['bss_end']-32):
@@ -437,6 +696,7 @@ def validate(p, m, words):
             words[0]!=0x52535131 or any(words[6:]) or
             request(words[2],words[1],*words[3:6],magic_format=bool(m.get('magic_format')))!=struct.pack('<16I',*words)):
         raise ValueError('Stored request is malformed')
+    diagnostic_layout(m,words[2])
     exact = dict(magic=MAGIC, schema=1, words=96, nonce=words[1],operation=words[2],
         state=3, result=0, stage=8, terminal=DONE, frame=frame_layout(m)['frame'], bytes=FRAME_BYTES,
         width=1120,height=1364,card=m['card'],card_size=200,slots=m['slots'],slots_size=640,
@@ -539,6 +799,8 @@ def magic_snapshot(b,m,p,label,card):
                 (stream['mode']==1)!=(stream['initial_available_bytes']==SLOT_BYTES)):
             raise ValueError('SD producer stream completion differs')
         result['stream']=stream
+        if m.get('raw_dma_tail_wait'):
+            result['dma_tail_wait']=dma_tail_snapshot(b,m,label,stream)
     elif p['operation']==2:
         raw=b.upload(m['sd_erase'],32,label+'-erase.bin')
         if len(raw)!=32: raise ValueError('Incomplete whole-card erase proof')
@@ -594,12 +856,17 @@ def card_snapshot(b,m,p,label):
     if gpio is not None:c['gpio_speed_proof']=gpio
     comp=compensation_snapshot(b,m,label)
     if comp is not None:c['compensation_proof']=comp
+    startup=startup_snapshot(b,m,label,p['operation'])
+    if startup is not None:c['startup_proof']=startup
+    early=early_clock_snapshot(b,m,label,p['operation'],c)
+    if early is not None:c['early_clock_proof']=early
     return c
 
 
 def run(a):
     folder=a.build.resolve(); m,code=checked_build(folder,a.expected_sha)
     names=fields(folder); op=OPS[a.operation]; nonce=secrets.randbelow(0xffffffff)+1
+    diagnostic_layout(m,op)
     if op==2:
         if m.get('magic_format'):
             if a.generation is not None or a.slot_limit:

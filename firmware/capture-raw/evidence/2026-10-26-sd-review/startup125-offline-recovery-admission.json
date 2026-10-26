@@ -1,0 +1,123 @@
+{
+  "schema": 1,
+  "hardware_accessed": false,
+  "exact_allowlist_entries_added": true,
+  "profile": "reviewed125-startup-no-tail",
+  "profiles": [
+    {
+      "passed": true,
+      "hardware_accessed": false,
+      "allowlist_modified": true,
+      "reviewer": "/root/phase125_recovery",
+      "build": "tmp/bringup/sd50-reviewed-20261026/flash-reviewed125-startup-awake",
+      "profile": "reviewed125-startup-no-tail",
+      "standby": false,
+      "baseline_prefix_sha256": "09fb59cfed0f715927e76f32d5f74187e4c2f1702a70ce192e0d17dcee2f822a",
+      "baseline_sector_sha256": "bb31867394a4e0d0fb9ab3f9fa96d0d16ffc7256e2a274db74be4f11f9cfdc14",
+      "binary_sha256": "f8b728723016035a34d11a39768fd03775c725e128e1f37f4016bef4cf92f044",
+      "prefix_sha256": "54cd99f5b2c02c6561e25d8a59fc98210ecdd799736a0a3a8c749cac57a63777",
+      "sector_sha256": "c6a9779db35a458fb2415754c480cc1274d01f662e62fb57a245882cc5db532a",
+      "prefix_bytes": 5140,
+      "early_load_bytes": 15804,
+      "recovery_literal_count": 20,
+      "compared_listing_rows": 1774,
+      "recovery_schema_unchanged": true,
+      "changed_prefix_bytes": [
+        3228,
+        3229,
+        3230,
+        3231,
+        4948,
+        4949,
+        4950,
+        4951
+      ],
+      "crc_literal_offsets": [
+        3228,
+        4948
+      ],
+      "early_crc32": "0x6b8e7ca7",
+      "park_address": "0x3418078c",
+      "limits": "Exact-pair recovery admission only. Hardware capture, readback, cold boot, Standby and energy qualification remain separate.",
+      "exact_guard_admission": {
+        "park_passed": true,
+        "read_passed": true,
+        "bytes": 5140,
+        "park": {
+          "bytes": 5140,
+          "park": 873990028,
+          "vcp": true,
+          "sector": "c6a9779db35a458fb2415754c480cc1274d01f662e62fb57a245882cc5db532a"
+        },
+        "read": {
+          "name": "raw-125-reviewed-startup-awake-qualification",
+          "sector_sha256": "c6a9779db35a458fb2415754c480cc1274d01f662e62fb57a245882cc5db532a",
+          "prefix_sha256": "54cd99f5b2c02c6561e25d8a59fc98210ecdd799736a0a3a8c749cac57a63777"
+        }
+      },
+      "driver_source_matches_qualified_ram_candidate": true
+    },
+    {
+      "passed": true,
+      "hardware_accessed": false,
+      "allowlist_modified": true,
+      "reviewer": "/root/phase125_recovery",
+      "build": "tmp/bringup/sd50-reviewed-20261026/flash-reviewed125-startup-standby",
+      "profile": "reviewed125-startup-no-tail",
+      "standby": true,
+      "baseline_prefix_sha256": "09fb59cfed0f715927e76f32d5f74187e4c2f1702a70ce192e0d17dcee2f822a",
+      "baseline_sector_sha256": "bb31867394a4e0d0fb9ab3f9fa96d0d16ffc7256e2a274db74be4f11f9cfdc14",
+      "binary_sha256": "70a1913bd270b72164f4313bf25ba1f5d82276651a9c134b575fe3ac5c9923c3",
+      "prefix_sha256": "4ef99d3b0b8ac7b790265cd1994428a5804dd3a20ad5587dd1585d2544a74b0b",
+      "sector_sha256": "c03e40c8ceea09bd9c171c179f2191a1ef9799c9e615db979a84b9c53ad66010",
+      "prefix_bytes": 5140,
+      "early_load_bytes": 15804,
+      "recovery_literal_count": 20,
+      "compared_listing_rows": 1774,
+      "recovery_schema_unchanged": true,
+      "changed_prefix_bytes": [
+        3228,
+        3229,
+        3230,
+        3231,
+        4948,
+        4949,
+        4950,
+        4951
+      ],
+      "crc_literal_offsets": [
+        3228,
+        4948
+      ],
+      "early_crc32": "0x72cd0b0e",
+      "park_address": "0x3418078c",
+      "limits": "Exact-pair recovery admission only. Hardware capture, readback, cold boot, Standby and energy qualification remain separate.",
+      "exact_guard_admission": {
+        "park_passed": true,
+        "read_passed": true,
+        "bytes": 5140,
+        "park": {
+          "bytes": 5140,
+          "park": 873990028,
+          "vcp": true,
+          "sector": "c03e40c8ceea09bd9c171c179f2191a1ef9799c9e615db979a84b9c53ad66010"
+        },
+        "read": {
+          "name": "raw-125-reviewed-startup-standby-qualification",
+          "sector_sha256": "c03e40c8ceea09bd9c171c179f2191a1ef9799c9e615db979a84b9c53ad66010",
+          "prefix_sha256": "4ef99d3b0b8ac7b790265cd1994428a5804dd3a20ad5587dd1585d2544a74b0b"
+        }
+      },
+      "driver_source_matches_qualified_ram_candidate": true
+    }
+  ],
+  "regressions": {
+    "park_tests_passed": 8,
+    "readback_tests_passed": 14
+  },
+  "limits": [
+    "Exact recovery/reader admission is not hardware qualification or installation.",
+    "No unknown or mixed prefix/sector pair is admitted; the frozen readback bridge is unchanged.",
+    "The lower-clock startup profile assumes the card shared3.3V rail is already valid before GPIO settling."
+  ]
+}

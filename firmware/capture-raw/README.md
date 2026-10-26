@@ -8,17 +8,144 @@ compression or full-frame CPU checksum in the normal save path.
 
 For fine phase timing, the optional [`--cycle-trace` profile](CYCLE_TRACE.md)
 stores cycle-counter timestamps in fixed RAM slots. Its first qualified cold
-run captured 101 events, including 203.689 ms in ACMD41 negotiation and
+run on October 25 captured 101 events, including 203.689 ms in ACMD41 negotiation and
 159.403 ms in the multiblock data phase. The diagnostic completion stays awake
 for guarded ST-LINK retrieval; normal Standby firmware was restored afterward.
 
-## Installed profile: four-bit SDMMC2 at 25 MHz
+## Current selected profile — October 26: reviewed 25 MHz startup, no tail wait
 
-The current PZSSD001/SanDisk Extreme 32 GB setup uses **four-bit SDMMC2,
+The selected profile uses **four-bit SDMMC2 at 25 MHz, falling-edge host
+launch during both identification and transfer, and rising-edge feedback input
+sampling**. `NEGEDGE` changes transmit timing; receive selection stays at
+`SELCLKRX=00`. GPIO speed 3, inherited compensation, 3.3 V signaling, the
+PZSSD001 carrier and 27-ohm CLK resistor are retained. The current card is the
+user's faster-initializing 64 GB-class card (122,507,264 logical sectors).
+Check [the bench checkpoint](../../AGENTS.md) for the live probe and power state.
+
+The [25 MHz twenty-image campaign](evidence/2026-10-26-sd25-twenty/README.md)
+qualified twenty complete RAM captures and same-speed readbacks on the user's
+replacement 64 GB-class card with the logic probes removed. Every image matched
+its original camera RAM, including four long exposures; two additional sensor
+patterns and a later preservation reread also passed. Both IDMA and progressive
+PIO writes were exercised with zero reported CRC/operation/cleanup errors.
+Those RAM tests preceded the explicit promotion below. They did not establish
+analog timing margins or a new energy baseline.
+After the user illuminated the scene, [one additional real-scene capture](evidence/2026-10-26-sd25-lit-scene/README.md)
+also passed complete same-speed source-RAM equality and recognizable image
+inspection; it is separate from the twenty-image count.
+
+`--sd-review-profile` enables the reviewed command, busy completion, abort and
+ownership guards. `--sd-startup-opt` retains the 1 ms GPIO settling interval,
+uses a 1 ms / 100 kHz initial clock train, reduces the inactive run-divider
+settling delay to 1 microsecond, and reuses the validated SCR within that card
+session. This assumes the existing board's card supply is already stable;
+it does not qualify a newly switched or slowly ramping supply. The `SOP1` RAM
+record verifies these intervals and the SCR cache behavior during inspection.
+
+The separate **RAM-only `--sd-early-run-clock` experiment** moves the run-clock
+transition to after CSD validation and before CMD7. Three alternating A/B
+pairs passed complete original-camera-RAM/readback equality. The targeted
+sequence improved by approximately 2.4 ms after removing the effect of frame
+validation moving to a later phase; card initialization varied too much to
+attribute a whole-cycle or energy gain. The normal installed Standby profile
+is unchanged, and identification remains at 100 kHz. See the
+[timing, safeguards and qualification limits](evidence/2026-10-26-sd-early-clock/README.md).
+
+The image still uses one preannounced CMD25, conservative LINE publication and
+asynchronous sensor STOP. A completely published slot uses polling IDMA;
+otherwise the existing progressive PIO path starts without an added wait.
+**The optional 10 ms DMA-tail wait is disabled:** at 12.5 MHz it timed out
+without improving the approximately 321.6 ms storage phase. The observed warm
+RAM cycle was 377.752 ms without the wait versus 386.271 ms with it; these are
+not cold-start or energy measurements. See the
+[startup trials](evidence/2026-10-26-sd-review/STARTUP-TRIALS.md) and
+[selection rationale](NOTES.md#2026-10-26--select-reviewed125-mhz-startup-improvements-without-the-tail-wait-for-cold-qualification).
+Receive-IDMA diagnostics, WFI during transfers and experimental electrical
+settings are also disabled. **50 MHz remains unqualified:** successful writes
+did not resolve repeated read CRC failures, including receive-IDMA trials.
+
+The user explicitly selected 25 MHz for active firmware after these tests.
+The cold awake flash image saved slot 47 and passed complete SD-to-original
+camera-RAM equality and independent PNG decoding. The normal Standby image
+then saved slot 48, returned to about 8.18 mA on the JS-fed Nucleo branch,
+and passed first-attempt warm UART recovery. The guarded flag read observed
+SBF=1/PDDS=1/STOPF=0; its `trial_entry_proven:false` limitation is retained.
+Complete slot-48 readback and independent PNG decoding showed a recognizable
+scene. Original camera RAM was lost in Standby, so slot 48 is not another
+source-RAM comparison. Both installations passed independent physical reads
+of all 64 KiB, with the following 4 KiB unchanged. See the
+[promotion evidence and final bench state](evidence/2026-10-26-sd25-active/README.md).
+The earlier [12.5 MHz qualification](evidence/2026-10-26-sd-review/FINAL-QUALIFICATION.md)
+remains historical evidence. No new energy or power-loss qualification is claimed.
+
+**Installed selected Standby sector:**
+`c68593cebeddf5b9c24f85249505ae719dd1ea73d11f309e3a8553e9c1a9fa47`.
+Exact recovery prefix:
+`0592a543cb1e75b176e97f715f139a0a13d8a4d791ba44efd0ec94dc4f5b6754`.
+Frozen awake/Standby hashes, source identities and the unchanged 15,804-byte
+early-load boundary are in
+[promotion evidence](evidence/2026-10-26-sd25-active/README.md).
+The [review evidence](evidence/2026-10-26-sd-review/README.md) separates digital
+waveforms, complete image readback, recovery and energy evidence.
+
+### Build the selected profile explicitly
+
+Historical defaults remain one bit, 25 MHz and the old launch phase; merely
+omitting diagnostic options does not select this profile. These commands are
+offline builds into **new** directories and never program the target:
+
+```powershell
+# RAM scene capture; stays awake for inspection and original-frame comparison.
+python firmware/capture-raw/build.py --out tmp/bringup/raw-reviewed25-ram `
+  --magic-format --line-stream --async-stop --transport idma `
+  --sd-bus-width 4 --sd-clock-hz 25000000 --sd-gpio-speed 3 `
+  --sd-clock-negedge --sd-clock-negedge-init --sd-review-profile --sd-startup-opt
+
+# Cold-boot awake image; retains the frame and startup proof.
+python firmware/capture-raw/build.py --out tmp/bringup/raw-reviewed25-awake `
+  --flash --magic-format --line-stream --async-stop --transport idma `
+  --sd-bus-width 4 --sd-clock-hz 25000000 --sd-gpio-speed 3 `
+  --sd-clock-negedge --sd-clock-negedge-init --sd-review-profile --sd-startup-opt
+
+# Same selected capture path, followed by guarded final Standby.
+python firmware/capture-raw/build.py --out tmp/bringup/raw-reviewed25-standby `
+  --flash --standby --magic-format --line-stream --async-stop --transport idma `
+  --sd-bus-width 4 --sd-clock-hz 25000000 --sd-gpio-speed 3 `
+  --sd-clock-negedge --sd-clock-negedge-init --sd-review-profile --sd-startup-opt
+```
+
+These use the normal scene and 1,428-line exposure defaults. Do not add
+`--raw-dma-tail-wait`, `--sd-idma-read`, `--dma-sleep` or electrical trial flags.
+The selected startup flash admission also excludes `--cycle-trace`, preinit,
+snapshots, poison and pattern diagnostics; use a separately bound RAM build
+for those experiments. Flash installation still requires exact build/recovery
+admission and independent readback; compilation alone is not qualification.
+
+## Historical October 26 capture: v23 default phase at 12.5 MHz
+
+Before the falling-edge and startup work, the user requested a slower clock
+for precise logic capture. The earlier `flash125-v23` Standby image was restored:
+four bits, 12.5 MHz, default launch phase, speed 3 and unchanged compensation.
+The 27-ohm CLK resistor remained and all six SD signals were probed. Full flash
+readback and the following 4 KiB guard passed; no card erase was needed.
+
+One cold capture showed all 3,730 packets in slot 16 accepted, all four lane
+CRCs valid, and final CMD12 DAT0 busy of 819.108 microseconds. This checked the
+recorded bus transaction; it did not establish new image readback or energy
+qualification. That saved trace used rising-edge decoding at 250 MS/s with
+offset 8 (+32 ns), CMD=CH0, CLK=CH1 and DAT0..3=CH2..5. This decoder offset is
+specific to that historical capture, not a receiver setting or a default for
+the selected profile. See
+[saved evidence](../../tools/saleae-sd-native/evidence/2026-10-26-sd125.json).
+
+## Historical October 25 qualification: four-bit SDMMC2 at 25 MHz
+
+The October 25 PZSSD001/SanDisk Extreme 32 GB setup used **four-bit SDMMC2,
 25 MHz, NEGEDGE launch phase, GPIO speed 3 and unchanged compensation**, with
 **27 ohms in series with CLK midway along the jumper wire**. The six SD signal
-probes have been removed; only NRST, recovery UART and analyzer ground remain.
-Select the profile explicitly; historical build defaults remain unchanged:
+probes had been removed for those tests; only NRST, recovery UART and analyzer
+ground remained. This is a historical profile, not the current selection.
+Its explicit reproduction command is:
 
 ```powershell
 python firmware/capture-raw/build.py --out tmp/bringup/raw-flash25-standby `
@@ -48,7 +175,7 @@ awake capture used IDMA and saved the complete slot in **169.826 ms** from first
 submission to payload completion. That single counter result is separate from
 the complete-cycle measurements and does not isolate card programming time.
 
-Installed 64 KiB sector SHA-256:
+At that historical checkpoint, the installed 64 KiB sector SHA-256 was:
 `79c7c4ef3fb7d06baf3c2fb16dccaae4cd7f585c2319af7065f939bd006a39cd`.
 The full NOR readback matched and the following 4 KiB remained unchanged.
 Exact recovery prefix:
@@ -152,7 +279,7 @@ after the leading magic. It keeps the same **3730 sectors per image** and one
 announced CMD25. The user prefers this simple fixed-slot format for its expected
 mapping to future NAND storage, independently of the current SD timing result.
 
-**V18 established this front-metadata format; the current 25 MHz profile retains it.** The historical v18 complete
+**V18 established this front-metadata format; the selected 25 MHz profile retains it.** The historical v18 complete
 64 KiB NOR sector readback matched
 `174424c6792f96c72e336fc68e442474e9da665718552d3239a772d59ba73e2e`;
 the following 4 KiB remained unchanged. Its exact recovery prefix is
@@ -452,13 +579,16 @@ used by `capture-sd` and `capture-packed`.
 
 ```powershell
 python firmware/capture-raw/build.py --out tmp/bringup/raw-example `
-  --magic-format --line-stream --async-stop --pattern diagonal
+  --magic-format --line-stream --async-stop --pattern diagonal `
+  --sd-bus-width 4 --sd-clock-hz 12500000 --sd-gpio-speed 3 `
+  --sd-clock-negedge --sd-clock-negedge-init --sd-review-profile --sd-startup-opt
 ```
 
 The default output is a RAM test image. It must be entered through a verified
 early recovery and SRAM bridge; the build command never connects to hardware.
-Only the bench owner operates instruments. The existing one-bit 3.3 V wiring
-is retained, and the driver never negotiates four-bit or 1.8 V operation.
+Only the bench owner operates instruments. The selected full-pin carrier uses
+native four-bit 3.3 V SDMMC after SCR/ACMD6 negotiation; it is not QSPI and does
+not switch to 1.8 V signaling. The historical seven-pin carrier uses one bit.
 
 The image's privileged top-level entry owns its CPU/FPU context and never returns
 to a C caller. Its completion branch records and clears only its inactive owned

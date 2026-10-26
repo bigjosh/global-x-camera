@@ -31,6 +31,37 @@ SECTOR_SHA="7fda9d00cc7ffb3fbb9e6aac6695cf18545754b5dbfce1520cf30b2da39c4e63"
 # command-line opt-in for unknown firmware. This table does not broaden the
 # bridge or READ-module identities, and check_park still verifies live code.
 APPROVED_RECOVERY={
+    # Exact independently reviewed 25 MHz startup/no-tail pairs. This admits
+    # the unchanged READ bridge, not a new cold-boot or Standby result.
+    '571660be49caafcfc167e295514c4c1863b8fe35c06192a3cdd184647e39ba38':
+        dict(name='raw-25-reviewed-startup-awake-qualification',sector_sha256=
+             '39cdee32788c08ae81d8b3e35de6ec846d50044433f6aad6633a645585ff2bc7'),
+    '0592a543cb1e75b176e97f715f139a0a13d8a4d791ba44efd0ec94dc4f5b6754':
+        dict(name='raw-25-reviewed-startup-standby-qualification',sector_sha256=
+             'c68593cebeddf5b9c24f85249505ae719dd1ea73d11f309e3a8553e9c1a9fa47'),
+    # Exact reviewed 12.5 MHz startup/no-tail pairs; bridge identity unchanged.
+    '54cd99f5b2c02c6561e25d8a59fc98210ecdd799736a0a3a8c749cac57a63777':
+        dict(name='raw-125-reviewed-startup-awake-qualification',sector_sha256=
+             'c6a9779db35a458fb2415754c480cc1274d01f662e62fb57a245882cc5db532a'),
+    '4ef99d3b0b8ac7b790265cd1994428a5804dd3a20ad5587dd1585d2544a74b0b':
+        dict(name='raw-125-reviewed-startup-standby-qualification',sector_sha256=
+             'c03e40c8ceea09bd9c171c179f2191a1ef9799c9e615db979a84b9c53ad66010'),
+    # Offline reviewed exact50 MHz pairs; unchanged early recovery and bridge.
+    # Admission is not promotion: a real50 MHz read CRC failure is unresolved.
+    '005230cf308432650a0967d68e2c292c77aaa5aae6a7cab0f8b2d8c865529dee':
+        dict(name='raw-50-reviewed-awake-unqualified',sector_sha256=
+             '1faea44570f9284fa239a50db8bb5d1856d7c15645828df6869070bca9b135eb'),
+    '1c5e443b23ea34a6474fbf35d2c43964684b7e4315500d5bd6b4a3143ffbe95d':
+        dict(name='raw-50-reviewed-standby-unqualified',sector_sha256=
+             'cc8a35dba9d7c9692424e3f904e3ef8fd8a2b6fc4713730e71767653ea37bed5'),
+    # Exact reviewed 12.5 MHz falling-launch init/transfer candidate pairs.
+    # Admission preserves the frozen READ bridge; hardware must be qualified.
+    '2ff3c9b33dda25456724811d1bf7ccaeac0f6912336f92bcc41b7ee72c304d22':
+        dict(name='raw-125-negedge-init-speed3-awake-qualification',sector_sha256=
+             'c85907d0c29da1bfa6905734b65f7af3a73a73db70d1f2186065405a5aeb467f'),
+    'd5f17279640f5acd9642a28fa0df11bddf1825a2b9d06432908ef4a460204c60':
+        dict(name='raw-125-negedge-init-speed3-standby-qualification',sector_sha256=
+             '4762bbe49e5d48bba5869892f327b8871fccaf8f543cde550ab7858252949945'),
     # Fixed-slot logger awake build; independently reviewed CRC-only prefix
     # change and exact hardware early park passed before this READ admission.
     '0e37d33e1ede9008525feffb7f20c81112daf2169171f7130f68798366a4eec0':

@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "kind": "offline-25mhz-flash-promotion-build-validation",
+  "hardware_access": false,
+  "profiles": {
+    "flash25-awake": {
+      "build": "tmp\\bringup\\sd25-promote-20261026\\flash25-awake",
+      "receiver_sha256": "c8b4d9af368803571359331257722231647327371efbe6c96eaa09088e2c7910",
+      "receiver_bytes": 27704,
+      "sector_sha256": "39cdee32788c08ae81d8b3e35de6ec846d50044433f6aad6633a645585ff2bc7",
+      "prefix_sha256": "571660be49caafcfc167e295514c4c1863b8fe35c06192a3cdd184647e39ba38",
+      "early_bytes": 15804,
+      "sd_clock_hz": 25000000,
+      "standby": false,
+      "startup_flash_admitted": true,
+      "exact_recovery_review": "Separate reviewer audit and hardware qualification required"
+    },
+    "flash25-standby": {
+      "build": "tmp\\bringup\\sd25-promote-20261026\\flash25-standby",
+      "receiver_sha256": "4dbe72895705a30b3c699500d90517e2424676d732c18eb944971560901e6512",
+      "receiver_bytes": 31332,
+      "sector_sha256": "c68593cebeddf5b9c24f85249505ae719dd1ea73d11f309e3a8553e9c1a9fa47",
+      "prefix_sha256": "0592a543cb1e75b176e97f715f139a0a13d8a4d791ba44efd0ec94dc4f5b6754",
+      "early_bytes": 15804,
+      "sd_clock_hz": 25000000,
+      "standby": true,
+      "startup_flash_admitted": true,
+      "exact_recovery_review": "Separate reviewer audit and hardware qualification required"
+    }
+  },
+  "prior_125_bytes": {
+    "capture.bin": {
+      "sha256": "70a1913bd270b72164f4313bf25ba1f5d82276651a9c134b575fe3ac5c9923c3",
+      "unchanged": true
+    },
+    "staged/stage1.bin": {
+      "sha256": "4ef99d3b0b8ac7b790265cd1994428a5804dd3a20ad5587dd1585d2544a74b0b",
+      "unchanged": true
+    },
+    "staged/stage1_boot.bin": {
+      "sha256": "2aaa22c76d642f46b0f197dd90c24737164fd67b1a4e215f6913f034a6722be3",
+      "unchanged": true
+    },
+    "staged/capture_sector_0.bin": {
+      "sha256": "c03e40c8ceea09bd9c171c179f2191a1ef9799c9e615db979a84b9c53ad66010",
+      "unchanged": true
+    }
+  },
+  "tests": {
+    "capture_suite_count": 162,
+    "capture_suite_passed": true,
+    "log": "tmp/bringup/sd25-promote-20261026/capture-tests.txt",
+    "log_sha256": "4f1736664657a86825a5fde91850f91a81c64bc1a6992fa7e0ef9c7365f79556"
+  }
+}
