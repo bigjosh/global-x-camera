@@ -1,0 +1,1022 @@
+{
+  "schema": 1,
+  "source": "tmp\\bringup\\error-blinks-20261026\\fault7-repeat-current.jsonl",
+  "source_sha256": "3913fe9c9833a8f4a41fc152fcb57c401bd87e34f5503dcdf8720e7a161c80c4",
+  "source_bytes": 9013326,
+  "launch_host_utc": "2026-10-26T20:42:08.770000+00:00",
+  "launch_estimated_sample_s": 12.589884042739868,
+  "trace_first_utc_estimate": "2026-10-26T20:41:56.180116+00:00",
+  "trace_end_utc_estimate": "2026-10-26T20:42:36.168547+00:00",
+  "fault_window_duration_s": 27.39854695726013,
+  "native_sample_rate_hz": 2000000,
+  "bin_width_s": 0.005,
+  "method": {
+    "signal": "current",
+    "statistic": "bin minimum",
+    "median_filter_bins": 3,
+    "calibration_s": [
+      12.889884042739869,
+      17.589884042739868
+    ],
+    "lower_floor_A": 0.0789119228720665,
+    "upper_floor_A": 0.08179699629545212,
+    "cluster_separation_A": 0.00288507342338562,
+    "led_on_thresholds_A": [
+      0.08035445958375931,
+      0.08251826465129852
+    ],
+    "edge_uncertainty_s": 0.01,
+    "interval_uncertainty_s": 0.02,
+    "reason": "Positive periodic board-current spikes bias mean thresholds; minima separate the observed floor states. Higher startup current is a third state."
+  },
+  "checks": {
+    "no_queue_drop": true,
+    "no_logger_error": true,
+    "continuous_current_ids": true,
+    "continuous_voltage_ids": true,
+    "fault_window_current_finite": true,
+    "fault_window_voltage_finite": true,
+    "five_groups": true,
+    "expected_blinks_per_group": true,
+    "expected_total_blinks": true,
+    "no_censored_counted_pulses": true,
+    "low_current_after_final_group": true,
+    "cleanup_success": true
+  },
+  "complete_pattern_observed": true,
+  "timing_consistency": {
+    "on_100ms_consistent": true,
+    "between_blinks_400ms_consistent": true,
+    "between_sets_2000ms_consistent": true
+  },
+  "measured": {
+    "pulses": 35,
+    "groups": [
+      7,
+      7,
+      7,
+      7,
+      7
+    ],
+    "on_s": {
+      "count": 35,
+      "minimum": 0.09499999999999886,
+      "median": 0.09499999999999886,
+      "maximum": 0.10500000000000043
+    },
+    "interblink_off_s": {
+      "count": 30,
+      "minimum": 0.4049999999999976,
+      "median": 0.40500000000000114,
+      "maximum": 0.4100000000000037
+    },
+    "interset_off_s": {
+      "count": 4,
+      "minimum": 2.0150000000000006,
+      "median": 2.0150000000000006,
+      "maximum": 2.019999999999998
+    },
+    "rising_period_s": {
+      "count": 30,
+      "minimum": 0.5,
+      "median": 0.504999999999999,
+      "maximum": 0.5099999999999998
+    }
+  },
+  "groups": [
+    {
+      "index": 1,
+      "pulses": [
+        {
+          "start_sample_id": 25450000,
+          "end_sample_id_exclusive": 25660000,
+          "start_s": 12.725,
+          "end_s": 12.83,
+          "start_utc_estimate": "2026-10-26T20:42:08.905116+00:00",
+          "end_utc_estimate": "2026-10-26T20:42:09.010116+00:00",
+          "duration_s": 0.10500000000000043,
+          "start_bounds_s": [
+            12.715,
+            12.735
+          ],
+          "end_bounds_s": [
+            12.82,
+            12.84
+          ],
+          "duration_bounds_s": [
+            0.08500000000000042,
+            0.12500000000000042
+          ],
+          "left_censored": false,
+          "right_censored": false,
+          "index": 1
+        },
+        {
+          "start_sample_id": 26470000,
+          "end_sample_id_exclusive": 26660000,
+          "start_s": 13.235,
+          "end_s": 13.33,
+          "start_utc_estimate": "2026-10-26T20:42:09.415116+00:00",
+          "end_utc_estimate": "2026-10-26T20:42:09.510116+00:00",
+          "duration_s": 0.09500000000000064,
+          "start_bounds_s": [
+            13.225,
+            13.245
+          ],
+          "end_bounds_s": [
+            13.32,
+            13.34
+          ],
+          "duration_bounds_s": [
+            0.07500000000000064,
+            0.11500000000000064
+          ],
+          "left_censored": false,
+          "right_censored": false,
+          "index": 2
+        },
+        {
+          "start_sample_id": 27480000,
+          "end_sample_id_exclusive": 27670000,
+          "start_s": 13.74,
+          "end_s": 13.835,
+          "start_utc_estimate": "2026-10-26T20:42:09.920116+00:00",
+          "end_utc_estimate": "2026-10-26T20:42:10.015116+00:00",
+          "duration_s": 0.09500000000000064,
+          "start_bounds_s": [
+            13.73,
+            13.75
+          ],
+          "end_bounds_s": [
+            13.825000000000001,
+            13.845
+          ],
+          "duration_bounds_s": [
+            0.07500000000000064,
+            0.11500000000000064
+          ],
+          "left_censored": false,
+          "right_censored": false,
+          "index": 3
+        },
+        {
+          "start_sample_id": 28480000,
+          "end_sample_id_exclusive": 28680000,
+          "start_s": 14.24,
+          "end_s": 14.34,
+          "start_utc_estimate": "2026-10-26T20:42:10.420116+00:00",
+          "end_utc_estimate": "2026-10-26T20:42:10.520116+00:00",
+          "duration_s": 0.09999999999999964,
+          "start_bounds_s": [
+            14.23,
+            14.25
+          ],
+          "end_bounds_s": [
+            14.33,
+            14.35
+          ],
+          "duration_bounds_s": [
+            0.07999999999999964,
+            0.11999999999999965
+          ],
+          "left_censored": false,
+          "right_censored": false,
+          "index": 4
+        },
+        {
+          "start_sample_id": 29490000,
+          "end_sample_id_exclusive": 29680000,
+          "start_s": 14.745,
+          "end_s": 14.84,
+          "start_utc_estimate": "2026-10-26T20:42:10.925116+00:00",
+          "end_utc_estimate": "2026-10-26T20:42:11.020116+00:00",
+          "duration_s": 0.09500000000000064,
+          "start_bounds_s": [
+            14.735,
+            14.754999999999999
+          ],
+          "end_bounds_s": [
+            14.83,
+            14.85
+          ],
+          "duration_bounds_s": [
+            0.07500000000000064,
+            0.11500000000000064
+          ],
+          "left_censored": false,
+          "right_censored": false,
+          "index": 5
+        },
+        {
+          "start_sample_id": 30500000,
+          "end_sample_id_exclusive": 30690000,
+          "start_s": 15.25,
+          "end_s": 15.345,
+          "start_utc_estimate": "2026-10-26T20:42:11.430116+00:00",
+          "end_utc_estimate": "2026-10-26T20:42:11.525116+00:00",
+          "duration_s": 0.09500000000000064,
+          "start_bounds_s": [
+            15.24,
+            15.26
+          ],
+          "end_bounds_s": [
+            15.335,
+            15.355
+          ],
+          "duration_bounds_s": [
+            0.07500000000000064,
+            0.11500000000000064
+          ],
+          "left_censored": false,
+          "right_censored": false,
+          "index": 6
+        },
+        {
+          "start_sample_id": 31500000,
+          "end_sample_id_exclusive": 31690000,
+          "start_s": 15.75,
+          "end_s": 15.845,
+          "start_utc_estimate": "2026-10-26T20:42:11.930116+00:00",
+          "end_utc_estimate": "2026-10-26T20:42:12.025116+00:00",
+          "duration_s": 0.09500000000000064,
+          "start_bounds_s": [
+            15.74,
+            15.76
+          ],
+          "end_bounds_s": [
+            15.835,
+            15.855
+          ],
+          "duration_bounds_s": [
+            0.07500000000000064,
+            0.11500000000000064
+          ],
+          "left_censored": false,
+          "right_censored": false,
+          "index": 7
+        }
+      ],
+      "count": 7,
+      "expected_count": 7
+    },
+    {
+      "index": 2,
+      "pulses": [
+        {
+          "start_sample_id": 35730000,
+          "end_sample_id_exclusive": 35920000,
+          "start_s": 17.865,
+          "end_s": 17.96,
+          "start_utc_estimate": "2026-10-26T20:42:14.045116+00:00",
+          "end_utc_estimate": "2026-10-26T20:42:14.140116+00:00",
+          "duration_s": 0.09500000000000242,
+          "start_bounds_s": [
+            17.854999999999997,
+            17.875
+          ],
+          "end_bounds_s": [
+            17.95,
+            17.970000000000002
+          ],
+          "duration_bounds_s": [
+            0.07500000000000241,
+            0.11500000000000242
+          ],
+          "left_censored": false,
+          "right_censored": false,
+          "index": 1
+        },
+        {
+          "start_sample_id": 36740000,
+          "end_sample_id_exclusive": 36930000,
+          "start_s": 18.37,
+          "end_s": 18.465,
+          "start_utc_estimate": "2026-10-26T20:42:14.550116+00:00",
+          "end_utc_estimate": "2026-10-26T20:42:14.645116+00:00",
+          "duration_s": 0.09499999999999886,
+          "start_bounds_s": [
+            18.36,
+            18.380000000000003
+          ],
+          "end_bounds_s": [
+            18.455,
+            18.475
+          ],
+          "duration_bounds_s": [
+            0.07499999999999886,
+            0.11499999999999887
+          ],
+          "left_censored": false,
+          "right_censored": false,
+          "index": 2
+        },
+        {
+          "start_sample_id": 37740000,
+          "end_sample_id_exclusive": 37930000,
+          "start_s": 18.87,
+          "end_s": 18.965,
+          "start_utc_estimate": "2026-10-26T20:42:15.050116+00:00",
+          "end_utc_estimate": "2026-10-26T20:42:15.145116+00:00",
+          "duration_s": 0.09499999999999886,
+          "start_bounds_s": [
+            18.86,
+            18.880000000000003
+          ],
+          "end_bounds_s": [
+            18.955,
+            18.975
+          ],
+          "duration_bounds_s": [
+            0.07499999999999886,
+            0.11499999999999887
+          ],
+          "left_censored": false,
+          "right_censored": false,
+          "index": 3
+        },
+        {
+          "start_sample_id": 38750000,
+          "end_sample_id_exclusive": 38940000,
+          "start_s": 19.375,
+          "end_s": 19.47,
+          "start_utc_estimate": "2026-10-26T20:42:15.555116+00:00",
+          "end_utc_estimate": "2026-10-26T20:42:15.650116+00:00",
+          "duration_s": 0.09499999999999886,
+          "start_bounds_s": [
+            19.365,
+            19.385
+          ],
+          "end_bounds_s": [
+            19.459999999999997,
+            19.48
+          ],
+          "duration_bounds_s": [
+            0.07499999999999886,
+            0.11499999999999887
+          ],
+          "left_censored": false,
+          "right_censored": false,
+          "index": 4
+        },
+        {
+          "start_sample_id": 39750000,
+          "end_sample_id_exclusive": 39940000,
+          "start_s": 19.875,
+          "end_s": 19.97,
+          "start_utc_estimate": "2026-10-26T20:42:16.055116+00:00",
+          "end_utc_estimate": "2026-10-26T20:42:16.150116+00:00",
+          "duration_s": 0.09499999999999886,
+          "start_bounds_s": [
+            19.865,
+            19.885
+          ],
+          "end_bounds_s": [
+            19.959999999999997,
+            19.98
+          ],
+          "duration_bounds_s": [
+            0.07499999999999886,
+            0.11499999999999887
+          ],
+          "left_censored": false,
+          "right_censored": false,
+          "index": 5
+        },
+        {
+          "start_sample_id": 40760000,
+          "end_sample_id_exclusive": 40950000,
+          "start_s": 20.38,
+          "end_s": 20.475,
+          "start_utc_estimate": "2026-10-26T20:42:16.560116+00:00",
+          "end_utc_estimate": "2026-10-26T20:42:16.655116+00:00",
+          "duration_s": 0.09500000000000242,
+          "start_bounds_s": [
+            20.369999999999997,
+            20.39
+          ],
+          "end_bounds_s": [
+            20.465,
+            20.485000000000003
+          ],
+          "duration_bounds_s": [
+            0.07500000000000241,
+            0.11500000000000242
+          ],
+          "left_censored": false,
+          "right_censored": false,
+          "index": 6
+        },
+        {
+          "start_sample_id": 41760000,
+          "end_sample_id_exclusive": 41960000,
+          "start_s": 20.88,
+          "end_s": 20.98,
+          "start_utc_estimate": "2026-10-26T20:42:17.060116+00:00",
+          "end_utc_estimate": "2026-10-26T20:42:17.160116+00:00",
+          "duration_s": 0.10000000000000142,
+          "start_bounds_s": [
+            20.869999999999997,
+            20.89
+          ],
+          "end_bounds_s": [
+            20.97,
+            20.990000000000002
+          ],
+          "duration_bounds_s": [
+            0.08000000000000142,
+            0.12000000000000142
+          ],
+          "left_censored": false,
+          "right_censored": false,
+          "index": 7
+        }
+      ],
+      "count": 7,
+      "expected_count": 7
+    },
+    {
+      "index": 3,
+      "pulses": [
+        {
+          "start_sample_id": 45990000,
+          "end_sample_id_exclusive": 46180000,
+          "start_s": 22.995,
+          "end_s": 23.09,
+          "start_utc_estimate": "2026-10-26T20:42:19.175116+00:00",
+          "end_utc_estimate": "2026-10-26T20:42:19.270116+00:00",
+          "duration_s": 0.09499999999999886,
+          "start_bounds_s": [
+            22.985,
+            23.005000000000003
+          ],
+          "end_bounds_s": [
+            23.08,
+            23.1
+          ],
+          "duration_bounds_s": [
+            0.07499999999999886,
+            0.11499999999999887
+          ],
+          "left_censored": false,
+          "right_censored": false,
+          "index": 1
+        },
+        {
+          "start_sample_id": 47000000,
+          "end_sample_id_exclusive": 47190000,
+          "start_s": 23.5,
+          "end_s": 23.595,
+          "start_utc_estimate": "2026-10-26T20:42:19.680116+00:00",
+          "end_utc_estimate": "2026-10-26T20:42:19.775116+00:00",
+          "duration_s": 0.09499999999999886,
+          "start_bounds_s": [
+            23.49,
+            23.51
+          ],
+          "end_bounds_s": [
+            23.584999999999997,
+            23.605
+          ],
+          "duration_bounds_s": [
+            0.07499999999999886,
+            0.11499999999999887
+          ],
+          "left_censored": false,
+          "right_censored": false,
+          "index": 2
+        },
+        {
+          "start_sample_id": 48000000,
+          "end_sample_id_exclusive": 48190000,
+          "start_s": 24.0,
+          "end_s": 24.095,
+          "start_utc_estimate": "2026-10-26T20:42:20.180116+00:00",
+          "end_utc_estimate": "2026-10-26T20:42:20.275116+00:00",
+          "duration_s": 0.09499999999999886,
+          "start_bounds_s": [
+            23.99,
+            24.01
+          ],
+          "end_bounds_s": [
+            24.084999999999997,
+            24.105
+          ],
+          "duration_bounds_s": [
+            0.07499999999999886,
+            0.11499999999999887
+          ],
+          "left_censored": false,
+          "right_censored": false,
+          "index": 3
+        },
+        {
+          "start_sample_id": 49010000,
+          "end_sample_id_exclusive": 49200000,
+          "start_s": 24.505,
+          "end_s": 24.6,
+          "start_utc_estimate": "2026-10-26T20:42:20.685116+00:00",
+          "end_utc_estimate": "2026-10-26T20:42:20.780116+00:00",
+          "duration_s": 0.09500000000000242,
+          "start_bounds_s": [
+            24.494999999999997,
+            24.515
+          ],
+          "end_bounds_s": [
+            24.59,
+            24.610000000000003
+          ],
+          "duration_bounds_s": [
+            0.07500000000000241,
+            0.11500000000000242
+          ],
+          "left_censored": false,
+          "right_censored": false,
+          "index": 4
+        },
+        {
+          "start_sample_id": 50010000,
+          "end_sample_id_exclusive": 50210000,
+          "start_s": 25.005,
+          "end_s": 25.105,
+          "start_utc_estimate": "2026-10-26T20:42:21.185116+00:00",
+          "end_utc_estimate": "2026-10-26T20:42:21.285116+00:00",
+          "duration_s": 0.10000000000000142,
+          "start_bounds_s": [
+            24.994999999999997,
+            25.015
+          ],
+          "end_bounds_s": [
+            25.095,
+            25.115000000000002
+          ],
+          "duration_bounds_s": [
+            0.08000000000000142,
+            0.12000000000000142
+          ],
+          "left_censored": false,
+          "right_censored": false,
+          "index": 5
+        },
+        {
+          "start_sample_id": 51020000,
+          "end_sample_id_exclusive": 51210000,
+          "start_s": 25.51,
+          "end_s": 25.605,
+          "start_utc_estimate": "2026-10-26T20:42:21.690116+00:00",
+          "end_utc_estimate": "2026-10-26T20:42:21.785116+00:00",
+          "duration_s": 0.09499999999999886,
+          "start_bounds_s": [
+            25.5,
+            25.520000000000003
+          ],
+          "end_bounds_s": [
+            25.595,
+            25.615000000000002
+          ],
+          "duration_bounds_s": [
+            0.07499999999999886,
+            0.11499999999999887
+          ],
+          "left_censored": false,
+          "right_censored": false,
+          "index": 6
+        },
+        {
+          "start_sample_id": 52030000,
+          "end_sample_id_exclusive": 52220000,
+          "start_s": 26.015,
+          "end_s": 26.11,
+          "start_utc_estimate": "2026-10-26T20:42:22.195116+00:00",
+          "end_utc_estimate": "2026-10-26T20:42:22.290116+00:00",
+          "duration_s": 0.09499999999999886,
+          "start_bounds_s": [
+            26.005,
+            26.025000000000002
+          ],
+          "end_bounds_s": [
+            26.099999999999998,
+            26.12
+          ],
+          "duration_bounds_s": [
+            0.07499999999999886,
+            0.11499999999999887
+          ],
+          "left_censored": false,
+          "right_censored": false,
+          "index": 7
+        }
+      ],
+      "count": 7,
+      "expected_count": 7
+    },
+    {
+      "index": 4,
+      "pulses": [
+        {
+          "start_sample_id": 56250000,
+          "end_sample_id_exclusive": 56440000,
+          "start_s": 28.125,
+          "end_s": 28.22,
+          "start_utc_estimate": "2026-10-26T20:42:24.305116+00:00",
+          "end_utc_estimate": "2026-10-26T20:42:24.400116+00:00",
+          "duration_s": 0.09499999999999886,
+          "start_bounds_s": [
+            28.115,
+            28.135
+          ],
+          "end_bounds_s": [
+            28.209999999999997,
+            28.23
+          ],
+          "duration_bounds_s": [
+            0.07499999999999886,
+            0.11499999999999887
+          ],
+          "left_censored": false,
+          "right_censored": false,
+          "index": 1
+        },
+        {
+          "start_sample_id": 57260000,
+          "end_sample_id_exclusive": 57450000,
+          "start_s": 28.63,
+          "end_s": 28.725,
+          "start_utc_estimate": "2026-10-26T20:42:24.810116+00:00",
+          "end_utc_estimate": "2026-10-26T20:42:24.905116+00:00",
+          "duration_s": 0.09500000000000242,
+          "start_bounds_s": [
+            28.619999999999997,
+            28.64
+          ],
+          "end_bounds_s": [
+            28.715,
+            28.735000000000003
+          ],
+          "duration_bounds_s": [
+            0.07500000000000241,
+            0.11500000000000242
+          ],
+          "left_censored": false,
+          "right_censored": false,
+          "index": 2
+        },
+        {
+          "start_sample_id": 58260000,
+          "end_sample_id_exclusive": 58450000,
+          "start_s": 29.13,
+          "end_s": 29.225,
+          "start_utc_estimate": "2026-10-26T20:42:25.310116+00:00",
+          "end_utc_estimate": "2026-10-26T20:42:25.405116+00:00",
+          "duration_s": 0.09500000000000242,
+          "start_bounds_s": [
+            29.119999999999997,
+            29.14
+          ],
+          "end_bounds_s": [
+            29.215,
+            29.235000000000003
+          ],
+          "duration_bounds_s": [
+            0.07500000000000241,
+            0.11500000000000242
+          ],
+          "left_censored": false,
+          "right_censored": false,
+          "index": 3
+        },
+        {
+          "start_sample_id": 59260000,
+          "end_sample_id_exclusive": 59460000,
+          "start_s": 29.63,
+          "end_s": 29.73,
+          "start_utc_estimate": "2026-10-26T20:42:25.810116+00:00",
+          "end_utc_estimate": "2026-10-26T20:42:25.910116+00:00",
+          "duration_s": 0.10000000000000142,
+          "start_bounds_s": [
+            29.619999999999997,
+            29.64
+          ],
+          "end_bounds_s": [
+            29.72,
+            29.740000000000002
+          ],
+          "duration_bounds_s": [
+            0.08000000000000142,
+            0.12000000000000142
+          ],
+          "left_censored": false,
+          "right_censored": false,
+          "index": 4
+        },
+        {
+          "start_sample_id": 60270000,
+          "end_sample_id_exclusive": 60460000,
+          "start_s": 30.135,
+          "end_s": 30.23,
+          "start_utc_estimate": "2026-10-26T20:42:26.315116+00:00",
+          "end_utc_estimate": "2026-10-26T20:42:26.410116+00:00",
+          "duration_s": 0.09499999999999886,
+          "start_bounds_s": [
+            30.125,
+            30.145000000000003
+          ],
+          "end_bounds_s": [
+            30.22,
+            30.240000000000002
+          ],
+          "duration_bounds_s": [
+            0.07499999999999886,
+            0.11499999999999887
+          ],
+          "left_censored": false,
+          "right_censored": false,
+          "index": 5
+        },
+        {
+          "start_sample_id": 61280000,
+          "end_sample_id_exclusive": 61470000,
+          "start_s": 30.64,
+          "end_s": 30.735,
+          "start_utc_estimate": "2026-10-26T20:42:26.820116+00:00",
+          "end_utc_estimate": "2026-10-26T20:42:26.915116+00:00",
+          "duration_s": 0.09499999999999886,
+          "start_bounds_s": [
+            30.63,
+            30.650000000000002
+          ],
+          "end_bounds_s": [
+            30.724999999999998,
+            30.745
+          ],
+          "duration_bounds_s": [
+            0.07499999999999886,
+            0.11499999999999887
+          ],
+          "left_censored": false,
+          "right_censored": false,
+          "index": 6
+        },
+        {
+          "start_sample_id": 62280000,
+          "end_sample_id_exclusive": 62470000,
+          "start_s": 31.14,
+          "end_s": 31.235,
+          "start_utc_estimate": "2026-10-26T20:42:27.320116+00:00",
+          "end_utc_estimate": "2026-10-26T20:42:27.415116+00:00",
+          "duration_s": 0.09499999999999886,
+          "start_bounds_s": [
+            31.13,
+            31.150000000000002
+          ],
+          "end_bounds_s": [
+            31.224999999999998,
+            31.245
+          ],
+          "duration_bounds_s": [
+            0.07499999999999886,
+            0.11499999999999887
+          ],
+          "left_censored": false,
+          "right_censored": false,
+          "index": 7
+        }
+      ],
+      "count": 7,
+      "expected_count": 7
+    },
+    {
+      "index": 5,
+      "pulses": [
+        {
+          "start_sample_id": 66500000,
+          "end_sample_id_exclusive": 66690000,
+          "start_s": 33.25,
+          "end_s": 33.345,
+          "start_utc_estimate": "2026-10-26T20:42:29.430116+00:00",
+          "end_utc_estimate": "2026-10-26T20:42:29.525116+00:00",
+          "duration_s": 0.09499999999999886,
+          "start_bounds_s": [
+            33.24,
+            33.26
+          ],
+          "end_bounds_s": [
+            33.335,
+            33.355
+          ],
+          "duration_bounds_s": [
+            0.07499999999999886,
+            0.11499999999999887
+          ],
+          "left_censored": false,
+          "right_censored": false,
+          "index": 1
+        },
+        {
+          "start_sample_id": 67510000,
+          "end_sample_id_exclusive": 67700000,
+          "start_s": 33.755,
+          "end_s": 33.85,
+          "start_utc_estimate": "2026-10-26T20:42:29.935116+00:00",
+          "end_utc_estimate": "2026-10-26T20:42:30.030116+00:00",
+          "duration_s": 0.09499999999999886,
+          "start_bounds_s": [
+            33.745000000000005,
+            33.765
+          ],
+          "end_bounds_s": [
+            33.84,
+            33.86
+          ],
+          "duration_bounds_s": [
+            0.07499999999999886,
+            0.11499999999999887
+          ],
+          "left_censored": false,
+          "right_censored": false,
+          "index": 2
+        },
+        {
+          "start_sample_id": 68510000,
+          "end_sample_id_exclusive": 68710000,
+          "start_s": 34.255,
+          "end_s": 34.355,
+          "start_utc_estimate": "2026-10-26T20:42:30.435116+00:00",
+          "end_utc_estimate": "2026-10-26T20:42:30.535116+00:00",
+          "duration_s": 0.09999999999999432,
+          "start_bounds_s": [
+            34.245000000000005,
+            34.265
+          ],
+          "end_bounds_s": [
+            34.345,
+            34.364999999999995
+          ],
+          "duration_bounds_s": [
+            0.07999999999999431,
+            0.11999999999999432
+          ],
+          "left_censored": false,
+          "right_censored": false,
+          "index": 3
+        },
+        {
+          "start_sample_id": 69520000,
+          "end_sample_id_exclusive": 69710000,
+          "start_s": 34.76,
+          "end_s": 34.855,
+          "start_utc_estimate": "2026-10-26T20:42:30.940116+00:00",
+          "end_utc_estimate": "2026-10-26T20:42:31.035116+00:00",
+          "duration_s": 0.09499999999999886,
+          "start_bounds_s": [
+            34.75,
+            34.769999999999996
+          ],
+          "end_bounds_s": [
+            34.845,
+            34.864999999999995
+          ],
+          "duration_bounds_s": [
+            0.07499999999999886,
+            0.11499999999999887
+          ],
+          "left_censored": false,
+          "right_censored": false,
+          "index": 4
+        },
+        {
+          "start_sample_id": 70520000,
+          "end_sample_id_exclusive": 70720000,
+          "start_s": 35.26,
+          "end_s": 35.36,
+          "start_utc_estimate": "2026-10-26T20:42:31.440116+00:00",
+          "end_utc_estimate": "2026-10-26T20:42:31.540116+00:00",
+          "duration_s": 0.10000000000000142,
+          "start_bounds_s": [
+            35.25,
+            35.269999999999996
+          ],
+          "end_bounds_s": [
+            35.35,
+            35.37
+          ],
+          "duration_bounds_s": [
+            0.08000000000000142,
+            0.12000000000000142
+          ],
+          "left_censored": false,
+          "right_censored": false,
+          "index": 5
+        },
+        {
+          "start_sample_id": 71530000,
+          "end_sample_id_exclusive": 71720000,
+          "start_s": 35.765,
+          "end_s": 35.86,
+          "start_utc_estimate": "2026-10-26T20:42:31.945116+00:00",
+          "end_utc_estimate": "2026-10-26T20:42:32.040116+00:00",
+          "duration_s": 0.09499999999999886,
+          "start_bounds_s": [
+            35.755,
+            35.775
+          ],
+          "end_bounds_s": [
+            35.85,
+            35.87
+          ],
+          "duration_bounds_s": [
+            0.07499999999999886,
+            0.11499999999999887
+          ],
+          "left_censored": false,
+          "right_censored": false,
+          "index": 6
+        },
+        {
+          "start_sample_id": 72540000,
+          "end_sample_id_exclusive": 72730000,
+          "start_s": 36.27,
+          "end_s": 36.365,
+          "start_utc_estimate": "2026-10-26T20:42:32.450116+00:00",
+          "end_utc_estimate": "2026-10-26T20:42:32.545116+00:00",
+          "duration_s": 0.09499999999999886,
+          "start_bounds_s": [
+            36.260000000000005,
+            36.28
+          ],
+          "end_bounds_s": [
+            36.355000000000004,
+            36.375
+          ],
+          "duration_bounds_s": [
+            0.07499999999999886,
+            0.11499999999999887
+          ],
+          "left_censored": false,
+          "right_censored": false,
+          "index": 7
+        }
+      ],
+      "count": 7,
+      "expected_count": 7
+    }
+  ],
+  "excluded_short_intervals": [],
+  "low_current_plateau": {
+    "start_s": 36.77,
+    "start_utc_estimate": "2026-10-26T20:42:32.950116+00:00",
+    "duration_s": 3.2184309999999954,
+    "median_current_A": 0.00806747316364199,
+    "scope": "observed current plateau only; not independent Standby attribution"
+  },
+  "session_whole_coverage": {
+    "checks": {
+      "both_signals_received": true,
+      "no_queue_drop": true,
+      "no_logger_error": true,
+      "contiguous_received_ids": true,
+      "all_received_samples_finite": false
+    },
+    "passed": false,
+    "signals": {
+      "current": {
+        "chunks": 1223,
+        "samples": 79976862,
+        "finite": 79976791,
+        "bins": 7998,
+        "first_sample_id": 0,
+        "end_sample_id_exclusive": 79976862,
+        "gap_native_samples": 0,
+        "discontinuities": 0,
+        "overlaps_or_resets": 0,
+        "sample_rate_hz": 2000000,
+        "decimate_factor": 1
+      },
+      "voltage": {
+        "chunks": 1223,
+        "samples": 79976862,
+        "finite": 79976862,
+        "bins": 7999,
+        "first_sample_id": 16128,
+        "end_sample_id_exclusive": 79992990,
+        "gap_native_samples": 0,
+        "discontinuities": 0,
+        "overlaps_or_resets": 0,
+        "sample_rate_hz": 2000000,
+        "decimate_factor": 1
+      }
+    },
+    "dropped_chunks": 0,
+    "logger_error": null,
+    "scope": "received intervals only; unobserved start/end not covered; no clipping or energy qualification"
+  },
+  "fault_window_nonfinite_current": 0,
+  "fault_window_nonfinite_voltage": 0,
+  "whole_session_ok": false,
+  "limits": [
+    "LED cause inferred from deliberately injected firmware and characteristic current changes; no optical/GPIO probe.",
+    "Driver UTC and host launch are approximate; pulse spacings use native sample ids.",
+    "Timing intervals include conservative bin/filter uncertainty, not precision calibration.",
+    "Whole-session startup NaNs are retained; scoped finite fault-window evidence is separate.",
+    "No energy, analog margin, general fault coverage, or independent Standby claim."
+  ]
+}

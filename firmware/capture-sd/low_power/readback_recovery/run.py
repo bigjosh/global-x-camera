@@ -31,6 +31,12 @@ SECTOR_SHA="7fda9d00cc7ffb3fbb9e6aac6695cf18545754b5dbfce1520cf30b2da39c4e63"
 # command-line opt-in for unknown firmware. This table does not broaden the
 # bridge or READ-module identities, and check_park still verifies live code.
 APPROVED_RECOVERY={
+    # Independently reviewed error-blink prefix: unchanged early guard and all
+    # 20 literals; six failure-loop bytes plus two CRC words differ. The fixed
+    # appended handler needs an exact longer length, not a broad size allowance.
+    '7f8017fd70bd9b77cfabcf212d072201ec8e134c3a44a0555a2108d7cc454c32':
+        dict(name='raw-25-error-blinks-v2-standby-qualification',prefix_bytes=6500,
+             sector_sha256='5ad1bc968606b17e513680bcdf6abf9c73ca3ccf24a236a37b8ecc89d4e9c661'),
     # Exact independently reviewed 25 MHz startup/no-tail pairs. This admits
     # the unchanged READ bridge, not a new cold-boot or Standby result.
     '571660be49caafcfc167e295514c4c1863b8fe35c06192a3cdd184647e39ba38':
@@ -175,7 +181,7 @@ def checked_recovery(path):
     sector=(path/"capture_sector_0.bin").read_bytes()
     digest=sd.sha(prefix)
     approved=APPROVED_RECOVERY.get(digest)
-    if (approved is None or len(prefix)!=5140 or len(sector)!=65536 or
+    if (approved is None or len(prefix)!=approved.get("prefix_bytes",5140) or len(sector)!=65536 or
             sd.sha(sector)!=approved["sector_sha256"]):
         raise ValueError("Unreviewed recovery prefix/sector pair")
     return dict(approved,prefix_sha256=digest)

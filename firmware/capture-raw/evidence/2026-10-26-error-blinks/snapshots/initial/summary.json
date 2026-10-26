@@ -1,0 +1,237 @@
+{
+  "schema": 1,
+  "qualification_complete": false,
+  "pending": [
+    "Normal cold capture and complete saved-image verification with this installed image",
+    "Error signal from the exact production ROM-loaded prefix, then UART recovery",
+    "Final instrument closure and live bench checkpoint"
+  ],
+  "checks": {
+    "flash-v2": {
+      "binary_sha256": "471fddf2c71b7d8bba8e47debf8379a8fd72c7f3daae59dcdf10dc8eed1198af",
+      "source_files": 44
+    },
+    "ram-test": {
+      "binary_sha256": "ad66bde3018dc0689f321a30286c4a5c7f344594836539a70fc6e45a5929a7e5",
+      "source_files": 40
+    },
+    "prefix_review": {
+      "prefix_sha256": "7f8017fd70bd9b77cfabcf212d072201ec8e134c3a44a0555a2108d7cc454c32",
+      "bytes": 6500,
+      "old_bytes": 5140,
+      "early_receiver_bytes": 15804,
+      "preserved_literals": 20,
+      "changed_offsets": [
+        "0xe6",
+        "0xe7",
+        "0xe8",
+        "0xe9",
+        "0xea",
+        "0xeb",
+        "0xc9c",
+        "0xc9d",
+        "0xc9e",
+        "0xc9f",
+        "0x1354",
+        "0x1355",
+        "0x1356",
+        "0x1357"
+      ]
+    },
+    "exact_allowlists": {
+      "passed": true,
+      "new_and_old_exact_pairs_pass": true,
+      "negative_cases": {
+        "prefix-short": {
+          "early-park": "rejected",
+          "readback-recovery": "rejected"
+        },
+        "prefix-engine-change": {
+          "early-park": "rejected",
+          "readback-recovery": "rejected"
+        },
+        "prefix-guard-change": {
+          "early-park": "rejected",
+          "readback-recovery": "rejected"
+        },
+        "sector-short": {
+          "early-park": "rejected",
+          "readback-recovery": "rejected"
+        },
+        "sector-changed": {
+          "early-park": "rejected",
+          "readback-recovery": "rejected"
+        },
+        "new-prefix-old-sector": {
+          "early-park": "rejected",
+          "readback-recovery": "rejected"
+        },
+        "old-prefix-new-sector": {
+          "early-park": "rejected",
+          "readback-recovery": "rejected"
+        }
+      },
+      "existing_readback_tests_passed": 14
+    },
+    "installation": {
+      "sector_sha256": "5ad1bc968606b17e513680bcdf6abf9c73ca3ccf24a236a37b8ecc89d4e9c661",
+      "full_bytes_equal": 65536,
+      "following_bytes_unchanged": 4096,
+      "following_sha256": "01cc465d3a7581d9d003b09e5db684eb7bec8e8512e12ce3565154c3aced816f"
+    },
+    "fault2-park": {
+      "prefix_sha256": "0592a543cb1e75b176e97f715f139a0a13d8a4d791ba44efd0ec94dc4f5b6754",
+      "good_pulses": 9,
+      "bad_pulses": 0
+    },
+    "fault7-repeat-park": {
+      "prefix_sha256": "0592a543cb1e75b176e97f715f139a0a13d8a4d791ba44efd0ec94dc4f5b6754",
+      "good_pulses": 9,
+      "bad_pulses": 0
+    },
+    "new-prefix-park": {
+      "prefix_sha256": "7f8017fd70bd9b77cfabcf212d072201ec8e134c3a44a0555a2108d7cc454c32",
+      "good_pulses": 9,
+      "bad_pulses": 0
+    },
+    "fault2-sbf": {
+      "sbf": true,
+      "pdds": true,
+      "stopf": false,
+      "trial_entry_proven": false,
+      "interpretation": "SBF is set: hardware reports Standby since the last POR or CSSF clear. Attribution to this trial requires its pre-entry flag-clear proof and reset/power history."
+    },
+    "fault7-repeat-sbf": {
+      "sbf": true,
+      "pdds": true,
+      "stopf": false,
+      "trial_entry_proven": false,
+      "interpretation": "SBF is set: hardware reports Standby since the last POR or CSSF clear. Attribution to this trial requires its pre-entry flag-clear proof and reset/power history."
+    },
+    "ram_fault_scope": {
+      "codes": [
+        2,
+        7
+      ],
+      "synthetic": true,
+      "no_sd_or_nor_writes": true,
+      "storage_idle_not_claimed": true,
+      "production_prefix_error_pending": true
+    },
+    "fault7-current": {
+      "complete_pattern_observed": false,
+      "measured": {
+        "pulses": 25,
+        "groups": [
+          7,
+          7,
+          7,
+          4
+        ],
+        "on_s": {
+          "count": 25,
+          "minimum": 0.09499999999999886,
+          "median": 0.09499999999999886,
+          "maximum": 0.10499999999999687
+        },
+        "interblink_off_s": {
+          "count": 21,
+          "minimum": 0.4049999999999976,
+          "median": 0.40500000000000114,
+          "maximum": 0.4100000000000037
+        },
+        "interset_off_s": {
+          "count": 3,
+          "minimum": 2.014999999999997,
+          "median": 2.0199999999999996,
+          "maximum": 2.020000000000003
+        },
+        "rising_period_s": {
+          "count": 21,
+          "minimum": 0.5,
+          "median": 0.504999999999999,
+          "maximum": 0.509999999999998
+        }
+      },
+      "timing_consistency": {
+        "on_100ms_consistent": true,
+        "between_blinks_400ms_consistent": true,
+        "between_sets_2000ms_consistent": true
+      },
+      "low_current_plateau": null,
+      "whole_session_ok": false,
+      "fault_window_nonfinite_current": 0,
+      "fault_window_nonfinite_voltage": 0,
+      "limits": [
+        "LED cause inferred from deliberately injected firmware and characteristic current changes; no optical/GPIO probe.",
+        "Driver UTC and host launch are approximate; pulse spacings use native sample ids.",
+        "Timing intervals include conservative bin/filter uncertainty, not precision calibration.",
+        "Whole-session startup NaNs are retained; scoped finite fault-window evidence is separate.",
+        "No energy, analog margin, general fault coverage, or independent Standby claim."
+      ]
+    },
+    "fault7-repeat-current": {
+      "complete_pattern_observed": true,
+      "measured": {
+        "pulses": 35,
+        "groups": [
+          7,
+          7,
+          7,
+          7,
+          7
+        ],
+        "on_s": {
+          "count": 35,
+          "minimum": 0.09499999999999886,
+          "median": 0.09499999999999886,
+          "maximum": 0.10500000000000043
+        },
+        "interblink_off_s": {
+          "count": 30,
+          "minimum": 0.4049999999999976,
+          "median": 0.40500000000000114,
+          "maximum": 0.4100000000000037
+        },
+        "interset_off_s": {
+          "count": 4,
+          "minimum": 2.0150000000000006,
+          "median": 2.0150000000000006,
+          "maximum": 2.019999999999998
+        },
+        "rising_period_s": {
+          "count": 30,
+          "minimum": 0.5,
+          "median": 0.504999999999999,
+          "maximum": 0.5099999999999998
+        }
+      },
+      "timing_consistency": {
+        "on_100ms_consistent": true,
+        "between_blinks_400ms_consistent": true,
+        "between_sets_2000ms_consistent": true
+      },
+      "low_current_plateau": {
+        "start_s": 36.77,
+        "start_utc_estimate": "2026-10-26T20:42:32.950116+00:00",
+        "duration_s": 3.2184309999999954,
+        "median_current_A": 0.00806747316364199,
+        "scope": "observed current plateau only; not independent Standby attribution"
+      },
+      "whole_session_ok": false,
+      "fault_window_nonfinite_current": 0,
+      "fault_window_nonfinite_voltage": 0,
+      "limits": [
+        "LED cause inferred from deliberately injected firmware and characteristic current changes; no optical/GPIO probe.",
+        "Driver UTC and host launch are approximate; pulse spacings use native sample ids.",
+        "Timing intervals include conservative bin/filter uncertainty, not precision calibration.",
+        "Whole-session startup NaNs are retained; scoped finite fault-window evidence is separate.",
+        "No energy, analog margin, general fault coverage, or independent Standby claim."
+      ]
+    }
+  },
+  "waveforms_recomputed": true,
+  "created_utc": "2026-10-26T20:54:46.069093+00:00",
+  "source": "D:\\Github\\global-x-camera\\tmp\\bringup\\error-blinks-20261026",
+  "review_source": "D:\\Github\\global-x-camera\\tmp\\bringup\\error-signal-review-20261026"
+}

@@ -6,6 +6,14 @@ the existing UART recovery mechanism. It uses the container in
 [raw-slots](../raw-slots/README.md); there is no FAT filesystem, image conversion,
 compression or full-frame CPU checksum in the normal save path.
 
+The selected error policy is now **five sets of numbered red blinks followed
+by shutdown**, enabled explicitly with `--error-blinks`. Red still marks normal
+startup before acquisition. The [code table and failure shutdown contract](ERROR_SIGNALS.md)
+distinguish implemented detectors, reserved codes, UART recovery and the
+separate successful-save path. The [error-signaling qualification](evidence/2026-10-26-error-blinks/README.md)
+records the installed image, normal cold capture and synthetic failure tests.
+The live bench state remains in [the checkpoint](../../AGENTS.md).
+
 For fine phase timing, the optional [`--cycle-trace` profile](CYCLE_TRACE.md)
 stores cycle-counter timestamps in fixed RAM slots. Its first qualified cold
 run on October 25 captured 101 events, including 203.689 ms in ACMD41 negotiation and
@@ -13,6 +21,18 @@ run on October 25 captured 101 events, including 203.689 ms in ACMD41 negotiatio
 for guarded ST-LINK retrieval; normal Standby firmware was restored afterward.
 
 ## Current selected profile — October 26: reviewed 25 MHz startup, no tail wait
+
+The current error-blink Standby receiver is
+`471fddf2c71b7d8bba8e47debf8379a8fd72c7f3daae59dcdf10dc8eed1198af`,
+with 64 KiB NOR sector
+`5ad1bc968606b17e513680bcdf6abf9c73ca3ccf24a236a37b8ecc89d4e9c661`
+and ROM-loaded prefix
+`7f8017fd70bd9b77cfabcf212d072201ec8e134c3a44a0555a2108d7cc454c32`.
+Independent physical NOR readback matched. A normal cold boot saved slot 51,
+which was proven free beforehand, and its complete 25 MHz readback passed
+independent PNG sample decoding. Synthetic errors exercised the RAM engine
+and the exact installed prefix, including UART recovery during the blink
+sequence. See [the evidence and limits](evidence/2026-10-26-error-blinks/QUALIFICATION.md).
 
 The selected profile uses **four-bit SDMMC2 at 25 MHz, falling-edge host
 launch during both identification and transfer, and rising-edge feedback input
@@ -78,7 +98,7 @@ of all 64 KiB, with the following 4 KiB unchanged. See the
 The earlier [12.5 MHz qualification](evidence/2026-10-26-sd-review/FINAL-QUALIFICATION.md)
 remains historical evidence. No new energy or power-loss qualification is claimed.
 
-**Installed selected Standby sector:**
+**Qualified 25 MHz Standby sector before the error-blink change:**
 `c68593cebeddf5b9c24f85249505ae719dd1ea73d11f309e3a8553e9c1a9fa47`.
 Exact recovery prefix:
 `0592a543cb1e75b176e97f715f139a0a13d8a4d791ba44efd0ec94dc4f5b6754`.
@@ -96,26 +116,29 @@ offline builds into **new** directories and never program the target:
 
 ```powershell
 # RAM scene capture; stays awake for inspection and original-frame comparison.
-python firmware/capture-raw/build.py --out tmp/bringup/raw-reviewed25-ram `
-  --magic-format --line-stream --async-stop --transport idma `
+python firmware/capture-raw/build.py --out tmp/bringup/raw-reviewed25-errors-ram `
+  --error-blinks --magic-format --line-stream --async-stop --transport idma `
   --sd-bus-width 4 --sd-clock-hz 25000000 --sd-gpio-speed 3 `
   --sd-clock-negedge --sd-clock-negedge-init --sd-review-profile --sd-startup-opt
 
 # Cold-boot awake image; retains the frame and startup proof.
-python firmware/capture-raw/build.py --out tmp/bringup/raw-reviewed25-awake `
-  --flash --magic-format --line-stream --async-stop --transport idma `
+python firmware/capture-raw/build.py --out tmp/bringup/raw-reviewed25-errors-awake `
+  --flash --error-blinks --magic-format --line-stream --async-stop --transport idma `
   --sd-bus-width 4 --sd-clock-hz 25000000 --sd-gpio-speed 3 `
   --sd-clock-negedge --sd-clock-negedge-init --sd-review-profile --sd-startup-opt
 
 # Same selected capture path, followed by guarded final Standby.
-python firmware/capture-raw/build.py --out tmp/bringup/raw-reviewed25-standby `
-  --flash --standby --magic-format --line-stream --async-stop --transport idma `
+python firmware/capture-raw/build.py --out tmp/bringup/raw-reviewed25-errors-standby `
+  --flash --standby --error-blinks --magic-format --line-stream --async-stop --transport idma `
   --sd-bus-width 4 --sd-clock-hz 25000000 --sd-gpio-speed 3 `
   --sd-clock-negedge --sd-clock-negedge-init --sd-review-profile --sd-startup-opt
 ```
 
 These use the normal scene and 1,428-line exposure defaults. Do not add
 `--raw-dma-tail-wait`, `--sd-idma-read`, `--dma-sleep` or electrical trial flags.
+With `--error-blinks`, capture failures shut down in both awake and Standby
+profiles; "awake" describes successful diagnostic completion only. Omit the
+option when reproducing the historical solid-red failure-park firmware.
 The selected startup flash admission also excludes `--cycle-trace`, preinit,
 snapshots, poison and pattern diagnostics; use a separately bound RAM build
 for those experiments. Flash installation still requires exact build/recovery
@@ -596,6 +619,9 @@ FP context after all work has finished. This is not a reusable context cleanup
 routine for a returning function. Success requires a fresh terminal proof,
 idle/deinitialized card, disabled caches, exact immutable code and the expected
 park address. A failure report alone does not authorize a power cycle.
+The selected `--error-blinks` capture path instead performs its own explicit
+[failure shutdown](ERROR_SIGNALS.md#failure-shutdown-and-storage), retaining
+the nonzero error and never publishing a successful storage-idle proof.
 
 ## Historical v12–v16 capture and storage paths
 
@@ -746,7 +772,9 @@ The linker audit requires the vectors and camera interrupt handlers to remain
 in the early range, checks direct crossings into late code, and caps early
 loading at the qualified v66c receiver's 15,804 bytes. These are offline layout
 checks, not a new measured timing guarantee. A failed late load may leave
-capture or a NOR read active; its failure park is not a maintenance permission.
+capture or a NOR read active. The historical failure park is not a maintenance
+permission; with `--error-blinks`, the ROM-loaded failure engine can shut down
+without entering the unverified late range.
 
 The early load is padded to exactly 15,804 bytes. GCC otherwise changes prefix
 register allocation and literal-pool placement for some receiver lengths or CRC
@@ -755,10 +783,18 @@ deterministic, the prefix compiles with v66c's original CRC constant, then the
 builder relocates only the two reviewed CRC data words at offsets `0xC9C` and
 `0x1354`. It verifies their exact original bytes, disassembled data-literal form,
 and unique ELF mapping. The ELF, raw binary and listing are updated together;
-all instructions stay unchanged. The manifest records both CRCs, exact offsets
+the CRC relocation itself leaves instructions unchanged. The manifest records both CRCs, exact offsets
 and hashes, and preserves the unrelocated artifacts. The unchanged recovery
 identity checks run again after relocation. This is not permission to patch
 arbitrary code or admit a changed recovery branch.
+
+The separate `--error-blinks` transformation replaces only the six bytes of
+the prefix's later failure loop and alignment, then appends a fixed bridge and
+self-contained error engine. Its reviewed prefix grows from 5,140 to 6,500
+bytes; the early receiver remains 15,804 bytes and the full UART recovery guard
+and all 20 referenced literals remain identical. The larger ROM load may add
+startup time; preserving the receiver boundary is not a claim of unchanged
+power-on latency. See [the layout and recovery review](ERROR_SIGNALS.md#boot-layout-and-recovery).
 
 Flash builds support the scene configuration only. The diagonal-pattern prefix
 changes literal addresses before the existing conservative recovery boundary,

@@ -15,6 +15,7 @@ from producer_transform import transform as transform_producer
 from phase_protocol import PHASE_PROTOCOL
 from magic_transform import transform as transform_magic, sensor_exposure
 from cycle_trace_transform import transform as transform_cycle_trace
+import error_build
 
 HERE=Path(__file__).resolve().parent
 ROOT=HERE.parents[1]
@@ -41,7 +42,7 @@ def relocate_prefix_crc(folder,prefix,compiled_crc,actual_crc):
     """
     offsets=(0xC9C,0x1354)
     old=struct.pack('<I',compiled_crc); new=struct.pack('<I',actual_crc)
-    if compiled_crc!=0x3E97C7F7 or len(prefix)!=5140:
+    if compiled_crc!=0x3E97C7F7 or not 5140<=len(prefix)<=0x1C00:
         raise ValueError('Unreviewed prefix CRC relocation geometry')
     if [i for i in range(len(prefix)) if prefix.startswith(old,i)]!=list(offsets):
         raise ValueError('Pinned CRC must occur only at its two reviewed literals')
@@ -231,6 +232,8 @@ def main():
     p.add_argument('--exposure-coarse',type=int,default=1428,help='RAM diagnostic exposure in sensor lines')
     p.add_argument('--flash',action='store_true')
     p.add_argument('--standby',action='store_true')
+    p.add_argument('--error-blinks',action='store_true',help='Five coded red sets followed by failure shutdown; preserves early UART recovery')
+    p.add_argument('--error-test-code',type=int,choices=range(10),default=0,help='RAM-only synthetic failure qualification; 9 selects request word6; never admitted to flash')
     p.add_argument('--cycle-trace',action='store_true',help='Fixed RAM timestamps; awake diagnostic completion preserves logs for ST-LINK')
     p.add_argument('--async-stop',action='store_true')
     p.add_argument('--dma-sleep',action='store_true',help='Experimental shallow WFI during SD DMA, after sensor STOP')
@@ -239,6 +242,10 @@ def main():
     p.add_argument('--snapshot',action='store_true',help='RAM diagnostic: copy the last 512 B at each published prefix')
     p.add_argument('--poison',action='store_true',help='RAM diagnostic: fill the frame with A5 before sensor start')
     a=p.parse_args()
+    if a.error_blinks and not a.magic_format:
+        p.error('Error signaling currently requires the selected magic-slot layout')
+    if a.error_test_code and (not a.error_blinks or a.flash or a.standby):
+        p.error('Injected error requires an explicit RAM-only error-signaling build')
     a.sd_high_speed=a.sd_clock_hz==50000000
     if a.sd_early_run_clock and (a.flash or a.standby or not a.sd_review_profile or
             not a.sd_startup_opt or a.sd_bus_width!=4 or a.sd_clock_hz!=12500000 or
@@ -337,8 +344,17 @@ def main():
         for name in names:
             dst=out/name
             text=(ROOT/'firmware'/folder/name).read_text().replace('../sd-storage/sd_card.h','sd_card.h')
+            if name=='runtime.c' and a.error_blinks:
+                text=error_build.runtime_source(text)
+                if a.error_test_code: text=error_build.inject_error(text,a.error_test_code)
             dst.write_text(text,newline='\n')
             if dst.suffix=='.c': compiled.append(dst)
+    if a.error_blinks:
+        for name in ('error_signal.h','error_codes.h'):
+            (out/name).write_bytes((HERE/name).read_bytes())
+        if not a.flash:
+            (out/'error_signal.c').write_bytes((HERE/'error_signal.c').read_bytes())
+            compiled.append(out/'error_signal.c')
     if a.magic_format:
         for folder,names in [('raw-slots',('magic_slots.c','magic_slots.h')),
                              ('capture-raw',('magic_runtime.inc',))]:
@@ -361,6 +377,10 @@ def main():
             data=(ROOT/'firmware/capture-sd/low_power'/name).read_text()
             if name=='peripherals.c': data=shutdown_source(data)
             if name=='completion.c':
+                if a.error_blinks:
+                    data=replace(data,'#include "completion.h"','#include "completion.h"\n#include "error_signal.h"')
+                    data=replace(data,'    publish(LPC_STATE_REFUSED);','    publish(LPC_STATE_REFUSED);\n    error_signal_shutdown(8U);')
+                    data=replace(data,'    publish(LPC_STATE_RETURNED);','    publish(LPC_STATE_RETURNED);\n    error_signal_shutdown(8U);')
                 data=replace(data,'#include "status_leds.h"','#include "status_leds.h"\n#include "phase_gpio.h"')
                 data=replace(data,'    LP[LPC_ARM_CYCLES]=DWT->CYCCNT;',
                     '    (void)phase_gpio_emit(10U);\n    LP[LPC_ARM_CYCLES]=DWT->CYCCNT;')
@@ -368,6 +388,7 @@ def main():
             if name.endswith('.c'): compiled.append(out/name)
     flags=[f for f in m['compile_flags'] if f!='-I'+str(rbase)]
     flags.insert(0,'-I'+str(out))
+    if a.error_blinks: flags.append(f'-DRAW_ERROR_PREFIX={int(a.flash)}')
     if a.cycle_trace: flags.append('-DRAW_CYCLE_TRACE=1')
     flags += [f'-DRAW_PATTERN={int(a.pattern=="diagonal")}',f'-DRAW_FLASH={int(a.flash)}',
               f'-DSD_BUS_WIDTH={a.sd_bus_width}',
@@ -410,7 +431,7 @@ def main():
     assert sp==0x343B0000 and len(code)<0xE000
     manifest=dict(schema=1,kind='raw-slots',load=0x34300000,entry=entry,stack=sp,
         stack_floor=symbol('_sstack'),park=park,reject_park=refused,
-        failure_park=park,failure_park_policy='Same terminal loop; nonzero result is failure, never idle permission',
+        failure_park=park,failure_park_policy=('Five coded red sets then failure-only shutdown; never idle permission' if a.error_blinks else 'Same terminal loop; nonzero result is failure, never idle permission'),
         request=0x343FD000,request_words=16,
         proof=0x343FD100,proof_words=96,read_buffer=0x34200000,read_buffer_bytes=262144,
         abort_address=0x343FD300,abort_words=16,
@@ -471,6 +492,8 @@ def main():
         sd_compensation_modified=a.sd_fixed_compensation,
         chunk_sectors=3730 if a.whole_image_preerase or a.magic_format else a.chunk_sectors,
         flash=a.flash,standby=a.standby,async_stop=a.async_stop,line_stream=a.line_stream,
+        error_blinks=a.error_blinks,
+        error_test_code=a.error_test_code,
         dma_sleep=a.dma_sleep,dma_wait=symbol('raw_dma_wait',a.dma_sleep),dma_wait_bytes=24,
         raw_dma_tail_wait=a.raw_dma_tail_wait,
         raw_dma_tail_wait_proof=symbol('raw_dma_tail_wait_proof',a.raw_dma_tail_wait),
@@ -504,6 +527,7 @@ def main():
             if src.name=='stage1_sensor.c': dst.write_text(sensor_source(src.read_text()),newline='\n')
             else: dst.write_bytes(src.read_bytes())
             sources.append(dst)
+        if a.error_blinks: sources.extend(error_build.prefix_sources(pd,HERE))
         pf=[f for f in pm['compile_flags'] if not f.startswith(('-DSTAGE2_BYTES=','-DSTAGE2_EXPECTED_CRC32='))]
         pf.insert(0,'-I'+str(pd))
         early_code=code[:late_meta['early_bytes']]
@@ -513,7 +537,8 @@ def main():
         prefix,psize=compile_sources(pd,[s for s in sources if s.suffix.lower() in ('.c','.s')],pf,pd/'stage1.ld','stage1')
         prefix,crc_relocation=relocate_prefix_crc(pd,prefix,0x3E97C7F7,zlib.crc32(early_code))
         original=(pbase/'stage1.bin').read_bytes()
-        literals=check_recovery_identity(pd,prefix,original,len(early_code))
+        literals=(error_build.check_prefix(pd,prefix,original,len(early_code),check_recovery_identity)
+            if a.error_blinks else check_recovery_identity(pd,prefix,original,len(early_code)))
         boot=make_image(prefix); assert len(boot)<=0x2000
         sector=bytearray(b'\xff'*65536); sector[:len(boot)]=boot; sector[0x2000:0x2000+len(code)]=code
         (pd/'stage1_boot.bin').write_bytes(boot); (pd/'stage2.bin').write_bytes(early_code)

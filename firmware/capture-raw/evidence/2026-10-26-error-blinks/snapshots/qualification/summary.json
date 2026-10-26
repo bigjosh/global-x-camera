@@ -1,0 +1,132 @@
+{
+  "schema": 1,
+  "kind": "qualification-addendum",
+  "qualification_complete": false,
+  "pending": [
+    "Final instrument closure and live bench checkpoint"
+  ],
+  "checks": {
+    "normal_cold": {
+      "receiver_sha256": "471fddf2c71b7d8bba8e47debf8379a8fd72c7f3daae59dcdf10dc8eed1198af",
+      "sector_sha256": "5ad1bc968606b17e513680bcdf6abf9c73ca3ccf24a236a37b8ecc89d4e9c661",
+      "completion_current_mA": 8.176051080226898,
+      "completion_voltage_V": 4.892402648925781,
+      "individual_target_rails_probed": false
+    },
+    "new_slot_attribution": {
+      "slot": 51,
+      "first_sector_erased": true,
+      "preceding_slot50_not_claimed": true,
+      "first_sector_sha256": "076a27c79e5ace2a3d47f9dd2e83e4ff6ea8872b3c2218f66c92b89b55f36560"
+    },
+    "normal_saved_image": {
+      "passed": true,
+      "slot": 51,
+      "bytes": 1909600,
+      "slot_bytes": 1909760,
+      "raw_sha256": "304cd4dd1f175e9ba91949eabf4bb8276b8cef85c3ae925538fa75c5598e759d",
+      "slot_sha256": "97fd6b998fe75eeed73e1b5ffff6933a9003d55296241f18bb2b01d2905e8f78",
+      "png_sha256": "9ed7445dfab200960ec63a94fca2ba6ebd063b78592df55c493efc638be460ea",
+      "complete_card_chunks_equal_slot": true,
+      "independent_png_samples_equal_raw10_shift6": true,
+      "all_152_metadata_bytes_zero": true,
+      "original_camera_ram_comparison": false,
+      "minimum_sample": 74,
+      "maximum_sample": 1023,
+      "checked_utc": "2026-10-26T20:58:07.397867+00:00",
+      "scope": "Local private-byte comparison; public replay validates proofs and hashes, not missing photo pixels"
+    },
+    "normal_uart_recovery": {
+      "prefix_sha256": "7f8017fd70bd9b77cfabcf212d072201ec8e134c3a44a0555a2108d7cc454c32",
+      "good_pulses": 10,
+      "bad_pulses": 0
+    },
+    "normal_guarded_flags": {
+      "sbf": true,
+      "pdds": true,
+      "stopf": false,
+      "trial_entry_proven": false,
+      "interpretation": "SBF is set: hardware reports Standby since the last POR or CSSF clear. Attribution to this trial requires its pre-entry flag-clear proof and reset/power history."
+    },
+    "production_prefix_injection": {
+      "code": 2,
+      "entry": "0x34181821",
+      "prefix_sha256": "7f8017fd70bd9b77cfabcf212d072201ec8e134c3a44a0555a2108d7cc454c32",
+      "synthetic": true,
+      "injection": "Stage1 result17 then direct debugger entry at the installed failure bridge",
+      "real_camera_failure_tested": false,
+      "sd_or_nor_write": false
+    },
+    "production_prefix_pattern": {
+      "complete_pattern_observed": true,
+      "measured": {
+        "pulses": 10,
+        "groups": [
+          2,
+          2,
+          2,
+          2,
+          2
+        ],
+        "on_s": {
+          "count": 10,
+          "minimum": 0.09499999999999886,
+          "median": 0.09499999999999886,
+          "maximum": 0.10499999999999865
+        },
+        "interblink_off_s": {
+          "count": 5,
+          "minimum": 0.40500000000000114,
+          "median": 0.41000000000000014,
+          "maximum": 0.41000000000000014
+        },
+        "interset_off_s": {
+          "count": 4,
+          "minimum": 2.0150000000000006,
+          "median": 2.0175,
+          "maximum": 2.0200000000000014
+        },
+        "rising_period_s": {
+          "count": 5,
+          "minimum": 0.5,
+          "median": 0.504999999999999,
+          "maximum": 0.5099999999999998
+        }
+      },
+      "timing_consistency": {
+        "on_100ms_consistent": true,
+        "between_blinks_400ms_consistent": true,
+        "between_sets_2000ms_consistent": true
+      },
+      "low_current_plateau": {
+        "start_s": 25.49,
+        "start_utc_estimate": "2026-10-26T20:54:19.812361+00:00",
+        "duration_s": 14.498431,
+        "median_current_A": 0.008065929486136884,
+        "scope": "observed current plateau only; not independent Standby attribution"
+      },
+      "whole_session_ok": false,
+      "limits": [
+        "LED cause inferred from deliberately injected firmware and characteristic current changes; no optical/GPIO probe.",
+        "Driver UTC and host launch are approximate; pulse spacings use native sample ids.",
+        "Timing intervals include conservative bin/filter uncertainty, not precision calibration.",
+        "Whole-session startup NaNs are retained; scoped finite fault-window evidence is separate.",
+        "No energy, analog margin, general fault coverage, or independent Standby claim."
+      ]
+    },
+    "production_prefix_uart_recovery": {
+      "prefix_sha256": "7f8017fd70bd9b77cfabcf212d072201ec8e134c3a44a0555a2108d7cc454c32",
+      "good_pulses": 10,
+      "bad_pulses": 0
+    },
+    "production_prefix_guarded_flags": {
+      "sbf": true,
+      "pdds": true,
+      "stopf": false,
+      "trial_entry_proven": false,
+      "interpretation": "SBF is set: hardware reports Standby since the last POR or CSSF clear. Attribution to this trial requires its pre-entry flag-clear proof and reset/power history."
+    }
+  },
+  "waveforms_recomputed": true,
+  "created_utc": "2026-10-26T20:58:09.022978+00:00"
+}

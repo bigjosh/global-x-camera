@@ -30,6 +30,13 @@ VCP_FIELDS = (
     'reserved30 reserved31').split()
 # An unknown/self-consistent build is insufficient authorization to halt.
 APPROVED = {
+    # Failure-blink v2: fresh ELF/objcopy/objdump review against the installed
+    # 25 MHz image preserves all 20 recovery literals and the complete guard.
+    # Only its six-byte later failure loop and two receiver-CRC words change;
+    # the fixed bridge/standalone failure engine extend the ROM-loaded prefix.
+    '7f8017fd70bd9b77cfabcf212d072201ec8e134c3a44a0555a2108d7cc454c32':
+        {'bytes': 6500, 'park': 0x3418078C, 'vcp': True,
+         'sector': '5ad1bc968606b17e513680bcdf6abf9c73ca3ccf24a236a37b8ecc89d4e9c661'},
     # Exact reviewed 25 MHz startup/no-tail candidates. Fresh objcopy/objdump
     # comparison retains all recovery instructions and 20 literals; only the
     # two receiver CRC words differ from v23. Cold qualification is separate.

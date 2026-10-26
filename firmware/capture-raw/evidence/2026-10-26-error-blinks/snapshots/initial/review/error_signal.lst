@@ -1,0 +1,473 @@
+
+D:\Github\global-x-camera\tmp\bringup\error-signal-review-20261026\error_signal.o:     file format elf32-littlearm
+
+
+Disassembly of section .error_text:
+
+00000000 <error_signal_shutdown>:
+   0:	1e43      	subs	r3, r0, #1
+   2:	2b08      	cmp	r3, #8
+   4:	bf28      	it	cs
+   6:	2008      	movcs	r0, #8
+   8:	e92d 4880 	stmdb	sp!, {r7, fp, lr}
+   c:	b672      	cpsid	i
+   e:	f04f 23e0 	mov.w	r3, #3758153728	@ 0xe000e000
+  12:	2200      	movs	r2, #0
+  14:	611a      	str	r2, [r3, #16]
+  16:	619a      	str	r2, [r3, #24]
+  18:	f04f 6320 	mov.w	r3, #167772160	@ 0xa000000
+  1c:	2644      	movs	r6, #68	@ 0x44
+  1e:	2180      	movs	r1, #128	@ 0x80
+  20:	f44f 0280 	mov.w	r2, #4194304	@ 0x400000
+  24:	4db6      	ldr	r5, [pc, #728]	@ (300 <error_signal_shutdown+0x300>)
+  26:	606b      	str	r3, [r5, #4]
+  28:	692b      	ldr	r3, [r5, #16]
+  2a:	f023 0316 	bic.w	r3, r3, #22
+  2e:	612b      	str	r3, [r5, #16]
+  30:	4bb4      	ldr	r3, [pc, #720]	@ (304 <error_signal_shutdown+0x304>)
+  32:	f8c3 6a3c 	str.w	r6, [r3, #2620]	@ 0xa3c
+  36:	f8c3 1a20 	str.w	r1, [r3, #2592]	@ 0xa20
+  3a:	f8c3 2a24 	str.w	r2, [r3, #2596]	@ 0xa24
+  3e:	f3bf 8f4f 	dsb	sy
+  42:	4cb1      	ldr	r4, [pc, #708]	@ (308 <error_signal_shutdown+0x308>)
+  44:	f8c4 627c 	str.w	r6, [r4, #636]	@ 0x27c
+  48:	f44f 3640 	mov.w	r6, #196608	@ 0x30000
+  4c:	f8c4 6240 	str.w	r6, [r4, #576]	@ 0x240
+  50:	f8c4 1260 	str.w	r1, [r4, #608]	@ 0x260
+  54:	f8c4 2264 	str.w	r2, [r4, #612]	@ 0x264
+  58:	f246 0256 	movw	r2, #24662	@ 0x6056
+  5c:	f8c3 2a5c 	str.w	r2, [r3, #2652]	@ 0xa5c
+  60:	f3bf 8f4f 	dsb	sy
+  64:	f8d3 125c 	ldr.w	r1, [r3, #604]	@ 0x25c
+  68:	ea01 0602 	and.w	r6, r1, r2
+  6c:	438a      	bics	r2, r1
+  6e:	f040 80b3 	bne.w	1d8 <error_signal_shutdown+0x1d8>
+  72:	f8d3 221c 	ldr.w	r2, [r3, #540]	@ 0x21c
+  76:	4232      	tst	r2, r6
+  78:	f040 80ae 	bne.w	1d8 <error_signal_shutdown+0x1d8>
+  7c:	f240 5101 	movw	r1, #1281	@ 0x501
+  80:	4aa2      	ldr	r2, [pc, #648]	@ (30c <error_signal_shutdown+0x30c>)
+  82:	4ea3      	ldr	r6, [pc, #652]	@ (310 <error_signal_shutdown+0x310>)
+  84:	6191      	str	r1, [r2, #24]
+  86:	6851      	ldr	r1, [r2, #4]
+  88:	f421 61a0 	bic.w	r1, r1, #1280	@ 0x500
+  8c:	f021 0101 	bic.w	r1, r1, #1
+  90:	6051      	str	r1, [r2, #4]
+  92:	68d1      	ldr	r1, [r2, #12]
+  94:	4031      	ands	r1, r6
+  96:	60d1      	str	r1, [r2, #12]
+  98:	6811      	ldr	r1, [r2, #0]
+  9a:	4031      	ands	r1, r6
+  9c:	f441 1188 	orr.w	r1, r1, #1114112	@ 0x110000
+  a0:	f041 0101 	orr.w	r1, r1, #1
+  a4:	6011      	str	r1, [r2, #0]
+  a6:	f44f 1100 	mov.w	r1, #2097152	@ 0x200000
+  aa:	f502 5200 	add.w	r2, r2, #8192	@ 0x2000
+  ae:	6191      	str	r1, [r2, #24]
+  b0:	6851      	ldr	r1, [r2, #4]
+  b2:	f021 0120 	bic.w	r1, r1, #32
+  b6:	6051      	str	r1, [r2, #4]
+  b8:	68d1      	ldr	r1, [r2, #12]
+  ba:	f421 6140 	bic.w	r1, r1, #3072	@ 0xc00
+  be:	60d1      	str	r1, [r2, #12]
+  c0:	6811      	ldr	r1, [r2, #0]
+  c2:	f421 6140 	bic.w	r1, r1, #3072	@ 0xc00
+  c6:	f441 6180 	orr.w	r1, r1, #1024	@ 0x400
+  ca:	6011      	str	r1, [r2, #0]
+  cc:	f5a2 5250 	sub.w	r2, r2, #13312	@ 0x3400
+  d0:	6811      	ldr	r1, [r2, #0]
+  d2:	f441 0170 	orr.w	r1, r1, #15728640	@ 0xf00000
+  d6:	6011      	str	r1, [r2, #0]
+  d8:	68d1      	ldr	r1, [r2, #12]
+  da:	f421 0170 	bic.w	r1, r1, #15728640	@ 0xf00000
+  de:	60d1      	str	r1, [r2, #12]
+  e0:	498c      	ldr	r1, [pc, #560]	@ (314 <error_signal_shutdown+0x314>)
+  e2:	680a      	ldr	r2, [r1, #0]
+  e4:	f442 627f 	orr.w	r2, r2, #4080	@ 0xff0
+  e8:	f042 0203 	orr.w	r2, r2, #3
+  ec:	600a      	str	r2, [r1, #0]
+  ee:	68ca      	ldr	r2, [r1, #12]
+  f0:	f422 627f 	bic.w	r2, r2, #4080	@ 0xff0
+  f4:	f022 0203 	bic.w	r2, r2, #3
+  f8:	60ca      	str	r2, [r1, #12]
+  fa:	4a87      	ldr	r2, [pc, #540]	@ (318 <error_signal_shutdown+0x318>)
+  fc:	6811      	ldr	r1, [r2, #0]
+  fe:	f441 7140 	orr.w	r1, r1, #768	@ 0x300
+ 102:	6011      	str	r1, [r2, #0]
+ 104:	68d1      	ldr	r1, [r2, #12]
+ 106:	f421 7140 	bic.w	r1, r1, #768	@ 0x300
+ 10a:	60d1      	str	r1, [r2, #12]
+ 10c:	2102      	movs	r1, #2
+ 10e:	f502 5210 	add.w	r2, r2, #9216	@ 0x2400
+ 112:	6191      	str	r1, [r2, #24]
+ 114:	6851      	ldr	r1, [r2, #4]
+ 116:	f021 0102 	bic.w	r1, r1, #2
+ 11a:	6051      	str	r1, [r2, #4]
+ 11c:	6811      	ldr	r1, [r2, #0]
+ 11e:	f021 010c 	bic.w	r1, r1, #12
+ 122:	f041 0104 	orr.w	r1, r1, #4
+ 126:	6011      	str	r1, [r2, #0]
+ 128:	f3bf 8f4f 	dsb	sy
+ 12c:	2120      	movs	r1, #32
+ 12e:	f8c3 1a20 	str.w	r1, [r3, #2592]	@ 0xa20
+ 132:	f3bf 8f4f 	dsb	sy
+ 136:	f242 0120 	movw	r1, #8224	@ 0x2020
+ 13a:	f8c4 1260 	str.w	r1, [r4, #608]	@ 0x260
+ 13e:	6811      	ldr	r1, [r2, #0]
+ 140:	f441 5143 	orr.w	r1, r1, #12480	@ 0x30c0
+ 144:	f041 0130 	orr.w	r1, r1, #48	@ 0x30
+ 148:	6011      	str	r1, [r2, #0]
+ 14a:	68d1      	ldr	r1, [r2, #12]
+ 14c:	f421 5143 	bic.w	r1, r1, #12480	@ 0x30c0
+ 150:	f021 013c 	bic.w	r1, r1, #60	@ 0x3c
+ 154:	60d1      	str	r1, [r2, #12]
+ 156:	f3bf 8f4f 	dsb	sy
+ 15a:	f3ef 8205 	mrs	r2, IPSR
+ 15e:	2a00      	cmp	r2, #0
+ 160:	d13a      	bne.n	1d8 <error_signal_shutdown+0x1d8>
+ 162:	f3ef 8213 	mrs	r2, FAULTMASK
+ 166:	2a00      	cmp	r2, #0
+ 168:	d136      	bne.n	1d8 <error_signal_shutdown+0x1d8>
+ 16a:	f3ef 8214 	mrs	r2, CONTROL
+ 16e:	0792      	lsls	r2, r2, #30
+ 170:	d132      	bne.n	1d8 <error_signal_shutdown+0x1d8>
+ 172:	696a      	ldr	r2, [r5, #20]
+ 174:	03d7      	lsls	r7, r2, #15
+ 176:	d42f      	bmi.n	1d8 <error_signal_shutdown+0x1d8>
+ 178:	6a19      	ldr	r1, [r3, #32]
+ 17a:	4a68      	ldr	r2, [pc, #416]	@ (31c <error_signal_shutdown+0x31c>)
+ 17c:	4291      	cmp	r1, r2
+ 17e:	d12b      	bne.n	1d8 <error_signal_shutdown+0x1d8>
+ 180:	6a5a      	ldr	r2, [r3, #36]	@ 0x24
+ 182:	f5b2 1f80 	cmp.w	r2, #1048576	@ 0x100000
+ 186:	d127      	bne.n	1d8 <error_signal_shutdown+0x1d8>
+ 188:	f8d3 1080 	ldr.w	r1, [r3, #128]	@ 0x80
+ 18c:	4a64      	ldr	r2, [pc, #400]	@ (320 <error_signal_shutdown+0x320>)
+ 18e:	4291      	cmp	r1, r2
+ 190:	d122      	bne.n	1d8 <error_signal_shutdown+0x1d8>
+ 192:	f8d3 3084 	ldr.w	r3, [r3, #132]	@ 0x84
+ 196:	b9fb      	cbnz	r3, 1d8 <error_signal_shutdown+0x1d8>
+ 198:	4b5a      	ldr	r3, [pc, #360]	@ (304 <error_signal_shutdown+0x304>)
+ 19a:	4a62      	ldr	r2, [pc, #392]	@ (324 <error_signal_shutdown+0x324>)
+ 19c:	f8d3 1088 	ldr.w	r1, [r3, #136]	@ 0x88
+ 1a0:	4291      	cmp	r1, r2
+ 1a2:	d119      	bne.n	1d8 <error_signal_shutdown+0x1d8>
+ 1a4:	f8d3 10c4 	ldr.w	r1, [r3, #196]	@ 0xc4
+ 1a8:	4a5f      	ldr	r2, [pc, #380]	@ (328 <error_signal_shutdown+0x328>)
+ 1aa:	400a      	ands	r2, r1
+ 1ac:	f5b2 3f00 	cmp.w	r2, #131072	@ 0x20000
+ 1b0:	d112      	bne.n	1d8 <error_signal_shutdown+0x1d8>
+ 1b2:	6c9b      	ldr	r3, [r3, #72]	@ 0x48
+ 1b4:	f413 73c0 	ands.w	r3, r3, #384	@ 0x180
+ 1b8:	d10e      	bne.n	1d8 <error_signal_shutdown+0x1d8>
+ 1ba:	f8d5 20fc 	ldr.w	r2, [r5, #252]	@ 0xfc
+ 1be:	f042 7280 	orr.w	r2, r2, #16777216	@ 0x1000000
+ 1c2:	f8c5 20fc 	str.w	r2, [r5, #252]	@ 0xfc
+ 1c6:	4a59      	ldr	r2, [pc, #356]	@ (32c <error_signal_shutdown+0x32c>)
+ 1c8:	6811      	ldr	r1, [r2, #0]
+ 1ca:	f041 0101 	orr.w	r1, r1, #1
+ 1ce:	6011      	str	r1, [r2, #0]
+ 1d0:	6811      	ldr	r1, [r2, #0]
+ 1d2:	07ce      	lsls	r6, r1, #31
+ 1d4:	f100 818b 	bmi.w	4ee <error_signal_shutdown+0x4ee>
+ 1d8:	4b4a      	ldr	r3, [pc, #296]	@ (304 <error_signal_shutdown+0x304>)
+ 1da:	f8d3 225c 	ldr.w	r2, [r3, #604]	@ 0x25c
+ 1de:	0655      	lsls	r5, r2, #25
+ 1e0:	d509      	bpl.n	1f6 <error_signal_shutdown+0x1f6>
+ 1e2:	f8d3 321c 	ldr.w	r3, [r3, #540]	@ 0x21c
+ 1e6:	065c      	lsls	r4, r3, #25
+ 1e8:	d405      	bmi.n	1f6 <error_signal_shutdown+0x1f6>
+ 1ea:	f240 5201 	movw	r2, #1281	@ 0x501
+ 1ee:	4b47      	ldr	r3, [pc, #284]	@ (30c <error_signal_shutdown+0x30c>)
+ 1f0:	619a      	str	r2, [r3, #24]
+ 1f2:	f3bf 8f4f 	dsb	sy
+ 1f6:	b672      	cpsid	i
+ 1f8:	f04f 23e0 	mov.w	r3, #3758153728	@ 0xe000e000
+ 1fc:	6859      	ldr	r1, [r3, #4]
+ 1fe:	2200      	movs	r2, #0
+ 200:	f001 010f 	and.w	r1, r1, #15
+ 204:	3101      	adds	r1, #1
+ 206:	f04f 30ff 	mov.w	r0, #4294967295
+ 20a:	f041 e001 	dls	lr, r1
+ 20e:	0093      	lsls	r3, r2, #2
+ 210:	f103 4360 	add.w	r3, r3, #3758096384	@ 0xe0000000
+ 214:	f503 4361 	add.w	r3, r3, #57600	@ 0xe100
+ 218:	f8c3 0080 	str.w	r0, [r3, #128]	@ 0x80
+ 21c:	3201      	adds	r2, #1
+ 21e:	f8c3 0180 	str.w	r0, [r3, #384]	@ 0x180
+ 222:	f00f c00d 	le	lr, 20e <error_signal_shutdown+0x20e>
+ 226:	f04f 6320 	mov.w	r3, #167772160	@ 0xa000000
+ 22a:	2002      	movs	r0, #2
+ 22c:	4a34      	ldr	r2, [pc, #208]	@ (300 <error_signal_shutdown+0x300>)
+ 22e:	6053      	str	r3, [r2, #4]
+ 230:	6913      	ldr	r3, [r2, #16]
+ 232:	f023 0316 	bic.w	r3, r3, #22
+ 236:	6113      	str	r3, [r2, #16]
+ 238:	4b32      	ldr	r3, [pc, #200]	@ (304 <error_signal_shutdown+0x304>)
+ 23a:	f8c3 0a78 	str.w	r0, [r3, #2680]	@ 0xa78
+ 23e:	f44f 2080 	mov.w	r0, #262144	@ 0x40000
+ 242:	f8c3 0a5c 	str.w	r0, [r3, #2652]	@ 0xa5c
+ 246:	f3bf 8f4f 	dsb	sy
+ 24a:	f3ef 8005 	mrs	r0, IPSR
+ 24e:	2800      	cmp	r0, #0
+ 250:	f040 80fc 	bne.w	44c <error_signal_shutdown+0x44c>
+ 254:	f3ef 8013 	mrs	r0, FAULTMASK
+ 258:	2800      	cmp	r0, #0
+ 25a:	f040 80f7 	bne.w	44c <error_signal_shutdown+0x44c>
+ 25e:	f3ef 8014 	mrs	r0, CONTROL
+ 262:	0780      	lsls	r0, r0, #30
+ 264:	f040 80f2 	bne.w	44c <error_signal_shutdown+0x44c>
+ 268:	6952      	ldr	r2, [r2, #20]
+ 26a:	03d7      	lsls	r7, r2, #15
+ 26c:	f100 80ee 	bmi.w	44c <error_signal_shutdown+0x44c>
+ 270:	4a2f      	ldr	r2, [pc, #188]	@ (330 <error_signal_shutdown+0x330>)
+ 272:	6b52      	ldr	r2, [r2, #52]	@ 0x34
+ 274:	07d6      	lsls	r6, r2, #31
+ 276:	f100 80e9 	bmi.w	44c <error_signal_shutdown+0x44c>
+ 27a:	f8d3 2278 	ldr.w	r2, [r3, #632]	@ 0x278
+ 27e:	0795      	lsls	r5, r2, #30
+ 280:	f140 80e4 	bpl.w	44c <error_signal_shutdown+0x44c>
+ 284:	f8d3 225c 	ldr.w	r2, [r3, #604]	@ 0x25c
+ 288:	0354      	lsls	r4, r2, #13
+ 28a:	f140 80df 	bpl.w	44c <error_signal_shutdown+0x44c>
+ 28e:	f8d3 221c 	ldr.w	r2, [r3, #540]	@ 0x21c
+ 292:	0350      	lsls	r0, r2, #13
+ 294:	f100 80da 	bmi.w	44c <error_signal_shutdown+0x44c>
+ 298:	f8d3 3248 	ldr.w	r3, [r3, #584]	@ 0x248
+ 29c:	07da      	lsls	r2, r3, #31
+ 29e:	f140 80d5 	bpl.w	44c <error_signal_shutdown+0x44c>
+ 2a2:	4b18      	ldr	r3, [pc, #96]	@ (304 <error_signal_shutdown+0x304>)
+ 2a4:	f8d3 3208 	ldr.w	r3, [r3, #520]	@ 0x208
+ 2a8:	07db      	lsls	r3, r3, #31
+ 2aa:	f100 80cf 	bmi.w	44c <error_signal_shutdown+0x44c>
+ 2ae:	4b21      	ldr	r3, [pc, #132]	@ (334 <error_signal_shutdown+0x334>)
+ 2b0:	f8d3 294c 	ldr.w	r2, [r3, #2380]	@ 0x94c
+ 2b4:	00d7      	lsls	r7, r2, #3
+ 2b6:	f140 80c9 	bpl.w	44c <error_signal_shutdown+0x44c>
+ 2ba:	f8d3 28cc 	ldr.w	r2, [r3, #2252]	@ 0x8cc
+ 2be:	00d6      	lsls	r6, r2, #3
+ 2c0:	f140 80c4 	bpl.w	44c <error_signal_shutdown+0x44c>
+ 2c4:	f8d3 21f0 	ldr.w	r2, [r3, #496]	@ 0x1f0
+ 2c8:	f640 0301 	movw	r3, #2049	@ 0x801
+ 2cc:	421a      	tst	r2, r3
+ 2ce:	f040 80bd 	bne.w	44c <error_signal_shutdown+0x44c>
+ 2d2:	4b19      	ldr	r3, [pc, #100]	@ (338 <error_signal_shutdown+0x338>)
+ 2d4:	685a      	ldr	r2, [r3, #4]
+ 2d6:	f022 0207 	bic.w	r2, r2, #7
+ 2da:	605a      	str	r2, [r3, #4]
+ 2dc:	685a      	ldr	r2, [r3, #4]
+ 2de:	f012 0207 	ands.w	r2, r2, #7
+ 2e2:	f040 80b3 	bne.w	44c <error_signal_shutdown+0x44c>
+ 2e6:	f3bf 8f4f 	dsb	sy
+ 2ea:	f3bf 8f6f 	isb	sy
+ 2ee:	4b04      	ldr	r3, [pc, #16]	@ (300 <error_signal_shutdown+0x300>)
+ 2f0:	6958      	ldr	r0, [r3, #20]
+ 2f2:	f420 3000 	bic.w	r0, r0, #131072	@ 0x20000
+ 2f6:	6158      	str	r0, [r3, #20]
+ 2f8:	f8c3 2250 	str.w	r2, [r3, #592]	@ 0x250
+ 2fc:	e01e      	b.n	33c <error_signal_shutdown+0x33c>
+ 2fe:	bf00      	nop
+ 300:	e000ed00 	.word	0xe000ed00
+ 304:	56028000 	.word	0x56028000
+ 308:	56029000 	.word	0x56029000
+ 30c:	56021800 	.word	0x56021800
+ 310:	ffccfffc 	.word	0xffccfffc
+ 314:	56020800 	.word	0x56020800
+ 318:	56021000 	.word	0x56021000
+ 31c:	33330000 	.word	0x33330000
+ 320:	00404b00 	.word	0x00404b00
+ 324:	49000005 	.word	0x49000005
+ 328:	30ff0000 	.word	0x30ff0000
+ 32c:	e0001000 	.word	0xe0001000
+ 330:	e000ef00 	.word	0xe000ef00
+ 334:	56009000 	.word	0x56009000
+ 338:	54001000 	.word	0x54001000
+ 33c:	f3bf 8f4f 	dsb	sy
+ 340:	f3bf 8f6f 	isb	sy
+ 344:	4b6d      	ldr	r3, [pc, #436]	@ (4fc <error_signal_shutdown+0x4fc>)
+ 346:	2403      	movs	r4, #3
+ 348:	f8c3 2080 	str.w	r2, [r3, #128]	@ 0x80
+ 34c:	f8c3 2090 	str.w	r2, [r3, #144]	@ 0x90
+ 350:	f8c3 20a0 	str.w	r2, [r3, #160]	@ 0xa0
+ 354:	f8c3 2084 	str.w	r2, [r3, #132]	@ 0x84
+ 358:	f8c3 2094 	str.w	r2, [r3, #148]	@ 0x94
+ 35c:	f8c3 20a4 	str.w	r2, [r3, #164]	@ 0xa4
+ 360:	601a      	str	r2, [r3, #0]
+ 362:	621a      	str	r2, [r3, #32]
+ 364:	641a      	str	r2, [r3, #64]	@ 0x40
+ 366:	605a      	str	r2, [r3, #4]
+ 368:	625a      	str	r2, [r3, #36]	@ 0x24
+ 36a:	645a      	str	r2, [r3, #68]	@ 0x44
+ 36c:	68da      	ldr	r2, [r3, #12]
+ 36e:	60da      	str	r2, [r3, #12]
+ 370:	6ada      	ldr	r2, [r3, #44]	@ 0x2c
+ 372:	62da      	str	r2, [r3, #44]	@ 0x2c
+ 374:	6cda      	ldr	r2, [r3, #76]	@ 0x4c
+ 376:	64da      	str	r2, [r3, #76]	@ 0x4c
+ 378:	691a      	ldr	r2, [r3, #16]
+ 37a:	611a      	str	r2, [r3, #16]
+ 37c:	6b1a      	ldr	r2, [r3, #48]	@ 0x30
+ 37e:	631a      	str	r2, [r3, #48]	@ 0x30
+ 380:	6d1a      	ldr	r2, [r3, #80]	@ 0x50
+ 382:	651a      	str	r2, [r3, #80]	@ 0x50
+ 384:	4a5e      	ldr	r2, [pc, #376]	@ (500 <error_signal_shutdown+0x500>)
+ 386:	6d90      	ldr	r0, [r2, #88]	@ 0x58
+ 388:	f020 000f 	bic.w	r0, r0, #15
+ 38c:	6590      	str	r0, [r2, #88]	@ 0x58
+ 38e:	200f      	movs	r0, #15
+ 390:	6510      	str	r0, [r2, #80]	@ 0x50
+ 392:	485c      	ldr	r0, [pc, #368]	@ (504 <error_signal_shutdown+0x504>)
+ 394:	6084      	str	r4, [r0, #8]
+ 396:	68d0      	ldr	r0, [r2, #12]
+ 398:	f020 0011 	bic.w	r0, r0, #17
+ 39c:	60d0      	str	r0, [r2, #12]
+ 39e:	6b10      	ldr	r0, [r2, #48]	@ 0x30
+ 3a0:	f420 3080 	bic.w	r0, r0, #65536	@ 0x10000
+ 3a4:	f020 0003 	bic.w	r0, r0, #3
+ 3a8:	4320      	orrs	r0, r4
+ 3aa:	6310      	str	r0, [r2, #48]	@ 0x30
+ 3ac:	f3bf 8f4f 	dsb	sy
+ 3b0:	6b10      	ldr	r0, [r2, #48]	@ 0x30
+ 3b2:	f000 1001 	and.w	r0, r0, #65537	@ 0x10001
+ 3b6:	2801      	cmp	r0, #1
+ 3b8:	d148      	bne.n	44c <error_signal_shutdown+0x44c>
+ 3ba:	6d90      	ldr	r0, [r2, #88]	@ 0x58
+ 3bc:	0705      	lsls	r5, r0, #28
+ 3be:	d145      	bne.n	44c <error_signal_shutdown+0x44c>
+ 3c0:	6d52      	ldr	r2, [r2, #84]	@ 0x54
+ 3c2:	2a00      	cmp	r2, #0
+ 3c4:	d142      	bne.n	44c <error_signal_shutdown+0x44c>
+ 3c6:	f8d3 2080 	ldr.w	r2, [r3, #128]	@ 0x80
+ 3ca:	2a00      	cmp	r2, #0
+ 3cc:	d13e      	bne.n	44c <error_signal_shutdown+0x44c>
+ 3ce:	f8d3 3090 	ldr.w	r3, [r3, #144]	@ 0x90
+ 3d2:	2b00      	cmp	r3, #0
+ 3d4:	d13a      	bne.n	44c <error_signal_shutdown+0x44c>
+ 3d6:	4b49      	ldr	r3, [pc, #292]	@ (4fc <error_signal_shutdown+0x4fc>)
+ 3d8:	f8d3 20a0 	ldr.w	r2, [r3, #160]	@ 0xa0
+ 3dc:	2a00      	cmp	r2, #0
+ 3de:	d135      	bne.n	44c <error_signal_shutdown+0x44c>
+ 3e0:	f8d3 2084 	ldr.w	r2, [r3, #132]	@ 0x84
+ 3e4:	2a00      	cmp	r2, #0
+ 3e6:	d131      	bne.n	44c <error_signal_shutdown+0x44c>
+ 3e8:	f8d3 2094 	ldr.w	r2, [r3, #148]	@ 0x94
+ 3ec:	bb72      	cbnz	r2, 44c <error_signal_shutdown+0x44c>
+ 3ee:	f8d3 20a4 	ldr.w	r2, [r3, #164]	@ 0xa4
+ 3f2:	bb5a      	cbnz	r2, 44c <error_signal_shutdown+0x44c>
+ 3f4:	68da      	ldr	r2, [r3, #12]
+ 3f6:	bb4a      	cbnz	r2, 44c <error_signal_shutdown+0x44c>
+ 3f8:	6ada      	ldr	r2, [r3, #44]	@ 0x2c
+ 3fa:	bb3a      	cbnz	r2, 44c <error_signal_shutdown+0x44c>
+ 3fc:	6cda      	ldr	r2, [r3, #76]	@ 0x4c
+ 3fe:	bb2a      	cbnz	r2, 44c <error_signal_shutdown+0x44c>
+ 400:	691a      	ldr	r2, [r3, #16]
+ 402:	bb1a      	cbnz	r2, 44c <error_signal_shutdown+0x44c>
+ 404:	6b1a      	ldr	r2, [r3, #48]	@ 0x30
+ 406:	bb0a      	cbnz	r2, 44c <error_signal_shutdown+0x44c>
+ 408:	6d1b      	ldr	r3, [r3, #80]	@ 0x50
+ 40a:	b9fb      	cbnz	r3, 44c <error_signal_shutdown+0x44c>
+ 40c:	4b3e      	ldr	r3, [pc, #248]	@ (508 <error_signal_shutdown+0x508>)
+ 40e:	689b      	ldr	r3, [r3, #8]
+ 410:	4023      	ands	r3, r4
+ 412:	d11b      	bne.n	44c <error_signal_shutdown+0x44c>
+ 414:	2900      	cmp	r1, #0
+ 416:	bf14      	ite	ne
+ 418:	4608      	movne	r0, r1
+ 41a:	2001      	moveq	r0, #1
+ 41c:	009a      	lsls	r2, r3, #2
+ 41e:	f102 4260 	add.w	r2, r2, #3758096384	@ 0xe0000000
+ 422:	f502 4261 	add.w	r2, r2, #57600	@ 0xe100
+ 426:	6811      	ldr	r1, [r2, #0]
+ 428:	b981      	cbnz	r1, 44c <error_signal_shutdown+0x44c>
+ 42a:	f8d2 2100 	ldr.w	r2, [r2, #256]	@ 0x100
+ 42e:	b96a      	cbnz	r2, 44c <error_signal_shutdown+0x44c>
+ 430:	3801      	subs	r0, #1
+ 432:	f103 0301 	add.w	r3, r3, #1
+ 436:	d1f1      	bne.n	41c <error_signal_shutdown+0x41c>
+ 438:	4a34      	ldr	r2, [pc, #208]	@ (50c <error_signal_shutdown+0x50c>)
+ 43a:	6913      	ldr	r3, [r2, #16]
+ 43c:	f043 0304 	orr.w	r3, r3, #4
+ 440:	6113      	str	r3, [r2, #16]
+ 442:	f3bf 8f4f 	dsb	sy
+ 446:	f3bf 8f6f 	isb	sy
+ 44a:	bf30      	wfi
+ 44c:	4a2f      	ldr	r2, [pc, #188]	@ (50c <error_signal_shutdown+0x50c>)
+ 44e:	6913      	ldr	r3, [r2, #16]
+ 450:	f023 0304 	bic.w	r3, r3, #4
+ 454:	6113      	str	r3, [r2, #16]
+ 456:	f3bf 8f4f 	dsb	sy
+ 45a:	bf30      	wfi
+ 45c:	e7fb      	b.n	456 <error_signal_shutdown+0x456>
+ 45e:	4c2c      	ldr	r4, [pc, #176]	@ (510 <error_signal_shutdown+0x510>)
+ 460:	61bc      	str	r4, [r7, #24]
+ 462:	f3bf 8f4f 	dsb	sy
+ 466:	6856      	ldr	r6, [r2, #4]
+ 468:	2400      	movs	r4, #0
+ 46a:	46b6      	mov	lr, r6
+ 46c:	6855      	ldr	r5, [r2, #4]
+ 46e:	1bad      	subs	r5, r5, r6
+ 470:	455d      	cmp	r5, fp
+ 472:	d323      	bcc.n	4bc <error_signal_shutdown+0x4bc>
+ 474:	f8c7 9018 	str.w	r9, [r7, #24]
+ 478:	f3bf 8f4f 	dsb	sy
+ 47c:	3101      	adds	r1, #1
+ 47e:	4281      	cmp	r1, r0
+ 480:	d327      	bcc.n	4d2 <error_signal_shutdown+0x4d2>
+ 482:	2b04      	cmp	r3, #4
+ 484:	bf14      	ite	ne
+ 486:	f44f 64fa 	movne.w	r4, #2000	@ 0x7d0
+ 48a:	f44f 74c8 	moveq.w	r4, #400	@ 0x190
+ 48e:	f8d2 e004 	ldr.w	lr, [r2, #4]
+ 492:	2500      	movs	r5, #0
+ 494:	46f0      	mov	r8, lr
+ 496:	fb0a f404 	mul.w	r4, sl, r4
+ 49a:	6856      	ldr	r6, [r2, #4]
+ 49c:	eba6 060e 	sub.w	r6, r6, lr
+ 4a0:	42b4      	cmp	r4, r6
+ 4a2:	d819      	bhi.n	4d8 <error_signal_shutdown+0x4d8>
+ 4a4:	4281      	cmp	r1, r0
+ 4a6:	d1da      	bne.n	45e <error_signal_shutdown+0x45e>
+ 4a8:	3301      	adds	r3, #1
+ 4aa:	2b05      	cmp	r3, #5
+ 4ac:	f43f ae94 	beq.w	1d8 <error_signal_shutdown+0x1d8>
+ 4b0:	2100      	movs	r1, #0
+ 4b2:	f240 5901 	movw	r9, #1281	@ 0x501
+ 4b6:	f8df a05c 	ldr.w	sl, [pc, #92]	@ 514 <error_signal_shutdown+0x514>
+ 4ba:	e7d0      	b.n	45e <error_signal_shutdown+0x45e>
+ 4bc:	6855      	ldr	r5, [r2, #4]
+ 4be:	4575      	cmp	r5, lr
+ 4c0:	d105      	bne.n	4ce <error_signal_shutdown+0x4ce>
+ 4c2:	3401      	adds	r4, #1
+ 4c4:	4564      	cmp	r4, ip
+ 4c6:	f43f ae87 	beq.w	1d8 <error_signal_shutdown+0x1d8>
+ 4ca:	46ae      	mov	lr, r5
+ 4cc:	e7ce      	b.n	46c <error_signal_shutdown+0x46c>
+ 4ce:	2400      	movs	r4, #0
+ 4d0:	e7fb      	b.n	4ca <error_signal_shutdown+0x4ca>
+ 4d2:	f44f 74c8 	mov.w	r4, #400	@ 0x190
+ 4d6:	e7da      	b.n	48e <error_signal_shutdown+0x48e>
+ 4d8:	6856      	ldr	r6, [r2, #4]
+ 4da:	4546      	cmp	r6, r8
+ 4dc:	d105      	bne.n	4ea <error_signal_shutdown+0x4ea>
+ 4de:	3501      	adds	r5, #1
+ 4e0:	4565      	cmp	r5, ip
+ 4e2:	f43f ae79 	beq.w	1d8 <error_signal_shutdown+0x1d8>
+ 4e6:	46b0      	mov	r8, r6
+ 4e8:	e7d7      	b.n	49a <error_signal_shutdown+0x49a>
+ 4ea:	2500      	movs	r5, #0
+ 4ec:	e7fb      	b.n	4e6 <error_signal_shutdown+0x4e6>
+ 4ee:	4f0a      	ldr	r7, [pc, #40]	@ (518 <error_signal_shutdown+0x518>)
+ 4f0:	f8df b028 	ldr.w	fp, [pc, #40]	@ 51c <error_signal_shutdown+0x51c>
+ 4f4:	f8df c028 	ldr.w	ip, [pc, #40]	@ 520 <error_signal_shutdown+0x520>
+ 4f8:	e7da      	b.n	4b0 <error_signal_shutdown+0x4b0>
+ 4fa:	bf00      	nop
+ 4fc:	56025000 	.word	0x56025000
+ 500:	56024800 	.word	0x56024800
+ 504:	56029000 	.word	0x56029000
+ 508:	56028000 	.word	0x56028000
+ 50c:	e000ed00 	.word	0xe000ed00
+ 510:	04000101 	.word	0x04000101
+ 514:	00061a80 	.word	0x00061a80
+ 518:	56021800 	.word	0x56021800
+ 51c:	02625a00 	.word	0x02625a00
+ 520:	000186a0 	.word	0x000186a0
