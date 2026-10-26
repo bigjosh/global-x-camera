@@ -1,0 +1,147 @@
+{
+  "date_local": "2026-10-25",
+  "app_version": "2.4.48",
+  "api_port": 10431,
+  "source_recording": "tmp/bringup/sd25-crc-20261025/phase01/signals/signals.sal",
+  "installed_analyzer_directory": "C:\\Users\\joshd\\OneDrive\\Documents\\Logic Pro Analyzers",
+  "dll_sha256": "bf2fe4cbd7935d2a3767fab470bd836b8ab1ac1ca1dea0cc26fadc45dc10e292",
+  "settings": {
+    "width": "Auto (start 1-bit)",
+    "edge": "Rising",
+    "sample_offset": 0,
+    "capture_mode": "Complete capture",
+    "channels": {
+      "CLK": 2,
+      "CMD": 3,
+      "DAT0": 7,
+      "DAT1": 4,
+      "DAT2": 5,
+      "DAT3": 1
+    }
+  },
+  "event_counts": {
+    "response": 55,
+    "command": 46,
+    "transfer": 8,
+    "data_block": 18,
+    "bus_width": 1,
+    "write_status": 11,
+    "busy": 11
+  },
+  "error_flagged_events": 18,
+  "table_rows": 141,
+  "exports": {
+    "sd-all-events.csv": {
+      "bytes": 36937,
+      "sha256": "774fc53d3f19c22de078286327e21d46793fcf8d6f9198100646d8a503eb66eb"
+    },
+    "sd-analyzed.sal": {
+      "bytes": 1638191,
+      "sha256": "0feea09073ba7b29805d44ca61877b90c53fbf0d4ee1cdc02c1b0aac9d872e4f"
+    },
+    "sd-table.csv": {
+      "bytes": 32850,
+      "sha256": "1378a4c34114f9c025ac3e3f3cc745936f6e4e446716d7b3f3343064228f19a1"
+    }
+  },
+  "verified_reference_events": [
+    {
+      "start_sample": "105659107",
+      "end_sample": "105659580",
+      "start_s": "0.422636428",
+      "end_s": "0.42263832",
+      "duration_us": "1.892",
+      "signal": "CMD",
+      "type": "command",
+      "error": "false",
+      "description": "CMD25 WRITE_MULTIPLE_BLOCK 0x00003A48",
+      "fields": "command=25; application=no; response_type=; crc=OK; end_bit=1; argument=0x00003A48; crc_received=0x28; crc_calculated=0x28"
+    },
+    {
+      "start_sample": "105694085",
+      "end_sample": "105704547",
+      "start_s": "0.42277634",
+      "end_s": "0.422818188",
+      "duration_us": "41.848",
+      "signal": "DAT",
+      "type": "data_block",
+      "error": "false",
+      "description": "Write block 1 CRC OK",
+      "fields": "block=1; bytes=512; width=4; payload_clocks=1024; packet_clocks=1042; CRC16 received/calculated=D0:OK 0xDD67/0xDD67; D1:OK 0xD0F3/0xD0F3; D2:OK 0xD663/0xD663; D3:OK 0xEF59/0xEF59; end_bits=OK; preview=47 58 52 32 00 00 00 00 00 00 00 00 00 00 00 00; mode=command-associated"
+    },
+    {
+      "start_sample": "105704624",
+      "end_sample": "105765650",
+      "start_s": "0.422818496",
+      "end_s": "0.4230626",
+      "duration_us": "244.104",
+      "signal": "DAT",
+      "type": "busy",
+      "error": "false",
+      "description": "Block 1 DAT0 busy \u2192 released",
+      "fields": "block=1; sample_duration=61026; boundary=raw DAT0 transitions; complete=yes"
+    },
+    {
+      "start_sample": "159917895",
+      "end_sample": "159918367",
+      "start_s": "0.63967158",
+      "end_s": "0.639673468",
+      "duration_us": "1.888",
+      "signal": "CMD",
+      "type": "command",
+      "error": "false",
+      "description": "CMD12 STOP_TRANSMISSION 0x00000000",
+      "fields": "command=12; application=no; response_type=; crc=OK; end_bit=1; argument=0x00000000; crc_received=0x30; crc_calculated=0x30"
+    },
+    {
+      "start_sample": "159918394",
+      "end_sample": "160132045",
+      "start_s": "0.639673576",
+      "end_s": "0.64052818",
+      "duration_us": "854.604",
+      "signal": "DAT",
+      "type": "busy",
+      "error": "false",
+      "description": "CMD12 R1b / DAT0 busy \u2192 released",
+      "fields": "block=11; sample_duration=213651; boundary=raw DAT0 transitions; complete=yes"
+    },
+    {
+      "start_sample": "159918457",
+      "end_sample": "159918930",
+      "start_s": "0.639673828",
+      "end_s": "0.63967572",
+      "duration_us": "1.892",
+      "signal": "CMD",
+      "type": "response",
+      "error": "false",
+      "description": "R1b to CMD12",
+      "fields": "command=12; application=no; response_type=R1b; crc=OK; end_bit=1; value=0x00000C00; crc_received=0x0E; crc_calculated=0x0E; card_state=receive-data; ready_for_data=no; status_errors=0x00000000"
+    },
+    {
+      "start_sample": "159930847",
+      "end_sample": "159931320",
+      "start_s": "0.639723388",
+      "end_s": "0.63972528",
+      "duration_us": "1.892",
+      "signal": "CMD",
+      "type": "response",
+      "error": "false",
+      "description": "R1 to CMD13",
+      "fields": "command=13; application=no; response_type=R1; crc=OK; end_bit=1; value=0x00000E00; crc_received=0x2E; crc_calculated=0x2E; card_state=programming; ready_for_data=no; status_errors=0x00000000"
+    },
+    {
+      "start_sample": "160197183",
+      "end_sample": "160197656",
+      "start_s": "0.640788732",
+      "end_s": "0.640790624",
+      "duration_us": "1.892",
+      "signal": "CMD",
+      "type": "response",
+      "error": "false",
+      "description": "R1 to CMD13",
+      "fields": "command=13; application=no; response_type=R1; crc=OK; end_bit=1; value=0x00000900; crc_received=0x1F; crc_calculated=0x1F; card_state=transfer; ready_for_data=yes; status_errors=0x00000000"
+    }
+  ],
+  "limitation": "Pre-resistor diagnostic trace; malformed write status at block 11 suspends data decoding. This is not a complete 3730-block decode. CMD12 busy still matches the raw-edge reference.",
+  "hardware_operations": "None; saved recording only."
+}

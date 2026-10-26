@@ -23,6 +23,13 @@ The Windows x64 DLL is built for Logic 2 and the Logic Pro 8. It provides:
 The prepared local binary is `dist/windows-x64/GlobalXNativeSD.dll`; build
 artifacts are ignored by Git. Source, tests and fixtures are tracked.
 
+**Installed on this workstation:** the user selected
+`C:\Users\joshd\OneDrive\Documents\Logic Pro Analyzers`, and the verified DLL
+is copied there. The inspected capture is open in the fresh Logic instance on
+API port **10431**; an older background instance remains on 10430. Use
+`--port 10431` for that inspection instance. A normal rebuild still outputs
+to the build folder and does not silently replace the installed DLL.
+
 1. In Logic 2, open **Settings → Custom Low Level Analyzers** and choose
    `D:\Github\global-x-camera\tools\saleae-sd-native\dist\windows-x64`.
    If you already have a custom analyzer directory, copy this DLL into that
@@ -149,8 +156,8 @@ block instead of retaining every image byte.
 
 ## Scope and evidence
 
-The [validation record](VALIDATION.md) identifies the prepared DLL and clearly
-separates completed offline/adapter checks from pending in-app integration.
+The [validation record](VALIDATION.md) identifies the DLL and records completed
+offline, adapter and real Logic 2 integration checks.
 
 The [recorded fixtures](tests/fixtures/README.md) preserve raw transitions from
 our bench capture. They verify a 512-byte write with all four CRCs, a
@@ -164,8 +171,10 @@ failures, native write tokens, malformed/truncated input, explicit versus
 hinted block counts and a busy release without further clock edges. This
 implementation targets SD memory SDR, not SPI, SDIO, MMC, DDR/UHS-II or
 voltage-switching analysis. A capture beginning mid-packet may need a later
-valid command to resynchronize. Rolling/live-export behavior is not qualified;
-use a completed recording for reproducible export. At 25 MHz, the archived
+valid command to resynchronize. After a malformed write-status token, data decoding suspends until a new
+recognized data command; it does not guess subsequent block boundaries.
+Rolling/live-export behavior is not qualified; use a completed recording for
+reproducible export. At 25 MHz, the archived
 250 MS/s capture has 4 ns edge resolution; it cannot establish analog signal
 integrity or sub-sample setup/hold margins.
 

@@ -50,11 +50,30 @@ the payload and cannot establish the full image's validity.
 The replay Python scripts also pass bytecode compilation. Build instructions
 and the CTest targets reproduce these checks without instrument access.
 
-## Integration boundary
+## Logic 2 integration completed
 
-At this checkpoint the DLL is built and the actual adapter is tested with
-SDK mocks. **Loading it in the running Logic 2 application is pending the
-one-time custom-analyzer-directory selection and restart.** No current
-hardware capture, firmware change, reset, SD write or power operation was
-performed to develop or validate this analyzer. Offline decoding does not
-qualify analog signal integrity or current board wiring.
+The same DLL was copied and hash-verified in the user's configured folder,
+`C:\Users\joshd\OneDrive\Documents\Logic Pro Analyzers`. Logic 2 2.4.48
+successfully loaded it in a fresh visible instance on API port **10431**.
+The older background instance on 10430 predates the configuration change and
+was left intact; restarting a separate visible window had not updated it.
+
+The full `phase01/signals/signals.sal` recording is open with **SD Commands**
+and **SD Data and busy** views, automatic width, rising edge and offset zero.
+The annotated capture and two CSV exports are saved locally under
+`tmp/sd-analyzer-replay-20261025/`. Both the all-events CSV and Logic's data
+table reproduce the two exact busy intervals above, including the final busy
+starting 252 ns before the CMD12 response. The subsequent CMD13 responses
+show PRG/not-ready while busy and TRAN/ready after release.
+
+The pre-resistor recording is noisy. Data decoding suspends at block 11's
+malformed write-status token; the transfer is flagged erroneous. **This is
+not a successful decode of all 3,730 blocks.** Command decoding continues and
+the final CMD12 busy still matches the raw-edge reference. The exports contain
+150 events (18 error-flagged) and 141 table rows; eight transfer summaries and
+one width-change event are intentionally omitted from the sequential table.
+
+The [integration record](tests/fixtures/logic2-integration.json) preserves
+settings, export hashes and reference events. No new hardware capture,
+firmware change, reset, SD write or power operation was performed. Saved-trace
+decoding does not qualify analog signal integrity or current board wiring.

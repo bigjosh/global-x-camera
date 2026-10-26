@@ -23,3 +23,18 @@ sample interval 159918394–160132045 at 250 MS/s. The Saleae SDK lacks a
 reliable end-of-capture sample API: complete-recording truncation ends at the
 last observed CLK/DAT0 edge and is labeled a lower bound; live mode must not
 treat a temporary lack of transitions as final input.
+
+## 2026-10-25  Check API instance identity when a configured analyzer appears missing
+
+**Why:** the directory was correctly saved and the DLL present, but the API on
+10430 still belonged to a background Logic instance started October 19. The
+user's visible-window restart had not restarted that instance. A fresh visible
+instance on 10431 loaded the same DLL and replayed the saved recording with
+both views. Preserve other sessions instead of assuming they are disposable.
+
+**Rejected:** repeatedly asking the user to re-enter an already correct path;
+force-closing all Logic processes; treating an old process's missing-analyzer
+message as proof of a broken DLL.
+
+**Evidence:** [real Logic integration](VALIDATION.md#logic-2-integration-completed)
+and [export hashes and intervals](tests/fixtures/logic2-integration.json).
