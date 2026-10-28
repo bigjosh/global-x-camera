@@ -1,0 +1,4470 @@
+{
+  "run": "candidate02",
+  "group": "autostop",
+  "trace": "D:\\Github\\global-x-camera\\tmp\\bringup\\sensor-autostop-promote-20261028\\candidate02\\trace",
+  "evidence": {
+    "build": "D:\\Github\\global-x-camera\\tmp\\bringup\\sensor-autostop-promote-20261028\\flash-standby-v1"
+  },
+  "result_sha256": "d27da901a6e090bab13b623be3be0f2bd4dde9edb3f7546596e484c84cee99c2",
+  "checks": {
+    "current": {
+      "sha256": "bef8bd475f8912514897f91cfeb66bfd6a8fcef92a97fc0d092a9f21be63a355",
+      "hash_passed": true,
+      "contiguous": true,
+      "first_sample_id": 0,
+      "analyzed_end_exclusive": 46233558,
+      "excluded_final_chunk": false,
+      "nonfinite": 71
+    },
+    "voltage": {
+      "sha256": "ce40cd98f097098f6914eb0d7e6655830a38a43992c45102efe17d4210355d3c",
+      "hash_passed": true,
+      "contiguous": true,
+      "first_sample_id": 16128,
+      "analyzed_end_exclusive": 46249686,
+      "excluded_final_chunk": false,
+      "nonfinite": 0
+    },
+    "power": {
+      "sha256": "082d1033c727086fefd27f80fab0cf4499135af4f66f6c4350697c0cf26c282e",
+      "hash_passed": true,
+      "contiguous": true,
+      "first_sample_id": 16128,
+      "analyzed_end_exclusive": 46249686,
+      "excluded_final_chunk": false,
+      "nonfinite": 0
+    },
+    "gpi0": {
+      "sha256": "1f89a40d81fe48877e1ca686e70547cc62177aa8fd9a8b30e5cc1e48048856b1",
+      "hash_passed": true,
+      "contiguous": true,
+      "first_sample_id": 16128,
+      "analyzed_end_exclusive": 46116128,
+      "excluded_final_chunk": true,
+      "nonfinite": null
+    },
+    "gpi1": {
+      "sha256": "633d1e1f3299c3c7833d27de657ffd3676477540cc5d829a4cc8abf324c6c004",
+      "hash_passed": true,
+      "contiguous": true,
+      "first_sample_id": 16128,
+      "analyzed_end_exclusive": 46116128,
+      "excluded_final_chunk": true,
+      "nonfinite": null
+    }
+  },
+  "marker_events": [
+    {
+      "id": 1,
+      "name": "receiver_entry",
+      "sample_id": 34291300,
+      "end_sample_id": 34291305,
+      "width_us": 2.5,
+      "time_ms": 23.942
+    },
+    {
+      "id": 2,
+      "name": "first_strobe_irq_observed",
+      "sample_id": 34293569,
+      "end_sample_id": 34293578,
+      "width_us": 4.5,
+      "time_ms": 25.076500000000003
+    },
+    {
+      "id": 4,
+      "name": "sd_initialization_begin",
+      "sample_id": 34316901,
+      "end_sample_id": 34316918,
+      "width_us": 8.5,
+      "time_ms": 36.7425
+    },
+    {
+      "id": 3,
+      "name": "first_frame_complete_irq_observed",
+      "sample_id": 34337296,
+      "end_sample_id": 34337309,
+      "width_us": 6.5,
+      "time_ms": 46.940000000000005
+    },
+    {
+      "id": 11,
+      "name": "sensor_autonomous_standby_first_observed",
+      "sample_id": 34343455,
+      "end_sample_id": 34343500,
+      "width_us": 22.5,
+      "time_ms": 50.0195
+    },
+    {
+      "id": 5,
+      "name": "sd_initialization_complete",
+      "sample_id": 34503094,
+      "end_sample_id": 34503115,
+      "width_us": 10.5,
+      "time_ms": 129.839
+    },
+    {
+      "id": 6,
+      "name": "first_slot_transport_submission",
+      "sample_id": 34695416,
+      "end_sample_id": 34695441,
+      "width_us": 12.5,
+      "time_ms": 226.0
+    },
+    {
+      "id": 7,
+      "name": "slot_transport_returned_success",
+      "sample_id": 35457519,
+      "end_sample_id": 35457548,
+      "width_us": 14.5,
+      "time_ms": 607.0514999999999
+    },
+    {
+      "id": 8,
+      "name": "full_slot_commit_complete",
+      "sample_id": 35457849,
+      "end_sample_id": 35457882,
+      "width_us": 16.5,
+      "time_ms": 607.2165
+    },
+    {
+      "id": 9,
+      "name": "sd_deinitialization_complete",
+      "sample_id": 35457978,
+      "end_sample_id": 35458015,
+      "width_us": 18.5,
+      "time_ms": 607.281
+    },
+    {
+      "id": 10,
+      "name": "pre_standby_wfi",
+      "sample_id": 35458603,
+      "end_sample_id": 35458645,
+      "width_us": 21.0,
+      "time_ms": 607.5935000000001
+    }
+  ],
+  "marker_precedence_pass": true,
+  "unique_marker_train": true,
+  "marker_rule": "Unique contiguous normal1..10 or autostop1..11 train; each ID once; width2*ID+0.24us +/-0.80us at native0.5us grid; normal lifecycle plus3<11<8.",
+  "all_gpi_edges": {
+    "gpi0": [
+      {
+        "sample_id": 34278022,
+        "level": 1
+      },
+      {
+        "sample_id": 34278180,
+        "level": 0
+      },
+      {
+        "sample_id": 34278181,
+        "level": 1
+      },
+      {
+        "sample_id": 34278183,
+        "level": 0
+      },
+      {
+        "sample_id": 34278184,
+        "level": 1
+      },
+      {
+        "sample_id": 34278185,
+        "level": 0
+      },
+      {
+        "sample_id": 34278186,
+        "level": 1
+      },
+      {
+        "sample_id": 34278187,
+        "level": 0
+      },
+      {
+        "sample_id": 34278191,
+        "level": 1
+      },
+      {
+        "sample_id": 34278192,
+        "level": 0
+      },
+      {
+        "sample_id": 34278193,
+        "level": 1
+      },
+      {
+        "sample_id": 34278195,
+        "level": 0
+      },
+      {
+        "sample_id": 34278198,
+        "level": 1
+      },
+      {
+        "sample_id": 34278199,
+        "level": 0
+      },
+      {
+        "sample_id": 34278203,
+        "level": 1
+      },
+      {
+        "sample_id": 34278207,
+        "level": 0
+      },
+      {
+        "sample_id": 34278208,
+        "level": 1
+      },
+      {
+        "sample_id": 34278209,
+        "level": 0
+      },
+      {
+        "sample_id": 34278210,
+        "level": 1
+      },
+      {
+        "sample_id": 34278211,
+        "level": 0
+      },
+      {
+        "sample_id": 34278213,
+        "level": 1
+      },
+      {
+        "sample_id": 34278219,
+        "level": 0
+      },
+      {
+        "sample_id": 34278220,
+        "level": 1
+      },
+      {
+        "sample_id": 34278226,
+        "level": 0
+      },
+      {
+        "sample_id": 34278227,
+        "level": 1
+      },
+      {
+        "sample_id": 34278228,
+        "level": 0
+      },
+      {
+        "sample_id": 34278229,
+        "level": 1
+      },
+      {
+        "sample_id": 34278230,
+        "level": 0
+      },
+      {
+        "sample_id": 34278231,
+        "level": 1
+      },
+      {
+        "sample_id": 34278232,
+        "level": 0
+      },
+      {
+        "sample_id": 34278234,
+        "level": 1
+      },
+      {
+        "sample_id": 34278236,
+        "level": 0
+      },
+      {
+        "sample_id": 34278237,
+        "level": 1
+      },
+      {
+        "sample_id": 34278239,
+        "level": 0
+      },
+      {
+        "sample_id": 34278240,
+        "level": 1
+      },
+      {
+        "sample_id": 34278241,
+        "level": 0
+      },
+      {
+        "sample_id": 34278243,
+        "level": 1
+      },
+      {
+        "sample_id": 34278244,
+        "level": 0
+      },
+      {
+        "sample_id": 34278246,
+        "level": 1
+      },
+      {
+        "sample_id": 34278248,
+        "level": 0
+      },
+      {
+        "sample_id": 34278250,
+        "level": 1
+      },
+      {
+        "sample_id": 34278251,
+        "level": 0
+      },
+      {
+        "sample_id": 34278253,
+        "level": 1
+      },
+      {
+        "sample_id": 34278254,
+        "level": 0
+      },
+      {
+        "sample_id": 34278259,
+        "level": 1
+      },
+      {
+        "sample_id": 34278261,
+        "level": 0
+      },
+      {
+        "sample_id": 34278262,
+        "level": 1
+      },
+      {
+        "sample_id": 34278263,
+        "level": 0
+      },
+      {
+        "sample_id": 34278265,
+        "level": 1
+      },
+      {
+        "sample_id": 34278266,
+        "level": 0
+      },
+      {
+        "sample_id": 34278267,
+        "level": 1
+      },
+      {
+        "sample_id": 34278268,
+        "level": 0
+      },
+      {
+        "sample_id": 34278269,
+        "level": 1
+      },
+      {
+        "sample_id": 34278270,
+        "level": 0
+      },
+      {
+        "sample_id": 34278277,
+        "level": 1
+      },
+      {
+        "sample_id": 34278278,
+        "level": 0
+      },
+      {
+        "sample_id": 34278279,
+        "level": 1
+      },
+      {
+        "sample_id": 34278280,
+        "level": 0
+      },
+      {
+        "sample_id": 34278281,
+        "level": 1
+      },
+      {
+        "sample_id": 34278282,
+        "level": 0
+      },
+      {
+        "sample_id": 34278283,
+        "level": 1
+      },
+      {
+        "sample_id": 34278285,
+        "level": 0
+      },
+      {
+        "sample_id": 34278286,
+        "level": 1
+      },
+      {
+        "sample_id": 34278287,
+        "level": 0
+      },
+      {
+        "sample_id": 34278288,
+        "level": 1
+      },
+      {
+        "sample_id": 34278289,
+        "level": 0
+      },
+      {
+        "sample_id": 34278294,
+        "level": 1
+      },
+      {
+        "sample_id": 34278296,
+        "level": 0
+      },
+      {
+        "sample_id": 34278297,
+        "level": 1
+      },
+      {
+        "sample_id": 34278299,
+        "level": 0
+      },
+      {
+        "sample_id": 34278300,
+        "level": 1
+      },
+      {
+        "sample_id": 34278301,
+        "level": 0
+      },
+      {
+        "sample_id": 34278304,
+        "level": 1
+      },
+      {
+        "sample_id": 34278305,
+        "level": 0
+      },
+      {
+        "sample_id": 34278306,
+        "level": 1
+      },
+      {
+        "sample_id": 34278308,
+        "level": 0
+      },
+      {
+        "sample_id": 34278311,
+        "level": 1
+      },
+      {
+        "sample_id": 34278316,
+        "level": 0
+      },
+      {
+        "sample_id": 34278318,
+        "level": 1
+      },
+      {
+        "sample_id": 34278319,
+        "level": 0
+      },
+      {
+        "sample_id": 34278322,
+        "level": 1
+      },
+      {
+        "sample_id": 34278323,
+        "level": 0
+      },
+      {
+        "sample_id": 34278324,
+        "level": 1
+      },
+      {
+        "sample_id": 34278325,
+        "level": 0
+      },
+      {
+        "sample_id": 34278329,
+        "level": 1
+      },
+      {
+        "sample_id": 34278330,
+        "level": 0
+      },
+      {
+        "sample_id": 34278332,
+        "level": 1
+      },
+      {
+        "sample_id": 34278333,
+        "level": 0
+      },
+      {
+        "sample_id": 34278335,
+        "level": 1
+      },
+      {
+        "sample_id": 34278338,
+        "level": 0
+      },
+      {
+        "sample_id": 34278339,
+        "level": 1
+      },
+      {
+        "sample_id": 34278340,
+        "level": 0
+      },
+      {
+        "sample_id": 34278344,
+        "level": 1
+      },
+      {
+        "sample_id": 34278345,
+        "level": 0
+      },
+      {
+        "sample_id": 34278349,
+        "level": 1
+      },
+      {
+        "sample_id": 34278350,
+        "level": 0
+      },
+      {
+        "sample_id": 34278357,
+        "level": 1
+      },
+      {
+        "sample_id": 34278358,
+        "level": 0
+      },
+      {
+        "sample_id": 34278359,
+        "level": 1
+      },
+      {
+        "sample_id": 34278361,
+        "level": 0
+      },
+      {
+        "sample_id": 34278368,
+        "level": 1
+      },
+      {
+        "sample_id": 34278369,
+        "level": 0
+      },
+      {
+        "sample_id": 34278372,
+        "level": 1
+      },
+      {
+        "sample_id": 34278373,
+        "level": 0
+      },
+      {
+        "sample_id": 34278384,
+        "level": 1
+      },
+      {
+        "sample_id": 34278385,
+        "level": 0
+      },
+      {
+        "sample_id": 34278386,
+        "level": 1
+      },
+      {
+        "sample_id": 34278388,
+        "level": 0
+      },
+      {
+        "sample_id": 34278389,
+        "level": 1
+      },
+      {
+        "sample_id": 34278391,
+        "level": 0
+      },
+      {
+        "sample_id": 34278392,
+        "level": 1
+      },
+      {
+        "sample_id": 34278393,
+        "level": 0
+      },
+      {
+        "sample_id": 34278397,
+        "level": 1
+      },
+      {
+        "sample_id": 34278398,
+        "level": 0
+      },
+      {
+        "sample_id": 34278406,
+        "level": 1
+      },
+      {
+        "sample_id": 34278407,
+        "level": 0
+      },
+      {
+        "sample_id": 34278413,
+        "level": 1
+      },
+      {
+        "sample_id": 34278415,
+        "level": 0
+      },
+      {
+        "sample_id": 34278420,
+        "level": 1
+      },
+      {
+        "sample_id": 34278422,
+        "level": 0
+      },
+      {
+        "sample_id": 34278423,
+        "level": 1
+      },
+      {
+        "sample_id": 34278425,
+        "level": 0
+      },
+      {
+        "sample_id": 34278434,
+        "level": 1
+      },
+      {
+        "sample_id": 34278435,
+        "level": 0
+      },
+      {
+        "sample_id": 34291300,
+        "level": 1
+      },
+      {
+        "sample_id": 34291305,
+        "level": 0
+      },
+      {
+        "sample_id": 34293569,
+        "level": 1
+      },
+      {
+        "sample_id": 34293578,
+        "level": 0
+      },
+      {
+        "sample_id": 34316901,
+        "level": 1
+      },
+      {
+        "sample_id": 34316918,
+        "level": 0
+      },
+      {
+        "sample_id": 34337296,
+        "level": 1
+      },
+      {
+        "sample_id": 34337309,
+        "level": 0
+      },
+      {
+        "sample_id": 34343455,
+        "level": 1
+      },
+      {
+        "sample_id": 34343500,
+        "level": 0
+      },
+      {
+        "sample_id": 34503094,
+        "level": 1
+      },
+      {
+        "sample_id": 34503115,
+        "level": 0
+      },
+      {
+        "sample_id": 34695416,
+        "level": 1
+      },
+      {
+        "sample_id": 34695441,
+        "level": 0
+      },
+      {
+        "sample_id": 35457519,
+        "level": 1
+      },
+      {
+        "sample_id": 35457548,
+        "level": 0
+      },
+      {
+        "sample_id": 35457849,
+        "level": 1
+      },
+      {
+        "sample_id": 35457882,
+        "level": 0
+      },
+      {
+        "sample_id": 35457978,
+        "level": 1
+      },
+      {
+        "sample_id": 35458015,
+        "level": 0
+      },
+      {
+        "sample_id": 35458603,
+        "level": 1
+      },
+      {
+        "sample_id": 35458645,
+        "level": 0
+      }
+    ],
+    "gpi1": [
+      {
+        "sample_id": 4169305,
+        "level": 0
+      },
+      {
+        "sample_id": 4169309,
+        "level": 1
+      },
+      {
+        "sample_id": 4169311,
+        "level": 0
+      },
+      {
+        "sample_id": 4169314,
+        "level": 1
+      },
+      {
+        "sample_id": 4169315,
+        "level": 0
+      },
+      {
+        "sample_id": 4169317,
+        "level": 1
+      },
+      {
+        "sample_id": 4169379,
+        "level": 0
+      },
+      {
+        "sample_id": 4169388,
+        "level": 1
+      },
+      {
+        "sample_id": 4169420,
+        "level": 0
+      },
+      {
+        "sample_id": 4169421,
+        "level": 1
+      },
+      {
+        "sample_id": 4169423,
+        "level": 0
+      },
+      {
+        "sample_id": 4169424,
+        "level": 1
+      },
+      {
+        "sample_id": 4169426,
+        "level": 0
+      },
+      {
+        "sample_id": 4169431,
+        "level": 1
+      },
+      {
+        "sample_id": 4169450,
+        "level": 0
+      },
+      {
+        "sample_id": 4169451,
+        "level": 1
+      },
+      {
+        "sample_id": 4169454,
+        "level": 0
+      },
+      {
+        "sample_id": 4169455,
+        "level": 1
+      },
+      {
+        "sample_id": 4169456,
+        "level": 0
+      },
+      {
+        "sample_id": 4169458,
+        "level": 1
+      },
+      {
+        "sample_id": 4169463,
+        "level": 0
+      },
+      {
+        "sample_id": 4169465,
+        "level": 1
+      },
+      {
+        "sample_id": 4169495,
+        "level": 0
+      },
+      {
+        "sample_id": 4169497,
+        "level": 1
+      },
+      {
+        "sample_id": 4169498,
+        "level": 0
+      },
+      {
+        "sample_id": 4169500,
+        "level": 1
+      },
+      {
+        "sample_id": 4169501,
+        "level": 0
+      },
+      {
+        "sample_id": 4169503,
+        "level": 1
+      },
+      {
+        "sample_id": 4169504,
+        "level": 0
+      },
+      {
+        "sample_id": 4169505,
+        "level": 1
+      },
+      {
+        "sample_id": 4169506,
+        "level": 0
+      },
+      {
+        "sample_id": 4169508,
+        "level": 1
+      },
+      {
+        "sample_id": 4169509,
+        "level": 0
+      },
+      {
+        "sample_id": 4169510,
+        "level": 1
+      },
+      {
+        "sample_id": 4169513,
+        "level": 0
+      },
+      {
+        "sample_id": 4169514,
+        "level": 1
+      },
+      {
+        "sample_id": 4169516,
+        "level": 0
+      },
+      {
+        "sample_id": 4169520,
+        "level": 1
+      },
+      {
+        "sample_id": 4169522,
+        "level": 0
+      },
+      {
+        "sample_id": 4169523,
+        "level": 1
+      },
+      {
+        "sample_id": 4169525,
+        "level": 0
+      },
+      {
+        "sample_id": 4169530,
+        "level": 1
+      },
+      {
+        "sample_id": 4169531,
+        "level": 0
+      },
+      {
+        "sample_id": 4169533,
+        "level": 1
+      },
+      {
+        "sample_id": 4169554,
+        "level": 0
+      },
+      {
+        "sample_id": 4169561,
+        "level": 1
+      },
+      {
+        "sample_id": 4169562,
+        "level": 0
+      },
+      {
+        "sample_id": 4169564,
+        "level": 1
+      },
+      {
+        "sample_id": 4169566,
+        "level": 0
+      },
+      {
+        "sample_id": 4169567,
+        "level": 1
+      },
+      {
+        "sample_id": 4169568,
+        "level": 0
+      },
+      {
+        "sample_id": 4169569,
+        "level": 1
+      },
+      {
+        "sample_id": 4169571,
+        "level": 0
+      },
+      {
+        "sample_id": 4169572,
+        "level": 1
+      },
+      {
+        "sample_id": 4169573,
+        "level": 0
+      },
+      {
+        "sample_id": 4169575,
+        "level": 1
+      },
+      {
+        "sample_id": 4169576,
+        "level": 0
+      },
+      {
+        "sample_id": 4169578,
+        "level": 1
+      },
+      {
+        "sample_id": 4169579,
+        "level": 0
+      },
+      {
+        "sample_id": 4169580,
+        "level": 1
+      },
+      {
+        "sample_id": 4169582,
+        "level": 0
+      },
+      {
+        "sample_id": 4169583,
+        "level": 1
+      },
+      {
+        "sample_id": 4169584,
+        "level": 0
+      },
+      {
+        "sample_id": 4169586,
+        "level": 1
+      },
+      {
+        "sample_id": 4169588,
+        "level": 0
+      },
+      {
+        "sample_id": 4169589,
+        "level": 1
+      },
+      {
+        "sample_id": 4169590,
+        "level": 0
+      },
+      {
+        "sample_id": 4169593,
+        "level": 1
+      },
+      {
+        "sample_id": 4169594,
+        "level": 0
+      },
+      {
+        "sample_id": 4169595,
+        "level": 1
+      },
+      {
+        "sample_id": 4169596,
+        "level": 0
+      },
+      {
+        "sample_id": 4169597,
+        "level": 1
+      },
+      {
+        "sample_id": 4169620,
+        "level": 0
+      },
+      {
+        "sample_id": 4169625,
+        "level": 1
+      },
+      {
+        "sample_id": 4169626,
+        "level": 0
+      },
+      {
+        "sample_id": 4169629,
+        "level": 1
+      },
+      {
+        "sample_id": 4169630,
+        "level": 0
+      },
+      {
+        "sample_id": 4169633,
+        "level": 1
+      },
+      {
+        "sample_id": 4169634,
+        "level": 0
+      },
+      {
+        "sample_id": 4169641,
+        "level": 1
+      },
+      {
+        "sample_id": 4169643,
+        "level": 0
+      },
+      {
+        "sample_id": 4169647,
+        "level": 1
+      },
+      {
+        "sample_id": 4169648,
+        "level": 0
+      },
+      {
+        "sample_id": 4169651,
+        "level": 1
+      },
+      {
+        "sample_id": 4169652,
+        "level": 0
+      },
+      {
+        "sample_id": 4169655,
+        "level": 1
+      },
+      {
+        "sample_id": 4169656,
+        "level": 0
+      },
+      {
+        "sample_id": 4169657,
+        "level": 1
+      },
+      {
+        "sample_id": 4169658,
+        "level": 0
+      },
+      {
+        "sample_id": 4169660,
+        "level": 1
+      },
+      {
+        "sample_id": 4169662,
+        "level": 0
+      },
+      {
+        "sample_id": 4169663,
+        "level": 1
+      },
+      {
+        "sample_id": 4169668,
+        "level": 0
+      },
+      {
+        "sample_id": 4169670,
+        "level": 1
+      },
+      {
+        "sample_id": 4169673,
+        "level": 0
+      },
+      {
+        "sample_id": 4169675,
+        "level": 1
+      },
+      {
+        "sample_id": 4169679,
+        "level": 0
+      },
+      {
+        "sample_id": 4169683,
+        "level": 1
+      },
+      {
+        "sample_id": 4169685,
+        "level": 0
+      },
+      {
+        "sample_id": 4169689,
+        "level": 1
+      },
+      {
+        "sample_id": 4169693,
+        "level": 0
+      },
+      {
+        "sample_id": 4169699,
+        "level": 1
+      },
+      {
+        "sample_id": 4169701,
+        "level": 0
+      },
+      {
+        "sample_id": 4169704,
+        "level": 1
+      },
+      {
+        "sample_id": 4169705,
+        "level": 0
+      },
+      {
+        "sample_id": 4169707,
+        "level": 1
+      },
+      {
+        "sample_id": 4169708,
+        "level": 0
+      },
+      {
+        "sample_id": 4169709,
+        "level": 1
+      },
+      {
+        "sample_id": 4169710,
+        "level": 0
+      },
+      {
+        "sample_id": 4169716,
+        "level": 1
+      },
+      {
+        "sample_id": 4169717,
+        "level": 0
+      },
+      {
+        "sample_id": 4169719,
+        "level": 1
+      },
+      {
+        "sample_id": 4169720,
+        "level": 0
+      },
+      {
+        "sample_id": 4169723,
+        "level": 1
+      },
+      {
+        "sample_id": 4169724,
+        "level": 0
+      },
+      {
+        "sample_id": 4169726,
+        "level": 1
+      },
+      {
+        "sample_id": 4169730,
+        "level": 0
+      },
+      {
+        "sample_id": 4169734,
+        "level": 1
+      },
+      {
+        "sample_id": 4169737,
+        "level": 0
+      },
+      {
+        "sample_id": 4169739,
+        "level": 1
+      },
+      {
+        "sample_id": 4169740,
+        "level": 0
+      },
+      {
+        "sample_id": 4169741,
+        "level": 1
+      },
+      {
+        "sample_id": 4169742,
+        "level": 0
+      },
+      {
+        "sample_id": 4169743,
+        "level": 1
+      },
+      {
+        "sample_id": 4169744,
+        "level": 0
+      },
+      {
+        "sample_id": 4169745,
+        "level": 1
+      },
+      {
+        "sample_id": 4169749,
+        "level": 0
+      },
+      {
+        "sample_id": 4169752,
+        "level": 1
+      },
+      {
+        "sample_id": 4169753,
+        "level": 0
+      },
+      {
+        "sample_id": 4169757,
+        "level": 1
+      },
+      {
+        "sample_id": 4169759,
+        "level": 0
+      },
+      {
+        "sample_id": 4169763,
+        "level": 1
+      },
+      {
+        "sample_id": 4169765,
+        "level": 0
+      },
+      {
+        "sample_id": 4169766,
+        "level": 1
+      },
+      {
+        "sample_id": 4169768,
+        "level": 0
+      },
+      {
+        "sample_id": 4169770,
+        "level": 1
+      },
+      {
+        "sample_id": 4169772,
+        "level": 0
+      },
+      {
+        "sample_id": 4169775,
+        "level": 1
+      },
+      {
+        "sample_id": 4169776,
+        "level": 0
+      },
+      {
+        "sample_id": 4169782,
+        "level": 1
+      },
+      {
+        "sample_id": 4169783,
+        "level": 0
+      },
+      {
+        "sample_id": 4169785,
+        "level": 1
+      },
+      {
+        "sample_id": 4169786,
+        "level": 0
+      },
+      {
+        "sample_id": 4169787,
+        "level": 1
+      },
+      {
+        "sample_id": 4169788,
+        "level": 0
+      },
+      {
+        "sample_id": 4169789,
+        "level": 1
+      },
+      {
+        "sample_id": 4169791,
+        "level": 0
+      },
+      {
+        "sample_id": 4169793,
+        "level": 1
+      },
+      {
+        "sample_id": 4169795,
+        "level": 0
+      },
+      {
+        "sample_id": 4169800,
+        "level": 1
+      },
+      {
+        "sample_id": 4169802,
+        "level": 0
+      },
+      {
+        "sample_id": 4169803,
+        "level": 1
+      },
+      {
+        "sample_id": 4169806,
+        "level": 0
+      },
+      {
+        "sample_id": 4169810,
+        "level": 1
+      },
+      {
+        "sample_id": 4169811,
+        "level": 0
+      },
+      {
+        "sample_id": 4169812,
+        "level": 1
+      },
+      {
+        "sample_id": 4169813,
+        "level": 0
+      },
+      {
+        "sample_id": 4169815,
+        "level": 1
+      },
+      {
+        "sample_id": 4169816,
+        "level": 0
+      },
+      {
+        "sample_id": 4169817,
+        "level": 1
+      },
+      {
+        "sample_id": 4169819,
+        "level": 0
+      },
+      {
+        "sample_id": 4169823,
+        "level": 1
+      },
+      {
+        "sample_id": 4169825,
+        "level": 0
+      },
+      {
+        "sample_id": 4169832,
+        "level": 1
+      },
+      {
+        "sample_id": 4169834,
+        "level": 0
+      },
+      {
+        "sample_id": 4169838,
+        "level": 1
+      },
+      {
+        "sample_id": 4169839,
+        "level": 0
+      },
+      {
+        "sample_id": 4169855,
+        "level": 1
+      },
+      {
+        "sample_id": 4169857,
+        "level": 0
+      },
+      {
+        "sample_id": 4169861,
+        "level": 1
+      },
+      {
+        "sample_id": 4169863,
+        "level": 0
+      },
+      {
+        "sample_id": 4169864,
+        "level": 1
+      },
+      {
+        "sample_id": 4169866,
+        "level": 0
+      },
+      {
+        "sample_id": 4169867,
+        "level": 1
+      },
+      {
+        "sample_id": 4169868,
+        "level": 0
+      },
+      {
+        "sample_id": 4169870,
+        "level": 1
+      },
+      {
+        "sample_id": 4169871,
+        "level": 0
+      },
+      {
+        "sample_id": 4169873,
+        "level": 1
+      },
+      {
+        "sample_id": 4169875,
+        "level": 0
+      },
+      {
+        "sample_id": 4169878,
+        "level": 1
+      },
+      {
+        "sample_id": 4169881,
+        "level": 0
+      },
+      {
+        "sample_id": 4169883,
+        "level": 1
+      },
+      {
+        "sample_id": 4169884,
+        "level": 0
+      },
+      {
+        "sample_id": 4169888,
+        "level": 1
+      },
+      {
+        "sample_id": 4169890,
+        "level": 0
+      },
+      {
+        "sample_id": 4169891,
+        "level": 1
+      },
+      {
+        "sample_id": 4169892,
+        "level": 0
+      },
+      {
+        "sample_id": 4169898,
+        "level": 1
+      },
+      {
+        "sample_id": 4169899,
+        "level": 0
+      },
+      {
+        "sample_id": 4169900,
+        "level": 1
+      },
+      {
+        "sample_id": 4169901,
+        "level": 0
+      },
+      {
+        "sample_id": 4169927,
+        "level": 1
+      },
+      {
+        "sample_id": 4169929,
+        "level": 0
+      },
+      {
+        "sample_id": 4169931,
+        "level": 1
+      },
+      {
+        "sample_id": 4169932,
+        "level": 0
+      },
+      {
+        "sample_id": 4169933,
+        "level": 1
+      },
+      {
+        "sample_id": 4169934,
+        "level": 0
+      },
+      {
+        "sample_id": 4169935,
+        "level": 1
+      },
+      {
+        "sample_id": 4169938,
+        "level": 0
+      },
+      {
+        "sample_id": 4169942,
+        "level": 1
+      },
+      {
+        "sample_id": 4169944,
+        "level": 0
+      },
+      {
+        "sample_id": 4169946,
+        "level": 1
+      },
+      {
+        "sample_id": 4169947,
+        "level": 0
+      },
+      {
+        "sample_id": 4169950,
+        "level": 1
+      },
+      {
+        "sample_id": 4169953,
+        "level": 0
+      },
+      {
+        "sample_id": 4169971,
+        "level": 1
+      },
+      {
+        "sample_id": 4169972,
+        "level": 0
+      },
+      {
+        "sample_id": 4169979,
+        "level": 1
+      },
+      {
+        "sample_id": 4169982,
+        "level": 0
+      },
+      {
+        "sample_id": 4169983,
+        "level": 1
+      },
+      {
+        "sample_id": 4169984,
+        "level": 0
+      },
+      {
+        "sample_id": 4169985,
+        "level": 1
+      },
+      {
+        "sample_id": 4169988,
+        "level": 0
+      },
+      {
+        "sample_id": 4169990,
+        "level": 1
+      },
+      {
+        "sample_id": 4169991,
+        "level": 0
+      },
+      {
+        "sample_id": 4170001,
+        "level": 1
+      },
+      {
+        "sample_id": 4170002,
+        "level": 0
+      },
+      {
+        "sample_id": 4170003,
+        "level": 1
+      },
+      {
+        "sample_id": 4170004,
+        "level": 0
+      },
+      {
+        "sample_id": 4170007,
+        "level": 1
+      },
+      {
+        "sample_id": 4170008,
+        "level": 0
+      },
+      {
+        "sample_id": 4170013,
+        "level": 1
+      },
+      {
+        "sample_id": 4170015,
+        "level": 0
+      },
+      {
+        "sample_id": 4170018,
+        "level": 1
+      },
+      {
+        "sample_id": 4170019,
+        "level": 0
+      },
+      {
+        "sample_id": 4170020,
+        "level": 1
+      },
+      {
+        "sample_id": 4170021,
+        "level": 0
+      },
+      {
+        "sample_id": 4170024,
+        "level": 1
+      },
+      {
+        "sample_id": 4170025,
+        "level": 0
+      },
+      {
+        "sample_id": 4170029,
+        "level": 1
+      },
+      {
+        "sample_id": 4170030,
+        "level": 0
+      },
+      {
+        "sample_id": 4170031,
+        "level": 1
+      },
+      {
+        "sample_id": 4170032,
+        "level": 0
+      },
+      {
+        "sample_id": 4170040,
+        "level": 1
+      },
+      {
+        "sample_id": 4170041,
+        "level": 0
+      },
+      {
+        "sample_id": 4170043,
+        "level": 1
+      },
+      {
+        "sample_id": 4170044,
+        "level": 0
+      },
+      {
+        "sample_id": 4170047,
+        "level": 1
+      },
+      {
+        "sample_id": 4170049,
+        "level": 0
+      },
+      {
+        "sample_id": 4170053,
+        "level": 1
+      },
+      {
+        "sample_id": 4170054,
+        "level": 0
+      },
+      {
+        "sample_id": 4170057,
+        "level": 1
+      },
+      {
+        "sample_id": 4170058,
+        "level": 0
+      },
+      {
+        "sample_id": 4170063,
+        "level": 1
+      },
+      {
+        "sample_id": 4170065,
+        "level": 0
+      },
+      {
+        "sample_id": 34253911,
+        "level": 1
+      },
+      {
+        "sample_id": 34253912,
+        "level": 0
+      },
+      {
+        "sample_id": 34253916,
+        "level": 1
+      },
+      {
+        "sample_id": 34253918,
+        "level": 0
+      },
+      {
+        "sample_id": 34253919,
+        "level": 1
+      },
+      {
+        "sample_id": 34253922,
+        "level": 0
+      },
+      {
+        "sample_id": 34253924,
+        "level": 1
+      },
+      {
+        "sample_id": 34253925,
+        "level": 0
+      },
+      {
+        "sample_id": 34253928,
+        "level": 1
+      },
+      {
+        "sample_id": 34253929,
+        "level": 0
+      },
+      {
+        "sample_id": 34253938,
+        "level": 1
+      },
+      {
+        "sample_id": 34253939,
+        "level": 0
+      },
+      {
+        "sample_id": 34253942,
+        "level": 1
+      },
+      {
+        "sample_id": 34253943,
+        "level": 0
+      },
+      {
+        "sample_id": 34253950,
+        "level": 1
+      },
+      {
+        "sample_id": 34253951,
+        "level": 0
+      },
+      {
+        "sample_id": 34253952,
+        "level": 1
+      },
+      {
+        "sample_id": 34253953,
+        "level": 0
+      },
+      {
+        "sample_id": 34253958,
+        "level": 1
+      },
+      {
+        "sample_id": 34253959,
+        "level": 0
+      },
+      {
+        "sample_id": 34253961,
+        "level": 1
+      },
+      {
+        "sample_id": 34253963,
+        "level": 0
+      },
+      {
+        "sample_id": 34253965,
+        "level": 1
+      },
+      {
+        "sample_id": 34253967,
+        "level": 0
+      },
+      {
+        "sample_id": 34253970,
+        "level": 1
+      },
+      {
+        "sample_id": 34253971,
+        "level": 0
+      },
+      {
+        "sample_id": 34253973,
+        "level": 1
+      },
+      {
+        "sample_id": 34253974,
+        "level": 0
+      },
+      {
+        "sample_id": 34253977,
+        "level": 1
+      },
+      {
+        "sample_id": 34253983,
+        "level": 0
+      },
+      {
+        "sample_id": 34253987,
+        "level": 1
+      },
+      {
+        "sample_id": 34253988,
+        "level": 0
+      },
+      {
+        "sample_id": 34253993,
+        "level": 1
+      },
+      {
+        "sample_id": 34253994,
+        "level": 0
+      },
+      {
+        "sample_id": 34253995,
+        "level": 1
+      },
+      {
+        "sample_id": 34253996,
+        "level": 0
+      },
+      {
+        "sample_id": 34253997,
+        "level": 1
+      },
+      {
+        "sample_id": 34253998,
+        "level": 0
+      },
+      {
+        "sample_id": 34253999,
+        "level": 1
+      },
+      {
+        "sample_id": 34254000,
+        "level": 0
+      },
+      {
+        "sample_id": 34254001,
+        "level": 1
+      },
+      {
+        "sample_id": 34254002,
+        "level": 0
+      },
+      {
+        "sample_id": 34254004,
+        "level": 1
+      },
+      {
+        "sample_id": 34254006,
+        "level": 0
+      },
+      {
+        "sample_id": 34254007,
+        "level": 1
+      },
+      {
+        "sample_id": 34254009,
+        "level": 0
+      },
+      {
+        "sample_id": 34254010,
+        "level": 1
+      },
+      {
+        "sample_id": 34254011,
+        "level": 0
+      },
+      {
+        "sample_id": 34254012,
+        "level": 1
+      },
+      {
+        "sample_id": 34254013,
+        "level": 0
+      },
+      {
+        "sample_id": 34254014,
+        "level": 1
+      },
+      {
+        "sample_id": 34254015,
+        "level": 0
+      },
+      {
+        "sample_id": 34254019,
+        "level": 1
+      },
+      {
+        "sample_id": 34254023,
+        "level": 0
+      },
+      {
+        "sample_id": 34254025,
+        "level": 1
+      },
+      {
+        "sample_id": 34254026,
+        "level": 0
+      },
+      {
+        "sample_id": 34254030,
+        "level": 1
+      },
+      {
+        "sample_id": 34254031,
+        "level": 0
+      },
+      {
+        "sample_id": 34254033,
+        "level": 1
+      },
+      {
+        "sample_id": 34254034,
+        "level": 0
+      },
+      {
+        "sample_id": 34254036,
+        "level": 1
+      },
+      {
+        "sample_id": 34254037,
+        "level": 0
+      },
+      {
+        "sample_id": 34254046,
+        "level": 1
+      },
+      {
+        "sample_id": 34254048,
+        "level": 0
+      },
+      {
+        "sample_id": 34254049,
+        "level": 1
+      },
+      {
+        "sample_id": 34254051,
+        "level": 0
+      },
+      {
+        "sample_id": 34254053,
+        "level": 1
+      },
+      {
+        "sample_id": 34254054,
+        "level": 0
+      },
+      {
+        "sample_id": 34254056,
+        "level": 1
+      },
+      {
+        "sample_id": 34254059,
+        "level": 0
+      },
+      {
+        "sample_id": 34254060,
+        "level": 1
+      },
+      {
+        "sample_id": 34254062,
+        "level": 0
+      },
+      {
+        "sample_id": 34254063,
+        "level": 1
+      },
+      {
+        "sample_id": 34254065,
+        "level": 0
+      },
+      {
+        "sample_id": 34254067,
+        "level": 1
+      },
+      {
+        "sample_id": 34254068,
+        "level": 0
+      },
+      {
+        "sample_id": 34254073,
+        "level": 1
+      },
+      {
+        "sample_id": 34254074,
+        "level": 0
+      },
+      {
+        "sample_id": 34254075,
+        "level": 1
+      },
+      {
+        "sample_id": 34254077,
+        "level": 0
+      },
+      {
+        "sample_id": 34254079,
+        "level": 1
+      },
+      {
+        "sample_id": 34254082,
+        "level": 0
+      },
+      {
+        "sample_id": 34254083,
+        "level": 1
+      },
+      {
+        "sample_id": 34254085,
+        "level": 0
+      },
+      {
+        "sample_id": 34254086,
+        "level": 1
+      },
+      {
+        "sample_id": 34254087,
+        "level": 0
+      },
+      {
+        "sample_id": 34254089,
+        "level": 1
+      },
+      {
+        "sample_id": 34254091,
+        "level": 0
+      },
+      {
+        "sample_id": 34254093,
+        "level": 1
+      },
+      {
+        "sample_id": 34254094,
+        "level": 0
+      },
+      {
+        "sample_id": 34254096,
+        "level": 1
+      },
+      {
+        "sample_id": 34254102,
+        "level": 0
+      },
+      {
+        "sample_id": 34254103,
+        "level": 1
+      },
+      {
+        "sample_id": 34291412,
+        "level": 0
+      },
+      {
+        "sample_id": 34293558,
+        "level": 1
+      },
+      {
+        "sample_id": 34315527,
+        "level": 0
+      },
+      {
+        "sample_id": 35475515,
+        "level": 1
+      },
+      {
+        "sample_id": 35475516,
+        "level": 0
+      },
+      {
+        "sample_id": 35475517,
+        "level": 1
+      },
+      {
+        "sample_id": 35475522,
+        "level": 0
+      },
+      {
+        "sample_id": 35475523,
+        "level": 1
+      },
+      {
+        "sample_id": 35475525,
+        "level": 0
+      },
+      {
+        "sample_id": 35475528,
+        "level": 1
+      },
+      {
+        "sample_id": 35475529,
+        "level": 0
+      },
+      {
+        "sample_id": 35475530,
+        "level": 1
+      },
+      {
+        "sample_id": 35475531,
+        "level": 0
+      },
+      {
+        "sample_id": 35475532,
+        "level": 1
+      },
+      {
+        "sample_id": 35475533,
+        "level": 0
+      },
+      {
+        "sample_id": 35475535,
+        "level": 1
+      },
+      {
+        "sample_id": 35475536,
+        "level": 0
+      },
+      {
+        "sample_id": 35475537,
+        "level": 1
+      },
+      {
+        "sample_id": 35475539,
+        "level": 0
+      },
+      {
+        "sample_id": 35475542,
+        "level": 1
+      },
+      {
+        "sample_id": 35475543,
+        "level": 0
+      },
+      {
+        "sample_id": 35475544,
+        "level": 1
+      },
+      {
+        "sample_id": 35475546,
+        "level": 0
+      },
+      {
+        "sample_id": 35475550,
+        "level": 1
+      },
+      {
+        "sample_id": 35475551,
+        "level": 0
+      },
+      {
+        "sample_id": 35475554,
+        "level": 1
+      },
+      {
+        "sample_id": 35475555,
+        "level": 0
+      },
+      {
+        "sample_id": 35475556,
+        "level": 1
+      },
+      {
+        "sample_id": 35475559,
+        "level": 0
+      },
+      {
+        "sample_id": 35475569,
+        "level": 1
+      },
+      {
+        "sample_id": 35475570,
+        "level": 0
+      },
+      {
+        "sample_id": 35475571,
+        "level": 1
+      },
+      {
+        "sample_id": 35475573,
+        "level": 0
+      },
+      {
+        "sample_id": 35475576,
+        "level": 1
+      },
+      {
+        "sample_id": 35475577,
+        "level": 0
+      },
+      {
+        "sample_id": 35475578,
+        "level": 1
+      },
+      {
+        "sample_id": 35475579,
+        "level": 0
+      },
+      {
+        "sample_id": 35475580,
+        "level": 1
+      },
+      {
+        "sample_id": 35475581,
+        "level": 0
+      },
+      {
+        "sample_id": 35475582,
+        "level": 1
+      },
+      {
+        "sample_id": 35475584,
+        "level": 0
+      },
+      {
+        "sample_id": 35475585,
+        "level": 1
+      },
+      {
+        "sample_id": 35475586,
+        "level": 0
+      },
+      {
+        "sample_id": 35475587,
+        "level": 1
+      },
+      {
+        "sample_id": 35475588,
+        "level": 0
+      },
+      {
+        "sample_id": 35475589,
+        "level": 1
+      },
+      {
+        "sample_id": 35475590,
+        "level": 0
+      },
+      {
+        "sample_id": 35475591,
+        "level": 1
+      },
+      {
+        "sample_id": 35475592,
+        "level": 0
+      },
+      {
+        "sample_id": 35475593,
+        "level": 1
+      },
+      {
+        "sample_id": 35475596,
+        "level": 0
+      },
+      {
+        "sample_id": 35475597,
+        "level": 1
+      },
+      {
+        "sample_id": 35475599,
+        "level": 0
+      },
+      {
+        "sample_id": 35475602,
+        "level": 1
+      },
+      {
+        "sample_id": 35475604,
+        "level": 0
+      },
+      {
+        "sample_id": 35475607,
+        "level": 1
+      },
+      {
+        "sample_id": 35475610,
+        "level": 0
+      },
+      {
+        "sample_id": 35475611,
+        "level": 1
+      },
+      {
+        "sample_id": 35475614,
+        "level": 0
+      },
+      {
+        "sample_id": 35475615,
+        "level": 1
+      },
+      {
+        "sample_id": 35475618,
+        "level": 0
+      },
+      {
+        "sample_id": 35475635,
+        "level": 1
+      },
+      {
+        "sample_id": 35475636,
+        "level": 0
+      },
+      {
+        "sample_id": 35475638,
+        "level": 1
+      },
+      {
+        "sample_id": 35475641,
+        "level": 0
+      },
+      {
+        "sample_id": 35475646,
+        "level": 1
+      },
+      {
+        "sample_id": 35475649,
+        "level": 0
+      },
+      {
+        "sample_id": 35475651,
+        "level": 1
+      },
+      {
+        "sample_id": 35475653,
+        "level": 0
+      },
+      {
+        "sample_id": 35475654,
+        "level": 1
+      },
+      {
+        "sample_id": 35475655,
+        "level": 0
+      },
+      {
+        "sample_id": 35475657,
+        "level": 1
+      },
+      {
+        "sample_id": 35475665,
+        "level": 0
+      },
+      {
+        "sample_id": 35475669,
+        "level": 1
+      },
+      {
+        "sample_id": 35475670,
+        "level": 0
+      },
+      {
+        "sample_id": 35475671,
+        "level": 1
+      },
+      {
+        "sample_id": 35475672,
+        "level": 0
+      },
+      {
+        "sample_id": 35475673,
+        "level": 1
+      },
+      {
+        "sample_id": 35475674,
+        "level": 0
+      },
+      {
+        "sample_id": 35475675,
+        "level": 1
+      },
+      {
+        "sample_id": 35475677,
+        "level": 0
+      },
+      {
+        "sample_id": 35475678,
+        "level": 1
+      },
+      {
+        "sample_id": 35475687,
+        "level": 0
+      },
+      {
+        "sample_id": 35475688,
+        "level": 1
+      }
+    ]
+  },
+  "unclassified_gpi0_edges": 124,
+  "unclassified_pulses": [
+    {
+      "sample_id": 34278022,
+      "end_sample_id": 34278180,
+      "width_us": 79.0,
+      "matching_ids": []
+    },
+    {
+      "sample_id": 34278181,
+      "end_sample_id": 34278183,
+      "width_us": 1.0,
+      "matching_ids": []
+    },
+    {
+      "sample_id": 34278184,
+      "end_sample_id": 34278185,
+      "width_us": 0.5,
+      "matching_ids": []
+    },
+    {
+      "sample_id": 34278186,
+      "end_sample_id": 34278187,
+      "width_us": 0.5,
+      "matching_ids": []
+    },
+    {
+      "sample_id": 34278191,
+      "end_sample_id": 34278192,
+      "width_us": 0.5,
+      "matching_ids": []
+    },
+    {
+      "sample_id": 34278193,
+      "end_sample_id": 34278195,
+      "width_us": 1.0,
+      "matching_ids": []
+    },
+    {
+      "sample_id": 34278198,
+      "end_sample_id": 34278199,
+      "width_us": 0.5,
+      "matching_ids": []
+    },
+    {
+      "sample_id": 34278203,
+      "end_sample_id": 34278207,
+      "width_us": 2.0,
+      "matching_ids": [
+        1
+      ]
+    },
+    {
+      "sample_id": 34278208,
+      "end_sample_id": 34278209,
+      "width_us": 0.5,
+      "matching_ids": []
+    },
+    {
+      "sample_id": 34278210,
+      "end_sample_id": 34278211,
+      "width_us": 0.5,
+      "matching_ids": []
+    },
+    {
+      "sample_id": 34278213,
+      "end_sample_id": 34278219,
+      "width_us": 3.0,
+      "matching_ids": [
+        1
+      ]
+    },
+    {
+      "sample_id": 34278220,
+      "end_sample_id": 34278226,
+      "width_us": 3.0,
+      "matching_ids": [
+        1
+      ]
+    },
+    {
+      "sample_id": 34278227,
+      "end_sample_id": 34278228,
+      "width_us": 0.5,
+      "matching_ids": []
+    },
+    {
+      "sample_id": 34278229,
+      "end_sample_id": 34278230,
+      "width_us": 0.5,
+      "matching_ids": []
+    },
+    {
+      "sample_id": 34278231,
+      "end_sample_id": 34278232,
+      "width_us": 0.5,
+      "matching_ids": []
+    },
+    {
+      "sample_id": 34278234,
+      "end_sample_id": 34278236,
+      "width_us": 1.0,
+      "matching_ids": []
+    },
+    {
+      "sample_id": 34278237,
+      "end_sample_id": 34278239,
+      "width_us": 1.0,
+      "matching_ids": []
+    },
+    {
+      "sample_id": 34278240,
+      "end_sample_id": 34278241,
+      "width_us": 0.5,
+      "matching_ids": []
+    },
+    {
+      "sample_id": 34278243,
+      "end_sample_id": 34278244,
+      "width_us": 0.5,
+      "matching_ids": []
+    },
+    {
+      "sample_id": 34278246,
+      "end_sample_id": 34278248,
+      "width_us": 1.0,
+      "matching_ids": []
+    },
+    {
+      "sample_id": 34278250,
+      "end_sample_id": 34278251,
+      "width_us": 0.5,
+      "matching_ids": []
+    },
+    {
+      "sample_id": 34278253,
+      "end_sample_id": 34278254,
+      "width_us": 0.5,
+      "matching_ids": []
+    },
+    {
+      "sample_id": 34278259,
+      "end_sample_id": 34278261,
+      "width_us": 1.0,
+      "matching_ids": []
+    },
+    {
+      "sample_id": 34278262,
+      "end_sample_id": 34278263,
+      "width_us": 0.5,
+      "matching_ids": []
+    },
+    {
+      "sample_id": 34278265,
+      "end_sample_id": 34278266,
+      "width_us": 0.5,
+      "matching_ids": []
+    },
+    {
+      "sample_id": 34278267,
+      "end_sample_id": 34278268,
+      "width_us": 0.5,
+      "matching_ids": []
+    },
+    {
+      "sample_id": 34278269,
+      "end_sample_id": 34278270,
+      "width_us": 0.5,
+      "matching_ids": []
+    },
+    {
+      "sample_id": 34278277,
+      "end_sample_id": 34278278,
+      "width_us": 0.5,
+      "matching_ids": []
+    },
+    {
+      "sample_id": 34278279,
+      "end_sample_id": 34278280,
+      "width_us": 0.5,
+      "matching_ids": []
+    },
+    {
+      "sample_id": 34278281,
+      "end_sample_id": 34278282,
+      "width_us": 0.5,
+      "matching_ids": []
+    },
+    {
+      "sample_id": 34278283,
+      "end_sample_id": 34278285,
+      "width_us": 1.0,
+      "matching_ids": []
+    },
+    {
+      "sample_id": 34278286,
+      "end_sample_id": 34278287,
+      "width_us": 0.5,
+      "matching_ids": []
+    },
+    {
+      "sample_id": 34278288,
+      "end_sample_id": 34278289,
+      "width_us": 0.5,
+      "matching_ids": []
+    },
+    {
+      "sample_id": 34278294,
+      "end_sample_id": 34278296,
+      "width_us": 1.0,
+      "matching_ids": []
+    },
+    {
+      "sample_id": 34278297,
+      "end_sample_id": 34278299,
+      "width_us": 1.0,
+      "matching_ids": []
+    },
+    {
+      "sample_id": 34278300,
+      "end_sample_id": 34278301,
+      "width_us": 0.5,
+      "matching_ids": []
+    },
+    {
+      "sample_id": 34278304,
+      "end_sample_id": 34278305,
+      "width_us": 0.5,
+      "matching_ids": []
+    },
+    {
+      "sample_id": 34278306,
+      "end_sample_id": 34278308,
+      "width_us": 1.0,
+      "matching_ids": []
+    },
+    {
+      "sample_id": 34278311,
+      "end_sample_id": 34278316,
+      "width_us": 2.5,
+      "matching_ids": [
+        1
+      ]
+    },
+    {
+      "sample_id": 34278318,
+      "end_sample_id": 34278319,
+      "width_us": 0.5,
+      "matching_ids": []
+    },
+    {
+      "sample_id": 34278322,
+      "end_sample_id": 34278323,
+      "width_us": 0.5,
+      "matching_ids": []
+    },
+    {
+      "sample_id": 34278324,
+      "end_sample_id": 34278325,
+      "width_us": 0.5,
+      "matching_ids": []
+    },
+    {
+      "sample_id": 34278329,
+      "end_sample_id": 34278330,
+      "width_us": 0.5,
+      "matching_ids": []
+    },
+    {
+      "sample_id": 34278332,
+      "end_sample_id": 34278333,
+      "width_us": 0.5,
+      "matching_ids": []
+    },
+    {
+      "sample_id": 34278335,
+      "end_sample_id": 34278338,
+      "width_us": 1.5,
+      "matching_ids": [
+        1
+      ]
+    },
+    {
+      "sample_id": 34278339,
+      "end_sample_id": 34278340,
+      "width_us": 0.5,
+      "matching_ids": []
+    },
+    {
+      "sample_id": 34278344,
+      "end_sample_id": 34278345,
+      "width_us": 0.5,
+      "matching_ids": []
+    },
+    {
+      "sample_id": 34278349,
+      "end_sample_id": 34278350,
+      "width_us": 0.5,
+      "matching_ids": []
+    },
+    {
+      "sample_id": 34278357,
+      "end_sample_id": 34278358,
+      "width_us": 0.5,
+      "matching_ids": []
+    },
+    {
+      "sample_id": 34278359,
+      "end_sample_id": 34278361,
+      "width_us": 1.0,
+      "matching_ids": []
+    },
+    {
+      "sample_id": 34278368,
+      "end_sample_id": 34278369,
+      "width_us": 0.5,
+      "matching_ids": []
+    },
+    {
+      "sample_id": 34278372,
+      "end_sample_id": 34278373,
+      "width_us": 0.5,
+      "matching_ids": []
+    },
+    {
+      "sample_id": 34278384,
+      "end_sample_id": 34278385,
+      "width_us": 0.5,
+      "matching_ids": []
+    },
+    {
+      "sample_id": 34278386,
+      "end_sample_id": 34278388,
+      "width_us": 1.0,
+      "matching_ids": []
+    },
+    {
+      "sample_id": 34278389,
+      "end_sample_id": 34278391,
+      "width_us": 1.0,
+      "matching_ids": []
+    },
+    {
+      "sample_id": 34278392,
+      "end_sample_id": 34278393,
+      "width_us": 0.5,
+      "matching_ids": []
+    },
+    {
+      "sample_id": 34278397,
+      "end_sample_id": 34278398,
+      "width_us": 0.5,
+      "matching_ids": []
+    },
+    {
+      "sample_id": 34278406,
+      "end_sample_id": 34278407,
+      "width_us": 0.5,
+      "matching_ids": []
+    },
+    {
+      "sample_id": 34278413,
+      "end_sample_id": 34278415,
+      "width_us": 1.0,
+      "matching_ids": []
+    },
+    {
+      "sample_id": 34278420,
+      "end_sample_id": 34278422,
+      "width_us": 1.0,
+      "matching_ids": []
+    },
+    {
+      "sample_id": 34278423,
+      "end_sample_id": 34278425,
+      "width_us": 1.0,
+      "matching_ids": []
+    },
+    {
+      "sample_id": 34278434,
+      "end_sample_id": 34278435,
+      "width_us": 0.5,
+      "matching_ids": []
+    }
+  ],
+  "onset_sample_id": 34243416,
+  "onset_definition": "First >=20mA native sample in500ms before receiver marker; preceding1ms finite with absolute mean<100uA.",
+  "plateau_sample_id": 35500000,
+  "plateau_definition": "First whole1ms bin after marker10 with10 consecutive bin means6..12mA;1ms endpoint resolution.",
+  "first5ms_raw_unqualified": {
+    "start_sample_id": 34243416,
+    "end_sample_id_exclusive": 34253416,
+    "start_ms": 0.0,
+    "end_ms": 5.0,
+    "duration_ms": 5.0,
+    "current_mean": 0.18577841231087222,
+    "current_min": -0.5102587938308716,
+    "current_max": 7.830845832824707,
+    "voltage_mean": 5.100516828155517,
+    "voltage_min": 1.8053138256072998,
+    "voltage_max": 5.802547931671143,
+    "power_mean": 0.7347485539987684,
+    "power_min": -2.894782543182373,
+    "power_max": 23.21616554260254,
+    "energy_mJ": 3.6737427699938414,
+    "current_mean_mA": 185.77841231087223,
+    "finite": true
+  },
+  "whole_cycle_raw_unqualified": {
+    "start_sample_id": 34243416,
+    "end_sample_id_exclusive": 35500000,
+    "start_ms": 0.0,
+    "end_ms": 628.2919999999999,
+    "duration_ms": 628.2919999999999,
+    "current_mean": 0.08655618030352936,
+    "current_min": -0.5102587938308716,
+    "current_max": 7.830845832824707,
+    "voltage_mean": 4.979511751742482,
+    "voltage_min": 1.8053138256072998,
+    "voltage_max": 5.802547931671143,
+    "power_mean": 0.4293145735684201,
+    "power_min": -2.894782543182373,
+    "power_max": 23.21616554260254,
+    "energy_mJ": 269.7349120564498,
+    "current_mean_mA": 86.55618030352936,
+    "finite": true
+  },
+  "post5ms_to_plateau": {
+    "start_sample_id": 34253416,
+    "end_sample_id_exclusive": 35500000,
+    "start_ms": 5.0,
+    "end_ms": 628.2919999999999,
+    "duration_ms": 623.2919999999999,
+    "current_mean": 0.08576022726701243,
+    "current_min": 0.0046803634613752365,
+    "current_max": 0.14983657002449036,
+    "voltage_mean": 4.9785410584204675,
+    "voltage_min": 4.953618049621582,
+    "voltage_max": 5.0330634117126465,
+    "power_mean": 0.4268644059067916,
+    "power_min": 0.023413147777318954,
+    "power_max": 0.7435935735702515,
+    "energy_mJ": 266.06116928645594,
+    "current_mean_mA": 85.76022726701244,
+    "finite": true
+  },
+  "post5ms_to_pre_WFI": {
+    "start_sample_id": 34253416,
+    "end_sample_id_exclusive": 35458603,
+    "start_ms": 5.0,
+    "end_ms": 607.5935000000001,
+    "duration_ms": 602.5935,
+    "current_mean": 0.0877541120761657,
+    "current_min": 0.0359063446521759,
+    "current_max": 0.14983657002449036,
+    "voltage_mean": 4.978141627134734,
+    "voltage_min": 4.953618049621582,
+    "voltage_max": 5.0330634117126465,
+    "power_mean": 0.4367767610831599,
+    "power_min": 0.1797001212835312,
+    "power_max": 0.7435935735702515,
+    "energy_mJ": 263.1988371797651,
+    "current_mean_mA": 87.7541120761657,
+    "finite": true
+  },
+  "low_plateau_100ms": {
+    "start_sample_id": 35500000,
+    "end_sample_id_exclusive": 35700000,
+    "start_ms": 628.2919999999999,
+    "end_ms": 728.292,
+    "duration_ms": 100.0,
+    "current_mean": 0.00854840129555203,
+    "current_min": 0.0063812825828790665,
+    "current_max": 0.009801055304706097,
+    "voltage_mean": 4.994248291165829,
+    "voltage_min": 4.988801002502441,
+    "voltage_max": 5.002419948577881,
+    "power_mean": 0.04269280910175294,
+    "power_min": 0.031892888247966766,
+    "power_max": 0.04894000664353371,
+    "energy_mJ": 4.2692809101752935,
+    "current_mean_mA": 8.54840129555203,
+    "finite": true
+  },
+  "segments_disjoint": [
+    {
+      "name": "post5ms_begin -> receiver_entry",
+      "start_sample_id": 34253416,
+      "end_sample_id_exclusive": 34291300,
+      "start_ms": 5.0,
+      "end_ms": 23.942,
+      "duration_ms": 18.942,
+      "current_mean": 0.07147388618367455,
+      "current_min": 0.0359063446521759,
+      "current_max": 0.1374548077583313,
+      "voltage_mean": 4.988726748935323,
+      "voltage_min": 4.963832378387451,
+      "voltage_max": 5.0330634117126465,
+      "power_mean": 0.3563177823389474,
+      "power_min": 0.1797001212835312,
+      "power_max": 0.6827905178070068,
+      "energy_mJ": 6.749371433064342,
+      "current_mean_mA": 71.47388618367455,
+      "finite": true
+    },
+    {
+      "name": "receiver_entry -> first_strobe_irq_observed",
+      "start_sample_id": 34291300,
+      "end_sample_id_exclusive": 34293569,
+      "start_ms": 23.942,
+      "end_ms": 25.076500000000003,
+      "duration_ms": 1.1345,
+      "current_mean": 0.12150901282816114,
+      "current_min": 0.11455456912517548,
+      "current_max": 0.14238347113132477,
+      "voltage_mean": 4.9715333564946596,
+      "voltage_min": 4.964967250823975,
+      "voltage_max": 4.976316452026367,
+      "power_mean": 0.6040786981004721,
+      "power_min": 0.5695397257804871,
+      "power_max": 0.7070909142494202,
+      "energy_mJ": 0.6853272829949857,
+      "current_mean_mA": 121.50901282816113,
+      "finite": true
+    },
+    {
+      "name": "first_strobe_irq_observed -> sd_initialization_begin",
+      "start_sample_id": 34293569,
+      "end_sample_id_exclusive": 34316901,
+      "start_ms": 25.076500000000003,
+      "end_ms": 36.7425,
+      "duration_ms": 11.665999999999999,
+      "current_mean": 0.12164945291639774,
+      "current_min": 0.08720650523900986,
+      "current_max": 0.14385606348514557,
+      "voltage_mean": 4.9726250606970455,
+      "voltage_min": 4.963832378387451,
+      "voltage_max": 4.986530780792236,
+      "power_mean": 0.6048998301518264,
+      "power_min": 0.43426409363746643,
+      "power_max": 0.714730441570282,
+      "energy_mJ": 7.056761418551207,
+      "current_mean_mA": 121.64945291639773,
+      "finite": true
+    },
+    {
+      "name": "sd_initialization_begin -> first_frame_complete_irq_observed",
+      "start_sample_id": 34316901,
+      "end_sample_id_exclusive": 34337296,
+      "start_ms": 36.7425,
+      "end_ms": 46.940000000000005,
+      "duration_ms": 10.1975,
+      "current_mean": 0.12523237734331633,
+      "current_min": 0.11278145015239716,
+      "current_max": 0.1444571167230606,
+      "voltage_mean": 4.970918747630006,
+      "voltage_min": 4.960427284240723,
+      "voltage_max": 4.976316452026367,
+      "power_mean": 0.6225058162203604,
+      "power_min": 0.5607241988182068,
+      "power_max": 0.7170756459236145,
+      "energy_mJ": 6.348003060907125,
+      "current_mean_mA": 125.23237734331633,
+      "finite": true
+    },
+    {
+      "name": "first_frame_complete_irq_observed -> sensor_autonomous_standby_first_observed",
+      "start_sample_id": 34337296,
+      "end_sample_id_exclusive": 34343455,
+      "start_ms": 46.940000000000005,
+      "end_ms": 50.0195,
+      "duration_ms": 3.0795000000000003,
+      "current_mean": 0.083212121056381,
+      "current_min": 0.04218738153576851,
+      "current_max": 0.1274321973323822,
+      "voltage_mean": 4.97952513989738,
+      "voltage_min": 4.9672369956970215,
+      "voltage_max": 4.994475364685059,
+      "power_mean": 0.4142433695276172,
+      "power_min": 0.21051234006881714,
+      "power_max": 0.6338537335395813,
+      "energy_mJ": 1.2756624564602972,
+      "current_mean_mA": 83.212121056381,
+      "finite": true
+    },
+    {
+      "name": "sensor_autonomous_standby_first_observed -> sd_initialization_complete",
+      "start_sample_id": 34343455,
+      "end_sample_id_exclusive": 34503094,
+      "start_ms": 50.0195,
+      "end_ms": 129.839,
+      "duration_ms": 79.8195,
+      "current_mean": 0.08303474616903285,
+      "current_min": 0.0403541624546051,
+      "current_max": 0.14983657002449036,
+      "voltage_mean": 4.978771489327208,
+      "voltage_min": 4.953618049621582,
+      "voltage_max": 4.994475364685059,
+      "power_mean": 0.41326295959711207,
+      "power_min": 0.20145627856254578,
+      "power_max": 0.7435935735702515,
+      "energy_mJ": 32.98644280356169,
+      "current_mean_mA": 83.03474616903284,
+      "finite": true
+    },
+    {
+      "name": "sd_initialization_complete -> first_slot_transport_submission",
+      "start_sample_id": 34503094,
+      "end_sample_id_exclusive": 34695416,
+      "start_ms": 129.839,
+      "end_ms": 226.0,
+      "duration_ms": 96.161,
+      "current_mean": 0.07019919107799169,
+      "current_min": 0.05351729691028595,
+      "current_max": 0.10400602966547012,
+      "voltage_mean": 4.981217464208764,
+      "voltage_min": 4.9672369956970215,
+      "voltage_max": 4.992205619812012,
+      "power_mean": 0.3496514075313657,
+      "power_min": 0.26704785227775574,
+      "power_max": 0.5170947909355164,
+      "energy_mJ": 33.62282899962366,
+      "current_mean_mA": 70.19919107799169,
+      "finite": true
+    },
+    {
+      "name": "first_slot_transport_submission -> slot_transport_returned_success",
+      "start_sample_id": 34695416,
+      "end_sample_id_exclusive": 35457519,
+      "start_ms": 226.0,
+      "end_ms": 607.0514999999999,
+      "duration_ms": 381.0515,
+      "current_mean": 0.09190948587358108,
+      "current_min": 0.059167224913835526,
+      "current_max": 0.11882206797599792,
+      "voltage_mean": 4.9770716597752935,
+      "voltage_min": 4.962697505950928,
+      "voltage_max": 4.992205619812012,
+      "power_mean": 0.45741325950585265,
+      "power_min": 0.29510635137557983,
+      "power_max": 0.5907567739486694,
+      "energy_mJ": 174.2980086545944,
+      "current_mean_mA": 91.90948587358108,
+      "finite": true
+    },
+    {
+      "name": "slot_transport_returned_success -> full_slot_commit_complete",
+      "start_sample_id": 35457519,
+      "end_sample_id_exclusive": 35457849,
+      "start_ms": 607.0514999999999,
+      "end_ms": 607.2165,
+      "duration_ms": 0.165,
+      "current_mean": 0.07266362643603122,
+      "current_min": 0.06088023632764816,
+      "current_max": 0.08086536079645157,
+      "voltage_mean": 4.979962171207775,
+      "voltage_min": 4.97404670715332,
+      "voltage_max": 4.985395908355713,
+      "power_mean": 0.3618488430976868,
+      "power_min": 0.3035120964050293,
+      "power_max": 0.402595192193985,
+      "energy_mJ": 0.059705059111118314,
+      "current_mean_mA": 72.66362643603122,
+      "finite": true
+    },
+    {
+      "name": "full_slot_commit_complete -> sd_deinitialization_complete",
+      "start_sample_id": 35457849,
+      "end_sample_id_exclusive": 35457978,
+      "start_ms": 607.2165,
+      "end_ms": 607.281,
+      "duration_ms": 0.0645,
+      "current_mean": 0.07157519442397495,
+      "current_min": 0.06547831743955612,
+      "current_max": 0.07795023918151855,
+      "voltage_mean": 4.981525021930073,
+      "voltage_min": 4.976316452026367,
+      "voltage_max": 4.987666130065918,
+      "power_mean": 0.35654807599015936,
+      "power_min": 0.3264353275299072,
+      "power_max": 0.38808199763298035,
+      "energy_mJ": 0.02299735090136528,
+      "current_mean_mA": 71.57519442397495,
+      "finite": true
+    },
+    {
+      "name": "sd_deinitialization_complete -> pre_standby_wfi",
+      "start_sample_id": 35457978,
+      "end_sample_id_exclusive": 35458603,
+      "start_ms": 607.281,
+      "end_ms": 607.5935000000001,
+      "duration_ms": 0.3125,
+      "current_mean": 0.06017889888286591,
+      "current_min": 0.0496404804289341,
+      "current_max": 0.07314178347587585,
+      "voltage_mean": 4.984183068847656,
+      "voltage_min": 4.976316452026367,
+      "voltage_max": 4.989935874938965,
+      "power_mean": 0.29993171198368074,
+      "power_min": 0.2474774569272995,
+      "power_max": 0.3643087148666382,
+      "energy_mJ": 0.09372865999490022,
+      "current_mean_mA": 60.17889888286591,
+      "finite": true
+    },
+    {
+      "name": "pre_standby_wfi -> low_plateau",
+      "start_sample_id": 35458603,
+      "end_sample_id_exclusive": 35500000,
+      "start_ms": 607.5935000000001,
+      "end_ms": 628.2919999999999,
+      "duration_ms": 20.698500000000003,
+      "current_mean": 0.027712444783040528,
+      "current_min": 0.0046803634613752365,
+      "current_max": 0.06734158843755722,
+      "voltage_mean": 4.990169664187993,
+      "voltage_min": 4.976316452026367,
+      "voltage_max": 5.006959915161133,
+      "power_mean": 0.13828693415903828,
+      "power_min": 0.023413147777318954,
+      "power_max": 0.33541879057884216,
+      "energy_mJ": 2.862332106690854,
+      "current_mean_mA": 27.712444783040528,
+      "finite": true
+    }
+  ],
+  "phase_windows_overlapping_not_additive": {
+    "receiver_to_strobe": {
+      "start_sample_id": 34291300,
+      "end_sample_id_exclusive": 34293569,
+      "start_ms": 23.942,
+      "end_ms": 25.076500000000003,
+      "duration_ms": 1.1345,
+      "current_mean": 0.12150901282816114,
+      "current_min": 0.11455456912517548,
+      "current_max": 0.14238347113132477,
+      "voltage_mean": 4.9715333564946596,
+      "voltage_min": 4.964967250823975,
+      "voltage_max": 4.976316452026367,
+      "power_mean": 0.6040786981004721,
+      "power_min": 0.5695397257804871,
+      "power_max": 0.7070909142494202,
+      "energy_mJ": 0.6853272829949857,
+      "current_mean_mA": 121.50901282816113,
+      "finite": true
+    },
+    "strobe_to_frame_complete": {
+      "start_sample_id": 34293569,
+      "end_sample_id_exclusive": 34337296,
+      "start_ms": 25.076500000000003,
+      "end_ms": 46.940000000000005,
+      "duration_ms": 21.863500000000002,
+      "current_mean": 0.12332058845478373,
+      "current_min": 0.08720650523900986,
+      "current_max": 0.1444571167230606,
+      "voltage_mean": 4.971829207905812,
+      "voltage_min": 4.960427284240723,
+      "voltage_max": 4.986530780792236,
+      "power_mean": 0.6131115548497876,
+      "power_min": 0.43426409363746643,
+      "power_max": 0.7170756459236145,
+      "energy_mJ": 13.404764479458333,
+      "current_mean_mA": 123.32058845478373,
+      "finite": true
+    },
+    "SD_initialization": {
+      "start_sample_id": 34316901,
+      "end_sample_id_exclusive": 34503094,
+      "start_ms": 36.7425,
+      "end_ms": 129.839,
+      "duration_ms": 93.09649999999999,
+      "current_mean": 0.08766281027311136,
+      "current_min": 0.0403541624546051,
+      "current_max": 0.14983657002449036,
+      "voltage_mean": 4.977936254205304,
+      "voltage_min": 4.953618049621582,
+      "voltage_max": 4.994475364685059,
+      "power_mean": 0.4362151995072759,
+      "power_min": 0.20145627856254578,
+      "power_max": 0.7435935735702515,
+      "energy_mJ": 40.61010832092911,
+      "current_mean_mA": 87.66281027311136,
+      "finite": true
+    },
+    "SD_ready_to_first_submission": {
+      "start_sample_id": 34503094,
+      "end_sample_id_exclusive": 34695416,
+      "start_ms": 129.839,
+      "end_ms": 226.0,
+      "duration_ms": 96.161,
+      "current_mean": 0.07019919107799169,
+      "current_min": 0.05351729691028595,
+      "current_max": 0.10400602966547012,
+      "voltage_mean": 4.981217464208764,
+      "voltage_min": 4.9672369956970215,
+      "voltage_max": 4.992205619812012,
+      "power_mean": 0.3496514075313657,
+      "power_min": 0.26704785227775574,
+      "power_max": 0.5170947909355164,
+      "energy_mJ": 33.62282899962366,
+      "current_mean_mA": 70.19919107799169,
+      "finite": true
+    },
+    "slot_transport": {
+      "start_sample_id": 34695416,
+      "end_sample_id_exclusive": 35457519,
+      "start_ms": 226.0,
+      "end_ms": 607.0514999999999,
+      "duration_ms": 381.0515,
+      "current_mean": 0.09190948587358108,
+      "current_min": 0.059167224913835526,
+      "current_max": 0.11882206797599792,
+      "voltage_mean": 4.9770716597752935,
+      "voltage_min": 4.962697505950928,
+      "voltage_max": 4.992205619812012,
+      "power_mean": 0.45741325950585265,
+      "power_min": 0.29510635137557983,
+      "power_max": 0.5907567739486694,
+      "energy_mJ": 174.2980086545944,
+      "current_mean_mA": 91.90948587358108,
+      "finite": true
+    },
+    "post_transport_commit": {
+      "start_sample_id": 35457519,
+      "end_sample_id_exclusive": 35457849,
+      "start_ms": 607.0514999999999,
+      "end_ms": 607.2165,
+      "duration_ms": 0.165,
+      "current_mean": 0.07266362643603122,
+      "current_min": 0.06088023632764816,
+      "current_max": 0.08086536079645157,
+      "voltage_mean": 4.979962171207775,
+      "voltage_min": 4.97404670715332,
+      "voltage_max": 4.985395908355713,
+      "power_mean": 0.3618488430976868,
+      "power_min": 0.3035120964050293,
+      "power_max": 0.402595192193985,
+      "energy_mJ": 0.059705059111118314,
+      "current_mean_mA": 72.66362643603122,
+      "finite": true
+    },
+    "storage_deinit": {
+      "start_sample_id": 35457849,
+      "end_sample_id_exclusive": 35457978,
+      "start_ms": 607.2165,
+      "end_ms": 607.281,
+      "duration_ms": 0.0645,
+      "current_mean": 0.07157519442397495,
+      "current_min": 0.06547831743955612,
+      "current_max": 0.07795023918151855,
+      "voltage_mean": 4.981525021930073,
+      "voltage_min": 4.976316452026367,
+      "voltage_max": 4.987666130065918,
+      "power_mean": 0.35654807599015936,
+      "power_min": 0.3264353275299072,
+      "power_max": 0.38808199763298035,
+      "energy_mJ": 0.02299735090136528,
+      "current_mean_mA": 71.57519442397495,
+      "finite": true
+    },
+    "cleanup_to_pre_WFI": {
+      "start_sample_id": 35457978,
+      "end_sample_id_exclusive": 35458603,
+      "start_ms": 607.281,
+      "end_ms": 607.5935000000001,
+      "duration_ms": 0.3125,
+      "current_mean": 0.06017889888286591,
+      "current_min": 0.0496404804289341,
+      "current_max": 0.07314178347587585,
+      "voltage_mean": 4.984183068847656,
+      "voltage_min": 4.976316452026367,
+      "voltage_max": 4.989935874938965,
+      "power_mean": 0.29993171198368074,
+      "power_min": 0.2474774569272995,
+      "power_max": 0.3643087148666382,
+      "energy_mJ": 0.09372865999490022,
+      "current_mean_mA": 60.17889888286591,
+      "finite": true
+    },
+    "pre_WFI_to_low_plateau": {
+      "start_sample_id": 35458603,
+      "end_sample_id_exclusive": 35500000,
+      "start_ms": 607.5935000000001,
+      "end_ms": 628.2919999999999,
+      "duration_ms": 20.698500000000003,
+      "current_mean": 0.027712444783040528,
+      "current_min": 0.0046803634613752365,
+      "current_max": 0.06734158843755722,
+      "voltage_mean": 4.990169664187993,
+      "voltage_min": 4.976316452026367,
+      "voltage_max": 5.006959915161133,
+      "power_mean": 0.13828693415903828,
+      "power_min": 0.023413147777318954,
+      "power_max": 0.33541879057884216,
+      "energy_mJ": 2.862332106690854,
+      "current_mean_mA": 27.712444783040528,
+      "finite": true
+    }
+  },
+  "capture_SD_init_overlap_ms": 10.1975,
+  "peaks_1ms": [
+    {
+      "start_sample_id": 34323416,
+      "end_sample_id_exclusive": 34325416,
+      "start_ms": 40.0,
+      "end_ms": 41.0,
+      "duration_ms": 1.0,
+      "current_mean": 0.13316786976903677,
+      "current_min": 0.11984386295080185,
+      "current_max": 0.13877713680267334,
+      "voltage_mean": 4.969420830249787,
+      "voltage_min": 4.964967250823975,
+      "voltage_max": 4.976316452026367,
+      "power_mean": 0.6617607045471668,
+      "power_min": 0.595714271068573,
+      "power_max": 0.6893389225006104,
+      "energy_mJ": 0.6617607045471668,
+      "current_mean_mA": 133.16786976903677,
+      "finite": true,
+      "overlapping_phases": [
+        {
+          "name": "sd_initialization_begin -> first_frame_complete_irq_observed",
+          "overlap_ms": 1.0
+        }
+      ]
+    },
+    {
+      "start_sample_id": 34330216,
+      "end_sample_id_exclusive": 34332216,
+      "start_ms": 43.4,
+      "end_ms": 44.4,
+      "duration_ms": 1.0,
+      "current_mean": 0.13261991677060722,
+      "current_min": 0.12420152127742767,
+      "current_max": 0.1444571167230606,
+      "voltage_mean": 4.969398113965988,
+      "voltage_min": 4.960427284240723,
+      "voltage_max": 4.976316452026367,
+      "power_mean": 0.6590290638208389,
+      "power_min": 0.6175022721290588,
+      "power_max": 0.7170756459236145,
+      "energy_mJ": 0.6590290638208389,
+      "current_mean_mA": 132.61991677060723,
+      "finite": true,
+      "overlapping_phases": [
+        {
+          "name": "sd_initialization_begin -> first_frame_complete_irq_observed",
+          "overlap_ms": 1.0
+        }
+      ]
+    },
+    {
+      "start_sample_id": 34327816,
+      "end_sample_id_exclusive": 34329816,
+      "start_ms": 42.2,
+      "end_ms": 43.2,
+      "duration_ms": 1.0,
+      "current_mean": 0.13201525390148164,
+      "current_min": 0.12507306039333344,
+      "current_max": 0.14385606348514557,
+      "voltage_mean": 4.96951842045784,
+      "voltage_min": 4.960427284240723,
+      "voltage_max": 4.976316452026367,
+      "power_mean": 0.6560423975288868,
+      "power_min": 0.6218352913856506,
+      "power_max": 0.7142406702041626,
+      "energy_mJ": 0.6560423975288868,
+      "current_mean_mA": 132.01525390148163,
+      "finite": true,
+      "overlapping_phases": [
+        {
+          "name": "sd_initialization_begin -> first_frame_complete_irq_observed",
+          "overlap_ms": 1.0
+        }
+      ]
+    }
+  ],
+  "whole_session_finite": false,
+  "qualification": "Post5ms window finite/contiguous, native power integrated; first5ms and whole-cycle integrals remain provisional. Markers establish firmware observations, not independent image integrity or Standby flags. Auto-stop frame count and autonomous FSM2 must be qualified from retained AST/sensor/STROBE evidence; the receiver snapshot and one phase2 marker cannot count all sensor exposures.",
+  "limits": [
+    "Input-side JS voltage, not target voltage after sense/wire drops.",
+    "Final packed GPIO chunk excluded; all remaining unmatched edges preserved.",
+    "Normal flash cycles include camera, card and populated Nucleo support loads.",
+    "Card initialization, slot scan and write latency can vary; report each run and interval rather than attributing every time change to PHY power-down.",
+    "Native extrema are retained but not qualified physical peaks."
+  ],
+  "frame_IRQ_to_standby_observation_ms": 3.0795000000000003,
+  "standby_marker_qualification": "Marker11 follows the first firmware I2C observation of sensor FSM2. It is an upper bound on autonomous standby transition time, with polling/service latency. AST proof and no-STOP audit are separate required evidence.",
+  "external_strobe": {
+    "pulses": [
+      {
+        "rise_sample_id": 34293558,
+        "fall_sample_id": 34315527,
+        "rise_ms": 25.070999999999998,
+        "fall_ms": 36.055499999999995,
+        "duration_ms": 10.984499999999999
+      }
+    ],
+    "complete_pulses": 1,
+    "first_rise_minus_phase2_us": -5.5,
+    "explicit_mirror_low_sample_id": 34291412,
+    "window_begin_sample_id": 34291612,
+    "window_end_sample_id": 35457849,
+    "scope": "PD0 exposure IRQ envelopes qualified from explicit post-entry LOW through commit8, following the stable sensor check. PD0 remains driven LOW through10, but IRQs are disabled after8/9 during shutdown, so that final LOW is continuity only, not continuing sensor monitoring.",
+    "qualified_exposure_pulses": [
+      {
+        "rise_sample_id": 34293558,
+        "fall_sample_id": 34315527,
+        "rise_ms": 25.070999999999998,
+        "fall_ms": 36.055499999999995,
+        "duration_ms": 10.984499999999999
+      }
+    ],
+    "qualified_observation_end_sample_id": 35457849,
+    "post_commit_envelopes_before_pre_Standby": [],
+    "continuity_end_sample_id": 35458603
+  },
+  "autostop_phase_windows_overlapping_not_additive": {
+    "camera_strobe_to_frame_IRQ": {
+      "start_sample_id": 34293569,
+      "end_sample_id_exclusive": 34337296,
+      "start_ms": 25.076500000000003,
+      "end_ms": 46.940000000000005,
+      "duration_ms": 21.863500000000002,
+      "current_mean": 0.12332058845478373,
+      "current_min": 0.08720650523900986,
+      "current_max": 0.1444571167230606,
+      "voltage_mean": 4.971829207905812,
+      "voltage_min": 4.960427284240723,
+      "voltage_max": 4.986530780792236,
+      "power_mean": 0.6131115548497876,
+      "power_min": 0.43426409363746643,
+      "power_max": 0.7170756459236145,
+      "energy_mJ": 13.404764479458333,
+      "current_mean_mA": 123.32058845478373,
+      "finite": true,
+      "peaks_1ms": [
+        {
+          "start_sample_id": 34323369,
+          "end_sample_id_exclusive": 34325369,
+          "start_ms": 39.9765,
+          "end_ms": 40.9765,
+          "duration_ms": 1.0,
+          "current_mean": 0.13315410559624433,
+          "current_min": 0.11984386295080185,
+          "current_max": 0.13877713680267334,
+          "voltage_mean": 4.969428774356842,
+          "voltage_min": 4.964967250823975,
+          "voltage_max": 4.976316452026367,
+          "power_mean": 0.6616932349205017,
+          "power_min": 0.595714271068573,
+          "power_max": 0.6893389225006104,
+          "energy_mJ": 0.6616932349205018,
+          "current_mean_mA": 133.15410559624434,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "sd_initialization_begin -> first_frame_complete_irq_observed",
+              "overlap_ms": 1.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 34330169,
+          "end_sample_id_exclusive": 34332169,
+          "start_ms": 43.3765,
+          "end_ms": 44.3765,
+          "duration_ms": 1.0,
+          "current_mean": 0.13261573943123223,
+          "current_min": 0.12420152127742767,
+          "current_max": 0.1444571167230606,
+          "voltage_mean": 4.969364065408707,
+          "voltage_min": 4.960427284240723,
+          "voltage_max": 4.976316452026367,
+          "power_mean": 0.6590036116540432,
+          "power_min": 0.6175022721290588,
+          "power_max": 0.7170756459236145,
+          "energy_mJ": 0.6590036116540432,
+          "current_mean_mA": 132.6157394312322,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "sd_initialization_begin -> first_frame_complete_irq_observed",
+              "overlap_ms": 1.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 34327769,
+          "end_sample_id_exclusive": 34329769,
+          "start_ms": 42.1765,
+          "end_ms": 43.1765,
+          "duration_ms": 1.0,
+          "current_mean": 0.1317276333682239,
+          "current_min": 0.11906249076128006,
+          "current_max": 0.14385606348514557,
+          "voltage_mean": 4.969597867965698,
+          "voltage_min": 4.960427284240723,
+          "voltage_max": 4.976316452026367,
+          "power_mean": 0.654623168349266,
+          "power_min": 0.5922223925590515,
+          "power_max": 0.7142406702041626,
+          "energy_mJ": 0.654623168349266,
+          "current_mean_mA": 131.7276333682239,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "sd_initialization_begin -> first_frame_complete_irq_observed",
+              "overlap_ms": 1.0
+            }
+          ]
+        }
+      ],
+      "peaks_10ms": [
+        {
+          "start_sample_id": 34317169,
+          "end_sample_id_exclusive": 34337169,
+          "start_ms": 36.8765,
+          "end_ms": 46.8765,
+          "duration_ms": 10.0,
+          "current_mean": 0.12535176453515887,
+          "current_min": 0.11317213624715805,
+          "current_max": 0.1444571167230606,
+          "voltage_mean": 4.970893853831291,
+          "voltage_min": 4.960427284240723,
+          "voltage_max": 4.976316452026367,
+          "power_mean": 0.6230962073981762,
+          "power_min": 0.5626665949821472,
+          "power_max": 0.7170756459236145,
+          "energy_mJ": 6.230962073981762,
+          "current_mean_mA": 125.35176453515886,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "sd_initialization_begin -> first_frame_complete_irq_observed",
+              "overlap_ms": 10.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 34293569,
+          "end_sample_id_exclusive": 34313569,
+          "start_ms": 25.076500000000003,
+          "end_ms": 35.076499999999996,
+          "duration_ms": 10.0,
+          "current_mean": 0.12492815879546106,
+          "current_min": 0.1192728579044342,
+          "current_max": 0.14385606348514557,
+          "voltage_mean": 4.972038768792152,
+          "voltage_min": 4.963832378387451,
+          "voltage_max": 4.977451324462891,
+          "power_mean": 0.6211454123497009,
+          "power_min": 0.5931333899497986,
+          "power_max": 0.714730441570282,
+          "energy_mJ": 6.21145412349701,
+          "current_mean_mA": 124.92815879546106,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "first_strobe_irq_observed -> sd_initialization_begin",
+              "overlap_ms": 10.0
+            }
+          ]
+        }
+      ]
+    },
+    "SD_initialization": {
+      "start_sample_id": 34316901,
+      "end_sample_id_exclusive": 34503094,
+      "start_ms": 36.7425,
+      "end_ms": 129.839,
+      "duration_ms": 93.09649999999999,
+      "current_mean": 0.08766281027311136,
+      "current_min": 0.0403541624546051,
+      "current_max": 0.14983657002449036,
+      "voltage_mean": 4.977936254205304,
+      "voltage_min": 4.953618049621582,
+      "voltage_max": 4.994475364685059,
+      "power_mean": 0.4362151995072759,
+      "power_min": 0.20145627856254578,
+      "power_max": 0.7435935735702515,
+      "energy_mJ": 40.61010832092911,
+      "current_mean_mA": 87.66281027311136,
+      "finite": true,
+      "peaks_1ms": [
+        {
+          "start_sample_id": 34323301,
+          "end_sample_id_exclusive": 34325301,
+          "start_ms": 39.942499999999995,
+          "end_ms": 40.9425,
+          "duration_ms": 1.0,
+          "current_mean": 0.1331567953489721,
+          "current_min": 0.11969359964132309,
+          "current_max": 0.13877713680267334,
+          "voltage_mean": 4.969403807163238,
+          "voltage_min": 4.964967250823975,
+          "voltage_max": 4.976316452026367,
+          "power_mean": 0.661703590452671,
+          "power_min": 0.595089852809906,
+          "power_max": 0.6893389225006104,
+          "energy_mJ": 0.661703590452671,
+          "current_mean_mA": 133.15679534897208,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "sd_initialization_begin -> first_frame_complete_irq_observed",
+              "overlap_ms": 1.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 34329901,
+          "end_sample_id_exclusive": 34331901,
+          "start_ms": 43.2425,
+          "end_ms": 44.2425,
+          "duration_ms": 1.0,
+          "current_mean": 0.13251138104870916,
+          "current_min": 0.12420152127742767,
+          "current_max": 0.1444571167230606,
+          "voltage_mean": 4.969421952009201,
+          "voltage_min": 4.960427284240723,
+          "voltage_max": 4.976316452026367,
+          "power_mean": 0.658493793129921,
+          "power_min": 0.6175022721290588,
+          "power_max": 0.7170756459236145,
+          "energy_mJ": 0.658493793129921,
+          "current_mean_mA": 132.51138104870915,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "sd_initialization_begin -> first_frame_complete_irq_observed",
+              "overlap_ms": 1.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 34327501,
+          "end_sample_id_exclusive": 34329501,
+          "start_ms": 42.0425,
+          "end_ms": 43.0425,
+          "duration_ms": 1.0,
+          "current_mean": 0.13192889708280564,
+          "current_min": 0.11906249076128006,
+          "current_max": 0.14385606348514557,
+          "voltage_mean": 4.969630764484405,
+          "voltage_min": 4.960427284240723,
+          "voltage_max": 4.976316452026367,
+          "power_mean": 0.6556248046159744,
+          "power_min": 0.5922223925590515,
+          "power_max": 0.7142406702041626,
+          "energy_mJ": 0.6556248046159744,
+          "current_mean_mA": 131.92889708280563,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "sd_initialization_begin -> first_frame_complete_irq_observed",
+              "overlap_ms": 1.0
+            }
+          ]
+        }
+      ],
+      "peaks_10ms": [
+        {
+          "start_sample_id": 34317301,
+          "end_sample_id_exclusive": 34337301,
+          "start_ms": 36.9425,
+          "end_ms": 46.942499999999995,
+          "duration_ms": 10.0,
+          "current_mean": 0.1254451288715005,
+          "current_min": 0.11317213624715805,
+          "current_max": 0.1444571167230606,
+          "voltage_mean": 4.97087807905674,
+          "voltage_min": 4.960427284240723,
+          "voltage_max": 4.976316452026367,
+          "power_mean": 0.6235584509342909,
+          "power_min": 0.5626665949821472,
+          "power_max": 0.7170756459236145,
+          "energy_mJ": 6.2355845093429085,
+          "current_mean_mA": 125.4451288715005,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "sd_initialization_begin -> first_frame_complete_irq_observed",
+              "overlap_ms": 9.997499999999999
+            },
+            {
+              "name": "first_frame_complete_irq_observed -> sensor_autonomous_standby_first_observed",
+              "overlap_ms": 0.0025
+            }
+          ]
+        },
+        {
+          "start_sample_id": 34414901,
+          "end_sample_id_exclusive": 34434901,
+          "start_ms": 85.74249999999999,
+          "end_ms": 95.74249999999999,
+          "duration_ms": 10.0,
+          "current_mean": 0.10916533967666328,
+          "current_min": 0.06857375800609589,
+          "current_max": 0.14884483814239502,
+          "voltage_mean": 4.973659972262382,
+          "voltage_min": 4.955887794494629,
+          "voltage_max": 4.992205619812012,
+          "power_mean": 0.5428612669587135,
+          "power_min": 0.3417116701602936,
+          "power_max": 0.7393475770950317,
+          "energy_mJ": 5.428612669587135,
+          "current_mean_mA": 109.16533967666328,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "sensor_autonomous_standby_first_observed -> sd_initialization_complete",
+              "overlap_ms": 10.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 34461901,
+          "end_sample_id_exclusive": 34481901,
+          "start_ms": 109.2425,
+          "end_ms": 119.2425,
+          "duration_ms": 10.0,
+          "current_mean": 0.10764054241366684,
+          "current_min": 0.08197731524705887,
+          "current_max": 0.14983657002449036,
+          "voltage_mean": 4.974043130040169,
+          "voltage_min": 4.955887794494629,
+          "voltage_max": 4.987666130065918,
+          "power_mean": 0.5353575243607164,
+          "power_min": 0.4084669053554535,
+          "power_max": 0.7435935735702515,
+          "energy_mJ": 5.353575243607163,
+          "current_mean_mA": 107.64054241366684,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "sensor_autonomous_standby_first_observed -> sd_initialization_complete",
+              "overlap_ms": 10.0
+            }
+          ]
+        }
+      ]
+    },
+    "SCR_scan_write_preparation": {
+      "start_sample_id": 34503094,
+      "end_sample_id_exclusive": 34695416,
+      "start_ms": 129.839,
+      "end_ms": 226.0,
+      "duration_ms": 96.161,
+      "current_mean": 0.07019919107799169,
+      "current_min": 0.05351729691028595,
+      "current_max": 0.10400602966547012,
+      "voltage_mean": 4.981217464208764,
+      "voltage_min": 4.9672369956970215,
+      "voltage_max": 4.992205619812012,
+      "power_mean": 0.3496514075313657,
+      "power_min": 0.26704785227775574,
+      "power_max": 0.5170947909355164,
+      "energy_mJ": 33.62282899962366,
+      "current_mean_mA": 70.19919107799169,
+      "finite": true,
+      "peaks_1ms": [
+        {
+          "start_sample_id": 34503294,
+          "end_sample_id_exclusive": 34505294,
+          "start_ms": 129.939,
+          "end_ms": 130.939,
+          "duration_ms": 1.0,
+          "current_mean": 0.07956510884687304,
+          "current_min": 0.05688321217894554,
+          "current_max": 0.10400602966547012,
+          "voltage_mean": 4.979525084972382,
+          "voltage_min": 4.9672369956970215,
+          "voltage_max": 4.989935874938965,
+          "power_mean": 0.39615671007335185,
+          "power_min": 0.2834562063217163,
+          "power_max": 0.5170947909355164,
+          "energy_mJ": 0.39615671007335185,
+          "current_mean_mA": 79.56510884687304,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "sd_initialization_complete -> first_slot_transport_submission",
+              "overlap_ms": 1.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 34633294,
+          "end_sample_id_exclusive": 34635294,
+          "start_ms": 194.939,
+          "end_ms": 195.939,
+          "duration_ms": 1.0,
+          "current_mean": 0.07271831084601581,
+          "current_min": 0.05426861718297005,
+          "current_max": 0.09204500913619995,
+          "voltage_mean": 4.980642986536026,
+          "voltage_min": 4.969507217407227,
+          "voltage_max": 4.989935874938965,
+          "power_mean": 0.36215521550178525,
+          "power_min": 0.27055054903030396,
+          "power_max": 0.45762723684310913,
+          "energy_mJ": 0.36215521550178525,
+          "current_mean_mA": 72.71831084601581,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "sd_initialization_complete -> first_slot_transport_submission",
+              "overlap_ms": 1.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 34518094,
+          "end_sample_id_exclusive": 34520094,
+          "start_ms": 137.339,
+          "end_ms": 138.339,
+          "duration_ms": 1.0,
+          "current_mean": 0.07268118049018085,
+          "current_min": 0.05538057163357735,
+          "current_max": 0.09342743456363678,
+          "voltage_mean": 4.980737189292908,
+          "voltage_min": 4.969507217407227,
+          "voltage_max": 4.992205619812012,
+          "power_mean": 0.36197755970060824,
+          "power_min": 0.27609407901763916,
+          "power_max": 0.4647124409675598,
+          "energy_mJ": 0.36197755970060824,
+          "current_mean_mA": 72.68118049018085,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "sd_initialization_complete -> first_slot_transport_submission",
+              "overlap_ms": 1.0
+            }
+          ]
+        }
+      ],
+      "peaks_10ms": [
+        {
+          "start_sample_id": 34503494,
+          "end_sample_id_exclusive": 34523494,
+          "start_ms": 130.039,
+          "end_ms": 140.039,
+          "duration_ms": 10.0,
+          "current_mean": 0.07091508009955287,
+          "current_min": 0.054088298231363297,
+          "current_max": 0.10400602966547012,
+          "voltage_mean": 4.981180040740967,
+          "voltage_min": 4.9672369956970215,
+          "voltage_max": 4.992205619812012,
+          "power_mean": 0.3532120144277811,
+          "power_min": 0.2696515917778015,
+          "power_max": 0.5170947909355164,
+          "energy_mJ": 3.5321201442778114,
+          "current_mean_mA": 70.91508009955287,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "sd_initialization_complete -> first_slot_transport_submission",
+              "overlap_ms": 10.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 34525894,
+          "end_sample_id_exclusive": 34545894,
+          "start_ms": 141.239,
+          "end_ms": 151.239,
+          "duration_ms": 10.0,
+          "current_mean": 0.0704285204757005,
+          "current_min": 0.05402819439768791,
+          "current_max": 0.0936979129910469,
+          "voltage_mean": 4.981187872242928,
+          "voltage_min": 4.969507217407227,
+          "voltage_max": 4.992205619812012,
+          "power_mean": 0.350792222186923,
+          "power_min": 0.2694745659828186,
+          "power_max": 0.46584510803222656,
+          "energy_mJ": 3.5079222218692303,
+          "current_mean_mA": 70.4285204757005,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "sd_initialization_complete -> first_slot_transport_submission",
+              "overlap_ms": 10.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 34574294,
+          "end_sample_id_exclusive": 34594294,
+          "start_ms": 165.439,
+          "end_ms": 175.43900000000002,
+          "duration_ms": 10.0,
+          "current_mean": 0.0703758875016123,
+          "current_min": 0.053877927362918854,
+          "current_max": 0.09378807246685028,
+          "voltage_mean": 4.981219537210465,
+          "voltage_min": 4.969507217407227,
+          "voltage_max": 4.992205619812012,
+          "power_mean": 0.35053249966949224,
+          "power_min": 0.26884740591049194,
+          "power_max": 0.4662933647632599,
+          "energy_mJ": 3.5053249966949225,
+          "current_mean_mA": 70.37588750161231,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "sd_initialization_complete -> first_slot_transport_submission",
+              "overlap_ms": 10.0
+            }
+          ]
+        }
+      ]
+    },
+    "slot_transport": {
+      "start_sample_id": 34695416,
+      "end_sample_id_exclusive": 35457519,
+      "start_ms": 226.0,
+      "end_ms": 607.0514999999999,
+      "duration_ms": 381.0515,
+      "current_mean": 0.09190948587358108,
+      "current_min": 0.059167224913835526,
+      "current_max": 0.11882206797599792,
+      "voltage_mean": 4.9770716597752935,
+      "voltage_min": 4.962697505950928,
+      "voltage_max": 4.992205619812012,
+      "power_mean": 0.45741325950585265,
+      "power_min": 0.29510635137557983,
+      "power_max": 0.5907567739486694,
+      "energy_mJ": 174.2980086545944,
+      "current_mean_mA": 91.90948587358108,
+      "finite": true,
+      "peaks_1ms": [
+        {
+          "start_sample_id": 34839016,
+          "end_sample_id_exclusive": 34841016,
+          "start_ms": 297.8,
+          "end_ms": 298.8,
+          "duration_ms": 1.0,
+          "current_mean": 0.10036657204851508,
+          "current_min": 0.07419363409280777,
+          "current_max": 0.11882206797599792,
+          "voltage_mean": 4.975493806123733,
+          "voltage_min": 4.964967250823975,
+          "voltage_max": 4.987666130065918,
+          "power_mean": 0.4993401554375887,
+          "power_min": 0.3698846399784088,
+          "power_max": 0.5907567739486694,
+          "energy_mJ": 0.4993401554375887,
+          "current_mean_mA": 100.36657204851508,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "first_slot_transport_submission -> slot_transport_returned_success",
+              "overlap_ms": 1.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 34796416,
+          "end_sample_id_exclusive": 34798416,
+          "start_ms": 276.5,
+          "end_ms": 277.5,
+          "duration_ms": 1.0,
+          "current_mean": 0.09951108849793673,
+          "current_min": 0.07626727968454361,
+          "current_max": 0.11203013360500336,
+          "voltage_mean": 4.975381443023681,
+          "voltage_min": 4.9672369956970215,
+          "voltage_max": 4.987666130065918,
+          "power_mean": 0.4950870297849178,
+          "power_min": 0.3802225887775421,
+          "power_max": 0.5569888353347778,
+          "energy_mJ": 0.49508702978491786,
+          "current_mean_mA": 99.51108849793673,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "first_slot_transport_submission -> slot_transport_returned_success",
+              "overlap_ms": 1.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 34983216,
+          "end_sample_id_exclusive": 34985216,
+          "start_ms": 369.90000000000003,
+          "end_ms": 370.90000000000003,
+          "duration_ms": 1.0,
+          "current_mean": 0.09950135148689151,
+          "current_min": 0.08023425191640854,
+          "current_max": 0.11242081969976425,
+          "voltage_mean": 4.97539279127121,
+          "voltage_min": 4.9672369956970215,
+          "voltage_max": 4.987666130065918,
+          "power_mean": 0.49503879810869694,
+          "power_min": 0.3996352553367615,
+          "power_max": 0.5589312314987183,
+          "energy_mJ": 0.4950387981086969,
+          "current_mean_mA": 99.50135148689151,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "first_slot_transport_submission -> slot_transport_returned_success",
+              "overlap_ms": 1.0
+            }
+          ]
+        }
+      ],
+      "peaks_10ms": [
+        {
+          "start_sample_id": 34735216,
+          "end_sample_id_exclusive": 34755216,
+          "start_ms": 245.9,
+          "end_ms": 255.9,
+          "duration_ms": 10.0,
+          "current_mean": 0.09697859174571931,
+          "current_min": 0.06971576064825058,
+          "current_max": 0.11332239955663681,
+          "voltage_mean": 4.975935406041145,
+          "voltage_min": 4.964967250823975,
+          "voltage_max": 4.989935874938965,
+          "power_mean": 0.48253863756656645,
+          "power_min": 0.34756070375442505,
+          "power_max": 0.563413679599762,
+          "energy_mJ": 4.825386375665665,
+          "current_mean_mA": 96.97859174571931,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "first_slot_transport_submission -> slot_transport_returned_success",
+              "overlap_ms": 10.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 34980616,
+          "end_sample_id_exclusive": 35000616,
+          "start_ms": 368.59999999999997,
+          "end_ms": 378.59999999999997,
+          "duration_ms": 10.0,
+          "current_mean": 0.09691144023388625,
+          "current_min": 0.0677923858165741,
+          "current_max": 0.11317213624715805,
+          "voltage_mean": 4.97592598927021,
+          "voltage_min": 4.9672369956970215,
+          "voltage_max": 4.992205619812012,
+          "power_mean": 0.48220205736160276,
+          "power_min": 0.3381257653236389,
+          "power_max": 0.5629234910011292,
+          "energy_mJ": 4.822020573616028,
+          "current_mean_mA": 96.91144023388624,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "first_slot_transport_submission -> slot_transport_returned_success",
+              "overlap_ms": 10.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 34957616,
+          "end_sample_id_exclusive": 34977616,
+          "start_ms": 357.09999999999997,
+          "end_ms": 367.09999999999997,
+          "duration_ms": 10.0,
+          "current_mean": 0.09689171505756676,
+          "current_min": 0.06785248965024948,
+          "current_max": 0.11323224008083344,
+          "voltage_mean": 4.975966505312919,
+          "voltage_min": 4.964967250823975,
+          "voltage_max": 4.989935874938965,
+          "power_mean": 0.48210819297134877,
+          "power_min": 0.33842554688453674,
+          "power_max": 0.5627084374427795,
+          "energy_mJ": 4.821081929713487,
+          "current_mean_mA": 96.89171505756676,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "first_slot_transport_submission -> slot_transport_returned_success",
+              "overlap_ms": 10.0
+            }
+          ]
+        }
+      ]
+    },
+    "strobe_to_standby_observation": {
+      "start_sample_id": 34293569,
+      "end_sample_id_exclusive": 34343455,
+      "start_ms": 25.076500000000003,
+      "end_ms": 50.0195,
+      "duration_ms": 24.943,
+      "current_mean": 0.1183687372198328,
+      "current_min": 0.04218738153576851,
+      "current_max": 0.1444571167230606,
+      "voltage_mean": 4.972779359153377,
+      "voltage_min": 4.960427284240723,
+      "voltage_max": 4.994475364685059,
+      "power_mean": 0.5885589919383646,
+      "power_min": 0.21051234006881714,
+      "power_max": 0.7170756459236145,
+      "energy_mJ": 14.680426935918629,
+      "current_mean_mA": 118.36873721983281,
+      "finite": true,
+      "peaks_1ms": [
+        {
+          "start_sample_id": 34323369,
+          "end_sample_id_exclusive": 34325369,
+          "start_ms": 39.9765,
+          "end_ms": 40.9765,
+          "duration_ms": 1.0,
+          "current_mean": 0.13315410559624433,
+          "current_min": 0.11984386295080185,
+          "current_max": 0.13877713680267334,
+          "voltage_mean": 4.969428774356842,
+          "voltage_min": 4.964967250823975,
+          "voltage_max": 4.976316452026367,
+          "power_mean": 0.6616932349205017,
+          "power_min": 0.595714271068573,
+          "power_max": 0.6893389225006104,
+          "energy_mJ": 0.6616932349205018,
+          "current_mean_mA": 133.15410559624434,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "sd_initialization_begin -> first_frame_complete_irq_observed",
+              "overlap_ms": 1.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 34330169,
+          "end_sample_id_exclusive": 34332169,
+          "start_ms": 43.3765,
+          "end_ms": 44.3765,
+          "duration_ms": 1.0,
+          "current_mean": 0.13261573943123223,
+          "current_min": 0.12420152127742767,
+          "current_max": 0.1444571167230606,
+          "voltage_mean": 4.969364065408707,
+          "voltage_min": 4.960427284240723,
+          "voltage_max": 4.976316452026367,
+          "power_mean": 0.6590036116540432,
+          "power_min": 0.6175022721290588,
+          "power_max": 0.7170756459236145,
+          "energy_mJ": 0.6590036116540432,
+          "current_mean_mA": 132.6157394312322,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "sd_initialization_begin -> first_frame_complete_irq_observed",
+              "overlap_ms": 1.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 34327769,
+          "end_sample_id_exclusive": 34329769,
+          "start_ms": 42.1765,
+          "end_ms": 43.1765,
+          "duration_ms": 1.0,
+          "current_mean": 0.1317276333682239,
+          "current_min": 0.11906249076128006,
+          "current_max": 0.14385606348514557,
+          "voltage_mean": 4.969597867965698,
+          "voltage_min": 4.960427284240723,
+          "voltage_max": 4.976316452026367,
+          "power_mean": 0.654623168349266,
+          "power_min": 0.5922223925590515,
+          "power_max": 0.7142406702041626,
+          "energy_mJ": 0.654623168349266,
+          "current_mean_mA": 131.7276333682239,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "sd_initialization_begin -> first_frame_complete_irq_observed",
+              "overlap_ms": 1.0
+            }
+          ]
+        }
+      ],
+      "peaks_10ms": [
+        {
+          "start_sample_id": 34317369,
+          "end_sample_id_exclusive": 34337369,
+          "start_ms": 36.9765,
+          "end_ms": 46.976499999999994,
+          "duration_ms": 10.0,
+          "current_mean": 0.12547281202189625,
+          "current_min": 0.11317213624715805,
+          "current_max": 0.1444571167230606,
+          "voltage_mean": 4.970881256747246,
+          "voltage_min": 4.960427284240723,
+          "voltage_max": 4.978586673736572,
+          "power_mean": 0.6236964823931456,
+          "power_min": 0.5626665949821472,
+          "power_max": 0.7170756459236145,
+          "energy_mJ": 6.236964823931455,
+          "current_mean_mA": 125.47281202189625,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "sd_initialization_begin -> first_frame_complete_irq_observed",
+              "overlap_ms": 9.9635
+            },
+            {
+              "name": "first_frame_complete_irq_observed -> sensor_autonomous_standby_first_observed",
+              "overlap_ms": 0.0365
+            }
+          ]
+        },
+        {
+          "start_sample_id": 34293569,
+          "end_sample_id_exclusive": 34313569,
+          "start_ms": 25.076500000000003,
+          "end_ms": 35.076499999999996,
+          "duration_ms": 10.0,
+          "current_mean": 0.12492815879546106,
+          "current_min": 0.1192728579044342,
+          "current_max": 0.14385606348514557,
+          "voltage_mean": 4.972038768792152,
+          "voltage_min": 4.963832378387451,
+          "voltage_max": 4.977451324462891,
+          "power_mean": 0.6211454123497009,
+          "power_min": 0.5931333899497986,
+          "power_max": 0.714730441570282,
+          "energy_mJ": 6.21145412349701,
+          "current_mean_mA": 124.92815879546106,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "first_strobe_irq_observed -> sd_initialization_begin",
+              "overlap_ms": 10.0
+            }
+          ]
+        }
+      ]
+    },
+    "frame_IRQ_to_standby_observation": {
+      "start_sample_id": 34337296,
+      "end_sample_id_exclusive": 34343455,
+      "start_ms": 46.940000000000005,
+      "end_ms": 50.0195,
+      "duration_ms": 3.0795000000000003,
+      "current_mean": 0.083212121056381,
+      "current_min": 0.04218738153576851,
+      "current_max": 0.1274321973323822,
+      "voltage_mean": 4.97952513989738,
+      "voltage_min": 4.9672369956970215,
+      "voltage_max": 4.994475364685059,
+      "power_mean": 0.4142433695276172,
+      "power_min": 0.21051234006881714,
+      "power_max": 0.6338537335395813,
+      "energy_mJ": 1.2756624564602972,
+      "current_mean_mA": 83.212121056381,
+      "finite": true,
+      "peaks_1ms": [
+        {
+          "start_sample_id": 34337296,
+          "end_sample_id_exclusive": 34339296,
+          "start_ms": 46.940000000000005,
+          "end_ms": 47.940000000000005,
+          "duration_ms": 1.0,
+          "current_mean": 0.10581907720863819,
+          "current_min": 0.09393833577632904,
+          "current_max": 0.1274321973323822,
+          "voltage_mean": 4.975169177770614,
+          "voltage_min": 4.9672369956970215,
+          "voltage_max": 4.980856418609619,
+          "power_mean": 0.5264581046998501,
+          "power_min": 0.4676801264286041,
+          "power_max": 0.6338537335395813,
+          "energy_mJ": 0.5264581046998501,
+          "current_mean_mA": 105.81907720863819,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "first_frame_complete_irq_observed -> sensor_autonomous_standby_first_observed",
+              "overlap_ms": 1.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 34339296,
+          "end_sample_id_exclusive": 34341296,
+          "start_ms": 47.940000000000005,
+          "end_ms": 48.94,
+          "duration_ms": 1.0,
+          "current_mean": 0.09153765547089279,
+          "current_min": 0.04615435376763344,
+          "current_max": 0.1000090017914772,
+          "voltage_mean": 4.978281125068665,
+          "voltage_min": 4.971776962280273,
+          "voltage_max": 4.994475364685059,
+          "power_mean": 0.4556451229378581,
+          "power_min": 0.23020251095294952,
+          "power_max": 0.4979034662246704,
+          "energy_mJ": 0.4556451229378581,
+          "current_mean_mA": 91.53765547089279,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "first_frame_complete_irq_observed -> sensor_autonomous_standby_first_observed",
+              "overlap_ms": 1.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 34341296,
+          "end_sample_id_exclusive": 34343296,
+          "start_ms": 48.94,
+          "end_ms": 49.94,
+          "duration_ms": 1.0,
+          "current_mean": 0.05434226020798087,
+          "current_min": 0.04218738153576851,
+          "current_max": 0.071128249168396,
+          "voltage_mean": 4.984812727689743,
+          "voltage_min": 4.97404670715332,
+          "voltage_max": 4.992205619812012,
+          "power_mean": 0.27087184388935565,
+          "power_min": 0.21051234006881714,
+          "power_max": 0.3539566695690155,
+          "energy_mJ": 0.27087184388935565,
+          "current_mean_mA": 54.34226020798087,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "first_frame_complete_irq_observed -> sensor_autonomous_standby_first_observed",
+              "overlap_ms": 1.0
+            }
+          ]
+        }
+      ],
+      "peaks_10ms": []
+    }
+  },
+  "peaks_10ms": [
+    {
+      "start_sample_id": 34288616,
+      "end_sample_id_exclusive": 34308616,
+      "start_ms": 22.599999999999998,
+      "end_ms": 32.599999999999994,
+      "duration_ms": 10.0,
+      "current_mean": 0.12550906248502433,
+      "current_min": 0.11455456912517548,
+      "current_max": 0.14385606348514557,
+      "voltage_mean": 4.9717322301387785,
+      "voltage_min": 4.963832378387451,
+      "voltage_max": 4.977451324462891,
+      "power_mean": 0.6239949428409338,
+      "power_min": 0.5695397257804871,
+      "power_max": 0.714730441570282,
+      "energy_mJ": 6.239949428409338,
+      "current_mean_mA": 125.50906248502433,
+      "finite": true,
+      "overlapping_phases": [
+        {
+          "name": "post5ms_begin -> receiver_entry",
+          "overlap_ms": 1.342
+        },
+        {
+          "name": "receiver_entry -> first_strobe_irq_observed",
+          "overlap_ms": 1.1345
+        },
+        {
+          "name": "first_strobe_irq_observed -> sd_initialization_begin",
+          "overlap_ms": 7.523499999999999
+        }
+      ]
+    },
+    {
+      "start_sample_id": 34317416,
+      "end_sample_id_exclusive": 34337416,
+      "start_ms": 37.0,
+      "end_ms": 47.0,
+      "duration_ms": 10.0,
+      "current_mean": 0.12546370601952075,
+      "current_min": 0.10764241963624954,
+      "current_max": 0.1444571167230606,
+      "voltage_mean": 4.970892038607597,
+      "voltage_min": 4.960427284240723,
+      "voltage_max": 4.980856418609619,
+      "power_mean": 0.6236523969769477,
+      "power_min": 0.5356627702713013,
+      "power_max": 0.7170756459236145,
+      "energy_mJ": 6.236523969769478,
+      "current_mean_mA": 125.46370601952076,
+      "finite": true,
+      "overlapping_phases": [
+        {
+          "name": "sd_initialization_begin -> first_frame_complete_irq_observed",
+          "overlap_ms": 9.94
+        },
+        {
+          "name": "first_frame_complete_irq_observed -> sensor_autonomous_standby_first_observed",
+          "overlap_ms": 0.060000000000000005
+        }
+      ]
+    },
+    {
+      "start_sample_id": 34414816,
+      "end_sample_id_exclusive": 34434816,
+      "start_ms": 85.7,
+      "end_ms": 95.69999999999999,
+      "duration_ms": 10.0,
+      "current_mean": 0.10912395995371044,
+      "current_min": 0.06857375800609589,
+      "current_max": 0.14884483814239502,
+      "voltage_mean": 4.973659631943702,
+      "voltage_min": 4.955887794494629,
+      "voltage_max": 4.992205619812012,
+      "power_mean": 0.5426552248418332,
+      "power_min": 0.3417116701602936,
+      "power_max": 0.7393475770950317,
+      "energy_mJ": 5.426552248418331,
+      "current_mean_mA": 109.12395995371044,
+      "finite": true,
+      "overlapping_phases": [
+        {
+          "name": "sensor_autonomous_standby_first_observed -> sd_initialization_complete",
+          "overlap_ms": 10.0
+        }
+      ]
+    }
+  ],
+  "analysis_sources": {
+    "D:\\Github\\global-x-camera\\tmp\\bringup\\sensor-autostop-20261028\\analysis\\analyze_cold.py": "6f8a4ebeded1c24ee55cc4f7443a68221df22ea311915c087c8f2caef6a73445",
+    "D:\\Github\\global-x-camera\\tmp\\bringup\\ethernet-normal-20261028\\analysis\\analyze_cycles.py": "7ff8d2528f8712eaac8ac82880d48d6551fb198f9344a00c3e98b8e36d9f6d7e"
+  },
+  "promotion_analysis_source": {
+    "D:\\Github\\global-x-camera\\tmp\\bringup\\sensor-autostop-promote-20261028\\analysis\\analyze_promotion.py": "9b0a40a192b906578f239334cad8376cb11e15e8943d801cef13f6712dbd81cc",
+    "D:\\Github\\global-x-camera\\tmp\\bringup\\sensor-autostop-20261028\\analysis\\analyze_cold.py": "6f8a4ebeded1c24ee55cc4f7443a68221df22ea311915c087c8f2caef6a73445"
+  },
+  "receiver_entry_to_first_strobe_ms": 1.1345000000000027,
+  "all_expected_markers_observed": true,
+  "single_external_exposure_envelope_observed": true,
+  "exposure_envelopes_end_before_frame_IRQ": true,
+  "no_external_exposure_edges_between_standby_observed_and_commit": true,
+  "external_exposure_proof_scope": "PD0 mirrors PA0 STROBE interrupts. Explicit post-entry LOW excludes startup chatter; exposure counts are qualified through commit8 and the stable sensor check. This independently records the IRQ signal, not a directly probed sensor pin. Counter/FSM/zero-STOP proof and full image readback are separate required records.",
+  "cold_scope": "Cold start from measured current onset through low-current plateau. All currents include the full powered board. Marker10 plus low current does not independently prove fresh SBF, a particular saved slot or image integrity."
+}

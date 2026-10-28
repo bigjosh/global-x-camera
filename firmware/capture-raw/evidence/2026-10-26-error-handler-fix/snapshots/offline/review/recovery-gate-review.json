@@ -1,0 +1,83 @@
+{
+  "passed": true,
+  "offline": true,
+  "hardware_clients_constructed": false,
+  "positive_pairs": 2,
+  "negative_pairs": 7,
+  "gate_checks": 18,
+  "results": [
+    {
+      "case": "flash-normal-v2",
+      "expected": "accept",
+      "both_gates_passed": true
+    },
+    {
+      "case": "flash-postframe-v3",
+      "expected": "accept",
+      "both_gates_passed": true
+    },
+    {
+      "case": "prefix-truncated",
+      "expected": "reject",
+      "both_gates_passed": true,
+      "reasons": {
+        "park": "Recovery prefix is not in the reviewed allowlist",
+        "readback": "Unreviewed recovery prefix/sector pair"
+      }
+    },
+    {
+      "case": "prefix-guard-mutated",
+      "expected": "reject",
+      "both_gates_passed": true,
+      "reasons": {
+        "park": "Recovery prefix is not in the reviewed allowlist",
+        "readback": "Unreviewed recovery prefix/sector pair"
+      }
+    },
+    {
+      "case": "prefix-crc-mutated",
+      "expected": "reject",
+      "both_gates_passed": true,
+      "reasons": {
+        "park": "Recovery prefix is not in the reviewed allowlist",
+        "readback": "Unreviewed recovery prefix/sector pair"
+      }
+    },
+    {
+      "case": "sector-truncated",
+      "expected": "reject",
+      "both_gates_passed": true,
+      "reasons": {
+        "park": "Unreviewed recovery sector",
+        "readback": "Unreviewed recovery prefix/sector pair"
+      }
+    },
+    {
+      "case": "sector-mutated",
+      "expected": "reject",
+      "both_gates_passed": true,
+      "reasons": {
+        "park": "Unreviewed recovery sector",
+        "readback": "Unreviewed recovery prefix/sector pair"
+      }
+    },
+    {
+      "case": "normal-prefix-diag-sector",
+      "expected": "reject",
+      "both_gates_passed": true,
+      "reasons": {
+        "park": "Unreviewed recovery sector",
+        "readback": "Unreviewed recovery prefix/sector pair"
+      }
+    },
+    {
+      "case": "diag-prefix-normal-sector",
+      "expected": "reject",
+      "both_gates_passed": true,
+      "reasons": {
+        "park": "Unreviewed recovery sector",
+        "readback": "Unreviewed recovery prefix/sector pair"
+      }
+    }
+  ]
+}

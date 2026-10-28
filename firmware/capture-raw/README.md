@@ -1,5 +1,15 @@
 # Packed RAW capture to fixed SD slots
 
+**Single-frame normal firmware installed October 28:** the sensor automatically
+stops after one exposure. The normal capture path retains unused Ethernet PHY
+power-down, four-bit 25 MHz SD saving, guarded Standby, UART recovery and the
+relocated error engine. Three cold cycles passed all eleven phase markers,
+one observed exposure each and recovery. Awake slot 142 matched the original
+camera RAM; cold slots 143 and 144 passed complete SD readback and visual
+inspection. Slot 145 passed its first 2,560 of 3,730 sectors before testing
+stopped at the user's request; that partial read is not full-image verification.
+[Current build and qualification](evidence/2026-10-28-sensor-single-frame/README.md).
+
 This integration captures the sensor's unchanged ten-bit samples as packed MIPI
 RAW10 bytes, writes them directly to the native SDMMC2 interface, and retains
 the existing UART recovery mechanism. It uses the container in
@@ -10,8 +20,8 @@ The selected error policy is now **five sets of numbered red blinks followed
 by shutdown**, enabled explicitly with `--error-blinks`. Red still marks normal
 startup before acquisition. The [code table and failure shutdown contract](ERROR_SIGNALS.md)
 distinguish implemented detectors, reserved codes, UART recovery and the
-separate successful-save path. The [error-signaling qualification](evidence/2026-10-26-error-blinks/README.md)
-records the installed image, normal cold capture and synthetic failure tests.
+separate successful-save path. The [error-signaling qualification](evidence/2026-10-26-error-handler-fix/README.md)
+records the October 26 image, post-frame failure regression and real SD error.
 The live bench state remains in [the checkpoint](../../AGENTS.md).
 
 For fine phase timing, the optional [`--cycle-trace` profile](CYCLE_TRACE.md)
@@ -20,27 +30,121 @@ run on October 25 captured 101 events, including 203.689 ms in ACMD41 negotiatio
 159.403 ms in the multiblock data phase. The diagnostic completion stays awake
 for guarded ST-LINK retrieval; normal Standby firmware was restored afterward.
 
-## Current selected profile — October 26: reviewed 25 MHz startup, no tail wait
+## Current selected profile — October 28: single frame at 25 MHz with Ethernet power-down
 
 The current error-blink Standby receiver is
-`471fddf2c71b7d8bba8e47debf8379a8fd72c7f3daae59dcdf10dc8eed1198af`,
+`560a8734306436fe95bc1407031e70f1bc5b448949366e1bd007779c1736f646`,
 with 64 KiB NOR sector
-`5ad1bc968606b17e513680bcdf6abf9c73ca3ccf24a236a37b8ecc89d4e9c661`
+`79a379470927135bc03841098fe070912cad8275e91c5d5985cc066c294cf64e`
 and ROM-loaded prefix
-`7f8017fd70bd9b77cfabcf212d072201ec8e134c3a44a0555a2108d7cc454c32`.
-Independent physical NOR readback matched. A normal cold boot saved slot 51,
-which was proven free beforehand, and its complete 25 MHz readback passed
-independent PNG sample decoding. Synthetic errors exercised the RAM engine
-and the exact installed prefix, including UART recovery during the blink
-sequence. See [the evidence and limits](evidence/2026-10-26-error-blinks/QUALIFICATION.md).
+`6378483a91b560ffc6b31d74a9dd1205996a14c8030447ffddf7deddc9d23874`.
+All recovery instructions/literals and the 1,536-byte error engine are
+unchanged. The prefix substitutes one acknowledged context-setting burst for
+a duplicate exposure-mode write; its production-only audit also checks the
+two receiver CRC words and shifted post-recovery table pointers. Runtime
+errors still execute from the checked copy at
+`0x343C8000`, outside the frame. The earlier post-frame/real SD error signaling
+tests are retained in [the error-handler evidence](evidence/2026-10-26-error-handler-fix/README.md).
+The cold awake proof showed exactly one frame/exposure, zero explicit STOP
+writes and stable autonomous standby. Three normal Standby cycles each passed
+all eleven markers, one external exposure envelope and exact UART recovery;
+guarded SBF=1/PDDS=1/STOPF=0 was observed afterward. Cold slots 143 and 144
+passed full SD readback and visual inspection; awake slot 142 also matched
+every image byte to original camera RAM. Slot 145 passed its first 2,560 of
+3,730 sectors before the user stopped testing; complete-image verification is
+not claimed for that slot. The installed NOR image is ready for the next
+power cycle; the final live execution state belongs to the bench checkpoint.
+See [the current installation and qualification
+limits](evidence/2026-10-28-sensor-single-frame/README.md).
+
+The selected `--ethernet-powerdown` option runs once after the receiver is
+armed and flash's checked late-code load has completed, before SD initialization.
+`board_eth_powerdown.inc` verifies the LAN8742 identity and stable BMCR, sets
+power-down with one write, and verifies two readbacks. A stable already-down
+PHY needs no write. It restores PF4/MDIO and PG11/MDC configuration and any GPIO
+clock bits it added, leaving the PHY down through saving and shutdown. All
+transactions and counter waits are bounded; a missing PHY, unsuitable clock,
+unexpected register value or uncertain write produces a nonfatal `ETH1` RAM
+record. It does not replace camera/SD errors or claim a power saving on failure.
+RAM READ requests bypass the helper and do not infer or change retained PHY state.
+
+All helper functions reside in the checked late region; the 15,804-byte early
+load and 6,720-byte recovery prefix boundaries remain fixed. The helper itself
+is outside the exposure-start path, but its work delays SD initialization and
+the enlarged late image/BSS must be included in full-cycle comparisons. The
+RAM candidate saved slot 126 with complete SD-to-original-camera-RAM equality.
+The [campaign record](evidence/2026-10-28-ethernet-powerdown/README.md) separates
+that proof, installation, cold-cycle readbacks and energy measurements.
 
 The selected profile uses **four-bit SDMMC2 at 25 MHz, falling-edge host
 launch during both identification and transfer, and rising-edge feedback input
 sampling**. `NEGEDGE` changes transmit timing; receive selection stays at
 `SELCLKRX=00`. GPIO speed 3, inherited compensation, 3.3 V signaling, the
-PZSSD001 carrier and 27-ohm CLK resistor are retained. The current card is the
+PZSSD001 carrier are retained. The earlier successful25MHz qualification used
+the27-ohm CLK resistor. The current CLK connection is a **direct jumper with
+no series resistor**. The user clarified that this has been true throughout
+the slew-rate and PIO/IDMA tests; earlier carried-forward resistor assumptions
+in those records are superseded by the
+[wiring correction](evidence/2026-10-27-sd-wiring-correction/README.md).
+The automated CLK-only speed3/2/1 comparison failed the first CMD17 at every
+setting under its recorded earlier wiring geometry.
+On October 27 the user selected a **twisted CLK/GND pair** after reporting
+successful cycles without probes, and moved SD GND to **CN3.8** and VCC to
+**CN3.5 / main VDDIO (3.3 V)**. CLK remains direct, without a resistor.
+This is the [canonical prototype wiring](../../docs/prototype/sd-breakout-benchmark.md).
+Wire placement remains a known failure risk. October 28 baseline slot 122 and
+Ethernet-power-down candidate slot 126 passed complete automated image
+write/readback equality against their original camera RAM on this arrangement;
+see [the campaign evidence](evidence/2026-10-28-ethernet-powerdown/README.md).
+Those digital checks do not establish analog signal margins.
+The current card is the
 user's faster-initializing 64 GB-class card (122,507,264 logical sectors).
 Check [the bench checkpoint](../../AGENTS.md) for the live probe and power state.
+
+The RAM-only `--sd-clk-gpio-speed {1,2,3}` diagnostic changes PC2/CLK slew
+while retaining CMD/DAT speed3,25MHz and the reviewed startup profile.
+Its three matched binaries differ at only one selector byte, and a retained
+GPIO record verifies the actual pin settings. All nine formal attempts
+(three per setting) failed before image writes, so no full-image verification
+or setting promotion was possible. The comparison did not change the installed
+SD GPIO settings. See [the October27 comparison and failed-data analysis](evidence/2026-10-27-clk-slew/README.md).
+
+The subsequent RAM-only `--sd-read-diagnostics` comparison holds the camera
+in reset and retains a single-sector receive buffer even when CRC fails.
+Three PIO and three IDMA reads at 25 MHz produced identical corrupted bytes;
+a fresh 12.5 MHz PIO read matched the saved pattern. This strongly disfavors
+CPU FIFO servicing. Subsequent matched controls isolate the CLK probe effect:
+
+| Probe condition at 25 MHz | PIO | IDMA |
+|---|---|---|
+| Initial signal-probe-free condition | 3/3 CRC failures | 3/3 CRC failures |
+| CMD + CLK + ground | 3/3 correct | 3/3 correct |
+| CLK + ground only | 3/3 correct | 3/3 correct |
+| Ground only | 3/3 CRC failures | 3/3 CRC failures |
+
+All successful512-byte reads match the reference; all failures reproduce the
+same corrupted bytes. Ground stayed connected across the CLK-only to
+ground-only reversal, and CMD stayed disconnected. This identifies a CLK
+probe effect on these isolated reads, not the analog mechanism. It does not
+rule out a CMD-probe effect during a full capture/write cycle. See
+[the four-condition evidence](evidence/2026-10-27-pio-idma-ground-only/README.md),
+which links the preceding sealed records and the no-resistor wiring correction.
+No new full-image write/read or cold-cycle qualification is claimed.
+The diagnostic is opt-in, READ-only and never treats failed data as valid.
+
+The subsequent October27 reproduction supports the user's reported need for
+both probes in that earlier setup. With CLK alone, unchanged normal cold firmware
+failed the first slot-header CMD17 at LBA0 with data CRC failure, before any
+image-sector write. The exact earlier warm PIO helper then failed too, returning
+the same512 corrupt bytes. Adding only CMD restored that helper's complete
+512-byte equality and zero error/cleanup result. A both-probe cold run returned
+to low current before the1.5s observer check, without the extended error sequence;
+its new image and Standby flags were not reread. The earlier CLK-only passes
+are not presently reproducible, so cold-versus-warm alone does not explain the
+discrepancy. Camera STOP preceded the failed cold read by about37ms. See
+[the current comparison and retained failure bytes](evidence/2026-10-27-cold-clk-only/README.md).
+The physical cause remains unresolved; no production termination or electrical
+margin is established by these probe-dependent outcomes.
 
 The [25 MHz twenty-image campaign](evidence/2026-10-26-sd25-twenty/README.md)
 qualified twenty complete RAM captures and same-speed readbacks on the user's
@@ -116,25 +220,29 @@ offline builds into **new** directories and never program the target:
 
 ```powershell
 # RAM scene capture; stays awake for inspection and original-frame comparison.
-python firmware/capture-raw/build.py --out tmp/bringup/raw-reviewed25-errors-ram `
-  --error-blinks --magic-format --line-stream --async-stop --transport idma `
+python firmware/capture-raw/build.py --out tmp/bringup/raw-reviewed25-single-frame-ram `
+  --sensor-single-frame --error-blinks --ethernet-powerdown --magic-format --line-stream --async-stop --transport idma `
   --sd-bus-width 4 --sd-clock-hz 25000000 --sd-gpio-speed 3 `
   --sd-clock-negedge --sd-clock-negedge-init --sd-review-profile --sd-startup-opt
 
 # Cold-boot awake image; retains the frame and startup proof.
-python firmware/capture-raw/build.py --out tmp/bringup/raw-reviewed25-errors-awake `
-  --flash --error-blinks --magic-format --line-stream --async-stop --transport idma `
+python firmware/capture-raw/build.py --out tmp/bringup/raw-reviewed25-single-frame-awake `
+  --flash --sensor-single-frame --error-blinks --ethernet-powerdown --magic-format --line-stream --async-stop --transport idma `
   --sd-bus-width 4 --sd-clock-hz 25000000 --sd-gpio-speed 3 `
   --sd-clock-negedge --sd-clock-negedge-init --sd-review-profile --sd-startup-opt
 
 # Same selected capture path, followed by guarded final Standby.
-python firmware/capture-raw/build.py --out tmp/bringup/raw-reviewed25-errors-standby `
-  --flash --standby --error-blinks --magic-format --line-stream --async-stop --transport idma `
+python firmware/capture-raw/build.py --out tmp/bringup/raw-reviewed25-single-frame-standby `
+  --flash --standby --sensor-single-frame --error-blinks --ethernet-powerdown --magic-format --line-stream --async-stop --transport idma `
   --sd-bus-width 4 --sd-clock-hz 25000000 --sd-gpio-speed 3 `
   --sd-clock-negedge --sd-clock-negedge-init --sd-review-profile --sd-startup-opt
 ```
 
-These use the normal scene and 1,428-line exposure defaults. Do not add
+These use the normal scene and 1,428-line exposure defaults. Single-frame
+operation and Ethernet power-down are explicit selections; omitting
+`--sensor-single-frame` reproduces the preceding explicit-STOP behavior.
+Do not substitute `--power-probe ethernet-powerdown`; that RAM-only experiment
+adds a diagnostic hold and restores the PHY afterward. Do not add
 `--raw-dma-tail-wait`, `--sd-idma-read`, `--dma-sleep` or electrical trial flags.
 With `--error-blinks`, capture failures shut down in both awake and Standby
 profiles; "awake" describes successful diagnostic completion only. Omit the
@@ -143,6 +251,52 @@ The selected startup flash admission also excludes `--cycle-trace`, preinit,
 snapshots, poison and pattern diagnostics; use a separately bound RAM build
 for those experiments. Flash installation still requires exact build/recovery
 admission and independent readback; compilation alone is not qualification.
+
+### Diagnostic gap between sensor STOP and SD initialization
+
+`--sd-init-gap-ms 200` adds a temporary power-attribution experiment to the
+selected Ethernet-powerdown profile. It waits for the existing validated FRAME
+and acknowledged sensor STOP, then waits 80,000,000 DWT cycles at the checked
+400 MHz configuration before issuing any SD command. The frame/STOP wait and
+the gap both have finite failure bounds; failed guards use normal failure
+cleanup. The normal streaming and image-validation rules remain in force.
+
+```powershell
+python firmware/capture-raw/build.py --out tmp/bringup/raw-sd-gap-standby `
+  --flash --standby --error-blinks --ethernet-powerdown --sd-init-gap-ms 200 `
+  --magic-format --line-stream --async-stop --transport idma `
+  --sd-bus-width 4 --sd-clock-hz 25000000 --sd-gpio-speed 3 `
+  --sd-clock-negedge --sd-clock-negedge-init --sd-review-profile --sd-startup-opt
+```
+
+Omit `--standby` for a cold-boot awake diagnostic, or omit both `--flash` and
+`--standby` for a RAM diagnostic. The latter retains the `GAP1` record and frame
+for inspection, but a warm RAM run does not reproduce cold card startup. The
+builder accepts only 0 (default) or 200 ms, requires `--ethernet-powerdown`, and
+rejects incompatible diagnostic profiles, including `--cycle-trace`.
+
+The existing PD12 marker output emits event 11 (`sd_init_gap_begin`) after STOP
+and event 12 (`sd_init_gap_end`) after the wait; SD-init event 4 follows them.
+The separate 64-byte `GAP1` proof records entry, FRAME, STOP and gap timestamps,
+the requested cycle count, frame/STOP validity and zero SD command counts at
+the boundaries. Normal phase IDs 1–10 retain their meanings. RAM READ operations
+leave the gap proof zero; Standby does not retain a complete inspectable SRAM
+record, so cold measurements also use the external markers.
+
+This separates **host-command activity** from capture. The SD card remains
+powered and can perform internal work before its first command. The sensor and
+receiver rails stay powered after STOP, and the CPU runs an awake wait. The gap
+plateau therefore includes the board, CPU, stopped camera/receiver and powered
+uninitialized card; it is neither isolated SD idle current nor sensor-only
+power. Ethernet stays powered down. Do not compare the intentionally extended
+cycle's total energy as a production optimization.
+
+Omitting the gap reproduces the installed Ethernet candidate's receiver,
+recovery prefix and full 64 KiB sector byte-for-byte. The diagnostic retains the
+15,804-byte early load and error engine; its prefix changes only the two approved
+receiver-CRC literals. Build identity is separate from hardware qualification.
+See the [gap campaign evidence](evidence/2026-10-28-sd-init-gap/README.md) for the
+measured results and final restored firmware.
 
 ## Historical October 26 capture: v23 default phase at 12.5 MHz
 
@@ -812,6 +966,84 @@ Only after awake hardware qualification should `--standby` be added. It retains
 the previously qualified peripheral teardown and accepts it only after complete
 camera validation, sensor STOP, full slot commit, and idle/deinitialized SD.
 
+## RAM-only power attribution probes — October 28
+
+`--power-probe` adds a bounded diagnostic hold to the reviewed, awake RAM
+capture profile. It does not change the installed normal flash firmware.
+Every mode waits up to three seconds for a complete validated frame and sensor
+STOP **before SD initialization**, then holds for 200 ms between PD12 phase
+markers 11 and 12. The ordinary image save follows the hold. Thus the compared
+hold windows contain no active SD transaction and do not require pausing one.
+
+| Mode | State during the matched hold | Qualification |
+|---|---|---|
+| `hold-after-stop` | Sensor stopped; reset released; receiver retained | Measured control |
+| `reset-after-stop` | Same state, with sensor reset asserted | Measured against the control |
+| `receiver-off` | Sensor reset asserted; CSI receiver/PHY disabled, APB and kernel clocks retained | Measured against `reset-after-stop` |
+| `ethernet-control` | Sensor stopped; read/verify PHY identity and write unchanged BMCR | Initial attempt exposed the MDIO sampling defect; corrected source is built/tested offline, integrated capture rerun pending |
+| `ethernet-powerdown` | Matched PHY sequence, setting BMCR power-down during hold and save | Corrected management method passed separate isolated-board A/B/A; integrated capture/save profile not rerun |
+
+The 64-byte `PWP1` record binds mode, completion order, hold duration, reset
+levels and camera preconditions. `power_csi.inc` retains an additional
+128-byte record of receiver idle state, changes and unchanged clocks.
+`power_phy.inc` uses bounded MDIO transactions, checks IDs and BMCR, restores
+its GPIO configuration, and requires exact BMCR restoration after SD teardown
+on success. Its 256-byte record retains failure and restoration details.
+`bench.py` validates the records against the exact frozen executable and
+existing successful storage/terminal proofs; diagnostic telemetry never
+substitutes for those proofs.
+
+**MDIO correction:** sample the PHY's current bit at the end of MDC-low,
+before raising MDC. The PHY may advance its output immediately after that
+rising edge; sampling after the following high wait shifted the IDs by one
+bit and made the next register's first bit appear to be a bad turnaround.
+The corrected standalone diagnostic read IDs `0007/C131` and BMCR `3000`;
+separate isolated-board A/B/A tests verified power-down and restoration.
+`test_power_phy.py` retains the actual clock routine in a rising-edge PHY
+model, checks control/power-down/restore and failure guards, and deliberately
+regresses the sample placement to prove the old defect fails the same test.
+This hold-and-restore probe remains experimental RAM-only; it has not been
+rerun as an integrated capture/save profile. The separately installed normal
+[`--ethernet-powerdown` helper](evidence/2026-10-28-ethernet-powerdown/README.md)
+uses the corrected sampling method without the hold or PHY restoration.
+Clearing PHY power-down
+resets the PHY internally, so exact BMCR restoration does not prove identical
+negotiation state or immediate restoration of the original current waveform.
+See the [isolated-board evidence](../../docs/power/evidence/2026-10-28-isolated-nucleo/README.md)
+and [owning decision](NOTES.md#2026-10-28--sample-mdio-before-the-phy-advances-on-rising-mdc).
+
+For example, build the stopped-sensor control with:
+
+```powershell
+python firmware/capture-raw/build.py --out tmp/bringup/power-control `
+  --sd-review-profile --sd-startup-opt --sd-bus-width 4 --sd-clock-hz 25000000 `
+  --sd-clock-negedge --sd-clock-negedge-init --magic-format --line-stream `
+  --async-stop --cycle-trace --power-probe hold-after-stop
+```
+
+The builder rejects flash, Standby and incompatible diagnostic combinations.
+Normal, preinitialized-SD and long-exposure comparisons remain separate
+experiments. All measurements belong to the JS-fed 5 V board branch; a
+stopped-sensor-to-reset difference is not the sensor's active capture power,
+and receiver disable with retained clocks is not total MCU power.
+See the [aligned ablation results and image checks](../../docs/power/evidence/2026-10-28-aligned-ablation/README.md).
+
+A separate temporary shallow-WFI stub compared a 200 ms busy loop with a lower
+current plateau. It deliberately masked/cleared all interrupts and left
+`DBG_SLEEP` clear. Live ST-LINK observation and the normal UART/BREAK recovery
+attempt failed; hardware reset attempts did not
+restore verified AP1 access; a cold cycle with the UART guard did restore the
+exact installed early park. The retained proof was abandoned. This is only an
+externally observed sleep-path result, **not verified WFI entry, an isolated
+CPU power measurement, or a production sleep policy**. It is not exposed as a
+normal build option. The installed recovery mechanism uses the observed
+BREAK-to-NRST behavior followed by polling the C0 pulse pattern in the early
+prefix; no runtime UART interrupt listener was identified. The reason those
+warm recovery attempts failed is unresolved, so IRQ masking is not an
+established cause. Future sleep diagnostics must qualify finite wake-up,
+autonomous recovery and proof retrieval before removing observation paths.
+See the [correction to the initial recovery interpretation](../../docs/power/evidence/2026-10-28-aligned-ablation/CORRECTION.md).
+
 ## Cold-cycle measurements
 
 `cold_cycle.py` records one root-owned cold cycle through JS110 and the existing
@@ -888,3 +1120,99 @@ identities, without copying the multi-gigabyte sample arrays. Run
 intervals and the primary time/energy medians from that folder alone. This
 replays numerical integration, not raw onset/plateau classification or analog
 calibration. The existing 9.5 A validity criterion is unchanged.
+
+## RAM diagnostic for sensor automatic stop
+
+`--sensor-autostop` is an opt-in, awake RAM experiment on the normal Ethernet
+power-down, four-bit 25 MHz profile. It programs VD56G3 context 0's repeat count
+to 1 and next context to 4, reads both back, and reads the 16-bit frame counter
+before START. A fresh counter of zero is required. It retains the ordinary
+single-snapshot receiver checks and normal concurrent SD initialization/save;
+there is no intentional delay between capture and SD initialization.
+
+The successful capture path sends no explicit sensor STOP. Instead, a bounded
+one-second observer waits for sensor FSM 2 and records the sensor frame counter
+and all PA0 STROBE rising edges. The proof accepts independent counts of one or
+two because the manual also describes a first-two-frame exception; accepting a
+diagnostic outcome of two does not qualify it as single-frame operation. After
+the final SD payload acknowledgement, a second observation must still show FSM
+2, unchanged counter and STROBE counts, and STROBE low. Failure retains a failed
+proof and never becomes permission to treat the card or camera as idle.
+
+The `AST1` proof is forty 32-bit words at the manifest's
+`sensor_autostop_proof` address. The early configuration record is eight words
+at `0x343F4060`; the host saves both before validating the result. The STOP
+counter instruments actual `wr8(0x0202,1)` calls, including failed attempts and
+the existing receiver-deadline failure fallback. Marker 11 means **first
+observed autonomous standby**. PD0 mirrors PA0's rising/falling IRQ callbacks
+after the recorded activation timestamp; these are IRQ-observed exposure
+envelopes, not direct sensor-pin measurements. The FSM timestamp is also an
+observation, not the exact physical transition time. READ operations must
+leave the entire AST proof zero.
+
+```powershell
+python firmware/capture-raw/build.py --out tmp/autostop-ram `
+  --sensor-autostop --error-blinks --ethernet-powerdown `
+  --magic-format --line-stream --async-stop --transport idma `
+  --sd-bus-width 4 --sd-clock-hz 25000000 --sd-gpio-speed 3 `
+  --sd-clock-negedge --sd-clock-negedge-init --sd-review-profile --sd-startup-opt
+```
+
+This historical diagnostic rejects FLASH, Standby, the SD-init gap and other
+experimental profiles. The separately selected single-frame profile below
+implements cold integration. See the [RAM experiment evidence and qualification
+limits](evidence/2026-10-28-sensor-autostop/README.md) for frozen builds,
+image comparisons and observed frame counts. The frozen `ram-auto-v2`
+manifest's `storage_overlap` prose mistakenly mentions a 200 ms gap; its
+separate correction record and current builder describe the actual no-gap
+code. The frozen binary and manifest were not rewritten.
+
+## Normal single-frame profile
+
+The user requested promotion of automatic single-frame capture after the RAM
+experiment. Select `--sensor-single-frame` for the installed implementation;
+its cold awake and Standby qualification, including the user-requested testing
+stop and limits on image readback coverage, is recorded in the
+[single-frame promotion evidence](evidence/2026-10-28-sensor-single-frame/README.md).
+The existing explicit-STOP profile remains reproducible by omitting this option,
+and `--sensor-autostop` continues to reproduce the historical RAM diagnostic.
+
+Stage one already writes exposure mode 2 in its twelve-byte manual-exposure
+transaction. The single-frame profile replaces the later duplicate mode-2
+write with one four-byte transaction to `0x048C`: `01 00 04 00`, meaning
+context-0 repeat count 1 and next context 4. No context command or exposure-mode
+write intervenes between the original manual-exposure transaction and this
+replacement. The transaction is acknowledged before START. Using the existing
+byte-array writer preserves the shared pre-recovery helper's machine code.
+
+The forty-word AST proof uses **schema 2**. Context readback and the first frame
+counter observation happen **after START and after the checked late-code
+load**. This differs from the RAM diagnostic's pre-START proof: the first
+observed counter may already be 1, and the final counter field means the count
+since sensor reset, not a difference from that later observation. Successful
+capture requires exactly one sensor frame, exactly one observed exposure
+strobe, zero explicit STOP writes, and stable autonomous standby after the
+saved payload. A second frame or exposure is a failure in this profile.
+
+The receiver retains its 15,804-byte early load. Post-START readback and the
+16-bit sensor helper are placed after the checked late load; interrupt handlers
+and the exposure mirror remain in the early region. The 6,720-byte prefix and
+the existing error-engine placement are retained. The production-only prefix
+audit pins its complete unrelocated image, preserves every recovery instruction
+and all twenty recovery literals, checks both relocated CRC data words, and
+requires the fixed error bridge/engine bytes to match the preceding normal
+firmware. The explicit-STOP prefix checker remains unchanged.
+
+```powershell
+python firmware/capture-raw/build.py --out tmp/single-frame-standby `
+  --flash --standby --sensor-single-frame --error-blinks --ethernet-powerdown `
+  --magic-format --line-stream --async-stop --transport idma `
+  --sd-bus-width 4 --sd-clock-hz 25000000 --sd-gpio-speed 3 `
+  --sd-clock-negedge --sd-clock-negedge-init --sd-review-profile --sd-startup-opt
+```
+
+Omit `--standby` for the awake FLASH qualification build. Exact installed-state,
+cold-image, recovery and power results belong to the linked evidence, not to
+the presence of this build option. PD0 still mirrors exposure IRQs until
+shutdown masks interrupts; later low level through marker 10 is output
+continuity, not ongoing sensor observation.

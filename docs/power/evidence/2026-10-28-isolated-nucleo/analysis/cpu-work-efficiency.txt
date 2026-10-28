@@ -1,0 +1,12 @@
+CPU workload efficiency, isolated Nucleo
+
+Run | MHz | updates/s | busy mJ | uJ/update | fixed-work energy vs400MHz
+cpu400b | 400 | 2537911 | 74.757 | 0.146449 | 1.000x
+cpu200a | 200 | 2238324 | 73.473 | 0.163070 | 1.113x
+cpu100a | 100 | 1730668 | 72.584 | 0.208632 | 1.424x
+cpu50a | 50 | 1201747 | 72.204 | 0.298148 | 2.035x
+cpu400c | 400 | 2535459 | 74.802 | 0.146538 | 1.000x
+
+50MHz reduces current a little but completes about half the work per second.
+For this caches-off RAM workload, fixed-work energy therefore increases; do not promote slowing the CPU on current alone.
+The remaining floor includes MCU fabric/PLLs/SRAM and board loads; it is not established as removable board overhead.

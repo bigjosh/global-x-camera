@@ -1,0 +1,86 @@
+{
+  "rows": [
+    {
+      "run": "ram-control",
+      "analysis_sha256": "174e2d525f1e314e2ac83b8759418bbea7d16fe8a8083fd37b403b4d927e7e40",
+      "binary_sha256": "ef85e7106b3cb0cb253fe4a174e926a1bd227c006b7bfa46ab0433a1496ae000",
+      "startup": {
+        "first_strobe_phase2_from_runtime_begin_ms": 14.23805163680436,
+        "receiver_entry_phase1_from_runtime_begin_ms": 8.96455163680436,
+        "receiver_entry_to_first_strobe_ms": 5.2735,
+        "sensor_START_begin_from_runtime_begin_DWT_nominal_ms": 8.844725,
+        "sensor_START_end_from_runtime_begin_DWT_nominal_ms": 8.89218,
+        "scope": "Warm runtime only. First STROBE uses the identical phase2 IRQ marker and same-run GPIO/DWT-fitted runtime origin; not a cold button-to-exposure measurement."
+      },
+      "frame_to_stop_JS_ms": 36.081500000000005,
+      "frame_to_stop_nominal_DWT_ms": 35.9345125,
+      "whole_warm_duration_ms": 510.35050000000007,
+      "whole_warm_energy_mJ": 246.82432672007383,
+      "SD_init_ms": 17.961000000000002,
+      "scan_preparation_ms": 91.845,
+      "slot_transport_ms": 380.7335,
+      "external_strobe_count": null
+    },
+    {
+      "run": "ram-auto01",
+      "analysis_sha256": "1c08955fa7d142ef634de87efcfa166cc0746a3443bdb67a9d59c1aa1c273b89",
+      "binary_sha256": "5bf9e515bb28d74efa3cdee21c9a9f373fedbc3c36b73dd954e136f6df348e65",
+      "startup": {
+        "first_strobe_phase2_from_runtime_begin_ms": 14.62520545851905,
+        "receiver_entry_phase1_from_runtime_begin_ms": 9.33120545851905,
+        "receiver_entry_to_first_strobe_ms": 5.2940000000000005,
+        "sensor_START_begin_from_runtime_begin_DWT_nominal_ms": 9.22457,
+        "sensor_START_end_from_runtime_begin_DWT_nominal_ms": 9.2719325,
+        "scope": "Warm runtime only. First STROBE uses the identical phase2 IRQ marker and same-run GPIO/DWT-fitted runtime origin; not a cold button-to-exposure measurement.",
+        "config_begin_from_runtime_begin_DWT_nominal_ms": 8.8955,
+        "config_end_from_runtime_begin_DWT_nominal_ms": 9.21934,
+        "config_write_readback_cost_DWT_nominal_ms": 0.32384,
+        "config_write_readback_cost_JS_aligned_ms": 0.3255,
+        "config_scope": "Additional pre-START repeat/next writes and repeat/next/frame-counter readbacks; time from AST.config_begin through AST.config_end, before any START."
+      },
+      "frame_to_stop_JS_ms": 2.7295000000000003,
+      "frame_to_stop_nominal_DWT_ms": 2.7165975,
+      "whole_warm_duration_ms": 512.346,
+      "whole_warm_energy_mJ": 238.77598934707044,
+      "SD_init_ms": 17.987,
+      "scan_preparation_ms": 91.0145,
+      "slot_transport_ms": 383.003,
+      "external_strobe_count": 1,
+      "first_strobe_added_ms_vs_normal": 0.3871538217146888
+    },
+    {
+      "run": "ram-auto02",
+      "analysis_sha256": "148d29fffe2ef533b4009c46000851daaa47add32b0fec58819fe0f1597c0d87",
+      "binary_sha256": "5bf9e515bb28d74efa3cdee21c9a9f373fedbc3c36b73dd954e136f6df348e65",
+      "startup": {
+        "first_strobe_phase2_from_runtime_begin_ms": 14.6244197373786,
+        "receiver_entry_phase1_from_runtime_begin_ms": 9.3339197373786,
+        "receiver_entry_to_first_strobe_ms": 5.2905,
+        "sensor_START_begin_from_runtime_begin_DWT_nominal_ms": 9.225965,
+        "sensor_START_end_from_runtime_begin_DWT_nominal_ms": 9.27339,
+        "scope": "Warm runtime only. First STROBE uses the identical phase2 IRQ marker and same-run GPIO/DWT-fitted runtime origin; not a cold button-to-exposure measurement.",
+        "config_begin_from_runtime_begin_DWT_nominal_ms": 8.89655,
+        "config_end_from_runtime_begin_DWT_nominal_ms": 9.22068,
+        "config_write_readback_cost_DWT_nominal_ms": 0.32413,
+        "config_write_readback_cost_JS_aligned_ms": 0.326,
+        "config_scope": "Additional pre-START repeat/next writes and repeat/next/frame-counter readbacks; time from AST.config_begin through AST.config_end, before any START."
+      },
+      "frame_to_stop_JS_ms": 2.7805,
+      "frame_to_stop_nominal_DWT_ms": 2.7687525,
+      "whole_warm_duration_ms": 524.78,
+      "whole_warm_energy_mJ": 244.4415670449734,
+      "SD_init_ms": 18.0075,
+      "scan_preparation_ms": 92.293,
+      "slot_transport_ms": 394.1185,
+      "external_strobe_count": 1,
+      "first_strobe_added_ms_vs_normal": 0.38636810057423965
+    }
+  ],
+  "scope": "One normal warm RAM control and two same-binary automatic-stop repeats. No automatic-stop cold boot or Standby campaign; normal FLASH is unchanged.",
+  "limitations": [
+    "Automatic-stop sensor standby is first observed by I2C polling, not exact physical transition.",
+    "The experiment adds pre-START configuration writes/readbacks and delays first STROBE slightly; retain this cost.",
+    "Whole warm runtime and energy include card variability and slot scanning, so there is no demonstrated whole-cycle speedup.",
+    "All power is whole-board5V input; no sensor-only current attribution."
+  ]
+}

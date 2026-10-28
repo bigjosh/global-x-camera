@@ -1,0 +1,1 @@
+#define RAW_LATE_CRC32 0xCD1E6FE2U

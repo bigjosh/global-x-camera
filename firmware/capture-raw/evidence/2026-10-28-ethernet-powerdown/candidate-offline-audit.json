@@ -1,0 +1,134 @@
+{
+  "scope": "Offline files only; no hardware or installation qualification",
+  "builds": {
+    "ram-candidate": {
+      "binary_sha256": "ef85e7106b3cb0cb253fe4a174e926a1bd227c006b7bfa46ab0433a1496ae000",
+      "binary_bytes": 32072,
+      "admission": "checked_build RAM/awake passed",
+      "board_eth_proof": "0x343080c0",
+      "board_eth_proof_bytes": 256,
+      "bss": [
+        "0x34307d60",
+        "0x343087dc"
+      ],
+      "all_frozen_source_hashes_match": true
+    },
+    "flash-candidate": {
+      "binary_sha256": "69c5a5c0cc434eb7496371d9e5b9c007db346b8bb7b9a1a650c90f0eade79d28",
+      "binary_bytes": 33584,
+      "admission": "FLASH profile/layout/source hashes passed; RAM runner correctly rejects FLASH",
+      "board_eth_proof": "0x34308920",
+      "board_eth_proof_bytes": 256,
+      "bss": [
+        "0x34308340",
+        "0x34308d74"
+      ],
+      "all_frozen_source_hashes_match": true,
+      "fresh_layout_audit": {
+        "vectors_early": true,
+        "early_irq_symbols": true,
+        "direct_crossings": [
+          {
+            "address": 875570374,
+            "target": 875590728,
+            "name": "status_led_complete_sleep",
+            "owner": "raw_context_refused_park"
+          },
+          {
+            "address": 875570498,
+            "target": 875581548,
+            "name": "complete_storage",
+            "owner": "raw_capture_fail"
+          },
+          {
+            "address": 875575938,
+            "target": 875582276,
+            "name": "raw_storage_execute",
+            "owner": "main"
+          }
+        ],
+        "loader_call": 875575620,
+        "storage_call": 875575938
+      },
+      "early_bytes": 15804,
+      "early_immutable_bytes": 15776,
+      "early_padding_bytes": 24,
+      "late_address": "0x34303dbc",
+      "late_end": "0x34308330",
+      "late_bytes": 17780,
+      "ethernet_late_symbols": {
+        "beth_delay": "0x34303dbc",
+        "beth_snapshot": "0x34303de0",
+        "beth_record": "0x34303e3c",
+        "beth_equal": "0x34303e80",
+        "beth_field": "0x34303ebc",
+        "beth_put": "0x34303ec8",
+        "beth_restore_pin": "0x34303eda",
+        "beth_clock_guard": "0x34303f58",
+        "beth_bus_open": "0x3430402c",
+        "beth_bus_close": "0x34304230",
+        "beth_clock_bit": "0x343043a4",
+        "beth_send": "0x343043f4",
+        "beth_header": "0x34304412",
+        "beth_read": "0x34304456",
+        "beth_write_bmcr": "0x343044bc",
+        "board_eth_powerdown_once": "0x34304500"
+      }
+    }
+  },
+  "prefix": {
+    "old_sha256": "99dbb0f9ecdd56a9313e4e62bbbfec22ec8e5e5901c852d956315844cd066eba",
+    "new_sha256": "2b9724bc4b60af52b1c4ab45e1b232578e9640efc3a30a57772a810d99c3f344",
+    "bytes": 6720,
+    "changed_byte_offsets": [
+      3228,
+      3229,
+      3230,
+      3231,
+      4948,
+      4949,
+      4950,
+      4951
+    ],
+    "only_two_receiver_crc_words_changed": true,
+    "crc_word_offsets": [
+      "0xC9C",
+      "0x1354"
+    ],
+    "new_receiver_crc32": "0x23193f6f",
+    "unrelocated_prefix_identical": true,
+    "complete_guard_identical_through_offset": "0xAFE",
+    "referenced_literal_offsets": [
+      1660,
+      1664,
+      1668,
+      1672,
+      1676,
+      1680,
+      1684,
+      1688,
+      1692,
+      1696,
+      1700,
+      1704,
+      1708,
+      1712,
+      1716,
+      1720,
+      1724,
+      1728,
+      1732,
+      1736
+    ],
+    "referenced_literal_count": 20,
+    "park": "0x3418078c",
+    "error_engine_identical": true,
+    "error_engine_sha256": "247ad0ddd76963039ed01a2e14beb3499ee9097a8df86f62ad5751047835454e",
+    "error_engine_bytes": 1536,
+    "runtime_copy_destination": "0x343c8000",
+    "sector_sha256": "a10e4894d79cd3fe182b95b48eb56a308280f3201736d295860ecfe725a62645",
+    "early_receiver_bytes": 15804,
+    "receiver_sha256": "69c5a5c0cc434eb7496371d9e5b9c007db346b8bb7b9a1a650c90f0eade79d28"
+  },
+  "passed": true
+}

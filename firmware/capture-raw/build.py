@@ -15,6 +15,8 @@ from producer_transform import transform as transform_producer
 from phase_protocol import PHASE_PROTOCOL
 from magic_transform import transform as transform_magic, sensor_exposure
 from cycle_trace_transform import transform as transform_cycle_trace
+import sensor_autostop_transform
+import single_frame_prefix
 import error_build
 
 HERE=Path(__file__).resolve().parent
@@ -32,7 +34,7 @@ BASE_RECEIVER='20c5ddaef2e1bf6b78d272e3ee23f891ead2d41f88e922538962e218987f4e99'
 
 def sha(data): return hashlib.sha256(data).hexdigest()
 
-def relocate_prefix_crc(folder,prefix,compiled_crc,actual_crc):
+def relocate_prefix_crc(folder,prefix,compiled_crc,actual_crc,single_frame=False):
     """Patch only two reviewed literal words, preserving compiler instruction layout.
 
     Arbitrary CRC constants can change GCC instruction selection and literal
@@ -40,7 +42,8 @@ def relocate_prefix_crc(folder,prefix,compiled_crc,actual_crc):
     Compile with v66c's pinned constant, then relocate its exact two data words.
     The generated ELF, raw image and disassembly remain mutually consistent.
     """
-    offsets=(0xC9C,0x1354)
+    offsets=single_frame_prefix.CRC_OFFSETS if single_frame else (0xC9C,0x1354)
+    if single_frame: single_frame_prefix.check(folder,prefix)
     old=struct.pack('<I',compiled_crc); new=struct.pack('<I',actual_crc)
     if compiled_crc!=0x3E97C7F7 or not 5140<=len(prefix)<=0x1C00:
         raise ValueError('Unreviewed prefix CRC relocation geometry')
@@ -208,6 +211,8 @@ def main():
                    help='Native SD clock; explicitly select 12.5 MHz for the qualified fallback')
     p.add_argument('--sd-gpio-speed',type=int,choices=(0,1,2,3),default=3,
                    help='SD GPIO OSPEEDR encoding; nondefault slew is RAM diagnostic only')
+    p.add_argument('--sd-clk-gpio-speed',type=int,choices=(1,2,3),default=None,
+                   help='RAM25 isolated CLK OSPEEDR trial; CMD/DAT remain speed3')
     p.add_argument('--sd-fixed-compensation',action='store_true',
                    help='RAM-only ES0620 VDDIO5 fixed-code test at 25 MHz and GPIO speed3')
     p.add_argument('--sd-clock-negedge',action='store_true',
@@ -223,6 +228,7 @@ def main():
     p.add_argument('--sd-high-speed-combined-electrical',action='store_true',
                    help='Explicitly combine the two reviewed RAM50 slew/compensation experiments')
     p.add_argument('--sd-idma-read',action='store_true',help='Reviewed RAM read-only diagnostic using SDMMC receive IDMA')
+    p.add_argument('--sd-read-diagnostics',action='store_true',help='RAM single-sector READ diagnostic with pre-cleanup receive registers; PIO or IDMA')
     p.add_argument('--sd-startup-opt',action='store_true',help='Reviewed startup delays/SCR cache; flash admits only the exact 12.5/25 MHz no-tail profiles')
     p.add_argument('--sd-early-run-clock',action='store_true',help='RAM experiment: validate CSD speed and switch to 12.5 MHz before CMD7')
     p.add_argument('--raw-dma-tail-wait',action='store_true',help='RAM capture: wait up to 10 ms for validated frame tail before choosing PIO')
@@ -234,6 +240,7 @@ def main():
     p.add_argument('--standby',action='store_true')
     p.add_argument('--error-blinks',action='store_true',help='Five coded red sets followed by failure shutdown; preserves early UART recovery')
     p.add_argument('--error-test-code',type=int,choices=range(10),default=0,help='RAM-only synthetic failure qualification; 9 selects request word6; never admitted to flash')
+    p.add_argument('--error-after-frame-test',action='store_true',help='FLASH diagnostic: validated real frame/STOP then code4, without any SD operation')
     p.add_argument('--cycle-trace',action='store_true',help='Fixed RAM timestamps; awake diagnostic completion preserves logs for ST-LINK')
     p.add_argument('--async-stop',action='store_true')
     p.add_argument('--dma-sleep',action='store_true',help='Experimental shallow WFI during SD DMA, after sensor STOP')
@@ -241,12 +248,74 @@ def main():
     p.add_argument('--preinit',action='store_true',help='RAM diagnostic: initialize SD before sensor start')
     p.add_argument('--snapshot',action='store_true',help='RAM diagnostic: copy the last 512 B at each published prefix')
     p.add_argument('--poison',action='store_true',help='RAM diagnostic: fill the frame with A5 before sensor start')
+    p.add_argument('--power-probe',choices=('hold-after-stop','reset-after-stop','ethernet-control','ethernet-powerdown','receiver-off'),default=None,
+                   help='RAM-only: finish camera before SD init, then hold 200 ms with optional sensor reset')
+    p.add_argument('--ethernet-powerdown',action='store_true',
+                   help='Power down unused Nucleo LAN8742 after camera arm; bounded nonfatal diagnostic')
+    p.add_argument('--sd-init-gap-ms',type=int,choices=(0,200),default=0,
+                   help='Diagnostic: wait 200 ms after validated FRAME and sensor STOP before SD init')
+    p.add_argument('--sensor-autostop',action='store_true',
+                   help='Diagnostic: context0 repeat1/next4; observe autonomous standby without explicit STOP')
+    p.add_argument('--sensor-single-frame',action='store_true',
+                   help='Single-frame capture: minimal pre-START context write, strict one-frame autonomous standby')
     a=p.parse_args()
+    autostop_enabled=a.sensor_autostop or a.sensor_single_frame
+    if a.sensor_single_frame and (a.sensor_autostop or not a.ethernet_powerdown or a.cycle_trace or a.sd_init_gap_ms):
+        p.error('Single-frame capture requires the normal Ethernet-powerdown profile without other diagnostics')
+    if a.sensor_single_frame and a.flash and not a.error_blinks:
+        p.error('Single-frame FLASH requires the reviewed recovery/error-engine profile')
+    if a.sensor_autostop and (a.flash or a.standby or not a.ethernet_powerdown or a.cycle_trace or a.sd_init_gap_ms):
+        p.error('Sensor auto-stop is a RAM-awake diagnostic requiring the normal Ethernet-powerdown profile without other diagnostics')
+    if a.sd_init_gap_ms and (not a.ethernet_powerdown or a.cycle_trace):
+        p.error('SD init gap requires the normal Ethernet-powerdown profile without cycle trace')
+    if a.ethernet_powerdown and (not a.sd_review_profile or not a.sd_startup_opt or
+            a.sd_bus_width!=4 or a.sd_clock_hz!=25000000 or a.sd_gpio_speed!=3 or
+            not a.sd_clock_negedge or not a.sd_clock_negedge_init or not a.magic_format or
+            not a.line_stream or not a.async_stop or a.transport!='idma' or a.preinit or
+            a.snapshot or a.poison or a.whole_image_preerase or a.dma_sleep or a.raw_dma_tail_wait or
+            a.sd_early_run_clock or a.sd_idma_read or a.sd_read_diagnostics or a.sd_clk_gpio_speed is not None or
+            a.sd_fixed_compensation or a.sd_high_speed_mixed_slew or a.sd_high_speed_fixed_compensation or
+            a.sd_high_speed_combined_electrical or a.power_probe or a.error_test_code or a.error_after_frame_test or
+            a.pattern!='scene' or a.exposure_coarse!=1428):
+        p.error('Board Ethernet power-down requires the reviewed startup 25 MHz normal capture profile')
+    power_probe_mode={None:0,'hold-after-stop':1,'reset-after-stop':2,
+                      'ethernet-control':3,'ethernet-powerdown':4,'receiver-off':5}[a.power_probe]
+    if a.power_probe and (a.flash or a.standby or not a.sd_review_profile or not a.sd_startup_opt or
+            a.sd_bus_width!=4 or a.sd_clock_hz!=25000000 or a.sd_gpio_speed!=3 or
+            not a.sd_clock_negedge or not a.sd_clock_negedge_init or not a.magic_format or
+            not a.line_stream or not a.async_stop or a.transport!='idma' or a.preinit or
+            a.snapshot or a.poison or a.whole_image_preerase or a.dma_sleep or a.raw_dma_tail_wait or
+            a.sd_early_run_clock or a.sd_idma_read or a.sd_read_diagnostics or a.sd_clk_gpio_speed is not None or
+            a.sd_fixed_compensation or a.sd_high_speed_mixed_slew or a.sd_high_speed_fixed_compensation or
+            a.sd_high_speed_combined_electrical or a.error_blinks or a.error_test_code or a.error_after_frame_test or
+            a.pattern!='scene' or a.exposure_coarse!=1428):
+        p.error('Power probe requires the exact reviewed startup 25 MHz RAM scene profile')
     if a.error_blinks and not a.magic_format:
         p.error('Error signaling currently requires the selected magic-slot layout')
     if a.error_test_code and (not a.error_blinks or a.flash or a.standby):
         p.error('Injected error requires an explicit RAM-only error-signaling build')
+    if a.error_after_frame_test and (not a.error_blinks or not a.flash or a.error_test_code or not a.async_stop):
+        p.error('Post-frame error diagnostic requires flash error signaling and asynchronous STOP')
     a.sd_high_speed=a.sd_clock_hz==50000000
+    if a.sd_read_diagnostics and (a.flash or a.standby or not a.sd_review_profile or
+            not a.sd_startup_opt or a.sd_bus_width!=4 or a.sd_clock_hz not in (12500000,25000000) or
+            a.sd_gpio_speed!=3 or a.sd_clk_gpio_speed is not None or
+            not a.sd_clock_negedge or not a.sd_clock_negedge_init or a.sd_fixed_compensation or
+            a.sd_high_speed_mixed_slew or a.sd_high_speed_fixed_compensation or a.sd_high_speed_combined_electrical or
+            a.sd_early_run_clock or a.raw_dma_tail_wait or a.dma_sleep or
+            not a.magic_format or not a.line_stream or not a.async_stop or a.transport!='idma' or
+            a.preinit or a.snapshot or a.poison or a.whole_image_preerase or a.pattern!='scene' or
+            a.exposure_coarse!=1428 or a.error_blinks or a.error_test_code or a.error_after_frame_test):
+        p.error('Receive diagnostics require the reviewed startup 12.5/25 MHz single-sector RAM READ profile')
+    if a.sd_clk_gpio_speed is not None and (a.flash or a.standby or not a.sd_review_profile or
+            not a.sd_startup_opt or a.sd_bus_width!=4 or a.sd_clock_hz!=25000000 or a.sd_gpio_speed!=3 or
+            not a.sd_clock_negedge or not a.sd_clock_negedge_init or a.sd_fixed_compensation or
+            a.sd_high_speed_mixed_slew or a.sd_high_speed_fixed_compensation or a.sd_high_speed_combined_electrical or
+            a.sd_early_run_clock or a.sd_idma_read or a.raw_dma_tail_wait or a.dma_sleep or
+            not a.magic_format or not a.line_stream or not a.async_stop or a.transport!='idma' or
+            a.preinit or a.snapshot or a.poison or a.whole_image_preerase or
+            a.error_test_code or a.error_after_frame_test):
+        p.error('CLK-only slew requires the reviewed startup 25 MHz no-tail RAM capture/read profile')
     if a.sd_early_run_clock and (a.flash or a.standby or not a.sd_review_profile or
             not a.sd_startup_opt or a.sd_bus_width!=4 or a.sd_clock_hz!=12500000 or
             not a.sd_clock_negedge or not a.sd_clock_negedge_init or a.sd_gpio_speed!=3 or
@@ -327,6 +396,7 @@ def main():
         if src.name=='capture.c':
             capture=transform_capture(data.decode().replace('\r\n','\n'))
             capture=transform_magic(capture) if a.magic_format else capture
+            if autostop_enabled: capture=sensor_autostop_transform.capture(capture,a.sensor_single_frame)
             if a.cycle_trace: capture=transform_cycle_trace(capture)
             dst.write_text(capture,newline='\n')
         elif src.name=='phase_gpio.c':
@@ -334,6 +404,9 @@ def main():
             # 2 us, well above the measured ~0.24 us output/call overhead.
             phase=replace(data.decode().replace('\r\n','\n'),'event * 200U','event * 800U')
             phase=phase.replace('event * 200 nominal','event * 800 nominal')
+            if a.power_probe or a.sd_init_gap_ms or autostop_enabled:
+                phase=replace(phase,'event > 10U','event > 12U')
+                phase=phase.replace('event 1..10','event 1..12')
             dst.write_text(phase,newline='\n')
         else: dst.write_bytes(data)
         if dst.suffix.lower() in ('.c','.s'): compiled.append(dst)
@@ -347,6 +420,7 @@ def main():
             if name=='runtime.c' and a.error_blinks:
                 text=error_build.runtime_source(text)
                 if a.error_test_code: text=error_build.inject_error(text,a.error_test_code)
+                if a.error_after_frame_test: text=error_build.inject_after_frame(text)
             dst.write_text(text,newline='\n')
             if dst.suffix=='.c': compiled.append(dst)
     if a.error_blinks:
@@ -365,10 +439,22 @@ def main():
     if a.cycle_trace:
         for name in ('cycle_trace.h','cycle_trace_events.h','cycle_trace_sd.h'):
             (out/name).write_bytes((HERE/name).read_bytes())
+    if power_probe_mode in (3,4):
+        (out/'power_phy.inc').write_bytes((HERE/'power_phy.inc').read_bytes())
+    if a.ethernet_powerdown:
+        (out/'board_eth_powerdown.inc').write_bytes((HERE/'board_eth_powerdown.inc').read_bytes())
+    if a.sd_init_gap_ms:
+        (out/'sd_init_gap.inc').write_bytes((HERE/'sd_init_gap.inc').read_bytes())
+    if autostop_enabled:
+        (out/'sensor_autostop.inc').write_bytes((HERE/'sensor_autostop.inc').read_bytes())
+    if power_probe_mode==5:
+        (out/'power_csi.inc').write_bytes((HERE/'power_csi.inc').read_bytes())
     if a.sd_high_speed:
         (out/'sd_clock_profile.h').write_bytes((ROOT/'firmware/sd-storage/sd_clock_profile.h').read_bytes())
     if not a.flash:
         sensor=sensor_source((pbase/'stage1_sensor.c').read_text())
+        if a.sensor_autostop: sensor=sensor_autostop_transform.sensor(sensor)
+        if a.sensor_single_frame: sensor=sensor_autostop_transform.sensor_single(sensor)
         if a.exposure_coarse!=1428: sensor=sensor_exposure(sensor,a.exposure_coarse)
         (out/'stage1_sensor.c').write_text(sensor,newline='\n')
         compiled.append(out/'stage1_sensor.c')
@@ -390,6 +476,13 @@ def main():
     flags.insert(0,'-I'+str(out))
     if a.error_blinks: flags.append(f'-DRAW_ERROR_PREFIX={int(a.flash)}')
     if a.cycle_trace: flags.append('-DRAW_CYCLE_TRACE=1')
+    if a.sd_clk_gpio_speed is not None: flags.append(f'-DSD_CLK_GPIO_SPEED={a.sd_clk_gpio_speed}')
+    if a.sd_read_diagnostics: flags.append('-DSD_READ_DIAGNOSTICS=1')
+    if a.power_probe: flags.append(f'-DRAW_POWER_PROBE={power_probe_mode}')
+    if a.ethernet_powerdown: flags.append('-DRAW_BOARD_ETH_POWERDOWN=1')
+    if a.sd_init_gap_ms: flags.append(f'-DRAW_SD_INIT_GAP_MS={a.sd_init_gap_ms}U')
+    if autostop_enabled: flags.append('-DRAW_SENSOR_AUTOSTOP=1')
+    if a.sensor_single_frame: flags.append('-DRAW_SENSOR_SINGLE_FRAME=1')
     flags += [f'-DRAW_PATTERN={int(a.pattern=="diagonal")}',f'-DRAW_FLASH={int(a.flash)}',
               f'-DSD_BUS_WIDTH={a.sd_bus_width}',
               f'-DRAW_SD_CLOCK_HZ={a.sd_clock_hz}U',
@@ -417,6 +510,7 @@ def main():
               f'-DRAW_CHUNK_SECTORS={3730 if a.whole_image_preerase or a.magic_format else a.chunk_sectors}U','-DSTAGE1_SENSOR_TRIM=1',
               '-DLOW_POWER_MODE=3','-DLOW_POWER_ENTRY_DELAY_US=0']
     compiler=compile_with_late if a.flash else compile_sources
+    if a.error_blinks and a.flash: error_build.reserve_runtime(out/'capture.ld')
     code,size=compiler(out,compiled,flags,out/'capture.ld','capture',libc=True)
     late_meta=json.loads((out/'raw-late.json').read_text()) if a.flash else None
     symbols=(out/'symbols.txt').read_text()
@@ -454,6 +548,8 @@ def main():
         sd_width_proof_bytes=24 if a.sd_bus_width==4 else 0,
         sd_gpio_proof=symbol('sd_gpio_proof',a.sd_gpio_speed!=3),
         sd_gpio_proof_bytes=32 if a.sd_gpio_speed!=3 else 0,
+        sd_clk_gpio_proof=symbol('sd_clk_gpio_proof',a.sd_clk_gpio_speed is not None),
+        sd_clk_gpio_proof_bytes=48 if a.sd_clk_gpio_speed is not None else 0,
         sd_compensation_proof=symbol('sd_compensation_proof',a.sd_fixed_compensation),
         sd_compensation_proof_bytes=32 if a.sd_fixed_compensation else 0,
         exposure_coarse=a.exposure_coarse,
@@ -463,10 +559,16 @@ def main():
         system_core_clock=symbol('SystemCoreClock'),card=symbol('raw_card'),slots=symbol('raw_slots'),
         pattern=int(a.pattern=='diagonal'),transport=a.transport,sd_bus_width=a.sd_bus_width,
         sd_clock_hz=a.sd_clock_hz,sd_gpio_speed=a.sd_gpio_speed,
+        sd_clk_gpio_speed=a.sd_clk_gpio_speed,
         sd_clock_negedge=a.sd_clock_negedge,
         sd_clock_negedge_init=a.sd_clock_negedge_init,
         sd_review_profile=a.sd_review_profile,sd_high_speed=a.sd_high_speed,
         sd_idma_read=a.sd_idma_read,
+        sd_read_diagnostics=a.sd_read_diagnostics,
+        sd_read_diagnostics_proof=symbol('sd_read_diagnostics',a.sd_read_diagnostics),
+        sd_read_diagnostics_proof_bytes=64 if a.sd_read_diagnostics else 0,
+        raw_read_camera_proof=symbol('raw_read_camera_proof',a.sd_read_diagnostics),
+        raw_read_camera_proof_bytes=64 if a.sd_read_diagnostics else 0,
         sd_startup_opt=a.sd_startup_opt,
         sd_startup_proof=symbol('sd_startup_proof',a.sd_startup_opt),
         sd_startup_proof_bytes=64 if a.sd_startup_opt else 0,
@@ -494,6 +596,10 @@ def main():
         flash=a.flash,standby=a.standby,async_stop=a.async_stop,line_stream=a.line_stream,
         error_blinks=a.error_blinks,
         error_test_code=a.error_test_code,
+        error_after_frame_test=a.error_after_frame_test,
+        error_after_frame_proof=error_build.POST_FRAME_PROOF if a.error_after_frame_test else None,
+        error_after_frame_proof_bytes=64 if a.error_after_frame_test else 0,
+        error_after_frame_enable=symbol('raw_error_after_frame_enable',a.error_after_frame_test),
         dma_sleep=a.dma_sleep,dma_wait=symbol('raw_dma_wait',a.dma_sleep),dma_wait_bytes=24,
         raw_dma_tail_wait=a.raw_dma_tail_wait,
         raw_dma_tail_wait_proof=symbol('raw_dma_tail_wait_proof',a.raw_dma_tail_wait),
@@ -501,6 +607,27 @@ def main():
         dma_wait_clock=(symbol('HAL_GetTick')|1) if a.dma_sleep else None,
         dma_sleep_clocks=symbol('raw_dma_sleep_clocks',a.dma_sleep),dma_sleep_clocks_words=14,
         preinit=a.preinit,line_snapshots=a.snapshot,line_poison=a.poison,
+        power_probe=a.power_probe,
+        board_eth_powerdown=a.ethernet_powerdown,
+        board_eth_proof=symbol('raw_board_eth_proof',a.ethernet_powerdown),
+        board_eth_proof_bytes=256 if a.ethernet_powerdown else 0,
+        sd_init_gap_ms=a.sd_init_gap_ms,
+        sd_init_gap_proof=symbol('raw_sd_init_gap_proof',bool(a.sd_init_gap_ms)),
+        sd_init_gap_proof_bytes=64 if a.sd_init_gap_ms else 0,
+        sensor_autostop=autostop_enabled,
+        sensor_single_frame=a.sensor_single_frame,
+        sensor_autostop_proof_schema=2 if a.sensor_single_frame else 1,
+        sensor_autostop_readback_timing='post-start' if a.sensor_single_frame else 'pre-start',
+        sensor_autostop_proof=symbol('raw_sensor_autostop_proof',autostop_enabled),
+        sensor_autostop_proof_bytes=160 if autostop_enabled else 0,
+        sensor_autostop_prestart=0x343F4060 if a.sensor_autostop else None,
+        sensor_autostop_prestart_bytes=32 if a.sensor_autostop else 0,
+        power_probe_proof=symbol('raw_power_probe_proof',bool(a.power_probe)),
+        power_probe_proof_bytes=64 if a.power_probe else 0,
+        power_phy_proof=symbol('raw_power_phy_proof',power_probe_mode in (3,4)),
+        power_phy_proof_bytes=256 if power_probe_mode in (3,4) else 0,
+        power_csi_proof=symbol('raw_power_csi_proof',power_probe_mode==5),
+        power_csi_proof_bytes=128 if power_probe_mode==5 else 0,
         producer=symbol('raw_producer',False),producer_bytes=416,
         snapshot_address=0x343D0000,snapshot_capacity=20,snapshot_bytes=512,
         expected_flags=int(a.async_stop)|(int(a.line_stream)<<1)|(int(a.preinit)<<2)|
@@ -515,6 +642,18 @@ def main():
     if late_meta:
         manifest['late_load']=late_meta
         manifest['immutable_ranges']=late_meta['immutable_ranges']
+    if a.power_probe:
+        manifest['phase_markers']=copy.deepcopy(PHASE_PROTOCOL)
+        manifest['phase_markers']['events'].update({'11':'power_probe_hold_begin','12':'power_probe_hold_end'})
+        manifest['storage_overlap']='Power probe: validated FRAME and sensor STOP, then 200 ms hold, then SD init/save'
+    if a.sd_init_gap_ms:
+        manifest['phase_markers']=copy.deepcopy(PHASE_PROTOCOL)
+        manifest['phase_markers']['events'].update({'11':'sd_init_gap_begin','12':'sd_init_gap_end'})
+        manifest['storage_overlap']='Diagnostic: validated FRAME and sensor STOP, then 200 ms CPU-awake gap, then SD init/save'
+    if autostop_enabled:
+        manifest['phase_markers']=copy.deepcopy(PHASE_PROTOCOL)
+        manifest['phase_markers']['events']['11']='sensor_autonomous_standby_observed'
+        manifest['storage_overlap']='Normal concurrent SD initialization/save; autonomous sensor standby observation and stable recheck after payload completion; no intentional gap'
     if a.cycle_trace:
         manifest['cycle_trace']=dict(address=0x343FB000,words=256,schema=1,
             clock_hz=400000000,headers=['cycle_trace_events.h','cycle_trace_sd.h'],
@@ -524,7 +663,10 @@ def main():
         pd=out/'staged'; pd.mkdir(); sources=[]
         for rel in pm['sources']:
             src=pbase/Path(rel).name; dst=pd/src.name
-            if src.name=='stage1_sensor.c': dst.write_text(sensor_source(src.read_text()),newline='\n')
+            if src.name=='stage1_sensor.c':
+                sensor=sensor_source(src.read_text())
+                if a.sensor_single_frame: sensor=sensor_autostop_transform.sensor_single(sensor)
+                dst.write_text(sensor,newline='\n')
             else: dst.write_bytes(src.read_bytes())
             sources.append(dst)
         if a.error_blinks: sources.extend(error_build.prefix_sources(pd,HERE))
@@ -535,10 +677,19 @@ def main():
         pf += [f'-DSTAGE2_BYTES={len(early_code)}U','-DSTAGE2_EXPECTED_CRC32=0x3e97c7f7U',
                f'-DRAW_PATTERN={int(a.pattern=="diagonal")}']
         prefix,psize=compile_sources(pd,[s for s in sources if s.suffix.lower() in ('.c','.s')],pf,pd/'stage1.ld','stage1')
-        prefix,crc_relocation=relocate_prefix_crc(pd,prefix,0x3E97C7F7,zlib.crc32(early_code))
+        single_prefix_audit=single_frame_prefix.check(pd,prefix) if a.sensor_single_frame else None
+        prefix,crc_relocation=relocate_prefix_crc(pd,prefix,0x3E97C7F7,zlib.crc32(early_code),a.sensor_single_frame)
         original=(pbase/'stage1.bin').read_bytes()
-        literals=(error_build.check_prefix(pd,prefix,original,len(early_code),check_recovery_identity)
+        literals=(single_prefix_audit['recovery_literal_offsets'] if a.sensor_single_frame else
+            error_build.check_prefix(pd,prefix,original,len(early_code),check_recovery_identity)
             if a.error_blinks else check_recovery_identity(pd,prefix,original,len(early_code)))
+        if a.error_blinks:
+            engine=error_build.audit_engine(pd)
+            engine['sha256']=sha(prefix[error_build.ENTRY-0x34180400:error_build.ENTRY-0x34180400+error_build.COPY_BYTES])
+            if (symbol('_error_runtime_start'),symbol('_error_runtime_end'))!=(error_build.RUNTIME_ENTRY,error_build.RUNTIME_ENTRY+error_build.COPY_BYTES):
+                raise ValueError('Error runtime reservation moved')
+            manifest['error_runtime_copy']=engine
+            (out/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
         boot=make_image(prefix); assert len(boot)<=0x2000
         sector=bytearray(b'\xff'*65536); sector[:len(boot)]=boot; sector[0x2000:0x2000+len(code)]=code
         (pd/'stage1_boot.bin').write_bytes(boot); (pd/'stage2.bin').write_bytes(early_code)
@@ -552,6 +703,7 @@ def main():
             stage2_bytes=len(early_code),stage2_crc32=hex(zlib.crc32(early_code)),stage2_sha256=sha(early_code),
             stage2_full_bytes=len(code),stage2_full_sha256=sha(code),late_load=late_meta,
             prefix_crc_relocation=crc_relocation,
+            single_frame_prefix_audit=single_prefix_audit,
             stage2_build_manifest=str(out/'manifest.json'),
             stage2_manifest_sha256=sha((out/'manifest.json').read_bytes()),program_sha256=sha(sector),
             completion_policy='Standby after complete RAW slot' if a.standby else 'Awake RAW terminal park',

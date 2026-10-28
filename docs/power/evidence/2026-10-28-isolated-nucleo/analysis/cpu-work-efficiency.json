@@ -1,0 +1,75 @@
+{
+  "rows": [
+    {
+      "run": "cpu400b",
+      "cpu_MHz": 400.0,
+      "updates": 510464,
+      "busy_ms": 201.1355,
+      "updates_per_second": 2537911.010239366,
+      "busy_mA": 74.69261171325527,
+      "sleep_mA": 70.5766664716836,
+      "busy_energy_mJ": 74.75694345422089,
+      "total_busy_energy_uJ_per_update": 0.14644900219059698,
+      "incremental_energy_uJ_per_update": 0.008055943587605847,
+      "fixed_work_energy_ratio_to_mean_400MHz": 0.999695681082152
+    },
+    {
+      "run": "cpu200a",
+      "cpu_MHz": 200.0,
+      "updates": 450560,
+      "busy_ms": 201.2935,
+      "updates_per_second": 2238323.641846359,
+      "busy_mA": 73.32529715059223,
+      "sleep_mA": 69.62607164785977,
+      "busy_energy_mJ": 73.47287152953446,
+      "total_busy_energy_uJ_per_update": 0.16307011614332045,
+      "incremental_energy_uJ_per_update": 0.0082071644383602,
+      "fixed_work_energy_ratio_to_mean_400MHz": 1.1131553536286871
+    },
+    {
+      "run": "cpu100a",
+      "cpu_MHz": 100.0,
+      "updates": 347904,
+      "busy_ms": 201.023,
+      "updates_per_second": 1730667.6350467359,
+      "busy_mA": 72.44841057686364,
+      "sleep_mA": 69.21883256246807,
+      "busy_energy_mJ": 72.58407504443824,
+      "total_busy_energy_uJ_per_update": 0.20863248207677476,
+      "incremental_energy_uJ_per_update": 0.009273368599509,
+      "fixed_work_energy_ratio_to_mean_400MHz": 1.424174887816291
+    },
+    {
+      "run": "cpu50a",
+      "cpu_MHz": 50.0,
+      "updates": 242176,
+      "busy_ms": 201.52,
+      "updates_per_second": 1201746.7248908298,
+      "busy_mA": 72.00323615782257,
+      "sleep_mA": 69.06792291924955,
+      "busy_energy_mJ": 72.20438683208823,
+      "total_busy_energy_uJ_per_update": 0.298148399643599,
+      "incremental_energy_uJ_per_update": 0.012134466750376757,
+      "fixed_work_energy_ratio_to_mean_400MHz": 2.0352318075704763
+    },
+    {
+      "run": "cpu400c",
+      "cpu_MHz": 400.0,
+      "updates": 510464,
+      "busy_ms": 201.33,
+      "updates_per_second": 2535459.1963443104,
+      "busy_mA": 74.66492236725485,
+      "sleep_mA": 70.50124791353618,
+      "busy_energy_mJ": 74.80245720918477,
+      "total_busy_energy_uJ_per_update": 0.14653816372787262,
+      "incremental_energy_uJ_per_update": 0.008161140046058753,
+      "fixed_work_energy_ratio_to_mean_400MHz": 1.0003043189178478
+    }
+  ],
+  "method": "One update is one inner LFSR/SRAM buffer operation (BUSY_ITERATIONS counts256 per outer loop). Full busy window energy divided by completed updates. Incremental energy subtracts matched middle-sleep mean power; it is a model, not an isolated-core measurement.",
+  "caveats": [
+    "Workload and caches-off RAM execution are synthetic, not representative of every capture phase.",
+    "Clock-divider changes retain PLLs, bus/memory clocks, rails, and other board loads.",
+    "Fixed-work ratios extrapolate measured update throughput; they do not measure an actual longer job."
+  ]
+}

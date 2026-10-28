@@ -1,0 +1,496 @@
+{
+  "power_method": "Every mean power and energy comes directly from the native power.f32 stream, not mean(V)*mean(I).",
+  "changes": [
+    {
+      "name": "Ethernet PHY power-down",
+      "saving_mW": 182.84946464031754,
+      "saving_mA": 36.75796825051872,
+      "basis": "Two A/B/A runs; compare power-down with mean surrounding original/restored baseline. Restored bursts have not resumed within the measured hold.",
+      "runs": [
+        "phy01",
+        "phy02"
+      ]
+    },
+    {
+      "name": "400 MHz busy workload to bounded sleep",
+      "saving_mW": 20.568752755642794,
+      "saving_mA": 4.139809847645168,
+      "basis": "Within-run v4 pairs, 100Hz wakeups, camera/SD absent; busy is LFSR/SRAM work.",
+      "runs": [
+        "cpu400b",
+        "cpu400c"
+      ]
+    },
+    {
+      "name": "CPU 400 MHz to 50 MHz, busy",
+      "saving_mW": 13.308316784774732,
+      "saving_mA": 2.675530882432483,
+      "basis": "Same v4 binary and elapsed-time workload;50MHz completes fewer updates and costs2.035x energy per update.",
+      "runs": [
+        "cpu400b",
+        "cpu50a",
+        "cpu400c"
+      ]
+    },
+    {
+      "name": "Unused SRAM1/2/3 RUN clocks gated",
+      "saving_mW": 1.5921123720747388,
+      "saving_mA": 0.31678577117187956,
+      "basis": "Same v5 binary flags0/2/0; clock gating only, not SRAM retention power-off. No measured sleep saving.",
+      "runs": [
+        "ramcontrol01",
+        "ramoff01",
+        "ramcontrol02"
+      ]
+    }
+  ],
+  "phase_rows": [
+    {
+      "run": "cachecontrol01",
+      "phase": "busy",
+      "duration_ms": 151.227,
+      "mean_current_mA": 74.46078031673717,
+      "mean_power_mW": 370.9069655342983,
+      "energy_mJ": 56.09114767685532,
+      "start_sample_id": 4894746,
+      "end_sample_id_exclusive": 5197200
+    },
+    {
+      "run": "cachecontrol01",
+      "phase": "sleep",
+      "duration_ms": 151.307,
+      "mean_current_mA": 70.56612968549707,
+      "mean_power_mW": 351.55991659470385,
+      "energy_mJ": 53.19347630019486,
+      "start_sample_id": 5297253,
+      "end_sample_id_exclusive": 5599867
+    },
+    {
+      "run": "cachecontrol03",
+      "phase": "busy",
+      "duration_ms": 151.15449999999998,
+      "mean_current_mA": 74.51613916741401,
+      "mean_power_mW": 371.17553428855234,
+      "energy_mJ": 56.10485229761898,
+      "start_sample_id": 4957200,
+      "end_sample_id_exclusive": 5259509
+    },
+    {
+      "run": "cachecontrol03",
+      "phase": "sleep",
+      "duration_ms": 151.1115,
+      "mean_current_mA": 70.55710414642992,
+      "mean_power_mW": 351.50752648779394,
+      "energy_mJ": 53.11682958886027,
+      "start_sample_id": 5359562,
+      "end_sample_id_exclusive": 5661785
+    },
+    {
+      "run": "cacheon01",
+      "phase": "busy",
+      "duration_ms": 151.387,
+      "mean_current_mA": 74.26057645891505,
+      "mean_power_mW": 369.93303236198517,
+      "energy_mJ": 56.00305197018385,
+      "start_sample_id": 4930698,
+      "end_sample_id_exclusive": 5233472
+    },
+    {
+      "run": "cacheon01",
+      "phase": "sleep",
+      "duration_ms": 151.202,
+      "mean_current_mA": 70.6738332316954,
+      "mean_power_mW": 352.121389377383,
+      "energy_mJ": 53.24145831663907,
+      "start_sample_id": 5333523,
+      "end_sample_id_exclusive": 5635927
+    },
+    {
+      "run": "cpu100a",
+      "phase": "busy",
+      "duration_ms": 151.023,
+      "mean_current_mA": 72.44841057686364,
+      "mean_power_mW": 360.93344656616756,
+      "energy_mJ": 54.50925190076232,
+      "start_sample_id": 5177522,
+      "end_sample_id_exclusive": 5479568
+    },
+    {
+      "run": "cpu100a",
+      "phase": "sleep",
+      "duration_ms": 151.1045,
+      "mean_current_mA": 69.21883256246807,
+      "mean_power_mW": 344.88432766313866,
+      "energy_mJ": 52.11357388937473,
+      "start_sample_id": 5579623,
+      "end_sample_id_exclusive": 5881832
+    },
+    {
+      "run": "cpu200a",
+      "phase": "busy",
+      "duration_ms": 151.2935,
+      "mean_current_mA": 73.32529715059223,
+      "mean_power_mW": 365.2663442907362,
+      "energy_mJ": 55.26242365995049,
+      "start_sample_id": 5243058,
+      "end_sample_id_exclusive": 5545645
+    },
+    {
+      "run": "cpu200a",
+      "phase": "sleep",
+      "duration_ms": 151.26149999999998,
+      "mean_current_mA": 69.62607164785977,
+      "mean_power_mW": 346.89605409583385,
+      "energy_mJ": 52.47201748661697,
+      "start_sample_id": 5645698,
+      "end_sample_id_exclusive": 5948221
+    },
+    {
+      "run": "cpu400b",
+      "phase": "busy",
+      "duration_ms": 151.1355,
+      "mean_current_mA": 74.69261171325527,
+      "mean_power_mW": 372.0647147860766,
+      "energy_mJ": 56.23218670155108,
+      "start_sample_id": 5213830,
+      "end_sample_id_exclusive": 5516101
+    },
+    {
+      "run": "cpu400b",
+      "phase": "sleep",
+      "duration_ms": 151.0205,
+      "mean_current_mA": 70.5766664716836,
+      "mean_power_mW": 351.6194468572245,
+      "energy_mJ": 53.101744674101475,
+      "start_sample_id": 5616154,
+      "end_sample_id_exclusive": 5918195
+    },
+    {
+      "run": "cpu400c",
+      "phase": "busy",
+      "duration_ms": 151.32999999999998,
+      "mean_current_mA": 74.66492236725485,
+      "mean_power_mW": 371.93374717782257,
+      "energy_mJ": 56.28473396041989,
+      "start_sample_id": 5194492,
+      "end_sample_id_exclusive": 5497152
+    },
+    {
+      "run": "cpu400c",
+      "phase": "sleep",
+      "duration_ms": 151.31300000000002,
+      "mean_current_mA": 70.50124791353618,
+      "mean_power_mW": 351.24150959538906,
+      "energy_mJ": 53.14740654140711,
+      "start_sample_id": 5597205,
+      "end_sample_id_exclusive": 5899831
+    },
+    {
+      "run": "cpu50a",
+      "phase": "busy",
+      "duration_ms": 151.51999999999998,
+      "mean_current_mA": 72.00323615782257,
+      "mean_power_mW": 358.69091419717483,
+      "energy_mJ": 54.34884731915593,
+      "start_sample_id": 5444004,
+      "end_sample_id_exclusive": 5747044
+    },
+    {
+      "run": "cpu50a",
+      "phase": "sleep",
+      "duration_ms": 151.33599999999998,
+      "mean_current_mA": 69.06792291924955,
+      "mean_power_mW": 344.1083585216129,
+      "energy_mJ": 52.075982545226815,
+      "start_sample_id": 5847100,
+      "end_sample_id_exclusive": 6149772
+    },
+    {
+      "run": "ramcontrol01",
+      "phase": "busy",
+      "duration_ms": 151.285,
+      "mean_current_mA": 74.62274873725924,
+      "mean_power_mW": 371.71095073258573,
+      "energy_mJ": 56.23429118157923,
+      "start_sample_id": 5132813,
+      "end_sample_id_exclusive": 5435383
+    },
+    {
+      "run": "ramcontrol01",
+      "phase": "sleep",
+      "duration_ms": 151.1855,
+      "mean_current_mA": 70.45117911761199,
+      "mean_power_mW": 350.99599480539865,
+      "energy_mJ": 53.065504972651595,
+      "start_sample_id": 5535436,
+      "end_sample_id_exclusive": 5837807
+    },
+    {
+      "run": "ramcontrol02",
+      "phase": "busy",
+      "duration_ms": 151.2355,
+      "mean_current_mA": 74.69461459287115,
+      "mean_power_mW": 372.07141501901935,
+      "energy_mJ": 56.2704064861089,
+      "start_sample_id": 5130683,
+      "end_sample_id_exclusive": 5433154
+    },
+    {
+      "run": "ramcontrol02",
+      "phase": "sleep",
+      "duration_ms": 151.117,
+      "mean_current_mA": 70.48501889461878,
+      "mean_power_mW": 351.15761192633465,
+      "energy_mJ": 53.06588484147191,
+      "start_sample_id": 5533207,
+      "end_sample_id_exclusive": 5835441
+    },
+    {
+      "run": "ramoff01",
+      "phase": "busy",
+      "duration_ms": 150.998,
+      "mean_current_mA": 74.34189589389331,
+      "mean_power_mW": 370.2990705037278,
+      "energy_mJ": 55.914419047921896,
+      "start_sample_id": 5378450,
+      "end_sample_id_exclusive": 5680446
+    },
+    {
+      "run": "ramoff01",
+      "phase": "sleep",
+      "duration_ms": 151.014,
+      "mean_current_mA": 70.56877728234045,
+      "mean_power_mW": 351.5704935151516,
+      "energy_mJ": 53.092066507697105,
+      "start_sample_id": 5780499,
+      "end_sample_id_exclusive": 6082527
+    },
+    {
+      "run": "phy01",
+      "phase": "baseline",
+      "duration_ms": 251.4905,
+      "mean_current_mA": 74.07910694131695,
+      "mean_power_mW": 369.02507775658637,
+      "energy_mJ": 92.80630131754279,
+      "start_sample_id": 5080455,
+      "end_sample_id_exclusive": 5583436
+    },
+    {
+      "run": "phy01",
+      "phase": "powerdown",
+      "duration_ms": 251.392,
+      "mean_current_mA": 36.9329941977727,
+      "mean_power_mW": 184.2337866484348,
+      "energy_mJ": 46.31490009312331,
+      "start_sample_id": 5889876,
+      "end_sample_id_exclusive": 6392660
+    },
+    {
+      "run": "phy01",
+      "phase": "restored",
+      "duration_ms": 251.392,
+      "mean_current_mA": 73.25954660071466,
+      "mean_power_mW": 364.94187303724397,
+      "energy_mJ": 91.74346734657883,
+      "start_sample_id": 6702731,
+      "end_sample_id_exclusive": 7205515
+    },
+    {
+      "run": "phy02",
+      "phase": "baseline",
+      "duration_ms": 251.517,
+      "mean_current_mA": 74.17825501164701,
+      "mean_power_mW": 369.47852864964517,
+      "energy_mJ": 92.93013109037281,
+      "start_sample_id": 5094259,
+      "end_sample_id_exclusive": 5597293
+    },
+    {
+      "run": "phy02",
+      "phase": "powerdown",
+      "duration_ms": 251.423,
+      "mean_current_mA": 36.93264612393938,
+      "mean_power_mW": 184.224199931496,
+      "energy_mJ": 46.31820101937652,
+      "start_sample_id": 5903714,
+      "end_sample_id_exclusive": 6406560
+    },
+    {
+      "run": "phy02",
+      "phase": "restored",
+      "duration_ms": 251.426,
+      "mean_current_mA": 73.24624509182044,
+      "mean_power_mW": 364.86835227765613,
+      "energy_mJ": 91.73739033976197,
+      "start_sample_id": 6716632,
+      "end_sample_id_exclusive": 7219484
+    }
+  ],
+  "icache_rows": [
+    {
+      "run": "cachecontrol01",
+      "flags": 0,
+      "cpu_MHz": 400.0,
+      "iterations": 349440,
+      "updates_per_second": 1736546.2885199303,
+      "busy_mW": 370.9069655342983,
+      "sleep_mW": 351.55991659470385,
+      "energy_uJ_per_update": 0.21366687677736695
+    },
+    {
+      "run": "cachecontrol03",
+      "flags": 0,
+      "cpu_MHz": 400.0,
+      "iterations": 349440,
+      "updates_per_second": 1737172.1736277337,
+      "busy_mW": 371.17553428855234,
+      "sleep_mW": 351.50752648779394,
+      "energy_uJ_per_update": 0.21354981321613764
+    },
+    {
+      "run": "cacheon01",
+      "flags": 4,
+      "cpu_MHz": 400.0,
+      "iterations": 569088,
+      "updates_per_second": 2825842.780318491,
+      "busy_mW": 369.93303236198517,
+      "sleep_mW": 352.121389377383,
+      "energy_uJ_per_update": 0.13080997480671505
+    }
+  ],
+  "icache_comparison": {
+    "workrate_ratio": 1.6269843460896847,
+    "energy_per_update_ratio": 0.6123823243361765,
+    "busy_power_saving_mW": 1.1082175494401554,
+    "scope": "Same v6 binary flags 0/4/0; synthetic LFSR/SRAM loop only, not measured camera-save performance.",
+    "qualification": "Original cache-on host validation failed from incorrect cache-bit mask; corrected read-only reobservation passed with identical raw completion proof and unchanged code. Original failure retained."
+  },
+  "final_shutdown_plateau": {
+    "scope": "Final cold normal-flash missing-camera error shutdown, camera and SD physically absent. Not a successful capture/save cycle.",
+    "boundary": "Fixed middle interval: 0.5 s through 2.5 s after latest common native stream start. No current-based selection.",
+    "metrics": {
+      "start_sample_id": 1016128,
+      "end_sample_id_exclusive": 5016128,
+      "start_ms": 500.0,
+      "end_ms": 2500.0,
+      "duration_ms": 2000.0,
+      "current_mean": 0.008076613220342203,
+      "current_min": 0.006719074212014675,
+      "current_max": 0.009388530626893044,
+      "voltage_mean": 4.993705237222433,
+      "voltage_min": 4.988801002502441,
+      "voltage_max": 4.997880458831787,
+      "power_mean": 0.04033219885977264,
+      "power_min": 0.033550627529621124,
+      "power_max": 0.04688012972474098,
+      "energy_mJ": 80.66439771954528,
+      "current_mean_mA": 8.076613220342203,
+      "finite": true
+    },
+    "checks": {
+      "current": {
+        "sha256": "f93d0b787bd40639ee9699ec35f057cdc23769ec13abbdba538ce4d0cd2d19c6",
+        "hash_passed": true,
+        "contiguous": true,
+        "first_sample_id": 0,
+        "analyzed_end_exclusive": 6016248,
+        "excluded_final_chunk": false,
+        "nonfinite": 71
+      },
+      "voltage": {
+        "sha256": "588a5a20752450776d251f54dcde9a46b2cb52d6aa8a99f7c12dd7be78961520",
+        "hash_passed": true,
+        "contiguous": true,
+        "first_sample_id": 16128,
+        "analyzed_end_exclusive": 6032376,
+        "excluded_final_chunk": false,
+        "nonfinite": 0
+      },
+      "power": {
+        "sha256": "288de9fb2586869b7b8362fd554c4d6be3f574f725efa5a7f690409b815b5b8b",
+        "hash_passed": true,
+        "contiguous": true,
+        "first_sample_id": 16128,
+        "analyzed_end_exclusive": 6032376,
+        "excluded_final_chunk": false,
+        "nonfinite": 0
+      },
+      "gpi0": {
+        "sha256": "0e8eaa26409fe5ac59c285d3c958b214f72af57d1f235b33e4312a83addb3cce",
+        "hash_passed": true,
+        "contiguous": true,
+        "first_sample_id": 16128,
+        "analyzed_end_exclusive": 5916128,
+        "excluded_final_chunk": true,
+        "nonfinite": null
+      },
+      "gpi1": {
+        "sha256": "0d75089003d05ecb354e7753c985db6d747ca99b156e53aafe6156a7ffad4921",
+        "hash_passed": true,
+        "contiguous": true,
+        "first_sample_id": 16128,
+        "analyzed_end_exclusive": 5916128,
+        "excluded_final_chunk": true,
+        "nonfinite": null
+      }
+    },
+    "gpi": {
+      "gpi0": {
+        "initial": 0,
+        "transitions": 0
+      },
+      "gpi1": {
+        "initial": 1,
+        "transitions": 0
+      }
+    },
+    "current_100ms_mean_range_mA": [
+      8.07596014028415,
+      8.078999611828477
+    ],
+    "qualification": "Stable low plateau followed by first-attempt warm UART recovery and retained SBF=1/PDDS=1/STOPF=0. Reader retains trial_entry_proven=false; this is observed Standby history, not direct entry-time proof.",
+    "sbf": {
+      "cpucr": 66049,
+      "sbf": true,
+      "pdds": true,
+      "stopf": false,
+      "trial_entry_proven": false,
+      "sha256": "8304b4a484f6614923d14fe75b4fe13b0feb822ec7c535def6a0239865100291"
+    },
+    "events_sha256": "ef83b98aba842a9075b96d321d7bc4d996500b2014a35f3b85b3ec0ef8112014",
+    "park_sha256": "d0bd083bdca458b6b49de156962edf161469cc29e71bb76ad1e6a96a68f197bb",
+    "caveats": [
+      "Whole trace startup nonfinite samples remain invalid; bounded middle window is finite and contiguous.",
+      "Voltage is sensed at Joulescope input; recorded native power uses that voltage.",
+      "Do not compare this shutdown plateau as a matched PHY-on/off or CPU-only measurement."
+    ]
+  },
+  "measurement_limits": [
+    "No camera or SD connected; warm RAM workloads, not complete cold capture/save cycles.",
+    "All71 initial nonfinite current samples remain recorded. Whole-session current is invalid; reported bounded windows independently pass finite/continuity tests.",
+    "Native2MSPS analog streams aligned by sample_id to packed GPI. Whole final GPI chunks excluded for unresolved packing padding.",
+    "Middle windows discard25ms from both ends. PHY holds additionally follow100ms settle; restore DC state does not restore periodic bursts during the short window.",
+    "Code/request/raw proof/final context, faults, restored GPIO/clock/debug/LP state and exact native file hashes verified. Full before/after RCC inventory matched for CPU probes.",
+    "The current floor cannot be called MCU-only or removable-board-only; PHY difference includes upstream conversion losses.",
+    "Changes are measured in separate states and are not additive. Do not project final camera cycle savings until reintegrated and tested.",
+    "Compare throughput/energy per update within the same binary version; uncached instruction layout changes loop cost.",
+    "Current burst suppression is associated with PHY power state; an Ethernet line waveform was not measured."
+  ],
+  "excluded": [
+    {
+      "run": "cpu400a",
+      "version": 3,
+      "state": 15,
+      "error": 7,
+      "reason": "Diagnostic refused/failed; no successful bounded comparison."
+    },
+    {
+      "run": "inherited02",
+      "version": 1,
+      "state": 15,
+      "error": 4,
+      "reason": "Diagnostic refused/failed; no successful bounded comparison."
+    }
+  ],
+  "pending": []
+}

@@ -1,0 +1,142 @@
+{
+  "schema": 1,
+  "passed": true,
+  "reviewed_utc": "2026-10-26T22:00:49.929932+00:00",
+  "offline_only": true,
+  "method": "Recomputed existing pulse analyzer from immutable current bins; independently cross-checked DMA/error/copy records, register flags, recovery chronology, exact prefixes and installation checks. No instrument APIs or target access.",
+  "installed_normal_sector_sha256": "232af9173262473021453f40ea944dfa4cafc2657443cd0b83ea9c8c8bb3b02c",
+  "full_64KiB_readback_match": true,
+  "following_4KiB_unchanged": true,
+  "normal_real_failure": {
+    "frame_bytes": 1909600,
+    "frames": 1,
+    "frame_completed_and_sensor_stopped_before_terminal": true,
+    "engine_sha256": "247ad0ddd76963039ed01a2e14beb3499ee9097a8df86f62ad5751047835454e",
+    "cfsr": 0,
+    "hfsr": 0,
+    "card_command": 17,
+    "card_error": 14,
+    "card_error_stage": 5,
+    "card_error_sta": 2,
+    "cleanup_error": 10,
+    "runtime_result": 804,
+    "runtime_state": 15,
+    "headers_read": 2,
+    "sectors_written": 0,
+    "successful_idle_claim": false
+  },
+  "normal_display": {
+    "replay_matches_saved_analysis": true,
+    "source_sha256": "495f4f3887fae93ed4450570c4c560ae477c49ccb8fd1adacad974d2df8abd16",
+    "groups": [
+      4,
+      4,
+      4,
+      4,
+      4
+    ],
+    "timing": {
+      "pulses": 20,
+      "groups": [
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "on_s": {
+        "count": 20,
+        "minimum": 0.08000000000000007,
+        "median": 0.09499999999999886,
+        "maximum": 0.10000000000000142
+      },
+      "interblink_off_s": {
+        "count": 15,
+        "minimum": 0.4049999999999976,
+        "median": 0.41000000000000014,
+        "maximum": 0.41000000000000014
+      },
+      "interset_off_s": {
+        "count": 4,
+        "minimum": 2.0150000000000006,
+        "median": 2.0199999999999996,
+        "maximum": 2.0199999999999996
+      },
+      "rising_period_s": {
+        "count": 15,
+        "minimum": 0.4900000000000002,
+        "median": 0.504999999999999,
+        "maximum": 0.5050000000000026
+      }
+    },
+    "timing_consistency": {
+      "on_100ms_consistent": true,
+      "between_blinks_400ms_consistent": true,
+      "between_sets_2000ms_consistent": true
+    },
+    "interval_uncertainty_s": 0.02,
+    "low_current_plateau_A": 0.008062441254546866,
+    "scoped_after_launch_all_finite": true,
+    "startup_nonfinite_current_samples": 71,
+    "whole_session_ok": false
+  },
+  "normal_warm_uart_recovery": {
+    "passed": true,
+    "good_pulses": 10,
+    "bad_pulses": 0,
+    "source_bits": 2,
+    "exact_early_park_pc": "0x3418078c",
+    "prefix_sha256": "99dbb0f9ecdd56a9313e4e62bbbfec22ec8e5e5901c852d956315844cd066eba"
+  },
+  "guarded_standby_flags": {
+    "sbf": true,
+    "pdds": true,
+    "stopf": false,
+    "trial_entry_proven": false,
+    "observation_utc": "2026-10-26T21:57:34.393940+00:00",
+    "reader_completed_utc": "2026-10-26T21:57:35.113112+00:00"
+  },
+  "interrupted_postframe_diagnostic": {
+    "full_frame_proof_before_request": true,
+    "frame_bytes": 1909600,
+    "source_prefix_overwritten": true,
+    "high_engine_copy_matches": true,
+    "fault_regs_zero": true,
+    "sd_commands_or_writes": false,
+    "request_seconds_after_power_on": 2.123495,
+    "break_seconds_after_power_on": 2.548631,
+    "request_inside_nominal_sequence": true,
+    "uart_good_pulses": 3,
+    "uart_bad_pulses": 0,
+    "exact_early_park_pc": "0x3418078c",
+    "prefix_sha256": "d329f4051c466f3d35c4b20ae0af3f22daef7e997b48fd5c3567f3ce9c2e73fb"
+  },
+  "final_state": "Saved final flag reader ended at the exact normal early UART recovery park, powered; no subsequent normal boot is part of this evidence.",
+  "limitations": [
+    "Real 25MHz SD read CRC fault persists with the changed resistor-free hookup; no photo was saved by the normal test.",
+    "Failed-operation cleanup_error10 is retained; media_idle1 is not promoted to a clean successful-operation proof.",
+    "LED pulse attribution uses current signatures and known code4 dispatch, not optical or GPIO measurement; read-only debugger accesses occurred during display.",
+    "The normal trace includes an 80ms inferred pulse at the lower edge of the stated plus/minus20ms interval uncertainty; do not claim precision pulse calibration.",
+    "Whole-session validity remains false due to 71 startup NaNs; only the after-launch signaling window is finite/contiguous.",
+    "SBF/PDDS/STOPF were observed with guarded access, but trial_entry_proven remains false.",
+    "UART interruption was tested on the diagnostic build with the same runtime engine and unchanged guard; normal-build warm recovery was tested after completed failure shutdown.",
+    "No new successful image-write, energy, analog margin, or power-loss qualification."
+  ],
+  "source_sha256": {
+    "normal-analysis.json": "d4219519d0d79e3be2555ebce2d6f222918fb74a655819083fcb68615976e72e",
+    "normal-current.jsonl": "495f4f3887fae93ed4450570c4c560ae477c49ccb8fd1adacad974d2df8abd16",
+    "normal-current.power-on.json": "e99cb642b1f6b992936acf0e772f89362d57769df7252192f484d15237c02c1a",
+    "normal-live-proof/observation.json": "b31de581166f8c4c5edc7a5a05b6efaa3ba3d6bf90c7f8ace11a7fe8d4326057",
+    "normal-after-park/result.json": "2ba767b1194f0304c364773cb58a377499f6fae7027f5227ce80c951a09370bf",
+    "normal-after-sbf/result.json": "fe6afd0f53bc298e193aef28f6dbe7c91eae3f785af73e3453afa58bf8ec4004",
+    "normal-after-recovery/uart-events.json": "af92897b7c06d488c318598a2ec1d9c679d90b14b1c791d4885be4465029e5f0",
+    "interrupt-live-proof/verified.json": "0c520317686a1da1cc4814c842a5632dc9385eef9862fa7d787547abf16e26f7",
+    "interrupt-request.json": "947e673796f611e520fdcc8270cef7715f7aa737781eca6f606d5367bdac9fe4",
+    "interrupt-park/result.json": "867b869bead8355ab5166ba2f1ae23ecb7fd3668ba78db4de9239c05c2b3cd03",
+    "interrupt-recovery/uart-events.json": "2c9c15b943cbe464b16262586791115205a16271eec85d3621e3661b28f9c19e",
+    "postframe-interrupt-current.power-on.json": "5a1c05dd4617f37d316ae8100fa3a09c3b28865cc2aa67abe59bb9aa7729d283",
+    "install-normal/complete.json": "def9d3c0a0a9b8716723fc7365f7e0239b3127ce82e35c8dcaca354037f78835",
+    "install-normal/nor-after/verified.json": "d5e86fcb7bddab63c76f509c925770eaf108bafc26e5e327832c527f2ccc079b",
+    "install-normal/following-after/verified.json": "2b402ebf2619c88495ee54a688d2f1d9903f4bbed78e4458780bf3630408552f"
+  }
+}

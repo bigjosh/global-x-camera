@@ -1,10 +1,34 @@
 # Global X Camera
 
-An STM32N6-based, credit-card-size monochrome global-shutter camera project. This repository is the durable project record; chat and Page copies are working views. Latest checkpoint: October 24, 2026.
+An STM32N6-based, credit-card-size monochrome global-shutter camera project. This repository is the durable project record; chat and Page copies are working views. Latest checkpoint: October 28, 2026.
 
 **Public repository:** [bigjosh/global-x-camera](https://github.com/bigjosh/global-x-camera), created at the user's explicit request on October 13, 2026. The default branch is `main`.
 
 ## Start here
+
+**Latest normal firmware (October 28):** automatic single-frame capture is
+installed, retaining Ethernet power-down and four-bit 25 MHz SD saving. The
+cold awake proof showed one frame/exposure, zero explicit STOP writes and
+stable autonomous standby. Three normal cold cycles each passed all eleven
+phase markers, one observed exposure and UART recovery, with guarded Standby
+flags observed afterward. Awake slot 142 matched the original camera RAM;
+cold slots 143 and 144 passed complete SD readback and visual inspection.
+Slot 145 passed 2,560 of 3,730 sectors before the user stopped testing, so it
+is not fully verified. The installed firmware
+is ready for the next power cycle; AGENTS.md records the final live state.
+See the [single-frame promotion report](firmware/capture-raw/evidence/2026-10-28-sensor-single-frame/README.md)
+for firmware identities and qualification limits.
+
+The preceding Ethernet power-down campaign reduced median measured energy from
+**224.82 to 173.65 mJ (22.8%)**; median cycle time increased from **396.12 to
+413.88 ms**, with variable card latency. Energy excludes the unqualified first
+5 ms. The [integration report](firmware/capture-raw/evidence/2026-10-28-ethernet-powerdown/README.md)
+records image verification, firmware identity and measurement limits.
+The preceding [isolated Nucleo study](docs/power/evidence/2026-10-28-isolated-nucleo/README.md)
+contains CPU/cache/sleep controls and hardware-modification estimates.
+See AGENTS.md before bench work.
+
+**Canonical prototype power connection (October 27):** regulated source -> JS110 IN+ -> JS110 OUT+ -> **Arduino CN5.5/5V**; common return -> **CN5.6/GND**, with all CN9 shunts absent. [Source options, wiring and measurement limits](docs/power/nucleo-debug-isolation.md#canonical-target-power-connection--october-27).
 
 Read [NOTES.md](NOTES.md) for the reasons behind decisions, rejected approaches and hard-won constraints. Its map leads to the owning folder; the [bootstrap coverage record](docs/notes-bootstrap-2026-10-24.md) explains which sources were reviewed.
 
@@ -22,7 +46,7 @@ Read [NOTES.md](NOTES.md) for the reasons behind decisions, rejected approaches 
 
 ## Current position
 
-**Latest, October 24:** installed v18 captures packed RAW10 directly
+**Storage format selected October 24:** the normal firmware captures packed RAW10 directly
 into fixed SD slots, with all reserved photo metadata in the first sector.
 Each 3730-sector slot contains `GXR2`, 152 metadata bytes, 1,909,600 image bytes
 and trailing `GXRE`. The metadata bytes are zero for now; date/time and other
@@ -43,12 +67,18 @@ Standby check, and passed complete image readback and visual inspection.
 Its original RAM was lost in Standby; the two RAM tests supply that comparison.
 A directory test retrieved each slot's occupancy and metadata with one sector
 read, leaving completion unchecked. The layout change performed no erase.
-Native one-bit SDMMC2 at 25 MHz still sends CMD55/ACMD23 and one CMD25 per image;
+
+**Historical October 24 transfer profile:** native one-bit SDMMC2 at 25 MHz
+sent CMD55/ACMD23 and one CMD25 per image;
 complete objects use IDMA and arriving objects use progressive PIO with hardware
 flow control. The final sector remains withheld until capture validation and
 sensor STOP. First safe publication remains 89,600 bytes. There is no on-camera
 PNG conversion, compression, allocation table or separate header rewrite;
 host extraction reconstructs PNG. CPU sleep during active DMA stays disabled.
+
+The [current selected profile](firmware/capture-raw/README.md#current-selected-profile--october-28-single-frame-at-25-mhz-with-ethernet-power-down)
+uses four-bit 25 MHz SDMMC2 and confirms autonomous sensor standby before
+completion; it does not issue the historical successful-path sensor STOP.
 
 The historical v17d comparison measured medians of **998.118 ms / 536.883 mJ**,
 versus **997.516 ms / 549.897 mJ** for header-format v16. These are not v18

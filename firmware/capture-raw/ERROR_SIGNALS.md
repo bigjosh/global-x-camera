@@ -1,5 +1,12 @@
 # Red error signals and shutdown
 
+**Corrected and installed October 26:** runtime error handling now executes
+from a verified copy outside the camera frame. A complete real frame followed
+by an injected code4, and a separate real SD CRC failure, both produced five
+four-blink sets and Standby. UART recovery passed during signaling and after
+shutdown. See the [fix and qualification](evidence/2026-10-26-error-handler-fix/README.md)
+and the preserved [original fault diagnosis](evidence/2026-10-26-error-handler-overlap/README.md).
+
 The selected `--error-blinks` profile displays an error as a numbered set of
 red flashes, repeats that set five times, then turns all LEDs off and enters
 Standby. It applies to normal capture failures in the existing four-bit
@@ -89,14 +96,23 @@ camera off-state current.
 
 ## Boot layout and recovery
 
-The failure engine has no global data, BSS, HAL, libc or expanded-SRAM
-dependency. It resides in the ROM-loaded prefix at `0x34181840`; a small
-stage-one bridge at `0x34181820` maps sensor initialization failure to code 2
-and other prefix failures to code 8. The receiver calls that same fixed entry,
-so an early camera error or rejected late-code CRC never needs to execute
-unloaded or unverified storage code. RAM diagnostic builds link their own copy.
+The self-contained failure engine resides initially in the ROM-loaded prefix
+at `0x34181840`; a stage-one bridge at `0x34181820` handles failures before
+receiver handoff. Before any receiver error path or camera arm, the receiver
+copies and compares all 384 words to reserved executable RAM
+`0x343C8000..0x343C8600`. It rejects enabled D-cache, invalidates I-cache,
+and publishes fresh `ECP1` copy proof at `0x343FD380`. Runtime calls use only
+the high-RAM copy. A failed copy falls back to the prefix before DMA starts.
+RAM diagnostic builds continue to link their own engine.
 
-The reviewed prefix grows from **5,140 to 6,500 bytes**, while the early
+The build audits all engine branches and PC-relative loads for relocation
+safety, rejects external code/data dependencies, and reserves its destination
+outside the frame, stack, low-power helper and LINE snapshots. The copied
+engine remains available even if the late storage-code CRC fails. The prefix
+must never be called after camera DMA is armed; the earlier implementation
+violated this lifetime rule.
+
+The reviewed prefix grows from **5,140 to 6,720 bytes**, while the early
 receiver load remains **15,804 bytes** and the receiver stays at NOR offset
 `0x2000`. In the old prefix range, the only changed bytes are the six-byte
 later failure loop/alignment and the two checked receiver-CRC words. The
@@ -112,6 +128,39 @@ ROM must read NOR before that guard runs. The existing exact prefix/sector
 allowlists and maintenance checks remain required for host operations.
 
 ## Qualification
+
+The corrected normal and post-frame diagnostic builds passed independent
+ELF/binary/disassembly review, all20 recovery-literal checks,182 capture tests,
+33 recovery/Standby-reader tests, and18 exact/modified/truncated/cross-pair
+admission checks. Both installations passed full64KiB physical NOR readback
+and unchanged following4KiB checks. The normal, uninjected build is installed.
+
+The explicit `--error-after-frame-test` flash profile acquired all1,909,600
+bytes, validated one frame and its guards, stopped the sensor, then entered
+the normal code4 failure terminal before any SD operation. During signaling,
+read-only ST-LINK snapshots showed the original prefix overwritten, the
+entire relocated engine intact, and CFSR/HFSR zero. Current traces showed
+five groups of four, the specified timing within the retained±20ms bin/filter
+uncertainty, then8.059mA. A second full-frame trial passed UART recovery during
+signaling, requested2.123s after power-on.
+
+The normal firmware then encountered a real CMD17 data CRC error at25MHz
+with the CLK resistor removed. It likewise showed five groups of four and
+reached8.062mA without HardFault. Both complete sequences passed first-attempt
+warm UART recovery and guarded SBF=1/PDDS=1/STOPF=0; the flag reader retains
+`trial_entry_proven:false`. The failed SD cleanup history remains recorded;
+it was not converted into a successful storage operation.
+
+LED states are inferred from current changes, not optical/GPIO probes. Each
+trace retains71 startup nonfinite current samples and whole-session validity
+false; the complete post-launch windows are finite and contiguous. No new
+energy, boot-latency, image-save, resistor-free SD reliability or interrupted
+write-preservation qualification is claimed. [Reproducible evidence and limits](evidence/2026-10-26-error-handler-fix/README.md).
+
+### Earlier pre-capture tests
+
+The tests below describe the original build, before the placement defect was
+discovered. They remain historical observations, not post-DMA qualification.
 
 [test_error_signal.py](test_error_signal.py) executes the actual pulse scheduler
 with a host platform model: all codes, exactly five sets, final dark period,

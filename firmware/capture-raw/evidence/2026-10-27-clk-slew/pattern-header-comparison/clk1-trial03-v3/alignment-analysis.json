@@ -1,0 +1,84 @@
+{
+  "schema": 1,
+  "hardware_access": false,
+  "historical_proof": "D:\\Github\\global-x-camera\\tmp\\bringup\\raw-frontmeta-20261024\\bench\\preservation\\payload-0000\\verified.json",
+  "historical_read_sha256": "08c930bdd8f6280db855dd7185f76b3221a2371855389d31783975e46d409400",
+  "historical_lba": 0,
+  "card_cid": [
+    83,
+    1146433824,
+    269787418,
+    1979815748
+  ],
+  "historical_header_sha256": "fa6a9fc6d2fdd48e921c7a3b2d794e78477934056895190cc78449c4fcb05598",
+  "failed_header_sha256": "1b7fcc1c7901b579989afeaf7ab95b7afbf029cfa05c2d50ad299cbcae4802e2",
+  "historical_magic": "GXRS",
+  "failed_payload_crc_valid": false,
+  "raw_differing_bytes": 306,
+  "exact_prefix_bytes": 71,
+  "symbol_order": "High nibble then low nibble; one four-bit SD symbol per clock",
+  "first_differing_nibble": 143,
+  "deleted_reference_nibble_indices_zero_based": [
+    143,
+    149,
+    303,
+    309,
+    623,
+    629,
+    954,
+    960
+  ],
+  "deleted_reference_nibble_values": [
+    15,
+    15,
+    15,
+    15,
+    15,
+    15,
+    7,
+    7
+  ],
+  "remaining_data_nibbles_exactly_equal": 1016,
+  "crc16_polynomial": "0x1021",
+  "crc16_initial_value": 0,
+  "lane_crc16_hex": [
+    "c973",
+    "1349",
+    "ecd4",
+    "17b2"
+  ],
+  "crc_cross_check": "Independent binascii.crc_hqx over packed per-lane bit streams matches bitwise implementation",
+  "computed_full_crc_wire_hex": "554a5cabc79d2493",
+  "observed_last_four_bytes_hex": "554a5cab",
+  "crc_prefix_matches_observed_tail": true,
+  "entire_failed_512_bytes_equal_deletion_plus_crc_prefix_model": true,
+  "post_first_difference_lane_counts": [
+    {
+      "lane": 0,
+      "zero": 548,
+      "one": 333
+    },
+    {
+      "lane": 1,
+      "zero": 400,
+      "one": 481
+    },
+    {
+      "lane": 2,
+      "zero": 310,
+      "one": 571
+    },
+    {
+      "lane": 3,
+      "zero": 631,
+      "one": 250
+    }
+  ],
+  "interpretation": "The retained payload is exactly consistent with eight missing four-bit data symbols and four bytes of CRC entering the payload. This is stronger evidence of symbol-count disagreement than a simple stuck lane or independent random bit flips.",
+  "limitations": [
+    "This is an alignment model of one CRC-failed host RAM buffer against a historical verified same-card/LBA0 sector, not a wire capture.",
+    "Repeated symbols can make exact deletion locations locally ambiguous.",
+    "It does not prove reflections, which endpoint saw extra/missing clock edges, or whether the discrepancy occurred on the wire, at host sampling, or in another part of the receive path.",
+    "Historical agreement and matching CRC prefix are strong consistency checks, not a new successful read or fresh independent proof of unchanged media."
+  ]
+}

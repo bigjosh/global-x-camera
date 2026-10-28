@@ -4,8 +4,10 @@
  * the host is NOT evidence that the card is ready, and no success/idle report
  * is written here. Existing photos/power-loss behavior remain unqualified.
  *
- * This entire implementation is in the ROM-loaded .error_text region: no
- * data/BSS, function-pointer tables, HAL, libc or high SRAM dependencies.
+ * This implementation is self-contained: no data/BSS, function-pointer
+ * tables, HAL or libc dependencies. Flash uses the original prefix only
+ * before DMA; the receiver copies/word-verifies it to reserved high SRAM
+ * before camera setup and thereafter calls only that persistent copy.
  */
 #include "error_signal.h"
 

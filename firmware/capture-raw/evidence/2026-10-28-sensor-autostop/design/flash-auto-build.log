@@ -1,0 +1,90 @@
+D:\Github\global-x-camera\tmp\bringup\sensor-autostop-20261028\design\flash-auto\capture.c: In function 'ready_force_observe':
+D:\Github\global-x-camera\tmp\bringup\sensor-autostop-20261028\design\flash-auto\capture.c:204:3: warning: this 'if' clause does not guard... [-Wmisleading-indentation]
+  204 |   if(at!=6U) ready_force_stop_seen(FORCE[at+2U],FORCE[at]); __DMB();
+      |   ^~
+D:\Github\global-x-camera\tmp\bringup\sensor-autostop-20261028\design\flash-auto\capture.c:204:61: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the 'if'
+  204 |   if(at!=6U) ready_force_stop_seen(FORCE[at+2U],FORCE[at]); __DMB();
+      |                                                             ^~~~~
+D:\Github\global-x-camera\tmp\bringup\sensor-autostop-20261028\design\flash-auto\capture.c: At top level:
+D:\Github\global-x-camera\tmp\bringup\sensor-autostop-20261028\design\flash-auto\capture.c:365:39: warning: 'fast_failure_quiesce' defined but not used [-Wunused-function]
+  365 | __attribute__((noreturn)) static void fast_failure_quiesce(uint32_t where,int32_t result)
+      |                                       ^~~~~~~~~~~~~~~~~~~~
+D:\Github\global-x-camera\tmp\bringup\sensor-autostop-20261028\design\flash-auto\bus.c:569:17: warning: 'I2C_GetTiming' defined but not used [-Wunused-function]
+  569 | static uint32_t I2C_GetTiming(uint32_t clock_src_freq, uint32_t i2c_freq)
+      |                 ^~~~~~~~~~~~~
+D:\Github\global-x-camera\tmp\bringup\sensor-autostop-20261028\design\flash-auto\vd6g.c: In function 'display_error':
+D:\Github\global-x-camera\tmp\bringup\sensor-autostop-20261028\design\flash-auto\vd6g.c:306:7: warning: variable 'ret' set but not used [-Wunused-but-set-variable]
+  306 |   int ret;
+      |       ^~~
+D:\Github\global-x-camera\tmp\bringup\sensor-autostop-20261028\design\flash-auto\vd6g.c: In function 'VD6G_ComputeClocks':
+D:\Github\global-x-camera\tmp\bringup\sensor-autostop-20261028\design\flash-auto\vd6g.c:677:17: warning: comparison of integer expressions of different signedness: 'int' and 'unsigned int' [-Wsign-compare]
+  677 |   for (i = 0; i < ARRAY_SIZE(predivs); i++) {
+      |                 ^
+D:\Github\global-x-camera\tmp\bringup\sensor-autostop-20261028\design\flash-auto\vd6g.c: In function 'VD6G_SetExposureTime':
+D:\Github\global-x-camera\tmp\bringup\sensor-autostop-20261028\design\flash-auto\vd6g.c:124:52: warning: comparison of integer expressions of different signedness: 'int' and 'uint32_t' {aka 'long unsigned int'} [-Wsign-compare]
+  124 | #define CHECK_RANGE(x, min, max)             (((x) >= (min) && (x) <= (max)) ? 0 : -1)
+      |                                                    ^~
+D:\Github\global-x-camera\tmp\bringup\sensor-autostop-20261028\design\flash-auto\vd6g.c:1334:9: note: in expansion of macro 'CHECK_RANGE'
+ 1334 |   ret = CHECK_RANGE(exposure_us, exp_min, exp_max);
+      |         ^~~~~~~~~~~
+D:\Github\global-x-camera\tmp\bringup\sensor-autostop-20261028\design\flash-auto\vd6g.c:124:68: warning: comparison of integer expressions of different signedness: 'int' and 'uint32_t' {aka 'long unsigned int'} [-Wsign-compare]
+  124 | #define CHECK_RANGE(x, min, max)             (((x) >= (min) && (x) <= (max)) ? 0 : -1)
+      |                                                                    ^~
+D:\Github\global-x-camera\tmp\bringup\sensor-autostop-20261028\design\flash-auto\vd6g.c:1334:9: note: in expansion of macro 'CHECK_RANGE'
+ 1334 |   ret = CHECK_RANGE(exposure_us, exp_min, exp_max);
+      |         ^~~~~~~~~~~
+D:\Github\global-x-camera\tmp\bringup\sensor-autostop-20261028\design\flash-auto\vd6g.c:125:53: warning: comparison of integer expressions of different signedness: 'long unsigned int' and 'int' [-Wsign-compare]
+  125 | #define CEIL(num)                            ((num) == (int)(num) ? (int)(num) : (num) > 0 ? (int)((num) + 1) : (int)(num))
+      |                                                     ^~
+D:\Github\global-x-camera\tmp\bringup\sensor-autostop-20261028\design\flash-auto\vd6g.c:1342:55: note: in expansion of macro 'CEIL'
+ 1342 |   ret = ctx->write16(ctx, VD6G_REG_MANUAL_COARSE_EXP, CEIL(exposure_us / line_time_in_us));
+      |                                                       ^~~~
+D:\Github\global-x-camera\tmp\bringup\sensor-autostop-20261028\design\flash-auto\vd6g.c: At top level:
+D:\Github\global-x-camera\tmp\bringup\sensor-autostop-20261028\design\flash-auto\vd6g.c:483:12: warning: 'VD6G_ApplyVtPatchSlowBoot' defined but not used [-Wunused-function]
+  483 | static int VD6G_ApplyVtPatchSlowBoot(VD6G_Ctx_t *ctx)
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~~
+D:\Github\global-x-camera\tmp\bringup\sensor-autostop-20261028\design\flash-auto\vd6g.c:406:12: warning: 'VD6G_ApplyPatchSlowBoot' defined but not used [-Wunused-function]
+  406 | static int VD6G_ApplyPatchSlowBoot(VD6G_Ctx_t *ctx)
+      |            ^~~~~~~~~~~~~~~~~~~~~~~
+D:\Github\global-x-camera\tmp\bringup\sensor-autostop-20261028\design\flash-auto\hal_dcmipp.c: In function 'HAL_DCMIPP_PIPE_GetISPBadPixelRemovalConfig':
+D:\Github\global-x-camera\tmp\bringup\sensor-autostop-20261028\design\flash-auto\hal_dcmipp.c:4927:100: warning: unused parameter 'Pipe' [-Wunused-parameter]
+ 4927 | uint32_t HAL_DCMIPP_PIPE_GetISPBadPixelRemovalConfig(const DCMIPP_HandleTypeDef *hdcmipp, uint32_t Pipe)
+      |                                                                                           ~~~~~~~~~^~~~
+D:\Github\global-x-camera\tmp\bringup\sensor-autostop-20261028\design\flash-auto\hal_dcmipp.c: In function 'HAL_DCMIPP_PIPE_GetISPRemovedBadPixelCounter':
+D:\Github\global-x-camera\tmp\bringup\sensor-autostop-20261028\design\flash-auto\hal_dcmipp.c:4963:110: warning: unused parameter 'Pipe' [-Wunused-parameter]
+ 4963 | HAL_StatusTypeDef HAL_DCMIPP_PIPE_GetISPRemovedBadPixelCounter(const DCMIPP_HandleTypeDef *hdcmipp, uint32_t Pipe,
+      |                                                                                                     ~~~~~~~~~^~~~
+D:\Github\global-x-camera\tmp\bringup\sensor-autostop-20261028\design\flash-auto\hal_dcmipp.c: In function 'HAL_DCMIPP_PIPE_ResetFrameCounter':
+D:\Github\global-x-camera\tmp\bringup\sensor-autostop-20261028\design\flash-auto\hal_dcmipp.c:7128:93: warning: unused parameter 'Pipe' [-Wunused-parameter]
+ 7128 | HAL_StatusTypeDef HAL_DCMIPP_PIPE_ResetFrameCounter(DCMIPP_HandleTypeDef *hdcmipp, uint32_t Pipe)
+      |                                                                                    ~~~~~~~~~^~~~
+D:\Github\global-x-camera\tmp\bringup\sensor-autostop-20261028\design\flash-auto\hal_dcmipp.c: In function 'HAL_DCMIPP_PIPE_ReadFrameCounter':
+D:\Github\global-x-camera\tmp\bringup\sensor-autostop-20261028\design\flash-auto\hal_dcmipp.c:7160:98: warning: unused parameter 'Pipe' [-Wunused-parameter]
+ 7160 | HAL_StatusTypeDef HAL_DCMIPP_PIPE_ReadFrameCounter(const DCMIPP_HandleTypeDef *hdcmipp, uint32_t Pipe,
+      |                                                                                         ~~~~~~~~~^~~~
+D:\Github\global-x-camera\tmp\bringup\sensor-autostop-20261028\design\flash-auto\hal_dcmipp.c: In function 'HAL_DCMIPP_PIPE_GetDataCounter':
+D:\Github\global-x-camera\tmp\bringup\sensor-autostop-20261028\design\flash-auto\hal_dcmipp.c:7203:96: warning: unused parameter 'Pipe' [-Wunused-parameter]
+ 7203 | HAL_StatusTypeDef HAL_DCMIPP_PIPE_GetDataCounter(const DCMIPP_HandleTypeDef *hdcmipp, uint32_t Pipe,
+      |                                                                                       ~~~~~~~~~^~~~
+D:\Github\global-x-camera\tmp\bringup\sensor-autostop-20261028\design\flash-auto\hal_dcmipp.c: In function 'HAL_DCMIPP_PIPE_IsEnabledISPRemovalStatistic':
+D:\Github\global-x-camera\tmp\bringup\sensor-autostop-20261028\design\flash-auto\hal_dcmipp.c:7619:101: warning: unused parameter 'Pipe' [-Wunused-parameter]
+ 7619 | uint32_t HAL_DCMIPP_PIPE_IsEnabledISPRemovalStatistic(const DCMIPP_HandleTypeDef *hdcmipp, uint32_t Pipe)
+      |                                                                                            ~~~~~~~~~^~~~
+D:\Github\global-x-camera\tmp\bringup\sensor-autostop-20261028\design\flash-auto\runtime.c:633:12: warning: 'payload_transport' defined but not used [-Wunused-function]
+  633 | static int payload_transport(sd_card_t *card,uint32_t lba,const void *data,uint32_t count)
+      |            ^~~~~~~~~~~~~~~~~
+D:/ST/STM32CubeIDE_1.15.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.200.202406191623/tools/bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/bin/ld.exe: section .raw_late LMA [34303dbc,343084f3] overlaps section .rodata LMA [34303c0c,34303e23]
+D:/ST/STM32CubeIDE_1.15.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.200.202406191623/tools/bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/bin/ld.exe: section .ARM LMA [34303e24,34303e2b] overlaps section .raw_late LMA [34303dbc,343084f3]
+collect2.exe: error: ld returned 1 exit status
+Traceback (most recent call last):
+  File "D:\Github\global-x-camera\firmware\capture-raw\build.py", line 698, in <module>
+    if __name__=='__main__': main()
+                             ^^^^^^
+  File "D:\Github\global-x-camera\firmware\capture-raw\build.py", line 503, in main
+    code,size=compiler(out,compiled,flags,out/'capture.ld','capture',libc=True)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Github\global-x-camera\firmware\capture-raw\late_build.py", line 171, in compile_with_late
+    subprocess.run([str(TC/'arm-none-eabi-gcc.exe'),*flags,*runtime_flags,'-T',str(linker),
+  File "C:\Users\joshd\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['D:\\ST\\STM32CubeIDE_1.15.1\\STM32CubeIDE\\plugins\\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.200.202406191623\\tools\\bin\\arm-none-eabi-gcc.exe', '-ID:\\Github\\global-x-camera\\tmp\\bringup\\sensor-autostop-20261028\\design\\flash-auto', '-ID:\\Github\\global-x-camera\\tmp\\bringup\\sd-normal-20261024\\v66c-normal-standby\\receiver', '-mcpu=cortex-m55', '-mthumb', '-mcmse', '-mfpu=fpv5-d16', '-mfloat-abi=hard', '-Os', '-g3', '-ffunction-sections', '-fdata-sections', '-DNDEBUG', '-DSTM32N657xx', '-DSTM32N6570_NUCLEO_REV', '-Wall', '-Wextra', '-flto', '-DBUS_I2C2_FREQUENCY=1000000', '-DBENCH_RESET_US=100', '-DBENCH_POLL_US=50', '-DBENCH_STROBE=1', '-DBENCH_STOP_STAGE=0', '-DBENCH_ROM_CLOCKS=1', '-DBENCH_PREPARE_EARLY=0', '-DBENCH_GPIO_LEVEL=-1', '-DBENCH_COARSE_LINES=1428', '-DBENCH_BATCH_CONFIG=1', '-DBENCH_STAGE2=1', '-DBENCH_FRAME_LINES=4336', '-DBENCH_RECEIVER_EARLY=1', '-DBENCH_CLOCK_DIAGNOSTICS=1', '-ID:\\Github\\global-x-camera\\tmp\\bringup\\x-cube-n6-camera-capture\\Inc', '-ID:\\Github\\global-x-camera\\tmp\\bringup\\x-cube-n6-camera-capture\\STM32Cube_FW_N6\\Drivers\\CMSIS\\Include', '-ID:\\Github\\global-x-camera\\tmp\\bringup\\x-cube-n6-camera-capture\\STM32Cube_FW_N6\\Drivers\\CMSIS\\Device\\ST\\STM32N6xx\\Include', '-ID:\\Github\\global-x-camera\\tmp\\bringup\\x-cube-n6-camera-capture\\STM32Cube_FW_N6\\Drivers\\STM32N6xx_HAL_Driver\\Inc', '-ID:\\Github\\global-x-camera\\tmp\\bringup\\x-cube-n6-camera-capture\\STM32Cube_FW_N6\\Drivers\\STM32N6xx_HAL_Driver\\Inc\\Legacy', '-ID:\\Github\\global-x-camera\\tmp\\bringup\\x-cube-n6-camera-capture\\STM32Cube_FW_N6\\Drivers\\BSP\\STM32N6xx_Nucleo', '-ID:\\Github\\global-x-camera\\tmp\\bringup\\x-cube-n6-camera-capture\\STM32Cube_FW_N6\\Drivers\\BSP\\Components\\Common', '-ID:\\Github\\global-x-camera\\tmp\\bringup\\x-cube-n6-camera-capture\\Lib\\Camera_Middleware\\sensors\\vd6g', '-DFAST_SHUTDOWN_DATA_OFF=1', '-DFAST_DATA_STREAMING=0', '-DREADY_GATE=6', '-ID:\\Github\\global-x-camera\\tmp\\bringup\\sd-normal-20261024\\v66c-normal-standby\\receiver', '-DCAPTURE_DIAGNOSTICS=0', '-DRAW_ERROR_PREFIX=1', '-DRAW_BOARD_ETH_POWERDOWN=1', '-DRAW_SENSOR_AUTOSTOP=1', '-DRAW_PATTERN=0', '-DRAW_FLASH=1', '-DSD_BUS_WIDTH=4', '-DRAW_SD_CLOCK_HZ=25000000U', '-DSD_GPIO_SPEED=3', '-DSD_FIXED_COMPENSATION=0', '-DSD_CLOCK_NEGEDGE=1', '-DSD_CLOCK_NEGEDGE_INIT=1', '-DSD_REVIEW_PROFILE=1', '-DSD_IDMA_READ=0', '-DSD_STARTUP_OPT=1', '-DSD_EARLY_RUN_CLOCK=0', '-DSD_HIGH_SPEED=0', '-DSD_HIGH_SPEED_MIXED_SLEW=0', '-DSD_HIGH_SPEED_FIXED_COMPENSATION=0', '-DSD_HIGH_SPEED_COMBINED_ELECTRICAL=0', '-DRAW_STANDBY=1', '-DRAW_DMA=1', '-DRAW_ASYNC_STOP=1', '-DRAW_DMA_SLEEP=0', '-DRAW_DMA_TAIL_WAIT=0', '-DRAW_WHOLE_IMAGE_PREERASE=0', '-DRAW_MAGIC_FORMAT=1', '-DRAW_EXPOSURE_COARSE=1428U', '-DRAW_LINE_STREAM=1', '-DRAW_PREINIT=0', '-DRAW_LINE_SNAPSHOTS=0', '-DRAW_LINE_POISON=0', '-DRAW_CHUNK_SECTORS=3730U', '-DSTAGE1_SENSOR_TRIM=1', '-DLOW_POWER_MODE=3', '-DLOW_POWER_ENTRY_DELAY_US=0', '-nostartfiles', '--specs=nano.specs', '--specs=nosys.specs', '-T', 'D:\\Github\\global-x-camera\\tmp\\bringup\\sensor-autostop-20261028\\design\\flash-auto\\capture.ld', 'D:\\Github\\global-x-camera\\tmp\\bringup\\sensor-autostop-20261028\\design\\flash-auto\\00_capture.o', 'D:\\Github\\global-x-camera\\tmp\\bringup\\sensor-autostop-20261028\\design\\flash-auto\\01_clocks.o', 'D:\\Github\\global-x-camera\\tmp\\bringup\\sensor-autostop-20261028\\design\\flash-auto\\02_startup.o', 'D:\\Github\\global-x-camera\\tmp\\bringup\\sensor-autostop-20261028\\design\\flash-auto\\03_system.o', 'D:\\Github\\global-x-camera\\tmp\\bringup\\sensor-autostop-20261028\\design\\flash-auto\\04_stm32n6xx_nucleo.o', 'D:\\Github\\global-x-camera\\tmp\\bringup\\sensor-autostop-20261028\\design\\flash-auto\\05_bus.o', 'D:\\Github\\global-x-camera\\tmp\\bringup\\sensor-autostop-20261028\\design\\flash-auto\\06_vd6g.o', 'D:\\Github\\global-x-camera\\tmp\\bringup\\sensor-autostop-20261028\\design\\flash-auto\\07_stm32n6xx_hal.o', 'D:\\Github\\global-x-camera\\tmp\\bringup\\sensor-autostop-20261028\\design\\flash-auto\\08_stm32n6xx_hal_cortex.o', 'D:\\Github\\global-x-camera\\tmp\\bringup\\sensor-autostop-20261028\\design\\flash-auto\\09_hal_dcmipp.o', 'D:\\Github\\global-x-camera\\tmp\\bringup\\sensor-autostop-20261028\\design\\flash-auto\\10_stm32n6xx_hal_gpio.o', 'D:\\Github\\global-x-camera\\tmp\\bringup\\sensor-autostop-20261028\\design\\flash-auto\\11_stm32n6xx_hal_i2c.o', 'D:\\Github\\global-x-camera\\tmp\\bringup\\sensor-autostop-20261028\\design\\flash-auto\\12_stm32n6xx_hal_i2c_ex.o', 'D:\\Github\\global-x-camera\\tmp\\bringup\\sensor-autostop-20261028\\design\\flash-auto\\13_stm32n6xx_hal_pwr.o', 'D:\\Github\\global-x-camera\\tmp\\bringup\\sensor-autostop-20261028\\design\\flash-auto\\14_stm32n6xx_hal_pwr_ex.o', 'D:\\Github\\global-x-camera\\tmp\\bringup\\sensor-autostop-20261028\\design\\flash-auto\\15_stm32n6xx_hal_rcc.o', 'D:\\Github\\global-x-camera\\tmp\\bringup\\sensor-autostop-20261028\\design\\flash-auto\\16_stm32n6xx_hal_rcc_ex.o', 'D:\\Github\\global-x-camera\\tmp\\bringup\\sensor-autostop-20261028\\design\\flash-auto\\17_stm32n6xx_hal_rif.o', 'D:\\Github\\global-x-camera\\tmp\\bringup\\sensor-autostop-20261028\\design\\flash-auto\\18_phase_gpio.o', 'D:\\Github\\global-x-camera\\tmp\\bringup\\sensor-autostop-20261028\\design\\flash-auto\\19_runtime.o', 'D:\\Github\\global-x-camera\\tmp\\bringup\\sensor-autostop-20261028\\design\\flash-auto\\20_producer.o', 'D:\\Github\\global-x-camera\\tmp\\bringup\\sensor-autostop-20261028\\design\\flash-auto\\21_sd_card.o', 'D:\\Github\\global-x-camera\\tmp\\bringup\\sensor-autostop-20261028\\design\\flash-auto\\22_raw_slots.o', 'D:\\Github\\global-x-camera\\tmp\\bringup\\sensor-autostop-20261028\\design\\flash-auto\\23_magic_slots.o', 'D:\\Github\\global-x-camera\\tmp\\bringup\\sensor-autostop-20261028\\design\\flash-auto\\24_completion.o', 'D:\\Github\\global-x-camera\\tmp\\bringup\\sensor-autostop-20261028\\design\\flash-auto\\25_peripherals.o', 'D:\\Github\\global-x-camera\\tmp\\bringup\\sensor-autostop-20261028\\design\\flash-auto\\26_late_loader.o', '-Wl,--gc-sections,--build-id=none,--no-warn-rwx-segments', '-Wl,-Map=D:\\Github\\global-x-camera\\tmp\\bringup\\sensor-autostop-20261028\\design\\flash-auto\\capture.map', '-lc', '-lm', '-lnosys', '-o', 'D:\\Github\\global-x-camera\\tmp\\bringup\\sensor-autostop-20261028\\design\\flash-auto\\capture.elf']' returned non-zero exit status 1.

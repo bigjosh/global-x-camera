@@ -1,0 +1,60 @@
+{
+  "schema": 1,
+  "completed": true,
+  "normal_unchanged": true,
+  "nor_programming": false,
+  "active_helpers": false,
+  "logger_closed_utc": "2026-10-28T22:49:49.389730+00:00",
+  "target_state": "Powered after unchanged normal cold boot, low-current plateau; not RAM diagnostic or recovery park.",
+  "final_state_scope": "Ten phase markers and current signature only; final image and SBF not reread.",
+  "final_plateau_mA": 8.560202,
+  "final_plateau_V": 4.994354,
+  "sensor_autostop_installed": false,
+  "cold_sensor_autostop_qualified": false,
+  "expected_final_slot": 140,
+  "expected_final_slot_was_free": true,
+  "final_slot_readback": false,
+  "verified_sensor_slots": [
+    138,
+    139
+  ],
+  "full_original_frame_equality": true,
+  "visual_checks": "Root inspected both recovered PNGs: dim but recognizable patterned screen, ceiling and beams.",
+  "uart_recovery": "Exact unchanged normal prefix/park passed after each RAM test/readback; COM8 closed and BREAK released.",
+  "settings": "JS output left enabled; range128, stream and EXTIO settings restored without cleanup errors.",
+  "hardware": "Direct bench5V through JS to CN5.5, common return CN5.6; CN8/LTC disconnected, no CN9 shunts; CN10 separately powered, D2/R23 removed, U24 fitted. CN15 JS markers21/33 and ground20. Twisted SD CLK/GND CN3.3/8, VCC CN3.5. No resistor or SD signal probes. Camera/SD connected; normal boot jumpers.",
+  "normal_receiver_sha256": "69c5a5c0cc434eb7496371d9e5b9c007db346b8bb7b9a1a650c90f0eade79d28",
+  "normal_prefix_sha256": "2b9724bc4b60af52b1c4ab45e1b232578e9640efc3a30a57772a810d99c3f344",
+  "normal_sector_sha256": "a10e4894d79cd3fe182b95b48eb56a308280f3201736d295860ecfe725a62645",
+  "nor_identity_scope": "No programming occurred; exact prefix reread at recovery, normal artifacts rebuilt identically. Complete physical NOR was not reread in this task.",
+  "evidence": [
+    {
+      "path": "control-after/trace/result.json",
+      "sha256": "546609cc1c0f0f6f34e4d8ba51a024bbdbd6371641449a707a76435fde7298aa"
+    },
+    {
+      "path": "analysis/control-after-qualified-analysis.json",
+      "sha256": "fb2f6fae6096039d57a89b88d0fa39788ea82ec198784358b25b3f4064f8a9f6"
+    },
+    {
+      "path": "before-final-normal/park/result.json",
+      "sha256": "45f349e6dab100afdb29adb749ea36a077595e051e8de9c917f2724fff301ef8"
+    },
+    {
+      "path": "before-final-headers/summary.json",
+      "sha256": "97dfb9db32876a2ab31a48557f1dcdf05f18681f98526d3bd55e18fbdd37b20b"
+    },
+    {
+      "path": "ram-readback/readback-validation.json",
+      "sha256": "cd49a0588ef3655f1e1d912d61bccc7d220cc80eaa5802bd5aa4c799a06a5848"
+    },
+    {
+      "path": "ram-auto02-readback/readback-validation.json",
+      "sha256": "beb3e0887b120958f9755550a7b45dcdd35f455bbab8231c33005f63059bfa0f"
+    },
+    {
+      "path": "design/final-build-results.json",
+      "sha256": "f2e0731e3be6ba9d7aa9d33752c5b207720e6bfe014893553c02b891826cffce"
+    }
+  ]
+}

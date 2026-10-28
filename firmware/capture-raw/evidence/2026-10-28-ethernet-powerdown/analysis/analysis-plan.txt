@@ -1,0 +1,39 @@
+Cold normal-cycle PHY integration comparison
+
+Scope: offline only. Root owns all hardware, firmware installation, cold cycling,
+card reads, and state qualification. Analysis files stay in this directory.
+
+Run three original-firmware baseline cycles and three PHY-power-down candidate
+cycles with the same source, camera/card, wires, scene/exposure, marker protocol,
+and cold-off interval. Preserve each run, including any failures. Prefer an
+additional baseline reversal if a material unrelated drift is observed; do not
+automatically expand testing after a clean controlled result.
+
+Read native current/voltage/power and packed IN0/IN1 by sample ID. Require saved
+file hashes, continuous chunks, native 2 MSPS, unique complete marker IDs1..10
+and semantic precedence. Keep all startup chatter/unclassified edges. Exclude
+the entire last packed GPIO chunk because valid padding length is unresolved.
+
+Use first >=20 mA onset with preceding finite 1 ms near zero. Exclude first5ms
+from qualified energy comparisons, as in the prior direct5V archive. Plateau
+boundary is the first whole1ms bin after marker10 followed by ten bin means
+inside6..12mA. Also report marker10 endpoint separately. Retain whole/first5ms
+raw integrals explicitly unqualified. Report low plateau over100ms.
+
+Compute actual power means and energy from native power.f32, not mean V times
+mean I. Split at actual marker ordering, preserving exposure/SD-init overlap.
+Report SD initialization, first-slot submission to transport return, commit,
+deinit and shutdown separately. Three repetitions quantify the observed range;
+they do not establish a population distribution or prove every time reduction
+was caused by PHY power-down. Present slot-transport mean power alongside its
+duration so card-latency variation stays visible.
+
+Firmware identity, exact installation readback, PHY action proof, saved-image
+readback and Standby flags are separate evidence supplied by root. The analyzer
+does not derive these qualifications from current shape or markers.
+
+Invocation: python -B analyze_cycles.py input-manifest.json
+Manifest entries: run, group baseline/candidate, trace path, optional evidence.
+Relative trace paths resolve against tmp/bringup/ethernet-normal-20261028.
+Dependencies are two inert offline modules in power-ablation-20261028; their
+hashes are saved in comparison.json. No imported module executes hardware.

@@ -1,0 +1,1229 @@
+
+D:\Github\global-x-camera\tmp\bringup\nucleo-isolated-20261028\mdio\power_aba\power_aba.elf:     file format elf32-littlearm
+
+
+Disassembly of section .text:
+
+343c4000 <delay>:
+343c4000:	4906      	ldr	r1, [pc, #24]	@ (343c401c <delay+0x1c>)
+343c4002:	b510      	push	{r4, lr}
+343c4004:	4b06      	ldr	r3, [pc, #24]	@ (343c4020 <delay+0x20>)
+343c4006:	684c      	ldr	r4, [r1, #4]
+343c4008:	684a      	ldr	r2, [r1, #4]
+343c400a:	1b12      	subs	r2, r2, r4
+343c400c:	4282      	cmp	r2, r0
+343c400e:	d203      	bcs.n	343c4018 <delay+0x18>
+343c4010:	3b01      	subs	r3, #1
+343c4012:	d1f9      	bne.n	343c4008 <delay+0x8>
+343c4014:	2003      	movs	r0, #3
+343c4016:	bd10      	pop	{r4, pc}
+343c4018:	2000      	movs	r0, #0
+343c401a:	e7fc      	b.n	343c4016 <delay+0x16>
+343c401c:	e0001000 	.word	0xe0001000
+343c4020:	0007a120 	.word	0x0007a120
+
+343c4024 <snapshot>:
+343c4024:	b5f0      	push	{r4, r5, r6, r7, lr}
+343c4026:	f8d1 e000 	ldr.w	lr, [r1]
+343c402a:	684f      	ldr	r7, [r1, #4]
+343c402c:	688e      	ldr	r6, [r1, #8]
+343c402e:	68cd      	ldr	r5, [r1, #12]
+343c4030:	ea4f 0c42 	mov.w	ip, r2, lsl #1
+343c4034:	08d4      	lsrs	r4, r2, #3
+343c4036:	fa25 f50c 	lsr.w	r5, r5, ip
+343c403a:	f005 0503 	and.w	r5, r5, #3
+343c403e:	3408      	adds	r4, #8
+343c4040:	f851 4024 	ldr.w	r4, [r1, r4, lsl #2]
+343c4044:	60c5      	str	r5, [r0, #12]
+343c4046:	6949      	ldr	r1, [r1, #20]
+343c4048:	f002 0507 	and.w	r5, r2, #7
+343c404c:	00ad      	lsls	r5, r5, #2
+343c404e:	fa2e fe0c 	lsr.w	lr, lr, ip
+343c4052:	40d7      	lsrs	r7, r2
+343c4054:	fa26 f60c 	lsr.w	r6, r6, ip
+343c4058:	40ec      	lsrs	r4, r5
+343c405a:	fa21 f202 	lsr.w	r2, r1, r2
+343c405e:	f00e 0e03 	and.w	lr, lr, #3
+343c4062:	f007 0701 	and.w	r7, r7, #1
+343c4066:	f006 0603 	and.w	r6, r6, #3
+343c406a:	f004 040f 	and.w	r4, r4, #15
+343c406e:	f002 0201 	and.w	r2, r2, #1
+343c4072:	f8c0 e000 	str.w	lr, [r0]
+343c4076:	6047      	str	r7, [r0, #4]
+343c4078:	6086      	str	r6, [r0, #8]
+343c407a:	6104      	str	r4, [r0, #16]
+343c407c:	6142      	str	r2, [r0, #20]
+343c407e:	bdf0      	pop	{r4, r5, r6, r7, pc}
+
+343c4080 <restore_pin>:
+343c4080:	b082      	sub	sp, #8
+343c4082:	e92d 41f0 	stmdb	sp!, {r4, r5, r6, r7, r8, lr}
+343c4086:	ac06      	add	r4, sp, #24
+343c4088:	e884 000c 	stmia.w	r4, {r2, r3}
+343c408c:	2403      	movs	r4, #3
+343c408e:	2601      	movs	r6, #1
+343c4090:	f04f 080f 	mov.w	r8, #15
+343c4094:	6803      	ldr	r3, [r0, #0]
+343c4096:	004d      	lsls	r5, r1, #1
+343c4098:	40ac      	lsls	r4, r5
+343c409a:	ea23 0304 	bic.w	r3, r3, r4
+343c409e:	6003      	str	r3, [r0, #0]
+343c40a0:	9b07      	ldr	r3, [sp, #28]
+343c40a2:	6847      	ldr	r7, [r0, #4]
+343c40a4:	408b      	lsls	r3, r1
+343c40a6:	fa06 fc01 	lsl.w	ip, r6, r1
+343c40aa:	407b      	eors	r3, r7
+343c40ac:	ea03 030c 	and.w	r3, r3, ip
+343c40b0:	407b      	eors	r3, r7
+343c40b2:	6043      	str	r3, [r0, #4]
+343c40b4:	9b08      	ldr	r3, [sp, #32]
+343c40b6:	6887      	ldr	r7, [r0, #8]
+343c40b8:	40ab      	lsls	r3, r5
+343c40ba:	407b      	eors	r3, r7
+343c40bc:	4023      	ands	r3, r4
+343c40be:	407b      	eors	r3, r7
+343c40c0:	6083      	str	r3, [r0, #8]
+343c40c2:	9b09      	ldr	r3, [sp, #36]	@ 0x24
+343c40c4:	68c7      	ldr	r7, [r0, #12]
+343c40c6:	40ab      	lsls	r3, r5
+343c40c8:	407b      	eors	r3, r7
+343c40ca:	4023      	ands	r3, r4
+343c40cc:	407b      	eors	r3, r7
+343c40ce:	08cf      	lsrs	r7, r1, #3
+343c40d0:	60c3      	str	r3, [r0, #12]
+343c40d2:	eb00 0787 	add.w	r7, r0, r7, lsl #2
+343c40d6:	9b0a      	ldr	r3, [sp, #40]	@ 0x28
+343c40d8:	f001 0c07 	and.w	ip, r1, #7
+343c40dc:	f8d7 e020 	ldr.w	lr, [r7, #32]
+343c40e0:	ea4f 0c8c 	mov.w	ip, ip, lsl #2
+343c40e4:	fa03 f30c 	lsl.w	r3, r3, ip
+343c40e8:	ea83 030e 	eor.w	r3, r3, lr
+343c40ec:	fa08 fc0c 	lsl.w	ip, r8, ip
+343c40f0:	ea03 030c 	and.w	r3, r3, ip
+343c40f4:	ea83 030e 	eor.w	r3, r3, lr
+343c40f8:	623b      	str	r3, [r7, #32]
+343c40fa:	9b0b      	ldr	r3, [sp, #44]	@ 0x2c
+343c40fc:	fab3 f383 	clz	r3, r3
+343c4100:	095b      	lsrs	r3, r3, #5
+343c4102:	eb01 1103 	add.w	r1, r1, r3, lsl #4
+343c4106:	408e      	lsls	r6, r1
+343c4108:	6186      	str	r6, [r0, #24]
+343c410a:	6801      	ldr	r1, [r0, #0]
+343c410c:	fa02 f305 	lsl.w	r3, r2, r5
+343c4110:	404b      	eors	r3, r1
+343c4112:	4023      	ands	r3, r4
+343c4114:	404b      	eors	r3, r1
+343c4116:	e8bd 41f0 	ldmia.w	sp!, {r4, r5, r6, r7, r8, lr}
+343c411a:	6003      	str	r3, [r0, #0]
+343c411c:	b002      	add	sp, #8
+343c411e:	4770      	bx	lr
+
+343c4120 <wait_cycles>:
+343c4120:	2300      	movs	r3, #0
+343c4122:	b570      	push	{r4, r5, r6, lr}
+343c4124:	4d09      	ldr	r5, [pc, #36]	@ (343c414c <wait_cycles+0x2c>)
+343c4126:	4c0a      	ldr	r4, [pc, #40]	@ (343c4150 <wait_cycles+0x30>)
+343c4128:	686e      	ldr	r6, [r5, #4]
+343c412a:	686a      	ldr	r2, [r5, #4]
+343c412c:	1b92      	subs	r2, r2, r6
+343c412e:	4282      	cmp	r2, r0
+343c4130:	d302      	bcc.n	343c4138 <wait_cycles+0x18>
+343c4132:	b939      	cbnz	r1, 343c4144 <wait_cycles+0x24>
+343c4134:	2000      	movs	r0, #0
+343c4136:	bd70      	pop	{r4, r5, r6, pc}
+343c4138:	3c01      	subs	r4, #1
+343c413a:	f103 0301 	add.w	r3, r3, #1
+343c413e:	d003      	beq.n	343c4148 <wait_cycles+0x28>
+343c4140:	bf00      	nop
+343c4142:	e7f2      	b.n	343c412a <wait_cycles+0xa>
+343c4144:	600b      	str	r3, [r1, #0]
+343c4146:	e7f5      	b.n	343c4134 <wait_cycles+0x14>
+343c4148:	2003      	movs	r0, #3
+343c414a:	e7f4      	b.n	343c4136 <wait_cycles+0x16>
+343c414c:	e0001000 	.word	0xe0001000
+343c4150:	05f5e101 	.word	0x05f5e101
+
+343c4154 <marker.part.0>:
+343c4154:	f44f 5380 	mov.w	r3, #4096	@ 0x1000
+343c4158:	b510      	push	{r4, lr}
+343c415a:	4c09      	ldr	r4, [pc, #36]	@ (343c4180 <marker.part.0+0x2c>)
+343c415c:	61a3      	str	r3, [r4, #24]
+343c415e:	f3bf 8f4f 	dsb	sy
+343c4162:	f44f 7348 	mov.w	r3, #800	@ 0x320
+343c4166:	4358      	muls	r0, r3
+343c4168:	f7ff ff4a 	bl	343c4000 <delay>
+343c416c:	f04f 5380 	mov.w	r3, #268435456	@ 0x10000000
+343c4170:	61a3      	str	r3, [r4, #24]
+343c4172:	f3bf 8f4f 	dsb	sy
+343c4176:	b110      	cbz	r0, 343c417e <marker.part.0+0x2a>
+343c4178:	4b02      	ldr	r3, [pc, #8]	@ (343c4184 <marker.part.0+0x30>)
+343c417a:	f8c3 0174 	str.w	r0, [r3, #372]	@ 0x174
+343c417e:	bd10      	pop	{r4, pc}
+343c4180:	56020c00 	.word	0x56020c00
+343c4184:	343c6000 	.word	0x343c6000
+
+343c4188 <clock_bit>:
+343c4188:	2301      	movs	r3, #1
+343c418a:	f080 0001 	eor.w	r0, r0, #1
+343c418e:	0100      	lsls	r0, r0, #4
+343c4190:	b570      	push	{r4, r5, r6, lr}
+343c4192:	3004      	adds	r0, #4
+343c4194:	4e16      	ldr	r6, [pc, #88]	@ (343c41f0 <clock_bit+0x68>)
+343c4196:	4083      	lsls	r3, r0
+343c4198:	61b3      	str	r3, [r6, #24]
+343c419a:	f44f 60fa 	mov.w	r0, #2000	@ 0x7d0
+343c419e:	460c      	mov	r4, r1
+343c41a0:	f7ff ff2e 	bl	343c4000 <delay>
+343c41a4:	bb10      	cbnz	r0, 343c41ec <clock_bit+0x64>
+343c41a6:	4d13      	ldr	r5, [pc, #76]	@ (343c41f4 <clock_bit+0x6c>)
+343c41a8:	692b      	ldr	r3, [r5, #16]
+343c41aa:	0519      	lsls	r1, r3, #20
+343c41ac:	bf41      	itttt	mi
+343c41ae:	4a12      	ldrmi	r2, [pc, #72]	@ (343c41f8 <clock_bit+0x70>)
+343c41b0:	6e53      	ldrmi	r3, [r2, #100]	@ 0x64
+343c41b2:	3301      	addmi	r3, #1
+343c41b4:	6653      	strmi	r3, [r2, #100]	@ 0x64
+343c41b6:	b11c      	cbz	r4, 343c41c0 <clock_bit+0x38>
+343c41b8:	6933      	ldr	r3, [r6, #16]
+343c41ba:	f3c3 1300 	ubfx	r3, r3, #4, #1
+343c41be:	6023      	str	r3, [r4, #0]
+343c41c0:	f44f 6300 	mov.w	r3, #2048	@ 0x800
+343c41c4:	f44f 60fa 	mov.w	r0, #2000	@ 0x7d0
+343c41c8:	61ab      	str	r3, [r5, #24]
+343c41ca:	f7ff ff19 	bl	343c4000 <delay>
+343c41ce:	4b0a      	ldr	r3, [pc, #40]	@ (343c41f8 <clock_bit+0x70>)
+343c41d0:	b928      	cbnz	r0, 343c41de <clock_bit+0x56>
+343c41d2:	692a      	ldr	r2, [r5, #16]
+343c41d4:	0512      	lsls	r2, r2, #20
+343c41d6:	bf5e      	ittt	pl
+343c41d8:	6e9a      	ldrpl	r2, [r3, #104]	@ 0x68
+343c41da:	3201      	addpl	r2, #1
+343c41dc:	669a      	strpl	r2, [r3, #104]	@ 0x68
+343c41de:	f04f 6100 	mov.w	r1, #134217728	@ 0x8000000
+343c41e2:	4a04      	ldr	r2, [pc, #16]	@ (343c41f4 <clock_bit+0x6c>)
+343c41e4:	6191      	str	r1, [r2, #24]
+343c41e6:	6eda      	ldr	r2, [r3, #108]	@ 0x6c
+343c41e8:	3201      	adds	r2, #1
+343c41ea:	66da      	str	r2, [r3, #108]	@ 0x6c
+343c41ec:	bd70      	pop	{r4, r5, r6, pc}
+343c41ee:	bf00      	nop
+343c41f0:	56021400 	.word	0x56021400
+343c41f4:	56021800 	.word	0x56021800
+343c41f8:	343c6000 	.word	0x343c6000
+
+343c41fc <send_bits>:
+343c41fc:	b538      	push	{r3, r4, r5, lr}
+343c41fe:	4605      	mov	r5, r0
+343c4200:	460c      	mov	r4, r1
+343c4202:	3c01      	subs	r4, #1
+343c4204:	fa25 f004 	lsr.w	r0, r5, r4
+343c4208:	2100      	movs	r1, #0
+343c420a:	f000 0001 	and.w	r0, r0, #1
+343c420e:	f7ff ffbb 	bl	343c4188 <clock_bit>
+343c4212:	b908      	cbnz	r0, 343c4218 <send_bits+0x1c>
+343c4214:	2c00      	cmp	r4, #0
+343c4216:	d1f4      	bne.n	343c4202 <send_bits+0x6>
+343c4218:	bd38      	pop	{r3, r4, r5, pc}
+
+343c421a <write_bmcr>:
+343c421a:	2120      	movs	r1, #32
+343c421c:	b510      	push	{r4, lr}
+343c421e:	4604      	mov	r4, r0
+343c4220:	f04f 30ff 	mov.w	r0, #4294967295
+343c4224:	f7ff ffea 	bl	343c41fc <send_bits>
+343c4228:	4601      	mov	r1, r0
+343c422a:	bb30      	cbnz	r0, 343c427a <write_bmcr+0x60>
+343c422c:	2102      	movs	r1, #2
+343c422e:	2001      	movs	r0, #1
+343c4230:	f7ff ffe4 	bl	343c41fc <send_bits>
+343c4234:	4601      	mov	r1, r0
+343c4236:	bb00      	cbnz	r0, 343c427a <write_bmcr+0x60>
+343c4238:	2102      	movs	r1, #2
+343c423a:	2001      	movs	r0, #1
+343c423c:	f7ff ffde 	bl	343c41fc <send_bits>
+343c4240:	4601      	mov	r1, r0
+343c4242:	b9d0      	cbnz	r0, 343c427a <write_bmcr+0x60>
+343c4244:	2105      	movs	r1, #5
+343c4246:	f7ff ffd9 	bl	343c41fc <send_bits>
+343c424a:	4601      	mov	r1, r0
+343c424c:	b9a8      	cbnz	r0, 343c427a <write_bmcr+0x60>
+343c424e:	2105      	movs	r1, #5
+343c4250:	f7ff ffd4 	bl	343c41fc <send_bits>
+343c4254:	4601      	mov	r1, r0
+343c4256:	b980      	cbnz	r0, 343c427a <write_bmcr+0x60>
+343c4258:	2102      	movs	r1, #2
+343c425a:	4608      	mov	r0, r1
+343c425c:	f7ff ffce 	bl	343c41fc <send_bits>
+343c4260:	4601      	mov	r1, r0
+343c4262:	b950      	cbnz	r0, 343c427a <write_bmcr+0x60>
+343c4264:	2110      	movs	r1, #16
+343c4266:	4620      	mov	r0, r4
+343c4268:	f7ff ffc8 	bl	343c41fc <send_bits>
+343c426c:	4601      	mov	r1, r0
+343c426e:	b920      	cbnz	r0, 343c427a <write_bmcr+0x60>
+343c4270:	e8bd 4010 	ldmia.w	sp!, {r4, lr}
+343c4274:	2001      	movs	r0, #1
+343c4276:	f7ff bf87 	b.w	343c4188 <clock_bit>
+343c427a:	4608      	mov	r0, r1
+343c427c:	bd10      	pop	{r4, pc}
+
+343c427e <checked_read.constprop.0>:
+343c427e:	b573      	push	{r0, r1, r4, r5, r6, lr}
+343c4280:	2501      	movs	r5, #1
+343c4282:	4606      	mov	r6, r0
+343c4284:	460c      	mov	r4, r1
+343c4286:	f04f 30ff 	mov.w	r0, #4294967295
+343c428a:	2120      	movs	r1, #32
+343c428c:	9500      	str	r5, [sp, #0]
+343c428e:	f7ff ffb5 	bl	343c41fc <send_bits>
+343c4292:	4601      	mov	r1, r0
+343c4294:	2800      	cmp	r0, #0
+343c4296:	d13a      	bne.n	343c430e <checked_read.constprop.0+0x90>
+343c4298:	2102      	movs	r1, #2
+343c429a:	4628      	mov	r0, r5
+343c429c:	f7ff ffae 	bl	343c41fc <send_bits>
+343c42a0:	4601      	mov	r1, r0
+343c42a2:	bba0      	cbnz	r0, 343c430e <checked_read.constprop.0+0x90>
+343c42a4:	2102      	movs	r1, #2
+343c42a6:	4608      	mov	r0, r1
+343c42a8:	f7ff ffa8 	bl	343c41fc <send_bits>
+343c42ac:	4601      	mov	r1, r0
+343c42ae:	bb70      	cbnz	r0, 343c430e <checked_read.constprop.0+0x90>
+343c42b0:	2105      	movs	r1, #5
+343c42b2:	f7ff ffa3 	bl	343c41fc <send_bits>
+343c42b6:	4601      	mov	r1, r0
+343c42b8:	bb48      	cbnz	r0, 343c430e <checked_read.constprop.0+0x90>
+343c42ba:	2105      	movs	r1, #5
+343c42bc:	4630      	mov	r0, r6
+343c42be:	f7ff ff9d 	bl	343c41fc <send_bits>
+343c42c2:	4601      	mov	r1, r0
+343c42c4:	bb18      	cbnz	r0, 343c430e <checked_read.constprop.0+0x90>
+343c42c6:	4628      	mov	r0, r5
+343c42c8:	f7ff ff5e 	bl	343c4188 <clock_bit>
+343c42cc:	4601      	mov	r1, r0
+343c42ce:	b9f0      	cbnz	r0, 343c430e <checked_read.constprop.0+0x90>
+343c42d0:	4669      	mov	r1, sp
+343c42d2:	4628      	mov	r0, r5
+343c42d4:	f7ff ff58 	bl	343c4188 <clock_bit>
+343c42d8:	4601      	mov	r1, r0
+343c42da:	b9c0      	cbnz	r0, 343c430e <checked_read.constprop.0+0x90>
+343c42dc:	2510      	movs	r5, #16
+343c42de:	4606      	mov	r6, r0
+343c42e0:	9001      	str	r0, [sp, #4]
+343c42e2:	a901      	add	r1, sp, #4
+343c42e4:	2001      	movs	r0, #1
+343c42e6:	f7ff ff4f 	bl	343c4188 <clock_bit>
+343c42ea:	4601      	mov	r1, r0
+343c42ec:	b978      	cbnz	r0, 343c430e <checked_read.constprop.0+0x90>
+343c42ee:	9b01      	ldr	r3, [sp, #4]
+343c42f0:	3d01      	subs	r5, #1
+343c42f2:	ea43 0646 	orr.w	r6, r3, r6, lsl #1
+343c42f6:	d1f4      	bne.n	343c42e2 <checked_read.constprop.0+0x64>
+343c42f8:	2001      	movs	r0, #1
+343c42fa:	f7ff ff45 	bl	343c4188 <clock_bit>
+343c42fe:	4601      	mov	r1, r0
+343c4300:	b928      	cbnz	r0, 343c430e <checked_read.constprop.0+0x90>
+343c4302:	9b00      	ldr	r3, [sp, #0]
+343c4304:	6026      	str	r6, [r4, #0]
+343c4306:	2b00      	cmp	r3, #0
+343c4308:	bf0c      	ite	eq
+343c430a:	4629      	moveq	r1, r5
+343c430c:	2107      	movne	r1, #7
+343c430e:	4608      	mov	r0, r1
+343c4310:	b002      	add	sp, #8
+343c4312:	bd70      	pop	{r4, r5, r6, pc}
+
+343c4314 <identify>:
+343c4314:	f64f 73ff 	movw	r3, #65535	@ 0xffff
+343c4318:	b537      	push	{r0, r1, r2, r4, r5, lr}
+343c431a:	4604      	mov	r4, r0
+343c431c:	4669      	mov	r1, sp
+343c431e:	2002      	movs	r0, #2
+343c4320:	e9cd 3300 	strd	r3, r3, [sp]
+343c4324:	f7ff ffab 	bl	343c427e <checked_read.constprop.0>
+343c4328:	9d00      	ldr	r5, [sp, #0]
+343c432a:	4b0c      	ldr	r3, [pc, #48]	@ (343c435c <identify+0x48>)
+343c432c:	f843 5024 	str.w	r5, [r3, r4, lsl #2]
+343c4330:	b978      	cbnz	r0, 343c4352 <identify+0x3e>
+343c4332:	2003      	movs	r0, #3
+343c4334:	a901      	add	r1, sp, #4
+343c4336:	f7ff ffa2 	bl	343c427e <checked_read.constprop.0>
+343c433a:	9b01      	ldr	r3, [sp, #4]
+343c433c:	4a08      	ldr	r2, [pc, #32]	@ (343c4360 <identify+0x4c>)
+343c433e:	f842 3024 	str.w	r3, [r2, r4, lsl #2]
+343c4342:	b930      	cbnz	r0, 343c4352 <identify+0x3e>
+343c4344:	2d07      	cmp	r5, #7
+343c4346:	d106      	bne.n	343c4356 <identify+0x42>
+343c4348:	f24c 1231 	movw	r2, #49457	@ 0xc131
+343c434c:	4293      	cmp	r3, r2
+343c434e:	bf18      	it	ne
+343c4350:	2006      	movne	r0, #6
+343c4352:	b003      	add	sp, #12
+343c4354:	bd30      	pop	{r4, r5, pc}
+343c4356:	2006      	movs	r0, #6
+343c4358:	e7fb      	b.n	343c4352 <identify+0x3e>
+343c435a:	bf00      	nop
+343c435c:	343c6000 	.word	0x343c6000
+343c4360:	343c6004 	.word	0x343c6004
+
+343c4364 <stable_bmcr>:
+343c4364:	f64f 73ff 	movw	r3, #65535	@ 0xffff
+343c4368:	b573      	push	{r0, r1, r4, r5, r6, lr}
+343c436a:	460c      	mov	r4, r1
+343c436c:	4606      	mov	r6, r0
+343c436e:	4669      	mov	r1, sp
+343c4370:	2000      	movs	r0, #0
+343c4372:	e9cd 3300 	strd	r3, r3, [sp]
+343c4376:	f7ff ff82 	bl	343c427e <checked_read.constprop.0>
+343c437a:	4b0c      	ldr	r3, [pc, #48]	@ (343c43ac <stable_bmcr+0x48>)
+343c437c:	9d00      	ldr	r5, [sp, #0]
+343c437e:	f843 5024 	str.w	r5, [r3, r4, lsl #2]
+343c4382:	4603      	mov	r3, r0
+343c4384:	b968      	cbnz	r0, 343c43a2 <stable_bmcr+0x3e>
+343c4386:	a901      	add	r1, sp, #4
+343c4388:	f7ff ff79 	bl	343c427e <checked_read.constprop.0>
+343c438c:	4b08      	ldr	r3, [pc, #32]	@ (343c43b0 <stable_bmcr+0x4c>)
+343c438e:	9a01      	ldr	r2, [sp, #4]
+343c4390:	f843 2024 	str.w	r2, [r3, r4, lsl #2]
+343c4394:	4603      	mov	r3, r0
+343c4396:	b920      	cbnz	r0, 343c43a2 <stable_bmcr+0x3e>
+343c4398:	42b5      	cmp	r5, r6
+343c439a:	d105      	bne.n	343c43a8 <stable_bmcr+0x44>
+343c439c:	42aa      	cmp	r2, r5
+343c439e:	bf18      	it	ne
+343c43a0:	2309      	movne	r3, #9
+343c43a2:	4618      	mov	r0, r3
+343c43a4:	b002      	add	sp, #8
+343c43a6:	bd70      	pop	{r4, r5, r6, pc}
+343c43a8:	2309      	movs	r3, #9
+343c43aa:	e7fa      	b.n	343c43a2 <stable_bmcr+0x3e>
+343c43ac:	343c6000 	.word	0x343c6000
+343c43b0:	343c6004 	.word	0x343c6004
+
+343c43b4 <window>:
+343c43b4:	e92d 43f7 	stmdb	sp!, {r0, r1, r2, r4, r5, r6, r7, r8, r9, lr}
+343c43b8:	4605      	mov	r5, r0
+343c43ba:	460e      	mov	r6, r1
+343c43bc:	4815      	ldr	r0, [pc, #84]	@ (343c4414 <window+0x60>)
+343c43be:	2100      	movs	r1, #0
+343c43c0:	4617      	mov	r7, r2
+343c43c2:	f7ff fead 	bl	343c4120 <wait_cycles>
+343c43c6:	4604      	mov	r4, r0
+343c43c8:	bb00      	cbnz	r0, 343c440c <window+0x58>
+343c43ca:	4628      	mov	r0, r5
+343c43cc:	f7ff fec2 	bl	343c4154 <marker.part.0>
+343c43d0:	4604      	mov	r4, r0
+343c43d2:	b9d8      	cbnz	r0, 343c440c <window+0x58>
+343c43d4:	f8df 8040 	ldr.w	r8, [pc, #64]	@ 343c4418 <window+0x64>
+343c43d8:	f8df 9040 	ldr.w	r9, [pc, #64]	@ 343c441c <window+0x68>
+343c43dc:	f8d8 3004 	ldr.w	r3, [r8, #4]
+343c43e0:	a901      	add	r1, sp, #4
+343c43e2:	f849 3026 	str.w	r3, [r9, r6, lsl #2]
+343c43e6:	9001      	str	r0, [sp, #4]
+343c43e8:	480d      	ldr	r0, [pc, #52]	@ (343c4420 <window+0x6c>)
+343c43ea:	f7ff fe99 	bl	343c4120 <wait_cycles>
+343c43ee:	9b01      	ldr	r3, [sp, #4]
+343c43f0:	4604      	mov	r4, r0
+343c43f2:	f849 3027 	str.w	r3, [r9, r7, lsl #2]
+343c43f6:	f8d8 2004 	ldr.w	r2, [r8, #4]
+343c43fa:	4b0a      	ldr	r3, [pc, #40]	@ (343c4424 <window+0x70>)
+343c43fc:	1c68      	adds	r0, r5, #1
+343c43fe:	f843 2026 	str.w	r2, [r3, r6, lsl #2]
+343c4402:	f7ff fea7 	bl	343c4154 <marker.part.0>
+343c4406:	2c00      	cmp	r4, #0
+343c4408:	bf08      	it	eq
+343c440a:	4604      	moveq	r4, r0
+343c440c:	4620      	mov	r0, r4
+343c440e:	b003      	add	sp, #12
+343c4410:	e8bd 83f0 	ldmia.w	sp!, {r4, r5, r6, r7, r8, r9, pc}
+343c4414:	02625a00 	.word	0x02625a00
+343c4418:	e0001000 	.word	0xe0001000
+343c441c:	343c6000 	.word	0x343c6000
+343c4420:	07270e00 	.word	0x07270e00
+343c4424:	343c6004 	.word	0x343c6004
+
+343c4428 <power_aba_main>:
+343c4428:	e92d 4880 	stmdb	sp!, {r7, fp, lr}
+343c442c:	f44f 7e00 	mov.w	lr, #512	@ 0x200
+343c4430:	4a45      	ldr	r2, [pc, #276]	@ (343c4548 <power_aba_park+0x2>)
+343c4432:	2400      	movs	r4, #0
+343c4434:	4613      	mov	r3, r2
+343c4436:	f04e e001 	dls	lr, lr
+343c443a:	b0c1      	sub	sp, #260	@ 0x104
+343c443c:	f842 4b04 	str.w	r4, [r2], #4
+343c4440:	f00f c005 	le	lr, 343c443c <power_aba_main+0x14>
+343c4444:	4a41      	ldr	r2, [pc, #260]	@ (343c454c <power_aba_park+0x6>)
+343c4446:	2401      	movs	r4, #1
+343c4448:	601a      	str	r2, [r3, #0]
+343c444a:	2203      	movs	r2, #3
+343c444c:	4d40      	ldr	r5, [pc, #256]	@ (343c4550 <power_aba_park+0xa>)
+343c444e:	605a      	str	r2, [r3, #4]
+343c4450:	609c      	str	r4, [r3, #8]
+343c4452:	686a      	ldr	r2, [r5, #4]
+343c4454:	615a      	str	r2, [r3, #20]
+343c4456:	4a3f      	ldr	r2, [pc, #252]	@ (343c4554 <power_aba_park+0xe>)
+343c4458:	61da      	str	r2, [r3, #28]
+343c445a:	4a3f      	ldr	r2, [pc, #252]	@ (343c4558 <power_aba_park+0x12>)
+343c445c:	f8c3 2158 	str.w	r2, [r3, #344]	@ 0x158
+343c4460:	4a3e      	ldr	r2, [pc, #248]	@ (343c455c <power_aba_park+0x16>)
+343c4462:	f8c3 215c 	str.w	r2, [r3, #348]	@ 0x15c
+343c4466:	f3ef 8214 	mrs	r2, CONTROL
+343c446a:	f8c3 20e0 	str.w	r2, [r3, #224]	@ 0xe0
+343c446e:	f3ef 8205 	mrs	r2, IPSR
+343c4472:	f8c3 20e4 	str.w	r2, [r3, #228]	@ 0xe4
+343c4476:	f3ef 8208 	mrs	r2, MSP
+343c447a:	f8c3 20e8 	str.w	r2, [r3, #232]	@ 0xe8
+343c447e:	f3ef 820a 	mrs	r2, MSPLIM
+343c4482:	f8c3 20ec 	str.w	r2, [r3, #236]	@ 0xec
+343c4486:	4a36      	ldr	r2, [pc, #216]	@ (343c4560 <power_aba_park+0x1a>)
+343c4488:	f8c3 00f0 	str.w	r0, [r3, #240]	@ 0xf0
+343c448c:	f8c3 10f4 	str.w	r1, [r3, #244]	@ 0xf4
+343c4490:	6a11      	ldr	r1, [r2, #32]
+343c4492:	46a1      	mov	r9, r4
+343c4494:	62d9      	str	r1, [r3, #44]	@ 0x2c
+343c4496:	6a51      	ldr	r1, [r2, #36]	@ 0x24
+343c4498:	6319      	str	r1, [r3, #48]	@ 0x30
+343c449a:	f8d2 10c4 	ldr.w	r1, [r2, #196]	@ 0xc4
+343c449e:	6359      	str	r1, [r3, #52]	@ 0x34
+343c44a0:	f8d2 1080 	ldr.w	r1, [r2, #128]	@ 0x80
+343c44a4:	6399      	str	r1, [r3, #56]	@ 0x38
+343c44a6:	f8d2 1084 	ldr.w	r1, [r2, #132]	@ 0x84
+343c44aa:	63d9      	str	r1, [r3, #60]	@ 0x3c
+343c44ac:	f8d2 2088 	ldr.w	r2, [r2, #136]	@ 0x88
+343c44b0:	641a      	str	r2, [r3, #64]	@ 0x40
+343c44b2:	682a      	ldr	r2, [r5, #0]
+343c44b4:	645a      	str	r2, [r3, #68]	@ 0x44
+343c44b6:	4a2b      	ldr	r2, [pc, #172]	@ (343c4564 <power_aba_park+0x1e>)
+343c44b8:	f8d2 20fc 	ldr.w	r2, [r2, #252]	@ 0xfc
+343c44bc:	649a      	str	r2, [r3, #72]	@ 0x48
+343c44be:	f8d3 20e0 	ldr.w	r2, [r3, #224]	@ 0xe0
+343c44c2:	b9fa      	cbnz	r2, 343c4504 <power_aba_main+0xdc>
+343c44c4:	f8d3 20e4 	ldr.w	r2, [r3, #228]	@ 0xe4
+343c44c8:	b9e2      	cbnz	r2, 343c4504 <power_aba_main+0xdc>
+343c44ca:	f3ef 8210 	mrs	r2, PRIMASK
+343c44ce:	42a2      	cmp	r2, r4
+343c44d0:	d118      	bne.n	343c4504 <power_aba_main+0xdc>
+343c44d2:	f3ef 8113 	mrs	r1, FAULTMASK
+343c44d6:	4691      	mov	r9, r2
+343c44d8:	b9a1      	cbnz	r1, 343c4504 <power_aba_main+0xdc>
+343c44da:	f8d3 10ec 	ldr.w	r1, [r3, #236]	@ 0xec
+343c44de:	4822      	ldr	r0, [pc, #136]	@ (343c4568 <power_aba_park+0x22>)
+343c44e0:	4281      	cmp	r1, r0
+343c44e2:	d10f      	bne.n	343c4504 <power_aba_main+0xdc>
+343c44e4:	f8d3 00e8 	ldr.w	r0, [r3, #232]	@ 0xe8
+343c44e8:	4288      	cmp	r0, r1
+343c44ea:	d90b      	bls.n	343c4504 <power_aba_main+0xdc>
+343c44ec:	f8d3 10e8 	ldr.w	r1, [r3, #232]	@ 0xe8
+343c44f0:	4a1e      	ldr	r2, [pc, #120]	@ (343c456c <power_aba_park+0x26>)
+343c44f2:	4291      	cmp	r1, r2
+343c44f4:	d806      	bhi.n	343c4504 <power_aba_main+0xdc>
+343c44f6:	6ad9      	ldr	r1, [r3, #44]	@ 0x2c
+343c44f8:	f1a2 7284 	sub.w	r2, r2, #17301504	@ 0x1080000
+343c44fc:	4291      	cmp	r1, r2
+343c44fe:	d037      	beq.n	343c4570 <power_aba_park+0x2a>
+343c4500:	f04f 0902 	mov.w	r9, #2
+343c4504:	4b10      	ldr	r3, [pc, #64]	@ (343c4548 <power_aba_park+0x2>)
+343c4506:	6e5a      	ldr	r2, [r3, #100]	@ 0x64
+343c4508:	b90a      	cbnz	r2, 343c450e <power_aba_main+0xe6>
+343c450a:	6e9a      	ldr	r2, [r3, #104]	@ 0x68
+343c450c:	b122      	cbz	r2, 343c4518 <power_aba_main+0xf0>
+343c450e:	f1b9 0f00 	cmp.w	r9, #0
+343c4512:	bf08      	it	eq
+343c4514:	f04f 0904 	moveq.w	r9, #4
+343c4518:	4a0d      	ldr	r2, [pc, #52]	@ (343c4550 <power_aba_park+0xa>)
+343c451a:	f8c3 900c 	str.w	r9, [r3, #12]
+343c451e:	6852      	ldr	r2, [r2, #4]
+343c4520:	619a      	str	r2, [r3, #24]
+343c4522:	f1b9 0f00 	cmp.w	r9, #0
+343c4526:	f040 83c9 	bne.w	343c4cbc <power_aba_park+0x776>
+343c452a:	691a      	ldr	r2, [r3, #16]
+343c452c:	2a00      	cmp	r2, #0
+343c452e:	f040 83c5 	bne.w	343c4cbc <power_aba_park+0x776>
+343c4532:	f8d3 3138 	ldr.w	r3, [r3, #312]	@ 0x138
+343c4536:	2b00      	cmp	r3, #0
+343c4538:	bf0c      	ite	eq
+343c453a:	2308      	moveq	r3, #8
+343c453c:	230f      	movne	r3, #15
+343c453e:	4a02      	ldr	r2, [pc, #8]	@ (343c4548 <power_aba_park+0x2>)
+343c4540:	6093      	str	r3, [r2, #8]
+343c4542:	f3bf 8f4f 	dsb	sy
+
+343c4546 <power_aba_park>:
+343c4546:	e7fe      	b.n	343c4546 <power_aba_park>
+343c4548:	343c6000 	.word	0x343c6000
+343c454c:	33414241 	.word	0x33414241
+343c4550:	e0001000 	.word	0xe0001000
+343c4554:	17d78400 	.word	0x17d78400
+343c4558:	02625a00 	.word	0x02625a00
+343c455c:	07270e00 	.word	0x07270e00
+343c4560:	56028000 	.word	0x56028000
+343c4564:	e000ed00 	.word	0xe000ed00
+343c4568:	343af000 	.word	0x343af000
+343c456c:	343b0000 	.word	0x343b0000
+343c4570:	6b1b      	ldr	r3, [r3, #48]	@ 0x30
+343c4572:	f5b3 1f80 	cmp.w	r3, #1048576	@ 0x100000
+343c4576:	d1c3      	bne.n	343c4500 <power_aba_main+0xd8>
+343c4578:	4cbe      	ldr	r4, [pc, #760]	@ (343c4874 <power_aba_park+0x32e>)
+343c457a:	4bbf      	ldr	r3, [pc, #764]	@ (343c4878 <power_aba_park+0x332>)
+343c457c:	6ba2      	ldr	r2, [r4, #56]	@ 0x38
+343c457e:	429a      	cmp	r2, r3
+343c4580:	d1be      	bne.n	343c4500 <power_aba_main+0xd8>
+343c4582:	6be3      	ldr	r3, [r4, #60]	@ 0x3c
+343c4584:	2b00      	cmp	r3, #0
+343c4586:	d1bb      	bne.n	343c4500 <power_aba_main+0xd8>
+343c4588:	6c22      	ldr	r2, [r4, #64]	@ 0x40
+343c458a:	4bbc      	ldr	r3, [pc, #752]	@ (343c487c <power_aba_park+0x336>)
+343c458c:	429a      	cmp	r2, r3
+343c458e:	d1b7      	bne.n	343c4500 <power_aba_main+0xd8>
+343c4590:	6b63      	ldr	r3, [r4, #52]	@ 0x34
+343c4592:	f5b3 3f00 	cmp.w	r3, #131072	@ 0x20000
+343c4596:	d1b3      	bne.n	343c4500 <power_aba_main+0xd8>
+343c4598:	6c65      	ldr	r5, [r4, #68]	@ 0x44
+343c459a:	f015 0501 	ands.w	r5, r5, #1
+343c459e:	f000 838a 	beq.w	343c4cb6 <power_aba_park+0x770>
+343c45a2:	6ca3      	ldr	r3, [r4, #72]	@ 0x48
+343c45a4:	01df      	lsls	r7, r3, #7
+343c45a6:	f140 8386 	bpl.w	343c4cb6 <power_aba_park+0x770>
+343c45aa:	f44f 60fa 	mov.w	r0, #2000	@ 0x7d0
+343c45ae:	f7ff fd27 	bl	343c4000 <delay>
+343c45b2:	4681      	mov	r9, r0
+343c45b4:	2800      	cmp	r0, #0
+343c45b6:	d1a5      	bne.n	343c4504 <power_aba_main+0xdc>
+343c45b8:	4bb1      	ldr	r3, [pc, #708]	@ (343c4880 <power_aba_park+0x33a>)
+343c45ba:	f8d3 225c 	ldr.w	r2, [r3, #604]	@ 0x25c
+343c45be:	0716      	lsls	r6, r2, #28
+343c45c0:	d59e      	bpl.n	343c4500 <power_aba_main+0xd8>
+343c45c2:	f8d3 221c 	ldr.w	r2, [r3, #540]	@ 0x21c
+343c45c6:	f012 0208 	ands.w	r2, r2, #8
+343c45ca:	9208      	str	r2, [sp, #32]
+343c45cc:	d198      	bne.n	343c4500 <power_aba_main+0xd8>
+343c45ce:	4ead      	ldr	r6, [pc, #692]	@ (343c4884 <power_aba_park+0x33e>)
+343c45d0:	220c      	movs	r2, #12
+343c45d2:	4631      	mov	r1, r6
+343c45d4:	a81a      	add	r0, sp, #104	@ 0x68
+343c45d6:	f7ff fd25 	bl	343c4024 <snapshot>
+343c45da:	9a1a      	ldr	r2, [sp, #104]	@ 0x68
+343c45dc:	9215      	str	r2, [sp, #84]	@ 0x54
+343c45de:	9a1b      	ldr	r2, [sp, #108]	@ 0x6c
+343c45e0:	9214      	str	r2, [sp, #80]	@ 0x50
+343c45e2:	9a1c      	ldr	r2, [sp, #112]	@ 0x70
+343c45e4:	9216      	str	r2, [sp, #88]	@ 0x58
+343c45e6:	9a1d      	ldr	r2, [sp, #116]	@ 0x74
+343c45e8:	9213      	str	r2, [sp, #76]	@ 0x4c
+343c45ea:	9a1e      	ldr	r2, [sp, #120]	@ 0x78
+343c45ec:	9211      	str	r2, [sp, #68]	@ 0x44
+343c45ee:	9a1f      	ldr	r2, [sp, #124]	@ 0x7c
+343c45f0:	9212      	str	r2, [sp, #72]	@ 0x48
+343c45f2:	9a15      	ldr	r2, [sp, #84]	@ 0x54
+343c45f4:	f8c4 2180 	str.w	r2, [r4, #384]	@ 0x180
+343c45f8:	9a14      	ldr	r2, [sp, #80]	@ 0x50
+343c45fa:	f8c4 2184 	str.w	r2, [r4, #388]	@ 0x184
+343c45fe:	9a16      	ldr	r2, [sp, #88]	@ 0x58
+343c4600:	f8c4 2188 	str.w	r2, [r4, #392]	@ 0x188
+343c4604:	9a13      	ldr	r2, [sp, #76]	@ 0x4c
+343c4606:	f8c4 218c 	str.w	r2, [r4, #396]	@ 0x18c
+343c460a:	9a11      	ldr	r2, [sp, #68]	@ 0x44
+343c460c:	f8c4 2190 	str.w	r2, [r4, #400]	@ 0x190
+343c4610:	9a12      	ldr	r2, [sp, #72]	@ 0x48
+343c4612:	f8c4 2194 	str.w	r2, [r4, #404]	@ 0x194
+343c4616:	2201      	movs	r2, #1
+343c4618:	f8c4 2178 	str.w	r2, [r4, #376]	@ 0x178
+343c461c:	4a9a      	ldr	r2, [pc, #616]	@ (343c4888 <power_aba_park+0x342>)
+343c461e:	f8d2 1c00 	ldr.w	r1, [r2, #3072]	@ 0xc00
+343c4622:	f021 7140 	bic.w	r1, r1, #50331648	@ 0x3000000
+343c4626:	f8c2 1c00 	str.w	r1, [r2, #3072]	@ 0xc00
+343c462a:	f04f 5180 	mov.w	r1, #268435456	@ 0x10000000
+343c462e:	61b1      	str	r1, [r6, #24]
+343c4630:	f8d2 1c04 	ldr.w	r1, [r2, #3076]	@ 0xc04
+343c4634:	f421 5180 	bic.w	r1, r1, #4096	@ 0x1000
+343c4638:	f8c2 1c04 	str.w	r1, [r2, #3076]	@ 0xc04
+343c463c:	f8d2 1c0c 	ldr.w	r1, [r2, #3084]	@ 0xc0c
+343c4640:	f021 7140 	bic.w	r1, r1, #50331648	@ 0x3000000
+343c4644:	f8c2 1c0c 	str.w	r1, [r2, #3084]	@ 0xc0c
+343c4648:	f8d2 1c08 	ldr.w	r1, [r2, #3080]	@ 0xc08
+343c464c:	f021 7140 	bic.w	r1, r1, #50331648	@ 0x3000000
+343c4650:	f041 7180 	orr.w	r1, r1, #16777216	@ 0x1000000
+343c4654:	f8c2 1c08 	str.w	r1, [r2, #3080]	@ 0xc08
+343c4658:	f8d2 1c00 	ldr.w	r1, [r2, #3072]	@ 0xc00
+343c465c:	f021 7140 	bic.w	r1, r1, #50331648	@ 0x3000000
+343c4660:	f041 7180 	orr.w	r1, r1, #16777216	@ 0x1000000
+343c4664:	f8c2 1c00 	str.w	r1, [r2, #3072]	@ 0xc00
+343c4668:	f8d3 225c 	ldr.w	r2, [r3, #604]	@ 0x25c
+343c466c:	6222      	str	r2, [r4, #32]
+343c466e:	f8d3 321c 	ldr.w	r3, [r3, #540]	@ 0x21c
+343c4672:	62a3      	str	r3, [r4, #40]	@ 0x28
+343c4674:	6aa3      	ldr	r3, [r4, #40]	@ 0x28
+343c4676:	f013 0360 	ands.w	r3, r3, #96	@ 0x60
+343c467a:	9306      	str	r3, [sp, #24]
+343c467c:	f040 82ce 	bne.w	343c4c1c <power_aba_park+0x6d6>
+343c4680:	6a23      	ldr	r3, [r4, #32]
+343c4682:	43db      	mvns	r3, r3
+343c4684:	f013 0360 	ands.w	r3, r3, #96	@ 0x60
+343c4688:	9310      	str	r3, [sp, #64]	@ 0x40
+343c468a:	bf18      	it	ne
+343c468c:	9a10      	ldrne	r2, [sp, #64]	@ 0x40
+343c468e:	4b7c      	ldr	r3, [pc, #496]	@ (343c4880 <power_aba_park+0x33a>)
+343c4690:	bf18      	it	ne
+343c4692:	f8c3 2a5c 	strne.w	r2, [r3, #2652]	@ 0xa5c
+343c4696:	f3bf 8f4f 	dsb	sy
+343c469a:	f3bf 8f6f 	isb	sy
+343c469e:	f8d3 325c 	ldr.w	r3, [r3, #604]	@ 0x25c
+343c46a2:	f003 0360 	and.w	r3, r3, #96	@ 0x60
+343c46a6:	2b60      	cmp	r3, #96	@ 0x60
+343c46a8:	f040 82d2 	bne.w	343c4c50 <power_aba_park+0x70a>
+343c46ac:	4f77      	ldr	r7, [pc, #476]	@ (343c488c <power_aba_park+0x346>)
+343c46ae:	a832      	add	r0, sp, #200	@ 0xc8
+343c46b0:	4639      	mov	r1, r7
+343c46b2:	2204      	movs	r2, #4
+343c46b4:	f7ff fcb6 	bl	343c4024 <snapshot>
+343c46b8:	9b32      	ldr	r3, [sp, #200]	@ 0xc8
+343c46ba:	4e75      	ldr	r6, [pc, #468]	@ (343c4890 <power_aba_park+0x34a>)
+343c46bc:	9308      	str	r3, [sp, #32]
+343c46be:	9b33      	ldr	r3, [sp, #204]	@ 0xcc
+343c46c0:	220b      	movs	r2, #11
+343c46c2:	9306      	str	r3, [sp, #24]
+343c46c4:	9b34      	ldr	r3, [sp, #208]	@ 0xd0
+343c46c6:	4631      	mov	r1, r6
+343c46c8:	9305      	str	r3, [sp, #20]
+343c46ca:	9b35      	ldr	r3, [sp, #212]	@ 0xd4
+343c46cc:	a838      	add	r0, sp, #224	@ 0xe0
+343c46ce:	9307      	str	r3, [sp, #28]
+343c46d0:	9b36      	ldr	r3, [sp, #216]	@ 0xd8
+343c46d2:	f8df b1a0 	ldr.w	fp, [pc, #416]	@ 343c4874 <power_aba_park+0x32e>
+343c46d6:	930b      	str	r3, [sp, #44]	@ 0x2c
+343c46d8:	9b37      	ldr	r3, [sp, #220]	@ 0xdc
+343c46da:	9309      	str	r3, [sp, #36]	@ 0x24
+343c46dc:	f7ff fca2 	bl	343c4024 <snapshot>
+343c46e0:	9b38      	ldr	r3, [sp, #224]	@ 0xe0
+343c46e2:	930e      	str	r3, [sp, #56]	@ 0x38
+343c46e4:	9b39      	ldr	r3, [sp, #228]	@ 0xe4
+343c46e6:	930a      	str	r3, [sp, #40]	@ 0x28
+343c46e8:	9b3a      	ldr	r3, [sp, #232]	@ 0xe8
+343c46ea:	930f      	str	r3, [sp, #60]	@ 0x3c
+343c46ec:	9b3b      	ldr	r3, [sp, #236]	@ 0xec
+343c46ee:	930d      	str	r3, [sp, #52]	@ 0x34
+343c46f0:	9b3c      	ldr	r3, [sp, #240]	@ 0xf0
+343c46f2:	9304      	str	r3, [sp, #16]
+343c46f4:	9b3d      	ldr	r3, [sp, #244]	@ 0xf4
+343c46f6:	930c      	str	r3, [sp, #48]	@ 0x30
+343c46f8:	9b08      	ldr	r3, [sp, #32]
+343c46fa:	f8cb 3080 	str.w	r3, [fp, #128]	@ 0x80
+343c46fe:	9b06      	ldr	r3, [sp, #24]
+343c4700:	f8cb 3084 	str.w	r3, [fp, #132]	@ 0x84
+343c4704:	9b05      	ldr	r3, [sp, #20]
+343c4706:	f8cb 3088 	str.w	r3, [fp, #136]	@ 0x88
+343c470a:	9b07      	ldr	r3, [sp, #28]
+343c470c:	f8cb 308c 	str.w	r3, [fp, #140]	@ 0x8c
+343c4710:	9b0b      	ldr	r3, [sp, #44]	@ 0x2c
+343c4712:	f8cb 3090 	str.w	r3, [fp, #144]	@ 0x90
+343c4716:	9b09      	ldr	r3, [sp, #36]	@ 0x24
+343c4718:	f8cb 3094 	str.w	r3, [fp, #148]	@ 0x94
+343c471c:	9b0e      	ldr	r3, [sp, #56]	@ 0x38
+343c471e:	f8cb 3098 	str.w	r3, [fp, #152]	@ 0x98
+343c4722:	9b0a      	ldr	r3, [sp, #40]	@ 0x28
+343c4724:	f8cb 309c 	str.w	r3, [fp, #156]	@ 0x9c
+343c4728:	9b0f      	ldr	r3, [sp, #60]	@ 0x3c
+343c472a:	f8cb 30a0 	str.w	r3, [fp, #160]	@ 0xa0
+343c472e:	9b0d      	ldr	r3, [sp, #52]	@ 0x34
+343c4730:	f8cb 30a4 	str.w	r3, [fp, #164]	@ 0xa4
+343c4734:	9b04      	ldr	r3, [sp, #16]
+343c4736:	f8cb 30a8 	str.w	r3, [fp, #168]	@ 0xa8
+343c473a:	9b0c      	ldr	r3, [sp, #48]	@ 0x30
+343c473c:	f8cb 30ac 	str.w	r3, [fp, #172]	@ 0xac
+343c4740:	f3ef 8110 	mrs	r1, PRIMASK
+343c4744:	b672      	cpsid	i
+343c4746:	4b53      	ldr	r3, [pc, #332]	@ (343c4894 <power_aba_park+0x34e>)
+343c4748:	f04f 6800 	mov.w	r8, #134217728	@ 0x8000000
+343c474c:	f8d3 2400 	ldr.w	r2, [r3, #1024]	@ 0x400
+343c4750:	f422 7240 	bic.w	r2, r2, #768	@ 0x300
+343c4754:	f8c3 2400 	str.w	r2, [r3, #1024]	@ 0x400
+343c4758:	f8d3 2800 	ldr.w	r2, [r3, #2048]	@ 0x800
+343c475c:	f422 0240 	bic.w	r2, r2, #12582912	@ 0xc00000
+343c4760:	f8c3 2800 	str.w	r2, [r3, #2048]	@ 0x800
+343c4764:	2210      	movs	r2, #16
+343c4766:	61ba      	str	r2, [r7, #24]
+343c4768:	f8c6 8018 	str.w	r8, [r6, #24]
+343c476c:	f8d3 2404 	ldr.w	r2, [r3, #1028]	@ 0x404
+343c4770:	f042 0210 	orr.w	r2, r2, #16
+343c4774:	f8c3 2404 	str.w	r2, [r3, #1028]	@ 0x404
+343c4778:	f8d3 2804 	ldr.w	r2, [r3, #2052]	@ 0x804
+343c477c:	f422 6200 	bic.w	r2, r2, #2048	@ 0x800
+343c4780:	f8c3 2804 	str.w	r2, [r3, #2052]	@ 0x804
+343c4784:	f8d3 240c 	ldr.w	r2, [r3, #1036]	@ 0x40c
+343c4788:	f422 7240 	bic.w	r2, r2, #768	@ 0x300
+343c478c:	f8c3 240c 	str.w	r2, [r3, #1036]	@ 0x40c
+343c4790:	f8d3 280c 	ldr.w	r2, [r3, #2060]	@ 0x80c
+343c4794:	f422 0240 	bic.w	r2, r2, #12582912	@ 0xc00000
+343c4798:	f8c3 280c 	str.w	r2, [r3, #2060]	@ 0x80c
+343c479c:	f8d3 2408 	ldr.w	r2, [r3, #1032]	@ 0x408
+343c47a0:	f422 7240 	bic.w	r2, r2, #768	@ 0x300
+343c47a4:	f8c3 2408 	str.w	r2, [r3, #1032]	@ 0x408
+343c47a8:	f8d3 2808 	ldr.w	r2, [r3, #2056]	@ 0x808
+343c47ac:	f422 0240 	bic.w	r2, r2, #12582912	@ 0xc00000
+343c47b0:	f8c3 2808 	str.w	r2, [r3, #2056]	@ 0x808
+343c47b4:	f8d3 2400 	ldr.w	r2, [r3, #1024]	@ 0x400
+343c47b8:	f422 7240 	bic.w	r2, r2, #768	@ 0x300
+343c47bc:	f442 7280 	orr.w	r2, r2, #256	@ 0x100
+343c47c0:	f8c3 2400 	str.w	r2, [r3, #1024]	@ 0x400
+343c47c4:	f8d3 2800 	ldr.w	r2, [r3, #2048]	@ 0x800
+343c47c8:	f422 0240 	bic.w	r2, r2, #12582912	@ 0xc00000
+343c47cc:	f442 0280 	orr.w	r2, r2, #4194304	@ 0x400000
+343c47d0:	f8c3 2800 	str.w	r2, [r3, #2048]	@ 0x800
+343c47d4:	f3bf 8f4f 	dsb	sy
+343c47d8:	f381 8810 	msr	PRIMASK, r1
+343c47dc:	f44f 60fa 	mov.w	r0, #2000	@ 0x7d0
+343c47e0:	f7ff fc0e 	bl	343c4000 <delay>
+343c47e4:	46aa      	mov	sl, r5
+343c47e6:	4604      	mov	r4, r0
+343c47e8:	2800      	cmp	r0, #0
+343c47ea:	f040 80ae 	bne.w	343c494a <power_aba_park+0x404>
+343c47ee:	693b      	ldr	r3, [r7, #16]
+343c47f0:	f44f 60fa 	mov.w	r0, #2000	@ 0x7d0
+343c47f4:	f3c3 1300 	ubfx	r3, r3, #4, #1
+343c47f8:	f8cb 304c 	str.w	r3, [fp, #76]	@ 0x4c
+343c47fc:	6933      	ldr	r3, [r6, #16]
+343c47fe:	f3c3 23c0 	ubfx	r3, r3, #11, #1
+343c4802:	f8cb 3058 	str.w	r3, [fp, #88]	@ 0x58
+343c4806:	f44f 1380 	mov.w	r3, #1048576	@ 0x100000
+343c480a:	61bb      	str	r3, [r7, #24]
+343c480c:	f7ff fbf8 	bl	343c4000 <delay>
+343c4810:	4604      	mov	r4, r0
+343c4812:	2800      	cmp	r0, #0
+343c4814:	f040 8099 	bne.w	343c494a <power_aba_park+0x404>
+343c4818:	693b      	ldr	r3, [r7, #16]
+343c481a:	f44f 60fa 	mov.w	r0, #2000	@ 0x7d0
+343c481e:	f3c3 1300 	ubfx	r3, r3, #4, #1
+343c4822:	f8cb 3050 	str.w	r3, [fp, #80]	@ 0x50
+343c4826:	2310      	movs	r3, #16
+343c4828:	61bb      	str	r3, [r7, #24]
+343c482a:	f7ff fbe9 	bl	343c4000 <delay>
+343c482e:	4604      	mov	r4, r0
+343c4830:	2800      	cmp	r0, #0
+343c4832:	f040 808a 	bne.w	343c494a <power_aba_park+0x404>
+343c4836:	693b      	ldr	r3, [r7, #16]
+343c4838:	f44f 60fa 	mov.w	r0, #2000	@ 0x7d0
+343c483c:	f3c3 1300 	ubfx	r3, r3, #4, #1
+343c4840:	f8cb 3054 	str.w	r3, [fp, #84]	@ 0x54
+343c4844:	f44f 6300 	mov.w	r3, #2048	@ 0x800
+343c4848:	61b3      	str	r3, [r6, #24]
+343c484a:	f7ff fbd9 	bl	343c4000 <delay>
+343c484e:	4604      	mov	r4, r0
+343c4850:	2800      	cmp	r0, #0
+343c4852:	d17a      	bne.n	343c494a <power_aba_park+0x404>
+343c4854:	6933      	ldr	r3, [r6, #16]
+343c4856:	f44f 60fa 	mov.w	r0, #2000	@ 0x7d0
+343c485a:	f3c3 23c0 	ubfx	r3, r3, #11, #1
+343c485e:	f8cb 305c 	str.w	r3, [fp, #92]	@ 0x5c
+343c4862:	f8c6 8018 	str.w	r8, [r6, #24]
+343c4866:	f7ff fbcb 	bl	343c4000 <delay>
+343c486a:	4604      	mov	r4, r0
+343c486c:	2800      	cmp	r0, #0
+343c486e:	d16c      	bne.n	343c494a <power_aba_park+0x404>
+343c4870:	e012      	b.n	343c4898 <power_aba_park+0x352>
+343c4872:	bf00      	nop
+343c4874:	343c6000 	.word	0x343c6000
+343c4878:	00404b00 	.word	0x00404b00
+343c487c:	49000005 	.word	0x49000005
+343c4880:	56028000 	.word	0x56028000
+343c4884:	56020c00 	.word	0x56020c00
+343c4888:	56020000 	.word	0x56020000
+343c488c:	56021400 	.word	0x56021400
+343c4890:	56021800 	.word	0x56021800
+343c4894:	56021000 	.word	0x56021000
+343c4898:	6933      	ldr	r3, [r6, #16]
+343c489a:	f3c3 23c0 	ubfx	r3, r3, #11, #1
+343c489e:	f8cb 3060 	str.w	r3, [fp, #96]	@ 0x60
+343c48a2:	f8db a04c 	ldr.w	sl, [fp, #76]	@ 0x4c
+343c48a6:	f1ba 0f01 	cmp.w	sl, #1
+343c48aa:	f040 81ea 	bne.w	343c4c82 <power_aba_park+0x73c>
+343c48ae:	f8db 3050 	ldr.w	r3, [fp, #80]	@ 0x50
+343c48b2:	2b00      	cmp	r3, #0
+343c48b4:	f040 81e6 	bne.w	343c4c84 <power_aba_park+0x73e>
+343c48b8:	f8db 3054 	ldr.w	r3, [fp, #84]	@ 0x54
+343c48bc:	2b01      	cmp	r3, #1
+343c48be:	f040 81e1 	bne.w	343c4c84 <power_aba_park+0x73e>
+343c48c2:	f8db 3058 	ldr.w	r3, [fp, #88]	@ 0x58
+343c48c6:	2b00      	cmp	r3, #0
+343c48c8:	f040 81de 	bne.w	343c4c88 <power_aba_park+0x742>
+343c48cc:	f8db a05c 	ldr.w	sl, [fp, #92]	@ 0x5c
+343c48d0:	f1ba 0f01 	cmp.w	sl, #1
+343c48d4:	f040 81d8 	bne.w	343c4c88 <power_aba_park+0x742>
+343c48d8:	f8db 3060 	ldr.w	r3, [fp, #96]	@ 0x60
+343c48dc:	2b00      	cmp	r3, #0
+343c48de:	f040 81d1 	bne.w	343c4c84 <power_aba_park+0x73e>
+343c48e2:	2040      	movs	r0, #64	@ 0x40
+343c48e4:	f7ff fd16 	bl	343c4314 <identify>
+343c48e8:	4604      	mov	r4, r0
+343c48ea:	bb70      	cbnz	r0, 343c494a <power_aba_park+0x404>
+343c48ec:	2142      	movs	r1, #66	@ 0x42
+343c48ee:	f44f 5040 	mov.w	r0, #12288	@ 0x3000
+343c48f2:	f7ff fd37 	bl	343c4364 <stable_bmcr>
+343c48f6:	4604      	mov	r4, r0
+343c48f8:	bb38      	cbnz	r0, 343c494a <power_aba_park+0x404>
+343c48fa:	2302      	movs	r3, #2
+343c48fc:	2258      	movs	r2, #88	@ 0x58
+343c48fe:	2150      	movs	r1, #80	@ 0x50
+343c4900:	200b      	movs	r0, #11
+343c4902:	f8cb 3008 	str.w	r3, [fp, #8]
+343c4906:	f7ff fd55 	bl	343c43b4 <window>
+343c490a:	4604      	mov	r4, r0
+343c490c:	b9e8      	cbnz	r0, 343c494a <power_aba_park+0x404>
+343c490e:	2303      	movs	r3, #3
+343c4910:	f44f 5760 	mov.w	r7, #14336	@ 0x3800
+343c4914:	f8cb 3008 	str.w	r3, [fp, #8]
+343c4918:	f8cb 7110 	str.w	r7, [fp, #272]	@ 0x110
+343c491c:	f8db 3128 	ldr.w	r3, [fp, #296]	@ 0x128
+343c4920:	4638      	mov	r0, r7
+343c4922:	3301      	adds	r3, #1
+343c4924:	f8cb 3128 	str.w	r3, [fp, #296]	@ 0x128
+343c4928:	f7ff fc77 	bl	343c421a <write_bmcr>
+343c492c:	4604      	mov	r4, r0
+343c492e:	b960      	cbnz	r0, 343c494a <power_aba_park+0x404>
+343c4930:	2145      	movs	r1, #69	@ 0x45
+343c4932:	4638      	mov	r0, r7
+343c4934:	f7ff fd16 	bl	343c4364 <stable_bmcr>
+343c4938:	4604      	mov	r4, r0
+343c493a:	b930      	cbnz	r0, 343c494a <power_aba_park+0x404>
+343c493c:	2259      	movs	r2, #89	@ 0x59
+343c493e:	2152      	movs	r1, #82	@ 0x52
+343c4940:	200d      	movs	r0, #13
+343c4942:	f7ff fd37 	bl	343c43b4 <window>
+343c4946:	4604      	mov	r4, r0
+343c4948:	b118      	cbz	r0, 343c4952 <power_aba_park+0x40c>
+343c494a:	4bad      	ldr	r3, [pc, #692]	@ (343c4c00 <power_aba_park+0x6ba>)
+343c494c:	689a      	ldr	r2, [r3, #8]
+343c494e:	f8c3 2134 	str.w	r2, [r3, #308]	@ 0x134
+343c4952:	4eab      	ldr	r6, [pc, #684]	@ (343c4c00 <power_aba_park+0x6ba>)
+343c4954:	f8d6 3128 	ldr.w	r3, [r6, #296]	@ 0x128
+343c4958:	b37b      	cbz	r3, 343c49ba <power_aba_park+0x474>
+343c495a:	f8d6 312c 	ldr.w	r3, [r6, #300]	@ 0x12c
+343c495e:	f44f 5040 	mov.w	r0, #12288	@ 0x3000
+343c4962:	3301      	adds	r3, #1
+343c4964:	f8c6 312c 	str.w	r3, [r6, #300]	@ 0x12c
+343c4968:	f7ff fc57 	bl	343c421a <write_bmcr>
+343c496c:	b9b0      	cbnz	r0, 343c499c <power_aba_park+0x456>
+343c496e:	4fa5      	ldr	r7, [pc, #660]	@ (343c4c04 <power_aba_park+0x6be>)
+343c4970:	2147      	movs	r1, #71	@ 0x47
+343c4972:	f44f 5040 	mov.w	r0, #12288	@ 0x3000
+343c4976:	f8c6 5124 	str.w	r5, [r6, #292]	@ 0x124
+343c497a:	f7ff fcf3 	bl	343c4364 <stable_bmcr>
+343c497e:	4680      	mov	r8, r0
+343c4980:	2800      	cmp	r0, #0
+343c4982:	f040 8184 	bne.w	343c4c8e <power_aba_park+0x748>
+343c4986:	205b      	movs	r0, #91	@ 0x5b
+343c4988:	f7ff fcc4 	bl	343c4314 <identify>
+343c498c:	4680      	mov	r8, r0
+343c498e:	2800      	cmp	r0, #0
+343c4990:	f040 817d 	bne.w	343c4c8e <power_aba_park+0x748>
+343c4994:	2301      	movs	r3, #1
+343c4996:	f8c6 3130 	str.w	r3, [r6, #304]	@ 0x130
+343c499a:	4640      	mov	r0, r8
+343c499c:	4b98      	ldr	r3, [pc, #608]	@ (343c4c00 <power_aba_park+0x6ba>)
+343c499e:	f8c3 0138 	str.w	r0, [r3, #312]	@ 0x138
+343c49a2:	f8d3 2138 	ldr.w	r2, [r3, #312]	@ 0x138
+343c49a6:	4322      	orrs	r2, r4
+343c49a8:	d107      	bne.n	343c49ba <power_aba_park+0x474>
+343c49aa:	2204      	movs	r2, #4
+343c49ac:	2154      	movs	r1, #84	@ 0x54
+343c49ae:	609a      	str	r2, [r3, #8]
+343c49b0:	200f      	movs	r0, #15
+343c49b2:	225a      	movs	r2, #90	@ 0x5a
+343c49b4:	f7ff fcfe 	bl	343c43b4 <window>
+343c49b8:	4604      	mov	r4, r0
+343c49ba:	f1ba 0f00 	cmp.w	sl, #0
+343c49be:	f000 80b4 	beq.w	343c4b2a <power_aba_park+0x5e4>
+343c49c2:	4a91      	ldr	r2, [pc, #580]	@ (343c4c08 <power_aba_park+0x6c2>)
+343c49c4:	f8d2 325c 	ldr.w	r3, [r2, #604]	@ 0x25c
+343c49c8:	f003 0360 	and.w	r3, r3, #96	@ 0x60
+343c49cc:	2b60      	cmp	r3, #96	@ 0x60
+343c49ce:	f040 816c 	bne.w	343c4caa <power_aba_park+0x764>
+343c49d2:	f8d2 521c 	ldr.w	r5, [r2, #540]	@ 0x21c
+343c49d6:	f015 0560 	ands.w	r5, r5, #96	@ 0x60
+343c49da:	f040 8166 	bne.w	343c4caa <power_aba_park+0x764>
+343c49de:	f3ef 8810 	mrs	r8, PRIMASK
+343c49e2:	b672      	cpsid	i
+343c49e4:	2310      	movs	r3, #16
+343c49e6:	4f89      	ldr	r7, [pc, #548]	@ (343c4c0c <power_aba_park+0x6c6>)
+343c49e8:	4e89      	ldr	r6, [pc, #548]	@ (343c4c10 <power_aba_park+0x6ca>)
+343c49ea:	61bb      	str	r3, [r7, #24]
+343c49ec:	f04f 6300 	mov.w	r3, #134217728	@ 0x8000000
+343c49f0:	61b3      	str	r3, [r6, #24]
+343c49f2:	9b08      	ldr	r3, [sp, #32]
+343c49f4:	9332      	str	r3, [sp, #200]	@ 0xc8
+343c49f6:	9b06      	ldr	r3, [sp, #24]
+343c49f8:	9333      	str	r3, [sp, #204]	@ 0xcc
+343c49fa:	9b05      	ldr	r3, [sp, #20]
+343c49fc:	9334      	str	r3, [sp, #208]	@ 0xd0
+343c49fe:	9b07      	ldr	r3, [sp, #28]
+343c4a00:	9335      	str	r3, [sp, #212]	@ 0xd4
+343c4a02:	9b0b      	ldr	r3, [sp, #44]	@ 0x2c
+343c4a04:	9336      	str	r3, [sp, #216]	@ 0xd8
+343c4a06:	9b09      	ldr	r3, [sp, #36]	@ 0x24
+343c4a08:	9337      	str	r3, [sp, #220]	@ 0xdc
+343c4a0a:	ab34      	add	r3, sp, #208	@ 0xd0
+343c4a0c:	cb0f      	ldmia	r3, {r0, r1, r2, r3}
+343c4a0e:	e88d 000f 	stmia.w	sp, {r0, r1, r2, r3}
+343c4a12:	e9dd 2332 	ldrd	r2, r3, [sp, #200]	@ 0xc8
+343c4a16:	4638      	mov	r0, r7
+343c4a18:	2104      	movs	r1, #4
+343c4a1a:	f7ff fb31 	bl	343c4080 <restore_pin>
+343c4a1e:	9b0e      	ldr	r3, [sp, #56]	@ 0x38
+343c4a20:	9338      	str	r3, [sp, #224]	@ 0xe0
+343c4a22:	9b0a      	ldr	r3, [sp, #40]	@ 0x28
+343c4a24:	9339      	str	r3, [sp, #228]	@ 0xe4
+343c4a26:	9b0f      	ldr	r3, [sp, #60]	@ 0x3c
+343c4a28:	933a      	str	r3, [sp, #232]	@ 0xe8
+343c4a2a:	9b0d      	ldr	r3, [sp, #52]	@ 0x34
+343c4a2c:	933b      	str	r3, [sp, #236]	@ 0xec
+343c4a2e:	9b04      	ldr	r3, [sp, #16]
+343c4a30:	933c      	str	r3, [sp, #240]	@ 0xf0
+343c4a32:	9b0c      	ldr	r3, [sp, #48]	@ 0x30
+343c4a34:	933d      	str	r3, [sp, #244]	@ 0xf4
+343c4a36:	ab3a      	add	r3, sp, #232	@ 0xe8
+343c4a38:	cb0f      	ldmia	r3, {r0, r1, r2, r3}
+343c4a3a:	e88d 000f 	stmia.w	sp, {r0, r1, r2, r3}
+343c4a3e:	e9dd 2338 	ldrd	r2, r3, [sp, #224]	@ 0xe0
+343c4a42:	210b      	movs	r1, #11
+343c4a44:	4630      	mov	r0, r6
+343c4a46:	f7ff fb1b 	bl	343c4080 <restore_pin>
+343c4a4a:	f3bf 8f4f 	dsb	sy
+343c4a4e:	f388 8810 	msr	PRIMASK, r8
+343c4a52:	2204      	movs	r2, #4
+343c4a54:	4639      	mov	r1, r7
+343c4a56:	a826      	add	r0, sp, #152	@ 0x98
+343c4a58:	f7ff fae4 	bl	343c4024 <snapshot>
+343c4a5c:	e9dd ba26 	ldrd	fp, sl, [sp, #152]	@ 0x98
+343c4a60:	e9dd 8729 	ldrd	r8, r7, [sp, #164]	@ 0xa4
+343c4a64:	9b28      	ldr	r3, [sp, #160]	@ 0xa0
+343c4a66:	4631      	mov	r1, r6
+343c4a68:	9317      	str	r3, [sp, #92]	@ 0x5c
+343c4a6a:	9b2b      	ldr	r3, [sp, #172]	@ 0xac
+343c4a6c:	220b      	movs	r2, #11
+343c4a6e:	a82c      	add	r0, sp, #176	@ 0xb0
+343c4a70:	9318      	str	r3, [sp, #96]	@ 0x60
+343c4a72:	f7ff fad7 	bl	343c4024 <snapshot>
+343c4a76:	e9dd 622e 	ldrd	r6, r2, [sp, #184]	@ 0xb8
+343c4a7a:	e9dd ec2c 	ldrd	lr, ip, [sp, #176]	@ 0xb0
+343c4a7e:	e9dd 1030 	ldrd	r1, r0, [sp, #192]	@ 0xc0
+343c4a82:	9219      	str	r2, [sp, #100]	@ 0x64
+343c4a84:	9b17      	ldr	r3, [sp, #92]	@ 0x5c
+343c4a86:	4a5e      	ldr	r2, [pc, #376]	@ (343c4c00 <power_aba_park+0x6ba>)
+343c4a88:	f8c2 b0b0 	str.w	fp, [r2, #176]	@ 0xb0
+343c4a8c:	f8c2 a0b4 	str.w	sl, [r2, #180]	@ 0xb4
+343c4a90:	f8c2 30b8 	str.w	r3, [r2, #184]	@ 0xb8
+343c4a94:	9b18      	ldr	r3, [sp, #96]	@ 0x60
+343c4a96:	f8c2 80bc 	str.w	r8, [r2, #188]	@ 0xbc
+343c4a9a:	f8c2 70c0 	str.w	r7, [r2, #192]	@ 0xc0
+343c4a9e:	f8c2 30c4 	str.w	r3, [r2, #196]	@ 0xc4
+343c4aa2:	9b19      	ldr	r3, [sp, #100]	@ 0x64
+343c4aa4:	f8c2 e0c8 	str.w	lr, [r2, #200]	@ 0xc8
+343c4aa8:	f8c2 c0cc 	str.w	ip, [r2, #204]	@ 0xcc
+343c4aac:	f8c2 60d0 	str.w	r6, [r2, #208]	@ 0xd0
+343c4ab0:	f8c2 30d4 	str.w	r3, [r2, #212]	@ 0xd4
+343c4ab4:	9b08      	ldr	r3, [sp, #32]
+343c4ab6:	f8c2 10d8 	str.w	r1, [r2, #216]	@ 0xd8
+343c4aba:	455b      	cmp	r3, fp
+343c4abc:	f8c2 00dc 	str.w	r0, [r2, #220]	@ 0xdc
+343c4ac0:	462a      	mov	r2, r5
+343c4ac2:	d12b      	bne.n	343c4b1c <power_aba_park+0x5d6>
+343c4ac4:	9b06      	ldr	r3, [sp, #24]
+343c4ac6:	4553      	cmp	r3, sl
+343c4ac8:	d128      	bne.n	343c4b1c <power_aba_park+0x5d6>
+343c4aca:	9b05      	ldr	r3, [sp, #20]
+343c4acc:	f8dd a05c 	ldr.w	sl, [sp, #92]	@ 0x5c
+343c4ad0:	4553      	cmp	r3, sl
+343c4ad2:	d123      	bne.n	343c4b1c <power_aba_park+0x5d6>
+343c4ad4:	9b07      	ldr	r3, [sp, #28]
+343c4ad6:	4543      	cmp	r3, r8
+343c4ad8:	d120      	bne.n	343c4b1c <power_aba_park+0x5d6>
+343c4ada:	9b0b      	ldr	r3, [sp, #44]	@ 0x2c
+343c4adc:	42bb      	cmp	r3, r7
+343c4ade:	d11d      	bne.n	343c4b1c <power_aba_park+0x5d6>
+343c4ae0:	9b09      	ldr	r3, [sp, #36]	@ 0x24
+343c4ae2:	9d18      	ldr	r5, [sp, #96]	@ 0x60
+343c4ae4:	42ab      	cmp	r3, r5
+343c4ae6:	d119      	bne.n	343c4b1c <power_aba_park+0x5d6>
+343c4ae8:	9b0e      	ldr	r3, [sp, #56]	@ 0x38
+343c4aea:	4573      	cmp	r3, lr
+343c4aec:	f040 80db 	bne.w	343c4ca6 <power_aba_park+0x760>
+343c4af0:	9b0a      	ldr	r3, [sp, #40]	@ 0x28
+343c4af2:	4563      	cmp	r3, ip
+343c4af4:	f040 80d7 	bne.w	343c4ca6 <power_aba_park+0x760>
+343c4af8:	9b0f      	ldr	r3, [sp, #60]	@ 0x3c
+343c4afa:	42b3      	cmp	r3, r6
+343c4afc:	f040 80d3 	bne.w	343c4ca6 <power_aba_park+0x760>
+343c4b00:	9b0d      	ldr	r3, [sp, #52]	@ 0x34
+343c4b02:	9a19      	ldr	r2, [sp, #100]	@ 0x64
+343c4b04:	4293      	cmp	r3, r2
+343c4b06:	f040 80ce 	bne.w	343c4ca6 <power_aba_park+0x760>
+343c4b0a:	9b0c      	ldr	r3, [sp, #48]	@ 0x30
+343c4b0c:	9a04      	ldr	r2, [sp, #16]
+343c4b0e:	1a18      	subs	r0, r3, r0
+343c4b10:	4243      	negs	r3, r0
+343c4b12:	4143      	adcs	r3, r0
+343c4b14:	428a      	cmp	r2, r1
+343c4b16:	bf0c      	ite	eq
+343c4b18:	461a      	moveq	r2, r3
+343c4b1a:	2200      	movne	r2, #0
+343c4b1c:	4b38      	ldr	r3, [pc, #224]	@ (343c4c00 <power_aba_park+0x6ba>)
+343c4b1e:	67da      	str	r2, [r3, #124]	@ 0x7c
+343c4b20:	6fdb      	ldr	r3, [r3, #124]	@ 0x7c
+343c4b22:	2b00      	cmp	r3, #0
+343c4b24:	bf08      	it	eq
+343c4b26:	f04f 0905 	moveq.w	r9, #5
+343c4b2a:	9b10      	ldr	r3, [sp, #64]	@ 0x40
+343c4b2c:	b11b      	cbz	r3, 343c4b36 <power_aba_park+0x5f0>
+343c4b2e:	4b39      	ldr	r3, [pc, #228]	@ (343c4c14 <power_aba_park+0x6ce>)
+343c4b30:	9a10      	ldr	r2, [sp, #64]	@ 0x40
+343c4b32:	f8c3 225c 	str.w	r2, [r3, #604]	@ 0x25c
+343c4b36:	f3bf 8f4f 	dsb	sy
+343c4b3a:	f3bf 8f6f 	isb	sy
+343c4b3e:	4b32      	ldr	r3, [pc, #200]	@ (343c4c08 <power_aba_park+0x6c2>)
+343c4b40:	4d2f      	ldr	r5, [pc, #188]	@ (343c4c00 <power_aba_park+0x6ba>)
+343c4b42:	f8d3 225c 	ldr.w	r2, [r3, #604]	@ 0x25c
+343c4b46:	626a      	str	r2, [r5, #36]	@ 0x24
+343c4b48:	6a6a      	ldr	r2, [r5, #36]	@ 0x24
+343c4b4a:	6a29      	ldr	r1, [r5, #32]
+343c4b4c:	404a      	eors	r2, r1
+343c4b4e:	f012 0f60 	tst.w	r2, #96	@ 0x60
+343c4b52:	bf18      	it	ne
+343c4b54:	f04f 0905 	movne.w	r9, #5
+343c4b58:	f8c5 9010 	str.w	r9, [r5, #16]
+343c4b5c:	f8d3 225c 	ldr.w	r2, [r3, #604]	@ 0x25c
+343c4b60:	0712      	lsls	r2, r2, #28
+343c4b62:	f140 80a5 	bpl.w	343c4cb0 <power_aba_park+0x76a>
+343c4b66:	f8d3 321c 	ldr.w	r3, [r3, #540]	@ 0x21c
+343c4b6a:	071b      	lsls	r3, r3, #28
+343c4b6c:	f100 80a0 	bmi.w	343c4cb0 <power_aba_park+0x76a>
+343c4b70:	f04f 5380 	mov.w	r3, #268435456	@ 0x10000000
+343c4b74:	4e28      	ldr	r6, [pc, #160]	@ (343c4c18 <power_aba_park+0x6d2>)
+343c4b76:	61b3      	str	r3, [r6, #24]
+343c4b78:	9b15      	ldr	r3, [sp, #84]	@ 0x54
+343c4b7a:	931a      	str	r3, [sp, #104]	@ 0x68
+343c4b7c:	9b14      	ldr	r3, [sp, #80]	@ 0x50
+343c4b7e:	931b      	str	r3, [sp, #108]	@ 0x6c
+343c4b80:	9b16      	ldr	r3, [sp, #88]	@ 0x58
+343c4b82:	931c      	str	r3, [sp, #112]	@ 0x70
+343c4b84:	9b13      	ldr	r3, [sp, #76]	@ 0x4c
+343c4b86:	931d      	str	r3, [sp, #116]	@ 0x74
+343c4b88:	9b11      	ldr	r3, [sp, #68]	@ 0x44
+343c4b8a:	931e      	str	r3, [sp, #120]	@ 0x78
+343c4b8c:	9b12      	ldr	r3, [sp, #72]	@ 0x48
+343c4b8e:	931f      	str	r3, [sp, #124]	@ 0x7c
+343c4b90:	ab1c      	add	r3, sp, #112	@ 0x70
+343c4b92:	cb0f      	ldmia	r3, {r0, r1, r2, r3}
+343c4b94:	e88d 000f 	stmia.w	sp, {r0, r1, r2, r3}
+343c4b98:	e9dd 231a 	ldrd	r2, r3, [sp, #104]	@ 0x68
+343c4b9c:	4630      	mov	r0, r6
+343c4b9e:	210c      	movs	r1, #12
+343c4ba0:	f7ff fa6e 	bl	343c4080 <restore_pin>
+343c4ba4:	4631      	mov	r1, r6
+343c4ba6:	220c      	movs	r2, #12
+343c4ba8:	a820      	add	r0, sp, #128	@ 0x80
+343c4baa:	f7ff fa3b 	bl	343c4024 <snapshot>
+343c4bae:	e9dd 7620 	ldrd	r7, r6, [sp, #128]	@ 0x80
+343c4bb2:	e9dd 0122 	ldrd	r0, r1, [sp, #136]	@ 0x88
+343c4bb6:	e9dd 2324 	ldrd	r2, r3, [sp, #144]	@ 0x90
+343c4bba:	f8c5 7198 	str.w	r7, [r5, #408]	@ 0x198
+343c4bbe:	f8c5 619c 	str.w	r6, [r5, #412]	@ 0x19c
+343c4bc2:	f8c5 01a0 	str.w	r0, [r5, #416]	@ 0x1a0
+343c4bc6:	f8c5 11a4 	str.w	r1, [r5, #420]	@ 0x1a4
+343c4bca:	f8c5 21a8 	str.w	r2, [r5, #424]	@ 0x1a8
+343c4bce:	f8c5 31ac 	str.w	r3, [r5, #428]	@ 0x1ac
+343c4bd2:	9d15      	ldr	r5, [sp, #84]	@ 0x54
+343c4bd4:	42bd      	cmp	r5, r7
+343c4bd6:	d10e      	bne.n	343c4bf6 <power_aba_park+0x6b0>
+343c4bd8:	9d14      	ldr	r5, [sp, #80]	@ 0x50
+343c4bda:	42b5      	cmp	r5, r6
+343c4bdc:	d10b      	bne.n	343c4bf6 <power_aba_park+0x6b0>
+343c4bde:	9d16      	ldr	r5, [sp, #88]	@ 0x58
+343c4be0:	4285      	cmp	r5, r0
+343c4be2:	d108      	bne.n	343c4bf6 <power_aba_park+0x6b0>
+343c4be4:	9813      	ldr	r0, [sp, #76]	@ 0x4c
+343c4be6:	4288      	cmp	r0, r1
+343c4be8:	d105      	bne.n	343c4bf6 <power_aba_park+0x6b0>
+343c4bea:	9911      	ldr	r1, [sp, #68]	@ 0x44
+343c4bec:	4291      	cmp	r1, r2
+343c4bee:	d102      	bne.n	343c4bf6 <power_aba_park+0x6b0>
+343c4bf0:	9a12      	ldr	r2, [sp, #72]	@ 0x48
+343c4bf2:	429a      	cmp	r2, r3
+343c4bf4:	d002      	beq.n	343c4bfc <power_aba_park+0x6b6>
+343c4bf6:	2205      	movs	r2, #5
+343c4bf8:	4b01      	ldr	r3, [pc, #4]	@ (343c4c00 <power_aba_park+0x6ba>)
+343c4bfa:	611a      	str	r2, [r3, #16]
+343c4bfc:	46a1      	mov	r9, r4
+343c4bfe:	e481      	b.n	343c4504 <power_aba_main+0xdc>
+343c4c00:	343c6000 	.word	0x343c6000
+343c4c04:	00061a80 	.word	0x00061a80
+343c4c08:	56028000 	.word	0x56028000
+343c4c0c:	56021400 	.word	0x56021400
+343c4c10:	56021800 	.word	0x56021800
+343c4c14:	56029000 	.word	0x56029000
+343c4c18:	56020c00 	.word	0x56020c00
+343c4c1c:	f04f 0a00 	mov.w	sl, #0
+343c4c20:	e9cd aa05 	strd	sl, sl, [sp, #20]
+343c4c24:	f8cd a040 	str.w	sl, [sp, #64]	@ 0x40
+343c4c28:	f8cd a030 	str.w	sl, [sp, #48]	@ 0x30
+343c4c2c:	f8cd a010 	str.w	sl, [sp, #16]
+343c4c30:	f8cd a034 	str.w	sl, [sp, #52]	@ 0x34
+343c4c34:	f8cd a03c 	str.w	sl, [sp, #60]	@ 0x3c
+343c4c38:	f8cd a028 	str.w	sl, [sp, #40]	@ 0x28
+343c4c3c:	f8cd a038 	str.w	sl, [sp, #56]	@ 0x38
+343c4c40:	f8cd a024 	str.w	sl, [sp, #36]	@ 0x24
+343c4c44:	f8cd a02c 	str.w	sl, [sp, #44]	@ 0x2c
+343c4c48:	f8cd a01c 	str.w	sl, [sp, #28]
+343c4c4c:	2402      	movs	r4, #2
+343c4c4e:	e67c      	b.n	343c494a <power_aba_park+0x404>
+343c4c50:	f04f 0a00 	mov.w	sl, #0
+343c4c54:	f8cd a030 	str.w	sl, [sp, #48]	@ 0x30
+343c4c58:	f8cd a010 	str.w	sl, [sp, #16]
+343c4c5c:	f8cd a034 	str.w	sl, [sp, #52]	@ 0x34
+343c4c60:	f8cd a03c 	str.w	sl, [sp, #60]	@ 0x3c
+343c4c64:	f8cd a028 	str.w	sl, [sp, #40]	@ 0x28
+343c4c68:	f8cd a038 	str.w	sl, [sp, #56]	@ 0x38
+343c4c6c:	f8cd a024 	str.w	sl, [sp, #36]	@ 0x24
+343c4c70:	f8cd a02c 	str.w	sl, [sp, #44]	@ 0x2c
+343c4c74:	f8cd a01c 	str.w	sl, [sp, #28]
+343c4c78:	f8cd a014 	str.w	sl, [sp, #20]
+343c4c7c:	f8cd a020 	str.w	sl, [sp, #32]
+343c4c80:	e7e4      	b.n	343c4c4c <power_aba_park+0x706>
+343c4c82:	46aa      	mov	sl, r5
+343c4c84:	2404      	movs	r4, #4
+343c4c86:	e660      	b.n	343c494a <power_aba_park+0x404>
+343c4c88:	f04f 0a01 	mov.w	sl, #1
+343c4c8c:	e7fa      	b.n	343c4c84 <power_aba_park+0x73e>
+343c4c8e:	2100      	movs	r1, #0
+343c4c90:	4638      	mov	r0, r7
+343c4c92:	f7ff fa45 	bl	343c4120 <wait_cycles>
+343c4c96:	2800      	cmp	r0, #0
+343c4c98:	f47f ae80 	bne.w	343c499c <power_aba_park+0x456>
+343c4c9c:	3501      	adds	r5, #1
+343c4c9e:	2d65      	cmp	r5, #101	@ 0x65
+343c4ca0:	f47f ae66 	bne.w	343c4970 <power_aba_park+0x42a>
+343c4ca4:	e679      	b.n	343c499a <power_aba_park+0x454>
+343c4ca6:	2200      	movs	r2, #0
+343c4ca8:	e738      	b.n	343c4b1c <power_aba_park+0x5d6>
+343c4caa:	f04f 0902 	mov.w	r9, #2
+343c4cae:	e73c      	b.n	343c4b2a <power_aba_park+0x5e4>
+343c4cb0:	2202      	movs	r2, #2
+343c4cb2:	4b03      	ldr	r3, [pc, #12]	@ (343c4cc0 <power_aba_park+0x77a>)
+343c4cb4:	e7a1      	b.n	343c4bfa <power_aba_park+0x6b4>
+343c4cb6:	f04f 0903 	mov.w	r9, #3
+343c4cba:	e423      	b.n	343c4504 <power_aba_main+0xdc>
+343c4cbc:	230f      	movs	r3, #15
+343c4cbe:	e43e      	b.n	343c453e <power_aba_main+0x116>
+343c4cc0:	343c6000 	.word	0x343c6000
+
+343c4cc4 <power_aba_entry>:
+343c4cc4:	f3ef 8008 	mrs	r0, MSP
+343c4cc8:	f3ef 810a 	mrs	r1, MSPLIM
+343c4ccc:	f04f 0200 	mov.w	r2, #0
+343c4cd0:	f382 880a 	msr	MSPLIM, r2
+343c4cd4:	4a04      	ldr	r2, [pc, #16]	@ (343c4ce8 <power_aba_entry+0x24>)
+343c4cd6:	f382 8808 	msr	MSP, r2
+343c4cda:	4a04      	ldr	r2, [pc, #16]	@ (343c4cec <power_aba_entry+0x28>)
+343c4cdc:	f382 880a 	msr	MSPLIM, r2
+343c4ce0:	f3bf 8f6f 	isb	sy
+343c4ce4:	f7ff bba0 	b.w	343c4428 <power_aba_main>
+343c4ce8:	343b0000 	.word	0x343b0000
+343c4cec:	343af000 	.word	0x343af000

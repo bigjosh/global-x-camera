@@ -97,6 +97,42 @@ _Static_assert(SD_DMA_PREERASE_MAX_SECTORS*SD_SECTOR_BYTES<=0x1FFFFFFUL, "preera
 
 enum response { RESP_NONE, RESP_R1, RESP_R2, RESP_R3, RESP_R6, RESP_R7 };
 
+#if SD_READ_DIAGNOSTICS
+volatile sd_read_diagnostics_t sd_read_diagnostics;
+_Static_assert(sizeof(sd_read_diagnostics_t)==64U,"read diagnostics ABI");
+static void read_diagnostics_reset(void)
+{
+    volatile uint8_t *clear=(volatile uint8_t *)&sd_read_diagnostics;
+    for(size_t i=0;i<sizeof(sd_read_diagnostics);i++) clear[i]=0;
+    sd_read_diagnostics.magic=0x31445253U; /* SRD1 */
+    sd_read_diagnostics.version=1U;
+    sd_read_diagnostics.mode=0xFFFFFFFFU;
+}
+
+static void read_diagnostics_snapshot(sd_card_t *c,uint32_t mode,
+    uint32_t lba,const uint8_t *buffer,uint32_t count,uint32_t words,
+    uint32_t sta,uint32_t result)
+{
+    /* This observer never starts a controller, reads FIFO, changes transport
+     * state or invents a successful idle proof. Check before ANY SD register. */
+    if(!c || !c->controller_owned || !(R->AHB5ENR&RCC_AHB5ENR_SDMMC2EN)) return;
+    sd_read_diagnostics.mode=mode;
+    sd_read_diagnostics.lba=lba;
+    sd_read_diagnostics.count=count;
+    sd_read_diagnostics.destination=(uint32_t)(uintptr_t)buffer;
+    sd_read_diagnostics.requested_bytes=count*SD_SECTOR_BYTES;
+    sd_read_diagnostics.words=words;
+    sd_read_diagnostics.sta=sta;
+    sd_read_diagnostics.dcount=X->DCOUNT;
+    sd_read_diagnostics.fifo_flags=sta&(SDMMC_STA_RXFIFOHF|SDMMC_STA_RXFIFOF|SDMMC_STA_RXFIFOE);
+    sd_read_diagnostics.idmactrl=X->IDMACTRL;
+    sd_read_diagnostics.dctrl=X->DCTRL;
+    sd_read_diagnostics.clkcr=X->CLKCR;
+    sd_read_diagnostics.result=result;
+    __DSB();sd_read_diagnostics.captured=1U;
+}
+#endif
+
 #if SD_BUS_WIDTH == 4
 static int read_scr_selected(sd_card_t *c,sd_scr_t *scr);
 volatile sd_width_proof_t sd_bus_width_proof;
@@ -110,6 +146,14 @@ _Static_assert(sizeof(sd_high_speed_proof_t)==184U,"high-speed proof ABI");
 #if SD_GPIO_SPEED != 3
 volatile sd_gpio_proof_t sd_gpio_proof;
 _Static_assert(sizeof(sd_gpio_proof_t)==32U,"GPIO speed proof ABI");
+#endif
+#if SD_CLK_GPIO_SPEED != -1
+volatile sd_clk_gpio_proof_t sd_clk_gpio_proof;
+_Static_assert(sizeof(sd_clk_gpio_proof_t)==48U,"CLK GPIO speed proof ABI");
+/* Keep the selector in initialized data so compiler register reuse cannot
+ * change the experimental instruction layout between speeds3,2,1. */
+static const volatile uint32_t sd_clk_gpio_requested_speed=SD_CLK_GPIO_SPEED;
+#define CLK_SPEED_MASK (3UL<<4)
 #endif
 #if SD_FIXED_COMPENSATION
 volatile sd_compensation_proof_t sd_compensation_proof;
@@ -418,6 +462,9 @@ static int transfer(sd_card_t *c, uint32_t lba, uint8_t *buffer,
 #endif
     result=command(c,index,(c->ocr&(1UL<<30)) ? lba : lba*512UL,RESP_R1,1);
     if (result) {
+#if SD_READ_DIAGNOSTICS
+        if(!writing) read_diagnostics_snapshot(c,0U,lba,buffer,count,words,c->last_sta,(uint32_t)result);
+#endif
         abort_transfer(c,!writing);
         return result;
     }
@@ -472,6 +519,9 @@ static int transfer(sd_card_t *c, uint32_t lba, uint8_t *buffer,
     X->CMD&=~SDMMC_CMD_CMDTRANS;
     if (!result && (words!=total || !(sta&SDMMC_STA_DATAEND) ||
         (sta&(DATA_ERRORS|SDMMC_STA_DPSMACT)))) result=fault(c,SD_ERR_LENGTH);
+#if SD_READ_DIAGNOSTICS
+    if(!writing) read_diagnostics_snapshot(c,0U,lba,buffer,count,words,sta,(uint32_t)result);
+#endif
     if (!result && count>1) {
 #if SD_REVIEW_PROFILE
         result=command_checked(c,12,0,RESP_R1,0,
@@ -932,6 +982,9 @@ static int sd_init_attempt(sd_card_t *c, uint32_t max_hz)
 int sd_init(sd_card_t *c, uint32_t max_hz)
 #endif
 {
+#if SD_READ_DIAGNOSTICS
+    read_diagnostics_reset();
+#endif
     if (!c) return SD_ERR_ARGUMENT;
     if (c->initialized || c->controller_owned) return SD_ERR_STATE;
 #if SD_EARLY_RUN_CLOCK
@@ -964,6 +1017,16 @@ int sd_init(sd_card_t *c, uint32_t max_hz)
     sd_gpio_proof.e_mask=3UL<<8;
 #endif
 #endif
+#if SD_CLK_GPIO_SPEED != -1
+    volatile uint8_t *clk_gpio_clear=(volatile uint8_t *)&sd_clk_gpio_proof;
+    for(size_t i=0;i<sizeof(sd_clk_gpio_proof);i++) clk_gpio_clear[i]=0;
+    sd_clk_gpio_proof.magic=0x314B4C43U; /* CLK1 */
+    sd_clk_gpio_proof.version=1U;
+    sd_clk_gpio_proof.requested_speed=sd_clk_gpio_requested_speed;
+    sd_clk_gpio_proof.clk_mask=CLK_SPEED_MASK;
+    sd_clk_gpio_proof.c_mask=C_MASK;
+    sd_clk_gpio_proof.e_mask=3UL<<8;
+#endif
 #if SD_FIXED_COMPENSATION
     volatile uint8_t *comp_clear=(volatile uint8_t *)&sd_compensation_proof;
     for (size_t i=0;i<sizeof(sd_compensation_proof);++i) comp_clear[i]=0;
@@ -983,7 +1046,7 @@ int sd_init(sd_card_t *c, uint32_t max_hz)
 #else
     if (max_hz!=100000UL && max_hz!=12500000UL && max_hz!=25000000UL)
         return fault(c,SD_ERR_ARGUMENT);
-#if SD_FIXED_COMPENSATION || (SD_CLOCK_NEGEDGE && !SD_CLOCK_NEGEDGE_INIT) || SD_GPIO_SPEED == 1 || SD_GPIO_SPEED == 2
+#if SD_FIXED_COMPENSATION || (SD_CLOCK_NEGEDGE && !SD_CLOCK_NEGEDGE_INIT) || SD_GPIO_SPEED == 1 || SD_GPIO_SPEED == 2 || SD_CLK_GPIO_SPEED != -1
     if (max_hz!=25000000UL) return fault(c,SD_ERR_ARGUMENT);
 #endif
 #if SD_CLOCK_NEGEDGE_INIT
@@ -1032,6 +1095,15 @@ int sd_init(sd_card_t *c, uint32_t max_hz)
     sd_gpio_proof.c_before=C->OSPEEDR;
     sd_gpio_proof.e_before=E->OSPEEDR;
 #endif
+#if SD_CLK_GPIO_SPEED != -1
+    /* Volatile proof load keeps the three experimental instruction streams
+     * identical; only the separate initialized selector word differs. */
+    const uint32_t clk_profile_speed=sd_clk_gpio_proof.requested_speed;
+    if (clk_profile_speed<1U || clk_profile_speed>3U) return fault(c,SD_ERR_GPIO);
+    const uint32_t clk_profile_c_speed=(C_MASK&~CLK_SPEED_MASK)|(clk_profile_speed<<4);
+    sd_clk_gpio_proof.c_before=C->OSPEEDR;
+    sd_clk_gpio_proof.e_before=E->OSPEEDR;
+#endif
     C->BSRR=1UL<<(2+16);
     C->OTYPER&=~C_PINS;
     C->MODER&=~C_MASK;
@@ -1040,7 +1112,19 @@ int sd_init(sd_card_t *c, uint32_t max_hz)
     sd_high_speed_proof.gpio_c_before=C->OSPEEDR;
     sd_high_speed_proof.gpio_e_before=E->OSPEEDR;
 #endif
-#if SD_HIGH_SPEED_MIXED_SLEW
+#if SD_CLK_GPIO_SPEED != -1
+    C->OSPEEDR=(C->OSPEEDR&~C_MASK)|C_MASK;
+    sd_clk_gpio_proof.c_configured=C->OSPEEDR;
+    if ((sd_clk_gpio_proof.c_configured&C_MASK)!=C_MASK ||
+            ((sd_clk_gpio_proof.c_before^sd_clk_gpio_proof.c_configured)&~C_MASK))
+        return fault(c,SD_ERR_GPIO);
+    /* Keep the clock-only mutation separate from ordinary bank setup. All
+     * three explicit profiles execute this write, including speed3 control. */
+    C->OSPEEDR=(C->OSPEEDR&~CLK_SPEED_MASK)|(clk_profile_speed<<4);
+    if ((C->OSPEEDR&C_MASK)!=clk_profile_c_speed ||
+            ((C->OSPEEDR^sd_clk_gpio_proof.c_configured)&~CLK_SPEED_MASK))
+        return fault(c,SD_ERR_GPIO);
+#elif SD_HIGH_SPEED_MIXED_SLEW
     /* DS14791 HS table: CLK=01, CMD/DAT=00. PC1 and other pins untouched. */
     C->OSPEEDR=(C->OSPEEDR&~C_MASK)|(1UL<<4);
 #elif SD_GPIO_SPEED == 3
@@ -1271,6 +1355,17 @@ int sd_init(sd_card_t *c, uint32_t max_hz)
         return fault(c,SD_ERR_GPIO);
     sd_gpio_proof.applied=1U;
 #endif
+#if SD_CLK_GPIO_SPEED != -1
+    sd_clk_gpio_proof.c_after=C->OSPEEDR;
+    sd_clk_gpio_proof.e_after=E->OSPEEDR;
+    if (((sd_clk_gpio_proof.c_after^sd_clk_gpio_proof.c_configured)&~CLK_SPEED_MASK) ||
+            (sd_clk_gpio_proof.c_after&C_MASK)!=clk_profile_c_speed ||
+            (sd_clk_gpio_proof.e_after&(3UL<<8))!=(3UL<<8) ||
+            ((sd_clk_gpio_proof.c_before^sd_clk_gpio_proof.c_after)&~C_MASK) ||
+            ((sd_clk_gpio_proof.e_before^sd_clk_gpio_proof.e_after)&~(3UL<<8)))
+        return fault(c,SD_ERR_GPIO);
+    sd_clk_gpio_proof.applied=1U;
+#endif
 #if SD_HIGH_SPEED
     sd_high_speed_proof.gpio_c_after=C->OSPEEDR;
     sd_high_speed_proof.gpio_e_after=E->OSPEEDR;
@@ -1294,6 +1389,9 @@ int sd_init(sd_card_t *c, uint32_t max_hz)
 #if SD_HIGH_SPEED
 int sd_init(sd_card_t *c,uint32_t max_hz)
 {
+#if SD_READ_DIAGNOSTICS
+    read_diagnostics_reset();
+#endif
     if(!c) return SD_ERR_ARGUMENT;
     if(c->initialized || c->controller_owned) return SD_ERR_STATE;
     int result=sd_init_attempt(c,max_hz);
@@ -1349,6 +1447,13 @@ static int dma_read_request(sd_card_t *c,uint32_t lba,void *buffer,uint32_t coun
 #endif
 int sd_read_blocks(sd_card_t *c, uint32_t lba, void *buffer, uint32_t count)
 {
+#if SD_READ_DIAGNOSTICS
+    read_diagnostics_reset();
+    sd_read_diagnostics.lba=lba;
+    sd_read_diagnostics.count=count;
+    sd_read_diagnostics.destination=(uint32_t)(uintptr_t)buffer;
+    sd_read_diagnostics.requested_bytes=count<=0xFFFFFFFFU/SD_SECTOR_BYTES?count*SD_SECTOR_BYTES:0;
+#endif
 #if SD_IDMA_READ
     return dma_read_request(c,lba,buffer,count);
 #else
@@ -1460,6 +1565,10 @@ static int transfer_dma_read(sd_card_t *c,uint32_t lba,uint8_t *buffer,uint32_t 
     if(!result && (!(sta&SDMMC_STA_DATAEND) ||
        (sta&(DMA_ERRORS|SDMMC_STA_DPSMACT)) || X->DCOUNT))
         result=fault(c,SD_ERR_LENGTH);
+#if SD_READ_DIAGNOSTICS
+    read_diagnostics_snapshot(c,1U,lba,buffer,count,result?0U:count*128U,
+        result && !sta?c->last_sta:sta,(uint32_t)result);
+#endif
     if(result) {
         /* The same IDMA abort sequence applies to RX (RM 30.6.2): hardware
          * drains/discards its FIFO; CPU must not reset it or disable active DMA.

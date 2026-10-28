@@ -1,0 +1,96 @@
+Isolated Nucleo power findings — measured2026-10-28
+
+Every mean power and energy comes directly from the native power.f32 stream, not mean(V)*mean(I).
+
+Change | observed reduction mA | observed reduction mW | interpretation
+Ethernet PHY power-down | 36.758 | 182.849 | Two A/B/A runs; compare power-down with mean surrounding original/restored baseline. Restored bursts have not resumed within the measured hold.
+400 MHz busy workload to bounded sleep | 4.140 | 20.569 | Within-run v4 pairs, 100Hz wakeups, camera/SD absent; busy is LFSR/SRAM work.
+CPU 400 MHz to 50 MHz, busy | 2.676 | 13.308 | Same v4 binary and elapsed-time workload;50MHz completes fewer updates and costs2.035x energy per update.
+Unused SRAM1/2/3 RUN clocks gated | 0.317 | 1.592 | Same v5 binary flags0/2/0; clock gating only, not SRAM retention power-off. No measured sleep saving.
+
+Every waveform: run | phase | duration ms | mean mA | mean mW | energy mJ
+cachecontrol01 | busy | 151.2270 | 74.4608 | 370.9070 | 56.0911
+cachecontrol01 | sleep | 151.3070 | 70.5661 | 351.5599 | 53.1935
+cachecontrol03 | busy | 151.1545 | 74.5161 | 371.1755 | 56.1049
+cachecontrol03 | sleep | 151.1115 | 70.5571 | 351.5075 | 53.1168
+cacheon01 | busy | 151.3870 | 74.2606 | 369.9330 | 56.0031
+cacheon01 | sleep | 151.2020 | 70.6738 | 352.1214 | 53.2415
+cpu100a | busy | 151.0230 | 72.4484 | 360.9334 | 54.5093
+cpu100a | sleep | 151.1045 | 69.2188 | 344.8843 | 52.1136
+cpu200a | busy | 151.2935 | 73.3253 | 365.2663 | 55.2624
+cpu200a | sleep | 151.2615 | 69.6261 | 346.8961 | 52.4720
+cpu400b | busy | 151.1355 | 74.6926 | 372.0647 | 56.2322
+cpu400b | sleep | 151.0205 | 70.5767 | 351.6194 | 53.1017
+cpu400c | busy | 151.3300 | 74.6649 | 371.9337 | 56.2847
+cpu400c | sleep | 151.3130 | 70.5012 | 351.2415 | 53.1474
+cpu50a | busy | 151.5200 | 72.0032 | 358.6909 | 54.3488
+cpu50a | sleep | 151.3360 | 69.0679 | 344.1084 | 52.0760
+ramcontrol01 | busy | 151.2850 | 74.6227 | 371.7110 | 56.2343
+ramcontrol01 | sleep | 151.1855 | 70.4512 | 350.9960 | 53.0655
+ramcontrol02 | busy | 151.2355 | 74.6946 | 372.0714 | 56.2704
+ramcontrol02 | sleep | 151.1170 | 70.4850 | 351.1576 | 53.0659
+ramoff01 | busy | 150.9980 | 74.3419 | 370.2991 | 55.9144
+ramoff01 | sleep | 151.0140 | 70.5688 | 351.5705 | 53.0921
+phy01 | baseline | 251.4905 | 74.0791 | 369.0251 | 92.8063
+phy01 | powerdown | 251.3920 | 36.9330 | 184.2338 | 46.3149
+phy01 | restored | 251.3920 | 73.2595 | 364.9419 | 91.7435
+phy02 | baseline | 251.5170 | 74.1783 | 369.4785 | 92.9301
+phy02 | powerdown | 251.4230 | 36.9326 | 184.2242 | 46.3182
+phy02 | restored | 251.4260 | 73.2462 | 364.8684 | 91.7374
+
+I-cache work efficiency (same-version controls only):
+[
+  {
+    "run": "cachecontrol01",
+    "flags": 0,
+    "cpu_MHz": 400.0,
+    "iterations": 349440,
+    "updates_per_second": 1736546.2885199303,
+    "busy_mW": 370.9069655342983,
+    "sleep_mW": 351.55991659470385,
+    "energy_uJ_per_update": 0.21366687677736695
+  },
+  {
+    "run": "cachecontrol03",
+    "flags": 0,
+    "cpu_MHz": 400.0,
+    "iterations": 349440,
+    "updates_per_second": 1737172.1736277337,
+    "busy_mW": 371.17553428855234,
+    "sleep_mW": 351.50752648779394,
+    "energy_uJ_per_update": 0.21354981321613764
+  },
+  {
+    "run": "cacheon01",
+    "flags": 4,
+    "cpu_MHz": 400.0,
+    "iterations": 569088,
+    "updates_per_second": 2825842.780318491,
+    "busy_mW": 369.93303236198517,
+    "sleep_mW": 352.121389377383,
+    "energy_uJ_per_update": 0.13080997480671505
+  }
+]
+{
+  "workrate_ratio": 1.6269843460896847,
+  "energy_per_update_ratio": 0.6123823243361765,
+  "busy_power_saving_mW": 1.1082175494401554,
+  "scope": "Same v6 binary flags 0/4/0; synthetic LFSR/SRAM loop only, not measured camera-save performance.",
+  "qualification": "Original cache-on host validation failed from incorrect cache-bit mask; corrected read-only reobservation passed with identical raw completion proof and unchanged code. Original failure retained."
+}
+
+Final missing-camera shutdown plateau: {"duration_ms": 2000.0, "current_mean_mA": 8.076613220342203, "power_mean": 0.04033219885977264, "energy_mJ": 80.66439771954528}
+Stable low plateau followed by first-attempt warm UART recovery and retained SBF=1/PDDS=1/STOPF=0. Reader retains trial_entry_proven=false; this is observed Standby history, not direct entry-time proof.
+
+Limits:
+- No camera or SD connected; warm RAM workloads, not complete cold capture/save cycles.
+- All71 initial nonfinite current samples remain recorded. Whole-session current is invalid; reported bounded windows independently pass finite/continuity tests.
+- Native2MSPS analog streams aligned by sample_id to packed GPI. Whole final GPI chunks excluded for unresolved packing padding.
+- Middle windows discard25ms from both ends. PHY holds additionally follow100ms settle; restore DC state does not restore periodic bursts during the short window.
+- Code/request/raw proof/final context, faults, restored GPIO/clock/debug/LP state and exact native file hashes verified. Full before/after RCC inventory matched for CPU probes.
+- The current floor cannot be called MCU-only or removable-board-only; PHY difference includes upstream conversion losses.
+- Changes are measured in separate states and are not additive. Do not project final camera cycle savings until reintegrated and tested.
+- Compare throughput/energy per update within the same binary version; uncached instruction layout changes loop cost.
+- Current burst suppression is associated with PHY power state; an Ethernet line waveform was not measured.
+
+Recommendation: implement and qualify software PHY power-down before considering removal; it is the largest measured removable support load. Preserve a matched full capture/readback test after camera and SD are reconnected. Continue runtime idle/clock/cache optimization only against total energy and completed work. Main/auxiliary LDO branch current measurements are needed before estimating a custom-board power floor. Small ADC buffers, NOR idle bias, and debugger divider removal are lower priorities. See board-load-research.txt for sourced circuit estimates.

@@ -1,5 +1,64 @@
 # Nucleo debugger isolation and power measurement
 
+The latest [October 28 isolated-Nucleo report](evidence/2026-10-28-isolated-nucleo/README.md)
+records CPU/sleep/cache/SRAM controls with camera and SD physically disconnected,
+and a measured 182.85 mW Ethernet power-down saving. Final shutdown current was
+8.0766 mA at 4.9937 V; warm UART recovery and retained Standby flags passed.
+Normal NOR is unchanged. At 19:15:18 UTC the JS output was intentionally disabled;
+other instrument settings were restored. See the latest AGENTS checkpoint before
+operating the bench. The earlier [aligned ablations](evidence/2026-10-28-aligned-ablation/README.md)
+retain the complete-camera phase measurements and their separate limitations.
+
+## Direct 5 V baseline and proposed synchronized markers — October 28
+
+After the battery-side collapse test, the user confirms connecting the regulated bench supply directly through JS110 to the target, following the canonical CN5.5/5V and CN5.6/GND plan below. Supply capability is 2 A. This is a user hookup confirmation, not a measured voltage, successful boot or idle-state proof. Keep the proposed CN9-open/CN8-disconnected/LTC-output-disconnected configuration and independently powered CN10 with D2 removed; verify actual state before recording. Compare unchanged card, scene, exposure/gain and firmware over three complete capture/save cycles before component changes. A later stable-12-V-through-LTC comparison measures a different boundary and must be labeled separately.
+
+For simultaneous power and phase observation, the proposed wiring now uses only CN15, as requested by the user:
+
+| Nucleo signal | JS110 rear GPIO connector | Purpose |
+|---|---|---|
+| CN15 pin 21 / PD12 | IN0 | Existing phase-coded pulses: receiver entry, camera strobe/frame observations, SD initialization/write completion and pre-Standby |
+| CN15 pin 33 / PD0 | IN1 | Early firmware boot marker; verify its actual waveform during the smoke test |
+| CN15 pin 20 / GND | GPIO GND | Digital reference; keep the existing power return intact |
+
+CN15 does not expose target NRST. This replaces the originally proposed CN3.14 reset probe with a firmware boot observation; it cannot identify reset release or the entire ROM interval directly. PD12 supplies the phase alignment needed for this baseline. ST C02 ODB++ maps CN15.21 to PD12/net162, CN15.33 to PD0/net173 and CN15.20 to GND/net358; none of the CN15 contacts is target NRST/net235. These proposed signal connections do not change the CN5 power connections.
+
+The user confirmed these CN15 marker connections on October28. All three cold cycles resolved the ten PD12 phase markers, and a controlled PD0 test produced exactly three LOW/HIGH pulses on IN1. Both wires are confirmed; no firmware change was needed. The [measured baseline and wiring report](evidence/2026-10-28-direct5v-gpi/README.md) retains exact results, failed preliminary checks and qualification limits. Current onset to the low plateau was 571–634 ms; energy excluding the first 5 ms was 340–382 mJ. The first 5 ms analog extrema remain unqualified, so these are not complete-cycle energy claims. Undriven GPIO chatter must not be interpreted as firmware events. The final normal warm boot returned to approximately 8.568 mA at 4.993 V; saved photos and Standby flags were not independently reread.
+
+JS110 needs no external Vref wire; configure its internal IO reference to 3.3 V and leave its rear +5 V and OUT pins unconnected. Its GPIO reference is USB ground, which this wiring intentionally joins to DUT ground, unlike the isolated analog measurement terminals. The documented native GPI rate is 2 MSPS; enabled GPI channels consume one ADC LSB, reducing corresponding analog samples from 14 to 13 bits. Preserve and report these settings, and save full digital samples rather than just analog averages. [JS110 GPIO guide](https://docs.joulescope.com/en/products/js110/guide/gpio.html), [datasheet](https://docs.joulescope.com/en/products/js110/datasheet.html).
+
+The last installed normal RAW build's outer manifest declares phase protocol v2: event IDs are spaced by 2 us on PD12. The source and manifest are available under `tmp/bringup/error-relocate-20261026/flash-normal-v2`; [protocol and semantic precedence](../../firmware/capture-raw/phase_protocol.py) distinguish overlapping camera/storage activity. At a 0.5 us sample grid, do not apply Saleae's 0.4 us width tolerance unchanged or infer a missing event solely from expected order. Qualify observed pulses and record instrument-specific decoding uncertainty. The October28 test recorded the existing markers without changing their firmware.
+
+## Canonical target power connection — October 27
+
+Keep the **Joulescope JS110 in series** and use the Arduino power header:
+
+| Connection | Canonical destination |
+|---|---|
+| Selected regulated 5 V source | JS110 **IN+** |
+| JS110 **OUT+** | **CN5 pin 5 / 5V** |
+| Source return / JS110 common ground and voltage-sense return | **CN5 pin 6 / GND** |
+| CN9 selector | **All shunts absent**; no parallel target supply |
+
+CN5.5 is directly on the same target `5V` net as CN9.2/4/6; this changes the
+physical connection, not the downstream regulator tree. CN5.6 is board ground.
+Do not use CN5.8/VIN for the regulated 5 V feed. Retain the JS110's established
+ground/voltage-sense connections and do not bypass its positive-current path.
+
+The existing USB-fed bench source can remain **CN8 → CN9.3 → JS110 IN+**;
+only its target feed changes to CN5.5. Its documented CN8 bypass paths and
+measurement limitations still apply. When using **LTC3621/DC1863A or an
+independent external 5 V source**, disconnect the old CN9.3 source lead and
+leave CN8 unplugged. Select one upstream source, not parallel sources.
+CN10 may independently power the debugger with D2 removed; signal and sense
+paths still prevent assuming complete debugger isolation.
+
+This is the user's selected canonical plan, not confirmation of a completed
+physical move or a new power measurement. See the [decision](NOTES.md#2026-10-27--use-arduino-cn55-and-cn56-for-the-joulescope-fed-target)
+and [assembly guide](../prototype/nucleo-assembly-guide.md#4-connect-ltc-power).
+The dated records below retain their original wiring and evidence; their
+CN9.2 target connection is superseded for new assembly by CN5.5.
+
 ## D2 and R23 removed: CN8-only functional operation — October 18
 
 The user reports **D2 and R23 physically removed**. Only these two changes are confirmed; other assembly-guide rework remains pending. No instrument or firmware action was performed for this follow-up.

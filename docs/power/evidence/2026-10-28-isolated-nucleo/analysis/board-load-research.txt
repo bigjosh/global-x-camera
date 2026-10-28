@@ -1,0 +1,107 @@
+Offline non-Ethernet board-load review — 2026-10-28
+
+Scope: official MB1940-N657X0Q-C02 schematic/BOM plus manufacturer datasheets.
+Camera and SD are physically disconnected in the new campaign (root report).
+These are circuit/specification estimates, not measured savings. Root owns hardware.
+Ethernet is being investigated independently; no Ethernet savings are asserted here.
+
+Highest-value order
+1. Measure matched CPU busy/sleep and clock-divider controls with identical LEDs,
+   external clocks and rails. The bounded probe's busy case is an LFSR/SRAM load,
+   not the normal SD polling loop; it estimates workload sensitivity, not automatic
+   capture-cycle savings. Use native GPIO edges as wall time across sleep.
+2. Separately resolve Ethernet state and measure its controlled contribution.
+3. Measure main VDDIO and auxiliary1.8V rail currents at their measurement links.
+   Their LDO losses scale with load and can matter more than regulator bias current.
+   Neither rail is disposable merely because a camera or SD card is absent.
+4. Keep unused LEDs and USB-C control circuitry off. Avoid small-component rework
+   until branch measurements identify worthwhile loads.
+
+Documented remaining loads and limits
+
+U33 LD39020ADTPU33R: 5V→mainVDDIO3.3V LDO, always enabled. No-load bias20µA
+typical (~0.10mW at5V). Its conversion heat is approximately1.7V×rail current:
+e.g.40mA would mean68mW. This is a formula/example, not a measured40mA load.
+An efficient replacement rail could recover much of this loss; changing the whole
+board input to3.3V is not an equivalent drop-in test because other rails need5V.
+
+U23 LD39020ADTPU18R: 5V→always-on1.8V LDO. Same20µA no-load typical bias;
+conversion heat approximately3.2V×load current. Required AON rail, not a spare.
+
+U26 LD56100DPU18R: auxiliary3.3V→1.8V LDO,100µA typical no-load bias
+(~0.33mW at its3.3V input), plus1.5V×rail current. LCON grounded selects the
+0.5A current-limit setting, not a low-quiescent-current mode. Changing LCON
+does not constitute a power-saving mode. EN follows PWR_ON; do not disable
+the rail without auditing every MCU/sensor/NOR/analog consumer and pin state.
+
+U17 TPS62088YFP: core buck already uses a low-IQ architecture:4µA typical
+with EN high, no load, not switching. That20µW figure is NOT total operating
+converter loss. Actual conversion loss depends on core load. This is the
+non-A part; the forced-PWM A-family8mA no-load maximum does not apply.
+
+U34 ST1S31: auxiliary3.3V buck. Datasheet gives630µA typical no-load bias
+with duty cycle0/VFB1.2V (~3.15mW at5V), not a guarantee of total in-circuit
+light-load loss. Light-load pulse skipping reduces switching loss. Its rail
+also feeds required circuitry; don't remove U34 simply to save its bias.
+U14 ST1S31 is ALREADY disabled: R22 EN link and R10 output link are not
+fitted, and floating EN has an internal pulldown. Do not count another630µA
+saving. U25 VIN→5V regulator is not supplied with VIN/CN9 paths disconnected.
+
+U7/U8/U9: six TSZ122 ADC-buffer channels,28µA typical/channel at1.8V:
+168µA or0.302mW at the IC supply. Their feed via a1.8V LDO costs roughly
+0.554mW at the3.3V upstream rail, before buck losses. No enable input;
+removal loses analog-header paths. A very low-priority physical modification.
+
+U22 TCPP03-M20: datasheet OFF/reset with EN0 specifies no DC draw from
+VCC_VCONN/EN; normal mode permits2.7mA VCC draw. Verify PA7/EN and mode
+before assigning any normal-mode load. With CN8 absent, VBUS indicators and
+USB-power path are not part of the powered input. Do not credit2.7mA as a
+real saving when the controller was already off or hibernating.
+
+ST-LINK voltage-sense dividers: R65/R70=10k+10k on mainVDDIO means165µA;
+R73/R74=5.1k+10k on target5V means331µA. Since mainVDDIO is LDO supplied,
+their combined contribution at5V is approximately0.496mA/2.48mW. This is
+an ideal-resistor calculation; divider taps may have additional leakage.
+Removing them sacrifices debugger voltage sensing and is not the first lever.
+D2 and R23 are already removed. Do not count debugger main power or LD1 twice.
+
+User LEDs LD5/6/7 and Arduino LD3 can be turned off by firmware. Their
+remaining current must be measured or calculated using each actual resistor
+and LED voltage. The isolated probe deliberately holds all three status LEDs
+off in both windows. No microphones appear in the official C02 fitted BOM.
+
+U31 NOR identity caveat: official C02 BOM specifies MX25UM51245GXDI00,
+512Mb. The software library's MX66UW name does not prove installed silicon.
+For the BOM part, official March2026 datasheet p95 gives standby20µA typical
+and180µA maximum; deep power-down3µA typical/50µA maximum at1.8V. Typical
+silicon saving is only30.6µW once CS is idle. Don't subtract maxima to claim
+a guaranteed saving. Confirm actual JEDEC ID before any command experiment;
+all executing code/data must be in RAM and recovery/boot wake behavior proven.
+
+Startup capacitance
+C14 is fitted220µF directly on target5V: Murata GRM31CR60J227ME11,
+6.3V X5R MLCC,1206,±20%. Nominal constant-C0→5V charge is C×V=1.10mC;
+stored energy is0.5×C×V²=2.75mJ. Effective capacitance falls with DC bias;
+these are reference calculations, not exact expected charge/energy. For a
+voltage-dependent capacitance use the integrals of C(V)dV and V×C(V)dV.
+The nominal values are the same order as the previously
+measured first5ms charge~0.94mC and unqualified raw energy~3.7mJ. It makes
+bulk-cap charging plausible, not proven: capacitor tolerance, actual DUT rail
+voltage, other capacitances/loads and JS transient behavior remain unresolved.
+Do not remove bulk capacitance without validating rail droop and startup.
+Soft-start/current-limited input is a more useful first controlled experiment.
+
+Primary sources
+Board schematic sheets9,10,12,13 and officialC02BOM (local checked copies):
+https://www.st.com/resource/en/schematic_pack/mb1940-n657x0q-c02-schematic.pdf
+tmp/hardware-review/nucleo-modifications/mb1940-schematic.pdf
+tmp/hardware-review/nucleo-modifications/bom/MB1940-N657X0Q-C02_BOM.xlsx
+LD39020 datasheet: https://www.st.com/resource/en/datasheet/ld39020.pdf
+LD56100 p3/p6: https://www.st.com/resource/en/datasheet/ld56100.pdf
+TPS62088 p5: https://www.ti.com/lit/ds/symlink/tps62088.pdf
+ST1S31 p6 and§4.5/4.6: https://www.st.com/resource/en/datasheet/st1s31.pdf
+TSZ122 p4: https://www.st.com/resource/en/datasheet/tsz122.pdf
+TCPP03 p7/p11: https://www.st.com/resource/en/datasheet/tcpp03-m20.pdf
+MX25UM51245G p60/61/95:
+https://www.mxic.com.tw/Lists/Datasheet/Attachments/9241/MX25UM51245G,%201.8V,%20512Mb,%20v1.6.pdf
+Saved exact NOR PDF: analysis/mx25um51245g.pdf

@@ -196,7 +196,13 @@ def camera_telemetry(b,folder,m):
 
 def inspect(b,folder,m,code,*,download_frame=False):
     names=bench.fields(folder)
-    p=bench.decode(b.upload(bench.PROOF,384,'proof-before.bin'),names)
+    raw=b.upload(bench.PROOF,384,'proof-before.bin')
+    p=bench.decode(raw,names)
+    # Failed capture diagnostics can disappear at subsequent shutdown. Preserve
+    # SRAM evidence before the success gates, never grant halt/idle permission.
+    if m.get('sensor_autostop'):
+        (b.output.parent/'proof-before.bin').write_bytes(raw)
+        bench.sensor_autostop_retain(b,m,p,code,0,b.output.parent,names,'cold-retained')
     validate_proof(p,m)
     card=bench.card_snapshot(b,m,p,'before')
     slots=(bench.magic_snapshot(b,m,p,'before',card) if m.get('magic_format') else
@@ -206,6 +212,8 @@ def inspect(b,folder,m,code,*,download_frame=False):
         if b.upload(start,end-start,f'code-{index}.bin')!=code[start-bench.LOAD:end-bench.LOAD]:
             raise ValueError('Immutable early/late receiver code changed')
     whole=bench.frame_guards(b,m,p)
+    sensor_autostop=bench.sensor_autostop_snapshot(b,m,p,'before')
+    board_eth=bench.board_eth_snapshot(b,m,p,'before')
     if struct.unpack('<I',b.upload(m['system_core_clock'],4,'clock.bin'))!=(400000000,):
         raise ValueError('CPU clock differs from qualified profile')
     if bench.decode(b.upload(bench.PROOF,384,'proof-before-halt.bin'),names)!=p:
@@ -214,7 +222,8 @@ def inspect(b,folder,m,code,*,download_frame=False):
     context=bench.sd.context_proof(b,{m['park']},'completed')
     result=dict(passed=True,kind='raw-flash-inspection',proof=p,context=context,card=card,
         slots=slots,loader_words=loader,sd_payload_integrity_verified=False,
-        binary_sha256=sha(code),halt_after_success_idle_only=True,whole_image=whole)
+        binary_sha256=sha(code),halt_after_success_idle_only=True,whole_image=whole,
+        sensor_autostop=sensor_autostop,board_eth=board_eth)
     result['camera_telemetry']=camera_telemetry(b,folder,m)
     if m.get('cycle_trace'):
         expected=dict(address=0x343FB000,words=256,schema=1,clock_hz=400000000,

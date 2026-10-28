@@ -15,15 +15,16 @@
 <text x="380" y="331.8" font-family="Segoe UI,Arial,sans-serif" font-size="20" font-weight="400" fill="#52687a">JP1 ON for bring-up</text>
 <polyline points="620,280 700,280" fill="none" stroke="#146a94" stroke-width="4"/>
 <rect x="700" y="205" width="245" height="150" rx="6" fill="#f1f7fb" stroke="#146a94" stroke-width="2"/>
-<text x="720" y="248.0" font-family="Segoe UI,Arial,sans-serif" font-size="25" font-weight="700" fill="#183047">JS110 (optional)</text>
+<text x="720" y="248.0" font-family="Segoe UI,Arial,sans-serif" font-size="25" font-weight="700" fill="#183047">JS110 in series</text>
 <text x="720" y="295.32" font-family="Segoe UI,Arial,sans-serif" font-size="23" font-weight="400" fill="#183047">IN+ → OUT+</text>
 <text x="720" y="331.8" font-family="Segoe UI,Arial,sans-serif" font-size="20" font-weight="400" fill="#52687a">5 V measurement</text>
 <polyline points="945,280 1030,280" fill="none" stroke="#146a94" stroke-width="4"/>
 <rect x="1030" y="205" width="515" height="205" rx="6" fill="#f1f7fb" stroke="#146a94" stroke-width="2"/>
-<text x="1050" y="248.84" font-family="Segoe UI,Arial,sans-serif" font-size="26" font-weight="700" fill="#183047">NUCLEO target: CN9 pin 2</text>
+<text x="1050" y="248.0" font-family="Segoe UI,Arial,sans-serif" font-size="25" font-weight="700" fill="#183047">NUCLEO target: CN5 pin 5 / 5V</text>
 <text x="1050" y="290.48" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="700" fill="#aa3737">All CN9 source shunts REMOVED</text>
-<text x="1050" y="328.48" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#183047">CN8 USB and VIN disconnected</text>
-<text x="1050" y="367.64" font-family="Segoe UI,Arial,sans-serif" font-size="21" font-weight="400" fill="#183047">Common GND: Arduino CN14 pin 7</text>
+<text x="1050" y="326.8" font-family="Segoe UI,Arial,sans-serif" font-size="20" font-weight="400" fill="#183047">External/LTC supply: CN8 + VIN unplugged</text>
+<text x="1050" y="367.64" font-family="Segoe UI,Arial,sans-serif" font-size="21" font-weight="400" fill="#183047">Common return: CN5 pin 6 / GND</text>
+<text x="1050" y="395.12" font-family="Segoe UI,Arial,sans-serif" font-size="18" font-weight="400" fill="#52687a">Keep existing JS ground / voltage-sense wiring</text>
 <polyline points="1275,410 1275,470" fill="none" stroke="#146a94" stroke-width="4"/>
 <rect x="1030" y="470" width="515" height="168" rx="6" fill="#f1f7fb" stroke="#146a94" stroke-width="2"/>
 <text x="1050" y="513.16" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="700" fill="#183047">Keep stock downstream regulators</text>
@@ -55,7 +56,8 @@
 <text x="820" y="920.48" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="700" fill="#aa3737">R125 unfitted; label AREF 1.8 V</text>
 <text x="820" y="951.64" font-family="Segoe UI,Arial,sans-serif" font-size="21" font-weight="400" fill="#183047">100 nF + ~1 µF at NAND VCC / GND</text>
 <text x="820" y="979.96" font-family="Segoe UI,Arial,sans-serif" font-size="19" font-weight="400" fill="#aa3737">CN12.13 is NOT ground. Keep R104 fitted.</text>
-<text x="50" y="1050.16" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="700" fill="#183047">Before power: verify supply isolation and 1.8 V wiring with a meter.</text>
-<text x="50" y="1092.48" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#52687a">This rework does not implement NAND saving, RUN/HOLD or final shutdown firmware.</text>
-<text x="50" y="1134.48" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#52687a">Main battery OFF current and debugger backfeed still require separate qualification.</text>
+<text x="50" y="1038.48" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="700" fill="#183047">Bench-source option: CN8 → CN9.3 → JS110 IN+; the same OUT+ → CN5.5 and GND → CN5.6.</text>
+<text x="50" y="1076.48" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#183047">Use one upstream source. CN5.5 is the same target 5V net as old CN9.2; no parallel power feed.</text>
+<text x="50" y="1113.64" font-family="Segoe UI,Arial,sans-serif" font-size="21" font-weight="400" fill="#52687a">NAND conversion shown above is deferred; the active SD prototype keeps its GPIO banks at 3.3 V.</text>
+<text x="50" y="1151.64" font-family="Segoe UI,Arial,sans-serif" font-size="21" font-weight="400" fill="#52687a">Plan only: no physical power move, LTC installation or new isolation/energy result is implied.</text>
 </svg>

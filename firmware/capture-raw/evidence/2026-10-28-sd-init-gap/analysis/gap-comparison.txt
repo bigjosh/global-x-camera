@@ -1,0 +1,308 @@
+Cold SD-gap diagnostic comparison; first5ms excluded.
+Run | group | energy mJ | onset->plateau ms | peak1ms mA | peak10ms mA | SD init ms | scan/prep ms | write ms
+normal01 | normal | 172.016 | 409.871 | 193.140 | 159.904 | 103.291 | 84.583 | 164.597
+normal02 | normal | 173.653 | 413.880 | 193.153 | 159.778 | 106.757 | 85.154 | 164.339
+normal03 | normal | 186.764 | 443.547 | 193.320 | 159.785 | 113.184 | 85.873 | 187.042
+control-before | normal | 166.444 | 400.319 | 192.758 | 158.947 | 90.437 | 87.868 | 164.436
+cold-gap01 | gap | 223.830 | 657.320 | 128.778 | 125.527 | 98.838 | 88.426 | 164.344
+cold-gap02 | gap | 226.790 | 664.748 | 128.802 | 125.460 | 105.397 | 88.969 | 164.556
+control-after | normal | 195.915 | 465.124 | 192.794 | 159.090 | 109.797 | 89.484 | 208.274
+
+{
+  "fresh_normal": {
+    "post5ms_energy_mJ": {
+      "mean": 181.17979497729476,
+      "median": 181.17979497729476,
+      "min": 166.4441621313477,
+      "max": 195.9154278232418
+    },
+    "onset_to_plateau_ms": {
+      "mean": 432.72125,
+      "median": 432.72125,
+      "min": 400.31899999999996,
+      "max": 465.12350000000004
+    },
+    "first_strobe_ms": {
+      "mean": 24.75325,
+      "median": 24.75325,
+      "min": 24.7325,
+      "max": 24.774
+    },
+    "peak_1ms_mA": {
+      "mean": 192.77612783014774,
+      "median": 192.77612783014774,
+      "min": 192.75837441533804,
+      "max": 192.79388124495745
+    },
+    "peak_1ms_at_ms": {
+      "mean": 72.35,
+      "median": 72.35,
+      "min": 72.3,
+      "max": 72.4
+    },
+    "peak_10ms_mA": {
+      "mean": 159.01841221358626,
+      "median": 159.01841221358626,
+      "min": 158.946714778617,
+      "max": 159.0901096485555
+    },
+    "SD_init_ms": {
+      "mean": 100.11675000000001,
+      "median": 100.11675000000001,
+      "min": 90.43650000000001,
+      "max": 109.79700000000001
+    },
+    "scan_prep_ms": {
+      "mean": 88.67575,
+      "median": 88.67575,
+      "min": 87.8675,
+      "max": 89.484
+    },
+    "slot_ms": {
+      "mean": 186.35500000000002,
+      "median": 186.35500000000002,
+      "min": 164.436,
+      "max": 208.274
+    }
+  },
+  "gap": {
+    "post5ms_energy_mJ": {
+      "mean": 225.31013937380771,
+      "median": 225.31013937380771,
+      "min": 223.82995788915736,
+      "max": 226.79032085845805
+    },
+    "onset_to_plateau_ms": {
+      "mean": 661.03375,
+      "median": 661.03375,
+      "min": 657.32,
+      "max": 664.7475000000001
+    },
+    "first_strobe_ms": {
+      "mean": 25.060000000000002,
+      "median": 25.060000000000002,
+      "min": 24.985500000000002,
+      "max": 25.1345
+    },
+    "peak_1ms_mA": {
+      "mean": 128.78988417237997,
+      "median": 128.78988417237997,
+      "min": 128.7775437682867,
+      "max": 128.80222457647324
+    },
+    "peak_1ms_at_ms": {
+      "mean": 24.9,
+      "median": 24.9,
+      "min": 24.8,
+      "max": 25.0
+    },
+    "peak_10ms_mA": {
+      "mean": 125.49344402775168,
+      "median": 125.49344402775168,
+      "min": 125.46032281816005,
+      "max": 125.52656523734332
+    },
+    "SD_init_ms": {
+      "mean": 102.11775,
+      "median": 102.11775,
+      "min": 98.8385,
+      "max": 105.397
+    },
+    "scan_prep_ms": {
+      "mean": 88.69725,
+      "median": 88.69725,
+      "min": 88.426,
+      "max": 88.9685
+    },
+    "slot_ms": {
+      "mean": 164.45024999999998,
+      "median": 164.45024999999998,
+      "min": 164.344,
+      "max": 164.5565
+    },
+    "gap_ms": {
+      "mean": 201.47125,
+      "median": 201.47125,
+      "min": 201.4065,
+      "max": 201.536
+    },
+    "gap_last100ms_mean_mA": {
+      "mean": 42.75671252526343,
+      "median": 42.75671252526343,
+      "min": 42.74463910738007,
+      "max": 42.768785943146796
+    },
+    "gap_energy_mJ": {
+      "mean": 42.963989742357285,
+      "median": 42.963989742357285,
+      "min": 42.93811915492266,
+      "max": 42.98986032979191
+    }
+  },
+  "historical_normal_context": {
+    "post5ms_energy_mJ": {
+      "mean": 177.47753240331076,
+      "median": 173.65261511383764,
+      "min": 172.01627140889318,
+      "max": 186.76371068720147
+    },
+    "onset_to_plateau_ms": {
+      "mean": 422.43216666666666,
+      "median": 413.8795,
+      "min": 409.87050000000005,
+      "max": 443.54650000000004
+    },
+    "first_strobe_ms": {
+      "mean": 24.982333333333333,
+      "median": 24.965999999999998,
+      "min": 24.883,
+      "max": 25.098
+    },
+    "peak_1ms_mA": {
+      "mean": 193.20446345955133,
+      "median": 193.1534531340003,
+      "min": 193.14028412103653,
+      "max": 193.31965312361717
+    },
+    "peak_1ms_at_ms": {
+      "mean": 72.60000000000001,
+      "median": 72.6,
+      "min": 72.5,
+      "max": 72.7
+    },
+    "peak_10ms_mA": {
+      "mean": 159.82248906753958,
+      "median": 159.78547430075704,
+      "min": 159.7777944803238,
+      "max": 159.9041984215379
+    },
+    "SD_init_ms": {
+      "mean": 107.74399999999999,
+      "median": 106.757,
+      "min": 103.2915,
+      "max": 113.18350000000001
+    },
+    "scan_prep_ms": {
+      "mean": 85.20316666666666,
+      "median": 85.154,
+      "min": 84.583,
+      "max": 85.8725
+    },
+    "slot_ms": {
+      "mean": 171.99266666666668,
+      "median": 164.5975,
+      "min": 164.339,
+      "max": 187.0415
+    }
+  }
+}
+
+Measured gap cost and whole-board excess above its quiet floor:
+[
+  {
+    "run": "cold-gap01",
+    "gap_floor_current_mA": 42.768785943146796,
+    "gap_floor_power_mW": 213.30114640943705,
+    "gap_full_energy_mJ": 42.98986032979191,
+    "post5ms_energy_mJ": 223.82995788915736,
+    "post5ms_energy_excluding_measured_gap_mJ": 180.84009755936546,
+    "fresh_normal_reference_energy_mJ": 181.17979497729476,
+    "additional_energy_vs_fresh_normal_mJ": 42.650162911862594,
+    "remaining_difference_after_removing_measured_gap_mJ": -0.3396974179293011,
+    "phase_excess": [
+      {
+        "phase": "camera_strobe_to_validated_STOP",
+        "duration_ms": 57.78,
+        "mean_current_mA": 103.76412233649812,
+        "excess_current_above_gap_mA": 60.99533639335132,
+        "energy_mJ": 29.831475413322448,
+        "gap_floor_energy_for_same_duration_mJ": 12.324540239537274,
+        "excess_energy_above_gap_mJ": 17.506935173785173
+      },
+      {
+        "phase": "SD_initialization",
+        "duration_ms": 98.8385,
+        "mean_current_mA": 79.81536542186123,
+        "excess_current_above_gap_mA": 37.046579478714435,
+        "energy_mJ": 39.27563277062774,
+        "gap_floor_energy_for_same_duration_mJ": 21.082365359389144,
+        "excess_energy_above_gap_mJ": 18.193267411238594
+      },
+      {
+        "phase": "SCR_scan_write_preparation",
+        "duration_ms": 88.426,
+        "mean_current_mA": 70.24855737650884,
+        "excess_current_above_gap_mA": 27.479771433362046,
+        "energy_mJ": 30.94612836073339,
+        "gap_floor_energy_for_same_duration_mJ": 18.861367172400882,
+        "excess_energy_above_gap_mJ": 12.084761188332507
+      },
+      {
+        "phase": "slot_transport",
+        "duration_ms": 164.344,
+        "mean_current_mA": 85.9393787693655,
+        "excess_current_above_gap_mA": 43.17059282621871,
+        "energy_mJ": 70.32381407700478,
+        "gap_floor_energy_for_same_duration_mJ": 35.05476360551253,
+        "excess_energy_above_gap_mJ": 35.26905047149226
+      }
+    ]
+  },
+  {
+    "run": "cold-gap02",
+    "gap_floor_current_mA": 42.74463910738007,
+    "gap_floor_power_mW": 213.17405815139412,
+    "gap_full_energy_mJ": 42.93811915492266,
+    "post5ms_energy_mJ": 226.79032085845805,
+    "post5ms_energy_excluding_measured_gap_mJ": 183.8522017035354,
+    "fresh_normal_reference_energy_mJ": 181.17979497729476,
+    "additional_energy_vs_fresh_normal_mJ": 45.610525881163284,
+    "remaining_difference_after_removing_measured_gap_mJ": 2.672406726240638,
+    "phase_excess": [
+      {
+        "phase": "camera_strobe_to_validated_STOP",
+        "duration_ms": 57.7845,
+        "mean_current_mA": 103.72863189857785,
+        "excess_current_above_gap_mA": 60.98399279119778,
+        "energy_mJ": 29.821918764218687,
+        "gap_floor_energy_for_same_duration_mJ": 12.318156363249233,
+        "excess_energy_above_gap_mJ": 17.503762400969453
+      },
+      {
+        "phase": "SD_initialization",
+        "duration_ms": 105.397,
+        "mean_current_mA": 80.03692540552913,
+        "excess_current_above_gap_mA": 37.292286298149065,
+        "energy_mJ": 41.99966041876375,
+        "gap_floor_energy_for_same_duration_mJ": 22.467906206982487,
+        "excess_energy_above_gap_mJ": 19.531754211781266
+      },
+      {
+        "phase": "SCR_scan_write_preparation",
+        "duration_ms": 88.9685,
+        "mean_current_mA": 70.23690753350625,
+        "excess_current_above_gap_mA": 27.492268426126188,
+        "energy_mJ": 31.131172839105126,
+        "gap_floor_energy_for_same_duration_mJ": 18.96577619264231,
+        "excess_energy_above_gap_mJ": 12.165396646462817
+      },
+      {
+        "phase": "slot_transport",
+        "duration_ms": 164.5565,
+        "mean_current_mA": 86.01238742955519,
+        "excess_current_above_gap_mA": 43.26774832217512,
+        "energy_mJ": 70.4725714841038,
+        "gap_floor_energy_for_same_duration_mJ": 35.079176900189886,
+        "excess_energy_above_gap_mJ": 35.39339458391391
+      }
+    ]
+  }
+]
+
+Camera2->3 is directly comparable across all cold runs; camera2->11 is available only for gap runs and includes validation/STOP overhead.
+Actual capture, SD and whole-board demand may overlap; phase attribution is temporal, not per-component power.
+Excess over the quiet-gap floor subtracts whole-board mean power for an equal duration; it includes changing CPU/card/camera work and is not a measurement of a component rail or guaranteed removable energy.
+Artificial waiting adds energy and changes SD startup history; it is a diagnostic experiment, not automatically a better capture policy.
+Removing measured gap energy arithmetically does not predict a zero-gap implementation: ordering, timing and card startup history also changed.
+Card latency/slot occupancy varies; preserve per-run data and means/medians rather than assigning all timing changes to the gap.
+Native GPIO11/12 validates the gap boundary; RAM proof/readback remains separate evidence.

@@ -85,7 +85,7 @@ def mock_header():
 
 
 class SdDriverTests(unittest.TestCase):
-    def run_scripted_register_protocol_and_failures(self, width, speed=3, compensation=0, negedge=0, initial_negedge=0, review_profile=0, high_speed=0, mixed_slew=0, high_fixed=0, combined=0, idma_read=0, startup_opt=0, early_run_clock=0):
+    def run_scripted_register_protocol_and_failures(self, width, speed=3, compensation=0, negedge=0, initial_negedge=0, review_profile=0, high_speed=0, mixed_slew=0, high_fixed=0, combined=0, idma_read=0, startup_opt=0, early_run_clock=0, clk_speed=-1, read_diagnostics=0):
         compiler = shutil.which('clang++') or shutil.which('g++')
         self.assertIsNotNone(compiler, 'Native C++ compiler required')
         with tempfile.TemporaryDirectory(prefix='sd-driver-') as temp:
@@ -106,14 +106,82 @@ class SdDriverTests(unittest.TestCase):
                             f'-DSD_IDMA_READ={idma_read}',
                             f'-DSD_STARTUP_OPT={startup_opt}',
                             f'-DSD_EARLY_RUN_CLOCK={early_run_clock}',
+                            f'-DSD_CLK_GPIO_SPEED={clk_speed}',
+                            f'-DSD_READ_DIAGNOSTICS={read_diagnostics}',
                             f'-DSD_HIGH_SPEED_COMBINED_ELECTRICAL={combined}',
                             '-I', str(temp), '-I', str(HERE),
-                            str(HERE/('test_sd_early_clock.cpp' if early_run_clock else 'test_sd_startup.cpp' if startup_opt else 'test_sd_idma_read.cpp' if idma_read else 'test_sd_high_speed.cpp' if high_speed else 'test_sd_driver.cpp')), str(hook),
+                            str(HERE/('test_sd_read_diagnostics.cpp' if read_diagnostics else 'test_sd_clk_slew.cpp' if clk_speed != -1 else 'test_sd_early_clock.cpp' if early_run_clock else 'test_sd_startup.cpp' if startup_opt else 'test_sd_idma_read.cpp' if idma_read else 'test_sd_high_speed.cpp' if high_speed else 'test_sd_driver.cpp')), str(hook),
                             '-o', str(executable)],
                            check=True)
             completed = subprocess.run([str(executable)], text=True, capture_output=True)
             self.assertEqual(completed.returncode, 0, completed.stdout+completed.stderr)
             self.assertIn('protocol cases passed', completed.stdout)
+
+    def test_read_diagnostics_pio_and_idma(self):
+        for idma in (0,1):
+            with self.subTest(idma=idma):
+                self.run_scripted_register_protocol_and_failures(4,negedge=1,initial_negedge=1,
+                    review_profile=1,startup_opt=1,idma_read=idma,read_diagnostics=1)
+
+    def test_arm_read_diagnostics_compile_and_disabled_equivalence(self):
+        from test_cycle_trace_driver import ARM_BIN, allocatable_sections
+        with tempfile.TemporaryDirectory(prefix='sd-read-diag-arm-') as temp:
+            for idma in (0,1):
+                sections=[]
+                for option in (None,0,1):
+                    obj=Path(temp)/f'read-{idma}-{option}.o'
+                    subprocess.run([str(ARM_BIN/'arm-none-eabi-gcc.exe'),'-std=c11','-Os',
+                        '-Wall','-Wextra','-Werror','-mcpu=cortex-m55','-mthumb',
+                        '-DSTM32N657xx','-DCPU_IN_SECURE_STATE','-DSD_BUS_WIDTH=4',
+                        '-DSD_REVIEW_PROFILE=1','-DSD_STARTUP_OPT=1','-DSD_CLOCK_NEGEDGE=1',
+                        '-DSD_CLOCK_NEGEDGE_INIT=1',f'-DSD_IDMA_READ={idma}',
+                        *([] if option is None else [f'-DSD_READ_DIAGNOSTICS={option}']),
+                        '-I'+str(CMSIS/'Include'),'-I'+str(CMSIS/'Device/ST/STM32N6xx/Include'),
+                        '-c',str(HERE/'sd_card.c'),'-o',str(obj)],check=True)
+                    sections.append(allocatable_sections(obj))
+                self.assertEqual(sections[0],sections[1])
+                self.assertNotEqual(sections[0],sections[2])
+
+    def test_clk_only_slew_protocol_and_failures(self):
+        for clk_speed in (3, 2, 1):
+            with self.subTest(clk_speed=clk_speed):
+                self.run_scripted_register_protocol_and_failures(4, negedge=1,
+                    initial_negedge=1, review_profile=1, startup_opt=1, clk_speed=clk_speed)
+
+    def test_arm_clk_only_slew_compile_and_gates(self):
+        from test_cycle_trace_driver import ARM_BIN, allocatable_sections
+        flags={'SD_BUS_WIDTH':4, 'SD_REVIEW_PROFILE':1, 'SD_STARTUP_OPT':1,
+               'SD_CLOCK_NEGEDGE':1, 'SD_CLOCK_NEGEDGE_INIT':1, 'SD_CLK_GPIO_SPEED':3}
+        with tempfile.TemporaryDirectory(prefix='sd-clk-arm-') as temp:
+            def compile_options(options, name, success=True):
+                obj=Path(temp)/f'{name}.o'
+                result=subprocess.run([str(ARM_BIN/'arm-none-eabi-gcc.exe'), '-std=c11', '-Os',
+                    '-Wall','-Wextra','-Werror','-mcpu=cortex-m55','-mthumb',
+                    '-DSTM32N657xx','-DCPU_IN_SECURE_STATE',
+                    *[f'-D{k}={v}' for k,v in options.items()],
+                    '-I'+str(CMSIS/'Include'),'-I'+str(CMSIS/'Device/ST/STM32N6xx/Include'),
+                    '-c',str(HERE/'sd_card.c'),'-o',str(obj)],capture_output=True,text=True)
+                self.assertEqual(result.returncode==0,success,result.stderr)
+                return allocatable_sections(obj) if success else None
+            speed_sections={speed:compile_options(flags|{'SD_CLK_GPIO_SPEED':speed},f'speed{speed}')
+                            for speed in (3,2,1)}
+            for speed in (2,1):
+                control,candidate=speed_sections[3],speed_sections[speed]
+                self.assertEqual(control.keys(),candidate.keys())
+                changed=[name for name in control if control[name]!=candidate[name]]
+                self.assertEqual(changed,['.data'])
+                self.assertEqual(control['.data'][:3],candidate['.data'][:3])
+                self.assertEqual(control['.data'][3],(3).to_bytes(4,'little'))
+                self.assertEqual(candidate['.data'][3],speed.to_bytes(4,'little'))
+            legacy={k:v for k,v in flags.items() if k!='SD_CLK_GPIO_SPEED'}
+            self.assertEqual(compile_options(legacy,'omitted'),
+                             compile_options(legacy|{'SD_CLK_GPIO_SPEED':-1},'disabled'))
+            for index,change in enumerate(({'SD_CLK_GPIO_SPEED':0},{'SD_CLK_GPIO_SPEED':4},
+                    {'SD_CLK_GPIO_SPEED':-2},{'SD_BUS_WIDTH':1},{'SD_REVIEW_PROFILE':0},
+                    {'SD_STARTUP_OPT':0},{'SD_CLOCK_NEGEDGE_INIT':0},
+                    {'SD_GPIO_SPEED':2},{'SD_FIXED_COMPENSATION':1},
+                    {'SD_HIGH_SPEED':1},{'SD_EARLY_RUN_CLOCK':1},{'SD_IDMA_READ':1})):
+                compile_options(flags|change,f'refused{index}',success=False)
 
     def test_early_run_clock_protocol_and_failures(self):
         self.run_scripted_register_protocol_and_failures(4, negedge=1, initial_negedge=1,

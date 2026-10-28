@@ -425,6 +425,7 @@ MockReg& MockReg::operator=(uint32_t input)
     if(this==&test_gpio_c.OSPEEDR && bad_gpio_speed_write==1U) value^=1U<<4;
     if(this==&test_gpio_e.OSPEEDR && bad_gpio_speed_write==2U) value^=1U<<8;
     if(this==&test_gpio_c.OSPEEDR && bad_gpio_speed_write==3U) value^=1U<<2;
+    if(this==&test_gpio_e.OSPEEDR && bad_gpio_speed_write==4U) test_gpio_c.OSPEEDR.value^=1U<<4;
     if(this==&test_sd.CLKCR && drop_width_write) value&=~SDMMC_CLKCR_WIDBUS;
     if(this==&test_sd.CLKCR && drop_negedge_write) value&=~SDMMC_CLKCR_NEGEDGE;
     if (this==&test_sd.ICR) test_sd.STA.value&=~input;

@@ -40,6 +40,13 @@ def audit_layout(code,symbols,listing,begin,end):
         # an awake build; retained functions must obey their declared section.
         if name in parsed and not begin<=parsed[name]<end:
             raise ValueError('Late function outside late range: '+name)
+    # Optional board power management must never increase the early boot path
+    # or become callable before the independently checked late load.
+    for name,address in parsed.items():
+        if name.startswith(('beth_','ast_')) or name in ('board_eth_powerdown_once','magic_sd_init_gap',
+                'raw_sensor_autostop_begin','raw_sensor_autostop_finish'):
+            if not begin<=address<end:
+                raise ValueError('Board Ethernet helper outside late range: '+name)
     # The vector table ends at the first code address, which can precede Reset.
     first_code=min(int(m[1],16) for m in re.finditer(
         r'^([0-9a-f]+) [Tt] \S+$',symbols,re.M))
@@ -64,7 +71,7 @@ def audit_layout(code,symbols,listing,begin,end):
         address,target=int(m[1],16),int(m[3],16)
         if m[4]=='raw_late_load': loader_calls.append(address)
         if address<begin and begin<=target<end:
-            allowed=m[4] in ('raw_storage_execute','status_led_complete_sleep')
+            allowed=m[4] in ('raw_storage_execute','status_led_complete_sleep','raw_sensor_autostop_begin')
             if m[4]=='complete_storage' and owner=='raw_capture_fail': allowed=True
             if not allowed:
                 raise ValueError('Unreviewed early-to-late branch: '+line.strip())
@@ -72,6 +79,12 @@ def audit_layout(code,symbols,listing,begin,end):
     storage=[v['address'] for v in cross if v['name']=='raw_storage_execute']
     if len(loader_calls)!=1 or len(storage)!=1 or storage[0]<=loader_calls[0]:
         raise ValueError('Storage entry must follow the sole checked late load')
+    ast_begin=[v['address'] for v in cross if v['name']=='raw_sensor_autostop_begin']
+    if 'raw_sensor_autostop_begin' in parsed and (len(ast_begin)!=1 or
+            not loader_calls[0]<ast_begin[0]<storage[0]):
+        raise ValueError('Single-frame readback must follow checked late load and precede storage')
+    if 'raw_sensor_autostop_begin' in parsed and not begin<=parsed['rd16']<end:
+        raise ValueError('Single-frame rd16 must remain in the checked late range')
     return dict(vectors_early=True,early_irq_symbols=True,direct_crossings=cross,
                 loader_call=loader_calls[0],storage_call=storage[0])
 

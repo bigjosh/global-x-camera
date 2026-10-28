@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "hardware_access": false,
+  "installed_source": "tmp/bringup/error-relocate-20261026/flash-normal-v2",
+  "installed_receiver_sha256": "fd37dde1ac7e26918346eafd0d5ecc20f0551553fff82bd0126b716cf6d7303a",
+  "finding": "A successful isolated warm LBA0 read does not qualify the normal cold camera-and-save sequence, and does not contradict a four-blink normal-cycle error.",
+  "normal_scan": {
+    "source": "flash-normal-v2/magic_slots.c:28-43; magic_slots.h:12",
+    "read_size_bytes": 512,
+    "lbas": "0, 3730, 7460, ... until the first header whose initial word equals the card's erased word",
+    "stride_sectors": 3730,
+    "successful_count_semantics": "scan_headers and read_sectors increment only after sd_read_blocks succeeds; they exclude the failed read",
+    "failure_inference": "For fresh RAW result0x324, slot error4 and CMD17 scan failure, failed LBA = scan_headers * 3730. This is source-derived; no retained command-argument field is implied.",
+    "content_scope": "Distinct slot headers can contain different metadata and leading image bytes, so repeated LBA0 does not exercise all scanned data patterns. Do not assume the current failed slot without retained status."
+  },
+  "other_differences": [
+    "Normal flash starts and arms camera acquisition before storage work. The isolated READ diagnostic holds sensor PO5 reset low, with no camera DMA/start.",
+    "Normal sd_progress calls raw_capture_poll while capture_active (runtime.c:233); camera completion/stop and other traffic can overlap initialization or scanning.",
+    "Normal raw_magic_execute initializes the card, polls the camera, obtains SCR, opens slots, then scans headers (magic_runtime.inc:114-127). Isolated READ initializes then reads only the requested LBA0 sector.",
+    "CMD0 reinitialization of an already powered card is not a physical cold power-up. Card history, rail rise and command timing differ.",
+    "After allocation normal capture writes one 3730-sector image. The isolated diagnostics never exercise image-sector writes."
+  ],
+  "four_blink_limits": {
+    "source": "flash-normal-v2/error_codes.h:50,59-67",
+    "possibilities": "SD initialization/guard failure, SCR communication failure, or slot-scan I/O failure; code4 alone does not establish CMD17, CRC, LBA0 or an electrical cause",
+    "observer_window": "runtime.c:270-278 publishes retained nonzero result and state15 before signaling, without the later successful terminal publication. Read retained SRAM during blink display, not after Standby or reset."
+  },
+  "prior_concrete_example": {
+    "source": "tmp/bringup/error-relocate-20261026/normal-live-proof/observation.json",
+    "utc": "2026-10-26T21:56:01.554740+00:00",
+    "raw_result": 804,
+    "raw_stage": 3,
+    "sd_error": 14,
+    "command": 17,
+    "sta": 2,
+    "successful_scan_headers": 2,
+    "failed_lba_inferred": 7460,
+    "written_sectors": 0,
+    "limitation": "This earlier failure proves that normal scanning can pass LBA0 and fail later. It does not attribute either current cold attempt."
+  },
+  "run03_addendum": {
+    "source": "clk-only03-observation/observation.json",
+    "raw_result": 804,
+    "stage": 3,
+    "command": 17,
+    "sd_error": 14,
+    "sta": 2,
+    "scan_headers": 0,
+    "failed_header_lba_inferred": 0,
+    "written_sectors": 0,
+    "frame_ms_from_runtime_begin": 22.8492575,
+    "sensor_stopped_ms_from_runtime_begin": 58.79804,
+    "sd_ready_ms_from_runtime_begin": 95.9991875,
+    "implication": "The current cold failure is the same LBA0 sector used for warm READ controls, so different slot contents do not explain this case. FRAME and sensor STOP precede the scan; concurrent active camera transfer at the failed header is not supported. Cold versus warm initialization and preceding camera/peripheral history remain different.",
+    "header_model": "clk-only03-header-comparison.json: exact k8 deleted-nibble plus CRC-prefix model, byte-identical to the earlier CLK1-slew trial03 retained failure; this does not identify the electrical mechanism."
+  },
+  "next_discriminating_observation": "Repeat the exact frozen warm PIO LBA0 READ with CLK-only hookup unchanged after this cold failure, preserving the current failed operation before separately authorized recovery. A pass again isolates the difference to cold/normal versus warm/held-reset conditions, not LBA0 content; it still does not distinguish supply history, pad state, compensation, or prior camera setup."
+}

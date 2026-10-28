@@ -69,3 +69,110 @@
 **Rejected:** treating a lower-voltage research direction as performed Nucleo rework or a selected replacement power tree; claiming I/O voltage-squared savings as an equivalent whole-camera reduction. The 5 V prototype decision remains.
 **Evidence:** [related-chat coverage](../notes-bootstrap-2026-10-24.md), “Consolidate project decisions - remove 5v”, `01a1481f-598f-7542-930d-381adef2786f`, direct user clarification October 18 at 22:35:51 UTC and its surrounding analysis; [1.8 V architecture assessment](1v8-memory-assessment.md); [custom-board candidate](2026-10-14-power-tree-review.md#compact-board-candidate-not-selected).
 **Provenance:** reconstructed from the related chat retrieved during October 24 bootstrap. USB-on-battery scope is explicit user evidence; lower-voltage circuitry remains an assistant research recommendation, not an adopted modification.
+
+## 2026-10-27  Use Arduino CN5.5 and CN5.6 for the Joulescope-fed target
+
+**Why:** the user selected the Arduino power header as the canonical prototype power connection while explicitly retaining the JS110 in series. The regulated source feeds JS110 IN+, JS110 OUT+ feeds CN5.5/5V, and the common source/JS110 return connects to CN5.6/GND. This provides the requested header access while preserving the same target 5 V rail and downstream regulators. All CN9 shunts stay absent. The target-contact choice does not itself select a new upstream source: the existing CN8/CN9.3 bench source and separately configured LTC/external 5 V source remain distinct configurations.
+
+**Rejected:** retaining CN9.2 as the current target attachment in assembly instructions, bypassing the Joulescope with a direct or parallel feed, using VIN for regulated 5 V, inferring that LTC has been connected or the physical lead move completed, or treating the new contacts as a cure for remaining debugger/CN8 bypass paths. When using LTC/external 5 V, disconnect the CN9.3 source lead and unplug CN8; the existing USB-fed bench option retains its documented measurement limits.
+
+**Evidence:** direct user instruction on October27: "make CN5 pin 5 for 5V and CN5 pin 6 for GND the canonical power connection, keeping the joulescope in series." [Current connection table](nucleo-debug-isolation.md#canonical-target-power-connection--october-27); [assembly guide](../prototype/nucleo-assembly-guide.md#4-connect-ltc-power). ST MB1940 C02 manufacturing ODB++ maps CN5.5 and CN9.2/4/6 to net380/5V, CN5.6/7 to net358/GND, and CN5.8 to separate net10/VIN. [UM3417 Table16](https://www.st.com/resource/en/user_manual/um3417-stm32n6-nucleo144-board-mb1940-stmicroelectronics.pdf) confirms the header functions. No firmware or instrument operation accompanied this documentation change; historical measured wiring records remain unchanged.
+
+## 2026-10-28  Separate battery collapse from intrinsic camera power
+
+**Why:** the user moved to four series CR2032 cells through DC1863A and explicitly placed JS110 between the cells and LTC. The supplied screenshot reaches about 280 mA and 2.73 V, outside the demo's specified input range for regulated 5 V. Approximate paired voltage/current readings suggest roughly 0.6–0.7 W during several active intervals, so rising current alone is not proof of rising useful load power. U24, the Ethernet PHY, remains fitted; only D2/R23 removals are confirmed. The camera adapter's LDOs and the newly selected main-LDO SD supply are further conversion costs.
+
+**Rejected:** treating the 280 mA battery-side peak as MCU current; directly comparing it with old downstream 5 V current; asserting that the cells are permanently damaged; assigning an exact Nucleo overhead percentage from an aggregate collapsing-supply trace; reusing the old NAND model's roughly 40% custom-board saving as a measured SD result. Further rework and an energy reservoir remain proposals, not adopted hardware changes.
+
+**Evidence:** [user screenshot](../../research_notes/Camera%20power/startup%204x2032%20via%20LTC.png), direct October28 clarification that no further power removals were made, and [analysis with rail topology, reference loads and primary sources](power-cost-comparison.md#october-28-battery-side-trace-and-remaining-overhead). The 5 V output and firmware execution were not measured. No instrument operation or firmware change occurred; current hardware state and USB-source isolation must be re-established before bench work.
+
+## 2026-10-28  Establish board overhead on a stable direct 5 V baseline
+
+**Why:** the user accepted the direct regulated 5 V setup and reports the connections made with a 2 A-capable bench supply. Measuring the unchanged target before component changes separates its demand from coin-cell collapse and LTC startup/losses. Existing PD12 markers and a reset input can align phases with JS power samples without first changing the capture firmware.
+
+**Rejected:** treating a 2 A supply rating as measured proof of a stiff target rail; mixing upstream-LTC and target-5-V energy as one baseline; reusing Saleae pulse tolerances blindly for the JS110's slower digital sampling; assuming the JS GPIO shares the isolated measurement-terminal reference or requires JS220-style external Vref. GPIO wiring is proposed, not yet user-confirmed, and no new baseline has been recorded.
+
+**Evidence:** direct user hookup confirmation and [baseline/marker plan](nucleo-debug-isolation.md#direct-5-v-baseline-and-proposed-synchronized-markers--october-28), the installed build's protocol-v2 manifest, and the linked JS110 manufacturer documentation. No instrument operation or firmware modification occurred during this setup review.
+
+## 2026-10-28  Put the proposed JS marker wires on CN15
+
+**Why:** the user prefers all JS digital connections on one convenient header. CN15.21/PD12 supplies the existing phase observations, CN15.33/PD0 provides an early firmware marker to inspect, and CN15.20 is ground. Target NRST is not on CN15, so this convenience trades direct reset-release timing for a firmware boot observation; PD12 still provides the needed cycle-phase alignment.
+
+**Rejected:** inventing a CN15 equivalent of CN3.14/NRST or treating PD0 as reset release. The power wiring remains on CN5. Physical marker connection and waveform qualification remain pending; no firmware change was made.
+
+**Evidence:** user request and [revised marker table](nucleo-debug-isolation.md#direct-5-v-baseline-and-proposed-synchronized-markers--october-28); ST C02 ODB++ maps the three CN15 pins to nets162/PD12,173/PD0,358/GND and contains no CN15 contact on target NRST/net235. Historical [boot probe mapping](../../firmware/boot-timing/bench-results-2026-10-16.md) independently records PD0 and GND contacts.
+
+## 2026-10-28  Align Joulescope phase traces by native sample IDs and qualify startup separately
+
+**Why:** the confirmed CN15 connections resolve all ten driven PD12 phase markers in three cold cycles, and IN1 follows three controlled PD0 pulses. However, analog channels start at different native sample IDs, the final packed digital chunk has an unspecified valid length, and undriven GPIOs chatter during startup/recovery park. The first 5 ms also contain unqualified analog extrema. Scoped later windows remain useful for comparing board overhead without inventing a precise startup-current or instruction-entry measurement.
+
+**Rejected:** aligning raw files by array index or host callback timestamps; assigning every edge to firmware; treating PD0 as NRST; declaring a whole recording valid despite its 71 initial NaN current samples; promoting first-5-ms raw integrals or brief extrema as qualified whole-cycle energy/inrush. The corrected PD0 identity test does not erase its failed preliminary BSRR attempt or the strict IN0-silence failure while PD12 was undriven.
+
+**Evidence:** [three-run baseline, wire tests and retained limitations](evidence/2026-10-28-direct5v-gpi/README.md), native sample/hash analysis and per-run records. The installed firmware was unchanged; no independent image readback or fresh SBF check accompanied these measurements. Final normal boot returned to approximately 8.568 mA at 4.993 V.
+
+## 2026-10-28  Attribute power with matched phase controls and retain SD variability
+
+**Why:** GPIO-aligned direct5V measurements place roughly two-thirds of cold
+post5ms energy in SD transport, including the whole board's retained load.
+Identical normal warm runs vary164–384ms in that interval, far larger than
+small component changes. Matched post-STOP holds resolve0.791mA from sensor
+reset and another0.841mA from receiver disable; deferring SD lowers concurrent
+camera-period current25–32mA. These are useful incremental effects, not a
+complete partition of intrinsic MCU power and Nucleo overhead. Ethernet
+management did not acknowledge, leaving its saving unmeasured.
+
+**Rejected:** subtracting unlike warm/cold totals, treating whole-board phase
+energy as one component's power, attributing card write variability to an
+ablation without repeats, or promoting an artificial200ms hold into normal
+firmware. The sleep-path current drop remains externally observed because
+live proof could not be read; its recovery constraint is owned by the
+[RAW capture notes](../../firmware/capture-raw/NOTES.md).
+
+**Evidence:** [aligned baseline, twelve successful RAM captures, three complete
+image readbacks and final-state record](evidence/2026-10-28-aligned-ablation/README.md).
+Normal flash remained unchanged; source/binary snapshots and failed controls
+are retained with the measurement evidence.
+
+## 2026-10-28  Do not dismiss the early transient as autoranging or certify its physical peak
+
+**Why:** fixed10A and automatic-range controls both show the initial peak
+around35µs on raw range0; automatic downshift occurs later at128.5µs. Their
+first5ms charge agrees within about1.2%. Subsequent autoranging alone cannot
+explain it, but a common switch-on/measurement response and the negative
+transients remain unresolved. The raw event integrates to about3.7mJ,
+compared with hundreds of millijoules in sustained capture/save.
+
+**Rejected:** declaring the recorded approximately7.9A a calibrated physical
+inrush, treating it as coin-cell current through LTC, or adding its raw energy
+to a qualified full-cycle total. The source-side voltage does not establish
+target rail droop; direct5V hard turn-on differs from LTC soft start.
+
+**Evidence:** [fixed-range/automatic controls and SDK range interpretation](evidence/2026-10-28-aligned-ablation/README.md#initial-transient-fixed-range-versus-automatic-range).
+Both raw traces, range streams, settings restoration and qualification limits
+are retained. First5ms remain excluded from the qualified baseline windows.
+
+
+## 2026-10-28  Measure Ethernet power-down before removing hardware; compare CPU choices per completed work
+
+**Why:** with camera and SD physically disconnected, two matched LAN8742
+normal/down/restored controls reduced board-input power by182.85mW on average
+(36.76mA at5V). CPU-only400→50MHz saved13.31mW but doubled energy per completed
+synthetic update; same-binary I-cache control reduced energy per update38.76%.
+Unused SRAM RUN clock gating saved only1.59mW. The residual PHY-off board load
+cannot be called intrinsic MCU power because required regulators, buses, memory
+and other loads remain. A final missing-camera normal boot reached8.0766mA;
+warm recovery then observedSBF1/PDDS1/STOPF0, with generic trial_entry_proven:false
+retained and its cold-cycle history recorded separately.
+
+**Rejected:** treating lower clock current as automatically lower photo energy;
+adding separate control deltas as a measured combined configuration; counting
+already removedD2/R23 or already disabledU14 again; removingEthernet immediately
+when most of its awake cost can be addressed in firmware. Physical removal may
+also eliminate residual and pre-firmware power, but that additional saving is
+unmeasured. Defer regulator rework until main3.3V/auxiliary1.8V branch currents
+are measured. These are recommendations for subsequent qualification, not an
+installed production-firmware change or a measured custom-board floor.
+
+**Evidence:** [isolated Nucleo report, proofs, waveform analysis and frozen builds](evidence/2026-10-28-isolated-nucleo/README.md).
+Normal NOR unchanged; finalJSoutput disabled19:15:18UTC. The MDIO read-edge
+constraint belongs to [RAW firmware notes](../../firmware/capture-raw/NOTES.md).

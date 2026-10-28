@@ -1,0 +1,123 @@
+Normal capture PHY power comparison; native JS traces, post5ms energy only.
+
+Run | group | energy mJ | onset-to-plateau ms | SD init ms | slot transport ms | slot mean mW | plateau mA
+baseline01 | baseline | 351.127 | 591.044 | 87.293 | 370.980 | 625.023 | 8.556
+baseline02 | baseline | 221.684 | 389.727 | 90.540 | 166.641 | 603.393 | 8.688
+baseline03 | baseline | 224.824 | 396.120 | 96.584 | 164.454 | 602.228 | 8.668
+candidate01 | candidate | 172.016 | 409.871 | 103.291 | 164.597 | 431.933 | 8.662
+candidate02 | candidate | 173.653 | 413.880 | 106.757 | 164.339 | 430.564 | 8.666
+candidate03 | candidate | 186.764 | 443.547 | 113.184 | 187.042 | 432.470 | 8.663
+
+Mean comparison (retain per-run SD variability):
+{
+  "post5ms_energy_mJ": {
+    "baseline_mean": 265.8784985814315,
+    "candidate_mean": 177.47753240331076,
+    "candidate_minus_baseline": -88.40096617812071,
+    "reduction_percent": 33.24863298453066,
+    "baseline_median": 224.82394806744344,
+    "candidate_median": 173.65261511383764,
+    "candidate_minus_baseline_median": -51.1713329536058,
+    "median_reduction_percent": 22.76062376515835
+  },
+  "post5ms_duration_ms": {
+    "baseline_mean": 453.9638333333333,
+    "candidate_mean": 417.43216666666666,
+    "candidate_minus_baseline": -36.53166666666664,
+    "reduction_percent": 8.047263677025661,
+    "baseline_median": 391.12,
+    "candidate_median": 408.8795,
+    "candidate_minus_baseline_median": 17.759500000000003,
+    "median_reduction_percent": -4.5406780527715185
+  },
+  "post5ms_mean_power_mW": {
+    "baseline_mean": 583.3935001250021,
+    "candidate_mean": 425.1469452311773,
+    "candidate_minus_baseline": -158.2465548938248,
+    "reduction_percent": 27.125183064246983,
+    "baseline_median": 576.2116316373459,
+    "candidate_median": 424.86738700125886,
+    "candidate_minus_baseline_median": -151.34424463608707,
+    "median_reduction_percent": 26.265392145249088
+  },
+  "cycle_onset_to_plateau_ms": {
+    "baseline_mean": 458.9638333333333,
+    "candidate_mean": 422.43216666666666,
+    "candidate_minus_baseline": -36.53166666666664,
+    "reduction_percent": 7.959595944923759,
+    "baseline_median": 396.12,
+    "candidate_median": 413.8795,
+    "candidate_minus_baseline_median": 17.759500000000003,
+    "median_reduction_percent": -4.48336362718369
+  },
+  "strobe_from_onset_ms": {
+    "baseline_mean": 24.942333333333334,
+    "candidate_mean": 24.982333333333333,
+    "candidate_minus_baseline": 0.03999999999999915,
+    "reduction_percent": -0.16036991994867744,
+    "baseline_median": 24.98,
+    "candidate_median": 24.965999999999998,
+    "candidate_minus_baseline_median": -0.014000000000002899,
+    "median_reduction_percent": 0.05604483586870712
+  },
+  "SD_init_ms": {
+    "baseline_mean": 91.47233333333332,
+    "candidate_mean": 107.74399999999999,
+    "candidate_minus_baseline": 16.27166666666666,
+    "reduction_percent": -17.78862096735989,
+    "baseline_median": 90.5405,
+    "candidate_median": 106.757,
+    "candidate_minus_baseline_median": 16.21650000000001,
+    "median_reduction_percent": -17.91076921377728
+  },
+  "SD_ready_to_first_submission_ms": {
+    "baseline_mean": 82.142,
+    "candidate_mean": 85.20316666666666,
+    "candidate_minus_baseline": 3.061166666666665,
+    "reduction_percent": -3.726676568219256,
+    "baseline_median": 81.806,
+    "candidate_median": 85.154,
+    "candidate_minus_baseline_median": 3.347999999999999,
+    "median_reduction_percent": -4.092609344057885
+  },
+  "slot_transport_ms": {
+    "baseline_mean": 234.02499999999998,
+    "candidate_mean": 171.99266666666668,
+    "candidate_minus_baseline": -62.0323333333333,
+    "reduction_percent": 26.506712245842667,
+    "baseline_median": 166.64100000000002,
+    "candidate_median": 164.5975,
+    "candidate_minus_baseline_median": -2.043500000000023,
+    "median_reduction_percent": 1.2262888484826817
+  },
+  "slot_transport_mean_power_mW": {
+    "baseline_mean": 610.2148253245374,
+    "candidate_mean": 431.65555718342847,
+    "candidate_minus_baseline": -178.55926814110893,
+    "reduction_percent": 29.26170599774329,
+    "baseline_median": 603.3934739519301,
+    "candidate_median": 431.9332087913028,
+    "candidate_minus_baseline_median": -171.46026516062733,
+    "median_reduction_percent": 28.415995956609706
+  },
+  "slot_transport_energy_mJ": {
+    "baseline_mean": 143.82000820931296,
+    "candidate_mean": 74.24777508409818,
+    "candidate_minus_baseline": -69.57223312521478,
+    "reduction_percent": 48.37451616882169,
+    "baseline_median": 100.55009189282357,
+    "candidate_median": 71.09512633402646,
+    "candidate_minus_baseline_median": -29.454965558797113,
+    "median_reduction_percent": 29.293822615491184
+  },
+  "plateau_mA": {
+    "baseline_mean": 8.637157746550317,
+    "candidate_mean": 8.66370849133935,
+    "candidate_minus_baseline": 0.02655074478903252,
+    "reduction_percent": -0.3074014110676204,
+    "baseline_median": 8.66750751835294,
+    "candidate_median": 8.663382940371521,
+    "candidate_minus_baseline_median": -0.004124577981418298,
+    "median_reduction_percent": 0.04758666747833873
+  }
+}

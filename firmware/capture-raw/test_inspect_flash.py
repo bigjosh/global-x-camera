@@ -155,5 +155,35 @@ class FlashGuards(unittest.TestCase):
             (root/'evidence').write_bytes(b'changed')
             with self.assertRaises(ValueError):f.fresh_boot(token,'a'*64,'b'*64,now)
 
+    def test_failed_autostop_is_retained_before_rejection_and_never_halted(self):
+        p,m,code,payloads=fixture();m['sensor_autostop']=True
+        p.update(result=0x502,state=15)
+        names=f.bench.fields(HERE)
+        payloads['proof-before.bin']=struct.pack('<96I',*[p[n] for n in names])
+        with tempfile.TemporaryDirectory() as directory:
+            class B:
+                output=Path(directory)/'inspection'
+                def upload(self,address,count,name):return payloads[name]
+            with patch.object(f.bench,'sensor_autostop_retain') as retain, \
+                 patch.object(f.bench.sd,'context_proof') as context:
+                with self.assertRaisesRegex(ValueError,'not successful'):f.inspect(B(),HERE,m,code)
+                retain.assert_called_once()
+                self.assertEqual(retain.call_args.args[4],0)
+                self.assertEqual(retain.call_args.args[2],p)
+                context.assert_not_called()
+                self.assertEqual((Path(directory)/'proof-before.bin').read_bytes(),payloads['proof-before.bin'])
+
+    def test_autostop_and_ethernet_checks_precede_any_execution_control(self):
+        _,m,code,payloads=fixture()
+        for feature in ('sensor_autostop_snapshot','board_eth_snapshot'):
+            with self.subTest(feature=feature),tempfile.TemporaryDirectory() as directory:
+                class B:
+                    output=Path(directory)/'inspection'
+                    def upload(self,address,count,name):return payloads[name]
+                with patch.object(f.bench,feature,side_effect=ValueError('bad feature proof')) as proof, \
+                     patch.object(f.bench.sd,'context_proof') as context:
+                    with self.assertRaisesRegex(ValueError,'bad feature'):f.inspect(B(),HERE,m,code)
+                    proof.assert_called_once();context.assert_not_called()
+
 
 if __name__=='__main__':unittest.main()

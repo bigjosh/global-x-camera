@@ -1,0 +1,32 @@
+{
+  "passed": true,
+  "scope": "Independent offline file/source review only; not a hardware qualification",
+  "build": "tmp\\bringup\\sensor-autostop-20261028\\design\\ram-auto-v2",
+  "binary_sha256": "5bf9e515bb28d74efa3cdee21c9a9f373fedbc3c36b73dd954e136f6df348e65",
+  "binary_bytes": 32804,
+  "checked_build_passed": true,
+  "source_hashes_match": true,
+  "header": [
+    876281856,
+    875591733
+  ],
+  "configured_readback_before_start": true,
+  "config_register_writes": {
+    "0x048C": 1,
+    "0x048E": 4
+  },
+  "initial_sensor_counter_required_zero": true,
+  "normal_frame_gates_and_receiver_stop_retained": true,
+  "success_path_explicit_stop_removed": true,
+  "explicit_stop_write_counter_retained": true,
+  "bounded_autonomous_fsm2_poll": true,
+  "independent_counter_and_strobe_counts": true,
+  "stable_recheck_after_payload_before_commit": true,
+  "mirror_enabled_before_irq": true,
+  "normal_disabled_flash_receiver_prefix_sector_identical": true,
+  "normal_disabled_ram_binary_identical": false,
+  "normal_disabled_ram_comparison_note": "The generated disabled RAM control omits error_blinks; the older Ethernet RAM candidate includes them, so these are not the same build profile.",
+  "normal_binary_sha256": "312074aabf167f92f5dbe14762d145c5af64d74a1a345f6df8f76c233458171e",
+  "host_sha256": "ad3af5617948f0f6669d75c576a63bf453c0be752c91e89789ead708ff31c2ba",
+  "caution": "Receiver completion is one image; independent sensor observations can be one or two. No FLASH recovery-prefix or hardware audit is implied by this RAM-only report."
+}

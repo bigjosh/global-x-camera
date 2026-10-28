@@ -1,0 +1,2150 @@
+{
+  "run": "ram-gap01",
+  "verification_path": "tmp\\bringup\\sd-gap-20261028\\ram-gap01\\capture\\verified.json",
+  "verification_sha256": "9ea240e69ca93f67955c915c28e93bee0fd7213ec045a40c160c51910f8e0b3b",
+  "binary_sha256": "b106972b4973e0a46c25754ca417f347001b540c76fa2c0c43a3c54edaabb133",
+  "raw_gap_proof_sha256": "c3308d0c1c806770b1c48ca1a92feac3cdbac1929ade847a0a202cbe9ec1957d",
+  "gap_proof": {
+    "magic": 827343175,
+    "version": 1,
+    "state": 3,
+    "error": 0,
+    "entry": 2235114822,
+    "frame_done": 2241634279,
+    "stop_done": 2255906697,
+    "gap_begin": 2255918151,
+    "gap_end": 2335918410,
+    "target_cycles": 80000000,
+    "commands_before": 0,
+    "commands_after": 0,
+    "frame_valid": 1,
+    "stopped": 1,
+    "clock_hz": 400000000,
+    "reserved": 0
+  },
+  "checks": {
+    "current": {
+      "sha256": "186b2a1e37248e2f7e17610146984652a930c97fe29f531d92b9978bc8ca280f",
+      "hash_passed": true,
+      "contiguous": true,
+      "first_sample_id": 0,
+      "analyzed_end_exclusive": 16021530,
+      "excluded_final_chunk": false,
+      "nonfinite": 71
+    },
+    "voltage": {
+      "sha256": "6fc58008fd22aa74cfc1c97c8091c1d6c4c27e90d29deb0dc06053a5cac37ec9",
+      "hash_passed": true,
+      "contiguous": true,
+      "first_sample_id": 16128,
+      "analyzed_end_exclusive": 16037658,
+      "excluded_final_chunk": false,
+      "nonfinite": 0
+    },
+    "power": {
+      "sha256": "40a253db215a98d3cdb510389a78f9350c66b66593399f2a4c91136db47176d8",
+      "hash_passed": true,
+      "contiguous": true,
+      "first_sample_id": 16128,
+      "analyzed_end_exclusive": 16037658,
+      "excluded_final_chunk": false,
+      "nonfinite": 0
+    },
+    "gpi0": {
+      "sha256": "655971767440c0fc639ae4ca6cbded6cdf92b752127a3eaa2db1415fa171afce",
+      "hash_passed": true,
+      "contiguous": true,
+      "first_sample_id": 16128,
+      "analyzed_end_exclusive": 15916128,
+      "excluded_final_chunk": true,
+      "nonfinite": null
+    },
+    "gpi1": {
+      "sha256": "80ba255c480cbaf980212d7b2fe103518f93ebbbaaa7360e33be6f47fd134395",
+      "hash_passed": true,
+      "contiguous": true,
+      "first_sample_id": 16128,
+      "analyzed_end_exclusive": 15916128,
+      "excluded_final_chunk": true,
+      "nonfinite": null
+    }
+  },
+  "markers": [
+    {
+      "id": 1,
+      "name": "receiver_entry",
+      "sample_id": 4581293,
+      "end_sample_id": 4581298,
+      "width_us": 2.5,
+      "matching_ids": [
+        1
+      ]
+    },
+    {
+      "id": 2,
+      "name": "first_strobe_irq_observed",
+      "sample_id": 4591881,
+      "end_sample_id": 4591890,
+      "width_us": 4.5,
+      "matching_ids": [
+        2
+      ]
+    },
+    {
+      "id": 3,
+      "name": "first_frame_complete_irq_observed",
+      "sample_id": 4635607,
+      "end_sample_id": 4635619,
+      "width_us": 6.0,
+      "matching_ids": [
+        3
+      ]
+    },
+    {
+      "id": 11,
+      "name": "validated_STOP_gap_begin",
+      "sample_id": 4707406,
+      "end_sample_id": 4707451,
+      "width_us": 22.5,
+      "matching_ids": [
+        11
+      ]
+    },
+    {
+      "id": 12,
+      "name": "gap_end",
+      "sample_id": 5109700,
+      "end_sample_id": 5109749,
+      "width_us": 24.5,
+      "matching_ids": [
+        12
+      ]
+    },
+    {
+      "id": 4,
+      "name": "sd_initialization_begin",
+      "sample_id": 5109753,
+      "end_sample_id": 5109770,
+      "width_us": 8.5,
+      "matching_ids": [
+        4
+      ]
+    },
+    {
+      "id": 5,
+      "name": "sd_initialization_complete",
+      "sample_id": 5144750,
+      "end_sample_id": 5144770,
+      "width_us": 10.0,
+      "matching_ids": [
+        5
+      ]
+    },
+    {
+      "id": 6,
+      "name": "first_slot_transport_submission",
+      "sample_id": 5319018,
+      "end_sample_id": 5319043,
+      "width_us": 12.5,
+      "matching_ids": [
+        6
+      ]
+    },
+    {
+      "id": 7,
+      "name": "slot_transport_returned_success",
+      "sample_id": 5647771,
+      "end_sample_id": 5647800,
+      "width_us": 14.5,
+      "matching_ids": [
+        7
+      ]
+    },
+    {
+      "id": 8,
+      "name": "full_slot_commit_complete",
+      "sample_id": 5647817,
+      "end_sample_id": 5647850,
+      "width_us": 16.5,
+      "matching_ids": [
+        8
+      ]
+    },
+    {
+      "id": 9,
+      "name": "sd_deinitialization_complete",
+      "sample_id": 5647941,
+      "end_sample_id": 5647977,
+      "width_us": 18.0,
+      "matching_ids": [
+        9
+      ]
+    }
+  ],
+  "all_gpi0_edges": [
+    {
+      "sample_id": 4581293,
+      "level": 1
+    },
+    {
+      "sample_id": 4581298,
+      "level": 0
+    },
+    {
+      "sample_id": 4591881,
+      "level": 1
+    },
+    {
+      "sample_id": 4591890,
+      "level": 0
+    },
+    {
+      "sample_id": 4635607,
+      "level": 1
+    },
+    {
+      "sample_id": 4635619,
+      "level": 0
+    },
+    {
+      "sample_id": 4707406,
+      "level": 1
+    },
+    {
+      "sample_id": 4707451,
+      "level": 0
+    },
+    {
+      "sample_id": 5109700,
+      "level": 1
+    },
+    {
+      "sample_id": 5109749,
+      "level": 0
+    },
+    {
+      "sample_id": 5109753,
+      "level": 1
+    },
+    {
+      "sample_id": 5109770,
+      "level": 0
+    },
+    {
+      "sample_id": 5144750,
+      "level": 1
+    },
+    {
+      "sample_id": 5144770,
+      "level": 0
+    },
+    {
+      "sample_id": 5319018,
+      "level": 1
+    },
+    {
+      "sample_id": 5319043,
+      "level": 0
+    },
+    {
+      "sample_id": 5647771,
+      "level": 1
+    },
+    {
+      "sample_id": 5647800,
+      "level": 0
+    },
+    {
+      "sample_id": 5647817,
+      "level": 1
+    },
+    {
+      "sample_id": 5647850,
+      "level": 0
+    },
+    {
+      "sample_id": 5647941,
+      "level": 1
+    },
+    {
+      "sample_id": 5647977,
+      "level": 0
+    }
+  ],
+  "unclassified_edges": 0,
+  "unclassified_pulses": [],
+  "clock_alignment": {
+    "JS_samples_per_DWT_tick": 0.005026499616462772,
+    "origin_sample": 4563464.812849833,
+    "global_fit_anchor_residual_us": {
+      "3": -84.06326791783795,
+      "4": 1.6841569314710796,
+      "5": 0.951011426281184,
+      "6": 2.475150399375707,
+      "8": -1.3562851259484887,
+      "9": -0.9510114258155227
+    },
+    "mapping": "Piecewise linear between actual normal GPIO/DWT anchors; local extrapolation outside. Inferred proof timestamps retain up to100us alignment allowance; GPIO11/12 boundaries are primary.",
+    "gap_begin_after_marker11_fall_residual_us": -10.0,
+    "marker12_rise_after_gap_end_residual_us": 1.0
+  },
+  "mapped_gap_events": {
+    "entry": {
+      "tick": 2235114822,
+      "sample_id_inferred": 4602837,
+      "time_ms": 19.68609357508365
+    },
+    "frame_done": {
+      "tick": 2241634279,
+      "sample_id_inferred": 4635607,
+      "time_ms": 36.07109357508365
+    },
+    "stop_done": {
+      "tick": 2255906697,
+      "sample_id_inferred": 4707373,
+      "time_ms": 71.95409357508365
+    },
+    "gap_begin": {
+      "tick": 2255918151,
+      "sample_id_inferred": 4707431,
+      "time_ms": 71.98309357508364
+    },
+    "gap_end": {
+      "tick": 2335918410,
+      "sample_id_inferred": 5109698,
+      "time_ms": 273.11659357508364
+    }
+  },
+  "windows": {
+    "strobe_to_frame_IRQ": {
+      "start_sample_id": 4591881,
+      "end_sample_id_exclusive": 4635607,
+      "start_ms": 14.208,
+      "end_ms": 36.071,
+      "duration_ms": 21.863,
+      "current_mean": 0.10822467548819636,
+      "current_min": 0.08723655343055725,
+      "current_max": 0.142233207821846,
+      "voltage_mean": 4.975193901347289,
+      "voltage_min": 4.963832378387451,
+      "voltage_max": 4.986530780792236,
+      "power_mean": 0.5384098231296267,
+      "power_min": 0.43441373109817505,
+      "power_max": 0.7063446640968323,
+      "energy_mJ": 11.771253963083028,
+      "current_mean_mA": 108.22467548819637,
+      "finite": true,
+      "peaks_1ms": [
+        {
+          "start_sample_id": 4591881,
+          "end_sample_id_exclusive": 4593881,
+          "start_ms": 14.208,
+          "end_ms": 15.207999999999998,
+          "duration_ms": 1.0,
+          "current_mean": 0.12256686602532864,
+          "current_min": 0.11840132623910904,
+          "current_max": 0.142233207821846,
+          "voltage_mean": 4.972304659366608,
+          "voltage_min": 4.963832378387451,
+          "voltage_max": 4.977451324462891,
+          "power_mean": 0.6094356523752212,
+          "power_min": 0.5887993574142456,
+          "power_max": 0.7063446640968323,
+          "energy_mJ": 0.6094356523752213,
+          "current_mean_mA": 122.56686602532864,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "strobe_to_frame_IRQ",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "strobe_to_STOP_proof",
+              "overlap_ms": 1.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 4597681,
+          "end_sample_id_exclusive": 4599681,
+          "start_ms": 17.108,
+          "end_ms": 18.108,
+          "duration_ms": 1.0,
+          "current_mean": 0.12169954929873347,
+          "current_min": 0.11945317685604095,
+          "current_max": 0.12387093901634216,
+          "voltage_mean": 4.972532786607743,
+          "voltage_min": 4.968371868133545,
+          "voltage_max": 4.975181579589844,
+          "power_mean": 0.6051546737849712,
+          "power_min": 0.5943012237548828,
+          "power_max": 0.6158497929573059,
+          "energy_mJ": 0.6051546737849712,
+          "current_mean_mA": 121.69954929873347,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "strobe_to_frame_IRQ",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "strobe_to_STOP_proof",
+              "overlap_ms": 1.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 4594681,
+          "end_sample_id_exclusive": 4596681,
+          "start_ms": 15.608,
+          "end_ms": 16.608,
+          "duration_ms": 1.0,
+          "current_mean": 0.12157146419584751,
+          "current_min": 0.11942312121391296,
+          "current_max": 0.12429168075323105,
+          "voltage_mean": 4.972584991216659,
+          "voltage_min": 4.968371868133545,
+          "voltage_max": 4.975181579589844,
+          "power_mean": 0.6045241861641407,
+          "power_min": 0.5938806533813477,
+          "power_max": 0.6180915832519531,
+          "energy_mJ": 0.6045241861641407,
+          "current_mean_mA": 121.57146419584751,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "strobe_to_frame_IRQ",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "strobe_to_STOP_proof",
+              "overlap_ms": 1.0
+            }
+          ]
+        }
+      ],
+      "peaks_10ms": [
+        {
+          "start_sample_id": 4614681,
+          "end_sample_id_exclusive": 4634681,
+          "start_ms": 25.608,
+          "end_ms": 35.608000000000004,
+          "duration_ms": 10.0,
+          "current_mean": 0.11457396165728569,
+          "current_min": 0.11052749305963516,
+          "current_max": 0.11683858186006546,
+          "voltage_mean": 4.973982132911682,
+          "voltage_min": 4.97064208984375,
+          "voltage_max": 4.977451324462891,
+          "power_mean": 0.5698886836379766,
+          "power_min": 0.5496434569358826,
+          "power_max": 0.581558346748352,
+          "energy_mJ": 5.698886836379767,
+          "current_mean_mA": 114.5739616572857,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "strobe_to_frame_IRQ",
+              "overlap_ms": 10.0
+            },
+            {
+              "name": "strobe_to_STOP_proof",
+              "overlap_ms": 10.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 4591881,
+          "end_sample_id_exclusive": 4611881,
+          "start_ms": 14.208,
+          "end_ms": 24.208000000000002,
+          "duration_ms": 10.0,
+          "current_mean": 0.10314351021945477,
+          "current_min": 0.08723655343055725,
+          "current_max": 0.142233207821846,
+          "voltage_mean": 4.976186419630051,
+          "voltage_min": 4.963832378387451,
+          "voltage_max": 4.986530780792236,
+          "power_mean": 0.5132161862537264,
+          "power_min": 0.43441373109817505,
+          "power_max": 0.7063446640968323,
+          "energy_mJ": 5.132161862537266,
+          "current_mean_mA": 103.14351021945477,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "strobe_to_frame_IRQ",
+              "overlap_ms": 10.0
+            },
+            {
+              "name": "strobe_to_STOP_proof",
+              "overlap_ms": 10.0
+            }
+          ]
+        }
+      ]
+    },
+    "strobe_to_STOP_proof": {
+      "start_sample_id": 4591881,
+      "end_sample_id_exclusive": 4707373,
+      "start_ms": 14.208,
+      "end_ms": 71.95400000000001,
+      "duration_ms": 57.746,
+      "current_mean": 0.10014121821989158,
+      "current_min": 0.03398296236991882,
+      "current_max": 0.142233207821846,
+      "voltage_mean": 4.976755158289252,
+      "voltage_min": 4.963832378387451,
+      "voltage_max": 4.997880458831787,
+      "power_mean": 0.4983396096194335,
+      "power_min": 0.1696113795042038,
+      "power_max": 0.7063446640968323,
+      "energy_mJ": 28.777119097083805,
+      "current_mean_mA": 100.14121821989158,
+      "finite": true,
+      "peaks_1ms": [
+        {
+          "start_sample_id": 4591881,
+          "end_sample_id_exclusive": 4593881,
+          "start_ms": 14.208,
+          "end_ms": 15.207999999999998,
+          "duration_ms": 1.0,
+          "current_mean": 0.12256686602532864,
+          "current_min": 0.11840132623910904,
+          "current_max": 0.142233207821846,
+          "voltage_mean": 4.972304659366608,
+          "voltage_min": 4.963832378387451,
+          "voltage_max": 4.977451324462891,
+          "power_mean": 0.6094356523752212,
+          "power_min": 0.5887993574142456,
+          "power_max": 0.7063446640968323,
+          "energy_mJ": 0.6094356523752213,
+          "current_mean_mA": 122.56686602532864,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "strobe_to_frame_IRQ",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "strobe_to_STOP_proof",
+              "overlap_ms": 1.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 4597681,
+          "end_sample_id_exclusive": 4599681,
+          "start_ms": 17.108,
+          "end_ms": 18.108,
+          "duration_ms": 1.0,
+          "current_mean": 0.12169954929873347,
+          "current_min": 0.11945317685604095,
+          "current_max": 0.12387093901634216,
+          "voltage_mean": 4.972532786607743,
+          "voltage_min": 4.968371868133545,
+          "voltage_max": 4.975181579589844,
+          "power_mean": 0.6051546737849712,
+          "power_min": 0.5943012237548828,
+          "power_max": 0.6158497929573059,
+          "energy_mJ": 0.6051546737849712,
+          "current_mean_mA": 121.69954929873347,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "strobe_to_frame_IRQ",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "strobe_to_STOP_proof",
+              "overlap_ms": 1.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 4594681,
+          "end_sample_id_exclusive": 4596681,
+          "start_ms": 15.608,
+          "end_ms": 16.608,
+          "duration_ms": 1.0,
+          "current_mean": 0.12157146419584751,
+          "current_min": 0.11942312121391296,
+          "current_max": 0.12429168075323105,
+          "voltage_mean": 4.972584991216659,
+          "voltage_min": 4.968371868133545,
+          "voltage_max": 4.975181579589844,
+          "power_mean": 0.6045241861641407,
+          "power_min": 0.5938806533813477,
+          "power_max": 0.6180915832519531,
+          "energy_mJ": 0.6045241861641407,
+          "current_mean_mA": 121.57146419584751,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "strobe_to_frame_IRQ",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "strobe_to_STOP_proof",
+              "overlap_ms": 1.0
+            }
+          ]
+        }
+      ],
+      "peaks_10ms": [
+        {
+          "start_sample_id": 4614681,
+          "end_sample_id_exclusive": 4634681,
+          "start_ms": 25.608,
+          "end_ms": 35.608000000000004,
+          "duration_ms": 10.0,
+          "current_mean": 0.11457396165728569,
+          "current_min": 0.11052749305963516,
+          "current_max": 0.11683858186006546,
+          "voltage_mean": 4.973982132911682,
+          "voltage_min": 4.97064208984375,
+          "voltage_max": 4.977451324462891,
+          "power_mean": 0.5698886836379766,
+          "power_min": 0.5496434569358826,
+          "power_max": 0.581558346748352,
+          "energy_mJ": 5.698886836379767,
+          "current_mean_mA": 114.5739616572857,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "strobe_to_frame_IRQ",
+              "overlap_ms": 10.0
+            },
+            {
+              "name": "strobe_to_STOP_proof",
+              "overlap_ms": 10.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 4681481,
+          "end_sample_id_exclusive": 4701481,
+          "start_ms": 59.007999999999996,
+          "end_ms": 69.008,
+          "duration_ms": 10.0,
+          "current_mean": 0.1119442981697619,
+          "current_min": 0.10980622470378876,
+          "current_max": 0.11650799959897995,
+          "voltage_mean": 4.974455601716041,
+          "voltage_min": 4.97064208984375,
+          "voltage_max": 4.979721546173096,
+          "power_mean": 0.5568615994364023,
+          "power_min": 0.5463058948516846,
+          "power_max": 0.5791195631027222,
+          "energy_mJ": 5.568615994364023,
+          "current_mean_mA": 111.9442981697619,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "strobe_to_STOP_proof",
+              "overlap_ms": 10.0
+            },
+            {
+              "name": "frame_IRQ_to_STOP_proof",
+              "overlap_ms": 10.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 4591881,
+          "end_sample_id_exclusive": 4611881,
+          "start_ms": 14.208,
+          "end_ms": 24.208000000000002,
+          "duration_ms": 10.0,
+          "current_mean": 0.10314351021945477,
+          "current_min": 0.08723655343055725,
+          "current_max": 0.142233207821846,
+          "voltage_mean": 4.976186419630051,
+          "voltage_min": 4.963832378387451,
+          "voltage_max": 4.986530780792236,
+          "power_mean": 0.5132161862537264,
+          "power_min": 0.43441373109817505,
+          "power_max": 0.7063446640968323,
+          "energy_mJ": 5.132161862537266,
+          "current_mean_mA": 103.14351021945477,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "strobe_to_frame_IRQ",
+              "overlap_ms": 10.0
+            },
+            {
+              "name": "strobe_to_STOP_proof",
+              "overlap_ms": 10.0
+            }
+          ]
+        }
+      ]
+    },
+    "frame_IRQ_to_STOP_proof": {
+      "start_sample_id": 4635607,
+      "end_sample_id_exclusive": 4707373,
+      "start_ms": 36.071,
+      "end_ms": 71.95400000000001,
+      "duration_ms": 35.882999999999996,
+      "current_mean": 0.09521608302336544,
+      "current_min": 0.03398296236991882,
+      "current_max": 0.11650799959897995,
+      "voltage_mean": 4.977706409871397,
+      "voltage_min": 4.97064208984375,
+      "voltage_max": 4.997880458831787,
+      "power_mean": 0.47392540016165813,
+      "power_min": 0.1696113795042038,
+      "power_max": 0.5791195631027222,
+      "energy_mJ": 17.00586513400078,
+      "current_mean_mA": 95.21608302336544,
+      "finite": true,
+      "peaks_1ms": [
+        {
+          "start_sample_id": 4695007,
+          "end_sample_id_exclusive": 4697007,
+          "start_ms": 65.771,
+          "end_ms": 66.771,
+          "duration_ms": 1.0,
+          "current_mean": 0.11236667696014047,
+          "current_min": 0.11058759689331055,
+          "current_max": 0.11641784012317657,
+          "voltage_mean": 4.9745063304901125,
+          "voltage_min": 4.97064208984375,
+          "voltage_max": 4.977451324462891,
+          "power_mean": 0.5589684503376484,
+          "power_min": 0.5501933693885803,
+          "power_max": 0.5790504217147827,
+          "energy_mJ": 0.5589684503376484,
+          "current_mean_mA": 112.36667696014047,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "strobe_to_STOP_proof",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "frame_IRQ_to_STOP_proof",
+              "overlap_ms": 1.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 4682607,
+          "end_sample_id_exclusive": 4684607,
+          "start_ms": 59.571,
+          "end_ms": 60.571,
+          "duration_ms": 1.0,
+          "current_mean": 0.11209573574736714,
+          "current_min": 0.11046738177537918,
+          "current_max": 0.11539604514837265,
+          "voltage_mean": 4.974096641540528,
+          "voltage_min": 4.97064208984375,
+          "voltage_max": 4.977451324462891,
+          "power_mean": 0.5575746895074845,
+          "power_min": 0.549344539642334,
+          "power_max": 0.5741162896156311,
+          "energy_mJ": 0.5575746895074845,
+          "current_mean_mA": 112.09573574736714,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "strobe_to_STOP_proof",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "frame_IRQ_to_STOP_proof",
+              "overlap_ms": 1.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 4697007,
+          "end_sample_id_exclusive": 4699007,
+          "start_ms": 66.771,
+          "end_ms": 67.771,
+          "duration_ms": 1.0,
+          "current_mean": 0.1120002129226923,
+          "current_min": 0.11031711846590042,
+          "current_max": 0.1162976324558258,
+          "voltage_mean": 4.9745698835849765,
+          "voltage_min": 4.97064208984375,
+          "voltage_max": 4.979721546173096,
+          "power_mean": 0.5571525682806968,
+          "power_min": 0.5488477349281311,
+          "power_max": 0.5786018371582031,
+          "energy_mJ": 0.5571525682806969,
+          "current_mean_mA": 112.0002129226923,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "strobe_to_STOP_proof",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "frame_IRQ_to_STOP_proof",
+              "overlap_ms": 1.0
+            }
+          ]
+        }
+      ],
+      "peaks_10ms": [
+        {
+          "start_sample_id": 4681407,
+          "end_sample_id_exclusive": 4701407,
+          "start_ms": 58.971000000000004,
+          "end_ms": 68.971,
+          "duration_ms": 10.0,
+          "current_mean": 0.1119451787173748,
+          "current_min": 0.10980622470378876,
+          "current_max": 0.11650799959897995,
+          "voltage_mean": 4.974451175713539,
+          "voltage_min": 4.97064208984375,
+          "voltage_max": 4.979721546173096,
+          "power_mean": 0.5568654863476753,
+          "power_min": 0.5463058948516846,
+          "power_max": 0.5791195631027222,
+          "energy_mJ": 5.568654863476753,
+          "current_mean_mA": 111.9451787173748,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "strobe_to_STOP_proof",
+              "overlap_ms": 10.0
+            },
+            {
+              "name": "frame_IRQ_to_STOP_proof",
+              "overlap_ms": 10.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 4661407,
+          "end_sample_id_exclusive": 4681407,
+          "start_ms": 48.971000000000004,
+          "end_ms": 58.971000000000004,
+          "duration_ms": 10.0,
+          "current_mean": 0.09013385070674121,
+          "current_min": 0.08687592297792435,
+          "current_max": 0.11200007796287537,
+          "voltage_mean": 4.978583615708351,
+          "voltage_min": 4.97064208984375,
+          "voltage_max": 4.981991291046143,
+          "power_mean": 0.4487355370908976,
+          "power_min": 0.4326179027557373,
+          "power_max": 0.5569664835929871,
+          "energy_mJ": 4.4873553709089755,
+          "current_mean_mA": 90.13385070674121,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "strobe_to_STOP_proof",
+              "overlap_ms": 10.0
+            },
+            {
+              "name": "frame_IRQ_to_STOP_proof",
+              "overlap_ms": 10.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 4635607,
+          "end_sample_id_exclusive": 4655607,
+          "start_ms": 36.071,
+          "end_ms": 46.071,
+          "duration_ms": 10.0,
+          "current_mean": 0.08939576553441585,
+          "current_min": 0.0870562419295311,
+          "current_max": 0.1144493818283081,
+          "voltage_mean": 4.978802891469002,
+          "voltage_min": 4.972911834716797,
+          "voltage_max": 4.9842610359191895,
+          "power_mean": 0.4450835026279092,
+          "power_min": 0.43331819772720337,
+          "power_max": 0.5694064497947693,
+          "energy_mJ": 4.450835026279092,
+          "current_mean_mA": 89.39576553441584,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "strobe_to_STOP_proof",
+              "overlap_ms": 10.0
+            },
+            {
+              "name": "frame_IRQ_to_STOP_proof",
+              "overlap_ms": 10.0
+            }
+          ]
+        }
+      ]
+    },
+    "gap_proof": {
+      "start_sample_id": 4707431,
+      "end_sample_id_exclusive": 5109698,
+      "start_ms": 71.983,
+      "end_ms": 273.1165,
+      "duration_ms": 201.1335,
+      "current_mean": 0.04289388006307566,
+      "current_min": 0.03344201296567917,
+      "current_max": 0.05267581716179848,
+      "voltage_mean": 4.987630015189551,
+      "voltage_min": 4.979721546173096,
+      "voltage_max": 4.995610237121582,
+      "power_mean": 0.213927142266073,
+      "power_min": 0.16683554649353027,
+      "power_max": 0.2626695930957794,
+      "energy_mJ": 43.02791486897319,
+      "current_mean_mA": 42.893880063075656,
+      "finite": true,
+      "peaks_1ms": [
+        {
+          "start_sample_id": 4719831,
+          "end_sample_id_exclusive": 4721831,
+          "start_ms": 78.183,
+          "end_ms": 79.183,
+          "duration_ms": 1.0,
+          "current_mean": 0.04309156735613942,
+          "current_min": 0.034043069928884506,
+          "current_max": 0.05240534245967865,
+          "voltage_mean": 4.987352653980255,
+          "voltage_min": 4.979721546173096,
+          "voltage_max": 4.993340492248535,
+          "power_mean": 0.21490113586932422,
+          "power_min": 0.16998864710330963,
+          "power_max": 0.2612019181251526,
+          "energy_mJ": 0.21490113586932422,
+          "current_mean_mA": 43.09156735613942,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "gap_proof",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "gap_GPIO",
+              "overlap_ms": 1.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 5063231,
+          "end_sample_id_exclusive": 5065231,
+          "start_ms": 249.88299999999998,
+          "end_ms": 250.883,
+          "duration_ms": 1.0,
+          "current_mean": 0.04307270924560726,
+          "current_min": 0.033862754702568054,
+          "current_max": 0.05201465263962746,
+          "voltage_mean": 4.987407132148743,
+          "voltage_min": 4.979721546173096,
+          "voltage_max": 4.993340492248535,
+          "power_mean": 0.21480964201688765,
+          "power_min": 0.16901139914989471,
+          "power_max": 0.2592546343803406,
+          "energy_mJ": 0.21480964201688768,
+          "current_mean_mA": 43.07270924560726,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "gap_proof",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "gap_GPIO",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "gap_last100ms",
+              "overlap_ms": 1.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 4722631,
+          "end_sample_id_exclusive": 4724631,
+          "start_ms": 79.583,
+          "end_ms": 80.583,
+          "duration_ms": 1.0,
+          "current_mean": 0.04307131174206734,
+          "current_min": 0.033862754702568054,
+          "current_max": 0.05234523490071297,
+          "voltage_mean": 4.987553533792496,
+          "voltage_min": 4.981991291046143,
+          "voltage_max": 4.993340492248535,
+          "power_mean": 0.21480862016230823,
+          "power_min": 0.16901139914989471,
+          "power_max": 0.2609023153781891,
+          "energy_mJ": 0.2148086201623082,
+          "current_mean_mA": 43.07131174206734,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "gap_proof",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "gap_GPIO",
+              "overlap_ms": 1.0
+            }
+          ]
+        }
+      ],
+      "peaks_10ms": [
+        {
+          "start_sample_id": 4789631,
+          "end_sample_id_exclusive": 4809631,
+          "start_ms": 113.083,
+          "end_ms": 123.083,
+          "duration_ms": 10.0,
+          "current_mean": 0.042921816992014646,
+          "current_min": 0.03344201296567917,
+          "current_max": 0.052315182983875275,
+          "voltage_mean": 4.987795842218399,
+          "voltage_min": 4.979721546173096,
+          "voltage_max": 4.995610237121582,
+          "power_mean": 0.21407361091524363,
+          "power_min": 0.16691145300865173,
+          "power_max": 0.26075252890586853,
+          "energy_mJ": 2.140736109152436,
+          "current_mean_mA": 42.92181699201465,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "gap_proof",
+              "overlap_ms": 10.0
+            },
+            {
+              "name": "gap_GPIO",
+              "overlap_ms": 10.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 4735631,
+          "end_sample_id_exclusive": 4755631,
+          "start_ms": 86.08300000000001,
+          "end_ms": 96.083,
+          "duration_ms": 10.0,
+          "current_mean": 0.0429213391629979,
+          "current_min": 0.03380264714360237,
+          "current_max": 0.05243539437651634,
+          "voltage_mean": 4.987711972475052,
+          "voltage_min": 4.979721546173096,
+          "voltage_max": 4.995610237121582,
+          "power_mean": 0.21406773104518653,
+          "power_min": 0.16871140897274017,
+          "power_max": 0.26135170459747314,
+          "energy_mJ": 2.1406773104518653,
+          "current_mean_mA": 42.9213391629979,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "gap_proof",
+              "overlap_ms": 10.0
+            },
+            {
+              "name": "gap_GPIO",
+              "overlap_ms": 10.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 4756831,
+          "end_sample_id_exclusive": 4776831,
+          "start_ms": 96.683,
+          "end_ms": 106.683,
+          "duration_ms": 10.0,
+          "current_mean": 0.0429196877496317,
+          "current_min": 0.03374254330992699,
+          "current_max": 0.05219497159123421,
+          "voltage_mean": 4.98761788687706,
+          "voltage_min": 4.979721546173096,
+          "voltage_max": 4.995610237121582,
+          "power_mean": 0.21405540101602674,
+          "power_min": 0.16841140389442444,
+          "power_max": 0.2601533532142639,
+          "energy_mJ": 2.1405540101602676,
+          "current_mean_mA": 42.9196877496317,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "gap_proof",
+              "overlap_ms": 10.0
+            },
+            {
+              "name": "gap_GPIO",
+              "overlap_ms": 10.0
+            }
+          ]
+        }
+      ]
+    },
+    "gap_GPIO": {
+      "start_sample_id": 4707406,
+      "end_sample_id_exclusive": 5109700,
+      "start_ms": 71.9705,
+      "end_ms": 273.1175,
+      "duration_ms": 201.147,
+      "current_mean": 0.042894355534460145,
+      "current_min": 0.03344201296567917,
+      "current_max": 0.05362248048186302,
+      "voltage_mean": 4.987629969637395,
+      "voltage_min": 4.979721546173096,
+      "voltage_max": 4.995610237121582,
+      "power_mean": 0.21392951199521082,
+      "power_min": 0.16683554649353027,
+      "power_max": 0.26726844906806946,
+      "energy_mJ": 43.03127954930067,
+      "current_mean_mA": 42.894355534460146,
+      "finite": true,
+      "peaks_1ms": [
+        {
+          "start_sample_id": 4707406,
+          "end_sample_id_exclusive": 4709406,
+          "start_ms": 71.9705,
+          "end_ms": 72.97049999999999,
+          "duration_ms": 1.0,
+          "current_mean": 0.04309955391660333,
+          "current_min": 0.03344201296567917,
+          "current_max": 0.05362248048186302,
+          "voltage_mean": 4.98834685754776,
+          "voltage_min": 4.981991291046143,
+          "voltage_max": 4.995610237121582,
+          "power_mean": 0.21498404610902072,
+          "power_min": 0.16691145300865173,
+          "power_max": 0.26726844906806946,
+          "energy_mJ": 0.21498404610902072,
+          "current_mean_mA": 43.09955391660333,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "gap_proof",
+              "overlap_ms": 0.9875
+            },
+            {
+              "name": "gap_GPIO",
+              "overlap_ms": 1.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 5062806,
+          "end_sample_id_exclusive": 5064806,
+          "start_ms": 249.67049999999998,
+          "end_ms": 250.6705,
+          "duration_ms": 1.0,
+          "current_mean": 0.04308500081859529,
+          "current_min": 0.033862754702568054,
+          "current_max": 0.052164919674396515,
+          "voltage_mean": 4.987463879823685,
+          "voltage_min": 4.979721546173096,
+          "voltage_max": 4.993340492248535,
+          "power_mean": 0.21487333527952432,
+          "power_min": 0.16901139914989471,
+          "power_max": 0.26000356674194336,
+          "energy_mJ": 0.21487333527952432,
+          "current_mean_mA": 43.08500081859529,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "gap_proof",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "gap_GPIO",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "gap_last100ms",
+              "overlap_ms": 1.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 4719406,
+          "end_sample_id_exclusive": 4721406,
+          "start_ms": 77.9705,
+          "end_ms": 78.9705,
+          "duration_ms": 1.0,
+          "current_mean": 0.043081514678895476,
+          "current_min": 0.034043069928884506,
+          "current_max": 0.05240534245967865,
+          "voltage_mean": 4.987391241073609,
+          "voltage_min": 4.979721546173096,
+          "voltage_max": 4.993340492248535,
+          "power_mean": 0.2148532551601529,
+          "power_min": 0.16998864710330963,
+          "power_max": 0.2612019181251526,
+          "energy_mJ": 0.2148532551601529,
+          "current_mean_mA": 43.08151467889547,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "gap_proof",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "gap_GPIO",
+              "overlap_ms": 1.0
+            }
+          ]
+        }
+      ],
+      "peaks_10ms": [
+        {
+          "start_sample_id": 4956006,
+          "end_sample_id_exclusive": 4976006,
+          "start_ms": 196.2705,
+          "end_ms": 206.2705,
+          "duration_ms": 10.0,
+          "current_mean": 0.042921274559013546,
+          "current_min": 0.033562224358320236,
+          "current_max": 0.052315182983875275,
+          "voltage_mean": 4.987580546164513,
+          "voltage_min": 4.979721546173096,
+          "voltage_max": 4.995610237121582,
+          "power_mean": 0.21406172462031245,
+          "power_min": 0.16751143336296082,
+          "power_max": 0.2608712911605835,
+          "energy_mJ": 2.1406172462031243,
+          "current_mean_mA": 42.92127455901355,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "gap_proof",
+              "overlap_ms": 10.0
+            },
+            {
+              "name": "gap_GPIO",
+              "overlap_ms": 10.0
+            },
+            {
+              "name": "gap_last100ms",
+              "overlap_ms": 10.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 4789206,
+          "end_sample_id_exclusive": 4809206,
+          "start_ms": 112.87049999999999,
+          "end_ms": 122.87049999999999,
+          "duration_ms": 10.0,
+          "current_mean": 0.04292098002098501,
+          "current_min": 0.03344201296567917,
+          "current_max": 0.052315182983875275,
+          "voltage_mean": 4.987799474096298,
+          "voltage_min": 4.979721546173096,
+          "voltage_max": 4.995610237121582,
+          "power_mean": 0.21406960703134537,
+          "power_min": 0.16691145300865173,
+          "power_max": 0.26075252890586853,
+          "energy_mJ": 2.1406960703134534,
+          "current_mean_mA": 42.92098002098501,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "gap_proof",
+              "overlap_ms": 10.0
+            },
+            {
+              "name": "gap_GPIO",
+              "overlap_ms": 10.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 4736206,
+          "end_sample_id_exclusive": 4756206,
+          "start_ms": 86.3705,
+          "end_ms": 96.37049999999999,
+          "duration_ms": 10.0,
+          "current_mean": 0.042920977027900514,
+          "current_min": 0.03380264714360237,
+          "current_max": 0.05243539437651634,
+          "voltage_mean": 4.987705389857292,
+          "voltage_min": 4.979721546173096,
+          "voltage_max": 4.995610237121582,
+          "power_mean": 0.21406563913971186,
+          "power_min": 0.16871140897274017,
+          "power_max": 0.26135170459747314,
+          "energy_mJ": 2.1406563913971186,
+          "current_mean_mA": 42.92097702790051,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "gap_proof",
+              "overlap_ms": 10.0
+            },
+            {
+              "name": "gap_GPIO",
+              "overlap_ms": 10.0
+            }
+          ]
+        }
+      ]
+    },
+    "gap_last100ms": {
+      "start_sample_id": 4909700,
+      "end_sample_id_exclusive": 5109700,
+      "start_ms": 173.1175,
+      "end_ms": 273.1175,
+      "duration_ms": 100.0,
+      "current_mean": 0.0428881330470182,
+      "current_min": 0.03344201296567917,
+      "current_max": 0.05267581716179848,
+      "voltage_mean": 4.98756219562769,
+      "voltage_min": 4.979721546173096,
+      "voltage_max": 4.995610237121582,
+      "power_mean": 0.21389553969278932,
+      "power_min": 0.16683554649353027,
+      "power_max": 0.2626695930957794,
+      "energy_mJ": 21.38955396927893,
+      "current_mean_mA": 42.888133047018194,
+      "finite": true,
+      "peaks_1ms": [
+        {
+          "start_sample_id": 4999500,
+          "end_sample_id_exclusive": 5001500,
+          "start_ms": 218.0175,
+          "end_ms": 219.0175,
+          "duration_ms": 1.0,
+          "current_mean": 0.043060162145644426,
+          "current_min": 0.03413322940468788,
+          "current_max": 0.05204470828175545,
+          "voltage_mean": 4.9874695520401,
+          "voltage_min": 4.981991291046143,
+          "voltage_max": 4.993340492248535,
+          "power_mean": 0.21474956045299767,
+          "power_min": 0.17036135494709015,
+          "power_max": 0.25940442085266113,
+          "energy_mJ": 0.21474956045299767,
+          "current_mean_mA": 43.060162145644426,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "gap_proof",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "gap_GPIO",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "gap_last100ms",
+              "overlap_ms": 1.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 4955900,
+          "end_sample_id_exclusive": 4957900,
+          "start_ms": 196.2175,
+          "end_ms": 197.2175,
+          "duration_ms": 1.0,
+          "current_mean": 0.04305778797343373,
+          "current_min": 0.03380264714360237,
+          "current_max": 0.051984600722789764,
+          "voltage_mean": 4.987943952322007,
+          "voltage_min": 4.981991291046143,
+          "voltage_max": 4.995610237121582,
+          "power_mean": 0.21475799706578255,
+          "power_min": 0.16871140897274017,
+          "power_max": 0.25910481810569763,
+          "energy_mJ": 0.21475799706578255,
+          "current_mean_mA": 43.05778797343373,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "gap_proof",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "gap_GPIO",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "gap_last100ms",
+              "overlap_ms": 1.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 5063100,
+          "end_sample_id_exclusive": 5065100,
+          "start_ms": 249.8175,
+          "end_ms": 250.81750000000002,
+          "duration_ms": 1.0,
+          "current_mean": 0.04305768283084035,
+          "current_min": 0.033862754702568054,
+          "current_max": 0.05201465263962746,
+          "voltage_mean": 4.987457070112228,
+          "voltage_min": 4.979721546173096,
+          "voltage_max": 4.993340492248535,
+          "power_mean": 0.21473718652874232,
+          "power_min": 0.16901139914989471,
+          "power_max": 0.2592546343803406,
+          "energy_mJ": 0.21473718652874232,
+          "current_mean_mA": 43.05768283084035,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "gap_proof",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "gap_GPIO",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "gap_last100ms",
+              "overlap_ms": 1.0
+            }
+          ]
+        }
+      ],
+      "peaks_10ms": [
+        {
+          "start_sample_id": 4954900,
+          "end_sample_id_exclusive": 4974900,
+          "start_ms": 195.7175,
+          "end_ms": 205.7175,
+          "duration_ms": 10.0,
+          "current_mean": 0.042920443594455716,
+          "current_min": 0.033562224358320236,
+          "current_max": 0.052315182983875275,
+          "voltage_mean": 4.987610281920433,
+          "voltage_min": 4.979721546173096,
+          "voltage_max": 4.995610237121582,
+          "power_mean": 0.2140588592544198,
+          "power_min": 0.16751143336296082,
+          "power_max": 0.2608712911605835,
+          "energy_mJ": 2.140588592544198,
+          "current_mean_mA": 42.92044359445572,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "gap_proof",
+              "overlap_ms": 10.0
+            },
+            {
+              "name": "gap_GPIO",
+              "overlap_ms": 10.0
+            },
+            {
+              "name": "gap_last100ms",
+              "overlap_ms": 10.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 4987700,
+          "end_sample_id_exclusive": 5007700,
+          "start_ms": 212.11749999999998,
+          "end_ms": 222.1175,
+          "duration_ms": 10.0,
+          "current_mean": 0.042910144483298066,
+          "current_min": 0.03344201296567917,
+          "current_max": 0.05228513106703758,
+          "voltage_mean": 4.987518467640877,
+          "voltage_min": 4.979721546173096,
+          "voltage_max": 4.995610237121582,
+          "power_mean": 0.21400345877707005,
+          "power_min": 0.16683554649353027,
+          "power_max": 0.26048406958580017,
+          "energy_mJ": 2.1400345877707005,
+          "current_mean_mA": 42.91014448329807,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "gap_proof",
+              "overlap_ms": 10.0
+            },
+            {
+              "name": "gap_GPIO",
+              "overlap_ms": 10.0
+            },
+            {
+              "name": "gap_last100ms",
+              "overlap_ms": 10.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 5048500,
+          "end_sample_id_exclusive": 5068500,
+          "start_ms": 242.51749999999998,
+          "end_ms": 252.5175,
+          "duration_ms": 10.0,
+          "current_mean": 0.04290951337665319,
+          "current_min": 0.03374254330992699,
+          "current_max": 0.05237528681755066,
+          "voltage_mean": 4.987472956323623,
+          "voltage_min": 4.979721546173096,
+          "voltage_max": 4.995610237121582,
+          "power_mean": 0.21399844121262432,
+          "power_min": 0.16833482682704926,
+          "power_max": 0.2609332203865051,
+          "energy_mJ": 2.139984412126243,
+          "current_mean_mA": 42.909513376653194,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "gap_proof",
+              "overlap_ms": 10.0
+            },
+            {
+              "name": "gap_GPIO",
+              "overlap_ms": 10.0
+            },
+            {
+              "name": "gap_last100ms",
+              "overlap_ms": 10.0
+            }
+          ]
+        }
+      ]
+    },
+    "SD_init": {
+      "start_sample_id": 5109753,
+      "end_sample_id_exclusive": 5144750,
+      "start_ms": 273.144,
+      "end_ms": 290.64250000000004,
+      "duration_ms": 17.4985,
+      "current_mean": 0.0595323606604063,
+      "current_min": 0.033532172441482544,
+      "current_max": 0.10914506018161774,
+      "voltage_mean": 4.984317845772562,
+      "voltage_min": 4.966102123260498,
+      "voltage_max": 4.997880458831787,
+      "power_mean": 0.29668878648292474,
+      "power_min": 0.16728532314300537,
+      "power_max": 0.5425209999084473,
+      "energy_mJ": 5.191608730271458,
+      "current_mean_mA": 59.5323606604063,
+      "finite": true,
+      "peaks_1ms": [
+        {
+          "start_sample_id": 5142553,
+          "end_sample_id_exclusive": 5144553,
+          "start_ms": 289.54400000000004,
+          "end_ms": 290.54400000000004,
+          "duration_ms": 1.0,
+          "current_mean": 0.07654714488983154,
+          "current_min": 0.057394109666347504,
+          "current_max": 0.10914506018161774,
+          "voltage_mean": 4.9810935003757475,
+          "voltage_min": 4.966102123260498,
+          "voltage_max": 4.988801002502441,
+          "power_mean": 0.38123802034556864,
+          "power_min": 0.2861975133419037,
+          "power_max": 0.5425209999084473,
+          "energy_mJ": 0.38123802034556864,
+          "current_mean_mA": 76.54714488983154,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "SD_init",
+              "overlap_ms": 1.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 5121953,
+          "end_sample_id_exclusive": 5123953,
+          "start_ms": 279.24399999999997,
+          "end_ms": 280.24399999999997,
+          "duration_ms": 1.0,
+          "current_mean": 0.06749101388454437,
+          "current_min": 0.05811537802219391,
+          "current_max": 0.07701859623193741,
+          "voltage_mean": 4.982370300769806,
+          "voltage_min": 4.975181579589844,
+          "voltage_max": 4.988801002502441,
+          "power_mean": 0.33625358079373835,
+          "power_min": 0.2896622121334076,
+          "power_max": 0.3837059736251831,
+          "energy_mJ": 0.33625358079373835,
+          "current_mean_mA": 67.49101388454437,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "SD_init",
+              "overlap_ms": 1.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 5124353,
+          "end_sample_id_exclusive": 5126353,
+          "start_ms": 280.444,
+          "end_ms": 281.444,
+          "duration_ms": 1.0,
+          "current_mean": 0.06630969768576324,
+          "current_min": 0.05721379071474075,
+          "current_max": 0.0751853734254837,
+          "voltage_mean": 4.9825450797081,
+          "voltage_min": 4.975181579589844,
+          "voltage_max": 4.988801002502441,
+          "power_mean": 0.33037998209893704,
+          "power_min": 0.28516846895217896,
+          "power_max": 0.3744022250175476,
+          "energy_mJ": 0.330379982098937,
+          "current_mean_mA": 66.30969768576324,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "SD_init",
+              "overlap_ms": 1.0
+            }
+          ]
+        }
+      ],
+      "peaks_10ms": [
+        {
+          "start_sample_id": 5124553,
+          "end_sample_id_exclusive": 5144553,
+          "start_ms": 280.54400000000004,
+          "end_ms": 290.54400000000004,
+          "duration_ms": 10.0,
+          "current_mean": 0.06708673437517136,
+          "current_min": 0.05673294514417648,
+          "current_max": 0.10914506018161774,
+          "voltage_mean": 4.98289100253582,
+          "voltage_min": 4.966102123260498,
+          "voltage_max": 4.991070747375488,
+          "power_mean": 0.3342684494301677,
+          "power_min": 0.2829006016254425,
+          "power_max": 0.5425209999084473,
+          "energy_mJ": 3.3426844943016767,
+          "current_mean_mA": 67.08673437517136,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "SD_init",
+              "overlap_ms": 10.0
+            }
+          ]
+        }
+      ]
+    },
+    "scan_prep": {
+      "start_sample_id": 5144750,
+      "end_sample_id_exclusive": 5319018,
+      "start_ms": 290.64250000000004,
+      "end_ms": 377.7765,
+      "duration_ms": 87.134,
+      "current_mean": 0.07499767165447387,
+      "current_min": 0.05844595655798912,
+      "current_max": 0.1085440069437027,
+      "voltage_mean": 4.981458853358619,
+      "voltage_min": 4.968371868133545,
+      "voltage_max": 4.991070747375488,
+      "power_mean": 0.3735714384293962,
+      "power_min": 0.2913099229335785,
+      "power_max": 0.5395333766937256,
+      "energy_mJ": 32.55077371610701,
+      "current_mean_mA": 74.99767165447386,
+      "finite": true,
+      "peaks_1ms": [
+        {
+          "start_sample_id": 5144750,
+          "end_sample_id_exclusive": 5146750,
+          "start_ms": 290.64250000000004,
+          "end_ms": 291.64250000000004,
+          "duration_ms": 1.0,
+          "current_mean": 0.08188843204267324,
+          "current_min": 0.05952785909175873,
+          "current_max": 0.1085440069437027,
+          "voltage_mean": 4.980191226959229,
+          "voltage_min": 4.968371868133545,
+          "voltage_max": 4.991070747375488,
+          "power_mean": 0.40777943180501464,
+          "power_min": 0.2968375086784363,
+          "power_max": 0.5395333766937256,
+          "energy_mJ": 0.40777943180501464,
+          "current_mean_mA": 81.88843204267323,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "scan_prep",
+              "overlap_ms": 1.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 5168750,
+          "end_sample_id_exclusive": 5170750,
+          "start_ms": 302.6425,
+          "end_ms": 303.6425,
+          "duration_ms": 1.0,
+          "current_mean": 0.07777038465254009,
+          "current_min": 0.060008704662323,
+          "current_max": 0.0992877334356308,
+          "voltage_mean": 4.980834736824035,
+          "voltage_min": 4.97064208984375,
+          "voltage_max": 4.988801002502441,
+          "power_mean": 0.38733370910584924,
+          "power_min": 0.29909905791282654,
+          "power_max": 0.4939745366573334,
+          "energy_mJ": 0.38733370910584924,
+          "current_mean_mA": 77.77038465254009,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "scan_prep",
+              "overlap_ms": 1.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 5148350,
+          "end_sample_id_exclusive": 5150350,
+          "start_ms": 292.4425,
+          "end_ms": 293.4425,
+          "duration_ms": 1.0,
+          "current_mean": 0.07759083402529358,
+          "current_min": 0.05934754014015198,
+          "current_max": 0.09787525236606598,
+          "voltage_mean": 4.980680390357971,
+          "voltage_min": 4.97064208984375,
+          "voltage_max": 4.988801002502441,
+          "power_mean": 0.3864313869923353,
+          "power_min": 0.29580363631248474,
+          "power_max": 0.48672500252723694,
+          "energy_mJ": 0.3864313869923353,
+          "current_mean_mA": 77.59083402529359,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "scan_prep",
+              "overlap_ms": 1.0
+            }
+          ]
+        }
+      ],
+      "peaks_10ms": [
+        {
+          "start_sample_id": 5145150,
+          "end_sample_id_exclusive": 5165150,
+          "start_ms": 290.84250000000003,
+          "end_ms": 300.84250000000003,
+          "duration_ms": 10.0,
+          "current_mean": 0.07571869084890932,
+          "current_min": 0.05862627550959587,
+          "current_max": 0.1085440069437027,
+          "voltage_mean": 4.9812984669685365,
+          "voltage_min": 4.968371868133545,
+          "voltage_max": 4.991070747375488,
+          "power_mean": 0.37714893414229156,
+          "power_min": 0.2922086715698242,
+          "power_max": 0.5395333766937256,
+          "energy_mJ": 3.7714893414229156,
+          "current_mean_mA": 75.71869084890932,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "scan_prep",
+              "overlap_ms": 10.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 5254550,
+          "end_sample_id_exclusive": 5274550,
+          "start_ms": 345.54249999999996,
+          "end_ms": 355.54249999999996,
+          "duration_ms": 10.0,
+          "current_mean": 0.07520176587793977,
+          "current_min": 0.05865632742643356,
+          "current_max": 0.09973853081464767,
+          "voltage_mean": 4.981376322841644,
+          "voltage_min": 4.968371868133545,
+          "voltage_max": 4.991070747375488,
+          "power_mean": 0.37458222518861295,
+          "power_min": 0.2924915850162506,
+          "power_max": 0.49584144353866577,
+          "energy_mJ": 3.7458222518861293,
+          "current_mean_mA": 75.20176587793976,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "scan_prep",
+              "overlap_ms": 10.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 5169150,
+          "end_sample_id_exclusive": 5189150,
+          "start_ms": 302.84250000000003,
+          "end_ms": 312.84250000000003,
+          "duration_ms": 10.0,
+          "current_mean": 0.0751645875301212,
+          "current_min": 0.058686379343271255,
+          "current_max": 0.09937789291143417,
+          "voltage_mean": 4.981541001558304,
+          "voltage_min": 4.968371868133545,
+          "voltage_max": 4.991070747375488,
+          "power_mean": 0.3744090250909328,
+          "power_min": 0.29264146089553833,
+          "power_max": 0.4941974878311157,
+          "energy_mJ": 3.7440902509093283,
+          "current_mean_mA": 75.1645875301212,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "scan_prep",
+              "overlap_ms": 10.0
+            }
+          ]
+        }
+      ]
+    },
+    "slot_transport": {
+      "start_sample_id": 5319018,
+      "end_sample_id_exclusive": 5647771,
+      "start_ms": 377.7765,
+      "end_ms": 542.153,
+      "duration_ms": 164.37650000000002,
+      "current_mean": 0.09055128582576488,
+      "current_min": 0.06322435289621353,
+      "current_max": 0.12317972630262375,
+      "voltage_mean": 4.9785288808505,
+      "voltage_min": 4.961562633514404,
+      "voltage_max": 4.991070747375488,
+      "power_mean": 0.4507935060301541,
+      "power_min": 0.31527021527290344,
+      "power_max": 0.6124124526977539,
+      "energy_mJ": 74.09985874396563,
+      "current_mean_mA": 90.55128582576488,
+      "finite": true,
+      "peaks_1ms": [
+        {
+          "start_sample_id": 5322618,
+          "end_sample_id_exclusive": 5324618,
+          "start_ms": 379.5765,
+          "end_ms": 380.5765,
+          "duration_ms": 1.0,
+          "current_mean": 0.10480006886273623,
+          "current_min": 0.07981351017951965,
+          "current_max": 0.12317972630262375,
+          "voltage_mean": 4.975466514110566,
+          "voltage_min": 4.963832378387451,
+          "voltage_max": 4.988801002502441,
+          "power_mean": 0.5213989816606045,
+          "power_min": 0.3976302146911621,
+          "power_max": 0.6124124526977539,
+          "energy_mJ": 0.5213989816606044,
+          "current_mean_mA": 104.80006886273623,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "slot_transport",
+              "overlap_ms": 1.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 5645418,
+          "end_sample_id_exclusive": 5647418,
+          "start_ms": 540.9765,
+          "end_ms": 541.9765,
+          "duration_ms": 1.0,
+          "current_mean": 0.0986204582452774,
+          "current_min": 0.06794264912605286,
+          "current_max": 0.12122629582881927,
+          "voltage_mean": 4.977156426668167,
+          "voltage_min": 4.966102123260498,
+          "voltage_max": 4.988801002502441,
+          "power_mean": 0.49079535441100597,
+          "power_min": 0.3386439085006714,
+          "power_max": 0.602572500705719,
+          "energy_mJ": 0.490795354411006,
+          "current_mean_mA": 98.6204582452774,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "slot_transport",
+              "overlap_ms": 1.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 5319418,
+          "end_sample_id_exclusive": 5321418,
+          "start_ms": 377.9765,
+          "end_ms": 378.9765,
+          "duration_ms": 1.0,
+          "current_mean": 0.0942548057846725,
+          "current_min": 0.06451662629842758,
+          "current_max": 0.1141037717461586,
+          "voltage_mean": 4.9774889554977415,
+          "voltage_min": 4.966102123260498,
+          "voltage_max": 4.991070747375488,
+          "power_mean": 0.4691036414206028,
+          "power_min": 0.3218606114387512,
+          "power_max": 0.5674279928207397,
+          "energy_mJ": 0.4691036414206028,
+          "current_mean_mA": 94.2548057846725,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "slot_transport",
+              "overlap_ms": 1.0
+            }
+          ]
+        }
+      ],
+      "peaks_10ms": [
+        {
+          "start_sample_id": 5322618,
+          "end_sample_id_exclusive": 5342618,
+          "start_ms": 379.5765,
+          "end_ms": 389.5765,
+          "duration_ms": 10.0,
+          "current_mean": 0.09198860992267728,
+          "current_min": 0.07641754299402237,
+          "current_max": 0.12317972630262375,
+          "voltage_mean": 4.9780076182126995,
+          "voltage_min": 4.963832378387451,
+          "voltage_max": 4.988801002502441,
+          "power_mean": 0.45789757576286794,
+          "power_min": 0.38088497519493103,
+          "power_max": 0.6124124526977539,
+          "energy_mJ": 4.57897575762868,
+          "current_mean_mA": 91.98860992267728,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "slot_transport",
+              "overlap_ms": 10.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 5627418,
+          "end_sample_id_exclusive": 5647418,
+          "start_ms": 531.9765,
+          "end_ms": 541.9765,
+          "duration_ms": 10.0,
+          "current_mean": 0.09115830019712448,
+          "current_min": 0.06794264912605286,
+          "current_max": 0.12122629582881927,
+          "voltage_mean": 4.978616167354584,
+          "voltage_min": 4.966102123260498,
+          "voltage_max": 4.988801002502441,
+          "power_mean": 0.45381927030533553,
+          "power_min": 0.3386439085006714,
+          "power_max": 0.602572500705719,
+          "energy_mJ": 4.538192703053355,
+          "current_mean_mA": 91.15830019712448,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "slot_transport",
+              "overlap_ms": 10.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 5486618,
+          "end_sample_id_exclusive": 5506618,
+          "start_ms": 461.5765,
+          "end_ms": 471.5765,
+          "duration_ms": 10.0,
+          "current_mean": 0.09090930357649922,
+          "current_min": 0.07677817344665527,
+          "current_max": 0.11795053631067276,
+          "voltage_mean": 4.978624566221237,
+          "voltage_min": 4.963832378387451,
+          "voltage_max": 4.988801002502441,
+          "power_mean": 0.45258521472513674,
+          "power_min": 0.3826824724674225,
+          "power_max": 0.586022138595581,
+          "energy_mJ": 4.525852147251368,
+          "current_mean_mA": 90.90930357649923,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "slot_transport",
+              "overlap_ms": 10.0
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "overall_peaks": {
+    "1ms": [
+      {
+        "start_sample_id": 4588065,
+        "end_sample_id_exclusive": 4590065,
+        "start_ms": 12.3,
+        "end_ms": 13.299999999999999,
+        "duration_ms": 1.0,
+        "current_mean": 0.12458335756883025,
+        "current_min": 0.11870185285806656,
+        "current_max": 0.13249610364437103,
+        "voltage_mean": 4.971767842531205,
+        "voltage_min": 4.966102123260498,
+        "voltage_max": 4.977451324462891,
+        "power_mean": 0.6193959880173207,
+        "power_min": 0.5901737809181213,
+        "power_max": 0.6579891443252563,
+        "energy_mJ": 0.6193959880173207,
+        "current_mean_mA": 124.58335756883025,
+        "finite": true,
+        "overlapping_phases": []
+      },
+      {
+        "start_sample_id": 4591465,
+        "end_sample_id_exclusive": 4593465,
+        "start_ms": 14.0,
+        "end_ms": 15.0,
+        "duration_ms": 1.0,
+        "current_mean": 0.12374666447937488,
+        "current_min": 0.11840132623910904,
+        "current_max": 0.142233207821846,
+        "voltage_mean": 4.971869982004166,
+        "voltage_min": 4.963832378387451,
+        "voltage_max": 4.977451324462891,
+        "power_mean": 0.6152458983659744,
+        "power_min": 0.5887993574142456,
+        "power_max": 0.7063446640968323,
+        "energy_mJ": 0.6152458983659744,
+        "current_mean_mA": 123.74666447937489,
+        "finite": true,
+        "overlapping_phases": [
+          {
+            "name": "strobe_to_frame_IRQ",
+            "overlap_ms": 0.7919999999999999
+          },
+          {
+            "name": "strobe_to_STOP_proof",
+            "overlap_ms": 0.7919999999999999
+          }
+        ]
+      },
+      {
+        "start_sample_id": 4597665,
+        "end_sample_id_exclusive": 4599665,
+        "start_ms": 17.1,
+        "end_ms": 18.1,
+        "duration_ms": 1.0,
+        "current_mean": 0.12169194593653083,
+        "current_min": 0.11945317685604095,
+        "current_max": 0.12387093901634216,
+        "voltage_mean": 4.972535056352616,
+        "voltage_min": 4.968371868133545,
+        "voltage_max": 4.975181579589844,
+        "power_mean": 0.605117142021656,
+        "power_min": 0.5943012237548828,
+        "power_max": 0.6158497929573059,
+        "energy_mJ": 0.605117142021656,
+        "current_mean_mA": 121.69194593653083,
+        "finite": true,
+        "overlapping_phases": [
+          {
+            "name": "strobe_to_frame_IRQ",
+            "overlap_ms": 1.0
+          },
+          {
+            "name": "strobe_to_STOP_proof",
+            "overlap_ms": 1.0
+          }
+        ]
+      }
+    ],
+    "10ms": [
+      {
+        "start_sample_id": 4614865,
+        "end_sample_id_exclusive": 4634865,
+        "start_ms": 25.7,
+        "end_ms": 35.7,
+        "duration_ms": 10.0,
+        "current_mean": 0.1145761630281806,
+        "current_min": 0.11284155398607254,
+        "current_max": 0.11683858186006546,
+        "voltage_mean": 4.973994616508484,
+        "voltage_min": 4.97064208984375,
+        "voltage_max": 4.977451324462891,
+        "power_mean": 0.5699010574966669,
+        "power_min": 0.5614072680473328,
+        "power_max": 0.581558346748352,
+        "energy_mJ": 5.699010574966669,
+        "current_mean_mA": 114.5761630281806,
+        "finite": true,
+        "overlapping_phases": [
+          {
+            "name": "strobe_to_frame_IRQ",
+            "overlap_ms": 10.0
+          },
+          {
+            "name": "strobe_to_STOP_proof",
+            "overlap_ms": 10.0
+          }
+        ]
+      },
+      {
+        "start_sample_id": 4681465,
+        "end_sample_id_exclusive": 4701465,
+        "start_ms": 59.0,
+        "end_ms": 69.0,
+        "duration_ms": 10.0,
+        "current_mean": 0.11194370462708175,
+        "current_min": 0.10980622470378876,
+        "current_max": 0.11650799959897995,
+        "voltage_mean": 4.974455147767067,
+        "voltage_min": 4.97064208984375,
+        "voltage_max": 4.979721546173096,
+        "power_mean": 0.556858596342802,
+        "power_min": 0.5463058948516846,
+        "power_max": 0.5791195631027222,
+        "energy_mJ": 5.568585963428021,
+        "current_mean_mA": 111.94370462708176,
+        "finite": true,
+        "overlapping_phases": [
+          {
+            "name": "strobe_to_STOP_proof",
+            "overlap_ms": 10.0
+          },
+          {
+            "name": "frame_IRQ_to_STOP_proof",
+            "overlap_ms": 10.0
+          }
+        ]
+      },
+      {
+        "start_sample_id": 4585865,
+        "end_sample_id_exclusive": 4605865,
+        "start_ms": 11.2,
+        "end_ms": 21.2,
+        "duration_ms": 10.0,
+        "current_mean": 0.11187981307990849,
+        "current_min": 0.08723655343055725,
+        "current_max": 0.142233207821846,
+        "voltage_mean": 4.974331730127335,
+        "voltage_min": 4.963832378387451,
+        "voltage_max": 4.986530780792236,
+        "power_mean": 0.5564860001087188,
+        "power_min": 0.43441373109817505,
+        "power_max": 0.7063446640968323,
+        "energy_mJ": 5.564860001087189,
+        "current_mean_mA": 111.87981307990849,
+        "finite": true,
+        "overlapping_phases": [
+          {
+            "name": "strobe_to_frame_IRQ",
+            "overlap_ms": 6.992
+          },
+          {
+            "name": "strobe_to_STOP_proof",
+            "overlap_ms": 6.992
+          }
+        ]
+      }
+    ]
+  },
+  "scope": "Same-run warm RAM diagnostic GAP1 independently matched to native GPIO/DWT anchors. No cold boot or Standby measurement. Card electrically powered, zero recorded SD commands through gap. Source-image/card readback remains separate evidence. STOP and proof-gap endpoints are locally interpolated with up to100us allowance, not physical edge measurements."
+}

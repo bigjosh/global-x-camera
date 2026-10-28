@@ -9,11 +9,16 @@ It does not send ACMD23.
 
 The current camera configuration explicitly selects **four bits, 25 MHz,
 `SD_CLOCK_NEGEDGE=1`, GPIO speed3 and unchanged compensation**. Its PZSSD001
-carrier has a **27-ohm series CLK resistor fitted midspan**, with all six SD
-signal probes removed. The installed Standby sector SHA-256 is
-`79c7c4ef3fb7d06baf3c2fb16dccaae4cd7f585c2319af7065f939bd006a39cd`.
-See the [current qualification and its limits](../capture-raw/evidence/2026-10-25-sd25-crc/QUALIFICATION.md)
-and [wiring](../../docs/prototype/sd-breakout-benchmark.md). The earlier
+carrier now uses a **direct CLK wire twisted with the board-to-card ground**,
+without a series resistor or SD signal probes. SD GND is **CN3.8** and VCC is
+**CN3.5 / main VDDIO (3.3 V)**. This October 27 selection follows user-reported
+probe-free success; wire placement remains a known failure risk, and repeated
+full-image readback in this exact arrangement is pending. See the
+[canonical wiring](../../docs/prototype/sd-breakout-benchmark.md),
+[wiring decision](../../docs/prototype/NOTES.md#2026-10-27--lock-the-prototype-sd-clockground-pair-and-nearby-power-pins)
+and [current firmware identity](../capture-raw/README.md).
+The [October 25 qualification](../capture-raw/evidence/2026-10-25-sd25-crc/QUALIFICATION.md)
+used a 27-ohm midspan resistor and remains specific to that setup. The earlier
 [12.5 MHz four-bit comparison](../capture-raw/evidence/2026-10-25-sd-fourbit/README.md)
 remains a historical result under its recorded wiring/probe conditions.
 These explicit choices do not change the driver's default width, phase,

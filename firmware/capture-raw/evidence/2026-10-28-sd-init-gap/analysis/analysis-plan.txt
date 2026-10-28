@@ -1,0 +1,33 @@
+Offline SD-gap diagnostic analysis
+
+Read normal installed Ethernet-down cold controls (three historical same-day
+candidate recordings) and two new gap cold cycles. Keep original archives and
+raw recordings unchanged. All analysis output belongs in this directory.
+
+The existing normal decoder supports frame marker3 before SD-init marker4.
+Gap analysis adds a strict contiguous unique train with all twelve IDs1..12.
+Required gap precedence is3<11<12<4<5. Pulses11/12 use the existing2us/ID
+protocol and are measured at the JS native0.5us grid. Preserve startup chatter
+and every unclassified pulse. Do not map unknown edges to fabricated events.
+
+Markers11/12 directly bound the gap, superseding the initially proposed
+marker4-minus-nominal200ms estimate. Camera2->11 includes full-frame validation
+and sensor STOP before gapbegin; it is not a direct physical STOP edge.
+Last100ms before marker12 is the quiet-gap baseline. CardVCC remains on, so
+call this 'SD powered but not initialized', never pure card idle/current.
+No exact sensorSTOP marker exists in the three normal cold controls: use2->3
+for directly comparable acquisition timing; leave exactSTOP unavailable unless
+that same cycle has a validated retained timing proof.
+
+Require native stream hashes/sample continuity and finite bounded windows.
+Retain71 initial current NaNs and exclude first5ms from qualified energy.
+Keep the same onset and post-WFI low-plateau rules as the prior campaign.
+Peak comparisons use1ms and10ms mean windows, searched every0.1ms; no claim
+about physical native extrema or inrush. Report camera, gap, SDinit, scan/prep,
+write and whole post5ms energy/current separately; overlapping windows cannot
+be summed. Extra gap energy and changed SD power-up history remain visible.
+
+Optional same-run RAM GAP1 proof will be analyzed separately when its final
+schema is supplied, binding sensorSTOP/gap ticks to native GPIO/DWT anchors.
+RAM source equality and cold full-card readback remain root-owned validation.
+No instruments, power switching, serial commands, firmware edits or Git edits.

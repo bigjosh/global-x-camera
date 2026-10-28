@@ -1,0 +1,92 @@
+
+Discarded input sections
+
+ .text          0x00000000        0x0 C:\Users\joshd\AppData\Local\Temp\ccCeBCCI.o
+ .data          0x00000000        0x0 C:\Users\joshd\AppData\Local\Temp\ccCeBCCI.o
+ .bss           0x00000000        0x0 C:\Users\joshd\AppData\Local\Temp\ccCeBCCI.o
+ .comment       0x00000000       0x44 C:\Users\joshd\AppData\Local\Temp\ccCeBCCI.o
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+PROBE            0x343c4000         0x00002000         xrw
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+LOAD C:\Users\joshd\AppData\Local\Temp\ccCeBCCI.o
+
+.text           0x343c4000      0xcf0
+ *(.text*)
+ .text.delay    0x343c4000       0x24 C:\Users\joshd\AppData\Local\Temp\ccCeBCCI.o
+ .text.snapshot
+                0x343c4024       0x5c C:\Users\joshd\AppData\Local\Temp\ccCeBCCI.o
+ .text.restore_pin
+                0x343c4080       0xa0 C:\Users\joshd\AppData\Local\Temp\ccCeBCCI.o
+ .text.wait_cycles
+                0x343c4120       0x34 C:\Users\joshd\AppData\Local\Temp\ccCeBCCI.o
+ .text.marker.part.0
+                0x343c4154       0x34 C:\Users\joshd\AppData\Local\Temp\ccCeBCCI.o
+ .text.clock_bit
+                0x343c4188       0x74 C:\Users\joshd\AppData\Local\Temp\ccCeBCCI.o
+ .text.send_bits
+                0x343c41fc       0x1e C:\Users\joshd\AppData\Local\Temp\ccCeBCCI.o
+ .text.write_bmcr
+                0x343c421a       0x64 C:\Users\joshd\AppData\Local\Temp\ccCeBCCI.o
+ .text.checked_read.constprop.0
+                0x343c427e       0x96 C:\Users\joshd\AppData\Local\Temp\ccCeBCCI.o
+ .text.identify
+                0x343c4314       0x50 C:\Users\joshd\AppData\Local\Temp\ccCeBCCI.o
+ .text.stable_bmcr
+                0x343c4364       0x50 C:\Users\joshd\AppData\Local\Temp\ccCeBCCI.o
+ .text.window   0x343c43b4       0x74 C:\Users\joshd\AppData\Local\Temp\ccCeBCCI.o
+ .text.power_aba_main
+                0x343c4428      0x89c C:\Users\joshd\AppData\Local\Temp\ccCeBCCI.o
+                0x343c4428                power_aba_main
+                0x343c4546                power_aba_park
+ .text.power_aba_entry
+                0x343c4cc4       0x2c C:\Users\joshd\AppData\Local\Temp\ccCeBCCI.o
+                0x343c4cc4                power_aba_entry
+ *(.rodata*)
+
+.glue_7         0x343c4cf0        0x0
+ .glue_7        0x343c4cf0        0x0 linker stubs
+
+.glue_7t        0x343c4cf0        0x0
+ .glue_7t       0x343c4cf0        0x0 linker stubs
+
+.vfp11_veneer   0x343c4cf0        0x0
+ .vfp11_veneer  0x343c4cf0        0x0 linker stubs
+
+.v4_bx          0x343c4cf0        0x0
+ .v4_bx         0x343c4cf0        0x0 linker stubs
+
+.iplt           0x343c4cf0        0x0
+ .iplt          0x343c4cf0        0x0 C:\Users\joshd\AppData\Local\Temp\ccCeBCCI.o
+
+.rel.dyn        0x343c4cf0        0x0
+ .rel.iplt      0x343c4cf0        0x0 C:\Users\joshd\AppData\Local\Temp\ccCeBCCI.o
+
+.data
+ *(.data*)
+
+.igot.plt       0x343c4cf0        0x0
+ .igot.plt      0x343c4cf0        0x0 C:\Users\joshd\AppData\Local\Temp\ccCeBCCI.o
+
+.bss
+ *(.bss*)
+ *(COMMON)
+
+/DISCARD/
+ *(.comment*)
+ *(.ARM.exidx*)
+ *(.ARM.extab*)
+                0x00000001                        ASSERT ((SIZEOF (.data) == 0x0), No runtime data initialization permitted)
+                0x00000001                        ASSERT ((SIZEOF (.bss) == 0x0), No implicit BSS permitted)
+OUTPUT(D:\Github\global-x-camera\tmp\bringup\nucleo-isolated-20261028\mdio\power_aba\power_aba.elf elf32-littlearm)
+LOAD linker stubs
+
+.ARM.attributes
+                0x00000000       0x36
+ .ARM.attributes
+                0x00000000       0x36 C:\Users\joshd\AppData\Local\Temp\ccCeBCCI.o

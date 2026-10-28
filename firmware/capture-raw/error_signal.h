@@ -26,12 +26,18 @@ enum error_signal_code {
  * Reset plus the unchanged early UART guard remains the recovery mechanism.
  * Deep-mode precondition failure falls back to LEDs-off, masked shallow WFI.
  */
+#define ERROR_SIGNAL_PREFIX_ADDRESS 0x34181840U
+#define ERROR_SIGNAL_RUNTIME_ADDRESS 0x343C8000U
+#define ERROR_SIGNAL_COPY_BYTES 1536U
+#define ERROR_SIGNAL_COPY_PROOF 0x343FD380U
+
 #if RAW_ERROR_PREFIX
-/* The receiver's early range calls the separately ROM-loaded prefix engine.
- * Its fixed section address and complete bytes are verified by the builder. */
+/* The receiver copies and verifies this self-contained engine BEFORE camera
+ * setup. DMA may overwrite the prefix thereafter; runtime calls go only to
+ * the reserved persistent executable SRAM copy. */
 static inline __attribute__((noreturn)) void error_signal_shutdown(uint32_t code)
 {
-    ((void (*)(uint32_t))0x34181841U)(code);
+    ((void (*)(uint32_t))(ERROR_SIGNAL_RUNTIME_ADDRESS|1U))(code);
     __builtin_unreachable();
 }
 #else

@@ -51,6 +51,55 @@
 #ifndef RAW_SD_CLOCK_HZ
 #define RAW_SD_CLOCK_HZ 25000000U
 #endif
+#ifndef RAW_POWER_PROBE
+#define RAW_POWER_PROBE 0
+#endif
+#ifndef RAW_BOARD_ETH_POWERDOWN
+#define RAW_BOARD_ETH_POWERDOWN 0
+#endif
+#ifndef RAW_SD_INIT_GAP_MS
+#define RAW_SD_INIT_GAP_MS 0
+#endif
+#if RAW_SD_INIT_GAP_MS && (RAW_SD_INIT_GAP_MS != 200 || !RAW_BOARD_ETH_POWERDOWN || RAW_CYCLE_TRACE)
+#error SD init gap requires the normal Ethernet-powerdown profile and exactly 200 ms
+#endif
+#if RAW_BOARD_ETH_POWERDOWN && (RAW_POWER_PROBE || !SD_REVIEW_PROFILE || !SD_STARTUP_OPT || \
+    SD_BUS_WIDTH != 4 || RAW_SD_CLOCK_HZ != 25000000U || SD_GPIO_SPEED != 3 || \
+    !SD_CLOCK_NEGEDGE || !SD_CLOCK_NEGEDGE_INIT || !RAW_MAGIC_FORMAT || !RAW_LINE_STREAM || \
+    !RAW_ASYNC_STOP || !RAW_DMA || RAW_PREINIT || RAW_LINE_SNAPSHOTS || RAW_LINE_POISON || \
+    RAW_WHOLE_IMAGE_PREERASE || RAW_DMA_SLEEP || RAW_DMA_TAIL_WAIT || SD_EARLY_RUN_CLOCK || \
+    SD_IDMA_READ || SD_READ_DIAGNOSTICS || SD_CLK_GPIO_SPEED >= 0 || SD_FIXED_COMPENSATION || \
+    SD_HIGH_SPEED || RAW_PATTERN || RAW_EXPOSURE_COARSE != 1428U)
+#error Board Ethernet power-down requires the reviewed normal 25 MHz capture profile
+#endif
+#if RAW_POWER_PROBE && (RAW_POWER_PROBE < 1 || RAW_POWER_PROBE > 5 || RAW_FLASH || RAW_STANDBY || \
+    !SD_REVIEW_PROFILE || !SD_STARTUP_OPT || SD_BUS_WIDTH != 4 || RAW_SD_CLOCK_HZ != 25000000U || \
+    SD_GPIO_SPEED != 3 || !SD_CLOCK_NEGEDGE || !SD_CLOCK_NEGEDGE_INIT || !RAW_MAGIC_FORMAT || \
+    !RAW_LINE_STREAM || !RAW_ASYNC_STOP || !RAW_DMA || RAW_PREINIT || RAW_LINE_SNAPSHOTS || \
+    RAW_LINE_POISON || RAW_WHOLE_IMAGE_PREERASE || RAW_DMA_SLEEP || RAW_DMA_TAIL_WAIT || \
+    SD_EARLY_RUN_CLOCK || SD_IDMA_READ || SD_READ_DIAGNOSTICS || SD_CLK_GPIO_SPEED >= 0 || \
+    SD_FIXED_COMPENSATION || SD_HIGH_SPEED || RAW_PATTERN || RAW_EXPOSURE_COARSE != 1428U)
+#error Power probe requires the exact reviewed startup 25 MHz RAM scene profile
+#endif
+#if SD_READ_DIAGNOSTICS && (RAW_FLASH || RAW_STANDBY || !SD_REVIEW_PROFILE || !SD_STARTUP_OPT || \
+    SD_BUS_WIDTH != 4 || (RAW_SD_CLOCK_HZ != 12500000U && RAW_SD_CLOCK_HZ != 25000000U) || \
+    SD_GPIO_SPEED != 3 || SD_CLK_GPIO_SPEED != -1 || !SD_CLOCK_NEGEDGE || !SD_CLOCK_NEGEDGE_INIT || \
+    SD_FIXED_COMPENSATION || SD_HIGH_SPEED || SD_HIGH_SPEED_MIXED_SLEW || \
+    SD_HIGH_SPEED_FIXED_COMPENSATION || SD_HIGH_SPEED_COMBINED_ELECTRICAL || SD_EARLY_RUN_CLOCK || \
+    RAW_DMA_TAIL_WAIT || RAW_DMA_SLEEP || !RAW_MAGIC_FORMAT || !RAW_LINE_STREAM || !RAW_ASYNC_STOP || \
+    !RAW_DMA || RAW_PREINIT || RAW_LINE_SNAPSHOTS || RAW_LINE_POISON || RAW_WHOLE_IMAGE_PREERASE || \
+    RAW_PATTERN || RAW_EXPOSURE_COARSE != 1428U)
+#error Receive diagnostics require the reviewed startup single-sector RAM READ profile
+#endif
+#if SD_CLK_GPIO_SPEED >= 0 && (RAW_FLASH || RAW_STANDBY || !SD_REVIEW_PROFILE || !SD_STARTUP_OPT || \
+    SD_BUS_WIDTH != 4 || RAW_SD_CLOCK_HZ != 25000000U || SD_GPIO_SPEED != 3 || \
+    !SD_CLOCK_NEGEDGE || !SD_CLOCK_NEGEDGE_INIT || SD_FIXED_COMPENSATION || SD_HIGH_SPEED || \
+    SD_HIGH_SPEED_MIXED_SLEW || SD_HIGH_SPEED_FIXED_COMPENSATION || SD_HIGH_SPEED_COMBINED_ELECTRICAL || \
+    SD_EARLY_RUN_CLOCK || SD_IDMA_READ || RAW_DMA_TAIL_WAIT || RAW_DMA_SLEEP || !RAW_MAGIC_FORMAT || \
+    !RAW_LINE_STREAM || !RAW_ASYNC_STOP || !RAW_DMA || RAW_PREINIT || RAW_LINE_SNAPSHOTS || \
+    RAW_LINE_POISON || RAW_WHOLE_IMAGE_PREERASE)
+#error CLK-only slew requires the reviewed startup 25 MHz no-tail RAM capture/read profile
+#endif
 #if SD_EARLY_RUN_CLOCK && (RAW_FLASH || RAW_STANDBY || !SD_REVIEW_PROFILE || !SD_STARTUP_OPT || \
     SD_BUS_WIDTH != 4 || RAW_SD_CLOCK_HZ != 12500000U || !SD_CLOCK_NEGEDGE || !SD_CLOCK_NEGEDGE_INIT || \
     SD_GPIO_SPEED != 3 || SD_FIXED_COMPENSATION || SD_HIGH_SPEED || SD_HIGH_SPEED_MIXED_SLEW || \
@@ -104,6 +153,10 @@ sd_stream_t raw_stream;
 sd_erase_t raw_erase;
 volatile uint32_t raw_magic_proof[8];
 #endif
+#if RAW_SD_INIT_GAP_MS
+/* Separate retained proof; normal and READ paths must not touch this record. */
+volatile uint32_t raw_sd_init_gap_proof[16] __attribute__((aligned(32)));
+#endif
 #if RAW_WHOLE_IMAGE_PREERASE
 /* magic,state,true-boundary faults,post-pad faults,valid,padded,pad,sectors.
  * Original guard is validated before conversion to zero padding; the distinct
@@ -118,6 +171,20 @@ volatile uint32_t raw_dma_sleep_clocks[14];
 _Static_assert(sizeof(sd_dma_wait_t)==24U,"Update the wait-proof manifest when its ABI changes");
 #endif
 static uint32_t operation, capture_active, storage_call_depth;
+#if RAW_BOARD_ETH_POWERDOWN
+#include "board_eth_powerdown.inc"
+#endif
+#if RAW_POWER_PROBE
+/* PWP1, schema, mode, state, wait begin/end, hold begin/end, GPIO mode,
+ * GPIO ODR/IDR before/after, faults, qualified preconditions, hold cycles. */
+volatile uint32_t raw_power_probe_proof[16];
+#endif
+#if RAW_POWER_PROBE == 3 || RAW_POWER_PROBE == 4
+#include "power_phy.inc"
+#endif
+#if RAW_POWER_PROBE == 5
+#include "power_csi.inc"
+#endif
 /* SD callbacks may service bounded asynchronous STOP, but LINE mode defers
  * full post-frame validation/fail parks until all SD calls have returned. */
 #define SD_OPERATION(result, expression) do { \
@@ -309,6 +376,12 @@ static void complete_storage(int result)
             if(operation==RAW_OP_CAPTURE) (void)phase_gpio_emit(9U);
         }
     }
+#if RAW_POWER_PROBE == 3 || RAW_POWER_PROBE == 4
+    /* Hold the PHY condition through save, then restore its exact original
+     * stable BMCR and GPIO setup before an awake terminal. No SD call nests. */
+    int phy_restore=power_phy_restore();
+    if(phy_restore && !result) result=0x509U;
+#endif
     terminal((uint32_t)result);
 }
 
@@ -324,6 +397,47 @@ static void init_card(void)
     P[RP_SD_READY]=DWT->CYCCNT;
     if(operation==RAW_OP_CAPTURE) (void)phase_gpio_emit(5U);
 }
+
+#if SD_READ_DIAGNOSTICS
+/* Quiescence telemetry only: does not authorize storage recovery or success. */
+volatile uint32_t raw_read_camera_proof[16];
+static int read_camera_check(uint32_t phase)
+{
+    volatile uint32_t *v=raw_read_camera_proof;
+    v[2]=phase; v[3]=RCC->AHB4ENR;
+    if((v[3]&(RCC_AHB4ENR_PWREN|RCC_AHB4ENR_GPIOOEN))!=
+            (RCC_AHB4ENR_PWREN|RCC_AHB4ENR_GPIOOEN)) return 0;
+    v[4]=PWR->SVMCR3; v[5]=GPIOO->MODER; v[6]=GPIOO->ODR; v[7]=GPIOO->IDR;
+    v[8]=GPIOO->OTYPER; v[9]=GPIOO->PUPDR; v[11]=DWT->CYCCNT;
+    if(phase==2U && (v[3]&(RCC_AHB4ENR_GPIOCEN|RCC_AHB4ENR_GPIOEEN))==
+            (RCC_AHB4ENR_GPIOCEN|RCC_AHB4ENR_GPIOEEN)) {
+        v[12]=GPIOC->OSPEEDR; v[13]=GPIOE->OSPEEDR; v[14]=1U;
+    }
+    v[15]=((v[4]&PWR_SVMCR3_VDDIO2SV) && (v[5]&(3U<<10))==(1U<<10) &&
+        !(v[6]&(1U<<5)) && !(v[7]&(1U<<5)) && !(v[8]&(1U<<5)) && !(v[9]&(3U<<10)));
+    __DSB(); return v[15]!=0U;
+}
+
+static void read_camera_hold_reset(void)
+{
+    raw_read_camera_proof[0]=0x31504352U; /* RCP1 */
+    raw_read_camera_proof[1]=1U;
+    RCC->AHB4ENSR=RCC_AHB4ENSR_PWRENS|RCC_AHB4ENSR_GPIOOENS;
+    (void)RCC->AHB4ENR; __DSB();
+    if((RCC->AHB4ENR&(RCC_AHB4ENR_PWREN|RCC_AHB4ENR_GPIOOEN))!=
+            (RCC_AHB4ENR_PWREN|RCC_AHB4ENR_GPIOOEN)) terminal(0x215U);
+    PWR->SVMCR3|=PWR_SVMCR3_VDDIO2SV;
+    GPIOO->BSRR=1U<<21; GPIOO->OTYPER&=~(1U<<5);
+    GPIOO->PUPDR&=~(3U<<10); GPIOO->OSPEEDR|=3U<<10;
+    GPIOO->MODER=(GPIOO->MODER&~(3U<<10))|(1U<<10);
+    __DSB();
+    raw_read_camera_proof[10]=DWT->CYCCNT;
+    P[RP_SENSOR_RESET_BEGIN]=raw_read_camera_proof[10];
+    while((uint32_t)(DWT->CYCCNT-raw_read_camera_proof[10])<40800U) __NOP();
+    if(!read_camera_check(1U)) terminal(0x215U);
+    /* Keep PO5 asserted. No reset release, I2C setup or sensor START. */
+}
+#endif
 
 static void sensor_reset_start(void)
 {
@@ -387,6 +501,14 @@ void raw_runtime_dispatch(void)
     raw_producer_init(&raw_producer,RAW_LINE_STREAM);
     if(!RAW_FLASH && (Q[0]!=RAW_REQUEST_MAGIC || !Q[1] ||
        operation<RAW_OP_CAPTURE || operation>RAW_OP_READ)) terminal(1);
+#if RAW_POWER_PROBE
+    /* A power-probe binary never formats or reads a card as a separate task. */
+    if(operation!=RAW_OP_CAPTURE) terminal(1);
+#endif
+#if SD_READ_DIAGNOSTICS
+    /* Reject every camera/write path before sensor setup or card access. */
+    if(operation!=RAW_OP_READ || Q[4]!=1U || Q[5]!=0U) terminal(1);
+#endif
     if(__get_CONTROL() || __get_IPSR() || __get_PRIMASK()!=1U ||
        (SCB->CCR&SCB_CCR_DC_Msk) || __get_FAULTMASK() || (FPU->FPCCR&1U)) terminal(2);
     status_led_boot_begin(); status_led_proof_init();
@@ -406,6 +528,9 @@ void raw_runtime_dispatch(void)
         sensor_reset_start(); CYCLE_MARK(RUNTIME_READY); return;
     }
     SystemCoreClockUpdate();
+#if SD_READ_DIAGNOSTICS
+    read_camera_hold_reset();
+#endif
     init_card();
     int r;
     if(operation==RAW_OP_FORMAT) {
@@ -428,7 +553,20 @@ void raw_runtime_dispatch(void)
         if(!count || count>RAW_READ_MAX_BYTES/512U) complete_storage(3);
         P[RP_STAGE]=4U; P[RP_READ_LBA]=lba; P[RP_READ_COUNT]=count;
         P[RP_READ_DEST]=RAW_READ_ADDRESS;
+#if SD_READ_DIAGNOSTICS
+        /* Retained SRAM is not evidence of transfer: both modes start with
+         * the same sentinel. A failed read remains untrusted after capture. */
+        for(uint32_t i=0;i<128U;++i) ((volatile uint32_t *)RAW_READ_ADDRESS)[i]=0xA5A5A5A5U;
+        __DSB();
+#endif
         SD_OPERATION(r,sd_read_blocks(&raw_card,lba,(void *)RAW_READ_ADDRESS,count));
+#if SD_READ_DIAGNOSTICS
+        if(!read_camera_check(2U) || !raw_read_camera_proof[14]) {
+            /* Preserve the original SD error if present; a camera proof
+             * failure can never turn this into a successful read. */
+            if(!r) complete_storage(0x216U);
+        }
+#endif
         if(r) complete_storage(0x400U|(uint32_t)r);
         P[RP_READ_BYTES]=count*512U;
         if(raw_card.written_sectors) complete_storage(4);

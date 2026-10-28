@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "recorded_utc": "2026-10-27T06:02:29.736049+00:00",
+  "hardware_access": false,
+  "source": "User wiring clarification relayed by the exclusive bench owner during CLK-only control on2026-10-27",
+  "correct_clk_connection": "DIRECT JUMPER; NO SERIES RESISTOR",
+  "effective_from": "Beginning of CLK-slew experiments, including preliminary and formal trials",
+  "applies_to_conditions": [
+    "CLK-slew campaign",
+    "initial probe-free PIO/IDMA sector reads",
+    "joint CLK+CMD probe control",
+    "CLK-only probe control"
+  ],
+  "superseded_assumption": "27-ohm series CLK resistor present near the SD card after a wire extension",
+  "independent_physical_inspection": false,
+  "same_actual_clk_connection_across_conditions_reported_by_user": true,
+  "prior_archives_unchanged": true,
+  "affected_sealed_archives": [
+    {
+      "archive": "2026-10-27-clk-slew",
+      "checksum_manifest": "SHA256SUMS.json",
+      "checksum_manifest_sha256": "a71f9b68710eaf069280a66a44ee5ebf0941d03a401a4915fda48c4090b7532a",
+      "README_sha256": "310346aee298b4026476c6df5f1f437099ac38dbf276bd9450a6c9dd6fdf6371",
+      "archive_modified": false
+    },
+    {
+      "archive": "2026-10-27-pio-idma-read",
+      "checksum_manifest": "SHA256SUMS",
+      "checksum_manifest_sha256": "92f9373fba76c7a2b561220ad67ab1defd386f545a2a190f191df80dc9216da4",
+      "README_sha256": "83cf4938dd3572d236a2dc93e839119a56020c25e7d6aaa34d76060d8a568642",
+      "archive_modified": false
+    },
+    {
+      "archive": "2026-10-27-pio-idma-probe-control",
+      "checksum_manifest": "SHA256SUMS",
+      "checksum_manifest_sha256": "a648ea37bb3120c7fd792f0823c7592e10de9230e93a6ca54650aa7cf2204c4d",
+      "README_sha256": "fc056ac59a5db445c30461878fa902adb3d9b2fe04d7dd8797b07dde3c63ccab",
+      "archive_modified": false
+    }
+  ],
+  "new_clk_only_archive_policy": "Use corrected no-resistor condition from creation; link this addendum",
+  "earlier_experiments_outside_scope": "No retrospective wiring assertion",
+  "measurement_results_changed": false,
+  "physical_interpretation": "Any resistor-dependent explanation must be reevaluated; the correction itself establishes no electrical mechanism"
+}

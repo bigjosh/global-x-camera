@@ -1,0 +1,111 @@
+#ifndef CAPTURE_RAW_RUNTIME_H
+#define CAPTURE_RAW_RUNTIME_H
+#include <stdint.h>
+#include "sd_card.h"
+#include "raw_slots.h"
+#include "producer.h"
+#ifndef RAW_MAGIC_FORMAT
+#define RAW_MAGIC_FORMAT 0
+#endif
+#if RAW_MAGIC_FORMAT
+#include "magic_slots.h"
+#define RAW_FRAME_ADDRESS 0x340000A0U
+#define RAW_SLOT_BUFFER_ADDRESS 0x34000004U
+#else
+#define RAW_FRAME_ADDRESS 0x34000000U
+#endif
+#ifndef RAW_LINE_STREAM
+#define RAW_LINE_STREAM 0
+#endif
+#ifndef RAW_PREINIT
+#define RAW_PREINIT 0
+#endif
+#ifndef RAW_LINE_SNAPSHOTS
+#define RAW_LINE_SNAPSHOTS 0
+#endif
+#ifndef RAW_LINE_POISON
+#define RAW_LINE_POISON 0
+#endif
+#ifndef RAW_WHOLE_IMAGE_PREERASE
+#define RAW_WHOLE_IMAGE_PREERASE 0
+#endif
+#ifndef RAW_DMA_TAIL_WAIT
+#define RAW_DMA_TAIL_WAIT 0
+#endif
+#if RAW_DMA_TAIL_WAIT != 0 && RAW_DMA_TAIL_WAIT != 1
+#error DMA tail wait must be explicitly disabled or enabled
+#endif
+#if RAW_DMA_TAIL_WAIT && !RAW_MAGIC_FORMAT
+#error DMA tail wait requires the magic slot format
+#endif
+#if RAW_DMA_TAIL_WAIT
+/* Optional RAM experiment: this record is telemetry, never an idle proof. */
+#define RAW_DMA_TAIL_WAIT_MAGIC 0x31575444U /* DTW1 */
+#define RAW_DMA_TAIL_WAIT_WORDS 16U
+#define RAW_DMA_TAIL_WAIT_CYCLES 4000000U /* 10 ms at the qualified 400 MHz */
+enum {
+ DTW_MAGIC, DTW_VERSION, DTW_OUTCOME, DTW_START, DTW_END, DTW_ELAPSED,
+ DTW_LIMIT, DTW_AVAILABLE_BEFORE, DTW_AVAILABLE_AFTER, DTW_POLLS,
+ DTW_RESULT, DTW_FRAME_BEFORE, DTW_STOPPED_BEFORE,
+ DTW_RESERVED0, DTW_RESERVED1, DTW_RESERVED2
+};
+enum {
+ DTW_ALREADY_FULL=1, DTW_FRAME_PENDING=2, DTW_PREFIX_SHORT=3,
+ DTW_COMPLETED=4, DTW_TIMEOUT_PIO=5, DTW_FAULT=6
+};
+extern volatile uint32_t raw_dma_tail_wait_proof[RAW_DMA_TAIL_WAIT_WORDS];
+#endif
+#define RAW_REQUEST_ADDRESS 0x343FD000U
+#define RAW_PROOF_ADDRESS 0x343FD100U
+#define RAW_READ_ADDRESS 0x34200000U
+#define RAW_READ_MAX_BYTES 262144U
+#define RAW_PROOF_MAGIC 0x52535731U /* RSW1 */
+#define RAW_PROOF_TERMINAL 0x5253444EU /* RSDN */
+#define RAW_REQUEST_MAGIC 0x52535131U /* RSQ1 */
+#define RAW_PROOF_WORDS 96U
+#define RAW_CHUNK_TRACE_ADDRESS 0x343FE000U
+#define RAW_CHUNK_TRACE_CAPACITY 128U
+#define RAW_ABORT_ADDRESS 0x343FD300U
+#define RAW_ABORT_WORDS 16U
+#define RAW_ABORT_MAGIC 0x43414231U /* CAB1: failure reset, never success STOP */
+enum { RAW_OP_CAPTURE=1, RAW_OP_FORMAT=2, RAW_OP_READ=3 };
+enum {
+ RP_MAGIC, RP_SCHEMA, RP_WORDS, RP_NONCE, RP_OPERATION, RP_STATE, RP_RESULT,
+ RP_STAGE, RP_TERMINAL, RP_FRAME, RP_BYTES, RP_WIDTH, RP_HEIGHT,
+ RP_CARD, RP_CARD_SIZE, RP_SLOTS, RP_SLOTS_SIZE, RP_SD_ERROR,
+ RP_MEDIA_IDLE, RP_INITIALIZED, RP_CONTROLLER_OWNED, RP_LAST_READY,
+ RP_CLEANUP_ERROR, RP_SLOT, RP_PAYLOAD_LBA, RP_SLOT_COUNT, RP_WRITTEN_SECTORS,
+ RP_SCAN_HEADERS, RP_FORMATTED_SLOTS, RP_CAMERA_READY, RP_DMA_BYTES,
+ RP_FRAMES, RP_ERRORS, RP_CANARY, RP_FORMAT, RP_DATA_TYPE, RP_PATTERN,
+ RP_P0PPCR, RP_VC0CFGR1, RP_P0FSCR, RP_P0FCTCR, RP_CMSR1,
+ RP_CSI_SR0, RP_CSI_SR1, RP_BEGIN, RP_ARM, RP_FRAME_DONE, RP_CAMERA_STOP,
+ RP_SD_BEGIN, RP_SD_READY, RP_SCAN_DONE, RP_SLOT_BEGIN, RP_FIRST_WRITE,
+ RP_PAYLOAD_DONE, RP_COMMIT_DONE, RP_DEINIT_DONE, RP_END,
+ RP_CCR, RP_CONTROL, RP_IPSR, RP_PRIMASK, RP_FPCCR, RP_CPACR, RP_SYSTICK,
+ RP_READ_LBA, RP_READ_COUNT, RP_READ_DEST, RP_READ_BYTES,
+ RP_CARD_READ_LO, RP_CARD_READ_HI, RP_CARD_WRITE_LO, RP_CARD_WRITE_HI,
+ RP_WRITE_CYCLES_LO, RP_WRITE_CYCLES_HI, RP_READY_CYCLES_LO, RP_READY_CYCLES_HI,
+ RP_INIT_CYCLES, RP_CLOCK_HZ, RP_TRANSPORT, RP_CHUNK_SECTORS,
+ RP_GENERATION_LO, RP_GENERATION_HI, RP_CAPTURE_ERROR, RP_COMPLETION,
+ RP_CONTEXT_BEFORE, RP_FPCCR_BEFORE, RP_CPACR_BEFORE, RP_MSPLIM, RP_MSP,
+ RP_SENSOR_RESET_BEGIN, RP_SENSOR_RESET_END, RP_SENSOR_START_BEGIN,
+ RP_SENSOR_START_END, RP_FLAGS, RP_CHUNK_COUNT, RP_CHUNK_OVERFLOW
+};
+extern sd_card_t raw_card;
+extern raw_slots_t raw_slots;
+void raw_runtime_dispatch(void);
+void raw_storage_execute(void) __attribute__((noreturn));
+void raw_capture_poll(void);
+uint32_t raw_capture_available(void);
+uint32_t raw_capture_frame_validated(void);
+uint32_t raw_storage_transfer_active(void);
+uint32_t raw_capture_fault(void);
+void raw_capture_frame_event(void);
+void raw_capture_armed(void);
+void raw_capture_stopped(void);
+void raw_capture_data_ready(void);
+void raw_capture_fail(uint32_t where,int32_t result) __attribute__((noreturn));
+uint32_t raw_capture_sensor_stopped(void);
+uint32_t raw_capture_exposure_us(void);
+int raw_storage_shutdown_ready(void);
+#endif

@@ -1,0 +1,2011 @@
+{
+  "run": "candidate02",
+  "group": "candidate",
+  "trace": "D:\\Github\\global-x-camera\\tmp\\bringup\\ethernet-normal-20261028\\candidate02\\trace",
+  "evidence": {
+    "build": "D:\\Github\\global-x-camera\\tmp\\bringup\\ethernet-normal-20261028\\flash-candidate",
+    "prefix_sha256": "2b9724bc4b60af52b1c4ab45e1b232578e9640efc3a30a57772a810d99c3f344"
+  },
+  "result_sha256": "d3a7d2a82bf0e52206e61fd5e01ae872d5883ad4565f1c42b8edb80662e6742b",
+  "checks": {
+    "current": {
+      "sha256": "c7aad7ae1273b1ed0c208c59516320b1860390fe3f0c35da9a69a26e01f7ab33",
+      "hash_passed": true,
+      "contiguous": true,
+      "first_sample_id": 0,
+      "analyzed_end_exclusive": 46233558,
+      "excluded_final_chunk": false,
+      "nonfinite": 71
+    },
+    "voltage": {
+      "sha256": "c34fec855f3d233f5a996aa0837138f88c9e35f02bcf29263095db0a54479b6f",
+      "hash_passed": true,
+      "contiguous": true,
+      "first_sample_id": 16128,
+      "analyzed_end_exclusive": 46249686,
+      "excluded_final_chunk": false,
+      "nonfinite": 0
+    },
+    "power": {
+      "sha256": "92d76259615e750842436f26a8c53ef1b785597a5b515bc64bd1214a6eada414",
+      "hash_passed": true,
+      "contiguous": true,
+      "first_sample_id": 16128,
+      "analyzed_end_exclusive": 46249686,
+      "excluded_final_chunk": false,
+      "nonfinite": 0
+    },
+    "gpi0": {
+      "sha256": "2dde6f351add20e11ca287e11aa47c0b624e324621043e1d9f904f7e11e95e56",
+      "hash_passed": true,
+      "contiguous": true,
+      "first_sample_id": 16128,
+      "analyzed_end_exclusive": 46116128,
+      "excluded_final_chunk": true,
+      "nonfinite": null
+    },
+    "gpi1": {
+      "sha256": "024eee72e5eee3d271a9744f99ae31032b799f3ebe393de7e4008755f48028cb",
+      "hash_passed": true,
+      "contiguous": true,
+      "first_sample_id": 16128,
+      "analyzed_end_exclusive": 46116128,
+      "excluded_final_chunk": true,
+      "nonfinite": null
+    }
+  },
+  "marker_events": [
+    {
+      "id": 1,
+      "name": "receiver_entry",
+      "sample_id": 34221926,
+      "end_sample_id": 34221931,
+      "time_ms": 23.842499999999998,
+      "width_us": 2.5
+    },
+    {
+      "id": 2,
+      "name": "first_strobe_irq_observed",
+      "sample_id": 34224173,
+      "end_sample_id": 34224182,
+      "time_ms": 24.965999999999998,
+      "width_us": 4.5
+    },
+    {
+      "id": 4,
+      "name": "sd_initialization_begin",
+      "sample_id": 34246570,
+      "end_sample_id": 34246587,
+      "time_ms": 36.164500000000004,
+      "width_us": 8.5
+    },
+    {
+      "id": 3,
+      "name": "first_frame_complete_irq_observed",
+      "sample_id": 34267900,
+      "end_sample_id": 34267912,
+      "time_ms": 46.8295,
+      "width_us": 6.0
+    },
+    {
+      "id": 5,
+      "name": "sd_initialization_complete",
+      "sample_id": 34460084,
+      "end_sample_id": 34460105,
+      "time_ms": 142.9215,
+      "width_us": 10.5
+    },
+    {
+      "id": 6,
+      "name": "first_slot_transport_submission",
+      "sample_id": 34630392,
+      "end_sample_id": 34630417,
+      "time_ms": 228.07549999999998,
+      "width_us": 12.5
+    },
+    {
+      "id": 7,
+      "name": "slot_transport_returned_success",
+      "sample_id": 34959070,
+      "end_sample_id": 34959099,
+      "time_ms": 392.4145,
+      "width_us": 14.5
+    },
+    {
+      "id": 8,
+      "name": "full_slot_commit_complete",
+      "sample_id": 34959115,
+      "end_sample_id": 34959147,
+      "time_ms": 392.43699999999995,
+      "width_us": 16.0
+    },
+    {
+      "id": 9,
+      "name": "sd_deinitialization_complete",
+      "sample_id": 34959244,
+      "end_sample_id": 34959280,
+      "time_ms": 392.5015,
+      "width_us": 18.0
+    },
+    {
+      "id": 10,
+      "name": "pre_standby_wfi",
+      "sample_id": 34959824,
+      "end_sample_id": 34959865,
+      "time_ms": 392.79150000000004,
+      "width_us": 20.5
+    }
+  ],
+  "marker_precedence_pass": true,
+  "unique_marker_train": true,
+  "marker_rule": "Protocol2: abs(width_us - (2*ID+0.24)) <=0.80, native0.5us grid; unique IDs1..10 plus semantic precedence, arbitrary permitted ordering.",
+  "all_gpi_edges": {
+    "gpi0": [
+      {
+        "sample_id": 34221926,
+        "level": 1
+      },
+      {
+        "sample_id": 34221931,
+        "level": 0
+      },
+      {
+        "sample_id": 34224173,
+        "level": 1
+      },
+      {
+        "sample_id": 34224182,
+        "level": 0
+      },
+      {
+        "sample_id": 34246570,
+        "level": 1
+      },
+      {
+        "sample_id": 34246587,
+        "level": 0
+      },
+      {
+        "sample_id": 34267900,
+        "level": 1
+      },
+      {
+        "sample_id": 34267912,
+        "level": 0
+      },
+      {
+        "sample_id": 34460084,
+        "level": 1
+      },
+      {
+        "sample_id": 34460105,
+        "level": 0
+      },
+      {
+        "sample_id": 34630392,
+        "level": 1
+      },
+      {
+        "sample_id": 34630417,
+        "level": 0
+      },
+      {
+        "sample_id": 34959070,
+        "level": 1
+      },
+      {
+        "sample_id": 34959099,
+        "level": 0
+      },
+      {
+        "sample_id": 34959115,
+        "level": 1
+      },
+      {
+        "sample_id": 34959147,
+        "level": 0
+      },
+      {
+        "sample_id": 34959244,
+        "level": 1
+      },
+      {
+        "sample_id": 34959280,
+        "level": 0
+      },
+      {
+        "sample_id": 34959824,
+        "level": 1
+      },
+      {
+        "sample_id": 34959865,
+        "level": 0
+      }
+    ],
+    "gpi1": [
+      {
+        "sample_id": 4154711,
+        "level": 0
+      },
+      {
+        "sample_id": 4154714,
+        "level": 1
+      },
+      {
+        "sample_id": 4154715,
+        "level": 0
+      },
+      {
+        "sample_id": 4154717,
+        "level": 1
+      },
+      {
+        "sample_id": 4154722,
+        "level": 0
+      },
+      {
+        "sample_id": 4154723,
+        "level": 1
+      },
+      {
+        "sample_id": 4154725,
+        "level": 0
+      },
+      {
+        "sample_id": 4154726,
+        "level": 1
+      },
+      {
+        "sample_id": 4154779,
+        "level": 0
+      },
+      {
+        "sample_id": 4154780,
+        "level": 1
+      },
+      {
+        "sample_id": 4154783,
+        "level": 0
+      },
+      {
+        "sample_id": 4154786,
+        "level": 1
+      },
+      {
+        "sample_id": 4154788,
+        "level": 0
+      },
+      {
+        "sample_id": 4154789,
+        "level": 1
+      },
+      {
+        "sample_id": 4154792,
+        "level": 0
+      },
+      {
+        "sample_id": 4154796,
+        "level": 1
+      },
+      {
+        "sample_id": 4154797,
+        "level": 0
+      },
+      {
+        "sample_id": 4154798,
+        "level": 1
+      },
+      {
+        "sample_id": 4154823,
+        "level": 0
+      },
+      {
+        "sample_id": 4154825,
+        "level": 1
+      },
+      {
+        "sample_id": 4154827,
+        "level": 0
+      },
+      {
+        "sample_id": 4154829,
+        "level": 1
+      },
+      {
+        "sample_id": 4154831,
+        "level": 0
+      },
+      {
+        "sample_id": 4154833,
+        "level": 1
+      },
+      {
+        "sample_id": 4154836,
+        "level": 0
+      },
+      {
+        "sample_id": 4154841,
+        "level": 1
+      },
+      {
+        "sample_id": 4154844,
+        "level": 0
+      },
+      {
+        "sample_id": 4154845,
+        "level": 1
+      },
+      {
+        "sample_id": 4154846,
+        "level": 0
+      },
+      {
+        "sample_id": 4154847,
+        "level": 1
+      },
+      {
+        "sample_id": 4154850,
+        "level": 0
+      },
+      {
+        "sample_id": 4154851,
+        "level": 1
+      },
+      {
+        "sample_id": 4154852,
+        "level": 0
+      },
+      {
+        "sample_id": 4154853,
+        "level": 1
+      },
+      {
+        "sample_id": 4154856,
+        "level": 0
+      },
+      {
+        "sample_id": 4154857,
+        "level": 1
+      },
+      {
+        "sample_id": 4154858,
+        "level": 0
+      },
+      {
+        "sample_id": 4154861,
+        "level": 1
+      },
+      {
+        "sample_id": 4154862,
+        "level": 0
+      },
+      {
+        "sample_id": 4154868,
+        "level": 1
+      },
+      {
+        "sample_id": 4154869,
+        "level": 0
+      },
+      {
+        "sample_id": 4154871,
+        "level": 1
+      },
+      {
+        "sample_id": 4154876,
+        "level": 0
+      },
+      {
+        "sample_id": 4154877,
+        "level": 1
+      },
+      {
+        "sample_id": 4154879,
+        "level": 0
+      },
+      {
+        "sample_id": 4154881,
+        "level": 1
+      },
+      {
+        "sample_id": 4154898,
+        "level": 0
+      },
+      {
+        "sample_id": 4154902,
+        "level": 1
+      },
+      {
+        "sample_id": 4154903,
+        "level": 0
+      },
+      {
+        "sample_id": 4154904,
+        "level": 1
+      },
+      {
+        "sample_id": 4154905,
+        "level": 0
+      },
+      {
+        "sample_id": 4154907,
+        "level": 1
+      },
+      {
+        "sample_id": 4154912,
+        "level": 0
+      },
+      {
+        "sample_id": 4154913,
+        "level": 1
+      },
+      {
+        "sample_id": 4154914,
+        "level": 0
+      },
+      {
+        "sample_id": 4154918,
+        "level": 1
+      },
+      {
+        "sample_id": 4154919,
+        "level": 0
+      },
+      {
+        "sample_id": 4154921,
+        "level": 1
+      },
+      {
+        "sample_id": 4154923,
+        "level": 0
+      },
+      {
+        "sample_id": 4154927,
+        "level": 1
+      },
+      {
+        "sample_id": 4154930,
+        "level": 0
+      },
+      {
+        "sample_id": 4154931,
+        "level": 1
+      },
+      {
+        "sample_id": 4154932,
+        "level": 0
+      },
+      {
+        "sample_id": 4154933,
+        "level": 1
+      },
+      {
+        "sample_id": 4154935,
+        "level": 0
+      },
+      {
+        "sample_id": 4154941,
+        "level": 1
+      },
+      {
+        "sample_id": 4154942,
+        "level": 0
+      },
+      {
+        "sample_id": 4154943,
+        "level": 1
+      },
+      {
+        "sample_id": 4154945,
+        "level": 0
+      },
+      {
+        "sample_id": 4154948,
+        "level": 1
+      },
+      {
+        "sample_id": 4154949,
+        "level": 0
+      },
+      {
+        "sample_id": 4154951,
+        "level": 1
+      },
+      {
+        "sample_id": 4154952,
+        "level": 0
+      },
+      {
+        "sample_id": 4154953,
+        "level": 1
+      },
+      {
+        "sample_id": 4154955,
+        "level": 0
+      },
+      {
+        "sample_id": 4154957,
+        "level": 1
+      },
+      {
+        "sample_id": 4154959,
+        "level": 0
+      },
+      {
+        "sample_id": 4154961,
+        "level": 1
+      },
+      {
+        "sample_id": 4154962,
+        "level": 0
+      },
+      {
+        "sample_id": 4154963,
+        "level": 1
+      },
+      {
+        "sample_id": 4154965,
+        "level": 0
+      },
+      {
+        "sample_id": 4154973,
+        "level": 1
+      },
+      {
+        "sample_id": 4154974,
+        "level": 0
+      },
+      {
+        "sample_id": 4154976,
+        "level": 1
+      },
+      {
+        "sample_id": 4154980,
+        "level": 0
+      },
+      {
+        "sample_id": 4154981,
+        "level": 1
+      },
+      {
+        "sample_id": 4154983,
+        "level": 0
+      },
+      {
+        "sample_id": 4154986,
+        "level": 1
+      },
+      {
+        "sample_id": 4154987,
+        "level": 0
+      },
+      {
+        "sample_id": 4154993,
+        "level": 1
+      },
+      {
+        "sample_id": 4154996,
+        "level": 0
+      },
+      {
+        "sample_id": 4154999,
+        "level": 1
+      },
+      {
+        "sample_id": 4155000,
+        "level": 0
+      },
+      {
+        "sample_id": 4155002,
+        "level": 1
+      },
+      {
+        "sample_id": 4155003,
+        "level": 0
+      },
+      {
+        "sample_id": 4155009,
+        "level": 1
+      },
+      {
+        "sample_id": 4155011,
+        "level": 0
+      },
+      {
+        "sample_id": 4155012,
+        "level": 1
+      },
+      {
+        "sample_id": 4155014,
+        "level": 0
+      },
+      {
+        "sample_id": 4155015,
+        "level": 1
+      },
+      {
+        "sample_id": 4155016,
+        "level": 0
+      },
+      {
+        "sample_id": 4155021,
+        "level": 1
+      },
+      {
+        "sample_id": 4155022,
+        "level": 0
+      },
+      {
+        "sample_id": 4155025,
+        "level": 1
+      },
+      {
+        "sample_id": 4155027,
+        "level": 0
+      },
+      {
+        "sample_id": 4155031,
+        "level": 1
+      },
+      {
+        "sample_id": 4155033,
+        "level": 0
+      },
+      {
+        "sample_id": 4155035,
+        "level": 1
+      },
+      {
+        "sample_id": 4155036,
+        "level": 0
+      },
+      {
+        "sample_id": 4155043,
+        "level": 1
+      },
+      {
+        "sample_id": 4155045,
+        "level": 0
+      },
+      {
+        "sample_id": 4155047,
+        "level": 1
+      },
+      {
+        "sample_id": 4155050,
+        "level": 0
+      },
+      {
+        "sample_id": 4155052,
+        "level": 1
+      },
+      {
+        "sample_id": 4155054,
+        "level": 0
+      },
+      {
+        "sample_id": 4155056,
+        "level": 1
+      },
+      {
+        "sample_id": 4155057,
+        "level": 0
+      },
+      {
+        "sample_id": 4155061,
+        "level": 1
+      },
+      {
+        "sample_id": 4155062,
+        "level": 0
+      },
+      {
+        "sample_id": 4155063,
+        "level": 1
+      },
+      {
+        "sample_id": 4155064,
+        "level": 0
+      },
+      {
+        "sample_id": 4155065,
+        "level": 1
+      },
+      {
+        "sample_id": 4155066,
+        "level": 0
+      },
+      {
+        "sample_id": 4155067,
+        "level": 1
+      },
+      {
+        "sample_id": 4155068,
+        "level": 0
+      },
+      {
+        "sample_id": 4155069,
+        "level": 1
+      },
+      {
+        "sample_id": 4155072,
+        "level": 0
+      },
+      {
+        "sample_id": 4155075,
+        "level": 1
+      },
+      {
+        "sample_id": 4155076,
+        "level": 0
+      },
+      {
+        "sample_id": 4155077,
+        "level": 1
+      },
+      {
+        "sample_id": 4155078,
+        "level": 0
+      },
+      {
+        "sample_id": 4155079,
+        "level": 1
+      },
+      {
+        "sample_id": 4155081,
+        "level": 0
+      },
+      {
+        "sample_id": 4155082,
+        "level": 1
+      },
+      {
+        "sample_id": 4155084,
+        "level": 0
+      },
+      {
+        "sample_id": 4155086,
+        "level": 1
+      },
+      {
+        "sample_id": 4155088,
+        "level": 0
+      },
+      {
+        "sample_id": 4155089,
+        "level": 1
+      },
+      {
+        "sample_id": 4155092,
+        "level": 0
+      },
+      {
+        "sample_id": 4155093,
+        "level": 1
+      },
+      {
+        "sample_id": 4155094,
+        "level": 0
+      },
+      {
+        "sample_id": 4155095,
+        "level": 1
+      },
+      {
+        "sample_id": 4155096,
+        "level": 0
+      },
+      {
+        "sample_id": 4155100,
+        "level": 1
+      },
+      {
+        "sample_id": 4155101,
+        "level": 0
+      },
+      {
+        "sample_id": 4155103,
+        "level": 1
+      },
+      {
+        "sample_id": 4155104,
+        "level": 0
+      },
+      {
+        "sample_id": 4155105,
+        "level": 1
+      },
+      {
+        "sample_id": 4155106,
+        "level": 0
+      },
+      {
+        "sample_id": 4155114,
+        "level": 1
+      },
+      {
+        "sample_id": 4155115,
+        "level": 0
+      },
+      {
+        "sample_id": 4155117,
+        "level": 1
+      },
+      {
+        "sample_id": 4155118,
+        "level": 0
+      },
+      {
+        "sample_id": 4155128,
+        "level": 1
+      },
+      {
+        "sample_id": 4155130,
+        "level": 0
+      },
+      {
+        "sample_id": 4155131,
+        "level": 1
+      },
+      {
+        "sample_id": 4155132,
+        "level": 0
+      },
+      {
+        "sample_id": 4155133,
+        "level": 1
+      },
+      {
+        "sample_id": 4155134,
+        "level": 0
+      },
+      {
+        "sample_id": 4155136,
+        "level": 1
+      },
+      {
+        "sample_id": 4155138,
+        "level": 0
+      },
+      {
+        "sample_id": 4155140,
+        "level": 1
+      },
+      {
+        "sample_id": 4155141,
+        "level": 0
+      },
+      {
+        "sample_id": 4155145,
+        "level": 1
+      },
+      {
+        "sample_id": 4155147,
+        "level": 0
+      },
+      {
+        "sample_id": 4155149,
+        "level": 1
+      },
+      {
+        "sample_id": 4155150,
+        "level": 0
+      },
+      {
+        "sample_id": 4155154,
+        "level": 1
+      },
+      {
+        "sample_id": 4155155,
+        "level": 0
+      },
+      {
+        "sample_id": 4155156,
+        "level": 1
+      },
+      {
+        "sample_id": 4155157,
+        "level": 0
+      },
+      {
+        "sample_id": 4155159,
+        "level": 1
+      },
+      {
+        "sample_id": 4155160,
+        "level": 0
+      },
+      {
+        "sample_id": 4155161,
+        "level": 1
+      },
+      {
+        "sample_id": 4155162,
+        "level": 0
+      },
+      {
+        "sample_id": 4155163,
+        "level": 1
+      },
+      {
+        "sample_id": 4155164,
+        "level": 0
+      },
+      {
+        "sample_id": 4155170,
+        "level": 1
+      },
+      {
+        "sample_id": 4155171,
+        "level": 0
+      },
+      {
+        "sample_id": 4155173,
+        "level": 1
+      },
+      {
+        "sample_id": 4155175,
+        "level": 0
+      },
+      {
+        "sample_id": 4155181,
+        "level": 1
+      },
+      {
+        "sample_id": 4155182,
+        "level": 0
+      },
+      {
+        "sample_id": 4155183,
+        "level": 1
+      },
+      {
+        "sample_id": 4155184,
+        "level": 0
+      },
+      {
+        "sample_id": 4155193,
+        "level": 1
+      },
+      {
+        "sample_id": 4155196,
+        "level": 0
+      },
+      {
+        "sample_id": 4155197,
+        "level": 1
+      },
+      {
+        "sample_id": 4155199,
+        "level": 0
+      },
+      {
+        "sample_id": 4155207,
+        "level": 1
+      },
+      {
+        "sample_id": 4155208,
+        "level": 0
+      },
+      {
+        "sample_id": 4155210,
+        "level": 1
+      },
+      {
+        "sample_id": 4155212,
+        "level": 0
+      },
+      {
+        "sample_id": 4155224,
+        "level": 1
+      },
+      {
+        "sample_id": 4155225,
+        "level": 0
+      },
+      {
+        "sample_id": 4155231,
+        "level": 1
+      },
+      {
+        "sample_id": 4155232,
+        "level": 0
+      },
+      {
+        "sample_id": 4155244,
+        "level": 1
+      },
+      {
+        "sample_id": 4155245,
+        "level": 0
+      },
+      {
+        "sample_id": 4155249,
+        "level": 1
+      },
+      {
+        "sample_id": 4155250,
+        "level": 0
+      },
+      {
+        "sample_id": 4155253,
+        "level": 1
+      },
+      {
+        "sample_id": 4155254,
+        "level": 0
+      },
+      {
+        "sample_id": 4155257,
+        "level": 1
+      },
+      {
+        "sample_id": 4155258,
+        "level": 0
+      },
+      {
+        "sample_id": 4155278,
+        "level": 1
+      },
+      {
+        "sample_id": 4155279,
+        "level": 0
+      },
+      {
+        "sample_id": 4155281,
+        "level": 1
+      },
+      {
+        "sample_id": 4155282,
+        "level": 0
+      },
+      {
+        "sample_id": 4155287,
+        "level": 1
+      },
+      {
+        "sample_id": 4155288,
+        "level": 0
+      },
+      {
+        "sample_id": 4155290,
+        "level": 1
+      },
+      {
+        "sample_id": 4155292,
+        "level": 0
+      },
+      {
+        "sample_id": 4155297,
+        "level": 1
+      },
+      {
+        "sample_id": 4155298,
+        "level": 0
+      },
+      {
+        "sample_id": 4155302,
+        "level": 1
+      },
+      {
+        "sample_id": 4155303,
+        "level": 0
+      },
+      {
+        "sample_id": 4155343,
+        "level": 1
+      },
+      {
+        "sample_id": 4155345,
+        "level": 0
+      },
+      {
+        "sample_id": 4155347,
+        "level": 1
+      },
+      {
+        "sample_id": 4155348,
+        "level": 0
+      },
+      {
+        "sample_id": 4155349,
+        "level": 1
+      },
+      {
+        "sample_id": 4155350,
+        "level": 0
+      },
+      {
+        "sample_id": 4155351,
+        "level": 1
+      },
+      {
+        "sample_id": 4155354,
+        "level": 0
+      },
+      {
+        "sample_id": 4155355,
+        "level": 1
+      },
+      {
+        "sample_id": 4155356,
+        "level": 0
+      },
+      {
+        "sample_id": 4155358,
+        "level": 1
+      },
+      {
+        "sample_id": 4155359,
+        "level": 0
+      },
+      {
+        "sample_id": 34184840,
+        "level": 1
+      },
+      {
+        "sample_id": 34184842,
+        "level": 0
+      },
+      {
+        "sample_id": 34184845,
+        "level": 1
+      },
+      {
+        "sample_id": 34184846,
+        "level": 0
+      },
+      {
+        "sample_id": 34184847,
+        "level": 1
+      },
+      {
+        "sample_id": 34184852,
+        "level": 0
+      },
+      {
+        "sample_id": 34184853,
+        "level": 1
+      },
+      {
+        "sample_id": 34184855,
+        "level": 0
+      },
+      {
+        "sample_id": 34184860,
+        "level": 1
+      },
+      {
+        "sample_id": 34184862,
+        "level": 0
+      },
+      {
+        "sample_id": 34184875,
+        "level": 1
+      },
+      {
+        "sample_id": 34184876,
+        "level": 0
+      },
+      {
+        "sample_id": 34184877,
+        "level": 1
+      },
+      {
+        "sample_id": 34184879,
+        "level": 0
+      },
+      {
+        "sample_id": 34184897,
+        "level": 1
+      },
+      {
+        "sample_id": 34184898,
+        "level": 0
+      },
+      {
+        "sample_id": 34184900,
+        "level": 1
+      },
+      {
+        "sample_id": 34184902,
+        "level": 0
+      },
+      {
+        "sample_id": 34184910,
+        "level": 1
+      },
+      {
+        "sample_id": 34184912,
+        "level": 0
+      },
+      {
+        "sample_id": 34184913,
+        "level": 1
+      },
+      {
+        "sample_id": 34184914,
+        "level": 0
+      },
+      {
+        "sample_id": 34184915,
+        "level": 1
+      },
+      {
+        "sample_id": 34184916,
+        "level": 0
+      },
+      {
+        "sample_id": 34184920,
+        "level": 1
+      },
+      {
+        "sample_id": 34184921,
+        "level": 0
+      },
+      {
+        "sample_id": 34184922,
+        "level": 1
+      },
+      {
+        "sample_id": 34184923,
+        "level": 0
+      },
+      {
+        "sample_id": 34184927,
+        "level": 1
+      },
+      {
+        "sample_id": 34184928,
+        "level": 0
+      },
+      {
+        "sample_id": 34184931,
+        "level": 1
+      },
+      {
+        "sample_id": 34184933,
+        "level": 0
+      },
+      {
+        "sample_id": 34184935,
+        "level": 1
+      },
+      {
+        "sample_id": 34184938,
+        "level": 0
+      },
+      {
+        "sample_id": 34184940,
+        "level": 1
+      },
+      {
+        "sample_id": 34184941,
+        "level": 0
+      },
+      {
+        "sample_id": 34184942,
+        "level": 1
+      },
+      {
+        "sample_id": 34184944,
+        "level": 0
+      },
+      {
+        "sample_id": 34184946,
+        "level": 1
+      },
+      {
+        "sample_id": 34184948,
+        "level": 0
+      },
+      {
+        "sample_id": 34184949,
+        "level": 1
+      },
+      {
+        "sample_id": 34184950,
+        "level": 0
+      },
+      {
+        "sample_id": 34184953,
+        "level": 1
+      },
+      {
+        "sample_id": 34184955,
+        "level": 0
+      },
+      {
+        "sample_id": 34184957,
+        "level": 1
+      },
+      {
+        "sample_id": 34184958,
+        "level": 0
+      },
+      {
+        "sample_id": 34184959,
+        "level": 1
+      },
+      {
+        "sample_id": 34184962,
+        "level": 0
+      },
+      {
+        "sample_id": 34184968,
+        "level": 1
+      },
+      {
+        "sample_id": 34184973,
+        "level": 0
+      },
+      {
+        "sample_id": 34184974,
+        "level": 1
+      },
+      {
+        "sample_id": 34184995,
+        "level": 0
+      },
+      {
+        "sample_id": 34185000,
+        "level": 1
+      },
+      {
+        "sample_id": 34185001,
+        "level": 0
+      },
+      {
+        "sample_id": 34185002,
+        "level": 1
+      },
+      {
+        "sample_id": 34185004,
+        "level": 0
+      },
+      {
+        "sample_id": 34185007,
+        "level": 1
+      },
+      {
+        "sample_id": 34185008,
+        "level": 0
+      },
+      {
+        "sample_id": 34185009,
+        "level": 1
+      },
+      {
+        "sample_id": 34185012,
+        "level": 0
+      },
+      {
+        "sample_id": 34185014,
+        "level": 1
+      },
+      {
+        "sample_id": 34185015,
+        "level": 0
+      },
+      {
+        "sample_id": 34185021,
+        "level": 1
+      },
+      {
+        "sample_id": 34185025,
+        "level": 0
+      },
+      {
+        "sample_id": 34185026,
+        "level": 1
+      },
+      {
+        "sample_id": 34185027,
+        "level": 0
+      },
+      {
+        "sample_id": 34185033,
+        "level": 1
+      },
+      {
+        "sample_id": 34185034,
+        "level": 0
+      },
+      {
+        "sample_id": 34185035,
+        "level": 1
+      },
+      {
+        "sample_id": 34185036,
+        "level": 0
+      },
+      {
+        "sample_id": 34185040,
+        "level": 1
+      }
+    ]
+  },
+  "unclassified_gpi0_edges": 0,
+  "unclassified_pulses": [],
+  "onset_sample_id": 34174241,
+  "onset_definition": "First >=20mA native sample in500ms before receiver marker; preceding1ms finite with absolute mean<100uA.",
+  "plateau_sample_id": 35002000,
+  "plateau_definition": "First whole1ms bin after marker10 with10 consecutive bin means6..12mA;1ms endpoint resolution.",
+  "first5ms_raw_unqualified": {
+    "start_sample_id": 34174241,
+    "end_sample_id_exclusive": 34184241,
+    "start_ms": 0.0,
+    "end_ms": 5.0,
+    "duration_ms": 5.0,
+    "current_mean": 0.18808968462087214,
+    "current_min": -0.5118060111999512,
+    "current_max": 7.85714864730835,
+    "voltage_mean": 5.099313119459152,
+    "voltage_min": 1.800774097442627,
+    "voltage_max": 5.795738220214844,
+    "power_mean": 0.7433442069298588,
+    "power_min": -2.9000749588012695,
+    "power_max": 23.284297943115234,
+    "energy_mJ": 3.716721034649294,
+    "current_mean_mA": 188.08968462087213,
+    "finite": true
+  },
+  "whole_cycle_raw_unqualified": {
+    "start_sample_id": 34174241,
+    "end_sample_id_exclusive": 35002000,
+    "start_ms": 0.0,
+    "end_ms": 413.8795,
+    "duration_ms": 413.8795,
+    "current_mean": 0.08655668306910028,
+    "current_min": -0.5118060111999512,
+    "current_max": 7.85714864730835,
+    "voltage_mean": 4.981130777249933,
+    "voltage_min": 1.800774097442627,
+    "voltage_max": 5.795738220214844,
+    "power_mean": 0.4285530840461703,
+    "power_min": -2.9000749588012695,
+    "power_max": 23.284297943115234,
+    "energy_mJ": 177.36933614848692,
+    "current_mean_mA": 86.55668306910027,
+    "finite": true
+  },
+  "post5ms_to_plateau": {
+    "start_sample_id": 34184241,
+    "end_sample_id_exclusive": 35002000,
+    "start_ms": 5.0,
+    "end_ms": 413.8795,
+    "duration_ms": 408.8795,
+    "current_mean": 0.08531508252967764,
+    "current_min": 0.00478797871619463,
+    "current_max": 0.2303532212972641,
+    "voltage_mean": 4.979685579554656,
+    "voltage_min": 4.936594009399414,
+    "voltage_max": 5.030793190002441,
+    "power_mean": 0.42470364768553487,
+    "power_min": 0.023940615355968475,
+    "power_max": 1.1397746801376343,
+    "energy_mJ": 173.65261511383764,
+    "current_mean_mA": 85.31508252967764,
+    "finite": true
+  },
+  "post5ms_to_pre_WFI": {
+    "start_sample_id": 34184241,
+    "end_sample_id_exclusive": 34959824,
+    "start_ms": 5.0,
+    "end_ms": 392.79150000000004,
+    "duration_ms": 387.7915,
+    "current_mean": 0.08845950868411735,
+    "current_min": 0.035936396569013596,
+    "current_max": 0.2303532212972641,
+    "voltage_mean": 4.9790959854337276,
+    "voltage_min": 4.936594009399414,
+    "voltage_max": 5.030793190002441,
+    "power_mean": 0.4403383743248711,
+    "power_min": 0.17944267392158508,
+    "power_max": 1.1397746801376343,
+    "energy_mJ": 170.75947868700325,
+    "current_mean_mA": 88.45950868411735,
+    "finite": true
+  },
+  "low_plateau_100ms": {
+    "start_sample_id": 35002000,
+    "end_sample_id_exclusive": 35202000,
+    "start_ms": 413.8795,
+    "end_ms": 513.8795,
+    "duration_ms": 100.0,
+    "current_mean": 0.008665911076008342,
+    "current_min": 0.007245193235576153,
+    "current_max": 0.009944542311131954,
+    "voltage_mean": 4.993858902640342,
+    "voltage_min": 4.988801002502441,
+    "voltage_max": 4.997880458831787,
+    "power_mean": 0.043276319714356214,
+    "power_min": 0.03616127371788025,
+    "power_max": 0.04965648800134659,
+    "energy_mJ": 4.327631971435621,
+    "current_mean_mA": 8.665911076008342,
+    "finite": true
+  },
+  "segments_disjoint": [
+    {
+      "name": "post5ms_begin -> receiver_entry",
+      "start_sample_id": 34184241,
+      "end_sample_id_exclusive": 34221926,
+      "start_ms": 5.0,
+      "end_ms": 23.842499999999998,
+      "duration_ms": 18.8425,
+      "current_mean": 0.07145767488357589,
+      "current_min": 0.035936396569013596,
+      "current_max": 0.13652317225933075,
+      "voltage_mean": 4.988676364253873,
+      "voltage_min": 4.966102123260498,
+      "voltage_max": 5.030793190002441,
+      "power_mean": 0.3562311425467013,
+      "power_min": 0.17944267392158508,
+      "power_max": 0.6784584522247314,
+      "energy_mJ": 6.71228530343622,
+      "current_mean_mA": 71.45767488357589,
+      "finite": true
+    },
+    {
+      "name": "receiver_entry -> first_strobe_irq_observed",
+      "start_sample_id": 34221926,
+      "end_sample_id_exclusive": 34224173,
+      "start_ms": 23.842499999999998,
+      "end_ms": 24.965999999999998,
+      "duration_ms": 1.1235,
+      "current_mean": 0.12127177304541423,
+      "current_min": 0.11464472860097885,
+      "current_max": 0.14283426105976105,
+      "voltage_mean": 4.972300671661064,
+      "voltage_min": 4.963832378387451,
+      "voltage_max": 4.977451324462891,
+      "power_mean": 0.6029906967877812,
+      "power_min": 0.5701181292533875,
+      "power_max": 0.7093295454978943,
+      "energy_mJ": 0.677460047841072,
+      "current_mean_mA": 121.27177304541422,
+      "finite": true
+    },
+    {
+      "name": "first_strobe_irq_observed -> sd_initialization_begin",
+      "start_sample_id": 34224173,
+      "end_sample_id_exclusive": 34246570,
+      "start_ms": 24.965999999999998,
+      "end_ms": 36.164500000000004,
+      "duration_ms": 11.1985,
+      "current_mean": 0.12078351170042825,
+      "current_min": 0.08690597862005234,
+      "current_max": 0.14400632679462433,
+      "voltage_mean": 4.972665888084633,
+      "voltage_min": 4.963832378387451,
+      "voltage_max": 4.986530780792236,
+      "power_mean": 0.6005924420827371,
+      "power_min": 0.4327198565006256,
+      "power_max": 0.7153276801109314,
+      "energy_mJ": 6.725734462663532,
+      "current_mean_mA": 120.78351170042825,
+      "finite": true
+    },
+    {
+      "name": "sd_initialization_begin -> first_frame_complete_irq_observed",
+      "start_sample_id": 34246570,
+      "end_sample_id_exclusive": 34267900,
+      "start_ms": 36.164500000000004,
+      "end_ms": 46.8295,
+      "duration_ms": 10.665,
+      "current_mean": 0.12600983667313578,
+      "current_min": 0.10238317400217056,
+      "current_max": 0.14538875222206116,
+      "voltage_mean": 4.971437960748543,
+      "voltage_min": 4.961562633514404,
+      "voltage_max": 4.979721546173096,
+      "power_mean": 0.6264352195373567,
+      "power_min": 0.5096073150634766,
+      "power_max": 0.7218661904335022,
+      "energy_mJ": 6.68093161636591,
+      "current_mean_mA": 126.00983667313578,
+      "finite": true
+    },
+    {
+      "name": "first_frame_complete_irq_observed -> sd_initialization_complete",
+      "start_sample_id": 34267900,
+      "end_sample_id_exclusive": 34460084,
+      "start_ms": 46.8295,
+      "end_ms": 142.9215,
+      "duration_ms": 96.092,
+      "current_mean": 0.1031857628603984,
+      "current_min": 0.050091274082660675,
+      "current_max": 0.2303532212972641,
+      "voltage_mean": 4.9759512777452155,
+      "voltage_min": 4.936594009399414,
+      "voltage_max": 4.995610237121582,
+      "power_mean": 0.5133019089957761,
+      "power_min": 0.2498953938484192,
+      "power_max": 1.1397746801376343,
+      "energy_mJ": 49.324207039222124,
+      "current_mean_mA": 103.18576286039841,
+      "finite": true
+    },
+    {
+      "name": "sd_initialization_complete -> first_slot_transport_submission",
+      "start_sample_id": 34460084,
+      "end_sample_id_exclusive": 34630392,
+      "start_ms": 142.9215,
+      "end_ms": 228.07549999999998,
+      "duration_ms": 85.154,
+      "current_mean": 0.07015640151984866,
+      "current_min": 0.05384787544608116,
+      "current_max": 0.10400602966547012,
+      "voltage_mean": 4.982409489127657,
+      "voltage_min": 4.968371868133545,
+      "voltage_max": 4.993340492248535,
+      "power_mean": 0.349522338786689,
+      "power_min": 0.2686363160610199,
+      "power_max": 0.517448902130127,
+      "energy_mJ": 29.763225237041713,
+      "current_mean_mA": 70.15640151984866,
+      "finite": true
+    },
+    {
+      "name": "first_slot_transport_submission -> slot_transport_returned_success",
+      "start_sample_id": 34630392,
+      "end_sample_id_exclusive": 34959070,
+      "start_ms": 228.07549999999998,
+      "end_ms": 392.4145,
+      "duration_ms": 164.339,
+      "current_mean": 0.08647810905835265,
+      "current_min": 0.057424161583185196,
+      "current_max": 0.12101592123508453,
+      "voltage_mean": 4.979088274784193,
+      "voltage_min": 4.963832378387451,
+      "voltage_max": 4.993340492248535,
+      "power_mean": 0.4305637928142793,
+      "power_min": 0.286347359418869,
+      "power_max": 0.6015267968177795,
+      "energy_mJ": 70.75842314730585,
+      "current_mean_mA": 86.47810905835266,
+      "finite": true
+    },
+    {
+      "name": "slot_transport_returned_success -> full_slot_commit_complete",
+      "start_sample_id": 34959070,
+      "end_sample_id_exclusive": 34959115,
+      "start_ms": 392.4145,
+      "end_ms": 392.43699999999995,
+      "duration_ms": 0.022500000000000003,
+      "current_mean": 0.06930604411496057,
+      "current_min": 0.06423112750053406,
+      "current_max": 0.07458432018756866,
+      "voltage_mean": 4.981789525349935,
+      "voltage_min": 4.977451324462891,
+      "voltage_max": 4.986530780792236,
+      "power_mean": 0.34526335530810887,
+      "power_min": 0.3201446831226349,
+      "power_max": 0.371409147977829,
+      "energy_mJ": 0.007768425494432449,
+      "current_mean_mA": 69.30604411496057,
+      "finite": true
+    },
+    {
+      "name": "full_slot_commit_complete -> sd_deinitialization_complete",
+      "start_sample_id": 34959115,
+      "end_sample_id_exclusive": 34959244,
+      "start_ms": 392.43699999999995,
+      "end_ms": 392.5015,
+      "duration_ms": 0.0645,
+      "current_mean": 0.06897096624670103,
+      "current_min": 0.06097039580345154,
+      "current_max": 0.07766473293304443,
+      "voltage_mean": 4.983381300933601,
+      "voltage_min": 4.977451324462891,
+      "voltage_max": 4.988801002502441,
+      "power_mean": 0.34369754236797956,
+      "power_min": 0.30403074622154236,
+      "power_max": 0.386748731136322,
+      "energy_mJ": 0.02216849148273468,
+      "current_mean_mA": 68.97096624670102,
+      "finite": true
+    },
+    {
+      "name": "sd_deinitialization_complete -> pre_standby_wfi",
+      "start_sample_id": 34959244,
+      "end_sample_id_exclusive": 34959824,
+      "start_ms": 392.5015,
+      "end_ms": 392.79150000000004,
+      "duration_ms": 0.29,
+      "current_mean": 0.06037208383324845,
+      "current_min": 0.04891921579837799,
+      "current_max": 0.07682325690984726,
+      "voltage_mean": 4.985129903102743,
+      "voltage_min": 4.977451324462891,
+      "voltage_max": 4.991070747375488,
+      "power_mean": 0.30094798672302014,
+      "power_min": 0.2439371794462204,
+      "power_max": 0.3827327787876129,
+      "energy_mJ": 0.08727491614967585,
+      "current_mean_mA": 60.372083833248446,
+      "finite": true
+    },
+    {
+      "name": "pre_standby_wfi -> low_plateau",
+      "start_sample_id": 34959824,
+      "end_sample_id_exclusive": 35002000,
+      "start_ms": 392.79150000000004,
+      "end_ms": 413.8795,
+      "duration_ms": 21.087999999999997,
+      "current_mean": 0.027491593575324123,
+      "current_min": 0.00478797871619463,
+      "current_max": 0.06699598580598831,
+      "voltage_mean": 4.990527745172359,
+      "voltage_min": 4.979721546173096,
+      "voltage_max": 5.006959915161133,
+      "power_mean": 0.13719349520269297,
+      "power_min": 0.023940615355968475,
+      "power_max": 0.3337734043598175,
+      "energy_mJ": 2.8931364268343898,
+      "current_mean_mA": 27.491593575324124,
+      "finite": true
+    }
+  ],
+  "phase_windows_overlapping_not_additive": {
+    "receiver_to_strobe": {
+      "start_sample_id": 34221926,
+      "end_sample_id_exclusive": 34224173,
+      "start_ms": 23.842499999999998,
+      "end_ms": 24.965999999999998,
+      "duration_ms": 1.1235,
+      "current_mean": 0.12127177304541423,
+      "current_min": 0.11464472860097885,
+      "current_max": 0.14283426105976105,
+      "voltage_mean": 4.972300671661064,
+      "voltage_min": 4.963832378387451,
+      "voltage_max": 4.977451324462891,
+      "power_mean": 0.6029906967877812,
+      "power_min": 0.5701181292533875,
+      "power_max": 0.7093295454978943,
+      "energy_mJ": 0.677460047841072,
+      "current_mean_mA": 121.27177304541422,
+      "finite": true
+    },
+    "strobe_to_frame_complete": {
+      "start_sample_id": 34224173,
+      "end_sample_id_exclusive": 34267900,
+      "start_ms": 24.965999999999998,
+      "end_ms": 46.8295,
+      "duration_ms": 21.863500000000002,
+      "current_mean": 0.12333290936475125,
+      "current_min": 0.08690597862005234,
+      "current_max": 0.14538875222206116,
+      "voltage_mean": 4.972066905989387,
+      "voltage_min": 4.961562633514404,
+      "voltage_max": 4.986530780792236,
+      "power_mean": 0.6131985308404163,
+      "power_min": 0.4327198565006256,
+      "power_max": 0.7218661904335022,
+      "energy_mJ": 13.40666607902944,
+      "current_mean_mA": 123.33290936475125,
+      "finite": true
+    },
+    "SD_initialization": {
+      "start_sample_id": 34246570,
+      "end_sample_id_exclusive": 34460084,
+      "start_ms": 36.164500000000004,
+      "end_ms": 142.9215,
+      "duration_ms": 106.757,
+      "current_mean": 0.10546588263908124,
+      "current_min": 0.050091274082660675,
+      "current_max": 0.2303532212972641,
+      "voltage_mean": 4.975500398404567,
+      "voltage_min": 4.936594009399414,
+      "voltage_max": 4.995610237121582,
+      "power_mean": 0.524603900967506,
+      "power_min": 0.2498953938484192,
+      "power_max": 1.1397746801376343,
+      "energy_mJ": 56.005138655588034,
+      "current_mean_mA": 105.46588263908124,
+      "finite": true
+    },
+    "SD_ready_to_first_submission": {
+      "start_sample_id": 34460084,
+      "end_sample_id_exclusive": 34630392,
+      "start_ms": 142.9215,
+      "end_ms": 228.07549999999998,
+      "duration_ms": 85.154,
+      "current_mean": 0.07015640151984866,
+      "current_min": 0.05384787544608116,
+      "current_max": 0.10400602966547012,
+      "voltage_mean": 4.982409489127657,
+      "voltage_min": 4.968371868133545,
+      "voltage_max": 4.993340492248535,
+      "power_mean": 0.349522338786689,
+      "power_min": 0.2686363160610199,
+      "power_max": 0.517448902130127,
+      "energy_mJ": 29.763225237041713,
+      "current_mean_mA": 70.15640151984866,
+      "finite": true
+    },
+    "slot_transport": {
+      "start_sample_id": 34630392,
+      "end_sample_id_exclusive": 34959070,
+      "start_ms": 228.07549999999998,
+      "end_ms": 392.4145,
+      "duration_ms": 164.339,
+      "current_mean": 0.08647810905835265,
+      "current_min": 0.057424161583185196,
+      "current_max": 0.12101592123508453,
+      "voltage_mean": 4.979088274784193,
+      "voltage_min": 4.963832378387451,
+      "voltage_max": 4.993340492248535,
+      "power_mean": 0.4305637928142793,
+      "power_min": 0.286347359418869,
+      "power_max": 0.6015267968177795,
+      "energy_mJ": 70.75842314730585,
+      "current_mean_mA": 86.47810905835266,
+      "finite": true
+    },
+    "post_transport_commit": {
+      "start_sample_id": 34959070,
+      "end_sample_id_exclusive": 34959115,
+      "start_ms": 392.4145,
+      "end_ms": 392.43699999999995,
+      "duration_ms": 0.022500000000000003,
+      "current_mean": 0.06930604411496057,
+      "current_min": 0.06423112750053406,
+      "current_max": 0.07458432018756866,
+      "voltage_mean": 4.981789525349935,
+      "voltage_min": 4.977451324462891,
+      "voltage_max": 4.986530780792236,
+      "power_mean": 0.34526335530810887,
+      "power_min": 0.3201446831226349,
+      "power_max": 0.371409147977829,
+      "energy_mJ": 0.007768425494432449,
+      "current_mean_mA": 69.30604411496057,
+      "finite": true
+    },
+    "storage_deinit": {
+      "start_sample_id": 34959115,
+      "end_sample_id_exclusive": 34959244,
+      "start_ms": 392.43699999999995,
+      "end_ms": 392.5015,
+      "duration_ms": 0.0645,
+      "current_mean": 0.06897096624670103,
+      "current_min": 0.06097039580345154,
+      "current_max": 0.07766473293304443,
+      "voltage_mean": 4.983381300933601,
+      "voltage_min": 4.977451324462891,
+      "voltage_max": 4.988801002502441,
+      "power_mean": 0.34369754236797956,
+      "power_min": 0.30403074622154236,
+      "power_max": 0.386748731136322,
+      "energy_mJ": 0.02216849148273468,
+      "current_mean_mA": 68.97096624670102,
+      "finite": true
+    },
+    "cleanup_to_pre_WFI": {
+      "start_sample_id": 34959244,
+      "end_sample_id_exclusive": 34959824,
+      "start_ms": 392.5015,
+      "end_ms": 392.79150000000004,
+      "duration_ms": 0.29,
+      "current_mean": 0.06037208383324845,
+      "current_min": 0.04891921579837799,
+      "current_max": 0.07682325690984726,
+      "voltage_mean": 4.985129903102743,
+      "voltage_min": 4.977451324462891,
+      "voltage_max": 4.991070747375488,
+      "power_mean": 0.30094798672302014,
+      "power_min": 0.2439371794462204,
+      "power_max": 0.3827327787876129,
+      "energy_mJ": 0.08727491614967585,
+      "current_mean_mA": 60.372083833248446,
+      "finite": true
+    },
+    "pre_WFI_to_low_plateau": {
+      "start_sample_id": 34959824,
+      "end_sample_id_exclusive": 35002000,
+      "start_ms": 392.79150000000004,
+      "end_ms": 413.8795,
+      "duration_ms": 21.087999999999997,
+      "current_mean": 0.027491593575324123,
+      "current_min": 0.00478797871619463,
+      "current_max": 0.06699598580598831,
+      "voltage_mean": 4.990527745172359,
+      "voltage_min": 4.979721546173096,
+      "voltage_max": 5.006959915161133,
+      "power_mean": 0.13719349520269297,
+      "power_min": 0.023940615355968475,
+      "power_max": 0.3337734043598175,
+      "energy_mJ": 2.8931364268343898,
+      "current_mean_mA": 27.491593575324124,
+      "finite": true
+    }
+  },
+  "capture_SD_init_overlap_ms": 10.665,
+  "peaks_1ms": [
+    {
+      "start_sample_id": 34319441,
+      "end_sample_id_exclusive": 34321441,
+      "start_ms": 72.6,
+      "end_ms": 73.6,
+      "duration_ms": 1.0,
+      "current_mean": 0.1931534531340003,
+      "current_min": 0.16467343270778656,
+      "current_max": 0.2140166163444519,
+      "voltage_mean": 4.958413046360016,
+      "voltage_min": 4.947943210601807,
+      "voltage_max": 4.972911834716797,
+      "power_mean": 0.9576626187264919,
+      "power_min": 0.8185326457023621,
+      "power_max": 1.0599136352539062,
+      "energy_mJ": 0.9576626187264918,
+      "current_mean_mA": 193.1534531340003,
+      "finite": true,
+      "overlapping_phases": [
+        {
+          "name": "first_frame_complete_irq_observed -> sd_initialization_complete",
+          "overlap_ms": 1.0
+        }
+      ]
+    },
+    {
+      "start_sample_id": 34321441,
+      "end_sample_id_exclusive": 34323441,
+      "start_ms": 73.6,
+      "end_ms": 74.6,
+      "duration_ms": 1.0,
+      "current_mean": 0.19141727300733327,
+      "current_min": 0.1613394320011139,
+      "current_max": 0.21234962344169617,
+      "voltage_mean": 4.958413039207459,
+      "voltage_min": 4.947943210601807,
+      "voltage_max": 4.972911834716797,
+      "power_mean": 0.9490499694049358,
+      "power_min": 0.8019605278968811,
+      "power_max": 1.0521398782730103,
+      "energy_mJ": 0.9490499694049359,
+      "current_mean_mA": 191.41727300733328,
+      "finite": true,
+      "overlapping_phases": [
+        {
+          "name": "first_frame_complete_irq_observed -> sd_initialization_complete",
+          "overlap_ms": 1.0
+        }
+      ]
+    },
+    {
+      "start_sample_id": 34317441,
+      "end_sample_id_exclusive": 34319441,
+      "start_ms": 71.6,
+      "end_ms": 72.6,
+      "duration_ms": 1.0,
+      "current_mean": 0.1679732951670885,
+      "current_min": 0.12573421001434326,
+      "current_max": 0.2303532212972641,
+      "voltage_mean": 4.962274024248123,
+      "voltage_min": 4.936594009399414,
+      "voltage_max": 4.986530780792236,
+      "power_mean": 0.8333338348865509,
+      "power_min": 0.6259855628013611,
+      "power_max": 1.1397746801376343,
+      "energy_mJ": 0.8333338348865509,
+      "current_mean_mA": 167.9732951670885,
+      "finite": true,
+      "overlapping_phases": [
+        {
+          "name": "first_frame_complete_irq_observed -> sd_initialization_complete",
+          "overlap_ms": 1.0
+        }
+      ]
+    }
+  ],
+  "whole_session_finite": false,
+  "qualification": "Post5ms window finite/contiguous, native power integrated; first5ms and whole-cycle integrals remain provisional. Markers establish firmware observations, not independent image integrity or Standby flags.",
+  "limits": [
+    "Input-side JS voltage, not target voltage after sense/wire drops.",
+    "Final packed GPIO chunk excluded; all remaining unmatched edges preserved.",
+    "Normal flash cycles include camera, card and populated Nucleo support loads.",
+    "Card initialization, slot scan and write latency can vary; report each run and interval rather than attributing every time change to PHY power-down.",
+    "Native extrema are retained but not qualified physical peaks."
+  ]
+}

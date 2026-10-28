@@ -166,16 +166,22 @@ def startup_flash_profile(m):
     false_keys=('sd_high_speed','sd_fixed_compensation','sd_compensation_modified','sd_high_speed_mixed_slew',
                 'sd_high_speed_fixed_compensation','sd_high_speed_combined_electrical','sd_idma_read',
                 'raw_dma_tail_wait','dma_sleep','preinit','line_snapshots','line_poison','whole_image_preerase',
-                'sd_early_run_clock')
+                'sd_early_run_clock','sd_read_diagnostics')
     return (all(m.get(k) is True for k in true_keys) and
             all(m.get(k,False) is False for k in false_keys) and
             m.get('sd_clock_hz') in (12500000,25000000) and m.get('sd_bus_width')==4 and m.get('sd_gpio_speed')==3 and
             m.get('transport')=='idma' and m.get('pattern')==0 and m.get('exposure_coarse')==1428 and
-            not m.get('cycle_trace'))
+            not m.get('cycle_trace') and m.get('sd_clk_gpio_speed') is None)
 
 
 def diagnostic_layout(m,operation=None):
     """Bind the separate RAM-only receive and capture-tail experiments."""
+    board_eth_layout(m,operation)
+    sd_init_gap_layout(m,operation)
+    sensor_autostop_layout(m,operation)
+    power_probe_layout(m,operation)
+    clk_gpio_layout(m,operation)
+    read_diagnostics_layout(m,operation)
     for key,macro in (('sd_idma_read','SD_IDMA_READ'),('raw_dma_tail_wait','RAW_DMA_TAIL_WAIT'),
                       ('sd_startup_opt','SD_STARTUP_OPT'),('sd_early_run_clock','SD_EARLY_RUN_CLOCK')):
         value=m.get(key,False)
@@ -530,6 +536,678 @@ def gpio_snapshot(b,m,label):
     return proof
 
 
+POWER_PROBE_FIELDS=('magic version mode state wait_begin camera_ready hold_begin hold_end '
+    'gpio_mode gpio_odr_before gpio_idr_before gpio_odr_after gpio_idr_after faults preconditions hold_cycles').split()
+
+
+def board_eth_layout(m,operation=None):
+    """Optional board power saving has separate admission from RAM experiments."""
+    enabled=m.get('board_eth_powerdown',False)
+    selected=[f for f in m.get('flags',[]) if f.startswith('-DRAW_BOARD_ETH_POWERDOWN=')]
+    if type(enabled) is not bool:
+        raise ValueError('Board Ethernet selector type differs')
+    if not enabled:
+        if selected or m.get('board_eth_proof') is not None or m.get('board_eth_proof_bytes',0):
+            raise ValueError('Unexpected board Ethernet feature or telemetry')
+        return False
+    if selected!=['-DRAW_BOARD_ETH_POWERDOWN=1']:
+        raise ValueError('Board Ethernet manifest/compiler flag differs')
+    true_keys=('sd_review_profile','sd_startup_opt','sd_clock_negedge','sd_clock_negedge_init',
+               'magic_format','line_stream','async_stop')
+    false_keys=('sd_high_speed','sd_fixed_compensation','sd_compensation_modified',
+        'sd_high_speed_mixed_slew','sd_high_speed_fixed_compensation','sd_high_speed_combined_electrical',
+        'sd_early_run_clock','sd_idma_read','sd_read_diagnostics','raw_dma_tail_wait','dma_sleep',
+        'preinit','line_snapshots','line_poison','whole_image_preerase','error_test_code',
+        'error_after_frame_test','power_probe','cycle_trace')
+    flash=m.get('flash',False);standby=m.get('standby',False)
+    if (type(flash) is not bool or type(standby) is not bool or standby and not flash or
+        not all(m.get(k) is True for k in true_keys) or any(m.get(k,False) for k in false_keys) or
+        m.get('sd_bus_width')!=4 or m.get('sd_clock_hz')!=25000000 or m.get('sd_gpio_speed')!=3 or
+        m.get('sd_clk_gpio_speed') is not None or m.get('transport')!='idma' or m.get('pattern')!=0 or
+        m.get('exposure_coarse')!=1428 or operation is not None and operation not in (1,3)):
+        raise ValueError('Board Ethernet requires the reviewed startup 25 MHz capture/read profile')
+    required=dict(RAW_FLASH=str(int(flash)),RAW_STANDBY=str(int(standby)),
+        SD_REVIEW_PROFILE='1',SD_STARTUP_OPT='1',SD_BUS_WIDTH='4',RAW_SD_CLOCK_HZ='25000000U',
+        SD_GPIO_SPEED='3',SD_CLOCK_NEGEDGE='1',SD_CLOCK_NEGEDGE_INIT='1',RAW_MAGIC_FORMAT='1',
+        RAW_LINE_STREAM='1',RAW_ASYNC_STOP='1',RAW_DMA='1',RAW_PREINIT='0',RAW_LINE_SNAPSHOTS='0',
+        RAW_LINE_POISON='0',RAW_WHOLE_IMAGE_PREERASE='0',RAW_DMA_SLEEP='0',RAW_DMA_TAIL_WAIT='0',
+        SD_EARLY_RUN_CLOCK='0',SD_IDMA_READ='0',SD_FIXED_COMPENSATION='0',SD_HIGH_SPEED='0',
+        RAW_PATTERN='0',RAW_EXPOSURE_COARSE='1428U')
+    for key,value in required.items():
+        if [f for f in m.get('flags',[]) if f.startswith('-D'+key+'=')]!=[f'-D{key}={value}']:
+            raise ValueError('Board Ethernet profile compiler flag differs: '+key)
+    address=m.get('board_eth_proof')
+    if (type(address) is not int or address%32 or m.get('board_eth_proof_bytes')!=256 or
+        not LOAD<=m['bss_start']<=address<=m['bss_end']-256 or
+        m['bss_end']>m.get('stack_floor',0x343AF000)):
+        raise ValueError('Board Ethernet telemetry bounds differ')
+    for key,size in (('card',200),('slots',640),('producer',416),('magic_slots',576),('sd_scr',16),
+            ('sd_stream',44),('magic_proof',32),('sd_startup_proof',64),('sd_width_proof',24),
+            ('power_probe_proof',64),('power_phy_proof',256),('power_csi_proof',128),
+            ('sd_init_gap_proof',64),('sensor_autostop_proof',160)):
+        other=m.get(key)
+        if other is not None and address<other+size and other<address+256:
+            raise ValueError('Board Ethernet telemetry overlaps '+key)
+    return True
+
+
+def board_eth_snapshot(b,m,p,label):
+    """An optional power warning never changes a successful image result."""
+    if not board_eth_layout(m,p['operation']):return None
+    raw=b.upload(m['board_eth_proof'],256,label+'-board-eth.bin')
+    if len(raw)!=256:raise ValueError('Incomplete board Ethernet telemetry')
+    w=list(struct.unpack('<64I',raw))
+    if p['operation']==3:
+        if any(w):raise ValueError('READ unexpectedly entered board Ethernet helper')
+        return dict(words=w,attempted=False,qualified_powerdown=False,
+            scope='READ does not change Ethernet; retained PHY power state is not inferred')
+    if (w[0]!=0x31485445 or w[1]!=1 or w[2] not in (6,0xE1) or
+        w[3]>9 or w[4]>9 or w[5]&~255 or w[15]>1 or w[16]>6 or
+        w[30]>1 or w[31] or any(w[61:64])):
+        raise ValueError('Malformed board Ethernet terminal telemetry')
+    flags=w[5]
+    if bool(flags&8)!=bool(w[15]) or flags&4 and w[15]:
+        raise ValueError('Board Ethernet write-attempt flags differ')
+    for at in (32,38,44,50):
+        if any(w[at+i]>limit for i,limit in enumerate((3,1,3,3,15,1))):
+            raise ValueError('Board Ethernet GPIO field out of range')
+    if flags&1 and (w[8]!=7 or w[9]&0xFFF0!=0xC130):
+        raise ValueError('Board Ethernet identity flag is unsupported')
+    if flags&32 and (w[32:38]!=w[44:50] or w[38:44]!=w[50:56]):
+        raise ValueError('Board Ethernet GPIO restoration flag differs')
+    if flags&64 and w[17]!=w[18]:
+        raise ValueError('Board Ethernet clock restoration flag differs')
+    # The gap experiment intentionally moves SD initialization later. Bind its
+    # complete separate proof instead of relaxing the normal 10 ms adjacency.
+    gap=sd_init_gap_snapshot(b,m,p,label+'-eth-order') if m.get('sd_init_gap_ms',0) else None
+    qualified=w[2]==6
+    if qualified:
+        already=bool(flags&4)
+        wanted=w[10]|0x800
+        if (w[3] or w[4] or flags!=(119 if already else 123) or
+            w[8]!=7 or w[9]&0xFFF0!=0xC130 or w[10]!=w[11] or
+            w[10]&~0x2900!=0x1000 or bool(w[10]&0x800)!=already or w[12]!=wanted or
+            (w[13:15]!=[0,0] if already else w[13:15]!=[wanted,wanted]) or
+            w[15]!=(0 if already else 1) or w[16]!=(4 if already else 6) or
+            w[17]!=w[18] or w[19]&0x60 or w[20]!=(0x60&~w[17]) or w[21]!=1 or
+            w[22:30]!=[0x33330000,0x100000,0x20000,0x404B00,0,0x49000005,400000000,2000] or
+            # Cortex-M55 CONTROL FPCA/SFPA (bits 2/3) can be set by the
+            # privileged camera path. Still require MSP, privilege and no
+            # reserved bits; these FP context flags do not select PSP.
+            w[30] or w[56] or w[57]&~0xC or not w[58]&1 or not w[59]&0x1000000 or w[60]&0x10000):
+            raise ValueError('Board Ethernet power-down success proof differs')
+        next_begin=gap['entry'] if gap is not None else p['sd_begin']
+        if (not p['arm'] or not next_begin or
+            (w[6]-p['arm'])&0xFFFFFFFF>400000000 or
+            not 0<(w[7]-w[6])&0xFFFFFFFF<=400000000 or
+            (next_begin-w[7])&0xFFFFFFFF>4000000):
+            raise ValueError('Board Ethernet did not run after arm and before the next pre-SD stage')
+    elif not (w[3] or w[4]):
+        raise ValueError('Board Ethernet warning has no diagnostic error')
+    return dict(words=w,attempted=True,qualified_powerdown=qualified,
+        warning=None if qualified else dict(error=w[3],cleanup_error=w[4],flags=flags),
+        already_powered_down=bool(flags&4),write_attempts=w[15],read_attempts=w[16],
+        outcome_unknown=bool(flags&128),id1=w[8],id2=w[9],original_bmcr=w[10],
+        requested_bmcr=w[12],gpio_restored=bool(flags&32),clock_restored=bool(flags&64),
+        elapsed_ms=((w[7]-w[6])&0xFFFFFFFF)/400000,
+        scope='Optional LAN8742 power-down after receiver arm; no PHY restore before shutdown. '
+              'A warning preserves capture/save success but does not qualify a power saving.')
+
+
+SD_INIT_GAP_FIELDS=('magic version state error entry frame_done stop_done gap_begin gap_end '
+    'target_cycles commands_before commands_after frame_valid stopped clock_hz reserved').split()
+
+
+def sd_init_gap_layout(m,operation=None):
+    """One opt-in 200 ms separation diagnostic; legacy/default builds stay inert."""
+    duration=m.get('sd_init_gap_ms',0)
+    selected=[f for f in m.get('flags',[]) if f.startswith('-DRAW_SD_INIT_GAP_MS=')]
+    if type(duration) is not int or duration not in (0,200):
+        raise ValueError('SD initialization gap selector differs')
+    if not duration:
+        if selected or m.get('sd_init_gap_proof') is not None or m.get('sd_init_gap_proof_bytes',0):
+            raise ValueError('Unexpected SD initialization gap feature or telemetry')
+        return False
+    if selected!=['-DRAW_SD_INIT_GAP_MS=200U'] or not board_eth_layout(m,operation):
+        raise ValueError('SD initialization gap requires the exact Ethernet-down normal profile')
+    events=m.get('phase_markers',{}).get('events',{})
+    if events.get('11')!='sd_init_gap_begin' or events.get('12')!='sd_init_gap_end':
+        raise ValueError('SD initialization gap marker declaration differs')
+    address=m.get('sd_init_gap_proof')
+    if (type(address) is not int or address%32 or m.get('sd_init_gap_proof_bytes')!=64 or
+        not LOAD<=m['bss_start']<=address<=m['bss_end']-64 or
+        m['bss_end']>m.get('stack_floor',0x343AF000)):
+        raise ValueError('SD initialization gap telemetry bounds differ')
+    for key,size in (('card',200),('slots',640),('producer',416),('magic_slots',576),('sd_scr',16),
+            ('sd_stream',44),('magic_proof',32),('sd_startup_proof',64),('sd_width_proof',24),
+            ('board_eth_proof',256),('power_probe_proof',64),('power_phy_proof',256),('power_csi_proof',128)):
+        other=m.get(key)
+        if other is not None and address<other+size and other<address+64:
+            raise ValueError('SD initialization gap telemetry overlaps '+key)
+    return True
+
+
+def sd_init_gap_snapshot(b,m,p,label):
+    if not sd_init_gap_layout(m,p['operation']):return None
+    raw=b.upload(m['sd_init_gap_proof'],64,label+'-sd-init-gap.bin')
+    if len(raw)!=64:raise ValueError('Incomplete SD initialization gap telemetry')
+    values=struct.unpack('<16I',raw);g=dict(zip(SD_INIT_GAP_FIELDS,values))
+    if p['operation']==3:
+        if any(values):raise ValueError('READ unexpectedly entered SD initialization gap')
+        return dict(attempted=False,completed=False,
+            scope='READ bypasses the capture-only separation diagnostic')
+    if ((g['magic'],g['version'],g['state'],g['error'],g['target_cycles'],g['clock_hz'])!=
+            (0x31504147,1,3,0,80000000,400000000) or
+            g['commands_before'] or g['commands_after'] or g['reserved'] or
+            g['frame_valid']!=1 or g['stopped']!=1 or
+            not p.get('arm') or not p.get('frame_done') or not p.get('camera_stop') or not p.get('sd_begin') or
+            g['frame_done']!=p['frame_done'] or g['stop_done']!=p['camera_stop']):
+        raise ValueError('SD initialization gap completion/preconditions differ')
+    elapsed=lambda end,start:(end-start)&0xFFFFFFFF
+    if (elapsed(g['entry'],p['arm'])>400000000 or
+            elapsed(g['stop_done'],g['frame_done'])>1200000000 or
+            elapsed(g['gap_begin'],g['entry'])>1200000000 or
+            elapsed(g['gap_begin'],g['stop_done'])>4000000 or
+            not 80000000<=elapsed(g['gap_end'],g['gap_begin'])<100000000 or
+            elapsed(p['sd_begin'],g['gap_end'])>4000000):
+        raise ValueError('SD initialization gap timing/order differs')
+    g.update(attempted=True,completed=True,
+        wait_for_stop_ms=elapsed(g['gap_begin'],g['entry'])/400000,
+        elapsed_ms=elapsed(g['gap_end'],g['gap_begin'])/400000,
+        scope='Validated FRAME and acknowledged STOP precede the 200 ms gap; zero SD commands before/after. '
+              'Card is electrically powered: this separates firmware phases, not individual device rails.')
+    return g
+
+
+SENSOR_AUTOSTOP_FIELDS=('magic version words state error config_begin config_end repeat_readback '
+    'next_readback counter_before start_begin start_end frame_cycles wait_begin fsm2_observed_cycles '
+    'counter_at_stop strobes_at_frame strobes_at_stop explicit_stop_writes poll_attempts last_fsm '
+    'last_ack stable_begin stable_end stable_fsm stable_counter stable_strobes stable_strobe_level '
+    'receiver_frames sensor_delta flags timeout_cycles initial_strobes mirror_active '
+    'reserved34 reserved35 reserved36 reserved37 reserved38 reserved39').split()
+
+
+def sensor_autostop_layout(m,operation=None):
+    """Bind historical AST1 diagnostics or the explicit production AST2 profile."""
+    enabled=m.get('sensor_autostop',False)
+    selected=[f for f in m.get('flags',[]) if f.startswith('-DRAW_SENSOR_AUTOSTOP=')]
+    single=m.get('sensor_single_frame',False)
+    single_flags=[f for f in m.get('flags',[]) if f.startswith('-DRAW_SENSOR_SINGLE_FRAME=')]
+    if type(enabled) is not bool or type(single) is not bool:
+        raise ValueError('Sensor auto-stop selector type differs')
+    if not enabled:
+        if (selected or m.get('sensor_autostop_proof') is not None or m.get('sensor_autostop_proof_bytes',0) or
+                m.get('sensor_autostop_prestart') is not None or m.get('sensor_autostop_prestart_bytes',0) or
+                single or single_flags or m.get('sensor_autostop_proof_schema') is not None or
+                m.get('sensor_autostop_readback_timing') is not None):
+            raise ValueError('Unexpected sensor auto-stop feature or telemetry')
+        return False
+    if (selected!=['-DRAW_SENSOR_AUTOSTOP=1'] or not board_eth_layout(m,operation) or
+            m.get('sd_init_gap_ms',0)):
+        raise ValueError('Sensor auto-stop requires the exact Ethernet-down normal profile without a gap')
+    if single:
+        if (single_flags!=['-DRAW_SENSOR_SINGLE_FRAME=1'] or
+                m.get('sensor_autostop_proof_schema')!=2 or
+                m.get('sensor_autostop_readback_timing')!='post-start' or
+                m.get('sensor_autostop_prestart') is not None or m.get('sensor_autostop_prestart_bytes')!=0):
+            raise ValueError('Production sensor auto-stop schema/readback declaration differs')
+    elif (single_flags or m.get('sensor_autostop_proof_schema',1)!=1 or
+            m.get('sensor_autostop_readback_timing','pre-start')!='pre-start' or
+            m.get('sensor_autostop_prestart')!=0x343F4060 or m.get('sensor_autostop_prestart_bytes')!=32):
+        raise ValueError('Sensor auto-stop prestart declaration differs')
+    if m.get('phase_markers',{}).get('events',{}).get('11')!='sensor_autonomous_standby_observed':
+        raise ValueError('Sensor auto-stop marker declaration differs')
+    address=m.get('sensor_autostop_proof')
+    if (type(address) is not int or address%32 or m.get('sensor_autostop_proof_bytes')!=160 or
+            not LOAD<=m['bss_start']<=address<=m['bss_end']-160 or
+            m['bss_end']>m.get('stack_floor',0x343AF000)):
+        raise ValueError('Sensor auto-stop telemetry bounds differ')
+    for key,size in (('card',200),('slots',640),('producer',416),('magic_slots',576),('sd_scr',16),
+            ('sd_stream',44),('magic_proof',32),('sd_startup_proof',64),('sd_width_proof',24),
+            ('board_eth_proof',256),('power_probe_proof',64),('power_phy_proof',256),
+            ('power_csi_proof',128),('sd_init_gap_proof',64)):
+        other=m.get(key)
+        if other is not None and address<other+size and other<address+160:
+            raise ValueError('Sensor auto-stop telemetry overlaps '+key)
+    return True
+
+
+def sensor_autostop_record(raw):
+    """Decode retained SRAM evidence without granting success or idle admission."""
+    if len(raw)!=160:raise ValueError('Incomplete sensor auto-stop telemetry')
+    return dict(zip(SENSOR_AUTOSTOP_FIELDS,struct.unpack('<40I',raw)))
+
+
+def sensor_autostop_snapshot(b,m,p,label):
+    if not sensor_autostop_layout(m,p['operation']):return None
+    a=sensor_autostop_record(b.upload(m['sensor_autostop_proof'],160,label+'-sensor-autostop.bin'))
+    if p['operation']==3:
+        if any(a.values()):raise ValueError('READ unexpectedly entered sensor auto-stop')
+        return dict(attempted=False,completed=False,
+            scope='READ bypasses the capture-only auto-stop experiment; current sensor state is not inferred')
+    single=m.get('sensor_single_frame',False)
+    if not single:
+        prestart=b.upload(m['sensor_autostop_prestart'],32,label+'-sensor-prestart.bin')
+        expected=(0x41535431,a['config_begin'],a['config_end'],1,4,0,1,0)
+        if len(prestart)!=32 or struct.unpack('<8I',prestart)!=expected:
+            raise ValueError('Sensor auto-stop prestart readback record differs')
+    if ((a['magic'],a['version'],a['words'],a['state'],a['error'],a['repeat_readback'],
+            a['next_readback'],a['explicit_stop_writes'],a['last_fsm'],a['last_ack'],
+            a['stable_fsm'],a['stable_strobe_level'],a['receiver_frames'],a['flags'],
+            a['timeout_cycles'],a['initial_strobes'])!=
+            (0x41535431,2 if single else 1,40,4,0,1,4,0,2,0,2,0,1,15,400000000,0) or
+            any(a[k] for k in SENSOR_AUTOSTOP_FIELDS[34:]) or
+            not 1<=a['poll_attempts']<=1001 or a['sensor_delta'] not in ((1,) if single else (1,2)) or
+            a['counter_before'] not in ((0,1) if single else (0,)) or a['counter_at_stop']!=a['sensor_delta'] or
+            a['strobes_at_frame'] not in ((1,) if single else (1,2)) or
+            a['strobes_at_stop'] not in ((1,) if single else (1,2)) or
+            a['strobes_at_frame']>a['strobes_at_stop'] or
+            a['stable_counter']!=a['counter_at_stop'] or a['stable_strobes']!=a['strobes_at_stop']):
+        raise ValueError('Sensor auto-stop completion/preconditions differ')
+    elapsed=lambda end,start:(end-start)&0xFFFFFFFF
+    ordered=(('config_end','config_begin'),('start_end','start_begin'),
+             ('mirror_active','start_end'),('frame_cycles','mirror_active'),('wait_begin','frame_cycles'),
+             ('fsm2_observed_cycles','wait_begin'),
+             ('stable_end','stable_begin'))
+    ordered+=((('config_begin','start_end'),('wait_begin','config_end')) if single else
+              (('start_begin','config_end'),))
+    if (any(elapsed(a[end],a[start])>400000000 for end,start in ordered) or
+            elapsed(a['fsm2_observed_cycles'],a['wait_begin'])>a['timeout_cycles'] or
+            elapsed(a['stable_begin'],a['fsm2_observed_cycles'])>=0x80000000 or
+            elapsed(a['frame_cycles'],p['frame_done'])>40000 or
+            elapsed(p['camera_stop'],a['fsm2_observed_cycles'])>400000 or
+            elapsed(a['stable_begin'],p['payload_done'])>1200000000 or
+            elapsed(p['commit_done'],a['stable_end'])>4000000 or
+            not elapsed(a['stable_end'],a['stable_begin'])):
+        raise ValueError('Sensor auto-stop timing/order differs')
+    a.update(attempted=True,completed=True,production_single_frame=single,
+        exact_one_frame_observed=a['sensor_delta']==1 and a['stable_strobes']-a['initial_strobes']==1,
+        counter_and_strobe_counts_agree=a['sensor_delta']==a['stable_strobes']-a['initial_strobes'],
+        strobe_delta=a['stable_strobes']-a['initial_strobes'],
+        frame_to_fsm2_observed_ms=elapsed(a['fsm2_observed_cycles'],a['frame_cycles'])/400000,
+        stable_observation_after_fsm2_ms=elapsed(a['stable_end'],a['fsm2_observed_cycles'])/400000,
+        scope='Diagnostic outcome: receiver validates one full image; sensor FRAME_COUNTER and '
+              'STROBE counts are independent observations. FSM2 timestamps are polling observations, '
+              'not physical transition times. Two sensor frames or unequal counts do not establish '
+              'exact one-frame operation. No explicit STOP is issued on the successful path.')
+    if single:
+        a.update(readback_timing='post-start',context_readback_begin=a['config_begin'],
+            context_readback_end=a['config_end'],counter_at_readback=a['counter_before'],
+            sensor_count_from_reset=a['sensor_delta'],
+            scope='Production single-frame proof: context register values are read back after START; '
+                  'the frozen stage1 audit, not a runtime prestart record, establishes the write before START. '
+                  'Fresh-reset FRAME_COUNTER and independently observed STROBE must both be exactly one, '
+                  'remain stable through completed save, and autonomous FSM2 requires zero explicit STOP writes. '
+                  'FSM2 timestamps are polling observations, not physical transition times.')
+    return a
+
+
+def sensor_autostop_retain(b,m,p,code,nonce,out,names,label='retained'):
+    """Retain failed or successful experiment evidence before normal validation.
+
+    Only SRAM is read. Decoding does not authorize a reset, mutation or idle
+    assumption, and this function never turns a failed terminal into success.
+    """
+    if not sensor_autostop_layout(m,p['operation']):return None
+    raw=b.upload(m['sensor_autostop_proof'],160,label+'-sensor-autostop.bin')
+    single=m.get('sensor_single_frame',False)
+    prestart=b'' if single else b.upload(m['sensor_autostop_prestart'],32,label+'-sensor-prestart.bin')
+    (out/'sensor-autostop-retained.bin').write_bytes(raw)
+    if not single:(out/'sensor-prestart-retained.bin').write_bytes(prestart)
+    record=dict(operation_result=p['result'],nonce=nonce,proof=p,
+        binary_sha256=sha(code),source_hashes=m['source_hashes'],
+        ast_bytes=len(raw),ast_sha256=sha(raw),prestart_bytes=len(prestart),
+        prestart_sha256=None if single else sha(prestart),production_single_frame=single,
+        hardware_mutations=False,idle_permission=False,success_permission=False,
+        caveat='Unvalidated diagnostic retention; normal terminal, image and idle checks remain mandatory.')
+    if len(raw)==160:record['ast']=sensor_autostop_record(raw)
+    if len(prestart)==32:record['prestart_words']=list(struct.unpack('<8I',prestart))
+    dump(out/'sensor-autostop-retained.json',record)
+    # Re-read immutable code and terminal SRAM to qualify attribution only.
+    ranges=m['immutable_ranges'] if m.get('flash') else [[LOAD,LOAD+m['immutable_bytes']]]
+    observed=b''.join(b.upload(start,end-start,label+f'-sensor-immutable-{i}.bin')
+        for i,(start,end) in enumerate(ranges))
+    expected=b''.join(code[start-LOAD:end-LOAD] for start,end in ranges)
+    final=decode(b.upload(PROOF,384,label+'-sensor-final-proof.bin'),names)
+    record.update(expected_immutable_sha256=sha(expected),immutable_ranges=ranges,
+        observed_immutable_sha256=sha(observed),immutable_code_equal=observed==expected,
+        final_proof_equal=final==p,nonce_equal=p['nonce']==nonce)
+    dump(out/'sensor-autostop-retained.json',record)
+    if (len(raw)!=160 or len(prestart)!=(0 if single else 32) or not record['immutable_code_equal'] or
+            not record['final_proof_equal'] or not record['nonce_equal']):
+        raise ValueError('Retained sensor auto-stop attribution differs or is incomplete')
+    return record
+
+
+def power_probe_layout(m,operation=None):
+    """Bind a RAM-only pre-SD hold experiment; never expands idle admission."""
+    mode=m.get('power_probe')
+    selected=[f for f in m.get('flags',[]) if f.startswith('-DRAW_POWER_PROBE=')]
+    if mode is None:
+        if (selected or m.get('power_probe_proof') is not None or m.get('power_probe_proof_bytes',0) or
+            m.get('power_phy_proof') is not None or m.get('power_phy_proof_bytes',0) or
+            m.get('power_csi_proof') is not None or m.get('power_csi_proof_bytes',0)):
+            raise ValueError('Unexpected power-probe telemetry')
+        return None
+    modes={'hold-after-stop':1,'reset-after-stop':2,'ethernet-control':3,'ethernet-powerdown':4,'receiver-off':5}
+    if mode not in modes or selected!=[f'-DRAW_POWER_PROBE={modes[mode]}']:
+        raise ValueError('Power-probe mode/compiler flag differs')
+    true_keys=('sd_review_profile','sd_startup_opt','sd_clock_negedge','sd_clock_negedge_init',
+               'magic_format','line_stream','async_stop')
+    false_keys=('flash','standby','sd_high_speed','sd_fixed_compensation','sd_compensation_modified',
+        'sd_high_speed_mixed_slew','sd_high_speed_fixed_compensation','sd_high_speed_combined_electrical',
+        'sd_early_run_clock','sd_idma_read','sd_read_diagnostics','raw_dma_tail_wait','dma_sleep',
+        'preinit','line_snapshots','line_poison','whole_image_preerase','error_blinks','error_test_code','error_after_frame_test')
+    if (not all(m.get(k) is True for k in true_keys) or any(m.get(k,False) for k in false_keys) or
+        m.get('sd_bus_width')!=4 or m.get('sd_clock_hz')!=25000000 or m.get('sd_gpio_speed')!=3 or
+        m.get('sd_clk_gpio_speed') is not None or m.get('transport')!='idma' or m.get('pattern')!=0 or
+        m.get('exposure_coarse')!=1428 or operation is not None and operation!=1):
+        raise ValueError('Power probe requires the reviewed startup 25 MHz RAM capture profile')
+    required=dict(RAW_FLASH='0',RAW_STANDBY='0',SD_REVIEW_PROFILE='1',SD_STARTUP_OPT='1',
+        SD_BUS_WIDTH='4',RAW_SD_CLOCK_HZ='25000000U',SD_GPIO_SPEED='3',SD_CLOCK_NEGEDGE='1',
+        SD_CLOCK_NEGEDGE_INIT='1',RAW_MAGIC_FORMAT='1',RAW_LINE_STREAM='1',RAW_ASYNC_STOP='1',
+        RAW_DMA='1',RAW_PREINIT='0',RAW_LINE_SNAPSHOTS='0',RAW_LINE_POISON='0',
+        RAW_WHOLE_IMAGE_PREERASE='0',RAW_DMA_SLEEP='0',RAW_DMA_TAIL_WAIT='0',
+        SD_EARLY_RUN_CLOCK='0',SD_IDMA_READ='0',SD_FIXED_COMPENSATION='0',SD_HIGH_SPEED='0',
+        RAW_PATTERN='0',RAW_EXPOSURE_COARSE='1428U')
+    for key,value in required.items():
+        if [f for f in m.get('flags',[]) if f.startswith('-D'+key+'=')]!=[f'-D{key}={value}']:
+            raise ValueError('Power-probe profile compiler flag differs: '+key)
+    address=m.get('power_probe_proof')
+    if (type(address) is not int or address%4 or m.get('power_probe_proof_bytes')!=64 or
+        not m['bss_start']<=address<=m['bss_end']-64):
+        raise ValueError('Power-probe telemetry bounds differ')
+    for key,size in (('card',200),('slots',640),('producer',416),('magic_slots',576),('sd_scr',16),
+                     ('sd_stream',44),('sd_startup_proof',64),('sd_width_proof',24)):
+        other=m.get(key)
+        if other is not None and address<other+size and other<address+64:
+            raise ValueError('Power-probe telemetry overlaps '+key)
+    events=m.get('phase_markers',{}).get('events',{})
+    if events.get('11')!='power_probe_hold_begin' or events.get('12')!='power_probe_hold_end':
+        raise ValueError('Power-probe marker declaration differs')
+    phy_address=m.get('power_phy_proof')
+    if modes[mode] not in (3,4):
+        if phy_address is not None or m.get('power_phy_proof_bytes',0):
+            raise ValueError('Unexpected Ethernet power telemetry')
+    else:
+        if (type(phy_address) is not int or phy_address%32 or m.get('power_phy_proof_bytes')!=256 or
+            not m['bss_start']<=phy_address<=m['bss_end']-256):
+            raise ValueError('Ethernet power telemetry bounds differ')
+        for key,size in (('power_probe_proof',64),('card',200),('slots',640),('producer',416),
+                ('magic_slots',576),('sd_scr',16),('sd_stream',44),('sd_startup_proof',64),('sd_width_proof',24)):
+            other=m.get(key)
+            if other is not None and phy_address<other+size and other<phy_address+256:
+                raise ValueError('Ethernet power telemetry overlaps '+key)
+    csi_address=m.get('power_csi_proof')
+    if modes[mode]!=5:
+        if csi_address is not None or m.get('power_csi_proof_bytes',0):
+            raise ValueError('Unexpected receiver power telemetry')
+    else:
+        if (type(csi_address) is not int or csi_address%32 or m.get('power_csi_proof_bytes')!=128 or
+            not m['bss_start']<=csi_address<=m['bss_end']-128):
+            raise ValueError('Receiver power telemetry bounds differ')
+        for key,size in (('power_probe_proof',64),('card',200),('slots',640),('producer',416),
+                ('magic_slots',576),('sd_scr',16),('sd_stream',44),('sd_startup_proof',64),('sd_width_proof',24)):
+            other=m.get(key)
+            if other is not None and csi_address<other+size and other<csi_address+128:
+                raise ValueError('Receiver power telemetry overlaps '+key)
+    return modes[mode]
+
+
+def power_probe_snapshot(b,m,p,label):
+    mode=power_probe_layout(m,p['operation'])
+    if mode is None:return None
+    raw=b.upload(m['power_probe_proof'],64,label+'-power-probe.bin')
+    if len(raw)!=64:raise ValueError('Incomplete power-probe telemetry')
+    v=dict(zip(POWER_PROBE_FIELDS,struct.unpack('<16I',raw)))
+    expected=0 if mode in (2,5) else 1<<5
+    if (v['magic']!=0x31505750 or v['version']!=1 or v['mode']!=mode or v['state']!=3 or
+        v['faults'] or v['preconditions']!=15 or v['hold_cycles']!=80000000 or
+        (v['gpio_mode']&(3<<10))!=1<<10 or not v['gpio_odr_before']&(1<<5) or
+        not v['gpio_idr_before']&(1<<5) or (v['gpio_odr_after']&(1<<5))!=expected or
+        (v['gpio_idr_after']&(1<<5))!=expected or
+        (v['gpio_odr_before']^v['gpio_odr_after'])&~(1<<5)):
+        raise ValueError('Power-probe preconditions or GPIO result differ')
+    elapsed=(v['hold_end']-v['hold_begin'])&0xffffffff
+    if (not 80000000<=elapsed<=80400000 or
+        (v['camera_ready']-v['wait_begin'])&0xffffffff>1200400000 or
+        (v['hold_begin']-v['camera_ready'])&0xffffffff>(400000000 if mode>=3 else 4000000) or
+        (p['sd_begin']-v['hold_end'])&0xffffffff>4000000):
+        raise ValueError('Power-probe time bounds/order differ')
+    for field in ('frame_done','camera_stop'):
+        if not p[field] or (v['camera_ready']-p[field])&0xffffffff>1200400000:
+            raise ValueError('Power hold preceded completed camera: '+field)
+    v.update(hold_ms=elapsed/400000,scope='Stopped sensor, live receiver clocks, CPU busy hold; before SD initialization')
+    return v
+
+
+def power_phy_snapshot(b,m,p,label):
+    mode=power_probe_layout(m,p['operation'])
+    if mode not in (3,4):return None
+    raw=b.upload(m['power_phy_proof'],256,label+'-power-phy.bin')
+    if len(raw)!=256:raise ValueError('Incomplete Ethernet power telemetry')
+    w=list(struct.unpack('<64I',raw))
+    original=w[12];requested=original|(0x800 if mode==4 else 0)
+    if (w[0]!=0x31594850 or w[1]!=1 or w[2]!=mode or w[3]!=6 or w[4] or w[5] or
+        w[10]!=7 or w[11]&0xfff0!=0xc130 or original!=w[13] or original&~0x2100!=0x1000 or
+        w[14]!=requested or w[15]!=requested or w[16]!=requested or w[17]!=requested or
+        w[18]!=original or w[19]!=original or not 1<=w[20]<=100 or w[21] or w[22] or w[23]!=2 or
+        w[24]!=w[25] or w[26]&0x60 or w[27]!=w[28] or w[29]&0x60 or
+        w[30]!=1 or w[31]!=1 or w[32:38]!=w[44:50] or w[38:44]!=w[50:56] or
+        w[56]!=1 or w[57]!=w[10] or w[58]!=w[11] or w[59]!=3 or
+        w[60]!=400000000 or w[61]!=2000 or w[62] or w[63]):
+        raise ValueError('Ethernet identity, mutation or restoration proof differs')
+    for at in (32,38,44,50):
+        limits=(3,1,3,3,15,1)
+        if any(w[at+i]>limit for i,limit in enumerate(limits)):
+            raise ValueError('Ethernet GPIO proof field out of range')
+    if ((w[7]-w[6])&0xffffffff>400000000 or
+        (w[9]-w[8])&0xffffffff>400000000 or
+        not p['deinit_done'] or (w[8]-p['deinit_done'])&0xffffffff>4000000):
+        raise ValueError('Ethernet probe sequence timing differs')
+    return dict(words=w,mode=mode,phy_address=0,id1=w[10],id2=w[11],original_bmcr=original,
+        requested_bmcr=requested,restored_bmcr=w[19],gpio_restored=True,
+        begin_ms=((w[7]-w[6])&0xffffffff)/400000,
+        restore_ms=((w[9]-w[8])&0xffffffff)/400000,
+        scope='LAN8742 BMCR power-down through hold/save; exact original BMCR and pins restored after SD deinit; other PHY registers not qualified')
+
+
+def power_csi_snapshot(b,m,p,label):
+    mode=power_probe_layout(m,p['operation'])
+    if mode!=5:return None
+    raw=b.upload(m['power_csi_proof'],128,label+'-power-csi.bin')
+    if len(raw)!=128:raise ValueError('Incomplete receiver power telemetry')
+    w=list(struct.unpack('<32I',raw))
+    if (w[0]!=0x31595043 or w[1]!=1 or w[2]!=2 or w[3] or
+        w[6]&0x44!=0x44 or w[7]&0x44 or w[8]&0x30000!=0x30000 or
+        not w[9]&1 or not w[10]&2 or w[11]!=3 or w[12]&0x1e0000 or w[14]&0x80808000 or
+        any(w[i]&8 for i in (15,17,19)) or any(w[i]&0x80000000 for i in (16,18,20)) or
+        w[21]!=(w[9]&~1) or w[22]!=(w[10]&~2) or w[23] or
+        w[24]!=w[6] or w[25]!=w[7] or w[26]!=w[8] or w[29] or w[30] or w[31]):
+        raise ValueError('Receiver idle, power-off or retained-clock proof differs')
+    if ((w[5]-w[4])&0xffffffff>4000000 or not p['camera_stop'] or
+        (w[4]-p['camera_stop'])&0xffffffff>4000000):
+        raise ValueError('Receiver power-off did not follow bounded completed STOP')
+    return dict(words=w,receiver_off=True,apb_and_kernel_clocks_retained=True,
+        mutation_us=((w[5]-w[4])&0xffffffff)/400,
+        scope='Sensor held reset; CSI/PHY disabled and camera IRQs masked after idle checks; APB/kernel clocks retained')
+
+
+READ_DIAGNOSTIC_FIELDS=('magic version mode lba count destination requested_bytes words sta dcount '
+                        'fifo_flags idmactrl dctrl clkcr captured result').split()
+
+
+def read_diagnostics_layout(m,operation=None):
+    """Bind a single-sector receive observation; never an idle/success gate."""
+    enabled=m.get('sd_read_diagnostics',False)
+    selected=[f for f in m.get('flags',[]) if f.startswith('-DSD_READ_DIAGNOSTICS=')]
+    if type(enabled) is not bool:
+        raise ValueError('Receive diagnostic selector type differs')
+    if not enabled:
+        if (selected or m.get('sd_read_diagnostics_proof') is not None or m.get('sd_read_diagnostics_proof_bytes',0) or
+                m.get('raw_read_camera_proof') is not None or m.get('raw_read_camera_proof_bytes',0)):
+            raise ValueError('Unexpected receive diagnostics')
+        return False
+    true_keys=('sd_review_profile','sd_startup_opt','sd_clock_negedge','sd_clock_negedge_init',
+               'magic_format','line_stream','async_stop')
+    false_keys=('flash','standby','sd_high_speed','sd_fixed_compensation','sd_compensation_modified',
+                'sd_high_speed_mixed_slew','sd_high_speed_fixed_compensation','sd_high_speed_combined_electrical',
+                'sd_early_run_clock','raw_dma_tail_wait','dma_sleep','preinit','line_snapshots',
+                'line_poison','whole_image_preerase','error_blinks','error_after_frame_test')
+    if (selected!=['-DSD_READ_DIAGNOSTICS=1'] or
+            not all(m.get(k) is True for k in true_keys) or
+            not all(m.get(k,False) is False for k in false_keys) or
+            m.get('sd_clock_hz') not in (12500000,25000000) or m.get('sd_bus_width')!=4 or
+            m.get('sd_gpio_speed')!=3 or m.get('sd_clk_gpio_speed') is not None or
+            m.get('transport')!='idma' or m.get('pattern')!=0 or m.get('exposure_coarse')!=1428 or
+            m.get('error_test_code',0) or type(m.get('sd_idma_read')) is not bool or
+            operation not in (None,3)):
+        raise ValueError('Receive diagnostics require the exact single-sector RAM READ profile')
+    expected=dict(SD_READ_DIAGNOSTICS='1',SD_REVIEW_PROFILE='1',SD_STARTUP_OPT='1',
+        SD_CLOCK_NEGEDGE='1',SD_CLOCK_NEGEDGE_INIT='1',SD_BUS_WIDTH='4',SD_GPIO_SPEED='3',
+        RAW_SD_CLOCK_HZ=str(m['sd_clock_hz'])+'U',SD_IDMA_READ=str(int(m['sd_idma_read'])),
+        RAW_FLASH='0',RAW_STANDBY='0',SD_FIXED_COMPENSATION='0',SD_HIGH_SPEED='0',
+        SD_HIGH_SPEED_MIXED_SLEW='0',SD_HIGH_SPEED_FIXED_COMPENSATION='0',
+        SD_HIGH_SPEED_COMBINED_ELECTRICAL='0',SD_EARLY_RUN_CLOCK='0',RAW_DMA_TAIL_WAIT='0',
+        RAW_DMA_SLEEP='0',RAW_MAGIC_FORMAT='1',RAW_LINE_STREAM='1',RAW_ASYNC_STOP='1',RAW_DMA='1',
+        RAW_PREINIT='0',RAW_LINE_SNAPSHOTS='0',RAW_LINE_POISON='0',RAW_WHOLE_IMAGE_PREERASE='0',
+        RAW_PATTERN='0',RAW_EXPOSURE_COARSE='1428U')
+    for macro,value in expected.items():
+        flags=[f for f in m.get('flags',[]) if f.startswith('-D'+macro+'=')]
+        if flags!=['-D'+macro+'='+value]:
+            raise ValueError('Receive diagnostic compiler flag differs: '+macro)
+    if any(f.startswith('-DSD_CLK_GPIO_SPEED=') for f in m.get('flags',[])):
+        raise ValueError('Receive diagnostics refuse CLK slew experiment')
+    address=m.get('sd_read_diagnostics_proof')
+    if (type(address) is not int or address%4 or m.get('sd_read_diagnostics_proof_bytes')!=64 or
+            not m['bss_start']<=address<=m['bss_end']-64):
+        raise ValueError('Receive diagnostic bounds differ')
+    for key,size in (('card',200),('slots',640),('producer',416),('magic_slots',576),('magic_proof',32),
+                     ('sd_stream',44),('sd_scr',16),('sd_erase',32),('sd_width_proof',24),
+                     ('sd_gpio_proof',32),('sd_clk_gpio_proof',48),('sd_compensation_proof',32),
+                     ('sd_startup_proof',64),('raw_dma_tail_wait_proof',64),('sd_early_clock_proof',64),
+                     ('sd_high_speed_proof',184),('sd_clock_profile_proof',128),('raw_read_camera_proof',64)):
+        other=m.get(key)
+        if other is not None and address<other+size and other<address+64:
+            raise ValueError('Receive diagnostics overlap another owner')
+    camera=m.get('raw_read_camera_proof')
+    if (type(camera) is not int or camera%4 or m.get('raw_read_camera_proof_bytes')!=64 or
+            not m['bss_start']<=camera<=m['bss_end']-64):
+        raise ValueError('Read camera proof bounds differ')
+    for key,size in (('card',200),('slots',640),('producer',416),('magic_slots',576),('magic_proof',32),
+                     ('sd_stream',44),('sd_scr',16),('sd_erase',32),('sd_width_proof',24),
+                     ('sd_startup_proof',64),('sd_read_diagnostics_proof',64)):
+        other=m.get(key)
+        if other is not None and camera<other+size and other<camera+64:
+            raise ValueError('Read camera proof overlaps another owner')
+    return True
+
+
+def read_diagnostics_snapshot(b,m,label,*,lba,count):
+    """Read retained SRAM after terminal, including failed/untrusted reads.
+
+    This checks attribution and bounds only. Hardware/result/cleanup errors are
+    preserved for diagnosis and cannot authorize another operation.
+    """
+    if not read_diagnostics_layout(m,3):return None
+    if count!=1:raise ValueError('Receive diagnostics require one sector')
+    raw=b.upload(m['sd_read_diagnostics_proof'],64,label+'-sd-read-diagnostics.bin')
+    d=dict(zip(READ_DIAGNOSTIC_FIELDS,struct.unpack('<16I',raw)))
+    expected_clkcr=0x34000|(3 if m['sd_clock_hz']==25000000 else 6)
+    if (d['magic']!=0x31445253 or d['version']!=1 or d['captured']!=1 or
+            d['mode']!=int(m['sd_idma_read']) or d['lba']!=lba or d['count']!=count or
+            d['destination']!=READ_BUFFER or d['requested_bytes']!=512 or d['words']>128 or
+            d['dcount']>512 or d['fifo_flags']!=(d['sta']&0xA8000) or d['clkcr']!=expected_clkcr):
+        raise ValueError('Receive diagnostic record differs from request/profile')
+    if (not m['sd_idma_read'] and d['idmactrl']) or (m['sd_idma_read'] and d['idmactrl']!=1):
+        raise ValueError('Receive diagnostic IDMA ownership differs')
+    return d
+
+
+def read_camera_snapshot(b,m,label):
+    if not read_diagnostics_layout(m,3):return None
+    raw=b.upload(m['raw_read_camera_proof'],64,label+'-read-camera.bin')
+    keys=('magic version phase rcc_ahb4enr svmcr3 moder odr idr otyper pupdr '
+          'assert_begin checked c_ospeed e_ospeed sd_gpio_readable held').split()
+    d=dict(zip(keys,struct.unpack('<16I',raw)))
+    if (d['magic']!=0x31504352 or d['version']!=1 or d['phase']!=2 or d['held']!=1 or
+            d['rcc_ahb4enr']&0x44014!=0x44014 or not d['svmcr3']&0x100 or
+            d['moder']&0xC00!=0x400 or d['odr']&0x20 or d['idr']&0x20 or
+            d['otyper']&0x20 or d['pupdr']&0xC00 or d['sd_gpio_readable']!=1 or
+            d['c_ospeed']&0xFF3!=0xFF3 or d['e_ospeed']&0x300!=0x300 or
+            (d['checked']-d['assert_begin'])&0xFFFFFFFF<40800):
+        raise ValueError('Camera reset hold or unchanged SD GPIO speed proof differs')
+    return d
+
+
+def clk_gpio_layout(m,operation=None):
+    """Admit only the isolated PC2 slew trial; this record never proves idle."""
+    speed=m.get('sd_clk_gpio_speed')
+    flags=m.get('flags',[])
+    selected=[f for f in flags if f.startswith('-DSD_CLK_GPIO_SPEED=')]
+    if speed is None:
+        if selected or m.get('sd_clk_gpio_proof') is not None or m.get('sd_clk_gpio_proof_bytes',0):
+            raise ValueError('Unexpected CLK-only speed telemetry or compiler flag')
+        return None
+    true_keys=('sd_review_profile','sd_startup_opt','sd_clock_negedge','sd_clock_negedge_init',
+               'magic_format','line_stream','async_stop')
+    false_keys=('flash','standby','sd_high_speed','sd_fixed_compensation','sd_compensation_modified',
+                'sd_high_speed_mixed_slew','sd_high_speed_fixed_compensation','sd_high_speed_combined_electrical',
+                'sd_early_run_clock','sd_idma_read','raw_dma_tail_wait','dma_sleep','preinit',
+                'line_snapshots','line_poison','whole_image_preerase','error_after_frame_test')
+    if (type(speed) is not int or speed not in (1,2,3) or
+            selected!=[f'-DSD_CLK_GPIO_SPEED={speed}'] or
+            not all(m.get(k) is True for k in true_keys) or
+            not all(m.get(k,False) is False for k in false_keys) or
+            m.get('error_test_code',0)!=0 or m.get('sd_clock_hz')!=25000000 or
+            m.get('sd_bus_width')!=4 or m.get('sd_gpio_speed')!=3 or
+            m.get('transport')!='idma' or operation not in (None,1,3)):
+        raise ValueError('CLK-only slew requires the reviewed startup 25 MHz no-tail RAM capture/read profile')
+    macros=dict(SD_BUS_WIDTH='4',RAW_SD_CLOCK_HZ='25000000U',SD_GPIO_SPEED='3',
+        SD_REVIEW_PROFILE='1',SD_STARTUP_OPT='1',SD_CLOCK_NEGEDGE='1',SD_CLOCK_NEGEDGE_INIT='1',
+        RAW_FLASH='0',RAW_STANDBY='0',RAW_DMA='1',RAW_MAGIC_FORMAT='1',RAW_LINE_STREAM='1',RAW_ASYNC_STOP='1',
+        SD_FIXED_COMPENSATION='0',SD_HIGH_SPEED='0',SD_HIGH_SPEED_MIXED_SLEW='0',
+        SD_HIGH_SPEED_FIXED_COMPENSATION='0',SD_HIGH_SPEED_COMBINED_ELECTRICAL='0',
+        SD_EARLY_RUN_CLOCK='0',SD_IDMA_READ='0',RAW_DMA_TAIL_WAIT='0',RAW_DMA_SLEEP='0',
+        RAW_PREINIT='0',RAW_LINE_SNAPSHOTS='0',RAW_LINE_POISON='0',RAW_WHOLE_IMAGE_PREERASE='0')
+    for macro,value in macros.items():
+        if [f for f in flags if f.startswith('-D'+macro+'=')]!=[f'-D{macro}={value}']:
+            raise ValueError('CLK-only profile compiler flags differ: '+macro)
+    address=m.get('sd_clk_gpio_proof')
+    if (type(address) is not int or address%4 or m.get('sd_clk_gpio_proof_bytes')!=48 or
+            not m['bss_start']<=address<=m['bss_end']-48):
+        raise ValueError('CLK-only proof bounds differ')
+    for key,size in (('card',200),('slots',640),('producer',416),('magic_slots',576),('magic_proof',32),
+                     ('sd_stream',44),('sd_scr',16),('sd_erase',32),('sd_width_proof',24),
+                     ('sd_startup_proof',64),('sd_gpio_proof',32),('sd_compensation_proof',32),
+                     ('raw_dma_tail_wait_proof',64),('sd_high_speed_proof',184),
+                     ('sd_clock_profile_proof',128),('sd_early_clock_proof',64)):
+        other=m.get(key)
+        if other is not None and address<other+size and other<address+48:
+            raise ValueError('CLK-only proof overlaps another owner')
+    return speed
+
+
+def clk_gpio_snapshot(b,m,label,operation=None):
+    speed=clk_gpio_layout(m,operation)
+    if speed is None:return None
+    raw=b.upload(m['sd_clk_gpio_proof'],48,label+'-sd-clk-gpio.bin')
+    if len(raw)!=48:raise ValueError('Incomplete CLK-only speed telemetry')
+    names=('magic','version','requested_speed','clk_mask','c_mask','c_before','c_configured',
+           'c_after','e_mask','e_before','e_after','applied')
+    proof=dict(zip(names,struct.unpack('<12I',raw)))
+    expected_c=(0xFF3&~0x30)|(speed<<4)
+    if (proof['magic']!=0x314B4C43 or proof['version']!=1 or proof['requested_speed']!=speed or
+            proof['clk_mask']!=0x30 or proof['c_mask']!=0xFF3 or proof['e_mask']!=0x300 or
+            proof['applied']!=1 or (proof['c_configured']&0xFF3)!=0xFF3 or
+            (proof['c_after']&0xFF3)!=expected_c or (proof['e_after']&0x300)!=0x300 or
+            (proof['c_before']^proof['c_configured'])&~0xFF3 or
+            (proof['c_configured']^proof['c_after'])&~0x30 or
+            (proof['e_before']^proof['e_after'])&~0x300):
+        raise ValueError('CLK-only speed readback or unrelated-pin preservation differs')
+    return proof
+
+
 def compensation_layout(m):
     enabled=m.get('sd_fixed_compensation',False)
     if type(enabled) is not bool:
@@ -828,8 +1506,7 @@ def terminal_gate(b, folder, m, code, prior, label):
     return sd.context_proof(b,{m['park']},label+'-context')
 
 
-def card_snapshot(b,m,p,label):
-    raw=b.upload(m['card'],200,label+'-card.bin')
+def decode_card(raw):
     values=struct.unpack('<6Q38I',raw)
     names=('sector_count read_sectors written_sectors read_cycles write_cycles ready_cycles '
         'initialized controller_owned media_idle clock_hz ocr rca cid0 cid1 cid2 cid3 '
@@ -837,7 +1514,11 @@ def card_snapshot(b,m,p,label):
         'last_argument last_sta last_r1 command_count last_ready_r1 last_stop_r1 cleanup_error '
         'transfer_words transfer_sta transfer_cycles init_cycles gpioc_idr gpioe_idr '
         'vddio5_control saved_sdmmc_mux saved_demcr saved_dwt timer_owned').split()
-    c=dict(zip(names,values))
+    return dict(zip(names,values))
+
+
+def card_snapshot(b,m,p,label):
+    c=decode_card(b.upload(m['card'],200,label+'-card.bin'))
     if c['clock_hz']!=clock_layout(m) or p.get('clock_hz')!=c['clock_hz']:
         raise ValueError('Live card, terminal proof, and requested SD clock differ')
     if (any(c[k] for k in ('initialized','controller_owned','error','cleanup_error','timer_owned')) or
@@ -854,6 +1535,8 @@ def card_snapshot(b,m,p,label):
     if width is not None:c['bus_width_proof']=width
     gpio=gpio_snapshot(b,m,label)
     if gpio is not None:c['gpio_speed_proof']=gpio
+    clk_gpio=clk_gpio_snapshot(b,m,label,p['operation'])
+    if clk_gpio is not None:c['clk_gpio_speed_proof']=clk_gpio
     comp=compensation_snapshot(b,m,label)
     if comp is not None:c['compensation_proof']=comp
     startup=startup_snapshot(b,m,label,p['operation'])
@@ -877,6 +1560,8 @@ def run(a):
             args=(generation&0xffffffff,generation>>32,a.slot_limit)
     elif op==3: args=(a.lba,a.count,0)
     else: args=(0,0,0)
+    if m.get('sd_read_diagnostics') and (op!=3 or args[1]!=1):
+        raise ValueError('Receive diagnostics require one-sector READ')
     req=request(op,nonce,*args,magic_format=bool(m.get('magic_format'))); words=list(struct.unpack('<16I',req))
     a.out.mkdir(parents=True,exist_ok=False)
     dump(a.out/'plan.json',dict(execute=a.execute,operation=a.operation,request_words=words,
@@ -924,6 +1609,32 @@ def run(a):
         if poll%5==0: print(json.dumps(dict(state=p['state'],stage=p['stage'],formatted=p['formatted_slots'],sd_error=p['sd_error'])),flush=True)
         poll+=1; time.sleep(2 if op==2 else .2)
     dump(a.out/'proof.json',p)
+    if m.get('sensor_autostop'):
+        sensor_autostop_retain(b,m,p,code,nonce,a.out,names)
+    read_diagnostics=None
+    if m.get('sd_read_diagnostics'):
+        # Retain failed receive evidence before ordinary success validation.
+        # These are SRAM reads only, never accesses to clock-gated SD registers.
+        raw=b.upload(READ_BUFFER,512,'read-buffer.bin')
+        (a.out/'read-buffer.bin').write_bytes(raw)
+        retained_card=decode_card(b.upload(m['card'],200,'read-card.bin'))
+        retained_code=b.upload(LOAD,m['immutable_bytes'],'read-immutable-code.bin')
+        final_proof=decode(b.upload(PROOF,384,'read-final-proof.bin'),names)
+        cfsr,hfsr=struct.unpack('<2I',b.upload(0xE000ED28,8,'read-fault-status.bin'))
+        attribution=dict(binary_sha256=sha(code),expected_immutable_sha256=sha(code[:m['immutable_bytes']]),
+            observed_immutable_sha256=sha(retained_code),immutable_code_equal=retained_code==code[:m['immutable_bytes']],
+            final_proof_equal=final_proof==p,nonce=nonce,cfsr=cfsr,hfsr=hfsr,
+            hardware_mutations=False,idle_permission=False)
+        dump(a.out/'read-attribution.json',attribution)
+        read_diagnostics=read_diagnostics_snapshot(b,m,'completed',lba=args[0],count=args[1])
+        camera=read_camera_snapshot(b,m,'completed')
+        dump(a.out/'read-diagnostics.json',dict(diagnostics=read_diagnostics,
+            camera=camera,card=retained_card,attribution=attribution,
+            buffer_sha256=sha(raw),buffer_bytes=512,operation_result=p['result'],
+            nonce=nonce,read_data_valid=False,
+            caveat='Diagnostic retention only; ordinary success/idle validation is still required.'))
+        if not attribution['immutable_code_equal'] or not attribution['final_proof_equal'] or cfsr or hfsr:
+            raise ValueError('Retained receive attribution differs or MCU fault flags are set')
     validate(p,m,words)
     card=card_snapshot(b,m,p,'completed')
     magic=magic_snapshot(b,m,p,'completed',card) if m.get('magic_format') else None
@@ -934,6 +1645,19 @@ def run(a):
     clock,=struct.unpack('<I',b.upload(m['system_core_clock'],4,'system-clock.bin'))
     if clock!=400000000: raise ValueError('Clock differs from qualified profile')
     result=dict(passed=True,binary_sha256=sha(code),request_words=words,proof=p,context=context,card=card)
+    board_eth=board_eth_snapshot(b,m,p,'completed')
+    if board_eth is not None:result['board_eth']=board_eth
+    sd_init_gap=sd_init_gap_snapshot(b,m,p,'completed')
+    if sd_init_gap is not None:result['sd_init_gap']=sd_init_gap
+    sensor_autostop=sensor_autostop_snapshot(b,m,p,'completed')
+    if sensor_autostop is not None:result['sensor_autostop']=sensor_autostop
+    power_probe=power_probe_snapshot(b,m,p,'completed')
+    if power_probe is not None:result['power_probe']=power_probe
+    power_phy=power_phy_snapshot(b,m,p,'completed')
+    if power_phy is not None:result['power_phy']=power_phy
+    power_csi=power_csi_snapshot(b,m,p,'completed')
+    if power_csi is not None:result['power_csi']=power_csi
+    if read_diagnostics is not None:result['read_diagnostics']=read_diagnostics
     if magic is not None: result['magic_format']=magic
     if op==1:
         result['whole_image']=frame_guards(b,m,p)

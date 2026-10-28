@@ -1,0 +1,565 @@
+
+D:\Github\global-x-camera\tmp\bringup\power-ablation-20261028\sleep-probe\probe.elf:     file format elf32-littlearm
+
+
+Disassembly of section .text:
+
+343c1000 <fail>:
+343c1000:	220f      	movs	r2, #15
+343c1002:	4b03      	ldr	r3, [pc, #12]	@ (343c1010 <power_sleep_refused+0x4>)
+343c1004:	60d8      	str	r0, [r3, #12]
+343c1006:	609a      	str	r2, [r3, #8]
+343c1008:	f3bf 8f4f 	dsb	sy
+
+343c100c <power_sleep_refused>:
+343c100c:	e7fe      	b.n	343c100c <power_sleep_refused>
+343c100e:	bf00      	nop
+343c1010:	343c2000 	.word	0x343c2000
+
+343c1014 <power_sleep_entry>:
+343c1014:	b580      	push	{r7, lr}
+343c1016:	f04f 0e80 	mov.w	lr, #128	@ 0x80
+343c101a:	4a8f      	ldr	r2, [pc, #572]	@ (343c1258 <power_sleep_entry+0x244>)
+343c101c:	2100      	movs	r1, #0
+343c101e:	4613      	mov	r3, r2
+343c1020:	f04e e001 	dls	lr, lr
+343c1024:	f842 1b04 	str.w	r1, [r2], #4
+343c1028:	f00f c005 	le	lr, 343c1024 <power_sleep_entry+0x10>
+343c102c:	4a8b      	ldr	r2, [pc, #556]	@ (343c125c <power_sleep_entry+0x248>)
+343c102e:	601a      	str	r2, [r3, #0]
+343c1030:	2201      	movs	r2, #1
+343c1032:	605a      	str	r2, [r3, #4]
+343c1034:	609a      	str	r2, [r3, #8]
+343c1036:	4a8a      	ldr	r2, [pc, #552]	@ (343c1260 <power_sleep_entry+0x24c>)
+343c1038:	6852      	ldr	r2, [r2, #4]
+343c103a:	611a      	str	r2, [r3, #16]
+343c103c:	4a89      	ldr	r2, [pc, #548]	@ (343c1264 <power_sleep_entry+0x250>)
+343c103e:	6952      	ldr	r2, [r2, #20]
+343c1040:	625a      	str	r2, [r3, #36]	@ 0x24
+343c1042:	f3ef 8214 	mrs	r2, CONTROL
+343c1046:	629a      	str	r2, [r3, #40]	@ 0x28
+343c1048:	f3ef 8205 	mrs	r2, IPSR
+343c104c:	62da      	str	r2, [r3, #44]	@ 0x2c
+343c104e:	f3ef 8210 	mrs	r2, PRIMASK
+343c1052:	631a      	str	r2, [r3, #48]	@ 0x30
+343c1054:	f3ef 8213 	mrs	r2, FAULTMASK
+343c1058:	635a      	str	r2, [r3, #52]	@ 0x34
+343c105a:	4a83      	ldr	r2, [pc, #524]	@ (343c1268 <power_sleep_entry+0x254>)
+343c105c:	6b52      	ldr	r2, [r2, #52]	@ 0x34
+343c105e:	639a      	str	r2, [r3, #56]	@ 0x38
+343c1060:	f04f 22e0 	mov.w	r2, #3758153728	@ 0xe000e000
+343c1064:	6912      	ldr	r2, [r2, #16]
+343c1066:	63da      	str	r2, [r3, #60]	@ 0x3c
+343c1068:	f3ef 8208 	mrs	r2, MSP
+343c106c:	f8c3 20dc 	str.w	r2, [r3, #220]	@ 0xdc
+343c1070:	f3ef 820a 	mrs	r2, MSPLIM
+343c1074:	f8c3 20e0 	str.w	r2, [r3, #224]	@ 0xe0
+343c1078:	6a5a      	ldr	r2, [r3, #36]	@ 0x24
+343c107a:	f412 3f40 	tst.w	r2, #196608	@ 0x30000
+343c107e:	d11c      	bne.n	343c10ba <power_sleep_entry+0xa6>
+343c1080:	6a9a      	ldr	r2, [r3, #40]	@ 0x28
+343c1082:	b9d2      	cbnz	r2, 343c10ba <power_sleep_entry+0xa6>
+343c1084:	6ada      	ldr	r2, [r3, #44]	@ 0x2c
+343c1086:	b9c2      	cbnz	r2, 343c10ba <power_sleep_entry+0xa6>
+343c1088:	6b1a      	ldr	r2, [r3, #48]	@ 0x30
+343c108a:	2a01      	cmp	r2, #1
+343c108c:	d115      	bne.n	343c10ba <power_sleep_entry+0xa6>
+343c108e:	6b5a      	ldr	r2, [r3, #52]	@ 0x34
+343c1090:	b99a      	cbnz	r2, 343c10ba <power_sleep_entry+0xa6>
+343c1092:	6b9a      	ldr	r2, [r3, #56]	@ 0x38
+343c1094:	07d7      	lsls	r7, r2, #31
+343c1096:	d410      	bmi.n	343c10ba <power_sleep_entry+0xa6>
+343c1098:	6bda      	ldr	r2, [r3, #60]	@ 0x3c
+343c109a:	b972      	cbnz	r2, 343c10ba <power_sleep_entry+0xa6>
+343c109c:	f8d3 20e0 	ldr.w	r2, [r3, #224]	@ 0xe0
+343c10a0:	4972      	ldr	r1, [pc, #456]	@ (343c126c <power_sleep_entry+0x258>)
+343c10a2:	428a      	cmp	r2, r1
+343c10a4:	d109      	bne.n	343c10ba <power_sleep_entry+0xa6>
+343c10a6:	f8d3 30dc 	ldr.w	r3, [r3, #220]	@ 0xdc
+343c10aa:	4293      	cmp	r3, r2
+343c10ac:	d905      	bls.n	343c10ba <power_sleep_entry+0xa6>
+343c10ae:	4b6a      	ldr	r3, [pc, #424]	@ (343c1258 <power_sleep_entry+0x244>)
+343c10b0:	4a6f      	ldr	r2, [pc, #444]	@ (343c1270 <power_sleep_entry+0x25c>)
+343c10b2:	f8d3 10dc 	ldr.w	r1, [r3, #220]	@ 0xdc
+343c10b6:	4291      	cmp	r1, r2
+343c10b8:	d902      	bls.n	343c10c0 <power_sleep_entry+0xac>
+343c10ba:	2001      	movs	r0, #1
+343c10bc:	f7ff ffa0 	bl	343c1000 <fail>
+343c10c0:	4a6c      	ldr	r2, [pc, #432]	@ (343c1274 <power_sleep_entry+0x260>)
+343c10c2:	6a11      	ldr	r1, [r2, #32]
+343c10c4:	6499      	str	r1, [r3, #72]	@ 0x48
+343c10c6:	6a51      	ldr	r1, [r2, #36]	@ 0x24
+343c10c8:	64d9      	str	r1, [r3, #76]	@ 0x4c
+343c10ca:	f8d2 10c4 	ldr.w	r1, [r2, #196]	@ 0xc4
+343c10ce:	6519      	str	r1, [r3, #80]	@ 0x50
+343c10d0:	f8d2 1080 	ldr.w	r1, [r2, #128]	@ 0x80
+343c10d4:	6559      	str	r1, [r3, #84]	@ 0x54
+343c10d6:	f8d2 1084 	ldr.w	r1, [r2, #132]	@ 0x84
+343c10da:	6599      	str	r1, [r3, #88]	@ 0x58
+343c10dc:	f8d2 1088 	ldr.w	r1, [r2, #136]	@ 0x88
+343c10e0:	65d9      	str	r1, [r3, #92]	@ 0x5c
+343c10e2:	6c98      	ldr	r0, [r3, #72]	@ 0x48
+343c10e4:	4964      	ldr	r1, [pc, #400]	@ (343c1278 <power_sleep_entry+0x264>)
+343c10e6:	4288      	cmp	r0, r1
+343c10e8:	d113      	bne.n	343c1112 <power_sleep_entry+0xfe>
+343c10ea:	6cd9      	ldr	r1, [r3, #76]	@ 0x4c
+343c10ec:	f5b1 1f80 	cmp.w	r1, #1048576	@ 0x100000
+343c10f0:	d10f      	bne.n	343c1112 <power_sleep_entry+0xfe>
+343c10f2:	6d58      	ldr	r0, [r3, #84]	@ 0x54
+343c10f4:	4961      	ldr	r1, [pc, #388]	@ (343c127c <power_sleep_entry+0x268>)
+343c10f6:	4288      	cmp	r0, r1
+343c10f8:	d10b      	bne.n	343c1112 <power_sleep_entry+0xfe>
+343c10fa:	6d99      	ldr	r1, [r3, #88]	@ 0x58
+343c10fc:	b949      	cbnz	r1, 343c1112 <power_sleep_entry+0xfe>
+343c10fe:	6dd8      	ldr	r0, [r3, #92]	@ 0x5c
+343c1100:	495f      	ldr	r1, [pc, #380]	@ (343c1280 <power_sleep_entry+0x26c>)
+343c1102:	4288      	cmp	r0, r1
+343c1104:	d105      	bne.n	343c1112 <power_sleep_entry+0xfe>
+343c1106:	6d18      	ldr	r0, [r3, #80]	@ 0x50
+343c1108:	495e      	ldr	r1, [pc, #376]	@ (343c1284 <power_sleep_entry+0x270>)
+343c110a:	4001      	ands	r1, r0
+343c110c:	f5b1 3f00 	cmp.w	r1, #131072	@ 0x20000
+343c1110:	d001      	beq.n	343c1116 <power_sleep_entry+0x102>
+343c1112:	2002      	movs	r0, #2
+343c1114:	e7d2      	b.n	343c10bc <power_sleep_entry+0xa8>
+343c1116:	f8d2 1278 	ldr.w	r1, [r2, #632]	@ 0x278
+343c111a:	6619      	str	r1, [r3, #96]	@ 0x60
+343c111c:	f8d2 1248 	ldr.w	r1, [r2, #584]	@ 0x248
+343c1120:	6659      	str	r1, [r3, #100]	@ 0x64
+343c1122:	f8d2 2208 	ldr.w	r2, [r2, #520]	@ 0x208
+343c1126:	669a      	str	r2, [r3, #104]	@ 0x68
+343c1128:	6e1a      	ldr	r2, [r3, #96]	@ 0x60
+343c112a:	0796      	lsls	r6, r2, #30
+343c112c:	d505      	bpl.n	343c113a <power_sleep_entry+0x126>
+343c112e:	6e5a      	ldr	r2, [r3, #100]	@ 0x64
+343c1130:	07d5      	lsls	r5, r2, #31
+343c1132:	d502      	bpl.n	343c113a <power_sleep_entry+0x126>
+343c1134:	6e9b      	ldr	r3, [r3, #104]	@ 0x68
+343c1136:	07dc      	lsls	r4, r3, #31
+343c1138:	d501      	bpl.n	343c113e <power_sleep_entry+0x12a>
+343c113a:	2003      	movs	r0, #3
+343c113c:	e7be      	b.n	343c10bc <power_sleep_entry+0xa8>
+343c113e:	4b52      	ldr	r3, [pc, #328]	@ (343c1288 <power_sleep_entry+0x274>)
+343c1140:	685a      	ldr	r2, [r3, #4]
+343c1142:	4b45      	ldr	r3, [pc, #276]	@ (343c1258 <power_sleep_entry+0x244>)
+343c1144:	66da      	str	r2, [r3, #108]	@ 0x6c
+343c1146:	6eda      	ldr	r2, [r3, #108]	@ 0x6c
+343c1148:	07d0      	lsls	r0, r2, #31
+343c114a:	d501      	bpl.n	343c1150 <power_sleep_entry+0x13c>
+343c114c:	2004      	movs	r0, #4
+343c114e:	e7b5      	b.n	343c10bc <power_sleep_entry+0xa8>
+343c1150:	4a43      	ldr	r2, [pc, #268]	@ (343c1260 <power_sleep_entry+0x24c>)
+343c1152:	6812      	ldr	r2, [r2, #0]
+343c1154:	f8c3 20d8 	str.w	r2, [r3, #216]	@ 0xd8
+343c1158:	f8d3 20d8 	ldr.w	r2, [r3, #216]	@ 0xd8
+343c115c:	07d1      	lsls	r1, r2, #31
+343c115e:	d504      	bpl.n	343c116a <power_sleep_entry+0x156>
+343c1160:	4a40      	ldr	r2, [pc, #256]	@ (343c1264 <power_sleep_entry+0x250>)
+343c1162:	f8d2 20fc 	ldr.w	r2, [r2, #252]	@ 0xfc
+343c1166:	01d2      	lsls	r2, r2, #7
+343c1168:	d401      	bmi.n	343c116e <power_sleep_entry+0x15a>
+343c116a:	2005      	movs	r0, #5
+343c116c:	e7a6      	b.n	343c10bc <power_sleep_entry+0xa8>
+343c116e:	4a41      	ldr	r2, [pc, #260]	@ (343c1274 <power_sleep_entry+0x260>)
+343c1170:	f8d2 127c 	ldr.w	r1, [r2, #636]	@ 0x27c
+343c1174:	6719      	str	r1, [r3, #112]	@ 0x70
+343c1176:	f8d2 123c 	ldr.w	r1, [r2, #572]	@ 0x23c
+343c117a:	6759      	str	r1, [r3, #116]	@ 0x74
+343c117c:	f8d2 2240 	ldr.w	r2, [r2, #576]	@ 0x240
+343c1180:	679a      	str	r2, [r3, #120]	@ 0x78
+343c1182:	6f1a      	ldr	r2, [r3, #112]	@ 0x70
+343c1184:	f012 0f44 	tst.w	r2, #68	@ 0x44
+343c1188:	d006      	beq.n	343c1198 <power_sleep_entry+0x184>
+343c118a:	6f1b      	ldr	r3, [r3, #112]	@ 0x70
+343c118c:	f003 0344 	and.w	r3, r3, #68	@ 0x44
+343c1190:	2b44      	cmp	r3, #68	@ 0x44
+343c1192:	d001      	beq.n	343c1198 <power_sleep_entry+0x184>
+343c1194:	2006      	movs	r0, #6
+343c1196:	e791      	b.n	343c10bc <power_sleep_entry+0xa8>
+343c1198:	4b2f      	ldr	r3, [pc, #188]	@ (343c1258 <power_sleep_entry+0x244>)
+343c119a:	6f1a      	ldr	r2, [r3, #112]	@ 0x70
+343c119c:	f012 0f44 	tst.w	r2, #68	@ 0x44
+343c11a0:	d049      	beq.n	343c1236 <power_sleep_entry+0x222>
+343c11a2:	6f5a      	ldr	r2, [r3, #116]	@ 0x74
+343c11a4:	f012 0f44 	tst.w	r2, #68	@ 0x44
+343c11a8:	d145      	bne.n	343c1236 <power_sleep_entry+0x222>
+343c11aa:	4a38      	ldr	r2, [pc, #224]	@ (343c128c <power_sleep_entry+0x278>)
+343c11ac:	f8d2 2090 	ldr.w	r2, [r2, #144]	@ 0x90
+343c11b0:	67da      	str	r2, [r3, #124]	@ 0x7c
+343c11b2:	4a37      	ldr	r2, [pc, #220]	@ (343c1290 <power_sleep_entry+0x27c>)
+343c11b4:	f8d2 13f4 	ldr.w	r1, [r2, #1012]	@ 0x3f4
+343c11b8:	f8c3 1080 	str.w	r1, [r3, #128]	@ 0x80
+343c11bc:	f8d2 1500 	ldr.w	r1, [r2, #1280]	@ 0x500
+343c11c0:	f8c3 1084 	str.w	r1, [r3, #132]	@ 0x84
+343c11c4:	f8d2 1404 	ldr.w	r1, [r2, #1028]	@ 0x404
+343c11c8:	f8c3 1088 	str.w	r1, [r3, #136]	@ 0x88
+343c11cc:	f8d2 1900 	ldr.w	r1, [r2, #2304]	@ 0x900
+343c11d0:	f8c3 108c 	str.w	r1, [r3, #140]	@ 0x8c
+343c11d4:	f8d2 1804 	ldr.w	r1, [r2, #2052]	@ 0x804
+343c11d8:	f8c3 1090 	str.w	r1, [r3, #144]	@ 0x90
+343c11dc:	f8d2 1d00 	ldr.w	r1, [r2, #3328]	@ 0xd00
+343c11e0:	f8c3 1094 	str.w	r1, [r3, #148]	@ 0x94
+343c11e4:	f8d2 2c04 	ldr.w	r2, [r2, #3076]	@ 0xc04
+343c11e8:	f8c3 2098 	str.w	r2, [r3, #152]	@ 0x98
+343c11ec:	6fda      	ldr	r2, [r3, #124]	@ 0x7c
+343c11ee:	f412 1ff0 	tst.w	r2, #1966080	@ 0x1e0000
+343c11f2:	d11e      	bne.n	343c1232 <power_sleep_entry+0x21e>
+343c11f4:	f8d3 2080 	ldr.w	r2, [r3, #128]	@ 0x80
+343c11f8:	f002 3280 	and.w	r2, r2, #2155905152	@ 0x80808080
+343c11fc:	f022 0280 	bic.w	r2, r2, #128	@ 0x80
+343c1200:	b9ba      	cbnz	r2, 343c1232 <power_sleep_entry+0x21e>
+343c1202:	f8d3 2084 	ldr.w	r2, [r3, #132]	@ 0x84
+343c1206:	0717      	lsls	r7, r2, #28
+343c1208:	d413      	bmi.n	343c1232 <power_sleep_entry+0x21e>
+343c120a:	f8d3 2088 	ldr.w	r2, [r3, #136]	@ 0x88
+343c120e:	2a00      	cmp	r2, #0
+343c1210:	db0f      	blt.n	343c1232 <power_sleep_entry+0x21e>
+343c1212:	f8d3 208c 	ldr.w	r2, [r3, #140]	@ 0x8c
+343c1216:	0716      	lsls	r6, r2, #28
+343c1218:	d40b      	bmi.n	343c1232 <power_sleep_entry+0x21e>
+343c121a:	f8d3 2090 	ldr.w	r2, [r3, #144]	@ 0x90
+343c121e:	2a00      	cmp	r2, #0
+343c1220:	db07      	blt.n	343c1232 <power_sleep_entry+0x21e>
+343c1222:	f8d3 2094 	ldr.w	r2, [r3, #148]	@ 0x94
+343c1226:	0715      	lsls	r5, r2, #28
+343c1228:	d403      	bmi.n	343c1232 <power_sleep_entry+0x21e>
+343c122a:	f8d3 3098 	ldr.w	r3, [r3, #152]	@ 0x98
+343c122e:	2b00      	cmp	r3, #0
+343c1230:	da01      	bge.n	343c1236 <power_sleep_entry+0x222>
+343c1232:	2007      	movs	r0, #7
+343c1234:	e742      	b.n	343c10bc <power_sleep_entry+0xa8>
+343c1236:	4a0f      	ldr	r2, [pc, #60]	@ (343c1274 <power_sleep_entry+0x260>)
+343c1238:	4b07      	ldr	r3, [pc, #28]	@ (343c1258 <power_sleep_entry+0x244>)
+343c123a:	f8d2 1260 	ldr.w	r1, [r2, #608]	@ 0x260
+343c123e:	f8c3 109c 	str.w	r1, [r3, #156]	@ 0x9c
+343c1242:	f8d2 1220 	ldr.w	r1, [r2, #544]	@ 0x220
+343c1246:	f8c3 10a0 	str.w	r1, [r3, #160]	@ 0xa0
+343c124a:	f8d3 009c 	ldr.w	r0, [r3, #156]	@ 0x9c
+343c124e:	f010 0080 	ands.w	r0, r0, #128	@ 0x80
+343c1252:	d01f      	beq.n	343c1294 <power_sleep_entry+0x280>
+343c1254:	2008      	movs	r0, #8
+343c1256:	e731      	b.n	343c10bc <power_sleep_entry+0xa8>
+343c1258:	343c2000 	.word	0x343c2000
+343c125c:	31504c53 	.word	0x31504c53
+343c1260:	e0001000 	.word	0xe0001000
+343c1264:	e000ed00 	.word	0xe000ed00
+343c1268:	e000ef00 	.word	0xe000ef00
+343c126c:	343af000 	.word	0x343af000
+343c1270:	343b0000 	.word	0x343b0000
+343c1274:	56028000 	.word	0x56028000
+343c1278:	33330000 	.word	0x33330000
+343c127c:	00404b00 	.word	0x00404b00
+343c1280:	49000005 	.word	0x49000005
+343c1284:	30ff0000 	.word	0x30ff0000
+343c1288:	54001000 	.word	0x54001000
+343c128c:	58006000 	.word	0x58006000
+343c1290:	58002000 	.word	0x58002000
+343c1294:	f8d2 125c 	ldr.w	r1, [r2, #604]	@ 0x25c
+343c1298:	f8c3 10c8 	str.w	r1, [r3, #200]	@ 0xc8
+343c129c:	f04f 31ff 	mov.w	r1, #4294967295
+343c12a0:	f8c3 10d4 	str.w	r1, [r3, #212]	@ 0xd4
+343c12a4:	f8c3 10d0 	str.w	r1, [r3, #208]	@ 0xd0
+343c12a8:	f8c3 10cc 	str.w	r1, [r3, #204]	@ 0xcc
+343c12ac:	f8d3 10c8 	ldr.w	r1, [r3, #200]	@ 0xc8
+343c12b0:	044c      	lsls	r4, r1, #17
+343c12b2:	d50d      	bpl.n	343c12d0 <power_sleep_entry+0x2bc>
+343c12b4:	f8d2 221c 	ldr.w	r2, [r2, #540]	@ 0x21c
+343c12b8:	0451      	lsls	r1, r2, #17
+343c12ba:	d409      	bmi.n	343c12d0 <power_sleep_entry+0x2bc>
+343c12bc:	4a89      	ldr	r2, [pc, #548]	@ (343c14e4 <power_sleep_after_wfi+0x6>)
+343c12be:	6811      	ldr	r1, [r2, #0]
+343c12c0:	f8c3 10cc 	str.w	r1, [r3, #204]	@ 0xcc
+343c12c4:	6951      	ldr	r1, [r2, #20]
+343c12c6:	f8c3 10d0 	str.w	r1, [r3, #208]	@ 0xd0
+343c12ca:	6912      	ldr	r2, [r2, #16]
+343c12cc:	f8c3 20d4 	str.w	r2, [r3, #212]	@ 0xd4
+343c12d0:	f04f 23e0 	mov.w	r3, #3758153728	@ 0xe000e000
+343c12d4:	6859      	ldr	r1, [r3, #4]
+343c12d6:	2600      	movs	r6, #0
+343c12d8:	f001 010f 	and.w	r1, r1, #15
+343c12dc:	3101      	adds	r1, #1
+343c12de:	f04f 35ff 	mov.w	r5, #4294967295
+343c12e2:	f041 e001 	dls	lr, r1
+343c12e6:	4a80      	ldr	r2, [pc, #512]	@ (343c14e8 <power_sleep_after_wfi+0xa>)
+343c12e8:	f8c2 10b4 	str.w	r1, [r2, #180]	@ 0xb4
+343c12ec:	00b3      	lsls	r3, r6, #2
+343c12ee:	f103 4460 	add.w	r4, r3, #3758096384	@ 0xe0000000
+343c12f2:	f504 4461 	add.w	r4, r4, #57600	@ 0xe100
+343c12f6:	f8d4 c000 	ldr.w	ip, [r4]
+343c12fa:	f8d2 70a4 	ldr.w	r7, [r2, #164]	@ 0xa4
+343c12fe:	f1a3 231f 	sub.w	r3, r3, #520101632	@ 0x1f001f00
+343c1302:	ea47 070c 	orr.w	r7, r7, ip
+343c1306:	f8c2 70a4 	str.w	r7, [r2, #164]	@ 0xa4
+343c130a:	f8d4 c100 	ldr.w	ip, [r4, #256]	@ 0x100
+343c130e:	f8d2 70a8 	ldr.w	r7, [r2, #168]	@ 0xa8
+343c1312:	f5a3 037d 	sub.w	r3, r3, #16580608	@ 0xfd0000
+343c1316:	ea47 070c 	orr.w	r7, r7, ip
+343c131a:	f8c2 70a8 	str.w	r7, [r2, #168]	@ 0xa8
+343c131e:	f8d3 c000 	ldr.w	ip, [r3]
+343c1322:	f8d2 70b8 	ldr.w	r7, [r2, #184]	@ 0xb8
+343c1326:	3601      	adds	r6, #1
+343c1328:	ea47 070c 	orr.w	r7, r7, ip
+343c132c:	f8c2 70b8 	str.w	r7, [r2, #184]	@ 0xb8
+343c1330:	f8d3 c100 	ldr.w	ip, [r3, #256]	@ 0x100
+343c1334:	f8d2 70bc 	ldr.w	r7, [r2, #188]	@ 0xbc
+343c1338:	ea47 070c 	orr.w	r7, r7, ip
+343c133c:	f8c2 70bc 	str.w	r7, [r2, #188]	@ 0xbc
+343c1340:	f8c4 5080 	str.w	r5, [r4, #128]	@ 0x80
+343c1344:	f8c4 5180 	str.w	r5, [r4, #384]	@ 0x180
+343c1348:	f8c3 5080 	str.w	r5, [r3, #128]	@ 0x80
+343c134c:	f8c3 5180 	str.w	r5, [r3, #384]	@ 0x180
+343c1350:	f00f c035 	le	lr, 343c12ec <power_sleep_entry+0x2d8>
+343c1354:	f04f 6320 	mov.w	r3, #167772160	@ 0xa000000
+343c1358:	4a64      	ldr	r2, [pc, #400]	@ (343c14ec <power_sleep_after_wfi+0xe>)
+343c135a:	6053      	str	r3, [r2, #4]
+343c135c:	f502 3200 	add.w	r2, r2, #131072	@ 0x20000
+343c1360:	6053      	str	r3, [r2, #4]
+343c1362:	f3bf 8f4f 	dsb	sy
+343c1366:	f3bf 8f6f 	isb	sy
+343c136a:	4b5f      	ldr	r3, [pc, #380]	@ (343c14e8 <power_sleep_after_wfi+0xa>)
+343c136c:	468e      	mov	lr, r1
+343c136e:	b909      	cbnz	r1, 343c1374 <power_sleep_entry+0x360>
+343c1370:	f04f 0e01 	mov.w	lr, #1
+343c1374:	f04e e001 	dls	lr, lr
+343c1378:	0082      	lsls	r2, r0, #2
+343c137a:	f102 4160 	add.w	r1, r2, #3758096384	@ 0xe0000000
+343c137e:	f501 4161 	add.w	r1, r1, #57600	@ 0xe100
+343c1382:	680d      	ldr	r5, [r1, #0]
+343c1384:	f8d3 40ac 	ldr.w	r4, [r3, #172]	@ 0xac
+343c1388:	f1a2 221f 	sub.w	r2, r2, #520101632	@ 0x1f001f00
+343c138c:	432c      	orrs	r4, r5
+343c138e:	f8c3 40ac 	str.w	r4, [r3, #172]	@ 0xac
+343c1392:	f8d1 4100 	ldr.w	r4, [r1, #256]	@ 0x100
+343c1396:	f8d3 10b0 	ldr.w	r1, [r3, #176]	@ 0xb0
+343c139a:	f5a2 027d 	sub.w	r2, r2, #16580608	@ 0xfd0000
+343c139e:	4321      	orrs	r1, r4
+343c13a0:	f8c3 10b0 	str.w	r1, [r3, #176]	@ 0xb0
+343c13a4:	6814      	ldr	r4, [r2, #0]
+343c13a6:	f8d3 10c0 	ldr.w	r1, [r3, #192]	@ 0xc0
+343c13aa:	3001      	adds	r0, #1
+343c13ac:	4321      	orrs	r1, r4
+343c13ae:	f8c3 10c0 	str.w	r1, [r3, #192]	@ 0xc0
+343c13b2:	f8d2 1100 	ldr.w	r1, [r2, #256]	@ 0x100
+343c13b6:	f8d3 20c4 	ldr.w	r2, [r3, #196]	@ 0xc4
+343c13ba:	430a      	orrs	r2, r1
+343c13bc:	f8c3 20c4 	str.w	r2, [r3, #196]	@ 0xc4
+343c13c0:	f00f c027 	le	lr, 343c1378 <power_sleep_entry+0x364>
+343c13c4:	f8d3 20ac 	ldr.w	r2, [r3, #172]	@ 0xac
+343c13c8:	b942      	cbnz	r2, 343c13dc <power_sleep_entry+0x3c8>
+343c13ca:	f8d3 20b0 	ldr.w	r2, [r3, #176]	@ 0xb0
+343c13ce:	b92a      	cbnz	r2, 343c13dc <power_sleep_entry+0x3c8>
+343c13d0:	f8d3 20c0 	ldr.w	r2, [r3, #192]	@ 0xc0
+343c13d4:	b912      	cbnz	r2, 343c13dc <power_sleep_entry+0x3c8>
+343c13d6:	f8d3 20c4 	ldr.w	r2, [r3, #196]	@ 0xc4
+343c13da:	b10a      	cbz	r2, 343c13e0 <power_sleep_entry+0x3cc>
+343c13dc:	200a      	movs	r0, #10
+343c13de:	e66d      	b.n	343c10bc <power_sleep_entry+0xa8>
+343c13e0:	4a42      	ldr	r2, [pc, #264]	@ (343c14ec <power_sleep_after_wfi+0xe>)
+343c13e2:	6911      	ldr	r1, [r2, #16]
+343c13e4:	6419      	str	r1, [r3, #64]	@ 0x40
+343c13e6:	6911      	ldr	r1, [r2, #16]
+343c13e8:	f021 0116 	bic.w	r1, r1, #22
+343c13ec:	6111      	str	r1, [r2, #16]
+343c13ee:	6912      	ldr	r2, [r2, #16]
+343c13f0:	645a      	str	r2, [r3, #68]	@ 0x44
+343c13f2:	6c5b      	ldr	r3, [r3, #68]	@ 0x44
+343c13f4:	f013 0f16 	tst.w	r3, #22
+343c13f8:	d001      	beq.n	343c13fe <power_sleep_entry+0x3ea>
+343c13fa:	200b      	movs	r0, #11
+343c13fc:	e65e      	b.n	343c10bc <power_sleep_entry+0xa8>
+343c13fe:	4b3c      	ldr	r3, [pc, #240]	@ (343c14f0 <power_sleep_after_wfi+0x12>)
+343c1400:	f8d3 225c 	ldr.w	r2, [r3, #604]	@ 0x25c
+343c1404:	0712      	lsls	r2, r2, #28
+343c1406:	d401      	bmi.n	343c140c <power_sleep_entry+0x3f8>
+343c1408:	200c      	movs	r0, #12
+343c140a:	e657      	b.n	343c10bc <power_sleep_entry+0xa8>
+343c140c:	f8d3 321c 	ldr.w	r3, [r3, #540]	@ 0x21c
+343c1410:	071b      	lsls	r3, r3, #28
+343c1412:	d4f9      	bmi.n	343c1408 <power_sleep_entry+0x3f4>
+343c1414:	f000 f876 	bl	343c1504 <phase_gpio_init>
+343c1418:	2800      	cmp	r0, #0
+343c141a:	d0f5      	beq.n	343c1408 <power_sleep_entry+0x3f4>
+343c141c:	200b      	movs	r0, #11
+343c141e:	f000 f8af 	bl	343c1580 <phase_gpio_emit>
+343c1422:	2800      	cmp	r0, #0
+343c1424:	d0f0      	beq.n	343c1408 <power_sleep_entry+0x3f4>
+343c1426:	2302      	movs	r3, #2
+343c1428:	4c2f      	ldr	r4, [pc, #188]	@ (343c14e8 <power_sleep_after_wfi+0xa>)
+343c142a:	4d32      	ldr	r5, [pc, #200]	@ (343c14f4 <power_sleep_after_wfi+0x16>)
+343c142c:	60a3      	str	r3, [r4, #8]
+343c142e:	686b      	ldr	r3, [r5, #4]
+343c1430:	4831      	ldr	r0, [pc, #196]	@ (343c14f8 <power_sleep_after_wfi+0x1a>)
+343c1432:	6163      	str	r3, [r4, #20]
+343c1434:	4b31      	ldr	r3, [pc, #196]	@ (343c14fc <power_sleep_after_wfi+0x1e>)
+343c1436:	461a      	mov	r2, r3
+343c1438:	6869      	ldr	r1, [r5, #4]
+343c143a:	6966      	ldr	r6, [r4, #20]
+343c143c:	1b89      	subs	r1, r1, r6
+343c143e:	4281      	cmp	r1, r0
+343c1440:	d803      	bhi.n	343c144a <power_sleep_entry+0x436>
+343c1442:	3a01      	subs	r2, #1
+343c1444:	f103 33ff 	add.w	r3, r3, #4294967295
+343c1448:	d104      	bne.n	343c1454 <power_sleep_entry+0x440>
+343c144a:	686a      	ldr	r2, [r5, #4]
+343c144c:	61a2      	str	r2, [r4, #24]
+343c144e:	b91b      	cbnz	r3, 343c1458 <power_sleep_entry+0x444>
+343c1450:	200d      	movs	r0, #13
+343c1452:	e633      	b.n	343c10bc <power_sleep_entry+0xa8>
+343c1454:	bf00      	nop
+343c1456:	e7ef      	b.n	343c1438 <power_sleep_entry+0x424>
+343c1458:	200c      	movs	r0, #12
+343c145a:	f000 f891 	bl	343c1580 <phase_gpio_emit>
+343c145e:	2800      	cmp	r0, #0
+343c1460:	d0f6      	beq.n	343c1450 <power_sleep_entry+0x43c>
+343c1462:	4b23      	ldr	r3, [pc, #140]	@ (343c14f0 <power_sleep_after_wfi+0x12>)
+343c1464:	f8d3 227c 	ldr.w	r2, [r3, #636]	@ 0x27c
+343c1468:	f8c4 20e4 	str.w	r2, [r4, #228]	@ 0xe4
+343c146c:	f8d3 2240 	ldr.w	r2, [r3, #576]	@ 0x240
+343c1470:	f8c4 20e8 	str.w	r2, [r4, #232]	@ 0xe8
+343c1474:	f8d3 2260 	ldr.w	r2, [r3, #608]	@ 0x260
+343c1478:	f8c4 20ec 	str.w	r2, [r4, #236]	@ 0xec
+343c147c:	f8d3 3278 	ldr.w	r3, [r3, #632]	@ 0x278
+343c1480:	f8c4 30f0 	str.w	r3, [r4, #240]	@ 0xf0
+343c1484:	4b1e      	ldr	r3, [pc, #120]	@ (343c1500 <power_sleep_after_wfi+0x22>)
+343c1486:	685b      	ldr	r3, [r3, #4]
+343c1488:	f8c4 30f4 	str.w	r3, [r4, #244]	@ 0xf4
+343c148c:	f8d4 20e4 	ldr.w	r2, [r4, #228]	@ 0xe4
+343c1490:	6f23      	ldr	r3, [r4, #112]	@ 0x70
+343c1492:	429a      	cmp	r2, r3
+343c1494:	d114      	bne.n	343c14c0 <power_sleep_entry+0x4ac>
+343c1496:	f8d4 20e8 	ldr.w	r2, [r4, #232]	@ 0xe8
+343c149a:	6fa3      	ldr	r3, [r4, #120]	@ 0x78
+343c149c:	429a      	cmp	r2, r3
+343c149e:	d10f      	bne.n	343c14c0 <power_sleep_entry+0x4ac>
+343c14a0:	f8d4 20ec 	ldr.w	r2, [r4, #236]	@ 0xec
+343c14a4:	f8d4 309c 	ldr.w	r3, [r4, #156]	@ 0x9c
+343c14a8:	429a      	cmp	r2, r3
+343c14aa:	d109      	bne.n	343c14c0 <power_sleep_entry+0x4ac>
+343c14ac:	f8d4 20f0 	ldr.w	r2, [r4, #240]	@ 0xf0
+343c14b0:	6e23      	ldr	r3, [r4, #96]	@ 0x60
+343c14b2:	429a      	cmp	r2, r3
+343c14b4:	d104      	bne.n	343c14c0 <power_sleep_entry+0x4ac>
+343c14b6:	f8d4 20f4 	ldr.w	r2, [r4, #244]	@ 0xf4
+343c14ba:	6ee3      	ldr	r3, [r4, #108]	@ 0x6c
+343c14bc:	429a      	cmp	r2, r3
+343c14be:	d001      	beq.n	343c14c4 <power_sleep_entry+0x4b0>
+343c14c0:	200e      	movs	r0, #14
+343c14c2:	e5fb      	b.n	343c10bc <power_sleep_entry+0xa8>
+343c14c4:	686b      	ldr	r3, [r5, #4]
+343c14c6:	61e3      	str	r3, [r4, #28]
+343c14c8:	2303      	movs	r3, #3
+343c14ca:	60a3      	str	r3, [r4, #8]
+343c14cc:	f3bf 8f4f 	dsb	sy
+343c14d0:	f3bf 8f6f 	isb	sy
+343c14d4:	4a04      	ldr	r2, [pc, #16]	@ (343c14e8 <power_sleep_after_wfi+0xa>)
+
+343c14d6 <power_sleep_wfi>:
+343c14d6:	bf30      	wfi
+343c14d8:	6a13      	ldr	r3, [r2, #32]
+343c14da:	3301      	adds	r3, #1
+343c14dc:	6213      	str	r3, [r2, #32]
+
+343c14de <power_sleep_after_wfi>:
+343c14de:	bf00      	nop
+343c14e0:	e7f9      	b.n	343c14d6 <power_sleep_wfi>
+343c14e2:	bf00      	nop
+343c14e4:	56023800 	.word	0x56023800
+343c14e8:	343c2000 	.word	0x343c2000
+343c14ec:	e000ed00 	.word	0xe000ed00
+343c14f0:	56028000 	.word	0x56028000
+343c14f4:	e0001000 	.word	0xe0001000
+343c14f8:	04c4b3ff 	.word	0x04c4b3ff
+343c14fc:	05f5e100 	.word	0x05f5e100
+343c1500:	54001000 	.word	0x54001000
+
+343c1504 <phase_gpio_init>:
+343c1504:	4b1a      	ldr	r3, [pc, #104]	@ (343c1570 <phase_gpio_init+0x6c>)
+343c1506:	681b      	ldr	r3, [r3, #0]
+343c1508:	07d8      	lsls	r0, r3, #31
+343c150a:	d401      	bmi.n	343c1510 <phase_gpio_init+0xc>
+343c150c:	2000      	movs	r0, #0
+343c150e:	4770      	bx	lr
+343c1510:	4b18      	ldr	r3, [pc, #96]	@ (343c1574 <phase_gpio_init+0x70>)
+343c1512:	f8d3 30fc 	ldr.w	r3, [r3, #252]	@ 0xfc
+343c1516:	01d9      	lsls	r1, r3, #7
+343c1518:	d5f8      	bpl.n	343c150c <phase_gpio_init+0x8>
+343c151a:	2208      	movs	r2, #8
+343c151c:	4b16      	ldr	r3, [pc, #88]	@ (343c1578 <phase_gpio_init+0x74>)
+343c151e:	f8c3 2a5c 	str.w	r2, [r3, #2652]	@ 0xa5c
+343c1522:	f3bf 8f4f 	dsb	sy
+343c1526:	f8d3 225c 	ldr.w	r2, [r3, #604]	@ 0x25c
+343c152a:	0712      	lsls	r2, r2, #28
+343c152c:	d5ee      	bpl.n	343c150c <phase_gpio_init+0x8>
+343c152e:	f8d3 321c 	ldr.w	r3, [r3, #540]	@ 0x21c
+343c1532:	071b      	lsls	r3, r3, #28
+343c1534:	d4ea      	bmi.n	343c150c <phase_gpio_init+0x8>
+343c1536:	f04f 5280 	mov.w	r2, #268435456	@ 0x10000000
+343c153a:	4b10      	ldr	r3, [pc, #64]	@ (343c157c <phase_gpio_init+0x78>)
+343c153c:	619a      	str	r2, [r3, #24]
+343c153e:	685a      	ldr	r2, [r3, #4]
+343c1540:	f422 5280 	bic.w	r2, r2, #4096	@ 0x1000
+343c1544:	605a      	str	r2, [r3, #4]
+343c1546:	689a      	ldr	r2, [r3, #8]
+343c1548:	f022 7240 	bic.w	r2, r2, #50331648	@ 0x3000000
+343c154c:	f042 7280 	orr.w	r2, r2, #16777216	@ 0x1000000
+343c1550:	609a      	str	r2, [r3, #8]
+343c1552:	68da      	ldr	r2, [r3, #12]
+343c1554:	f022 7240 	bic.w	r2, r2, #50331648	@ 0x3000000
+343c1558:	60da      	str	r2, [r3, #12]
+343c155a:	681a      	ldr	r2, [r3, #0]
+343c155c:	f022 7240 	bic.w	r2, r2, #50331648	@ 0x3000000
+343c1560:	f042 7280 	orr.w	r2, r2, #16777216	@ 0x1000000
+343c1564:	601a      	str	r2, [r3, #0]
+343c1566:	f3bf 8f4f 	dsb	sy
+343c156a:	2001      	movs	r0, #1
+343c156c:	4770      	bx	lr
+343c156e:	bf00      	nop
+343c1570:	e0001000 	.word	0xe0001000
+343c1574:	e000ed00 	.word	0xe000ed00
+343c1578:	56028000 	.word	0x56028000
+343c157c:	56020c00 	.word	0x56020c00
+
+343c1580 <phase_gpio_emit>:
+343c1580:	1e43      	subs	r3, r0, #1
+343c1582:	2b0b      	cmp	r3, #11
+343c1584:	b570      	push	{r4, r5, r6, lr}
+343c1586:	d828      	bhi.n	343c15da <phase_gpio_emit+0x5a>
+343c1588:	4916      	ldr	r1, [pc, #88]	@ (343c15e4 <phase_gpio_emit+0x64>)
+343c158a:	680b      	ldr	r3, [r1, #0]
+343c158c:	f013 0301 	ands.w	r3, r3, #1
+343c1590:	d025      	beq.n	343c15de <phase_gpio_emit+0x5e>
+343c1592:	f3ef 8510 	mrs	r5, PRIMASK
+343c1596:	b672      	cpsid	i
+343c1598:	f44f 5380 	mov.w	r3, #4096	@ 0x1000
+343c159c:	4a12      	ldr	r2, [pc, #72]	@ (343c15e8 <phase_gpio_emit+0x68>)
+343c159e:	6193      	str	r3, [r2, #24]
+343c15a0:	f3bf 8f4f 	dsb	sy
+343c15a4:	f44f 7248 	mov.w	r2, #800	@ 0x320
+343c15a8:	4350      	muls	r0, r2
+343c15aa:	461a      	mov	r2, r3
+343c15ac:	684e      	ldr	r6, [r1, #4]
+343c15ae:	684c      	ldr	r4, [r1, #4]
+343c15b0:	1ba4      	subs	r4, r4, r6
+343c15b2:	4284      	cmp	r4, r0
+343c15b4:	d203      	bcs.n	343c15be <phase_gpio_emit+0x3e>
+343c15b6:	3a01      	subs	r2, #1
+343c15b8:	f103 33ff 	add.w	r3, r3, #4294967295
+343c15bc:	d10b      	bne.n	343c15d6 <phase_gpio_emit+0x56>
+343c15be:	f04f 5180 	mov.w	r1, #268435456	@ 0x10000000
+343c15c2:	4a09      	ldr	r2, [pc, #36]	@ (343c15e8 <phase_gpio_emit+0x68>)
+343c15c4:	6191      	str	r1, [r2, #24]
+343c15c6:	f3bf 8f4f 	dsb	sy
+343c15ca:	f385 8810 	msr	PRIMASK, r5
+343c15ce:	1e18      	subs	r0, r3, #0
+343c15d0:	bf18      	it	ne
+343c15d2:	2001      	movne	r0, #1
+343c15d4:	bd70      	pop	{r4, r5, r6, pc}
+343c15d6:	bf00      	nop
+343c15d8:	e7e9      	b.n	343c15ae <phase_gpio_emit+0x2e>
+343c15da:	2000      	movs	r0, #0
+343c15dc:	e7fa      	b.n	343c15d4 <phase_gpio_emit+0x54>
+343c15de:	4618      	mov	r0, r3
+343c15e0:	e7f8      	b.n	343c15d4 <phase_gpio_emit+0x54>
+343c15e2:	bf00      	nop
+343c15e4:	e0001000 	.word	0xe0001000
+343c15e8:	56020c00 	.word	0x56020c00

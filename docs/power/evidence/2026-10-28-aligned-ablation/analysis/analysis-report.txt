@@ -1,0 +1,74 @@
+POWER ABLATION ANALYSIS — 2026-10-28
+Offline analysis only. Existing recordings and completed warm experiments; no hardware operations by this analyzer.
+
+COLD NORMAL BASELINE (three runs; excludes unqualified first 5 ms)
+Post-5-ms boot to receiver entry: 18.890 ms mean; 6.706 mJ mean; 71.234 mA mean
+Receiver entry to first strobe IRQ: 1.137 ms mean; 0.684 mJ mean; 121.006 mA mean
+Acquisition before SD init: 4.990 ms mean; 3.153 mJ mean; 127.101 mA mean
+Acquisition overlaps SD init: 16.873 ms mean; 12.481 mJ mean; 148.945 mA mean
+After frame IRQ, SD init still running: 82.177 ms mean; 57.704 mJ mean; 141.555 mA mean
+SCR + slot scan + write preparation: 69.444 ms mean; 36.381 mJ mean; 105.304 mA mean
+Slot transport: transfer + card waits: 377.935 ms mean; 237.529 mJ mean; 126.420 mA mean
+Post-transport validation/commit: 0.022 ms mean; 0.011 mJ mean; 103.538 mA mean
+Storage deinitialization: 0.064 ms mean; 0.033 mJ mean; 103.667 mA mean
+Final cleanup to pre-WFI marker: 0.174 ms mean; 0.084 mJ mean; 97.732 mA mean
+Pre-WFI marker to low-current plateau: 20.897 ms mean; 2.904 mJ mean; 27.846 mA mean
+
+Stable post-5-ms peak: about 207 mA over 1 ms at 77–78 ms; about 194.5 mA over 10 ms at 71–81 ms. This occurs during SD initialization after frame IRQ, but the camera has not necessarily stopped.
+Slot transport consumes about two-thirds of post-5-ms energy. Its entire MCU + card + board load is included.
+
+WARM RAM EXPERIMENTS (not cold-cycle equivalents)
+hold01: 528.208 ms / 275.432 mJ; slot transport 164.520 ms / 103.759 mJ; scan 111 headers in 72.736 ms / 40.224 mJ
+  Middle hold: 151.254 ms, 79.19220 mA; first/last25ms excluded.
+  Sensor STOP at 71.971 ms; peak1ms 155.974 mA at 27.900 ms.
+hold02: 529.428 ms / 276.079 mJ; slot transport 164.331 ms / 103.532 mJ; scan 113 headers in 73.894 ms / 40.886 mJ
+  Middle hold: 151.405 ms, 79.13126 mA; first/last25ms excluded.
+  Sensor STOP at 72.042 ms; peak1ms 147.798 mA at 30.200 ms.
+long01: 379.499 ms / 271.178 mJ; slot transport 253.982 ms / 181.754 mJ; scan 110 headers in 70.938 ms / 54.143 mJ
+  Sensor STOP at 262.220 ms; peak1ms 209.084 mA at 129.700 ms.
+normal01: 269.606 ms / 172.988 mJ; slot transport 164.523 ms / 103.417 mJ; scan 108 headers in 72.993 ms / 50.061 mJ
+  Sensor STOP at 71.820 ms; peak1ms 190.065 mA at 31.500 ms.
+normal02: 274.004 ms / 175.740 mJ; slot transport 164.165 ms / 103.397 mJ; scan 115 headers in 77.790 ms / 52.853 mJ
+  Sensor STOP at 72.050 ms; peak1ms 199.684 mA at 31.400 ms.
+normal03: 492.442 ms / 324.517 mJ; slot transport 380.627 ms / 251.018 mJ; scan 118 headers in 79.755 ms / 53.987 mJ
+  Sensor STOP at 71.864 ms; peak1ms 191.662 mA at 31.400 ms.
+normal04: 496.935 ms / 326.535 mJ; slot transport 383.867 ms / 252.470 mJ; scan 121 headers in 80.999 ms / 54.547 mJ
+  Sensor STOP at 71.809 ms; peak1ms 191.285 mA at 31.400 ms.
+preinit01: 270.673 ms / 175.939 mJ; slot transport 164.750 ms / 103.786 mJ; scan 109 headers in 73.835 ms / 55.197 mJ
+  Sensor STOP at 89.177 ms; peak1ms 189.723 mA at 49.900 ms.
+receiver01: 530.036 ms / 272.957 mJ; slot transport 164.160 ms / 102.228 mJ; scan 116 headers in 75.522 ms / 41.172 mJ
+  Middle hold: 150.831 ms, 77.53659 mA; first/last25ms excluded.
+  Sensor STOP at 71.819 ms; peak1ms 153.168 mA at 59.500 ms.
+receiver02: 717.541 ms / 397.235 mJ; slot transport 350.200 ms / 225.721 mJ; scan 117 headers in 76.733 ms / 41.842 mJ
+  Middle hold: 151.034 ms, 77.52191 mA; first/last25ms excluded.
+  Sensor STOP at 71.841 ms; peak1ms 147.972 mA at 30.300 ms.
+reset01: 528.856 ms / 274.254 mJ; slot transport 164.772 ms / 103.395 mJ; scan 112 headers in 73.240 ms / 40.231 mJ
+  Middle hold: 151.242 ms, 78.38428 mA; first/last25ms excluded.
+  Sensor STOP at 71.883 ms; peak1ms 153.481 mA at 60.300 ms.
+reset02: 529.865 ms / 274.668 mJ; slot transport 164.596 ms / 103.161 mJ; scan 114 headers in 74.447 ms / 40.874 mJ
+  Middle hold: 151.236 ms, 78.35656 mA; first/last25ms excluded.
+  Sensor STOP at 71.853 ms; peak1ms 156.245 mA at 33.000 ms.
+hold middle-hold mean over 2 runs: 79.16173 mA
+reset middle-hold mean over 2 runs: 78.37042 mA
+receiver middle-hold mean over 2 runs: 77.52925 mA
+Sensor reset reduction 0.79131 mA; additional receiver-off reduction 0.84117 mA; combined 1.63248 mA.
+Normal03 slot transport took380.628ms/251.018mJ versus164.165–164.523ms/~103.4mJ in normal01/02. The cause is not established, but total-cycle variation cannot be assigned to small firmware changes without repetition.
+Ethernet control ethcontrol01 failed before SD initialization (result0x509, zero written sectors). It is excluded; no Ethernet power-down savings are established.
+
+INTERPRETATION AND NEXT TESTS
+1. Keep phase-timing interventions distinct from component isolation. Delaying SD until after STOP lowers the capture-period load, but includes CPU work, SD bus activity and card demand together.
+2. Hold versus sensor-reset middle windows isolate an incremental post-STOP reset benefit with a matched busy loop. Do not subtract the 79 mA awake floor from the separate 8.7 mA cold Standby plateau as if they were the same state.
+3. Prioritize independent Ethernet PHY power-down versus its matched control, then relevant MCU clock/peripheral gating. U24 remains a real candidate for overhead, but these traces alone do not quantify it.
+4. Reduce scan cost or add a validated allocation hint: the current scan reads one header per previously used slot. More occupied slots confound whole-cycle comparisons, so retain scan count and phase energy for every trial.
+5. Characterize the SD write loop separately: current plots do not distinguish each data transfer from each card-busy interval. Match bytes, card state and fixed SD kernel clock when evaluating CPU sleep/frequency changes.
+6. Qualify the excluded first 5 ms independently before claiming real inrush peak or complete-cycle energy. Source-side JS voltage does not establish target-side rail droop.
+
+LIMITS
+All scoped analysis windows have finite, contiguous analog samples and matching raw hashes. Original whole-session initial NaNs remain; final packed GPIO chunk is excluded.
+Phase7 retains the legacy name padded_payload_ready but in the installed magic-slot path it occurs after successful transport return.
+Warm DWT time is mapped to JS samples using piecewise GPIO/counter anchors; global-fit drift residuals are saved; do not interpret inferred counter boundaries as sub-microsecond truth.
+Firmware completion and downloaded original frame are not, by themselves, independent SD readback. Any later root-run SD equality checks belong to their own records.
+
+ARTIFACTS
+baseline-phase-partition.json / .csv: disjoint cold phase energies; baseline-phase-current.svg: three cold current traces.
+warm-ram-analysis.json and RUN-aligned-analysis.json: completed warm results and checks; warm-ram-current-comparison.png: shared-axis comparison.

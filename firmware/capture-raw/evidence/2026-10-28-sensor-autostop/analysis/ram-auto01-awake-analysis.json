@@ -1,0 +1,1916 @@
+{
+  "run": "ram-auto01",
+  "group": "autostop",
+  "verification_path": "tmp\\bringup\\sensor-autostop-20261028\\ram-auto01\\capture\\verified.json",
+  "verification_sha256": "fb24499d9a22bd93015196046a509b229879af5ff4ab7fa65faa8f3bc9e9561f",
+  "binary_sha256": "5bf9e515bb28d74efa3cdee21c9a9f373fedbc3c36b73dd954e136f6df348e65",
+  "checks": {
+    "current": {
+      "sha256": "31ce442c12817b0121bf2eab78ba11fb283ae79c5901c552243c9da8b7a62bc7",
+      "hash_passed": true,
+      "contiguous": true,
+      "first_sample_id": 0,
+      "analyzed_end_exclusive": 16021530,
+      "excluded_final_chunk": false,
+      "nonfinite": 71
+    },
+    "voltage": {
+      "sha256": "9f24eeec8fb26b604497c50c0f3cfd6011d90422231ca67d6dc802c72169eaa7",
+      "hash_passed": true,
+      "contiguous": true,
+      "first_sample_id": 16128,
+      "analyzed_end_exclusive": 16037658,
+      "excluded_final_chunk": false,
+      "nonfinite": 0
+    },
+    "power": {
+      "sha256": "03e15a9c6b07d3241c2861b133399049e7e4f98ac96b9e8d9e302f81943b15f2",
+      "hash_passed": true,
+      "contiguous": true,
+      "first_sample_id": 16128,
+      "analyzed_end_exclusive": 16037658,
+      "excluded_final_chunk": false,
+      "nonfinite": 0
+    },
+    "gpi0": {
+      "sha256": "c00031a57b1d2db915bf861ce7d2908a61dfa9f27ef8949bc373aaa9549a2f76",
+      "hash_passed": true,
+      "contiguous": true,
+      "first_sample_id": 16128,
+      "analyzed_end_exclusive": 15916128,
+      "excluded_final_chunk": true,
+      "nonfinite": null
+    },
+    "gpi1": {
+      "sha256": "b21a042345d17622316b4743e49a7b5c5f223b0354ececb61a99ba6d312ee0d0",
+      "hash_passed": true,
+      "contiguous": true,
+      "first_sample_id": 16128,
+      "analyzed_end_exclusive": 15916128,
+      "excluded_final_chunk": true,
+      "nonfinite": null
+    }
+  },
+  "ast": {
+    "magic": 1095980081,
+    "version": 1,
+    "words": 40,
+    "state": 4,
+    "error": 0,
+    "config_begin": 4197241125,
+    "config_end": 4197370661,
+    "repeat_readback": 1,
+    "next_readback": 4,
+    "counter_before": 0,
+    "start_begin": 4197372753,
+    "start_end": 4197391698,
+    "frame_cycles": 4208203027,
+    "wait_begin": 4208483708,
+    "fsm2_observed_cycles": 4209288167,
+    "counter_at_stop": 1,
+    "strobes_at_frame": 1,
+    "strobes_at_stop": 1,
+    "explicit_stop_writes": 0,
+    "poll_attempts": 2,
+    "last_fsm": 2,
+    "last_ack": 0,
+    "stable_begin": 102495344,
+    "stable_end": 102550110,
+    "stable_fsm": 2,
+    "stable_counter": 1,
+    "stable_strobes": 1,
+    "stable_strobe_level": 0,
+    "receiver_frames": 1,
+    "sensor_delta": 1,
+    "flags": 15,
+    "timeout_cycles": 400000000,
+    "initial_strobes": 0,
+    "mirror_active": 4197421968,
+    "reserved34": 0,
+    "reserved35": 0,
+    "reserved36": 0,
+    "reserved37": 0,
+    "reserved38": 0,
+    "reserved39": 0
+  },
+  "markers": [
+    {
+      "id": 1,
+      "name": "receiver_entry",
+      "sample_id": 5111282,
+      "end_sample_id": 5111287,
+      "width_us": 2.5,
+      "matching_ids": [
+        1
+      ]
+    },
+    {
+      "id": 2,
+      "name": "first_strobe_irq_observed",
+      "sample_id": 5121870,
+      "end_sample_id": 5121878,
+      "width_us": 4.0,
+      "matching_ids": [
+        2
+      ]
+    },
+    {
+      "id": 4,
+      "name": "sd_initialization_begin",
+      "sample_id": 5132795,
+      "end_sample_id": 5132811,
+      "width_us": 8.0,
+      "matching_ids": [
+        4
+      ]
+    },
+    {
+      "id": 3,
+      "name": "first_frame_complete_irq_observed",
+      "sample_id": 5165596,
+      "end_sample_id": 5165608,
+      "width_us": 6.0,
+      "matching_ids": [
+        3
+      ]
+    },
+    {
+      "id": 5,
+      "name": "sd_initialization_complete",
+      "sample_id": 5168769,
+      "end_sample_id": 5168790,
+      "width_us": 10.5,
+      "matching_ids": [
+        5
+      ]
+    },
+    {
+      "id": 11,
+      "name": "sensor_autonomous_standby_first_observed",
+      "sample_id": 5171055,
+      "end_sample_id": 5171099,
+      "width_us": 22.0,
+      "matching_ids": [
+        11
+      ]
+    },
+    {
+      "id": 6,
+      "name": "first_slot_transport_submission",
+      "sample_id": 5350798,
+      "end_sample_id": 5350823,
+      "width_us": 12.5,
+      "matching_ids": [
+        6
+      ]
+    },
+    {
+      "id": 7,
+      "name": "slot_transport_returned_success",
+      "sample_id": 6116804,
+      "end_sample_id": 6116833,
+      "width_us": 14.5,
+      "matching_ids": [
+        7
+      ]
+    },
+    {
+      "id": 8,
+      "name": "full_slot_commit_complete",
+      "sample_id": 6117132,
+      "end_sample_id": 6117165,
+      "width_us": 16.5,
+      "matching_ids": [
+        8
+      ]
+    },
+    {
+      "id": 9,
+      "name": "sd_deinitialization_complete",
+      "sample_id": 6117256,
+      "end_sample_id": 6117293,
+      "width_us": 18.5,
+      "matching_ids": [
+        9
+      ]
+    }
+  ],
+  "unclassified_gpi0_edges": 0,
+  "unclassified_pulses": [],
+  "clock_alignment": {
+    "JS_samples_per_DWT_tick": 0.005026157390404375,
+    "origin_sample": 5092619.589082962,
+    "global_fit_anchor_residual_us": {
+      "3": 1.8135751206427813,
+      "4": -3.7731622862629592,
+      "5": -0.27132124174386263,
+      "6": -4.623880347236991,
+      "8": 0.0,
+      "9": 0.2335518291220069,
+      "11": 0.5042548445053399
+    },
+    "mapping": "Piecewise linear between actual same-run GPIO/DWT anchors, local extrapolation outside; inferred timestamp allowance100us."
+  },
+  "mapped_proof_events": {
+    "begin": {
+      "tick": 4193682925,
+      "sample_id_inferred": 5092612,
+      "time_ms": -0.0037945414809510115
+    },
+    "sensor_reset_begin": {
+      "tick": 4193711935,
+      "sample_id_inferred": 5092758,
+      "time_ms": 0.069205458519049
+    },
+    "sensor_reset_end": {
+      "tick": 4193753069,
+      "sample_id_inferred": 5092965,
+      "time_ms": 0.17270545851904898
+    },
+    "sensor_start_begin": {
+      "tick": 4197372753,
+      "sample_id_inferred": 5111158,
+      "time_ms": 9.269205458519048
+    },
+    "sensor_start_end": {
+      "tick": 4197391698,
+      "sample_id_inferred": 5111253,
+      "time_ms": 9.31670545851905
+    },
+    "arm": {
+      "tick": 4199413304,
+      "sample_id_inferred": 5121414,
+      "time_ms": 14.397205458519048
+    },
+    "frame_done": {
+      "tick": 4208201528,
+      "sample_id_inferred": 5165596,
+      "time_ms": 36.488205458519055
+    },
+    "camera_stop": {
+      "tick": 4209327952,
+      "sample_id_inferred": 5171255,
+      "time_ms": 39.31770545851905
+    },
+    "sd_begin": {
+      "tick": 4201677692,
+      "sample_id_inferred": 5132795,
+      "time_ms": 20.08770545851905
+    },
+    "sd_ready": {
+      "tick": 4208833655,
+      "sample_id_inferred": 5168769,
+      "time_ms": 38.07470545851905
+    },
+    "scan_done": {
+      "tick": 4245045833,
+      "sample_id_inferred": 5350768,
+      "time_ms": 129.07420545851906
+    },
+    "first_write": {
+      "tick": 4245051722,
+      "sample_id_inferred": 5350798,
+      "time_ms": 129.08920545851905
+    },
+    "payload_done": {
+      "tick": 102493561,
+      "sample_id_inferred": 6116840,
+      "time_ms": 512.1102054585191
+    },
+    "commit_done": {
+      "tick": 102551747,
+      "sample_id_inferred": 6117132,
+      "time_ms": 512.256205458519
+    },
+    "deinit_done": {
+      "tick": 102576325,
+      "sample_id_inferred": 6117256,
+      "time_ms": 512.3182054585191
+    },
+    "end": {
+      "tick": 102587380,
+      "sample_id_inferred": 6117312,
+      "time_ms": 512.3462054585191
+    }
+  },
+  "startup": {
+    "first_strobe_phase2_from_runtime_begin_ms": 14.62520545851905,
+    "receiver_entry_phase1_from_runtime_begin_ms": 9.33120545851905,
+    "receiver_entry_to_first_strobe_ms": 5.2940000000000005,
+    "sensor_START_begin_from_runtime_begin_DWT_nominal_ms": 9.22457,
+    "sensor_START_end_from_runtime_begin_DWT_nominal_ms": 9.2719325,
+    "scope": "Warm runtime only. First STROBE uses the identical phase2 IRQ marker and same-run GPIO/DWT-fitted runtime origin; not a cold button-to-exposure measurement.",
+    "config_begin_from_runtime_begin_DWT_nominal_ms": 8.8955,
+    "config_end_from_runtime_begin_DWT_nominal_ms": 9.21934,
+    "config_write_readback_cost_DWT_nominal_ms": 0.32384,
+    "config_write_readback_cost_JS_aligned_ms": 0.3255,
+    "config_scope": "Additional pre-START repeat/next writes and repeat/next/frame-counter readbacks; time from AST.config_begin through AST.config_end, before any START."
+  },
+  "windows_overlapping_not_additive": {
+    "strobe_to_frame_IRQ": {
+      "start_sample_id": 5121870,
+      "end_sample_id_exclusive": 5165596,
+      "start_ms": 14.625,
+      "end_ms": 36.488,
+      "duration_ms": 21.863,
+      "current_mean": 0.1199000345557766,
+      "current_min": 0.0870562419295311,
+      "current_max": 0.14316484332084656,
+      "voltage_mean": 4.9724535472939495,
+      "voltage_min": 4.963832378387451,
+      "voltage_max": 4.986530780792236,
+      "power_mean": 0.5961075833156158,
+      "power_min": 0.433713436126709,
+      "power_max": 0.7109712958335876,
+      "energy_mJ": 13.032700094029309,
+      "current_mean_mA": 119.9000345557766,
+      "finite": true,
+      "peaks_1ms": [
+        {
+          "start_sample_id": 5145070,
+          "end_sample_id_exclusive": 5147070,
+          "start_ms": 26.224999999999998,
+          "end_ms": 27.224999999999998,
+          "duration_ms": 1.0,
+          "current_mean": 0.1392229865938425,
+          "current_min": 0.13760507106781006,
+          "current_max": 0.1407606303691864,
+          "voltage_mean": 4.967930567741394,
+          "voltage_min": 4.964967250823975,
+          "voltage_max": 4.971776962280273,
+          "power_mean": 0.6916499560773373,
+          "power_min": 0.683815598487854,
+          "power_max": 0.6991913914680481,
+          "energy_mJ": 0.6916499560773373,
+          "current_mean_mA": 139.2229865938425,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "strobe_to_frame_IRQ",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "strobe_to_sensor_stop_observation",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "SD_init",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "runtime_begin_to_completion",
+              "overlap_ms": 1.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 5152470,
+          "end_sample_id_exclusive": 5154470,
+          "start_ms": 29.925,
+          "end_ms": 30.925,
+          "duration_ms": 1.0,
+          "current_mean": 0.13807176811993122,
+          "current_min": 0.13658328354358673,
+          "current_max": 0.13943830132484436,
+          "voltage_mean": 4.968375509738922,
+          "voltage_min": 4.964967250823975,
+          "voltage_max": 4.971776962280273,
+          "power_mean": 0.6859921954274177,
+          "power_min": 0.6784415245056152,
+          "power_max": 0.6929395794868469,
+          "energy_mJ": 0.6859921954274179,
+          "current_mean_mA": 138.07176811993122,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "strobe_to_frame_IRQ",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "strobe_to_sensor_stop_observation",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "SD_init",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "runtime_begin_to_completion",
+              "overlap_ms": 1.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 5147070,
+          "end_sample_id_exclusive": 5149070,
+          "start_ms": 27.224999999999998,
+          "end_ms": 28.225,
+          "duration_ms": 1.0,
+          "current_mean": 0.13805704241245986,
+          "current_min": 0.13646307587623596,
+          "current_max": 0.13955850899219513,
+          "voltage_mean": 4.96824724984169,
+          "voltage_min": 4.964967250823975,
+          "voltage_max": 4.971776962280273,
+          "power_mean": 0.6859013339877129,
+          "power_min": 0.6779937148094177,
+          "power_max": 0.6930709481239319,
+          "energy_mJ": 0.6859013339877128,
+          "current_mean_mA": 138.05704241245985,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "strobe_to_frame_IRQ",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "strobe_to_sensor_stop_observation",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "SD_init",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "runtime_begin_to_completion",
+              "overlap_ms": 1.0
+            }
+          ]
+        }
+      ],
+      "peaks_10ms": [
+        {
+          "start_sample_id": 5144670,
+          "end_sample_id_exclusive": 5164670,
+          "start_ms": 26.025,
+          "end_ms": 36.025,
+          "duration_ms": 10.0,
+          "current_mean": 0.1378668154977262,
+          "current_min": 0.13402879238128662,
+          "current_max": 0.1407606303691864,
+          "voltage_mean": 4.968402186775208,
+          "voltage_min": 4.964967250823975,
+          "voltage_max": 4.971776962280273,
+          "power_mean": 0.6849775237709284,
+          "power_min": 0.6657527685165405,
+          "power_max": 0.6991913914680481,
+          "energy_mJ": 6.8497752377092835,
+          "current_mean_mA": 137.8668154977262,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "strobe_to_frame_IRQ",
+              "overlap_ms": 10.0
+            },
+            {
+              "name": "strobe_to_sensor_stop_observation",
+              "overlap_ms": 10.0
+            },
+            {
+              "name": "SD_init",
+              "overlap_ms": 10.0
+            },
+            {
+              "name": "runtime_begin_to_completion",
+              "overlap_ms": 10.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 5121870,
+          "end_sample_id_exclusive": 5141870,
+          "start_ms": 14.625,
+          "end_ms": 24.625,
+          "duration_ms": 10.0,
+          "current_mean": 0.10358152178674937,
+          "current_min": 0.0870562419295311,
+          "current_max": 0.14316484332084656,
+          "voltage_mean": 4.97625008649826,
+          "voltage_min": 4.963832378387451,
+          "voltage_max": 4.986530780792236,
+          "power_mean": 0.5154046181261539,
+          "power_min": 0.433713436126709,
+          "power_max": 0.7109712958335876,
+          "energy_mJ": 5.154046181261539,
+          "current_mean_mA": 103.58152178674936,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "strobe_to_frame_IRQ",
+              "overlap_ms": 10.0
+            },
+            {
+              "name": "strobe_to_sensor_stop_observation",
+              "overlap_ms": 10.0
+            },
+            {
+              "name": "SD_init",
+              "overlap_ms": 4.5375
+            },
+            {
+              "name": "runtime_begin_to_completion",
+              "overlap_ms": 10.0
+            }
+          ]
+        }
+      ]
+    },
+    "strobe_to_sensor_stop_observation": {
+      "start_sample_id": 5121870,
+      "end_sample_id_exclusive": 5171055,
+      "start_ms": 14.625,
+      "end_ms": 39.2175,
+      "duration_ms": 24.5925,
+      "current_mean": 0.11862223294547591,
+      "current_min": 0.05892680212855339,
+      "current_max": 0.1463504433631897,
+      "voltage_mean": 4.972692170501349,
+      "voltage_min": 4.962697505950928,
+      "voltage_max": 4.989935874938965,
+      "power_mean": 0.5897795023297202,
+      "power_min": 0.29377344250679016,
+      "power_max": 0.726957380771637,
+      "energy_mJ": 14.504152411043645,
+      "current_mean_mA": 118.62223294547591,
+      "finite": true,
+      "peaks_1ms": [
+        {
+          "start_sample_id": 5145070,
+          "end_sample_id_exclusive": 5147070,
+          "start_ms": 26.224999999999998,
+          "end_ms": 27.224999999999998,
+          "duration_ms": 1.0,
+          "current_mean": 0.1392229865938425,
+          "current_min": 0.13760507106781006,
+          "current_max": 0.1407606303691864,
+          "voltage_mean": 4.967930567741394,
+          "voltage_min": 4.964967250823975,
+          "voltage_max": 4.971776962280273,
+          "power_mean": 0.6916499560773373,
+          "power_min": 0.683815598487854,
+          "power_max": 0.6991913914680481,
+          "energy_mJ": 0.6916499560773373,
+          "current_mean_mA": 139.2229865938425,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "strobe_to_frame_IRQ",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "strobe_to_sensor_stop_observation",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "SD_init",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "runtime_begin_to_completion",
+              "overlap_ms": 1.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 5152470,
+          "end_sample_id_exclusive": 5154470,
+          "start_ms": 29.925,
+          "end_ms": 30.925,
+          "duration_ms": 1.0,
+          "current_mean": 0.13807176811993122,
+          "current_min": 0.13658328354358673,
+          "current_max": 0.13943830132484436,
+          "voltage_mean": 4.968375509738922,
+          "voltage_min": 4.964967250823975,
+          "voltage_max": 4.971776962280273,
+          "power_mean": 0.6859921954274177,
+          "power_min": 0.6784415245056152,
+          "power_max": 0.6929395794868469,
+          "energy_mJ": 0.6859921954274179,
+          "current_mean_mA": 138.07176811993122,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "strobe_to_frame_IRQ",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "strobe_to_sensor_stop_observation",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "SD_init",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "runtime_begin_to_completion",
+              "overlap_ms": 1.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 5147070,
+          "end_sample_id_exclusive": 5149070,
+          "start_ms": 27.224999999999998,
+          "end_ms": 28.225,
+          "duration_ms": 1.0,
+          "current_mean": 0.13805704241245986,
+          "current_min": 0.13646307587623596,
+          "current_max": 0.13955850899219513,
+          "voltage_mean": 4.96824724984169,
+          "voltage_min": 4.964967250823975,
+          "voltage_max": 4.971776962280273,
+          "power_mean": 0.6859013339877129,
+          "power_min": 0.6779937148094177,
+          "power_max": 0.6930709481239319,
+          "energy_mJ": 0.6859013339877128,
+          "current_mean_mA": 138.05704241245985,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "strobe_to_frame_IRQ",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "strobe_to_sensor_stop_observation",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "SD_init",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "runtime_begin_to_completion",
+              "overlap_ms": 1.0
+            }
+          ]
+        }
+      ],
+      "peaks_10ms": [
+        {
+          "start_sample_id": 5144670,
+          "end_sample_id_exclusive": 5164670,
+          "start_ms": 26.025,
+          "end_ms": 36.025,
+          "duration_ms": 10.0,
+          "current_mean": 0.1378668154977262,
+          "current_min": 0.13402879238128662,
+          "current_max": 0.1407606303691864,
+          "voltage_mean": 4.968402186775208,
+          "voltage_min": 4.964967250823975,
+          "voltage_max": 4.971776962280273,
+          "power_mean": 0.6849775237709284,
+          "power_min": 0.6657527685165405,
+          "power_max": 0.6991913914680481,
+          "energy_mJ": 6.8497752377092835,
+          "current_mean_mA": 137.8668154977262,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "strobe_to_frame_IRQ",
+              "overlap_ms": 10.0
+            },
+            {
+              "name": "strobe_to_sensor_stop_observation",
+              "overlap_ms": 10.0
+            },
+            {
+              "name": "SD_init",
+              "overlap_ms": 10.0
+            },
+            {
+              "name": "runtime_begin_to_completion",
+              "overlap_ms": 10.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 5121870,
+          "end_sample_id_exclusive": 5141870,
+          "start_ms": 14.625,
+          "end_ms": 24.625,
+          "duration_ms": 10.0,
+          "current_mean": 0.10358152178674937,
+          "current_min": 0.0870562419295311,
+          "current_max": 0.14316484332084656,
+          "voltage_mean": 4.97625008649826,
+          "voltage_min": 4.963832378387451,
+          "voltage_max": 4.986530780792236,
+          "power_mean": 0.5154046181261539,
+          "power_min": 0.433713436126709,
+          "power_max": 0.7109712958335876,
+          "energy_mJ": 5.154046181261539,
+          "current_mean_mA": 103.58152178674936,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "strobe_to_frame_IRQ",
+              "overlap_ms": 10.0
+            },
+            {
+              "name": "strobe_to_sensor_stop_observation",
+              "overlap_ms": 10.0
+            },
+            {
+              "name": "SD_init",
+              "overlap_ms": 4.5375
+            },
+            {
+              "name": "runtime_begin_to_completion",
+              "overlap_ms": 10.0
+            }
+          ]
+        }
+      ]
+    },
+    "frame_IRQ_to_sensor_stop_observation": {
+      "start_sample_id": 5165596,
+      "end_sample_id_exclusive": 5171055,
+      "start_ms": 36.488,
+      "end_ms": 39.2175,
+      "duration_ms": 2.7295000000000003,
+      "current_mean": 0.10838718014972444,
+      "current_min": 0.05892680212855339,
+      "current_max": 0.1463504433631897,
+      "voltage_mean": 4.974603516602608,
+      "voltage_min": 4.962697505950928,
+      "voltage_max": 4.989935874938965,
+      "power_mean": 0.5390922575615814,
+      "power_min": 0.29377344250679016,
+      "power_max": 0.726957380771637,
+      "energy_mJ": 1.4714523170143365,
+      "current_mean_mA": 108.38718014972444,
+      "finite": true,
+      "peaks_1ms": [
+        {
+          "start_sample_id": 5166596,
+          "end_sample_id_exclusive": 5168596,
+          "start_ms": 36.988,
+          "end_ms": 37.988,
+          "duration_ms": 1.0,
+          "current_mean": 0.12476528226211667,
+          "current_min": 0.1122405007481575,
+          "current_max": 0.1463504433631897,
+          "voltage_mean": 4.971194662570953,
+          "voltage_min": 4.962697505950928,
+          "voltage_max": 4.978586673736572,
+          "power_mean": 0.6202030459940433,
+          "power_min": 0.5580347180366516,
+          "power_max": 0.726957380771637,
+          "energy_mJ": 0.6202030459940434,
+          "current_mean_mA": 124.76528226211667,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "strobe_to_sensor_stop_observation",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "frame_IRQ_to_sensor_stop_observation",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "SD_init",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "runtime_begin_to_completion",
+              "overlap_ms": 1.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 5168596,
+          "end_sample_id_exclusive": 5170596,
+          "start_ms": 37.988,
+          "end_ms": 38.988,
+          "duration_ms": 1.0,
+          "current_mean": 0.0967835774347186,
+          "current_min": 0.06304404139518738,
+          "current_max": 0.11840132623910904,
+          "voltage_mean": 4.977168961048126,
+          "voltage_min": 4.9672369956970215,
+          "voltage_max": 4.989935874938965,
+          "power_mean": 0.4816439849883318,
+          "power_min": 0.31444260478019714,
+          "power_max": 0.5883962512016296,
+          "energy_mJ": 0.48164398498833183,
+          "current_mean_mA": 96.78357743471861,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "strobe_to_sensor_stop_observation",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "frame_IRQ_to_sensor_stop_observation",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "SD_init",
+              "overlap_ms": 0.08650000000000001
+            },
+            {
+              "name": "scan_prep",
+              "overlap_ms": 0.9135
+            },
+            {
+              "name": "runtime_begin_to_completion",
+              "overlap_ms": 1.0
+            }
+          ]
+        }
+      ],
+      "peaks_10ms": []
+    },
+    "SD_init": {
+      "start_sample_id": 5132795,
+      "end_sample_id_exclusive": 5168769,
+      "start_ms": 20.087500000000002,
+      "end_ms": 38.0745,
+      "duration_ms": 17.987,
+      "current_mean": 0.12201739748081504,
+      "current_min": 0.08756713569164276,
+      "current_max": 0.1463504433631897,
+      "voltage_mean": 4.9718104859578665,
+      "voltage_min": 4.962697505950928,
+      "voltage_max": 4.9842610359191895,
+      "power_mean": 0.6065524596885172,
+      "power_min": 0.43605995178222656,
+      "power_max": 0.726957380771637,
+      "energy_mJ": 10.91005909241736,
+      "current_mean_mA": 122.01739748081503,
+      "finite": true,
+      "peaks_1ms": [
+        {
+          "start_sample_id": 5144995,
+          "end_sample_id_exclusive": 5146995,
+          "start_ms": 26.1875,
+          "end_ms": 27.1875,
+          "duration_ms": 1.0,
+          "current_mean": 0.139183812700212,
+          "current_min": 0.13697396218776703,
+          "current_max": 0.1407606303691864,
+          "voltage_mean": 4.967922621965409,
+          "voltage_min": 4.964967250823975,
+          "voltage_max": 4.971776962280273,
+          "power_mean": 0.6914542318284511,
+          "power_min": 0.6803821921348572,
+          "power_max": 0.6991913914680481,
+          "energy_mJ": 0.6914542318284511,
+          "current_mean_mA": 139.183812700212,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "strobe_to_frame_IRQ",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "strobe_to_sensor_stop_observation",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "SD_init",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "runtime_begin_to_completion",
+              "overlap_ms": 1.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 5146995,
+          "end_sample_id_exclusive": 5148995,
+          "start_ms": 27.1875,
+          "end_ms": 28.1875,
+          "duration_ms": 1.0,
+          "current_mean": 0.13808060386031867,
+          "current_min": 0.13646307587623596,
+          "current_max": 0.14033988118171692,
+          "voltage_mean": 4.96824724984169,
+          "voltage_min": 4.964967250823975,
+          "voltage_max": 4.971776962280273,
+          "power_mean": 0.6860183872282505,
+          "power_min": 0.6779937148094177,
+          "power_max": 0.6971014738082886,
+          "energy_mJ": 0.6860183872282505,
+          "current_mean_mA": 138.08060386031866,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "strobe_to_frame_IRQ",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "strobe_to_sensor_stop_observation",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "SD_init",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "runtime_begin_to_completion",
+              "overlap_ms": 1.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 5152795,
+          "end_sample_id_exclusive": 5154795,
+          "start_ms": 30.0875,
+          "end_ms": 31.087500000000002,
+          "duration_ms": 1.0,
+          "current_mean": 0.138059446439147,
+          "current_min": 0.13658328354358673,
+          "current_max": 0.13943830132484436,
+          "voltage_mean": 4.9683664290905,
+          "voltage_min": 4.964967250823975,
+          "voltage_max": 4.971776962280273,
+          "power_mean": 0.6859297156035901,
+          "power_min": 0.6784415245056152,
+          "power_max": 0.6929395794868469,
+          "energy_mJ": 0.68592971560359,
+          "current_mean_mA": 138.059446439147,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "strobe_to_frame_IRQ",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "strobe_to_sensor_stop_observation",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "SD_init",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "runtime_begin_to_completion",
+              "overlap_ms": 1.0
+            }
+          ]
+        }
+      ],
+      "peaks_10ms": [
+        {
+          "start_sample_id": 5144795,
+          "end_sample_id_exclusive": 5164795,
+          "start_ms": 26.0875,
+          "end_ms": 36.0875,
+          "duration_ms": 10.0,
+          "current_mean": 0.13786909650191664,
+          "current_min": 0.13568170368671417,
+          "current_max": 0.1407606303691864,
+          "voltage_mean": 4.968412288570404,
+          "voltage_min": 4.964967250823975,
+          "voltage_max": 4.971776962280273,
+          "power_mean": 0.6849902413994073,
+          "power_min": 0.673963189125061,
+          "power_max": 0.6991913914680481,
+          "energy_mJ": 6.849902413994074,
+          "current_mean_mA": 137.86909650191663,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "strobe_to_frame_IRQ",
+              "overlap_ms": 10.0
+            },
+            {
+              "name": "strobe_to_sensor_stop_observation",
+              "overlap_ms": 10.0
+            },
+            {
+              "name": "SD_init",
+              "overlap_ms": 10.0
+            },
+            {
+              "name": "runtime_begin_to_completion",
+              "overlap_ms": 10.0
+            }
+          ]
+        }
+      ]
+    },
+    "scan_prep": {
+      "start_sample_id": 5168769,
+      "end_sample_id_exclusive": 5350798,
+      "start_ms": 38.0745,
+      "end_ms": 129.089,
+      "duration_ms": 91.0145,
+      "current_mean": 0.07513102091793716,
+      "current_min": 0.058536116033792496,
+      "current_max": 0.11840132623910904,
+      "voltage_mean": 4.980491479330432,
+      "voltage_min": 4.9672369956970215,
+      "voltage_max": 4.992205619812012,
+      "power_mean": 0.3741624507013649,
+      "power_min": 0.29195860028266907,
+      "power_max": 0.5883962512016296,
+      "energy_mJ": 34.05420836935937,
+      "current_mean_mA": 75.13102091793716,
+      "finite": true,
+      "peaks_1ms": [
+        {
+          "start_sample_id": 5168769,
+          "end_sample_id_exclusive": 5170769,
+          "start_ms": 38.0745,
+          "end_ms": 39.0745,
+          "duration_ms": 1.0,
+          "current_mean": 0.09306700563058257,
+          "current_min": 0.05892680212855339,
+          "current_max": 0.11840132623910904,
+          "voltage_mean": 4.977929373264312,
+          "voltage_min": 4.9672369956970215,
+          "voltage_max": 4.989935874938965,
+          "power_mean": 0.46320932894945144,
+          "power_min": 0.29377344250679016,
+          "power_max": 0.5883962512016296,
+          "energy_mJ": 0.46320932894945144,
+          "current_mean_mA": 93.06700563058257,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "strobe_to_sensor_stop_observation",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "frame_IRQ_to_sensor_stop_observation",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "scan_prep",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "runtime_begin_to_completion",
+              "overlap_ms": 1.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 5193169,
+          "end_sample_id_exclusive": 5195169,
+          "start_ms": 50.2745,
+          "end_ms": 51.2745,
+          "duration_ms": 1.0,
+          "current_mean": 0.07778826616704464,
+          "current_min": 0.05922733247280121,
+          "current_max": 0.09886699914932251,
+          "voltage_mean": 4.979851936340332,
+          "voltage_min": 4.969507217407227,
+          "voltage_max": 4.989935874938965,
+          "power_mean": 0.38734312833845613,
+          "power_min": 0.29540613293647766,
+          "power_max": 0.491544634103775,
+          "energy_mJ": 0.38734312833845613,
+          "current_mean_mA": 77.78826616704464,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "scan_prep",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "runtime_begin_to_completion",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "sensor_stopped_to_transport",
+              "overlap_ms": 1.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 5297369,
+          "end_sample_id_exclusive": 5299369,
+          "start_ms": 102.3745,
+          "end_ms": 103.3745,
+          "duration_ms": 1.0,
+          "current_mean": 0.07767734119296074,
+          "current_min": 0.05970817431807518,
+          "current_max": 0.0988970473408699,
+          "voltage_mean": 4.979826972961426,
+          "voltage_min": 4.9672369956970215,
+          "voltage_max": 4.987666130065918,
+          "power_mean": 0.3867923761457205,
+          "power_min": 0.2975333631038666,
+          "power_max": 0.49169406294822693,
+          "energy_mJ": 0.3867923761457205,
+          "current_mean_mA": 77.67734119296074,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "scan_prep",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "runtime_begin_to_completion",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "sensor_stopped_to_transport",
+              "overlap_ms": 1.0
+            }
+          ]
+        }
+      ],
+      "peaks_10ms": [
+        {
+          "start_sample_id": 5168769,
+          "end_sample_id_exclusive": 5188769,
+          "start_ms": 38.0745,
+          "end_ms": 48.0745,
+          "duration_ms": 10.0,
+          "current_mean": 0.07660783575493843,
+          "current_min": 0.05877653881907463,
+          "current_max": 0.11840132623910904,
+          "voltage_mean": 4.980338148808479,
+          "voltage_min": 4.9672369956970215,
+          "voltage_max": 4.989935874938965,
+          "power_mean": 0.3814980897411704,
+          "power_min": 0.29289090633392334,
+          "power_max": 0.5883962512016296,
+          "energy_mJ": 3.814980897411704,
+          "current_mean_mA": 76.60783575493844,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "strobe_to_sensor_stop_observation",
+              "overlap_ms": 1.143
+            },
+            {
+              "name": "frame_IRQ_to_sensor_stop_observation",
+              "overlap_ms": 1.143
+            },
+            {
+              "name": "scan_prep",
+              "overlap_ms": 10.0
+            },
+            {
+              "name": "runtime_begin_to_completion",
+              "overlap_ms": 10.0
+            },
+            {
+              "name": "sensor_stopped_to_transport",
+              "overlap_ms": 8.857000000000001
+            }
+          ]
+        },
+        {
+          "start_sample_id": 5279169,
+          "end_sample_id_exclusive": 5299169,
+          "start_ms": 93.2745,
+          "end_ms": 103.2745,
+          "duration_ms": 10.0,
+          "current_mean": 0.0752372777685523,
+          "current_min": 0.059016961604356766,
+          "current_max": 0.09946805238723755,
+          "voltage_mean": 4.980562863898277,
+          "voltage_min": 4.9672369956970215,
+          "voltage_max": 4.989935874938965,
+          "power_mean": 0.3746972987681627,
+          "power_min": 0.2943568825721741,
+          "power_max": 0.494532972574234,
+          "energy_mJ": 3.7469729876816276,
+          "current_mean_mA": 75.2372777685523,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "scan_prep",
+              "overlap_ms": 10.0
+            },
+            {
+              "name": "runtime_begin_to_completion",
+              "overlap_ms": 10.0
+            },
+            {
+              "name": "sensor_stopped_to_transport",
+              "overlap_ms": 10.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 5188769,
+          "end_sample_id_exclusive": 5208769,
+          "start_ms": 48.0745,
+          "end_ms": 58.0745,
+          "duration_ms": 10.0,
+          "current_mean": 0.07519629475660622,
+          "current_min": 0.058866698294878006,
+          "current_max": 0.09886699914932251,
+          "voltage_mean": 4.980496584439278,
+          "voltage_min": 4.969507217407227,
+          "voltage_max": 4.989935874938965,
+          "power_mean": 0.37448911928534506,
+          "power_min": 0.2934738099575043,
+          "power_max": 0.491544634103775,
+          "energy_mJ": 3.744891192853451,
+          "current_mean_mA": 75.19629475660622,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "scan_prep",
+              "overlap_ms": 10.0
+            },
+            {
+              "name": "runtime_begin_to_completion",
+              "overlap_ms": 10.0
+            },
+            {
+              "name": "sensor_stopped_to_transport",
+              "overlap_ms": 10.0
+            }
+          ]
+        }
+      ]
+    },
+    "slot_transport": {
+      "start_sample_id": 5350798,
+      "end_sample_id_exclusive": 6116804,
+      "start_ms": 129.089,
+      "end_ms": 512.092,
+      "duration_ms": 383.003,
+      "current_mean": 0.09654582460439724,
+      "current_min": 0.06197716295719147,
+      "current_max": 0.12381083518266678,
+      "voltage_mean": 4.976345933769785,
+      "voltage_min": 4.960427284240723,
+      "voltage_max": 4.992205619812012,
+      "power_mean": 0.48041805874194465,
+      "power_min": 0.3088400363922119,
+      "power_max": 0.6152787804603577,
+      "energy_mJ": 184.00155775234103,
+      "current_mean_mA": 96.54582460439724,
+      "finite": true,
+      "peaks_1ms": [
+        {
+          "start_sample_id": 5357398,
+          "end_sample_id_exclusive": 5359398,
+          "start_ms": 132.389,
+          "end_ms": 133.389,
+          "duration_ms": 1.0,
+          "current_mean": 0.1044741609506309,
+          "current_min": 0.07635743916034698,
+          "current_max": 0.12381083518266678,
+          "voltage_mean": 4.974375889778138,
+          "voltage_min": 4.962697505950928,
+          "voltage_max": 4.985395908355713,
+          "power_mean": 0.5196603163033724,
+          "power_min": 0.3804987370967865,
+          "power_max": 0.6152787804603577,
+          "energy_mJ": 0.5196603163033724,
+          "current_mean_mA": 104.4741609506309,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "slot_transport",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "runtime_begin_to_completion",
+              "overlap_ms": 1.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 5714198,
+          "end_sample_id_exclusive": 5716198,
+          "start_ms": 310.789,
+          "end_ms": 311.789,
+          "duration_ms": 1.0,
+          "current_mean": 0.10420987658947706,
+          "current_min": 0.08804798126220703,
+          "current_max": 0.11746969074010849,
+          "voltage_mean": 4.9745835897922515,
+          "voltage_min": 4.9672369956970215,
+          "voltage_max": 4.983126163482666,
+          "power_mean": 0.5183853886574507,
+          "power_min": 0.43850409984588623,
+          "power_max": 0.5840330719947815,
+          "energy_mJ": 0.5183853886574507,
+          "current_mean_mA": 104.20987658947706,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "slot_transport",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "runtime_begin_to_completion",
+              "overlap_ms": 1.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 5386398,
+          "end_sample_id_exclusive": 5388398,
+          "start_ms": 146.88899999999998,
+          "end_ms": 147.88899999999998,
+          "duration_ms": 1.0,
+          "current_mean": 0.10417672832682728,
+          "current_min": 0.08994130790233612,
+          "current_max": 0.1174396350979805,
+          "voltage_mean": 4.97486506152153,
+          "voltage_min": 4.9672369956970215,
+          "voltage_max": 4.983126163482666,
+          "power_mean": 0.5182488180249929,
+          "power_min": 0.4479847550392151,
+          "power_max": 0.5838836431503296,
+          "energy_mJ": 0.5182488180249929,
+          "current_mean_mA": 104.17672832682729,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "slot_transport",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "runtime_begin_to_completion",
+              "overlap_ms": 1.0
+            }
+          ]
+        }
+      ],
+      "peaks_10ms": [
+        {
+          "start_sample_id": 5377598,
+          "end_sample_id_exclusive": 5397598,
+          "start_ms": 142.489,
+          "end_ms": 152.489,
+          "duration_ms": 10.0,
+          "current_mean": 0.10182266708016395,
+          "current_min": 0.07455426454544067,
+          "current_max": 0.11749974638223648,
+          "voltage_mean": 4.975338889169693,
+          "voltage_min": 4.9672369956970215,
+          "voltage_max": 4.989935874938965,
+          "power_mean": 0.5065800601258874,
+          "power_min": 0.3716825544834137,
+          "power_max": 0.5840007662773132,
+          "energy_mJ": 5.065800601258874,
+          "current_mean_mA": 101.82266708016395,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "slot_transport",
+              "overlap_ms": 10.0
+            },
+            {
+              "name": "runtime_begin_to_completion",
+              "overlap_ms": 10.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 5413198,
+          "end_sample_id_exclusive": 5433198,
+          "start_ms": 160.289,
+          "end_ms": 170.289,
+          "duration_ms": 10.0,
+          "current_mean": 0.10179653164520859,
+          "current_min": 0.07512526959180832,
+          "current_max": 0.11810079962015152,
+          "voltage_mean": 4.975453514552116,
+          "voltage_min": 4.964967250823975,
+          "voltage_max": 4.989935874938965,
+          "power_mean": 0.5064619514286518,
+          "power_min": 0.37469974160194397,
+          "power_max": 0.5871708393096924,
+          "energy_mJ": 5.064619514286518,
+          "current_mean_mA": 101.79653164520859,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "slot_transport",
+              "overlap_ms": 10.0
+            },
+            {
+              "name": "runtime_begin_to_completion",
+              "overlap_ms": 10.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 5708998,
+          "end_sample_id_exclusive": 5728998,
+          "start_ms": 308.18899999999996,
+          "end_ms": 318.189,
+          "duration_ms": 10.0,
+          "current_mean": 0.10173214501403272,
+          "current_min": 0.07154898345470428,
+          "current_max": 0.11795053631067276,
+          "voltage_mean": 4.975169101524353,
+          "voltage_min": 4.964967250823975,
+          "voltage_max": 4.989935874938965,
+          "power_mean": 0.5061124361127615,
+          "power_min": 0.35670003294944763,
+          "power_max": 0.5861560106277466,
+          "energy_mJ": 5.061124361127615,
+          "current_mean_mA": 101.73214501403271,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "slot_transport",
+              "overlap_ms": 10.0
+            },
+            {
+              "name": "runtime_begin_to_completion",
+              "overlap_ms": 10.0
+            }
+          ]
+        }
+      ]
+    },
+    "runtime_begin_to_completion": {
+      "start_sample_id": 5092620,
+      "end_sample_id_exclusive": 6117312,
+      "start_ms": 0.0,
+      "end_ms": 512.346,
+      "duration_ms": 512.346,
+      "current_mean": 0.09365038936535743,
+      "current_min": 0.058536116033792496,
+      "current_max": 0.1463504433631897,
+      "voltage_mean": 4.9769537041634795,
+      "voltage_min": 4.960427284240723,
+      "voltage_max": 4.992205619812012,
+      "power_mean": 0.46604441011947095,
+      "power_min": 0.29195860028266907,
+      "power_max": 0.726957380771637,
+      "energy_mJ": 238.77598934707044,
+      "current_mean_mA": 93.65038936535743,
+      "finite": true,
+      "peaks_1ms": [
+        {
+          "start_sample_id": 5145020,
+          "end_sample_id_exclusive": 5147020,
+          "start_ms": 26.200000000000003,
+          "end_ms": 27.2,
+          "duration_ms": 1.0,
+          "current_mean": 0.13921434637904168,
+          "current_min": 0.13697396218776703,
+          "current_max": 0.1407606303691864,
+          "voltage_mean": 4.967911271333694,
+          "voltage_min": 4.964967250823975,
+          "voltage_max": 4.971776962280273,
+          "power_mean": 0.6916043578982353,
+          "power_min": 0.6803821921348572,
+          "power_max": 0.6991913914680481,
+          "energy_mJ": 0.6916043578982353,
+          "current_mean_mA": 139.21434637904167,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "strobe_to_frame_IRQ",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "strobe_to_sensor_stop_observation",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "SD_init",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "runtime_begin_to_completion",
+              "overlap_ms": 1.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 5147020,
+          "end_sample_id_exclusive": 5149020,
+          "start_ms": 27.2,
+          "end_ms": 28.2,
+          "duration_ms": 1.0,
+          "current_mean": 0.13806197111308574,
+          "current_min": 0.13646307587623596,
+          "current_max": 0.13958856463432312,
+          "voltage_mean": 4.968251790046692,
+          "voltage_min": 4.964967250823975,
+          "voltage_max": 4.971776962280273,
+          "power_mean": 0.6859264500141143,
+          "power_min": 0.6779937148094177,
+          "power_max": 0.6933695077896118,
+          "energy_mJ": 0.6859264500141145,
+          "current_mean_mA": 138.06197111308575,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "strobe_to_frame_IRQ",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "strobe_to_sensor_stop_observation",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "SD_init",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "runtime_begin_to_completion",
+              "overlap_ms": 1.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 5152820,
+          "end_sample_id_exclusive": 5154820,
+          "start_ms": 30.099999999999998,
+          "end_ms": 31.099999999999998,
+          "duration_ms": 1.0,
+          "current_mean": 0.138058920532465,
+          "current_min": 0.13658328354358673,
+          "current_max": 0.13943830132484436,
+          "voltage_mean": 4.968369834661484,
+          "voltage_min": 4.964967250823975,
+          "voltage_max": 4.971776962280273,
+          "power_mean": 0.6859275704026222,
+          "power_min": 0.6784415245056152,
+          "power_max": 0.6929395794868469,
+          "energy_mJ": 0.6859275704026222,
+          "current_mean_mA": 138.05892053246498,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "strobe_to_frame_IRQ",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "strobe_to_sensor_stop_observation",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "SD_init",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "runtime_begin_to_completion",
+              "overlap_ms": 1.0
+            }
+          ]
+        }
+      ],
+      "peaks_10ms": [
+        {
+          "start_sample_id": 5144820,
+          "end_sample_id_exclusive": 5164820,
+          "start_ms": 26.1,
+          "end_ms": 36.1,
+          "duration_ms": 10.0,
+          "current_mean": 0.13786896126270295,
+          "current_min": 0.13568170368671417,
+          "current_max": 0.1407606303691864,
+          "voltage_mean": 4.968413310146332,
+          "voltage_min": 4.964967250823975,
+          "voltage_max": 4.971776962280273,
+          "power_mean": 0.6849897100955248,
+          "power_min": 0.673963189125061,
+          "power_max": 0.6991913914680481,
+          "energy_mJ": 6.849897100955248,
+          "current_mean_mA": 137.86896126270295,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "strobe_to_frame_IRQ",
+              "overlap_ms": 10.0
+            },
+            {
+              "name": "strobe_to_sensor_stop_observation",
+              "overlap_ms": 10.0
+            },
+            {
+              "name": "SD_init",
+              "overlap_ms": 10.0
+            },
+            {
+              "name": "runtime_begin_to_completion",
+              "overlap_ms": 10.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 5115820,
+          "end_sample_id_exclusive": 5135820,
+          "start_ms": 11.6,
+          "end_ms": 21.6,
+          "duration_ms": 10.0,
+          "current_mean": 0.11193234766498208,
+          "current_min": 0.08525306731462479,
+          "current_max": 0.14316484332084656,
+          "voltage_mean": 4.9742034938097,
+          "voltage_min": 4.962697505950928,
+          "voltage_max": 4.986530780792236,
+          "power_mean": 0.5567328159362078,
+          "power_min": 0.42424628138542175,
+          "power_max": 0.7109712958335876,
+          "energy_mJ": 5.567328159362078,
+          "current_mean_mA": 111.93234766498209,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "strobe_to_frame_IRQ",
+              "overlap_ms": 6.9750000000000005
+            },
+            {
+              "name": "strobe_to_sensor_stop_observation",
+              "overlap_ms": 6.9750000000000005
+            },
+            {
+              "name": "SD_init",
+              "overlap_ms": 1.5125
+            },
+            {
+              "name": "runtime_begin_to_completion",
+              "overlap_ms": 10.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 5377620,
+          "end_sample_id_exclusive": 5397620,
+          "start_ms": 142.5,
+          "end_ms": 152.5,
+          "duration_ms": 10.0,
+          "current_mean": 0.10182357617802917,
+          "current_min": 0.07455426454544067,
+          "current_max": 0.11749974638223648,
+          "voltage_mean": 4.975342974805832,
+          "voltage_min": 4.9672369956970215,
+          "voltage_max": 4.989935874938965,
+          "power_mean": 0.5065850210025906,
+          "power_min": 0.3716825544834137,
+          "power_max": 0.5840007662773132,
+          "energy_mJ": 5.065850210025906,
+          "current_mean_mA": 101.82357617802917,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "slot_transport",
+              "overlap_ms": 10.0
+            },
+            {
+              "name": "runtime_begin_to_completion",
+              "overlap_ms": 10.0
+            }
+          ]
+        }
+      ]
+    },
+    "sensor_stopped_to_transport": {
+      "start_sample_id": 5171055,
+      "end_sample_id_exclusive": 5350798,
+      "start_ms": 39.2175,
+      "end_ms": 129.089,
+      "duration_ms": 89.87150000000001,
+      "current_mean": 0.07493709534832615,
+      "current_min": 0.058536116033792496,
+      "current_max": 0.09961831569671631,
+      "voltage_mean": 4.980520000838081,
+      "voltage_min": 4.9672369956970215,
+      "voltage_max": 4.992205619812012,
+      "power_mean": 0.37319974035135234,
+      "power_min": 0.29195860028266907,
+      "power_max": 0.4955061674118042,
+      "energy_mJ": 33.54002046498656,
+      "current_mean_mA": 74.93709534832615,
+      "finite": true,
+      "peaks_1ms": [
+        {
+          "start_sample_id": 5172855,
+          "end_sample_id_exclusive": 5174855,
+          "start_ms": 40.1175,
+          "end_ms": 41.1175,
+          "duration_ms": 1.0,
+          "current_mean": 0.07771502737700939,
+          "current_min": 0.05940764769911766,
+          "current_max": 0.09913747012615204,
+          "voltage_mean": 4.980262794494629,
+          "voltage_min": 4.969507217407227,
+          "voltage_max": 4.989935874938965,
+          "power_mean": 0.38701096367835996,
+          "power_min": 0.2961706519126892,
+          "power_max": 0.4928893744945526,
+          "energy_mJ": 0.38701096367836,
+          "current_mean_mA": 77.71502737700939,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "scan_prep",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "runtime_begin_to_completion",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "sensor_stopped_to_transport",
+              "overlap_ms": 1.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 5251255,
+          "end_sample_id_exclusive": 5253255,
+          "start_ms": 79.3175,
+          "end_ms": 80.3175,
+          "duration_ms": 1.0,
+          "current_mean": 0.07759738555736839,
+          "current_min": 0.060429442673921585,
+          "current_max": 0.09877683967351913,
+          "voltage_mean": 4.9798712363243105,
+          "voltage_min": 4.9672369956970215,
+          "voltage_max": 4.989935874938965,
+          "power_mean": 0.38639807699620726,
+          "power_min": 0.301127552986145,
+          "power_max": 0.4913206100463867,
+          "energy_mJ": 0.38639807699620726,
+          "current_mean_mA": 77.5973855573684,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "scan_prep",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "runtime_begin_to_completion",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "sensor_stopped_to_transport",
+              "overlap_ms": 1.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 5206455,
+          "end_sample_id_exclusive": 5208455,
+          "start_ms": 56.917500000000004,
+          "end_ms": 57.9175,
+          "duration_ms": 1.0,
+          "current_mean": 0.07745464976504444,
+          "current_min": 0.06066986545920372,
+          "current_max": 0.09727419912815094,
+          "voltage_mean": 4.979977924346924,
+          "voltage_min": 4.969507217407227,
+          "voltage_max": 4.989935874938965,
+          "power_mean": 0.3856954296678305,
+          "power_min": 0.30232560634613037,
+          "power_max": 0.48384639620780945,
+          "energy_mJ": 0.3856954296678305,
+          "current_mean_mA": 77.45464976504445,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "scan_prep",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "runtime_begin_to_completion",
+              "overlap_ms": 1.0
+            },
+            {
+              "name": "sensor_stopped_to_transport",
+              "overlap_ms": 1.0
+            }
+          ]
+        }
+      ],
+      "peaks_10ms": [
+        {
+          "start_sample_id": 5281855,
+          "end_sample_id_exclusive": 5301855,
+          "start_ms": 94.61749999999999,
+          "end_ms": 104.6175,
+          "duration_ms": 10.0,
+          "current_mean": 0.07524969861246646,
+          "current_min": 0.05880659073591232,
+          "current_max": 0.09946805238723755,
+          "voltage_mean": 4.980549018216133,
+          "voltage_min": 4.9672369956970215,
+          "voltage_max": 4.989935874938965,
+          "power_mean": 0.3747579038977623,
+          "power_min": 0.293174147605896,
+          "power_max": 0.494532972574234,
+          "energy_mJ": 3.747579038977623,
+          "current_mean_mA": 75.24969861246646,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "scan_prep",
+              "overlap_ms": 10.0
+            },
+            {
+              "name": "runtime_begin_to_completion",
+              "overlap_ms": 10.0
+            },
+            {
+              "name": "sensor_stopped_to_transport",
+              "overlap_ms": 10.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 5176655,
+          "end_sample_id_exclusive": 5196655,
+          "start_ms": 42.0175,
+          "end_ms": 52.0175,
+          "duration_ms": 10.0,
+          "current_mean": 0.07522682091332972,
+          "current_min": 0.05910712108016014,
+          "current_max": 0.09886699914932251,
+          "voltage_mean": 4.980394667291641,
+          "voltage_min": 4.969507217407227,
+          "voltage_max": 4.989935874938965,
+          "power_mean": 0.37463332504332064,
+          "power_min": 0.2946723997592926,
+          "power_max": 0.491544634103775,
+          "energy_mJ": 3.7463332504332065,
+          "current_mean_mA": 75.22682091332972,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "scan_prep",
+              "overlap_ms": 10.0
+            },
+            {
+              "name": "runtime_begin_to_completion",
+              "overlap_ms": 10.0
+            },
+            {
+              "name": "sensor_stopped_to_transport",
+              "overlap_ms": 10.0
+            }
+          ]
+        },
+        {
+          "start_sample_id": 5309255,
+          "end_sample_id_exclusive": 5329255,
+          "start_ms": 108.3175,
+          "end_ms": 118.31750000000001,
+          "duration_ms": 10.0,
+          "current_mean": 0.07520905667785555,
+          "current_min": 0.05874648690223694,
+          "current_max": 0.09934784471988678,
+          "voltage_mean": 4.980387856602669,
+          "voltage_min": 4.9672369956970215,
+          "voltage_max": 4.989935874938965,
+          "power_mean": 0.3745440243497491,
+          "power_min": 0.29300785064697266,
+          "power_max": 0.4939352869987488,
+          "energy_mJ": 3.745440243497491,
+          "current_mean_mA": 75.20905667785554,
+          "finite": true,
+          "overlapping_phases": [
+            {
+              "name": "scan_prep",
+              "overlap_ms": 10.0
+            },
+            {
+              "name": "runtime_begin_to_completion",
+              "overlap_ms": 10.0
+            },
+            {
+              "name": "sensor_stopped_to_transport",
+              "overlap_ms": 10.0
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "external_strobe": {
+    "window_begin_sample_id": 5111605,
+    "window_end_sample_id": 6117124,
+    "mirror_activation_inferred_sample_id": 5111405,
+    "pre_first_strobe_low_proven": true,
+    "pulses": [
+      {
+        "rise_sample_id": 5121858,
+        "fall_sample_id": 5143826,
+        "rise_ms": 14.61920545851905,
+        "fall_ms": 25.60320545851905,
+        "duration_ms": 10.984
+      }
+    ],
+    "external_complete_pulses": 1,
+    "first_rise_minus_phase2_us": -6.0,
+    "external_count_matches_IRQ_count": true,
+    "external_count_matches_sensor_counter": true,
+    "exact_one_exposure_observed": true,
+    "startup_edges_excluded": [
+      {
+        "sample_id": 5111406,
+        "level": 0
+      }
+    ],
+    "scope": "PD0 mirror of PA0 EXTI interrupts after explicit activation, through stable post-save sensor observation. Boot HIGH/chatter excluded. This confirms IRQ waveform/count externally, not independent direct PA0 electrical capture."
+  },
+  "DWT_frame_to_stop_observation_ms": 2.7165975,
+  "scope": "Warm RAM, no cold power-on or Standby. All currents include populated board and card. Source-image equality is separate evidence. Normal STOP and automatic FSM2 are software observations, not exact sensor transitions.",
+  "source_sha256": "b77f8691ddb374fea90c756492004f71aedc85f2d4a2a2f349e10c0483862286"
+}

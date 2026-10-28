@@ -1,0 +1,85 @@
+{
+  "utc": "2026-10-27T04:10:01.018713+00:00",
+  "scope": "Offline frozen v3 profile and trial runner audit; no instrument API invoked",
+  "profiles": {
+    "3": {
+      "binary_sha256": "9201baa94c4314202370461f9e033ed05254170165551a145f65c6f7553f18a2",
+      "bytes": 29944,
+      "offline_host_admission_passed": true,
+      "selector": 3,
+      "manifest_sha256": "06663c7006d34c88032e8a7c99c342bdd1b3954cd5f2cdabd935391bb959e1da"
+    },
+    "2": {
+      "binary_sha256": "7ce51adadb449caf43e9c88b199737ce8482d728b95fe42a4f26cebe4e304ecf",
+      "bytes": 29944,
+      "offline_host_admission_passed": true,
+      "selector": 2,
+      "manifest_sha256": "0fe2b4b2792bd3554b349a835678b56902769e83165c317bba6a9f0445982235"
+    },
+    "1": {
+      "binary_sha256": "f611bc9614247bcad7898430f417d330d64702b81894cb46015c9429386be8a7",
+      "bytes": 29944,
+      "offline_host_admission_passed": true,
+      "selector": 1,
+      "manifest_sha256": "930952e12220a56dd0baf5bde580411977ed1e9c8b55da11581ea4e8900cb185"
+    }
+  },
+  "comparisons": {
+    "3_vs_2": {
+      "same_bytes": 29944,
+      "difference_offsets": [
+        29936
+      ],
+      "difference_addresses": [
+        "0x343074f0"
+      ],
+      "bytes_control": [
+        3
+      ],
+      "bytes_trial": [
+        2
+      ],
+      "difference_in_initialized_data": true,
+      "all_instructions_byte_identical": true,
+      "all_frozen_source_hashes_identical": true,
+      "all_other_compiler_flags_identical": true,
+      "manifest_changed_keys": [
+        "sd_clk_gpio_speed",
+        "binary_sha256",
+        "flags",
+        "size"
+      ]
+    },
+    "3_vs_1": {
+      "same_bytes": 29944,
+      "difference_offsets": [
+        29936
+      ],
+      "difference_addresses": [
+        "0x343074f0"
+      ],
+      "bytes_control": [
+        3
+      ],
+      "bytes_trial": [
+        1
+      ],
+      "difference_in_initialized_data": true,
+      "all_instructions_byte_identical": true,
+      "all_frozen_source_hashes_identical": true,
+      "all_other_compiler_flags_identical": true,
+      "manifest_changed_keys": [
+        "sd_clk_gpio_speed",
+        "binary_sha256",
+        "flags",
+        "size"
+      ]
+    }
+  },
+  "runner_review": {
+    "source_sha256": "dcd4d49d5fcc24f71fe20494f58a5815bc9fe2b6281e07807ff1a7ec12f6f7c4",
+    "mock_tests_passed": 12,
+    "findings": []
+  },
+  "passed": true
+}

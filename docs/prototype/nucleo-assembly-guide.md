@@ -1,5 +1,7 @@
 # Nucleo prototype: consolidated modification and wiring guide
 
+**Current connection update, October 27:** target power is **source -> JS110 IN+ -> JS110 OUT+ -> CN5.5/5V**, with common return at **CN5.6/GND** and all CN9 shunts absent. See [step 4](#4-connect-ltc-power). The active storage prototype uses the [four-bit SD wiring](sd-breakout-benchmark.md); the NAND voltage-conversion steps below remain a separate deferred assembly plan. Dated bench states below are historical; consult [AGENTS.md](../../AGENTS.md) before hardware work.
+
 **Selected October 18, 2026:** existing **AS5F14G04SND-10LIN NAND**, Arduino-header **bit-banged quad data**, and **LTC3621 at 5.0 V** feeding the Nucleo's existing downstream regulators. This is the current assembly path; earlier CN3/VDDIO5, translated hardware-XSPI and direct-3.3 V proposals are alternatives, not additional steps.
 
 The plan is electrically sensible. The two costs are slower software-driven transfers and the remaining overhead of an evaluation board. Remove the large unnecessary loads as described below, retain convenient debugging during bring-up, then qualify complete-cycle energy. Four CR2032 cells' ability to supply startup and save pulses is still unmeasured.
@@ -107,18 +109,19 @@ The analog companions of A1/A4/A5 are high-value dividers feeding separate ADC b
 
 ## 4. Connect LTC power
 
-Use **regulated 5.0 V at CN9 pin 2**, not the VIN pin. Retain the Nucleo's main, auxiliary, core and 1.8 V converters and the camera adapter's regulators.
+Use **regulated 5.0 V through the JS110 to Arduino CN5 pin 5 / 5V**, with the common return at **CN5 pin 6 / GND**. This is the canonical target power connection selected October 27; keep the Joulescope in series. Retain the Nucleo's downstream regulators and the camera adapter's regulators. CN5 pin 8 / VIN is a different, higher-voltage input and is not used here.
 
 | Connection | Wiring |
 |---|---|
-| With JS110 | LTC 5 V output â†’ **JS110 IN+**; **OUT+ â†’ CN9.2** |
-| Without JS110 | LTC 5 V output â†’ **CN9.2** |
-| Ground | LTC ground â†’ board GND, for example **CN14.7**; retain the JS110's common-ground/voltage-sense arrangement |
+| Series positive path | LTC 5 V output -> **JS110 IN+**; **JS110 OUT+ -> CN5.5 / 5V** |
+| Ground | LTC / JS110 common return -> **CN5.6 / GND**; retain the JS110 ground/voltage-sense arrangement |
 | Old source | Remove JS110 IN+'s old connection to **CN9.3** and unplug **CN8** |
 | CN9 selection | **No shunts fitted** across any source pair |
 | Debugger | CN10 may independently power ST-LINK after D2 is open |
 
-CN9 pins 2/4/6 are the common target 5 V bus. Pins 1/3/5 are different upstream sources; do not bridge them together. CN8 must stay unplugged in this configuration because its USB paths bypass the measurement boundary, and simultaneous USB/battery source selection is not yet implemented. The LTC's shutdown function is not a qualified reverse-blocking power mux.
+CN5.5 and CN9 pins 2/4/6 are directly on the same target 5 V bus. The old JS110 OUT+ connection at CN9.2 is replaced by CN5.5, not duplicated or bypassed. CN9 pins 1/3/5 are different upstream sources; do not bridge them together. CN8 must stay unplugged in this LTC/external-source configuration because its USB paths bypass the measurement boundary, and simultaneous USB/battery source selection is not yet implemented. The LTC's shutdown function is not a qualified reverse-blocking power mux.
+
+For the existing USB-fed bench setup, keep **CN8 -> CN9.3 -> JS110 IN+**, and use the same **OUT+ -> CN5.5** and **common return -> CN5.6** target connections with all CN9 shunts absent. The user's connector selection does not itself switch the upstream source to LTC or establish that the physical move has been completed. See the [current power connection and measurement limits](../power/nucleo-debug-isolation.md#canonical-target-power-connection--october-27).
 
 **Regulator confirmed by the user, October 18: DC1863A.** Its adjustable LTC3621 supports the selected 5 V directly. With power off:
 

@@ -1,0 +1,833 @@
+
+D:\Github\global-x-camera\tmp\bringup\nucleo-isolated-20261028\mdio\mdio_diag.elf:     file format elf32-littlearm
+
+
+Disassembly of section .text:
+
+343c4000 <snapshot>:
+343c4000:	b5f0      	push	{r4, r5, r6, r7, lr}
+343c4002:	f8d1 e000 	ldr.w	lr, [r1]
+343c4006:	684f      	ldr	r7, [r1, #4]
+343c4008:	688e      	ldr	r6, [r1, #8]
+343c400a:	68cd      	ldr	r5, [r1, #12]
+343c400c:	ea4f 0c42 	mov.w	ip, r2, lsl #1
+343c4010:	08d4      	lsrs	r4, r2, #3
+343c4012:	fa25 f50c 	lsr.w	r5, r5, ip
+343c4016:	f005 0503 	and.w	r5, r5, #3
+343c401a:	3408      	adds	r4, #8
+343c401c:	f851 4024 	ldr.w	r4, [r1, r4, lsl #2]
+343c4020:	60c5      	str	r5, [r0, #12]
+343c4022:	6949      	ldr	r1, [r1, #20]
+343c4024:	f002 0507 	and.w	r5, r2, #7
+343c4028:	00ad      	lsls	r5, r5, #2
+343c402a:	fa2e fe0c 	lsr.w	lr, lr, ip
+343c402e:	40d7      	lsrs	r7, r2
+343c4030:	fa26 f60c 	lsr.w	r6, r6, ip
+343c4034:	40ec      	lsrs	r4, r5
+343c4036:	fa21 f202 	lsr.w	r2, r1, r2
+343c403a:	f00e 0e03 	and.w	lr, lr, #3
+343c403e:	f007 0701 	and.w	r7, r7, #1
+343c4042:	f006 0603 	and.w	r6, r6, #3
+343c4046:	f004 040f 	and.w	r4, r4, #15
+343c404a:	f002 0201 	and.w	r2, r2, #1
+343c404e:	f8c0 e000 	str.w	lr, [r0]
+343c4052:	6047      	str	r7, [r0, #4]
+343c4054:	6086      	str	r6, [r0, #8]
+343c4056:	6104      	str	r4, [r0, #16]
+343c4058:	6142      	str	r2, [r0, #20]
+343c405a:	bdf0      	pop	{r4, r5, r6, r7, pc}
+
+343c405c <delay.constprop.0>:
+343c405c:	4906      	ldr	r1, [pc, #24]	@ (343c4078 <delay.constprop.0+0x1c>)
+343c405e:	4b07      	ldr	r3, [pc, #28]	@ (343c407c <delay.constprop.0+0x20>)
+343c4060:	6848      	ldr	r0, [r1, #4]
+343c4062:	684a      	ldr	r2, [r1, #4]
+343c4064:	1a12      	subs	r2, r2, r0
+343c4066:	f5b2 6ffa 	cmp.w	r2, #2000	@ 0x7d0
+343c406a:	d203      	bcs.n	343c4074 <delay.constprop.0+0x18>
+343c406c:	3b01      	subs	r3, #1
+343c406e:	d1f8      	bne.n	343c4062 <delay.constprop.0+0x6>
+343c4070:	2003      	movs	r0, #3
+343c4072:	4770      	bx	lr
+343c4074:	2000      	movs	r0, #0
+343c4076:	4770      	bx	lr
+343c4078:	e0001000 	.word	0xe0001000
+343c407c:	0007a120 	.word	0x0007a120
+
+343c4080 <clock_bit>:
+343c4080:	b538      	push	{r3, r4, r5, lr}
+343c4082:	2301      	movs	r3, #1
+343c4084:	f080 0001 	eor.w	r0, r0, #1
+343c4088:	0100      	lsls	r0, r0, #4
+343c408a:	4a16      	ldr	r2, [pc, #88]	@ (343c40e4 <clock_bit+0x64>)
+343c408c:	3004      	adds	r0, #4
+343c408e:	4083      	lsls	r3, r0
+343c4090:	6193      	str	r3, [r2, #24]
+343c4092:	460c      	mov	r4, r1
+343c4094:	f7ff ffe2 	bl	343c405c <delay.constprop.0>
+343c4098:	bb10      	cbnz	r0, 343c40e0 <clock_bit+0x60>
+343c409a:	4d13      	ldr	r5, [pc, #76]	@ (343c40e8 <clock_bit+0x68>)
+343c409c:	692b      	ldr	r3, [r5, #16]
+343c409e:	051a      	lsls	r2, r3, #20
+343c40a0:	bf41      	itttt	mi
+343c40a2:	4a12      	ldrmi	r2, [pc, #72]	@ (343c40ec <clock_bit+0x6c>)
+343c40a4:	6e53      	ldrmi	r3, [r2, #100]	@ 0x64
+343c40a6:	3301      	addmi	r3, #1
+343c40a8:	6653      	strmi	r3, [r2, #100]	@ 0x64
+343c40aa:	f44f 6300 	mov.w	r3, #2048	@ 0x800
+343c40ae:	61ab      	str	r3, [r5, #24]
+343c40b0:	f7ff ffd4 	bl	343c405c <delay.constprop.0>
+343c40b4:	b960      	cbnz	r0, 343c40d0 <clock_bit+0x50>
+343c40b6:	692b      	ldr	r3, [r5, #16]
+343c40b8:	051b      	lsls	r3, r3, #20
+343c40ba:	bf5f      	itttt	pl
+343c40bc:	4a0b      	ldrpl	r2, [pc, #44]	@ (343c40ec <clock_bit+0x6c>)
+343c40be:	6e93      	ldrpl	r3, [r2, #104]	@ 0x68
+343c40c0:	3301      	addpl	r3, #1
+343c40c2:	6693      	strpl	r3, [r2, #104]	@ 0x68
+343c40c4:	b124      	cbz	r4, 343c40d0 <clock_bit+0x50>
+343c40c6:	4b07      	ldr	r3, [pc, #28]	@ (343c40e4 <clock_bit+0x64>)
+343c40c8:	691b      	ldr	r3, [r3, #16]
+343c40ca:	f3c3 1300 	ubfx	r3, r3, #4, #1
+343c40ce:	6023      	str	r3, [r4, #0]
+343c40d0:	f04f 6200 	mov.w	r2, #134217728	@ 0x8000000
+343c40d4:	4b04      	ldr	r3, [pc, #16]	@ (343c40e8 <clock_bit+0x68>)
+343c40d6:	619a      	str	r2, [r3, #24]
+343c40d8:	4a04      	ldr	r2, [pc, #16]	@ (343c40ec <clock_bit+0x6c>)
+343c40da:	6ed3      	ldr	r3, [r2, #108]	@ 0x6c
+343c40dc:	3301      	adds	r3, #1
+343c40de:	66d3      	str	r3, [r2, #108]	@ 0x6c
+343c40e0:	bd38      	pop	{r3, r4, r5, pc}
+343c40e2:	bf00      	nop
+343c40e4:	56021400 	.word	0x56021400
+343c40e8:	56021800 	.word	0x56021800
+343c40ec:	343c6000 	.word	0x343c6000
+
+343c40f0 <send_bits>:
+343c40f0:	b538      	push	{r3, r4, r5, lr}
+343c40f2:	4605      	mov	r5, r0
+343c40f4:	460c      	mov	r4, r1
+343c40f6:	3c01      	subs	r4, #1
+343c40f8:	fa25 f004 	lsr.w	r0, r5, r4
+343c40fc:	2100      	movs	r1, #0
+343c40fe:	f000 0001 	and.w	r0, r0, #1
+343c4102:	f7ff ffbd 	bl	343c4080 <clock_bit>
+343c4106:	b908      	cbnz	r0, 343c410c <send_bits+0x1c>
+343c4108:	2c00      	cmp	r4, #0
+343c410a:	d1f4      	bne.n	343c40f6 <send_bits+0x6>
+343c410c:	bd38      	pop	{r3, r4, r5, pc}
+
+343c410e <read_reg.constprop.0>:
+343c410e:	b5f7      	push	{r0, r1, r2, r4, r5, r6, r7, lr}
+343c4110:	4607      	mov	r7, r0
+343c4112:	460e      	mov	r6, r1
+343c4114:	f04f 30ff 	mov.w	r0, #4294967295
+343c4118:	2120      	movs	r1, #32
+343c411a:	4614      	mov	r4, r2
+343c411c:	461d      	mov	r5, r3
+343c411e:	f7ff ffe7 	bl	343c40f0 <send_bits>
+343c4122:	bb80      	cbnz	r0, 343c4186 <read_reg.constprop.0+0x78>
+343c4124:	2102      	movs	r1, #2
+343c4126:	2001      	movs	r0, #1
+343c4128:	f7ff ffe2 	bl	343c40f0 <send_bits>
+343c412c:	bb58      	cbnz	r0, 343c4186 <read_reg.constprop.0+0x78>
+343c412e:	2102      	movs	r1, #2
+343c4130:	4608      	mov	r0, r1
+343c4132:	f7ff ffdd 	bl	343c40f0 <send_bits>
+343c4136:	bb30      	cbnz	r0, 343c4186 <read_reg.constprop.0+0x78>
+343c4138:	2105      	movs	r1, #5
+343c413a:	4638      	mov	r0, r7
+343c413c:	f7ff ffd8 	bl	343c40f0 <send_bits>
+343c4140:	bb08      	cbnz	r0, 343c4186 <read_reg.constprop.0+0x78>
+343c4142:	2105      	movs	r1, #5
+343c4144:	4630      	mov	r0, r6
+343c4146:	f7ff ffd3 	bl	343c40f0 <send_bits>
+343c414a:	b9e0      	cbnz	r0, 343c4186 <read_reg.constprop.0+0x78>
+343c414c:	4601      	mov	r1, r0
+343c414e:	2001      	movs	r0, #1
+343c4150:	f7ff ff96 	bl	343c4080 <clock_bit>
+343c4154:	b9b8      	cbnz	r0, 343c4186 <read_reg.constprop.0+0x78>
+343c4156:	4629      	mov	r1, r5
+343c4158:	2001      	movs	r0, #1
+343c415a:	f7ff ff91 	bl	343c4080 <clock_bit>
+343c415e:	b990      	cbnz	r0, 343c4186 <read_reg.constprop.0+0x78>
+343c4160:	2610      	movs	r6, #16
+343c4162:	4605      	mov	r5, r0
+343c4164:	9001      	str	r0, [sp, #4]
+343c4166:	2001      	movs	r0, #1
+343c4168:	a901      	add	r1, sp, #4
+343c416a:	f7ff ff89 	bl	343c4080 <clock_bit>
+343c416e:	b950      	cbnz	r0, 343c4186 <read_reg.constprop.0+0x78>
+343c4170:	9b01      	ldr	r3, [sp, #4]
+343c4172:	3e01      	subs	r6, #1
+343c4174:	ea43 0545 	orr.w	r5, r3, r5, lsl #1
+343c4178:	d1f5      	bne.n	343c4166 <read_reg.constprop.0+0x58>
+343c417a:	4601      	mov	r1, r0
+343c417c:	2001      	movs	r0, #1
+343c417e:	f7ff ff7f 	bl	343c4080 <clock_bit>
+343c4182:	b900      	cbnz	r0, 343c4186 <read_reg.constprop.0+0x78>
+343c4184:	6025      	str	r5, [r4, #0]
+343c4186:	b003      	add	sp, #12
+343c4188:	bdf0      	pop	{r4, r5, r6, r7, pc}
+	...
+
+343c418c <mdio_diag_main>:
+343c418c:	e92d 4880 	stmdb	sp!, {r7, fp, lr}
+343c4190:	f44f 7e00 	mov.w	lr, #512	@ 0x200
+343c4194:	4abe      	ldr	r2, [pc, #760]	@ (343c4490 <mdio_diag_main+0x304>)
+343c4196:	2400      	movs	r4, #0
+343c4198:	4613      	mov	r3, r2
+343c419a:	f04e e001 	dls	lr, lr
+343c419e:	b0b3      	sub	sp, #204	@ 0xcc
+343c41a0:	f842 4b04 	str.w	r4, [r2], #4
+343c41a4:	f00f c005 	le	lr, 343c41a0 <mdio_diag_main+0x14>
+343c41a8:	4aba      	ldr	r2, [pc, #744]	@ (343c4494 <mdio_diag_main+0x308>)
+343c41aa:	4cbb      	ldr	r4, [pc, #748]	@ (343c4498 <mdio_diag_main+0x30c>)
+343c41ac:	601a      	str	r2, [r3, #0]
+343c41ae:	2201      	movs	r2, #1
+343c41b0:	605a      	str	r2, [r3, #4]
+343c41b2:	609a      	str	r2, [r3, #8]
+343c41b4:	6865      	ldr	r5, [r4, #4]
+343c41b6:	615d      	str	r5, [r3, #20]
+343c41b8:	f04f 35ff 	mov.w	r5, #4294967295
+343c41bc:	679d      	str	r5, [r3, #120]	@ 0x78
+343c41be:	4db7      	ldr	r5, [pc, #732]	@ (343c449c <mdio_diag_main+0x310>)
+343c41c0:	61dd      	str	r5, [r3, #28]
+343c41c2:	f3ef 8514 	mrs	r5, CONTROL
+343c41c6:	f8c3 50e0 	str.w	r5, [r3, #224]	@ 0xe0
+343c41ca:	f3ef 8505 	mrs	r5, IPSR
+343c41ce:	f8c3 50e4 	str.w	r5, [r3, #228]	@ 0xe4
+343c41d2:	f3ef 8508 	mrs	r5, MSP
+343c41d6:	f8c3 50e8 	str.w	r5, [r3, #232]	@ 0xe8
+343c41da:	f3ef 850a 	mrs	r5, MSPLIM
+343c41de:	f8c3 50ec 	str.w	r5, [r3, #236]	@ 0xec
+343c41e2:	f8c3 00f0 	str.w	r0, [r3, #240]	@ 0xf0
+343c41e6:	f8c3 10f4 	str.w	r1, [r3, #244]	@ 0xf4
+343c41ea:	49ad      	ldr	r1, [pc, #692]	@ (343c44a0 <mdio_diag_main+0x314>)
+343c41ec:	4692      	mov	sl, r2
+343c41ee:	6a08      	ldr	r0, [r1, #32]
+343c41f0:	62d8      	str	r0, [r3, #44]	@ 0x2c
+343c41f2:	6a48      	ldr	r0, [r1, #36]	@ 0x24
+343c41f4:	6318      	str	r0, [r3, #48]	@ 0x30
+343c41f6:	f8d1 00c4 	ldr.w	r0, [r1, #196]	@ 0xc4
+343c41fa:	6358      	str	r0, [r3, #52]	@ 0x34
+343c41fc:	f8d1 0080 	ldr.w	r0, [r1, #128]	@ 0x80
+343c4200:	6398      	str	r0, [r3, #56]	@ 0x38
+343c4202:	f8d1 0084 	ldr.w	r0, [r1, #132]	@ 0x84
+343c4206:	63d8      	str	r0, [r3, #60]	@ 0x3c
+343c4208:	f8d1 1088 	ldr.w	r1, [r1, #136]	@ 0x88
+343c420c:	6419      	str	r1, [r3, #64]	@ 0x40
+343c420e:	6821      	ldr	r1, [r4, #0]
+343c4210:	6459      	str	r1, [r3, #68]	@ 0x44
+343c4212:	49a4      	ldr	r1, [pc, #656]	@ (343c44a4 <mdio_diag_main+0x318>)
+343c4214:	f8d1 10fc 	ldr.w	r1, [r1, #252]	@ 0xfc
+343c4218:	6499      	str	r1, [r3, #72]	@ 0x48
+343c421a:	f8d3 10e0 	ldr.w	r1, [r3, #224]	@ 0xe0
+343c421e:	2900      	cmp	r1, #0
+343c4220:	f040 830e 	bne.w	343c4840 <mdio_diag_main+0x6b4>
+343c4224:	f8d3 10e4 	ldr.w	r1, [r3, #228]	@ 0xe4
+343c4228:	2900      	cmp	r1, #0
+343c422a:	f040 8309 	bne.w	343c4840 <mdio_diag_main+0x6b4>
+343c422e:	f8d3 10ec 	ldr.w	r1, [r3, #236]	@ 0xec
+343c4232:	489d      	ldr	r0, [pc, #628]	@ (343c44a8 <mdio_diag_main+0x31c>)
+343c4234:	4281      	cmp	r1, r0
+343c4236:	f040 8303 	bne.w	343c4840 <mdio_diag_main+0x6b4>
+343c423a:	f8d3 00e8 	ldr.w	r0, [r3, #232]	@ 0xe8
+343c423e:	4288      	cmp	r0, r1
+343c4240:	f240 82fe 	bls.w	343c4840 <mdio_diag_main+0x6b4>
+343c4244:	f8d3 10e8 	ldr.w	r1, [r3, #232]	@ 0xe8
+343c4248:	4a98      	ldr	r2, [pc, #608]	@ (343c44ac <mdio_diag_main+0x320>)
+343c424a:	4291      	cmp	r1, r2
+343c424c:	f200 82f8 	bhi.w	343c4840 <mdio_diag_main+0x6b4>
+343c4250:	6ad9      	ldr	r1, [r3, #44]	@ 0x2c
+343c4252:	f1a2 7284 	sub.w	r2, r2, #17301504	@ 0x1080000
+343c4256:	4291      	cmp	r1, r2
+343c4258:	f040 831d 	bne.w	343c4896 <mdio_diag_park+0x34>
+343c425c:	6b1a      	ldr	r2, [r3, #48]	@ 0x30
+343c425e:	f5b2 1f80 	cmp.w	r2, #1048576	@ 0x100000
+343c4262:	f040 8318 	bne.w	343c4896 <mdio_diag_park+0x34>
+343c4266:	6b99      	ldr	r1, [r3, #56]	@ 0x38
+343c4268:	4a91      	ldr	r2, [pc, #580]	@ (343c44b0 <mdio_diag_main+0x324>)
+343c426a:	4291      	cmp	r1, r2
+343c426c:	f040 8313 	bne.w	343c4896 <mdio_diag_park+0x34>
+343c4270:	6bdb      	ldr	r3, [r3, #60]	@ 0x3c
+343c4272:	9301      	str	r3, [sp, #4]
+343c4274:	2b00      	cmp	r3, #0
+343c4276:	f040 830e 	bne.w	343c4896 <mdio_diag_park+0x34>
+343c427a:	4c85      	ldr	r4, [pc, #532]	@ (343c4490 <mdio_diag_main+0x304>)
+343c427c:	4b8d      	ldr	r3, [pc, #564]	@ (343c44b4 <mdio_diag_main+0x328>)
+343c427e:	6c22      	ldr	r2, [r4, #64]	@ 0x40
+343c4280:	429a      	cmp	r2, r3
+343c4282:	f040 8308 	bne.w	343c4896 <mdio_diag_park+0x34>
+343c4286:	6b62      	ldr	r2, [r4, #52]	@ 0x34
+343c4288:	4b8b      	ldr	r3, [pc, #556]	@ (343c44b8 <mdio_diag_main+0x32c>)
+343c428a:	4013      	ands	r3, r2
+343c428c:	f5b3 3f00 	cmp.w	r3, #131072	@ 0x20000
+343c4290:	f040 8301 	bne.w	343c4896 <mdio_diag_park+0x34>
+343c4294:	6c63      	ldr	r3, [r4, #68]	@ 0x44
+343c4296:	07d9      	lsls	r1, r3, #31
+343c4298:	f140 8300 	bpl.w	343c489c <mdio_diag_park+0x3a>
+343c429c:	6ca3      	ldr	r3, [r4, #72]	@ 0x48
+343c429e:	01da      	lsls	r2, r3, #7
+343c42a0:	f140 82fc 	bpl.w	343c489c <mdio_diag_park+0x3a>
+343c42a4:	f7ff feda 	bl	343c405c <delay.constprop.0>
+343c42a8:	4682      	mov	sl, r0
+343c42aa:	2800      	cmp	r0, #0
+343c42ac:	f040 82c8 	bne.w	343c4840 <mdio_diag_main+0x6b4>
+343c42b0:	4b7b      	ldr	r3, [pc, #492]	@ (343c44a0 <mdio_diag_main+0x314>)
+343c42b2:	f8d3 225c 	ldr.w	r2, [r3, #604]	@ 0x25c
+343c42b6:	6222      	str	r2, [r4, #32]
+343c42b8:	f8d3 221c 	ldr.w	r2, [r3, #540]	@ 0x21c
+343c42bc:	62a2      	str	r2, [r4, #40]	@ 0x28
+343c42be:	6aa2      	ldr	r2, [r4, #40]	@ 0x28
+343c42c0:	f012 0f60 	tst.w	r2, #96	@ 0x60
+343c42c4:	f040 82ef 	bne.w	343c48a6 <mdio_diag_park+0x44>
+343c42c8:	6a22      	ldr	r2, [r4, #32]
+343c42ca:	43d2      	mvns	r2, r2
+343c42cc:	f012 0260 	ands.w	r2, r2, #96	@ 0x60
+343c42d0:	9201      	str	r2, [sp, #4]
+343c42d2:	bf18      	it	ne
+343c42d4:	f8c3 2a5c 	strne.w	r2, [r3, #2652]	@ 0xa5c
+343c42d8:	f3bf 8f4f 	dsb	sy
+343c42dc:	f3bf 8f6f 	isb	sy
+343c42e0:	f8d3 325c 	ldr.w	r3, [r3, #604]	@ 0x25c
+343c42e4:	f003 0360 	and.w	r3, r3, #96	@ 0x60
+343c42e8:	2b60      	cmp	r3, #96	@ 0x60
+343c42ea:	f040 82dc 	bne.w	343c48a6 <mdio_diag_park+0x44>
+343c42ee:	4e73      	ldr	r6, [pc, #460]	@ (343c44bc <mdio_diag_main+0x330>)
+343c42f0:	a824      	add	r0, sp, #144	@ 0x90
+343c42f2:	4631      	mov	r1, r6
+343c42f4:	2204      	movs	r2, #4
+343c42f6:	f7ff fe83 	bl	343c4000 <snapshot>
+343c42fa:	9b24      	ldr	r3, [sp, #144]	@ 0x90
+343c42fc:	4d70      	ldr	r5, [pc, #448]	@ (343c44c0 <mdio_diag_main+0x334>)
+343c42fe:	9306      	str	r3, [sp, #24]
+343c4300:	9b25      	ldr	r3, [sp, #148]	@ 0x94
+343c4302:	220b      	movs	r2, #11
+343c4304:	9305      	str	r3, [sp, #20]
+343c4306:	9b26      	ldr	r3, [sp, #152]	@ 0x98
+343c4308:	4629      	mov	r1, r5
+343c430a:	9304      	str	r3, [sp, #16]
+343c430c:	9b27      	ldr	r3, [sp, #156]	@ 0x9c
+343c430e:	a82a      	add	r0, sp, #168	@ 0xa8
+343c4310:	9303      	str	r3, [sp, #12]
+343c4312:	9b28      	ldr	r3, [sp, #160]	@ 0xa0
+343c4314:	f8df 9178 	ldr.w	r9, [pc, #376]	@ 343c4490 <mdio_diag_main+0x304>
+343c4318:	9307      	str	r3, [sp, #28]
+343c431a:	9b29      	ldr	r3, [sp, #164]	@ 0xa4
+343c431c:	9308      	str	r3, [sp, #32]
+343c431e:	f7ff fe6f 	bl	343c4000 <snapshot>
+343c4322:	9b2a      	ldr	r3, [sp, #168]	@ 0xa8
+343c4324:	9309      	str	r3, [sp, #36]	@ 0x24
+343c4326:	9b2b      	ldr	r3, [sp, #172]	@ 0xac
+343c4328:	930a      	str	r3, [sp, #40]	@ 0x28
+343c432a:	9b2c      	ldr	r3, [sp, #176]	@ 0xb0
+343c432c:	930b      	str	r3, [sp, #44]	@ 0x2c
+343c432e:	9b2d      	ldr	r3, [sp, #180]	@ 0xb4
+343c4330:	930c      	str	r3, [sp, #48]	@ 0x30
+343c4332:	9b2e      	ldr	r3, [sp, #184]	@ 0xb8
+343c4334:	9302      	str	r3, [sp, #8]
+343c4336:	9b2f      	ldr	r3, [sp, #188]	@ 0xbc
+343c4338:	930d      	str	r3, [sp, #52]	@ 0x34
+343c433a:	9b06      	ldr	r3, [sp, #24]
+343c433c:	f8c9 3080 	str.w	r3, [r9, #128]	@ 0x80
+343c4340:	9b05      	ldr	r3, [sp, #20]
+343c4342:	f8c9 3084 	str.w	r3, [r9, #132]	@ 0x84
+343c4346:	9b04      	ldr	r3, [sp, #16]
+343c4348:	f8c9 3088 	str.w	r3, [r9, #136]	@ 0x88
+343c434c:	9b03      	ldr	r3, [sp, #12]
+343c434e:	f8c9 308c 	str.w	r3, [r9, #140]	@ 0x8c
+343c4352:	9b07      	ldr	r3, [sp, #28]
+343c4354:	f8c9 3090 	str.w	r3, [r9, #144]	@ 0x90
+343c4358:	9b08      	ldr	r3, [sp, #32]
+343c435a:	f8c9 3094 	str.w	r3, [r9, #148]	@ 0x94
+343c435e:	9b09      	ldr	r3, [sp, #36]	@ 0x24
+343c4360:	f8c9 3098 	str.w	r3, [r9, #152]	@ 0x98
+343c4364:	9b0a      	ldr	r3, [sp, #40]	@ 0x28
+343c4366:	f8c9 309c 	str.w	r3, [r9, #156]	@ 0x9c
+343c436a:	9b0b      	ldr	r3, [sp, #44]	@ 0x2c
+343c436c:	f8c9 30a0 	str.w	r3, [r9, #160]	@ 0xa0
+343c4370:	9b0c      	ldr	r3, [sp, #48]	@ 0x30
+343c4372:	f8c9 30a4 	str.w	r3, [r9, #164]	@ 0xa4
+343c4376:	9b02      	ldr	r3, [sp, #8]
+343c4378:	f8c9 30a8 	str.w	r3, [r9, #168]	@ 0xa8
+343c437c:	9b0d      	ldr	r3, [sp, #52]	@ 0x34
+343c437e:	f8c9 30ac 	str.w	r3, [r9, #172]	@ 0xac
+343c4382:	f3ef 8110 	mrs	r1, PRIMASK
+343c4386:	b672      	cpsid	i
+343c4388:	f04f 0810 	mov.w	r8, #16
+343c438c:	f04f 6700 	mov.w	r7, #134217728	@ 0x8000000
+343c4390:	4b4c      	ldr	r3, [pc, #304]	@ (343c44c4 <mdio_diag_main+0x338>)
+343c4392:	f8d3 2400 	ldr.w	r2, [r3, #1024]	@ 0x400
+343c4396:	f422 7240 	bic.w	r2, r2, #768	@ 0x300
+343c439a:	f8c3 2400 	str.w	r2, [r3, #1024]	@ 0x400
+343c439e:	f8d3 2800 	ldr.w	r2, [r3, #2048]	@ 0x800
+343c43a2:	f422 0240 	bic.w	r2, r2, #12582912	@ 0xc00000
+343c43a6:	f8c3 2800 	str.w	r2, [r3, #2048]	@ 0x800
+343c43aa:	f8c6 8018 	str.w	r8, [r6, #24]
+343c43ae:	61af      	str	r7, [r5, #24]
+343c43b0:	f8d3 2404 	ldr.w	r2, [r3, #1028]	@ 0x404
+343c43b4:	ea42 0208 	orr.w	r2, r2, r8
+343c43b8:	f8c3 2404 	str.w	r2, [r3, #1028]	@ 0x404
+343c43bc:	f8d3 2804 	ldr.w	r2, [r3, #2052]	@ 0x804
+343c43c0:	f422 6200 	bic.w	r2, r2, #2048	@ 0x800
+343c43c4:	f8c3 2804 	str.w	r2, [r3, #2052]	@ 0x804
+343c43c8:	f8d3 240c 	ldr.w	r2, [r3, #1036]	@ 0x40c
+343c43cc:	f422 7240 	bic.w	r2, r2, #768	@ 0x300
+343c43d0:	f8c3 240c 	str.w	r2, [r3, #1036]	@ 0x40c
+343c43d4:	f8d3 280c 	ldr.w	r2, [r3, #2060]	@ 0x80c
+343c43d8:	f422 0240 	bic.w	r2, r2, #12582912	@ 0xc00000
+343c43dc:	f8c3 280c 	str.w	r2, [r3, #2060]	@ 0x80c
+343c43e0:	f8d3 2408 	ldr.w	r2, [r3, #1032]	@ 0x408
+343c43e4:	f422 7240 	bic.w	r2, r2, #768	@ 0x300
+343c43e8:	f8c3 2408 	str.w	r2, [r3, #1032]	@ 0x408
+343c43ec:	f8d3 2808 	ldr.w	r2, [r3, #2056]	@ 0x808
+343c43f0:	f422 0240 	bic.w	r2, r2, #12582912	@ 0xc00000
+343c43f4:	f8c3 2808 	str.w	r2, [r3, #2056]	@ 0x808
+343c43f8:	f8d3 2400 	ldr.w	r2, [r3, #1024]	@ 0x400
+343c43fc:	f422 7240 	bic.w	r2, r2, #768	@ 0x300
+343c4400:	f442 7280 	orr.w	r2, r2, #256	@ 0x100
+343c4404:	f8c3 2400 	str.w	r2, [r3, #1024]	@ 0x400
+343c4408:	f8d3 2800 	ldr.w	r2, [r3, #2048]	@ 0x800
+343c440c:	f422 0240 	bic.w	r2, r2, #12582912	@ 0xc00000
+343c4410:	f442 0280 	orr.w	r2, r2, #4194304	@ 0x400000
+343c4414:	f8c3 2800 	str.w	r2, [r3, #2048]	@ 0x800
+343c4418:	f3bf 8f4f 	dsb	sy
+343c441c:	f381 8810 	msr	PRIMASK, r1
+343c4420:	f7ff fe1c 	bl	343c405c <delay.constprop.0>
+343c4424:	4604      	mov	r4, r0
+343c4426:	2800      	cmp	r0, #0
+343c4428:	f040 80ec 	bne.w	343c4604 <mdio_diag_main+0x478>
+343c442c:	2302      	movs	r3, #2
+343c442e:	f8c9 3008 	str.w	r3, [r9, #8]
+343c4432:	6933      	ldr	r3, [r6, #16]
+343c4434:	f3c3 1300 	ubfx	r3, r3, #4, #1
+343c4438:	f8c9 304c 	str.w	r3, [r9, #76]	@ 0x4c
+343c443c:	692b      	ldr	r3, [r5, #16]
+343c443e:	f3c3 23c0 	ubfx	r3, r3, #11, #1
+343c4442:	f8c9 3058 	str.w	r3, [r9, #88]	@ 0x58
+343c4446:	f44f 1380 	mov.w	r3, #1048576	@ 0x100000
+343c444a:	61b3      	str	r3, [r6, #24]
+343c444c:	f7ff fe06 	bl	343c405c <delay.constprop.0>
+343c4450:	4604      	mov	r4, r0
+343c4452:	2800      	cmp	r0, #0
+343c4454:	f040 80d6 	bne.w	343c4604 <mdio_diag_main+0x478>
+343c4458:	6933      	ldr	r3, [r6, #16]
+343c445a:	f3c3 1300 	ubfx	r3, r3, #4, #1
+343c445e:	f8c9 3050 	str.w	r3, [r9, #80]	@ 0x50
+343c4462:	f8c6 8018 	str.w	r8, [r6, #24]
+343c4466:	f7ff fdf9 	bl	343c405c <delay.constprop.0>
+343c446a:	4604      	mov	r4, r0
+343c446c:	2800      	cmp	r0, #0
+343c446e:	f040 80c9 	bne.w	343c4604 <mdio_diag_main+0x478>
+343c4472:	6933      	ldr	r3, [r6, #16]
+343c4474:	f3c3 1300 	ubfx	r3, r3, #4, #1
+343c4478:	f8c9 3054 	str.w	r3, [r9, #84]	@ 0x54
+343c447c:	f44f 6300 	mov.w	r3, #2048	@ 0x800
+343c4480:	61ab      	str	r3, [r5, #24]
+343c4482:	f7ff fdeb 	bl	343c405c <delay.constprop.0>
+343c4486:	4604      	mov	r4, r0
+343c4488:	2800      	cmp	r0, #0
+343c448a:	f040 80bb 	bne.w	343c4604 <mdio_diag_main+0x478>
+343c448e:	e01b      	b.n	343c44c8 <mdio_diag_main+0x33c>
+343c4490:	343c6000 	.word	0x343c6000
+343c4494:	3144494d 	.word	0x3144494d
+343c4498:	e0001000 	.word	0xe0001000
+343c449c:	17d78400 	.word	0x17d78400
+343c44a0:	56028000 	.word	0x56028000
+343c44a4:	e000ed00 	.word	0xe000ed00
+343c44a8:	343af000 	.word	0x343af000
+343c44ac:	343b0000 	.word	0x343b0000
+343c44b0:	00404b00 	.word	0x00404b00
+343c44b4:	49000005 	.word	0x49000005
+343c44b8:	30ff0000 	.word	0x30ff0000
+343c44bc:	56021400 	.word	0x56021400
+343c44c0:	56021800 	.word	0x56021800
+343c44c4:	56021000 	.word	0x56021000
+343c44c8:	692b      	ldr	r3, [r5, #16]
+343c44ca:	f3c3 23c0 	ubfx	r3, r3, #11, #1
+343c44ce:	f8c9 305c 	str.w	r3, [r9, #92]	@ 0x5c
+343c44d2:	61af      	str	r7, [r5, #24]
+343c44d4:	f7ff fdc2 	bl	343c405c <delay.constprop.0>
+343c44d8:	4604      	mov	r4, r0
+343c44da:	2800      	cmp	r0, #0
+343c44dc:	f040 8092 	bne.w	343c4604 <mdio_diag_main+0x478>
+343c44e0:	692b      	ldr	r3, [r5, #16]
+343c44e2:	f3c3 23c0 	ubfx	r3, r3, #11, #1
+343c44e6:	f8c9 3060 	str.w	r3, [r9, #96]	@ 0x60
+343c44ea:	f8d9 304c 	ldr.w	r3, [r9, #76]	@ 0x4c
+343c44ee:	2b01      	cmp	r3, #1
+343c44f0:	f040 8087 	bne.w	343c4602 <mdio_diag_main+0x476>
+343c44f4:	f8d9 3050 	ldr.w	r3, [r9, #80]	@ 0x50
+343c44f8:	2b00      	cmp	r3, #0
+343c44fa:	f040 8082 	bne.w	343c4602 <mdio_diag_main+0x476>
+343c44fe:	f8d9 3054 	ldr.w	r3, [r9, #84]	@ 0x54
+343c4502:	2b01      	cmp	r3, #1
+343c4504:	d17d      	bne.n	343c4602 <mdio_diag_main+0x476>
+343c4506:	f8d9 3058 	ldr.w	r3, [r9, #88]	@ 0x58
+343c450a:	2b00      	cmp	r3, #0
+343c450c:	d179      	bne.n	343c4602 <mdio_diag_main+0x476>
+343c450e:	f8d9 305c 	ldr.w	r3, [r9, #92]	@ 0x5c
+343c4512:	464f      	mov	r7, r9
+343c4514:	2b01      	cmp	r3, #1
+343c4516:	d174      	bne.n	343c4602 <mdio_diag_main+0x476>
+343c4518:	f8d9 5060 	ldr.w	r5, [r9, #96]	@ 0x60
+343c451c:	2d00      	cmp	r5, #0
+343c451e:	d170      	bne.n	343c4602 <mdio_diag_main+0x476>
+343c4520:	2303      	movs	r3, #3
+343c4522:	f64f 7bff 	movw	fp, #65535	@ 0xffff
+343c4526:	f8c9 3008 	str.w	r3, [r9, #8]
+343c452a:	f509 7980 	add.w	r9, r9, #256	@ 0x100
+343c452e:	f04f 0801 	mov.w	r8, #1
+343c4532:	016b      	lsls	r3, r5, #5
+343c4534:	f843 5009 	str.w	r5, [r3, r9]
+343c4538:	2102      	movs	r1, #2
+343c453a:	4628      	mov	r0, r5
+343c453c:	ab14      	add	r3, sp, #80	@ 0x50
+343c453e:	aa12      	add	r2, sp, #72	@ 0x48
+343c4540:	e9cd bb12 	strd	fp, fp, [sp, #72]	@ 0x48
+343c4544:	e9cd 8814 	strd	r8, r8, [sp, #80]	@ 0x50
+343c4548:	f7ff fde1 	bl	343c410e <read_reg.constprop.0>
+343c454c:	eb09 1645 	add.w	r6, r9, r5, lsl #5
+343c4550:	4604      	mov	r4, r0
+343c4552:	2800      	cmp	r0, #0
+343c4554:	d156      	bne.n	343c4604 <mdio_diag_main+0x478>
+343c4556:	9b14      	ldr	r3, [sp, #80]	@ 0x50
+343c4558:	2103      	movs	r1, #3
+343c455a:	6073      	str	r3, [r6, #4]
+343c455c:	930e      	str	r3, [sp, #56]	@ 0x38
+343c455e:	9b12      	ldr	r3, [sp, #72]	@ 0x48
+343c4560:	4628      	mov	r0, r5
+343c4562:	930f      	str	r3, [sp, #60]	@ 0x3c
+343c4564:	60b3      	str	r3, [r6, #8]
+343c4566:	aa13      	add	r2, sp, #76	@ 0x4c
+343c4568:	ab15      	add	r3, sp, #84	@ 0x54
+343c456a:	f7ff fdd0 	bl	343c410e <read_reg.constprop.0>
+343c456e:	4604      	mov	r4, r0
+343c4570:	2800      	cmp	r0, #0
+343c4572:	d147      	bne.n	343c4604 <mdio_diag_main+0x478>
+343c4574:	9a15      	ldr	r2, [sp, #84]	@ 0x54
+343c4576:	990e      	ldr	r1, [sp, #56]	@ 0x38
+343c4578:	9b13      	ldr	r3, [sp, #76]	@ 0x4c
+343c457a:	4311      	orrs	r1, r2
+343c457c:	60f2      	str	r2, [r6, #12]
+343c457e:	6133      	str	r3, [r6, #16]
+343c4580:	d137      	bne.n	343c45f2 <mdio_diag_main+0x466>
+343c4582:	9a0f      	ldr	r2, [sp, #60]	@ 0x3c
+343c4584:	2a07      	cmp	r2, #7
+343c4586:	d134      	bne.n	343c45f2 <mdio_diag_main+0x466>
+343c4588:	f24c 1230 	movw	r2, #49456	@ 0xc130
+343c458c:	f023 030f 	bic.w	r3, r3, #15
+343c4590:	041b      	lsls	r3, r3, #16
+343c4592:	0c1b      	lsrs	r3, r3, #16
+343c4594:	4293      	cmp	r3, r2
+343c4596:	d12c      	bne.n	343c45f2 <mdio_diag_main+0x466>
+343c4598:	4bb2      	ldr	r3, [pc, #712]	@ (343c4864 <mdio_diag_park+0x2>)
+343c459a:	f8c6 8014 	str.w	r8, [r6, #20]
+343c459e:	6f5a      	ldr	r2, [r3, #116]	@ 0x74
+343c45a0:	2100      	movs	r1, #0
+343c45a2:	4442      	add	r2, r8
+343c45a4:	675a      	str	r2, [r3, #116]	@ 0x74
+343c45a6:	6f9a      	ldr	r2, [r3, #120]	@ 0x78
+343c45a8:	4628      	mov	r0, r5
+343c45aa:	3201      	adds	r2, #1
+343c45ac:	bf08      	it	eq
+343c45ae:	679d      	streq	r5, [r3, #120]	@ 0x78
+343c45b0:	f64f 73ff 	movw	r3, #65535	@ 0xffff
+343c45b4:	e9cd 3316 	strd	r3, r3, [sp, #88]	@ 0x58
+343c45b8:	2301      	movs	r3, #1
+343c45ba:	aa16      	add	r2, sp, #88	@ 0x58
+343c45bc:	9318      	str	r3, [sp, #96]	@ 0x60
+343c45be:	931e      	str	r3, [sp, #120]	@ 0x78
+343c45c0:	ab18      	add	r3, sp, #96	@ 0x60
+343c45c2:	f7ff fda4 	bl	343c410e <read_reg.constprop.0>
+343c45c6:	4604      	mov	r4, r0
+343c45c8:	b9e0      	cbnz	r0, 343c4604 <mdio_diag_main+0x478>
+343c45ca:	4601      	mov	r1, r0
+343c45cc:	ab1e      	add	r3, sp, #120	@ 0x78
+343c45ce:	4628      	mov	r0, r5
+343c45d0:	aa17      	add	r2, sp, #92	@ 0x5c
+343c45d2:	f7ff fd9c 	bl	343c410e <read_reg.constprop.0>
+343c45d6:	4604      	mov	r4, r0
+343c45d8:	b9a0      	cbnz	r0, 343c4604 <mdio_diag_main+0x478>
+343c45da:	9918      	ldr	r1, [sp, #96]	@ 0x60
+343c45dc:	981e      	ldr	r0, [sp, #120]	@ 0x78
+343c45de:	9a16      	ldr	r2, [sp, #88]	@ 0x58
+343c45e0:	9b17      	ldr	r3, [sp, #92]	@ 0x5c
+343c45e2:	4301      	orrs	r1, r0
+343c45e4:	61b2      	str	r2, [r6, #24]
+343c45e6:	61f3      	str	r3, [r6, #28]
+343c45e8:	d101      	bne.n	343c45ee <mdio_diag_main+0x462>
+343c45ea:	429a      	cmp	r2, r3
+343c45ec:	d001      	beq.n	343c45f2 <mdio_diag_main+0x466>
+343c45ee:	2302      	movs	r3, #2
+343c45f0:	6173      	str	r3, [r6, #20]
+343c45f2:	3501      	adds	r5, #1
+343c45f4:	2d20      	cmp	r5, #32
+343c45f6:	673d      	str	r5, [r7, #112]	@ 0x70
+343c45f8:	d199      	bne.n	343c452e <mdio_diag_main+0x3a2>
+343c45fa:	6e7b      	ldr	r3, [r7, #100]	@ 0x64
+343c45fc:	2b00      	cmp	r3, #0
+343c45fe:	f000 813f 	beq.w	343c4880 <mdio_diag_park+0x1e>
+343c4602:	2404      	movs	r4, #4
+343c4604:	4a98      	ldr	r2, [pc, #608]	@ (343c4868 <mdio_diag_park+0x6>)
+343c4606:	f8d2 325c 	ldr.w	r3, [r2, #604]	@ 0x25c
+343c460a:	f003 0360 	and.w	r3, r3, #96	@ 0x60
+343c460e:	2b60      	cmp	r3, #96	@ 0x60
+343c4610:	f040 813e 	bne.w	343c4890 <mdio_diag_park+0x2e>
+343c4614:	f8d2 321c 	ldr.w	r3, [r2, #540]	@ 0x21c
+343c4618:	f013 0860 	ands.w	r8, r3, #96	@ 0x60
+343c461c:	f040 8138 	bne.w	343c4890 <mdio_diag_park+0x2e>
+343c4620:	f3ef 8710 	mrs	r7, PRIMASK
+343c4624:	b672      	cpsid	i
+343c4626:	2310      	movs	r3, #16
+343c4628:	f04f 6200 	mov.w	r2, #134217728	@ 0x8000000
+343c462c:	498f      	ldr	r1, [pc, #572]	@ (343c486c <mdio_diag_park+0xa>)
+343c462e:	618b      	str	r3, [r1, #24]
+343c4630:	4b8f      	ldr	r3, [pc, #572]	@ (343c4870 <mdio_diag_park+0xe>)
+343c4632:	619a      	str	r2, [r3, #24]
+343c4634:	4a8f      	ldr	r2, [pc, #572]	@ (343c4874 <mdio_diag_park+0x12>)
+343c4636:	f8d2 0400 	ldr.w	r0, [r2, #1024]	@ 0x400
+343c463a:	f420 7040 	bic.w	r0, r0, #768	@ 0x300
+343c463e:	f8c2 0400 	str.w	r0, [r2, #1024]	@ 0x400
+343c4642:	f8d2 5404 	ldr.w	r5, [r2, #1028]	@ 0x404
+343c4646:	9805      	ldr	r0, [sp, #20]
+343c4648:	ea85 1000 	eor.w	r0, r5, r0, lsl #4
+343c464c:	f000 0010 	and.w	r0, r0, #16
+343c4650:	4068      	eors	r0, r5
+343c4652:	f8c2 0404 	str.w	r0, [r2, #1028]	@ 0x404
+343c4656:	f8d2 5408 	ldr.w	r5, [r2, #1032]	@ 0x408
+343c465a:	9804      	ldr	r0, [sp, #16]
+343c465c:	ea85 2000 	eor.w	r0, r5, r0, lsl #8
+343c4660:	f400 7040 	and.w	r0, r0, #768	@ 0x300
+343c4664:	4068      	eors	r0, r5
+343c4666:	f8c2 0408 	str.w	r0, [r2, #1032]	@ 0x408
+343c466a:	f8d2 540c 	ldr.w	r5, [r2, #1036]	@ 0x40c
+343c466e:	9803      	ldr	r0, [sp, #12]
+343c4670:	ea85 2000 	eor.w	r0, r5, r0, lsl #8
+343c4674:	f400 7040 	and.w	r0, r0, #768	@ 0x300
+343c4678:	4068      	eors	r0, r5
+343c467a:	f8c2 040c 	str.w	r0, [r2, #1036]	@ 0x40c
+343c467e:	6a0d      	ldr	r5, [r1, #32]
+343c4680:	9807      	ldr	r0, [sp, #28]
+343c4682:	ea85 4000 	eor.w	r0, r5, r0, lsl #16
+343c4686:	f400 2070 	and.w	r0, r0, #983040	@ 0xf0000
+343c468a:	4068      	eors	r0, r5
+343c468c:	6208      	str	r0, [r1, #32]
+343c468e:	9808      	ldr	r0, [sp, #32]
+343c4690:	2501      	movs	r5, #1
+343c4692:	fab0 f080 	clz	r0, r0
+343c4696:	0940      	lsrs	r0, r0, #5
+343c4698:	0100      	lsls	r0, r0, #4
+343c469a:	3004      	adds	r0, #4
+343c469c:	fa05 f000 	lsl.w	r0, r5, r0
+343c46a0:	6188      	str	r0, [r1, #24]
+343c46a2:	f8d2 6400 	ldr.w	r6, [r2, #1024]	@ 0x400
+343c46a6:	9806      	ldr	r0, [sp, #24]
+343c46a8:	ea86 2000 	eor.w	r0, r6, r0, lsl #8
+343c46ac:	f400 7040 	and.w	r0, r0, #768	@ 0x300
+343c46b0:	4070      	eors	r0, r6
+343c46b2:	f8c2 0400 	str.w	r0, [r2, #1024]	@ 0x400
+343c46b6:	f8d2 0800 	ldr.w	r0, [r2, #2048]	@ 0x800
+343c46ba:	f420 0040 	bic.w	r0, r0, #12582912	@ 0xc00000
+343c46be:	f8c2 0800 	str.w	r0, [r2, #2048]	@ 0x800
+343c46c2:	f8d2 6804 	ldr.w	r6, [r2, #2052]	@ 0x804
+343c46c6:	980a      	ldr	r0, [sp, #40]	@ 0x28
+343c46c8:	ea86 20c0 	eor.w	r0, r6, r0, lsl #11
+343c46cc:	f400 6000 	and.w	r0, r0, #2048	@ 0x800
+343c46d0:	4070      	eors	r0, r6
+343c46d2:	f8c2 0804 	str.w	r0, [r2, #2052]	@ 0x804
+343c46d6:	f8d2 6808 	ldr.w	r6, [r2, #2056]	@ 0x808
+343c46da:	980b      	ldr	r0, [sp, #44]	@ 0x2c
+343c46dc:	ea86 5080 	eor.w	r0, r6, r0, lsl #22
+343c46e0:	f400 0040 	and.w	r0, r0, #12582912	@ 0xc00000
+343c46e4:	4070      	eors	r0, r6
+343c46e6:	f8c2 0808 	str.w	r0, [r2, #2056]	@ 0x808
+343c46ea:	f8d2 680c 	ldr.w	r6, [r2, #2060]	@ 0x80c
+343c46ee:	980c      	ldr	r0, [sp, #48]	@ 0x30
+343c46f0:	ea86 5080 	eor.w	r0, r6, r0, lsl #22
+343c46f4:	f400 0040 	and.w	r0, r0, #12582912	@ 0xc00000
+343c46f8:	4070      	eors	r0, r6
+343c46fa:	f8c2 080c 	str.w	r0, [r2, #2060]	@ 0x80c
+343c46fe:	6a5e      	ldr	r6, [r3, #36]	@ 0x24
+343c4700:	9802      	ldr	r0, [sp, #8]
+343c4702:	ea86 3000 	eor.w	r0, r6, r0, lsl #12
+343c4706:	f400 4070 	and.w	r0, r0, #61440	@ 0xf000
+343c470a:	4070      	eors	r0, r6
+343c470c:	6258      	str	r0, [r3, #36]	@ 0x24
+343c470e:	980d      	ldr	r0, [sp, #52]	@ 0x34
+343c4710:	fab0 f080 	clz	r0, r0
+343c4714:	0940      	lsrs	r0, r0, #5
+343c4716:	0100      	lsls	r0, r0, #4
+343c4718:	300b      	adds	r0, #11
+343c471a:	4085      	lsls	r5, r0
+343c471c:	619d      	str	r5, [r3, #24]
+343c471e:	f8d2 5800 	ldr.w	r5, [r2, #2048]	@ 0x800
+343c4722:	9809      	ldr	r0, [sp, #36]	@ 0x24
+343c4724:	ea85 5080 	eor.w	r0, r5, r0, lsl #22
+343c4728:	f400 0040 	and.w	r0, r0, #12582912	@ 0xc00000
+343c472c:	4068      	eors	r0, r5
+343c472e:	f8c2 0800 	str.w	r0, [r2, #2048]	@ 0x800
+343c4732:	f3bf 8f4f 	dsb	sy
+343c4736:	f387 8810 	msr	PRIMASK, r7
+343c473a:	2204      	movs	r2, #4
+343c473c:	a818      	add	r0, sp, #96	@ 0x60
+343c473e:	f7ff fc5f 	bl	343c4000 <snapshot>
+343c4742:	e9dd 761b 	ldrd	r7, r6, [sp, #108]	@ 0x6c
+343c4746:	9a18      	ldr	r2, [sp, #96]	@ 0x60
+343c4748:	4619      	mov	r1, r3
+343c474a:	920e      	str	r2, [sp, #56]	@ 0x38
+343c474c:	a81e      	add	r0, sp, #120	@ 0x78
+343c474e:	e9dd 9219 	ldrd	r9, r2, [sp, #100]	@ 0x64
+343c4752:	920f      	str	r2, [sp, #60]	@ 0x3c
+343c4754:	220b      	movs	r2, #11
+343c4756:	9d1d      	ldr	r5, [sp, #116]	@ 0x74
+343c4758:	f7ff fc52 	bl	343c4000 <snapshot>
+343c475c:	e9dd c320 	ldrd	ip, r3, [sp, #128]	@ 0x80
+343c4760:	e9dd be1e 	ldrd	fp, lr, [sp, #120]	@ 0x78
+343c4764:	9310      	str	r3, [sp, #64]	@ 0x40
+343c4766:	9a0e      	ldr	r2, [sp, #56]	@ 0x38
+343c4768:	e9dd 1322 	ldrd	r1, r3, [sp, #136]	@ 0x88
+343c476c:	9311      	str	r3, [sp, #68]	@ 0x44
+343c476e:	4b3d      	ldr	r3, [pc, #244]	@ (343c4864 <mdio_diag_park+0x2>)
+343c4770:	980e      	ldr	r0, [sp, #56]	@ 0x38
+343c4772:	f8c3 20b0 	str.w	r2, [r3, #176]	@ 0xb0
+343c4776:	9a0f      	ldr	r2, [sp, #60]	@ 0x3c
+343c4778:	f8c3 90b4 	str.w	r9, [r3, #180]	@ 0xb4
+343c477c:	f8c3 20b8 	str.w	r2, [r3, #184]	@ 0xb8
+343c4780:	9a10      	ldr	r2, [sp, #64]	@ 0x40
+343c4782:	f8c3 70bc 	str.w	r7, [r3, #188]	@ 0xbc
+343c4786:	f8c3 60c0 	str.w	r6, [r3, #192]	@ 0xc0
+343c478a:	f8c3 50c4 	str.w	r5, [r3, #196]	@ 0xc4
+343c478e:	f8c3 b0c8 	str.w	fp, [r3, #200]	@ 0xc8
+343c4792:	f8c3 e0cc 	str.w	lr, [r3, #204]	@ 0xcc
+343c4796:	f8c3 c0d0 	str.w	ip, [r3, #208]	@ 0xd0
+343c479a:	f8c3 20d4 	str.w	r2, [r3, #212]	@ 0xd4
+343c479e:	9a11      	ldr	r2, [sp, #68]	@ 0x44
+343c47a0:	f8c3 10d8 	str.w	r1, [r3, #216]	@ 0xd8
+343c47a4:	f8c3 20dc 	str.w	r2, [r3, #220]	@ 0xdc
+343c47a8:	9a06      	ldr	r2, [sp, #24]
+343c47aa:	4643      	mov	r3, r8
+343c47ac:	4282      	cmp	r2, r0
+343c47ae:	d126      	bne.n	343c47fe <mdio_diag_main+0x672>
+343c47b0:	9a05      	ldr	r2, [sp, #20]
+343c47b2:	454a      	cmp	r2, r9
+343c47b4:	d123      	bne.n	343c47fe <mdio_diag_main+0x672>
+343c47b6:	9a04      	ldr	r2, [sp, #16]
+343c47b8:	980f      	ldr	r0, [sp, #60]	@ 0x3c
+343c47ba:	4282      	cmp	r2, r0
+343c47bc:	d11f      	bne.n	343c47fe <mdio_diag_main+0x672>
+343c47be:	9a03      	ldr	r2, [sp, #12]
+343c47c0:	42ba      	cmp	r2, r7
+343c47c2:	d11c      	bne.n	343c47fe <mdio_diag_main+0x672>
+343c47c4:	9a07      	ldr	r2, [sp, #28]
+343c47c6:	42b2      	cmp	r2, r6
+343c47c8:	d119      	bne.n	343c47fe <mdio_diag_main+0x672>
+343c47ca:	9a08      	ldr	r2, [sp, #32]
+343c47cc:	42aa      	cmp	r2, r5
+343c47ce:	d116      	bne.n	343c47fe <mdio_diag_main+0x672>
+343c47d0:	9a09      	ldr	r2, [sp, #36]	@ 0x24
+343c47d2:	455a      	cmp	r2, fp
+343c47d4:	d113      	bne.n	343c47fe <mdio_diag_main+0x672>
+343c47d6:	9b0a      	ldr	r3, [sp, #40]	@ 0x28
+343c47d8:	4573      	cmp	r3, lr
+343c47da:	d157      	bne.n	343c488c <mdio_diag_park+0x2a>
+343c47dc:	9b0b      	ldr	r3, [sp, #44]	@ 0x2c
+343c47de:	4563      	cmp	r3, ip
+343c47e0:	d154      	bne.n	343c488c <mdio_diag_park+0x2a>
+343c47e2:	9b0c      	ldr	r3, [sp, #48]	@ 0x30
+343c47e4:	9a10      	ldr	r2, [sp, #64]	@ 0x40
+343c47e6:	4293      	cmp	r3, r2
+343c47e8:	d150      	bne.n	343c488c <mdio_diag_park+0x2a>
+343c47ea:	9a11      	ldr	r2, [sp, #68]	@ 0x44
+343c47ec:	9b0d      	ldr	r3, [sp, #52]	@ 0x34
+343c47ee:	1a9b      	subs	r3, r3, r2
+343c47f0:	425a      	negs	r2, r3
+343c47f2:	415a      	adcs	r2, r3
+343c47f4:	9b02      	ldr	r3, [sp, #8]
+343c47f6:	428b      	cmp	r3, r1
+343c47f8:	bf0c      	ite	eq
+343c47fa:	4613      	moveq	r3, r2
+343c47fc:	2300      	movne	r3, #0
+343c47fe:	4a19      	ldr	r2, [pc, #100]	@ (343c4864 <mdio_diag_park+0x2>)
+343c4800:	67d3      	str	r3, [r2, #124]	@ 0x7c
+343c4802:	6fd3      	ldr	r3, [r2, #124]	@ 0x7c
+343c4804:	2b00      	cmp	r3, #0
+343c4806:	bf08      	it	eq
+343c4808:	f04f 0a05 	moveq.w	sl, #5
+343c480c:	9b01      	ldr	r3, [sp, #4]
+343c480e:	b11b      	cbz	r3, 343c4818 <mdio_diag_main+0x68c>
+343c4810:	4b19      	ldr	r3, [pc, #100]	@ (343c4878 <mdio_diag_park+0x16>)
+343c4812:	9a01      	ldr	r2, [sp, #4]
+343c4814:	f8c3 225c 	str.w	r2, [r3, #604]	@ 0x25c
+343c4818:	f3bf 8f4f 	dsb	sy
+343c481c:	f3bf 8f6f 	isb	sy
+343c4820:	4b11      	ldr	r3, [pc, #68]	@ (343c4868 <mdio_diag_park+0x6>)
+343c4822:	f8d3 225c 	ldr.w	r2, [r3, #604]	@ 0x25c
+343c4826:	4b0f      	ldr	r3, [pc, #60]	@ (343c4864 <mdio_diag_park+0x2>)
+343c4828:	625a      	str	r2, [r3, #36]	@ 0x24
+343c482a:	6a5a      	ldr	r2, [r3, #36]	@ 0x24
+343c482c:	6a19      	ldr	r1, [r3, #32]
+343c482e:	404a      	eors	r2, r1
+343c4830:	f012 0f60 	tst.w	r2, #96	@ 0x60
+343c4834:	bf18      	it	ne
+343c4836:	f04f 0a05 	movne.w	sl, #5
+343c483a:	f8c3 a010 	str.w	sl, [r3, #16]
+343c483e:	46a2      	mov	sl, r4
+343c4840:	4b08      	ldr	r3, [pc, #32]	@ (343c4864 <mdio_diag_park+0x2>)
+343c4842:	4a0e      	ldr	r2, [pc, #56]	@ (343c487c <mdio_diag_park+0x1a>)
+343c4844:	f8c3 a00c 	str.w	sl, [r3, #12]
+343c4848:	6852      	ldr	r2, [r2, #4]
+343c484a:	619a      	str	r2, [r3, #24]
+343c484c:	f1ba 0f00 	cmp.w	sl, #0
+343c4850:	d127      	bne.n	343c48a2 <mdio_diag_park+0x40>
+343c4852:	691a      	ldr	r2, [r3, #16]
+343c4854:	2a00      	cmp	r2, #0
+343c4856:	bf0c      	ite	eq
+343c4858:	2204      	moveq	r2, #4
+343c485a:	220f      	movne	r2, #15
+343c485c:	609a      	str	r2, [r3, #8]
+343c485e:	f3bf 8f4f 	dsb	sy
+
+343c4862 <mdio_diag_park>:
+343c4862:	e7fe      	b.n	343c4862 <mdio_diag_park>
+343c4864:	343c6000 	.word	0x343c6000
+343c4868:	56028000 	.word	0x56028000
+343c486c:	56021400 	.word	0x56021400
+343c4870:	56021800 	.word	0x56021800
+343c4874:	56021000 	.word	0x56021000
+343c4878:	56029000 	.word	0x56029000
+343c487c:	e0001000 	.word	0xe0001000
+343c4880:	6ebc      	ldr	r4, [r7, #104]	@ 0x68
+343c4882:	3c00      	subs	r4, #0
+343c4884:	bf18      	it	ne
+343c4886:	2401      	movne	r4, #1
+343c4888:	00a4      	lsls	r4, r4, #2
+343c488a:	e6bb      	b.n	343c4604 <mdio_diag_main+0x478>
+343c488c:	2300      	movs	r3, #0
+343c488e:	e7b6      	b.n	343c47fe <mdio_diag_main+0x672>
+343c4890:	f04f 0a02 	mov.w	sl, #2
+343c4894:	e7ba      	b.n	343c480c <mdio_diag_main+0x680>
+343c4896:	f04f 0a02 	mov.w	sl, #2
+343c489a:	e7d1      	b.n	343c4840 <mdio_diag_main+0x6b4>
+343c489c:	f04f 0a03 	mov.w	sl, #3
+343c48a0:	e7ce      	b.n	343c4840 <mdio_diag_main+0x6b4>
+343c48a2:	220f      	movs	r2, #15
+343c48a4:	e7da      	b.n	343c485c <mdio_diag_main+0x6d0>
+343c48a6:	2402      	movs	r4, #2
+343c48a8:	e7b0      	b.n	343c480c <mdio_diag_main+0x680>
+343c48aa:	bf00      	nop
+
+343c48ac <mdio_diag_entry>:
+343c48ac:	f3ef 8008 	mrs	r0, MSP
+343c48b0:	f3ef 810a 	mrs	r1, MSPLIM
+343c48b4:	f04f 0200 	mov.w	r2, #0
+343c48b8:	f382 880a 	msr	MSPLIM, r2
+343c48bc:	4a04      	ldr	r2, [pc, #16]	@ (343c48d0 <mdio_diag_entry+0x24>)
+343c48be:	f382 8808 	msr	MSP, r2
+343c48c2:	4a04      	ldr	r2, [pc, #16]	@ (343c48d4 <mdio_diag_entry+0x28>)
+343c48c4:	f382 880a 	msr	MSPLIM, r2
+343c48c8:	f3bf 8f6f 	isb	sy
+343c48cc:	f7ff bc5e 	b.w	343c418c <mdio_diag_main>
+343c48d0:	343b0000 	.word	0x343b0000
+343c48d4:	343af000 	.word	0x343af000

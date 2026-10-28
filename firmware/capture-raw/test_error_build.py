@@ -52,6 +52,35 @@ class ErrorBuildTests(unittest.TestCase):
             self.refused_cli(["--magic-format", "--line-stream", "--error-blinks",
                               "--error-test-code", str(code)], "invalid choice")
 
+    def test_post_frame_diagnostic_requires_explicit_flash_profile(self):
+        for options in ([], ["--error-blinks"], ["--error-blinks", "--flash"],
+                        ["--flash", "--async-stop"]):
+            self.refused_cli(["--magic-format", "--line-stream", "--error-after-frame-test", *options],
+                "Post-frame error diagnostic requires")
+
+    def test_post_frame_failure_precedes_sd_and_requires_both_frame_and_stop(self):
+        source=self.integration.inject_after_frame((HERE/'runtime.c').read_text())
+        diagnostic=source.split('void raw_storage_execute(void)\n{',1)[1]
+        self.assertLess(diagnostic.index('terminal(0x200U|SD_ERR_DATA);'),diagnostic.index('raw_magic_execute();'))
+        self.assertIn('while(!raw_capture_frame_validated() || !raw_capture_sensor_stopped())',diagnostic)
+        self.assertIn('HAL_GetTick()-started>3000U',diagnostic)
+        self.assertIn('test[15]=0x4550444EU',diagnostic)
+        self.assertIn('test[7]=P[RP_DMA_BYTES]',diagnostic)
+        self.assertIn('test[10]=*(volatile const uint32_t *)ERROR_SIGNAL_PREFIX_ADDRESS;',diagnostic)
+
+    def test_copy_replaces_retained_authority_before_all_terminal_paths(self):
+        source=self.integration.runtime_source((HERE/'runtime.c').read_text())
+        dispatch=source.split('void raw_runtime_dispatch(void)\n{',1)[1]
+        self.assertLess(dispatch.index('proof[0]=0U'),dispatch.index('dst[i]=src[i]'))
+        self.assertLess(dispatch.index('if(dst[i]!=src[i])'),dispatch.index('proof[0]=0x45435031U'))
+        self.assertLess(dispatch.index('SCB_InvalidateICache();'),dispatch.index('proof[0]=0x45435031U'))
+        self.assertLess(dispatch.index('proof[0]=0x45435031U'),dispatch.index('terminal(1)'))
+        self.assertLess(dispatch.index('proof[0]=0x45435031U'),dispatch.index('sensor_reset_start()'))
+        self.assertIn('ERROR_SIGNAL_PREFIX_ADDRESS|1U',dispatch)
+        header=(HERE/'error_signal.h').read_text()
+        self.assertIn('ERROR_SIGNAL_RUNTIME_ADDRESS|1U',header)
+        self.assertNotIn('0x34181841U',header)
+
     def test_actual_generated_injection_dispatch_and_request_gate(self):
         compiler = shutil.which("clang") or shutil.which("gcc")
         self.assertIsNotNone(compiler, "host C compiler required")
@@ -157,8 +186,8 @@ class ErrorBuildTests(unittest.TestCase):
             self.assertIn("result==17U?2U:8U", (folder / "error_bridge.c").read_text())
             self.assertEqual((folder / "error_signal.c").read_bytes(), (HERE / "error_signal.c").read_bytes())
             self.assertIn('b.w error_stage1_bridge', (folder / "stage1.c").read_text())
-            for bridge_size, handler_size, expected in ((32,0x7C0,None),
-                (33,0x7C0,"Error bridge overflow"), (32,0x7C1,"Error handler overflow")):
+            for bridge_size, handler_size, expected in ((32,1536,None),
+                (33,1536,"Error bridge overflow"), (32,1537,"cannot move location counter backwards")):
                 assembly = f'''.syntax unified
 .thumb
 .section .text.entry,"ax",%progbits
@@ -185,6 +214,38 @@ error_signal_shutdown:
                         symbols = subprocess.check_output([str(self.builder.TC / "arm-none-eabi-nm.exe"),
                             str(folder / "fixture.elf")], text=True)
                         self.assertRegex(symbols, r"34181840 [A-Za-z] error_signal_shutdown")
+
+    def test_engine_copy_audit_rejects_external_dependencies(self):
+        good='''34181840 <error_signal_shutdown>:
+34181840: e000 b.n 34181844 <error_signal_shutdown+0x4>
+34181842: 4800 ldr r0, [pc, #0] @ (34181848 <error_signal_shutdown+0x8>)
+34181844: e7fe b.n 34181844 <error_signal_shutdown+0x4>
+34181848: 56021800 .word 0x56021800
+'''
+        bad=[good.replace('b.n 34181844','b.n 34300100',1),
+             good.replace('b.n 34181844 <error_signal_shutdown+0x4>','blx r3',1),
+             good.replace('@ (34181848','@ (34180400'),
+             good.replace('0x56021800','0x34180401'),
+             good.replace('0x56021800','0x343C8001'),
+             good.replace('b.n 34181844 <error_signal_shutdown+0x4>','le lr, 34300100 <external>',1),
+             good.replace('b.n 34181844 <error_signal_shutdown+0x4>','wlstp.8 lr, r0, 34300100 <external>',1),
+             good.replace('b.n 34181844 <error_signal_shutdown+0x4>','mov pc, r3',1)]
+        with tempfile.TemporaryDirectory() as temp:
+            folder=Path(temp)
+            size=self.integration.ENTRY-0x34180400+self.integration.COPY_BYTES
+            (folder/'stage1.bin').write_bytes(bytes(size))
+            (folder/'stage1.lst').write_text(good)
+            audit=self.integration.audit_engine(folder)
+            self.assertEqual(audit['bytes'],1536)
+            self.assertEqual(audit['destination'],0x343C8000)
+            for listing in bad:
+                (folder/'stage1.lst').write_text(listing)
+                with self.subTest(listing=listing), self.assertRaises(ValueError):
+                    self.integration.audit_engine(folder)
+            (folder/'stage1.lst').write_text(good)
+            (folder/'stage1.bin').write_bytes(bytes(size-1))
+            with self.assertRaisesRegex(ValueError,'not ROM-loaded'):
+                self.integration.audit_engine(folder)
 
     def crc_fixture(self, folder, length):
         source = folder / "fixture.s"

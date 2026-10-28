@@ -1,0 +1,100 @@
+{
+  "scope": "Final cold normal-flash missing-camera error shutdown, camera and SD physically absent. Not a successful capture/save cycle.",
+  "boundary": "Fixed middle interval: 0.5 s through 2.5 s after latest common native stream start. No current-based selection.",
+  "metrics": {
+    "start_sample_id": 1016128,
+    "end_sample_id_exclusive": 5016128,
+    "start_ms": 500.0,
+    "end_ms": 2500.0,
+    "duration_ms": 2000.0,
+    "current_mean": 0.008076613220342203,
+    "current_min": 0.006719074212014675,
+    "current_max": 0.009388530626893044,
+    "voltage_mean": 4.993705237222433,
+    "voltage_min": 4.988801002502441,
+    "voltage_max": 4.997880458831787,
+    "power_mean": 0.04033219885977264,
+    "power_min": 0.033550627529621124,
+    "power_max": 0.04688012972474098,
+    "energy_mJ": 80.66439771954528,
+    "current_mean_mA": 8.076613220342203,
+    "finite": true
+  },
+  "checks": {
+    "current": {
+      "sha256": "f93d0b787bd40639ee9699ec35f057cdc23769ec13abbdba538ce4d0cd2d19c6",
+      "hash_passed": true,
+      "contiguous": true,
+      "first_sample_id": 0,
+      "analyzed_end_exclusive": 6016248,
+      "excluded_final_chunk": false,
+      "nonfinite": 71
+    },
+    "voltage": {
+      "sha256": "588a5a20752450776d251f54dcde9a46b2cb52d6aa8a99f7c12dd7be78961520",
+      "hash_passed": true,
+      "contiguous": true,
+      "first_sample_id": 16128,
+      "analyzed_end_exclusive": 6032376,
+      "excluded_final_chunk": false,
+      "nonfinite": 0
+    },
+    "power": {
+      "sha256": "288de9fb2586869b7b8362fd554c4d6be3f574f725efa5a7f690409b815b5b8b",
+      "hash_passed": true,
+      "contiguous": true,
+      "first_sample_id": 16128,
+      "analyzed_end_exclusive": 6032376,
+      "excluded_final_chunk": false,
+      "nonfinite": 0
+    },
+    "gpi0": {
+      "sha256": "0e8eaa26409fe5ac59c285d3c958b214f72af57d1f235b33e4312a83addb3cce",
+      "hash_passed": true,
+      "contiguous": true,
+      "first_sample_id": 16128,
+      "analyzed_end_exclusive": 5916128,
+      "excluded_final_chunk": true,
+      "nonfinite": null
+    },
+    "gpi1": {
+      "sha256": "0d75089003d05ecb354e7753c985db6d747ca99b156e53aafe6156a7ffad4921",
+      "hash_passed": true,
+      "contiguous": true,
+      "first_sample_id": 16128,
+      "analyzed_end_exclusive": 5916128,
+      "excluded_final_chunk": true,
+      "nonfinite": null
+    }
+  },
+  "gpi": {
+    "gpi0": {
+      "initial": 0,
+      "transitions": 0
+    },
+    "gpi1": {
+      "initial": 1,
+      "transitions": 0
+    }
+  },
+  "current_100ms_mean_range_mA": [
+    8.07596014028415,
+    8.078999611828477
+  ],
+  "qualification": "Stable low plateau followed by first-attempt warm UART recovery and retained SBF=1/PDDS=1/STOPF=0. Reader retains trial_entry_proven=false; this is observed Standby history, not direct entry-time proof.",
+  "sbf": {
+    "cpucr": 66049,
+    "sbf": true,
+    "pdds": true,
+    "stopf": false,
+    "trial_entry_proven": false,
+    "sha256": "8304b4a484f6614923d14fe75b4fe13b0feb822ec7c535def6a0239865100291"
+  },
+  "events_sha256": "ef83b98aba842a9075b96d321d7bc4d996500b2014a35f3b85b3ec0ef8112014",
+  "park_sha256": "d0bd083bdca458b6b49de156962edf161469cc29e71bb76ad1e6a96a68f197bb",
+  "caveats": [
+    "Whole trace startup nonfinite samples remain invalid; bounded middle window is finite and contiguous.",
+    "Voltage is sensed at Joulescope input; recorded native power uses that voltage.",
+    "Do not compare this shutdown plateau as a matched PHY-on/off or CPU-only measurement."
+  ]
+}

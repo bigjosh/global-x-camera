@@ -1,34 +1,42 @@
 # SD breakout wiring and comparison
 
-## October 24 replacement: Pzsmocn PZSSD001 full-pin breakout
+<a id="october-24-replacement-pzsmocn-pzssd001-full-pin-breakout"></a>
+
+## Current prototype wiring — October 27: Pzsmocn PZSSD001
 
 The user selected [Amazon B08FB3GC34](https://www.amazon.com/dp/B08FB3GC34),
 identified as **Pzsmocn PZSSD001**, to replace the seven-pin carrier. This is the
-current wiring plan. The replacement is wired and the installed RAW-slot
-Standby firmware uses **native four-bit SDMMC2 at 25 MHz and 3.3 V**, with
-**NEGEDGE enabled**, GPIO speed `3` (OSPEEDR `11`) and no compensation
-modification. A **27-ohm series resistor is fitted midway along CLK**, and all
-six Saleae probes on CLK, CMD and DAT0–DAT3 have been removed. The header pin
-assignments below are unchanged. The installed 64 KiB sector SHA-256 is
-`79c7c4ef3fb7d06baf3c2fb16dccaae4cd7f585c2319af7065f939bd006a39cd`.
-See [the 25 MHz qualification and its limits](../../firmware/capture-raw/evidence/2026-10-25-sd25-crc/QUALIFICATION.md)
-and [the RAW capture README](../../firmware/capture-raw/README.md) for current
-image verification and time/energy results. The earlier 12.5 MHz comparison
-and the October 19–20 status statements below are historical.
+current wiring plan. The installed RAW-slot Standby firmware uses **native
+four-bit SDMMC2 at 25 MHz and 3.3 V**, with falling-edge host launch during
+identification and transfer, GPIO speed `3` (OSPEEDR `11`) and inherited
+compensation. **Twist CLK with the board-to-card GND lead.** CLK is a direct
+wire with **no series resistor**. The user selected this arrangement after
+reporting successful cycles without probes, and moved SD **GND to CN3.8** and
+**VCC to CN3.5** to tighten the pair physically.
 
-Move the existing wires at the breakout end only. New-board pin numbers follow
+Wire geometry remains a known source of SD failures. Preserve the short,
+closely paired CLK/GND route when assembling or handling the prototype;
+recheck complete image writes/readbacks after wiring, probe or carrier changes.
+This selected arrangement has a user-reported functional pass, not a new
+automated full-image or electrical-margin qualification. See the
+[decision and limits](NOTES.md#2026-10-27--lock-the-prototype-sd-clockground-pair-and-nearby-power-pins),
+[current firmware](../../firmware/capture-raw/README.md) and
+[live bench checkpoint](../../AGENTS.md). Earlier resistor-assisted results
+and the October 19–20 status statements below remain historical.
+
+The table includes the October 27 Nucleo power/ground moves. Breakout pin numbers follow
 [the supplier's pin diagram](https://www.cqrobot.com/image/cache/catalog/Pzsmocn/PZSSD001/PZSSD001-2-550x550.jpg)
 for [PZSSD001](https://cqrobot.com/product/PZSSD001); use the printed labels to
 avoid reversing the header when viewed from the solder side.
 
-| Wire from old breakout | New breakout label | New pin | Existing Nucleo end |
+| Wire from old breakout | Breakout label | Breakout pin | Current Nucleo end |
 |---|---|---:|---|
-| SCK | CLK | 5 | CN3.3 / PC2, through the fitted 27-ohm series resistor |
+| SCK | CLK | 5 | CN3.3 / PC2; direct wire twisted with GND |
 | DI | CMD | 4 | CN3.25 / PC3 |
 | DO | D0 (data zero) | 3 | CN3.13 / PC4 |
 | CS | D3 | 6 | CN3.21 / PE4 |
-| VCC | 3.3V | 1 | CN5.4 / 3V3 |
-| GND | GND | 2 | CN3.19 |
+| VCC | 3.3V | 1 | **CN3.5 / VDDIO, currently 3.3 V** |
+| GND | GND | 2 | **CN3.8 / GND; twisted with CLK** |
 | CD (previously unused) | CD | 9 | Leave disconnected |
 
 The two additional wires used by native four-bit mode are:
@@ -44,23 +52,30 @@ and SB23; no voltage conversion or Nucleo solder modification is needed.
 Power down before moving the supply and signal wires. Keep the leads short
 and retain socket decoupling.
 
-The tested clock wiring is:
+The selected clock/power wiring is:
 
 ```text
-CN3.3 / PC2 ---- jumper ---- 27 ohms ---- jumper ---- CLK / breakout pin 5
-                            midspan
+CN3.3 / PC2  =============================== CLK / breakout pin 5
+                  twist these two wires
+CN3.8 / GND  =============================== GND / breakout pin 2
+
+CN3.5 / VDDIO (3.3 V) ---------------------- 3.3V / breakout pin 1
 ```
 
-Source-end placement is the usual series-termination recommendation, but that
-is not the resistor placement tested here. Preserve the recorded placement
-when reproducing these results. SD probe loading affected earlier outcomes;
-the selected configuration has no probes on any of the six SD signal lines.
+CN3.5 is a supply contact, not a GPIO output; this hookup relies on the
+prototype's unchanged 3.3 V main VDDIO. It changes the card's regulator branch
+from the previous CN5.4 auxiliary VDD3V3 supply; account for that in later
+power comparisons. CN3.5/VDDIO and CN3.8/GND are confirmed in UM3417 Table20
+and the MB1940 C02 ODB++ connectivity. The user reports operation without
+signal probes. The earlier 27-ohm midspan resistor belongs to the historical
+qualification below and is not part of this selected wiring.
 
 The installed firmware initializes the card at 100 kHz in one-bit mode, checks
 SCR support, then negotiates four-bit card/controller width using CMD55/ACMD6.
 All six SD signals use AF11 during four-bit transfers, including PC0/PC5/PE4,
-with CMD/data pull-ups retained. The selected launch phase is applied only
-after identification and idle command/data state checks. Its configured
+with CMD/data pull-ups retained. Falling-edge host launch is selected during
+both identification and transfer, with divider changes guarded by idle
+command/data state checks. The transfer configuration's
 `CLKCR` proof is `0x34003`. NEGEDGE changes outgoing CMD/data timing; it does
 not request a receive-clock, voltage or high-speed-mode change.
 
@@ -70,7 +85,7 @@ the separate slew/compensation trials established reliable reads. The initial
 but a later read also failed at 12.5 MHz after probe loading changed. After the
 27-ohm CLK resistor was added and all SD probes removed, normal and long-exposure
 RAM captures and a cold awake-flash capture passed full original-RAM equality
-at 25 MHz. The evidence supports the selected physical setup; it does not
+at 25 MHz. That evidence supports its recorded resistor/probe setup; it does not
 isolate the analog cause or establish reliability across cards and wiring.
 The module listing/pin diagram does not qualify the delivered board's reset-time
 pull-up/decoupling network. This interface is native

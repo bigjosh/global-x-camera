@@ -1,0 +1,73 @@
+Final SD-gap power experiment — 2026-10-28
+
+Primary comparison is fresh normal -> two diagnostic gap cycles -> restored
+normal. Historical normal01..03 remain separate context, not pooled controls.
+All following peaks are 1 ms current means with starts sampled every 0.1 ms.
+They are not qualified instantaneous hardware peaks. First 5 ms after current
+onset are excluded from the reported energy and peak comparisons.
+
+Run             Peak1ms mA  Peak10ms mA  Post5ms mJ  Onset-to-plateau ms
+control-before   192.758     158.947       166.444          400.319
+cold-gap01       128.778     125.527       223.830          657.320
+cold-gap02       128.802     125.460       226.790          664.748
+control-after    192.794     159.090       195.915          465.124
+
+The approximately193mA peak disappeared in both gap cycles and returned with
+normal firmware. Relative to the average surrounding controls, the1ms peak
+fell about33.2%, and the10ms peak about21.1%. The first-strobe observations
+remained around25ms (fresh-control mean24.753ms, gap mean25.060ms).
+
+The gap follows full-frame validation and acknowledged sensor STOP, and occurs
+before any SD command. Cold GPIO11/12 measure201.536 and201.407ms. The last100ms
+of each gap averages42.769/42.745mA (213.301/213.174mW). The powered SD card has
+not been initialized; the MCU remains awake. This is a whole-board baseline,
+not SD-only idle current.
+
+Separated phase peaks remain below the old concurrent peak:
+- Strobe through validated STOP:128.187/128.171mA.
+- SD initialization:128.399/127.950mA.
+- Image write:100.002/100.100mA.
+Phase searches have different0.1ms grid origins; tiny differences from the
+whole-window maximum are expected and are not contradictory native currents.
+
+Measured gap energy alone is42.990/42.938mJ. Total energy excluding that measured
+gap is180.840/183.852mJ. The average surrounding normal energy is181.180mJ, but
+its166.444–195.915mJ range reflects card initialization/write variability.
+Subtracting gap energy does not predict a zero-gap implementation: serialization,
+card power-up history and protocol timing also changed. The200ms wait costs time
+and energy and is an attribution experiment, not a selected normal behavior.
+
+Whole-board excess above the quiet-gap mean power, for the same phase duration:
+Phase                         gap01 mJ  gap02 mJ
+Strobe through validated STOP    17.507    17.504
+SD initialization               18.193    19.532
+SCR / slot scan / preparation   12.085    12.165
+Image write                     35.269    35.393
+These values include changing CPU, camera and card work. They are not individual
+rail energy or guaranteed removable load; selected phase windows are disjoint
+but do not cover the complete cycle.
+
+Interpretation: the reproducible before/gap/after reversal establishes that
+scheduling affects the approximately193mA peak. It supports overlapping demand,
+but this test also gives the electrically powered card an extra200ms before
+initialization. It does not isolate overlap from card startup aging. A later
+STOP->immediate-SD experiment could distinguish these while avoiding deliberate
+waiting; none was performed here.
+
+Qualification: all12 expected cold diagnostic markers are uniquely decoded with
+3<11<12<4<5. Both normal controls have all10 markers. Native2MSPS stream hashes,
+continuity and finite scoped windows pass; initial71 current NaNs and final
+packed-GPIO chunk exclusions remain explicit. The sensor's physical STOP edge
+is not directly measured: marker11 follows validated STOP. Warm GAP1 proof has
+zero commands before/after its nominal200.0006475ms DWT wait; its direct GPIO gap
+is201.147ms. DWT mapping is local interpolation with up to100us allowance.
+
+Root's separate readback evidence confirms complete3730-sector checks for cold
+slots133/134 and original-camera-RAM equality for warm slot132. The final restored
+normal cold cycle has current/marker evidence, but its expected extra slot135 and
+fresh Standby flags were not reread. Normal Ethernet-down firmware is restored.
+
+Primary plot: cold-gap-current-comparison.png (four panels, visually checked).
+Detailed measurements: gap-comparison.json, each *-analysis.json, and
+ram-gap01-proof-aligned.json. Reproduction scripts and hashes of imported offline
+dependencies are retained. No instrument operation was performed by this analysis.

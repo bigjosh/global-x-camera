@@ -1,0 +1,77 @@
+{
+  "passed": true,
+  "offline_replay": true,
+  "frame_dma_before_error_proven": true,
+  "frames": 1,
+  "frame_guard_failures": 0,
+  "source_prefix_overwritten": true,
+  "high_copy_sha256": "247ad0ddd76963039ed01a2e14beb3499ee9097a8df86f62ad5751047835454e",
+  "fault_regs_zero": true,
+  "intended_code": 4,
+  "display_groups": [
+    4,
+    4,
+    4,
+    4,
+    4
+  ],
+  "timing_consistency": {
+    "on_100ms_consistent": true,
+    "between_blinks_400ms_consistent": true,
+    "between_sets_2000ms_consistent": true
+  },
+  "measured": {
+    "pulses": 20,
+    "groups": [
+      4,
+      4,
+      4,
+      4,
+      4
+    ],
+    "on_s": {
+      "count": 20,
+      "minimum": 0.09499999999999886,
+      "median": 0.09499999999999886,
+      "maximum": 0.09999999999999964
+    },
+    "interblink_off_s": {
+      "count": 15,
+      "minimum": 0.4049999999999976,
+      "median": 0.41000000000000014,
+      "maximum": 0.41000000000000014
+    },
+    "interset_off_s": {
+      "count": 4,
+      "minimum": 2.014999999999997,
+      "median": 2.0150000000000006,
+      "maximum": 2.0150000000000006
+    },
+    "rising_period_s": {
+      "count": 15,
+      "minimum": 0.5,
+      "median": 0.504999999999999,
+      "maximum": 0.5099999999999998
+    }
+  },
+  "last_pulse_to_low_plateau_s": 0.40500000000000114,
+  "low_current_A": 0.00805887365755625,
+  "first_current_bin_nonfinite_samples": 71,
+  "fault_window_finite": true,
+  "whole_session_ok": false,
+  "uart_good_pulses": 9,
+  "uart_bad_pulses": 0,
+  "guarded_sbf": true,
+  "guarded_pdds": true,
+  "guarded_stopf": false,
+  "trial_entry_proven": false,
+  "limitations": [
+    "Current steps infer LED state; no optical/GPIO probe.",
+    "5ms summary bin/min/filter timing has plus/minus20ms interval uncertainty.",
+    "Read-only ST-LINK accesses occurred during display.",
+    "No SD transaction was injected or issued; test covers post-DMA runtime error renderer, not actual card-failure cleanup.",
+    "No source-image persistence or arbitrary power-loss qualification."
+  ],
+  "frame_bytes": 1909600,
+  "pixels": 1527680
+}

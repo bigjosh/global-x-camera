@@ -20,6 +20,34 @@
 #if SD_IDMA_READ && !SD_REVIEW_PROFILE
 #error "IDMA reads require the explicit reviewed driver profile"
 #endif
+#ifndef SD_READ_DIAGNOSTICS
+#define SD_READ_DIAGNOSTICS 0
+#endif
+#if SD_READ_DIAGNOSTICS != 0 && SD_READ_DIAGNOSTICS != 1
+#error "SD_READ_DIAGNOSTICS must be 0 or 1"
+#endif
+#if SD_READ_DIAGNOSTICS && !SD_REVIEW_PROFILE
+#error "Read diagnostics require the explicit reviewed driver profile"
+#endif
+#if SD_READ_DIAGNOSTICS
+/* SRD1, one data-loop terminal before cleanup. mode0=PIO,1=IDMA;
+ * modeFFFFFFFF/captured0 means no admitted snapshot. result is the data-loop
+ * result at this point, not the public operation's later cleanup result.
+ * N6 has no FIFOCNT register: fifo_flags are RXFIFOHF/RXFIFOF/RXFIFOE from STA,
+ * not an occupancy count. The buffer and words on error are untrusted.
+ * This is not atomic: STA is the saved loop/command observation; other
+ * registers are read sequentially later. Data-loop snapshots follow the
+ * existing CMDTRANS clear but precede abort; early command-failure snapshots
+ * can precede that clear. Transport/cleanup ordering is not changed.
+ * Reset at init and every public read; retained through deinit. */
+typedef struct {
+    uint32_t magic,version,mode,lba;
+    uint32_t count,destination,requested_bytes,words;
+    uint32_t sta,dcount,fifo_flags,idmactrl;
+    uint32_t dctrl,clkcr,captured,result;
+} sd_read_diagnostics_t;
+extern volatile sd_read_diagnostics_t sd_read_diagnostics;
+#endif
 #ifndef SD_STARTUP_OPT
 #define SD_STARTUP_OPT 0
 #endif
@@ -134,6 +162,28 @@ extern volatile sd_startup_proof_t sd_startup_proof;
 #endif
 #if SD_EARLY_RUN_CLOCK && (!SD_REVIEW_PROFILE || !SD_STARTUP_OPT || SD_BUS_WIDTH != 4 || !SD_CLOCK_NEGEDGE_INIT || SD_HIGH_SPEED || SD_IDMA_READ || SD_GPIO_SPEED != 3 || SD_FIXED_COMPENSATION)
 #error "Early run clock requires the isolated reviewed startup Default-Speed profile"
+#endif
+/* Isolated RAM experiment. -1 preserves the historical executable path;
+ * explicit 3 includes the same proof/guards as 2 and 1 for a fair control.
+ * PC2 alone takes this speed; CMD and all four DAT outputs retain speed3. */
+#ifndef SD_CLK_GPIO_SPEED
+#define SD_CLK_GPIO_SPEED -1
+#endif
+#if SD_CLK_GPIO_SPEED != -1 && (SD_CLK_GPIO_SPEED < 1 || SD_CLK_GPIO_SPEED > 3)
+#error "SD_CLK_GPIO_SPEED must be disabled (-1) or 1, 2, 3"
+#endif
+#if SD_CLK_GPIO_SPEED != -1 && (!SD_REVIEW_PROFILE || !SD_STARTUP_OPT || SD_BUS_WIDTH != 4 || !SD_CLOCK_NEGEDGE || !SD_CLOCK_NEGEDGE_INIT || SD_GPIO_SPEED != 3 || SD_FIXED_COMPENSATION || SD_HIGH_SPEED || SD_EARLY_RUN_CLOCK || SD_IDMA_READ)
+#error "CLK-only slew requires the isolated reviewed startup Default-Speed profile"
+#endif
+#if SD_CLK_GPIO_SPEED != -1
+/* CLK1: records the initial configuration and rechecks it after four-bit
+ * negotiation. Retained through deinit; not storage-idle permission. */
+typedef struct {
+    uint32_t magic,version,requested_speed,clk_mask;
+    uint32_t c_mask,c_before,c_configured,c_after;
+    uint32_t e_mask,e_before,e_after,applied;
+} sd_clk_gpio_proof_t;
+extern volatile sd_clk_gpio_proof_t sd_clk_gpio_proof;
 #endif
 #if SD_EARLY_RUN_CLOCK
 /* ECK1: retained across deinit; reset only by a fresh admitted init. Counts

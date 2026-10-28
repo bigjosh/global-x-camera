@@ -1,0 +1,20 @@
+Isolated Nucleo results: warm RAM probes; camera and SD disconnected.
+
+Run | MHz nominal | flags | DBG_SLEEP active | busy mA | sleep mA | reduction mA | busy ms | sleep ms
+cachecontrol01 | 400 | 0 | 0 | 74.460780 | 70.566130 | 3.894651 | 201.227000 | 201.307000
+cachecontrol03 | 400 | 0 | 0 | 74.516139 | 70.557104 | 3.959035 | 201.154500 | 201.111500
+cacheon01 | 400 | 4 | 0 | 74.260576 | 70.673833 | 3.586743 | 201.387000 | 201.202000
+cpu100a | 100 | 0 | 0 | 72.448411 | 69.218833 | 3.229578 | 201.023000 | 201.104500
+cpu200a | 200 | 0 | 0 | 73.325297 | 69.626072 | 3.699226 | 201.293500 | 201.261500
+cpu400b | 400 | 0 | 0 | 74.692612 | 70.576666 | 4.115945 | 201.135500 | 201.020500
+cpu400c | 400 | 0 | 0 | 74.664922 | 70.501248 | 4.163674 | 201.330000 | 201.313000
+cpu50a | 50 | 0 | 0 | 72.003236 | 69.067923 | 2.935313 | 201.520000 | 201.336000
+ramcontrol01 | 400 | 0 | 0 | 74.622749 | 70.451179 | 4.171570 | 201.285000 | 201.185500
+ramcontrol02 | 400 | 0 | 0 | 74.694615 | 70.485019 | 4.209596 | 201.235500 | 201.117000
+ramoff01 | 400 | 2 | 0 | 74.341896 | 70.568777 | 3.773119 | 200.998000 | 201.014000
+
+All reported means use native sample windows with25ms trimmed from both ends.
+Busy=LFSR/SRAM workload; sleep includes100Hz timer wakes. Not a capture-cycle energy comparison.
+Only exact successful proof + binary readback + complete native streams qualify a row.
+Excluded: [{"run": "cpu400a", "version": 3, "state": 15, "error": 7, "reason": "Diagnostic refused/failed; no successful bounded comparison."}, {"run": "inherited02", "version": 1, "state": 15, "error": 4, "reason": "Diagnostic refused/failed; no successful bounded comparison."}]
+Pending: []

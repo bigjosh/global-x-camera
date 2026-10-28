@@ -111,8 +111,87 @@ MAGIC_LATE static int magic_transport(sd_card_t *card,uint32_t lba,const void *d
 }
 
 MAGIC_LATE static void raw_magic_execute(void) __attribute__((noreturn));
+#if RAW_SD_INIT_GAP_MS
+#include "sd_init_gap.inc"
+#endif
+#if RAW_POWER_PROBE
+/* RAM-only matched hold before the first SD operation. Camera polling owns
+ * FRAME validation and STOP, so no receiver register is read after gating.
+ * Mode 2 changes only sensor RESET; all rails/CSI clocks remain powered.
+ * Neither mode is a no-save path or a shortcut around storage admission. */
+static void magic_power_probe(void)
+{
+    volatile uint32_t *v=raw_power_probe_proof;
+    for(unsigned i=0;i<16U;i++) v[i]=0U;
+    v[0]=0x31505750U; v[1]=1U; v[2]=RAW_POWER_PROBE; v[3]=1U;
+    v[15]=80000000U;
+    if(operation!=RAW_OP_CAPTURE || storage_call_depth || __get_IPSR() ||
+       raw_card.initialized || raw_card.controller_owned || raw_card.timer_owned ||
+       raw_card.read_sectors || raw_card.written_sectors ||
+       !(DWT->CTRL&DWT_CTRL_CYCCNTENA_Msk)) {
+        v[13]=1U; v[3]=15U; complete_storage(0x508U);
+    }
+    v[14]=1U;
+    v[4]=DWT->CYCCNT;
+    uint32_t budget=100000000U;
+    while(!raw_capture_frame_validated() || !raw_capture_sensor_stopped()) {
+        raw_capture_poll();
+        if(raw_capture_fault() || (uint32_t)(DWT->CYCCNT-v[4])>1200000000U || !--budget) {
+            v[13]=2U; v[3]=15U; complete_storage(0x508U);
+        }
+    }
+    v[5]=DWT->CYCCNT; v[14]|=6U;
+    /* GPIOO is already owned by sensor startup. Verify live access before
+     * any GPIO read, then require the expected push-pull, no-pull HIGH pin. */
+    if(!(RCC->AHB4ENR&RCC_AHB4ENR_GPIOOEN) || (RCC->AHB4RSTR&RCC_AHB4RSTR_GPIOORST)) {
+        v[13]=4U; v[3]=15U; complete_storage(0x508U);
+    }
+    v[8]=GPIOO->MODER; v[9]=GPIOO->ODR; v[10]=GPIOO->IDR;
+    if((v[8]&(3U<<10))!=(1U<<10) || (GPIOO->OTYPER&(1U<<5)) ||
+       (GPIOO->PUPDR&(3U<<10)) || !(v[9]&(1U<<5)) || !(v[10]&(1U<<5))) {
+        v[13]=8U; v[3]=15U; complete_storage(0x508U);
+    }
+    v[14]|=8U;
+    if(RAW_POWER_PROBE==2 || RAW_POWER_PROBE==5) GPIOO->BSRR=1U<<21;
+    __DSB(); v[11]=GPIOO->ODR; v[12]=GPIOO->IDR;
+    const uint32_t expected=(RAW_POWER_PROBE==2 || RAW_POWER_PROBE==5)?0U:(1U<<5);
+    if((v[11]&(1U<<5))!=expected || (v[12]&(1U<<5))!=expected ||
+       ((v[9]^v[11])&~(1U<<5))) {
+        v[13]=16U; v[3]=15U; complete_storage(0x508U);
+    }
+#if RAW_POWER_PROBE == 3 || RAW_POWER_PROBE == 4
+    if(power_phy_begin(RAW_POWER_PROBE)) {
+        v[13]=128U; v[3]=15U; complete_storage(0x509U);
+    }
+#endif
+#if RAW_POWER_PROBE == 5
+    if(power_csi_off()) {
+        v[13]=256U; v[3]=15U; complete_storage(0x50AU);
+    }
+#endif
+    if(!phase_gpio_emit(11U)) { v[13]=32U; v[3]=15U; complete_storage(0x508U); }
+    v[3]=2U; v[6]=DWT->CYCCNT; budget=100000000U;
+    while((uint32_t)(DWT->CYCCNT-v[6])<v[15] && --budget) __NOP();
+    v[7]=DWT->CYCCNT;
+    if(!budget || !phase_gpio_emit(12U)) {
+        v[13]=64U; v[3]=15U; complete_storage(0x508U);
+    }
+    v[3]=3U; __DSB();
+}
+#endif
 MAGIC_LATE static void raw_magic_execute(void)
 {
+#if RAW_BOARD_ETH_POWERDOWN
+    /* The receiver is armed and flash's checked late load has completed.
+     * Keep optional board power management out of the exposure-start path. */
+    board_eth_powerdown_once();
+#endif
+#if RAW_SD_INIT_GAP_MS
+    if(magic_sd_init_gap()) complete_storage(0x50BU);
+#endif
+#if RAW_POWER_PROBE
+    magic_power_probe();
+#endif
     if(!raw_card.initialized) init_card();
     raw_capture_poll();
     P[RP_STAGE]=3U;
@@ -162,6 +241,11 @@ MAGIC_LATE static void raw_magic_execute(void)
     for(uint32_t i=0;i<8U;i++)
         if(guard[i]!=(0xA15A1000U+i+1U)) raw_magic_proof[3]|=1U<<i;
     if(raw_magic_proof[3] || raw_capture_fault()) complete_storage(0x506U);
+#if RAW_SENSOR_AUTOSTOP
+    /* Recheck autonomous standby after the last payload ACK, before success. */
+    extern int raw_sensor_autostop_finish(void);
+    if(raw_sensor_autostop_finish()) complete_storage(0x50CU);
+#endif
     CYCLE_MARK(FINAL_GUARD_DONE);
     capture_active=0;raw_magic_proof[1]=3U;__DSB();
     P[RP_COMMIT_DONE]=DWT->CYCCNT;P[RP_STAGE]=8U;

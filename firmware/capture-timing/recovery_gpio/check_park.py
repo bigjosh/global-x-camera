@@ -30,6 +30,35 @@ VCP_FIELDS = (
     'reserved30 reserved31').split()
 # An unknown/self-consistent build is insufficient authorization to halt.
 APPROVED = {
+    # October 28 single-frame sensor profiles: independently audited exact
+    # recovery guard/all20 literals and fixed error engine. Two post-guard
+    # SRAM-array pointers relocate with identical arrays; context burst is
+    # configured before START. Hardware qualification is recorded separately.
+    '5330f1d1f606fb9dfd903dbdc39dac282360b1880d756931049eec1797ef6504':
+        {'bytes': 6720, 'park': 0x3418078C, 'vcp': True,
+         'sector': '185d86f0cf2a17c6b1e81880c1ec0b3263e318d477701fa57496cb72cf706638'},
+    '6378483a91b560ffc6b31d74a9dd1205996a14c8030447ffddf7deddc9d23874':
+        {'bytes': 6720, 'park': 0x3418078C, 'vcp': True,
+         'sector': '79a379470927135bc03841098fe070912cad8275e91c5d5985cc066c294cf64e'},
+    # Temporary 200 ms post-STOP/SD-init separation experiment. Independent
+    # prefix/late audit preserves recovery and error engine, CRC words only.
+    'cedb4d9e7c38b90f805dbf24c1bad5cc8af8c1597f3cd9e58fd5e9b9c86cc6c6':
+        {'bytes': 6720, 'park': 0x3418078C, 'vcp': True,
+         'sector': '9f1aafd3d2065dbf5ba4d255a8c4ec8402a5ec7ccc007266db5f0136946f0bc6'},
+    # October 28 Ethernet power-down: independent audit preserves every recovery
+    # instruction/literal and runtime error engine; only two CRC words differ.
+    '2b9724bc4b60af52b1c4ab45e1b232578e9640efc3a30a57772a810d99c3f344':
+        {'bytes': 6720, 'park': 0x3418078C, 'vcp': True,
+         'sector': 'a10e4894d79cd3fe182b95b48eb56a308280f3201736d295860ecfe725a62645'},
+    # Relocated runtime error engine: independently checked exact guard/literals;
+    # source prefix is 6720 bytes, with a checked copy outside the frame before arm.
+    '99dbb0f9ecdd56a9313e4e62bbbfec22ec8e5e5901c852d956315844cd066eba':
+        {'bytes': 6720, 'park': 0x3418078C, 'vcp': True,
+         'sector': '232af9173262473021453f40ea944dfa4cafc2657443cd0b83ea9c8c8bb3b02c'},
+    # Separate post-FRAME/STOP code4 regression; never the normal capture profile.
+    'd329f4051c466f3d35c4b20ae0af3f22daef7e997b48fd5c3567f3ce9c2e73fb':
+        {'bytes': 6720, 'park': 0x3418078C, 'vcp': True,
+         'sector': '7f21f21e8cf48f8a0cabc4bffb842b55e5960af136496133500e67f25b4ded08'},
     # Failure-blink v2: fresh ELF/objcopy/objdump review against the installed
     # 25 MHz image preserves all 20 recovery literals and the complete guard.
     # Only its six-byte later failure loop and two receiver-CRC words change;

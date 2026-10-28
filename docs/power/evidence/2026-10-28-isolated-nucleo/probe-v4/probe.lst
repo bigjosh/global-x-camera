@@ -1,0 +1,1060 @@
+
+D:\Github\global-x-camera\tmp\bringup\nucleo-isolated-20261028\probe-v4\probe.elf:     file format elf32-littlearm
+
+
+Disassembly of section .text:
+
+34300380 <isolated_entry>:
+34300380:	b672      	cpsid	i
+34300382:	2000      	movs	r0, #0
+34300384:	f380 880a 	msr	MSPLIM, r0
+34300388:	4808      	ldr	r0, [pc, #32]	@ (343003ac <isolated_park+0x2>)
+3430038a:	f380 8808 	msr	MSP, r0
+3430038e:	4808      	ldr	r0, [pc, #32]	@ (343003b0 <isolated_park+0x6>)
+34300390:	f380 880a 	msr	MSPLIM, r0
+34300394:	4807      	ldr	r0, [pc, #28]	@ (343003b4 <isolated_park+0xa>)
+34300396:	6802      	ldr	r2, [r0, #0]
+34300398:	4907      	ldr	r1, [pc, #28]	@ (343003b8 <isolated_park+0xe>)
+3430039a:	6001      	str	r1, [r0, #0]
+3430039c:	f3bf 8f4f 	dsb	sy
+343003a0:	f3bf 8f6f 	isb	sy
+343003a4:	4610      	mov	r0, r2
+343003a6:	f000 ba1e 	b.w	343007e6 <isolated_main>
+
+343003aa <isolated_park>:
+343003aa:	e7fe      	b.n	343003aa <isolated_park>
+343003ac:	343b0000 	.word	0x343b0000
+343003b0:	343af000 	.word	0x343af000
+343003b4:	e000ed08 	.word	0xe000ed08
+343003b8:	34300000 	.word	0x34300000
+
+343003bc <timer_start>:
+343003bc:	b510      	push	{r4, lr}
+343003be:	b672      	cpsid	i
+343003c0:	f04f 23e0 	mov.w	r3, #3758153728	@ 0xe000e000
+343003c4:	2200      	movs	r2, #0
+343003c6:	f04f 7400 	mov.w	r4, #33554432	@ 0x2000000
+343003ca:	480a      	ldr	r0, [pc, #40]	@ (343003f4 <timer_start+0x38>)
+343003cc:	611a      	str	r2, [r3, #16]
+343003ce:	f8d0 10bc 	ldr.w	r1, [r0, #188]	@ 0xbc
+343003d2:	6159      	str	r1, [r3, #20]
+343003d4:	4908      	ldr	r1, [pc, #32]	@ (343003f8 <timer_start+0x3c>)
+343003d6:	619a      	str	r2, [r3, #24]
+343003d8:	604c      	str	r4, [r1, #4]
+343003da:	f8c0 20c4 	str.w	r2, [r0, #196]	@ 0xc4
+343003de:	f881 2023 	strb.w	r2, [r1, #35]	@ 0x23
+343003e2:	2207      	movs	r2, #7
+343003e4:	611a      	str	r2, [r3, #16]
+343003e6:	f3bf 8f4f 	dsb	sy
+343003ea:	f3bf 8f6f 	isb	sy
+343003ee:	b662      	cpsie	i
+343003f0:	bd10      	pop	{r4, pc}
+343003f2:	bf00      	nop
+343003f4:	343c2000 	.word	0x343c2000
+343003f8:	e000ed00 	.word	0xe000ed00
+
+343003fc <timer_stop>:
+343003fc:	b672      	cpsid	i
+343003fe:	f04f 23e0 	mov.w	r3, #3758153728	@ 0xe000e000
+34300402:	2200      	movs	r2, #0
+34300404:	611a      	str	r2, [r3, #16]
+34300406:	f04f 7200 	mov.w	r2, #33554432	@ 0x2000000
+3430040a:	f8c3 2d04 	str.w	r2, [r3, #3332]	@ 0xd04
+3430040e:	f3bf 8f4f 	dsb	sy
+34300412:	4770      	bx	lr
+
+34300414 <finish>:
+34300414:	b508      	push	{r3, lr}
+34300416:	b672      	cpsid	i
+34300418:	f04f 23e0 	mov.w	r3, #3758153728	@ 0xe000e000
+3430041c:	2200      	movs	r2, #0
+3430041e:	611a      	str	r2, [r3, #16]
+34300420:	619a      	str	r2, [r3, #24]
+34300422:	f04f 7200 	mov.w	r2, #33554432	@ 0x2000000
+34300426:	f8c3 2d04 	str.w	r2, [r3, #3332]	@ 0xd04
+3430042a:	4bc7      	ldr	r3, [pc, #796]	@ (34300748 <finish+0x334>)
+3430042c:	f8d3 2124 	ldr.w	r2, [r3, #292]	@ 0x124
+34300430:	b13a      	cbz	r2, 34300442 <finish+0x2e>
+34300432:	6e19      	ldr	r1, [r3, #96]	@ 0x60
+34300434:	4ac5      	ldr	r2, [pc, #788]	@ (3430074c <finish+0x338>)
+34300436:	f8c2 10c4 	str.w	r1, [r2, #196]	@ 0xc4
+3430043a:	f3bf 8f4f 	dsb	sy
+3430043e:	f3bf 8f6f 	isb	sy
+34300442:	f8d3 2158 	ldr.w	r2, [r3, #344]	@ 0x158
+34300446:	b37a      	cbz	r2, 343004a8 <finish+0x94>
+34300448:	f8d3 2090 	ldr.w	r2, [r3, #144]	@ 0x90
+3430044c:	4cc0      	ldr	r4, [pc, #768]	@ (34300750 <finish+0x33c>)
+3430044e:	43d2      	mvns	r2, r2
+34300450:	f002 020e 	and.w	r2, r2, #14
+34300454:	f8c4 228c 	str.w	r2, [r4, #652]	@ 0x28c
+34300458:	f8d3 2094 	ldr.w	r2, [r3, #148]	@ 0x94
+3430045c:	49bb      	ldr	r1, [pc, #748]	@ (3430074c <finish+0x338>)
+3430045e:	43d2      	mvns	r2, r2
+34300460:	f402 4284 	and.w	r2, r2, #16896	@ 0x4200
+34300464:	f8c4 2298 	str.w	r2, [r4, #664]	@ 0x298
+34300468:	f8d3 2098 	ldr.w	r2, [r3, #152]	@ 0x98
+3430046c:	43d2      	mvns	r2, r2
+3430046e:	f002 0203 	and.w	r2, r2, #3
+34300472:	f8c4 2284 	str.w	r2, [r4, #644]	@ 0x284
+34300476:	f8d3 20a0 	ldr.w	r2, [r3, #160]	@ 0xa0
+3430047a:	43d2      	mvns	r2, r2
+3430047c:	f002 0202 	and.w	r2, r2, #2
+34300480:	f8c4 22b8 	str.w	r2, [r4, #696]	@ 0x2b8
+34300484:	f3bf 8f4f 	dsb	sy
+34300488:	f8d1 228c 	ldr.w	r2, [r1, #652]	@ 0x28c
+3430048c:	f8c3 213c 	str.w	r2, [r3, #316]	@ 0x13c
+34300490:	f8d1 2298 	ldr.w	r2, [r1, #664]	@ 0x298
+34300494:	f8c3 2144 	str.w	r2, [r3, #324]	@ 0x144
+34300498:	f8d1 2284 	ldr.w	r2, [r1, #644]	@ 0x284
+3430049c:	f8c3 214c 	str.w	r2, [r3, #332]	@ 0x14c
+343004a0:	f8d1 22b8 	ldr.w	r2, [r1, #696]	@ 0x2b8
+343004a4:	f8c3 2154 	str.w	r2, [r3, #340]	@ 0x154
+343004a8:	4ba7      	ldr	r3, [pc, #668]	@ (34300748 <finish+0x334>)
+343004aa:	6d5a      	ldr	r2, [r3, #84]	@ 0x54
+343004ac:	b122      	cbz	r2, 343004b8 <finish+0xa4>
+343004ae:	6c99      	ldr	r1, [r3, #72]	@ 0x48
+343004b0:	4aa8      	ldr	r2, [pc, #672]	@ (34300754 <finish+0x340>)
+343004b2:	6051      	str	r1, [r2, #4]
+343004b4:	6852      	ldr	r2, [r2, #4]
+343004b6:	651a      	str	r2, [r3, #80]	@ 0x50
+343004b8:	6bd9      	ldr	r1, [r3, #60]	@ 0x3c
+343004ba:	4aa7      	ldr	r2, [pc, #668]	@ (34300758 <finish+0x344>)
+343004bc:	6111      	str	r1, [r2, #16]
+343004be:	6912      	ldr	r2, [r2, #16]
+343004c0:	645a      	str	r2, [r3, #68]	@ 0x44
+343004c2:	4aa2      	ldr	r2, [pc, #648]	@ (3430074c <finish+0x338>)
+343004c4:	f8d2 10c4 	ldr.w	r1, [r2, #196]	@ 0xc4
+343004c8:	6699      	str	r1, [r3, #104]	@ 0x68
+343004ca:	f8d2 127c 	ldr.w	r1, [r2, #636]	@ 0x27c
+343004ce:	67d9      	str	r1, [r3, #124]	@ 0x7c
+343004d0:	f8d2 1260 	ldr.w	r1, [r2, #608]	@ 0x260
+343004d4:	f8c3 1084 	str.w	r1, [r3, #132]	@ 0x84
+343004d8:	f8d2 224c 	ldr.w	r2, [r2, #588]	@ 0x24c
+343004dc:	f8c3 208c 	str.w	r2, [r3, #140]	@ 0x8c
+343004e0:	2200      	movs	r2, #0
+343004e2:	f8c3 20b0 	str.w	r2, [r3, #176]	@ 0xb0
+343004e6:	f8c3 20ac 	str.w	r2, [r3, #172]	@ 0xac
+343004ea:	f04f 23e0 	mov.w	r3, #3758153728	@ 0xe000e000
+343004ee:	685b      	ldr	r3, [r3, #4]
+343004f0:	f003 0e0f 	and.w	lr, r3, #15
+343004f4:	f10e 0e01 	add.w	lr, lr, #1
+343004f8:	f04e e001 	dls	lr, lr
+343004fc:	4b92      	ldr	r3, [pc, #584]	@ (34300748 <finish+0x334>)
+343004fe:	0091      	lsls	r1, r2, #2
+34300500:	f101 4160 	add.w	r1, r1, #3758096384	@ 0xe0000000
+34300504:	f501 4161 	add.w	r1, r1, #57600	@ 0xe100
+34300508:	680d      	ldr	r5, [r1, #0]
+3430050a:	f8d3 40ac 	ldr.w	r4, [r3, #172]	@ 0xac
+3430050e:	3201      	adds	r2, #1
+34300510:	432c      	orrs	r4, r5
+34300512:	f8c3 40ac 	str.w	r4, [r3, #172]	@ 0xac
+34300516:	f8d1 4100 	ldr.w	r4, [r1, #256]	@ 0x100
+3430051a:	f8d3 10b0 	ldr.w	r1, [r3, #176]	@ 0xb0
+3430051e:	4321      	orrs	r1, r4
+34300520:	f8c3 10b0 	str.w	r1, [r3, #176]	@ 0xb0
+34300524:	f00f c815 	le	lr, 343004fe <finish+0xea>
+34300528:	f04f 22e0 	mov.w	r2, #3758153728	@ 0xe000e000
+3430052c:	6911      	ldr	r1, [r2, #16]
+3430052e:	f8c3 10c0 	str.w	r1, [r3, #192]	@ 0xc0
+34300532:	f8d3 10b8 	ldr.w	r1, [r3, #184]	@ 0xb8
+34300536:	6151      	str	r1, [r2, #20]
+34300538:	f3ef 8210 	mrs	r2, PRIMASK
+3430053c:	f8c3 20f4 	str.w	r2, [r3, #244]	@ 0xf4
+34300540:	4a85      	ldr	r2, [pc, #532]	@ (34300758 <finish+0x344>)
+34300542:	6a91      	ldr	r1, [r2, #40]	@ 0x28
+34300544:	f8c3 10f8 	str.w	r1, [r3, #248]	@ 0xf8
+34300548:	6ad2      	ldr	r2, [r2, #44]	@ 0x2c
+3430054a:	f8c3 20fc 	str.w	r2, [r3, #252]	@ 0xfc
+3430054e:	f8d3 2118 	ldr.w	r2, [r3, #280]	@ 0x118
+34300552:	b13a      	cbz	r2, 34300564 <finish+0x150>
+34300554:	4a81      	ldr	r2, [pc, #516]	@ (3430075c <finish+0x348>)
+34300556:	6952      	ldr	r2, [r2, #20]
+34300558:	f8c3 2108 	str.w	r2, [r3, #264]	@ 0x108
+3430055c:	4a80      	ldr	r2, [pc, #512]	@ (34300760 <finish+0x34c>)
+3430055e:	6952      	ldr	r2, [r2, #20]
+34300560:	f8c3 210c 	str.w	r2, [r3, #268]	@ 0x10c
+34300564:	2800      	cmp	r0, #0
+34300566:	bf0c      	ite	eq
+34300568:	2208      	moveq	r2, #8
+3430056a:	220f      	movne	r2, #15
+3430056c:	4b76      	ldr	r3, [pc, #472]	@ (34300748 <finish+0x334>)
+3430056e:	6118      	str	r0, [r3, #16]
+34300570:	60da      	str	r2, [r3, #12]
+34300572:	f3bf 8f4f 	dsb	sy
+34300576:	4a7b      	ldr	r2, [pc, #492]	@ (34300764 <finish+0x350>)
+34300578:	f8c3 211c 	str.w	r2, [r3, #284]	@ 0x11c
+3430057c:	f3bf 8f4f 	dsb	sy
+34300580:	4a72      	ldr	r2, [pc, #456]	@ (3430074c <finish+0x338>)
+34300582:	6811      	ldr	r1, [r2, #0]
+34300584:	f8c3 1280 	str.w	r1, [r3, #640]	@ 0x280
+34300588:	6851      	ldr	r1, [r2, #4]
+3430058a:	f8c3 1284 	str.w	r1, [r3, #644]	@ 0x284
+3430058e:	6a11      	ldr	r1, [r2, #32]
+34300590:	f8c3 1288 	str.w	r1, [r3, #648]	@ 0x288
+34300594:	6a51      	ldr	r1, [r2, #36]	@ 0x24
+34300596:	f8c3 128c 	str.w	r1, [r3, #652]	@ 0x28c
+3430059a:	f8d2 1080 	ldr.w	r1, [r2, #128]	@ 0x80
+3430059e:	f8c3 1290 	str.w	r1, [r3, #656]	@ 0x290
+343005a2:	f8d2 1084 	ldr.w	r1, [r2, #132]	@ 0x84
+343005a6:	f8c3 1294 	str.w	r1, [r3, #660]	@ 0x294
+343005aa:	f8d2 1088 	ldr.w	r1, [r2, #136]	@ 0x88
+343005ae:	f8c3 1298 	str.w	r1, [r3, #664]	@ 0x298
+343005b2:	f8d2 1090 	ldr.w	r1, [r2, #144]	@ 0x90
+343005b6:	f8c3 129c 	str.w	r1, [r3, #668]	@ 0x29c
+343005ba:	f8d2 1094 	ldr.w	r1, [r2, #148]	@ 0x94
+343005be:	f8c3 12a0 	str.w	r1, [r3, #672]	@ 0x2a0
+343005c2:	f8d2 1098 	ldr.w	r1, [r2, #152]	@ 0x98
+343005c6:	f8c3 12a4 	str.w	r1, [r3, #676]	@ 0x2a4
+343005ca:	f8d2 10a0 	ldr.w	r1, [r2, #160]	@ 0xa0
+343005ce:	f8c3 12a8 	str.w	r1, [r3, #680]	@ 0x2a8
+343005d2:	f8d2 10a4 	ldr.w	r1, [r2, #164]	@ 0xa4
+343005d6:	f8c3 12ac 	str.w	r1, [r3, #684]	@ 0x2ac
+343005da:	f8d2 10a8 	ldr.w	r1, [r2, #168]	@ 0xa8
+343005de:	f8c3 12b0 	str.w	r1, [r3, #688]	@ 0x2b0
+343005e2:	f8d2 10b0 	ldr.w	r1, [r2, #176]	@ 0xb0
+343005e6:	f8c3 12b4 	str.w	r1, [r3, #692]	@ 0x2b4
+343005ea:	f8d2 10b4 	ldr.w	r1, [r2, #180]	@ 0xb4
+343005ee:	f8c3 12b8 	str.w	r1, [r3, #696]	@ 0x2b8
+343005f2:	f8d2 10b8 	ldr.w	r1, [r2, #184]	@ 0xb8
+343005f6:	f8c3 12bc 	str.w	r1, [r3, #700]	@ 0x2bc
+343005fa:	f8d2 10c4 	ldr.w	r1, [r2, #196]	@ 0xc4
+343005fe:	f8c3 12c0 	str.w	r1, [r3, #704]	@ 0x2c0
+34300602:	f8d2 10c8 	ldr.w	r1, [r2, #200]	@ 0xc8
+34300606:	f8c3 12c4 	str.w	r1, [r3, #708]	@ 0x2c4
+3430060a:	f8d2 10cc 	ldr.w	r1, [r2, #204]	@ 0xcc
+3430060e:	f8c3 12c8 	str.w	r1, [r3, #712]	@ 0x2c8
+34300612:	f8d2 10d0 	ldr.w	r1, [r2, #208]	@ 0xd0
+34300616:	f8c3 12cc 	str.w	r1, [r3, #716]	@ 0x2cc
+3430061a:	f8d2 10d4 	ldr.w	r1, [r2, #212]	@ 0xd4
+3430061e:	f8c3 12d0 	str.w	r1, [r3, #720]	@ 0x2d0
+34300622:	f8d2 10d8 	ldr.w	r1, [r2, #216]	@ 0xd8
+34300626:	f8c3 12d4 	str.w	r1, [r3, #724]	@ 0x2d4
+3430062a:	f8d2 10ec 	ldr.w	r1, [r2, #236]	@ 0xec
+3430062e:	f8c3 12d8 	str.w	r1, [r3, #728]	@ 0x2d8
+34300632:	f8d2 1104 	ldr.w	r1, [r2, #260]	@ 0x104
+34300636:	f8c3 12dc 	str.w	r1, [r3, #732]	@ 0x2dc
+3430063a:	f8d2 1108 	ldr.w	r1, [r2, #264]	@ 0x108
+3430063e:	f8c3 12e0 	str.w	r1, [r3, #736]	@ 0x2e0
+34300642:	f8d2 1240 	ldr.w	r1, [r2, #576]	@ 0x240
+34300646:	f8c3 12e4 	str.w	r1, [r3, #740]	@ 0x2e4
+3430064a:	f8d2 1244 	ldr.w	r1, [r2, #580]	@ 0x244
+3430064e:	f8c3 12e8 	str.w	r1, [r3, #744]	@ 0x2e8
+34300652:	f8d2 1248 	ldr.w	r1, [r2, #584]	@ 0x248
+34300656:	f8c3 12ec 	str.w	r1, [r3, #748]	@ 0x2ec
+3430065a:	f8d2 124c 	ldr.w	r1, [r2, #588]	@ 0x24c
+3430065e:	f8c3 12f0 	str.w	r1, [r3, #752]	@ 0x2f0
+34300662:	f8d2 1250 	ldr.w	r1, [r2, #592]	@ 0x250
+34300666:	f8c3 12f4 	str.w	r1, [r3, #756]	@ 0x2f4
+3430066a:	f8d2 1254 	ldr.w	r1, [r2, #596]	@ 0x254
+3430066e:	f8c3 12f8 	str.w	r1, [r3, #760]	@ 0x2f8
+34300672:	f8d2 1258 	ldr.w	r1, [r2, #600]	@ 0x258
+34300676:	f8c3 12fc 	str.w	r1, [r3, #764]	@ 0x2fc
+3430067a:	f8d2 125c 	ldr.w	r1, [r2, #604]	@ 0x25c
+3430067e:	f8c3 1300 	str.w	r1, [r3, #768]	@ 0x300
+34300682:	f8d2 1260 	ldr.w	r1, [r2, #608]	@ 0x260
+34300686:	f8c3 1304 	str.w	r1, [r3, #772]	@ 0x304
+3430068a:	f8d2 1264 	ldr.w	r1, [r2, #612]	@ 0x264
+3430068e:	f8c3 1308 	str.w	r1, [r3, #776]	@ 0x308
+34300692:	f8d2 1268 	ldr.w	r1, [r2, #616]	@ 0x268
+34300696:	f8c3 130c 	str.w	r1, [r3, #780]	@ 0x30c
+3430069a:	f8d2 126c 	ldr.w	r1, [r2, #620]	@ 0x26c
+3430069e:	f8c3 1310 	str.w	r1, [r3, #784]	@ 0x310
+343006a2:	f8d2 1270 	ldr.w	r1, [r2, #624]	@ 0x270
+343006a6:	f8c3 1314 	str.w	r1, [r3, #788]	@ 0x314
+343006aa:	f8d2 1274 	ldr.w	r1, [r2, #628]	@ 0x274
+343006ae:	f8c3 1318 	str.w	r1, [r3, #792]	@ 0x318
+343006b2:	f8d2 1278 	ldr.w	r1, [r2, #632]	@ 0x278
+343006b6:	f8c3 131c 	str.w	r1, [r3, #796]	@ 0x31c
+343006ba:	f8d2 127c 	ldr.w	r1, [r2, #636]	@ 0x27c
+343006be:	f8c3 1320 	str.w	r1, [r3, #800]	@ 0x320
+343006c2:	f8d2 1284 	ldr.w	r1, [r2, #644]	@ 0x284
+343006c6:	f8c3 1324 	str.w	r1, [r3, #804]	@ 0x324
+343006ca:	f8d2 1288 	ldr.w	r1, [r2, #648]	@ 0x288
+343006ce:	f8c3 1328 	str.w	r1, [r3, #808]	@ 0x328
+343006d2:	f8d2 128c 	ldr.w	r1, [r2, #652]	@ 0x28c
+343006d6:	f8c3 132c 	str.w	r1, [r3, #812]	@ 0x32c
+343006da:	f8d2 1290 	ldr.w	r1, [r2, #656]	@ 0x290
+343006de:	f8c3 1330 	str.w	r1, [r3, #816]	@ 0x330
+343006e2:	f8d2 1294 	ldr.w	r1, [r2, #660]	@ 0x294
+343006e6:	f8c3 1334 	str.w	r1, [r3, #820]	@ 0x334
+343006ea:	f8d2 1298 	ldr.w	r1, [r2, #664]	@ 0x298
+343006ee:	f8c3 1338 	str.w	r1, [r3, #824]	@ 0x338
+343006f2:	f8d2 129c 	ldr.w	r1, [r2, #668]	@ 0x29c
+343006f6:	f8c3 133c 	str.w	r1, [r3, #828]	@ 0x33c
+343006fa:	f8d2 12a0 	ldr.w	r1, [r2, #672]	@ 0x2a0
+343006fe:	f8c3 1340 	str.w	r1, [r3, #832]	@ 0x340
+34300702:	f8d2 12a4 	ldr.w	r1, [r2, #676]	@ 0x2a4
+34300706:	f8c3 1344 	str.w	r1, [r3, #836]	@ 0x344
+3430070a:	f8d2 12a8 	ldr.w	r1, [r2, #680]	@ 0x2a8
+3430070e:	f8c3 1348 	str.w	r1, [r3, #840]	@ 0x348
+34300712:	f8d2 12ac 	ldr.w	r1, [r2, #684]	@ 0x2ac
+34300716:	f8c3 134c 	str.w	r1, [r3, #844]	@ 0x34c
+3430071a:	f8d2 12b0 	ldr.w	r1, [r2, #688]	@ 0x2b0
+3430071e:	f8c3 1350 	str.w	r1, [r3, #848]	@ 0x350
+34300722:	f8d2 12b4 	ldr.w	r1, [r2, #692]	@ 0x2b4
+34300726:	f8c3 1354 	str.w	r1, [r3, #852]	@ 0x354
+3430072a:	f8d2 12b8 	ldr.w	r1, [r2, #696]	@ 0x2b8
+3430072e:	f8c3 1358 	str.w	r1, [r3, #856]	@ 0x358
+34300732:	f8d2 22bc 	ldr.w	r2, [r2, #700]	@ 0x2bc
+34300736:	f8c3 235c 	str.w	r2, [r3, #860]	@ 0x35c
+3430073a:	2238      	movs	r2, #56	@ 0x38
+3430073c:	f8c3 2128 	str.w	r2, [r3, #296]	@ 0x128
+34300740:	f3bf 8f4f 	dsb	sy
+34300744:	f7ff fe31 	bl	343003aa <isolated_park>
+34300748:	343c2000 	.word	0x343c2000
+3430074c:	56028000 	.word	0x56028000
+34300750:	56029000 	.word	0x56029000
+34300754:	54001000 	.word	0x54001000
+34300758:	e000ed00 	.word	0xe000ed00
+3430075c:	56021800 	.word	0x56021800
+34300760:	56020c00 	.word	0x56020c00
+34300764:	454e4f44 	.word	0x454e4f44
+
+34300768 <pulse>:
+34300768:	f44f 5280 	mov.w	r2, #4096	@ 0x1000
+3430076c:	b5f8      	push	{r3, r4, r5, r6, r7, lr}
+3430076e:	4b12      	ldr	r3, [pc, #72]	@ (343007b8 <pulse+0x50>)
+34300770:	619a      	str	r2, [r3, #24]
+34300772:	f3bf 8f4f 	dsb	sy
+34300776:	f242 7210 	movw	r2, #10000	@ 0x2710
+3430077a:	f44f 7c48 	mov.w	ip, #800	@ 0x320
+3430077e:	4611      	mov	r1, r2
+34300780:	4d0e      	ldr	r5, [pc, #56]	@ (343007bc <pulse+0x54>)
+34300782:	4f0f      	ldr	r7, [pc, #60]	@ (343007c0 <pulse+0x58>)
+34300784:	686e      	ldr	r6, [r5, #4]
+34300786:	686c      	ldr	r4, [r5, #4]
+34300788:	69bb      	ldr	r3, [r7, #24]
+3430078a:	1ba4      	subs	r4, r4, r6
+3430078c:	fbbc f3f3 	udiv	r3, ip, r3
+34300790:	4343      	muls	r3, r0
+34300792:	429c      	cmp	r4, r3
+34300794:	d203      	bcs.n	3430079e <pulse+0x36>
+34300796:	3901      	subs	r1, #1
+34300798:	f102 32ff 	add.w	r2, r2, #4294967295
+3430079c:	d109      	bne.n	343007b2 <pulse+0x4a>
+3430079e:	f04f 5180 	mov.w	r1, #268435456	@ 0x10000000
+343007a2:	4b05      	ldr	r3, [pc, #20]	@ (343007b8 <pulse+0x50>)
+343007a4:	6199      	str	r1, [r3, #24]
+343007a6:	f3bf 8f4f 	dsb	sy
+343007aa:	b922      	cbnz	r2, 343007b6 <pulse+0x4e>
+343007ac:	201f      	movs	r0, #31
+343007ae:	f7ff fe31 	bl	34300414 <finish>
+343007b2:	bf00      	nop
+343007b4:	e7e7      	b.n	34300786 <pulse+0x1e>
+343007b6:	bdf8      	pop	{r3, r4, r5, r6, r7, pc}
+343007b8:	56020c00 	.word	0x56020c00
+343007bc:	e0001000 	.word	0xe0001000
+343007c0:	343c2000 	.word	0x343c2000
+
+343007c4 <SysTick_Handler>:
+343007c4:	4a03      	ldr	r2, [pc, #12]	@ (343007d4 <SysTick_Handler+0x10>)
+343007c6:	f8d2 30c4 	ldr.w	r3, [r2, #196]	@ 0xc4
+343007ca:	3301      	adds	r3, #1
+343007cc:	f8c2 30c4 	str.w	r3, [r2, #196]	@ 0xc4
+343007d0:	4770      	bx	lr
+343007d2:	bf00      	nop
+343007d4:	343c2000 	.word	0x343c2000
+
+343007d8 <isolated_fault>:
+343007d8:	b508      	push	{r3, lr}
+343007da:	f3ef 8005 	mrs	r0, IPSR
+343007de:	f440 4070 	orr.w	r0, r0, #61440	@ 0xf000
+343007e2:	f7ff fe17 	bl	34300414 <finish>
+
+343007e6 <isolated_main>:
+343007e6:	b5f8      	push	{r3, r4, r5, r6, r7, lr}
+343007e8:	f44f 7e80 	mov.w	lr, #256	@ 0x100
+343007ec:	4a96      	ldr	r2, [pc, #600]	@ (34300a48 <isolated_main+0x262>)
+343007ee:	2100      	movs	r1, #0
+343007f0:	4613      	mov	r3, r2
+343007f2:	f04e e001 	dls	lr, lr
+343007f6:	f842 1b04 	str.w	r1, [r2], #4
+343007fa:	f00f c005 	le	lr, 343007f6 <isolated_main+0x10>
+343007fe:	4a93      	ldr	r2, [pc, #588]	@ (34300a4c <isolated_main+0x266>)
+34300800:	601a      	str	r2, [r3, #0]
+34300802:	2204      	movs	r2, #4
+34300804:	605a      	str	r2, [r3, #4]
+34300806:	4a92      	ldr	r2, [pc, #584]	@ (34300a50 <isolated_main+0x26a>)
+34300808:	f8d2 1f04 	ldr.w	r1, [r2, #3844]	@ 0xf04
+3430080c:	6099      	str	r1, [r3, #8]
+3430080e:	2101      	movs	r1, #1
+34300810:	60d9      	str	r1, [r3, #12]
+34300812:	f8d2 1f08 	ldr.w	r1, [r2, #3848]	@ 0xf08
+34300816:	6159      	str	r1, [r3, #20]
+34300818:	f8d2 1f0c 	ldr.w	r1, [r2, #3852]	@ 0xf0c
+3430081c:	6199      	str	r1, [r3, #24]
+3430081e:	498d      	ldr	r1, [pc, #564]	@ (34300a54 <isolated_main+0x26e>)
+34300820:	690c      	ldr	r4, [r1, #16]
+34300822:	63dc      	str	r4, [r3, #60]	@ 0x3c
+34300824:	6358      	str	r0, [r3, #52]	@ 0x34
+34300826:	6888      	ldr	r0, [r1, #8]
+34300828:	6398      	str	r0, [r3, #56]	@ 0x38
+3430082a:	6949      	ldr	r1, [r1, #20]
+3430082c:	61d9      	str	r1, [r3, #28]
+3430082e:	f3ef 8114 	mrs	r1, CONTROL
+34300832:	6219      	str	r1, [r3, #32]
+34300834:	f3ef 8105 	mrs	r1, IPSR
+34300838:	6259      	str	r1, [r3, #36]	@ 0x24
+3430083a:	f3ef 8110 	mrs	r1, PRIMASK
+3430083e:	6299      	str	r1, [r3, #40]	@ 0x28
+34300840:	f3ef 8113 	mrs	r1, FAULTMASK
+34300844:	62d9      	str	r1, [r3, #44]	@ 0x2c
+34300846:	4984      	ldr	r1, [pc, #528]	@ (34300a58 <isolated_main+0x272>)
+34300848:	6b49      	ldr	r1, [r1, #52]	@ 0x34
+3430084a:	6319      	str	r1, [r3, #48]	@ 0x30
+3430084c:	f04f 21e0 	mov.w	r1, #3758153728	@ 0xe000e000
+34300850:	6908      	ldr	r0, [r1, #16]
+34300852:	f8c3 00b4 	str.w	r0, [r3, #180]	@ 0xb4
+34300856:	6949      	ldr	r1, [r1, #20]
+34300858:	f8c3 10b8 	str.w	r1, [r3, #184]	@ 0xb8
+3430085c:	f8d2 1f00 	ldr.w	r1, [r2, #3840]	@ 0xf00
+34300860:	4b7e      	ldr	r3, [pc, #504]	@ (34300a5c <isolated_main+0x276>)
+34300862:	4299      	cmp	r1, r3
+34300864:	d123      	bne.n	343008ae <isolated_main+0xc8>
+34300866:	f8d2 3f04 	ldr.w	r3, [r2, #3844]	@ 0xf04
+3430086a:	b303      	cbz	r3, 343008ae <isolated_main+0xc8>
+3430086c:	f8d2 3f08 	ldr.w	r3, [r2, #3848]	@ 0xf08
+34300870:	2b01      	cmp	r3, #1
+34300872:	d81c      	bhi.n	343008ae <isolated_main+0xc8>
+34300874:	f8d2 3f0c 	ldr.w	r3, [r2, #3852]	@ 0xf0c
+34300878:	2b01      	cmp	r3, #1
+3430087a:	d00b      	beq.n	34300894 <isolated_main+0xae>
+3430087c:	f8d2 3f0c 	ldr.w	r3, [r2, #3852]	@ 0xf0c
+34300880:	2b02      	cmp	r3, #2
+34300882:	d007      	beq.n	34300894 <isolated_main+0xae>
+34300884:	f8d2 3f0c 	ldr.w	r3, [r2, #3852]	@ 0xf0c
+34300888:	2b04      	cmp	r3, #4
+3430088a:	d003      	beq.n	34300894 <isolated_main+0xae>
+3430088c:	f8d2 3f0c 	ldr.w	r3, [r2, #3852]	@ 0xf0c
+34300890:	2b08      	cmp	r3, #8
+34300892:	d10c      	bne.n	343008ae <isolated_main+0xc8>
+34300894:	4b6e      	ldr	r3, [pc, #440]	@ (34300a50 <isolated_main+0x26a>)
+34300896:	f8d3 2f10 	ldr.w	r2, [r3, #3856]	@ 0xf10
+3430089a:	b942      	cbnz	r2, 343008ae <isolated_main+0xc8>
+3430089c:	f8d3 2f14 	ldr.w	r2, [r3, #3860]	@ 0xf14
+343008a0:	b92a      	cbnz	r2, 343008ae <isolated_main+0xc8>
+343008a2:	f8d3 2f18 	ldr.w	r2, [r3, #3864]	@ 0xf18
+343008a6:	b912      	cbnz	r2, 343008ae <isolated_main+0xc8>
+343008a8:	f8d3 3f1c 	ldr.w	r3, [r3, #3868]	@ 0xf1c
+343008ac:	b113      	cbz	r3, 343008b4 <isolated_main+0xce>
+343008ae:	2001      	movs	r0, #1
+343008b0:	f7ff fdb0 	bl	34300414 <finish>
+343008b4:	4b64      	ldr	r3, [pc, #400]	@ (34300a48 <isolated_main+0x262>)
+343008b6:	4a6a      	ldr	r2, [pc, #424]	@ (34300a60 <isolated_main+0x27a>)
+343008b8:	6999      	ldr	r1, [r3, #24]
+343008ba:	fbb2 f2f1 	udiv	r2, r2, r1
+343008be:	2164      	movs	r1, #100	@ 0x64
+343008c0:	f8c3 2120 	str.w	r2, [r3, #288]	@ 0x120
+343008c4:	f8d3 2120 	ldr.w	r2, [r3, #288]	@ 0x120
+343008c8:	fbb2 f2f1 	udiv	r2, r2, r1
+343008cc:	3a01      	subs	r2, #1
+343008ce:	f8c3 20bc 	str.w	r2, [r3, #188]	@ 0xbc
+343008d2:	69da      	ldr	r2, [r3, #28]
+343008d4:	f412 3f40 	tst.w	r2, #196608	@ 0x30000
+343008d8:	d113      	bne.n	34300902 <isolated_main+0x11c>
+343008da:	6a1a      	ldr	r2, [r3, #32]
+343008dc:	b98a      	cbnz	r2, 34300902 <isolated_main+0x11c>
+343008de:	6a5a      	ldr	r2, [r3, #36]	@ 0x24
+343008e0:	b97a      	cbnz	r2, 34300902 <isolated_main+0x11c>
+343008e2:	6a9a      	ldr	r2, [r3, #40]	@ 0x28
+343008e4:	2a01      	cmp	r2, #1
+343008e6:	d10c      	bne.n	34300902 <isolated_main+0x11c>
+343008e8:	6ada      	ldr	r2, [r3, #44]	@ 0x2c
+343008ea:	b952      	cbnz	r2, 34300902 <isolated_main+0x11c>
+343008ec:	6b1b      	ldr	r3, [r3, #48]	@ 0x30
+343008ee:	07dc      	lsls	r4, r3, #31
+343008f0:	d407      	bmi.n	34300902 <isolated_main+0x11c>
+343008f2:	4b55      	ldr	r3, [pc, #340]	@ (34300a48 <isolated_main+0x262>)
+343008f4:	f8d3 20b4 	ldr.w	r2, [r3, #180]	@ 0xb4
+343008f8:	b91a      	cbnz	r2, 34300902 <isolated_main+0x11c>
+343008fa:	6bd9      	ldr	r1, [r3, #60]	@ 0x3c
+343008fc:	f011 0106 	ands.w	r1, r1, #6
+34300900:	d001      	beq.n	34300906 <isolated_main+0x120>
+34300902:	2002      	movs	r0, #2
+34300904:	e7d4      	b.n	343008b0 <isolated_main+0xca>
+34300906:	f04f 22e0 	mov.w	r2, #3758153728	@ 0xe000e000
+3430090a:	6852      	ldr	r2, [r2, #4]
+3430090c:	4d55      	ldr	r5, [pc, #340]	@ (34300a64 <isolated_main+0x27e>)
+3430090e:	f002 020f 	and.w	r2, r2, #15
+34300912:	3201      	adds	r2, #1
+34300914:	2a00      	cmp	r2, #0
+34300916:	4696      	mov	lr, r2
+34300918:	bf14      	ite	ne
+3430091a:	4696      	movne	lr, r2
+3430091c:	f04f 0e01 	moveq.w	lr, #1
+34300920:	f04e e001 	dls	lr, lr
+34300924:	f8c3 212c 	str.w	r2, [r3, #300]	@ 0x12c
+34300928:	0088      	lsls	r0, r1, #2
+3430092a:	f100 4060 	add.w	r0, r0, #3758096384	@ 0xe0000000
+3430092e:	f500 4061 	add.w	r0, r0, #57600	@ 0xe100
+34300932:	6806      	ldr	r6, [r0, #0]
+34300934:	f8d3 40a4 	ldr.w	r4, [r3, #164]	@ 0xa4
+34300938:	4334      	orrs	r4, r6
+3430093a:	f8c3 40a4 	str.w	r4, [r3, #164]	@ 0xa4
+3430093e:	f8d0 0100 	ldr.w	r0, [r0, #256]	@ 0x100
+34300942:	f845 0021 	str.w	r0, [r5, r1, lsl #2]
+34300946:	f855 4021 	ldr.w	r4, [r5, r1, lsl #2]
+3430094a:	f8d3 00a8 	ldr.w	r0, [r3, #168]	@ 0xa8
+3430094e:	3101      	adds	r1, #1
+34300950:	4320      	orrs	r0, r4
+34300952:	f8c3 00a8 	str.w	r0, [r3, #168]	@ 0xa8
+34300956:	f00f c819 	le	lr, 34300928 <isolated_main+0x142>
+3430095a:	f8d3 10a4 	ldr.w	r1, [r3, #164]	@ 0xa4
+3430095e:	b109      	cbz	r1, 34300964 <isolated_main+0x17e>
+34300960:	2004      	movs	r0, #4
+34300962:	e7a5      	b.n	343008b0 <isolated_main+0xca>
+34300964:	2a00      	cmp	r2, #0
+34300966:	4696      	mov	lr, r2
+34300968:	bf14      	ite	ne
+3430096a:	4696      	movne	lr, r2
+3430096c:	f04f 0e01 	moveq.w	lr, #1
+34300970:	4608      	mov	r0, r1
+34300972:	f04e e001 	dls	lr, lr
+34300976:	4e34      	ldr	r6, [pc, #208]	@ (34300a48 <isolated_main+0x262>)
+34300978:	0083      	lsls	r3, r0, #2
+3430097a:	f103 4360 	add.w	r3, r3, #3758096384	@ 0xe0000000
+3430097e:	f503 4361 	add.w	r3, r3, #57600	@ 0xe100
+34300982:	f855 4020 	ldr.w	r4, [r5, r0, lsl #2]
+34300986:	681f      	ldr	r7, [r3, #0]
+34300988:	3001      	adds	r0, #1
+3430098a:	ea24 0407 	bic.w	r4, r4, r7
+3430098e:	f8c3 4180 	str.w	r4, [r3, #384]	@ 0x180
+34300992:	f8d6 3130 	ldr.w	r3, [r6, #304]	@ 0x130
+34300996:	4323      	orrs	r3, r4
+34300998:	f8c6 3130 	str.w	r3, [r6, #304]	@ 0x130
+3430099c:	f00f c015 	le	lr, 34300978 <isolated_main+0x192>
+343009a0:	f3bf 8f4f 	dsb	sy
+343009a4:	f3bf 8f6f 	isb	sy
+343009a8:	482f      	ldr	r0, [pc, #188]	@ (34300a68 <isolated_main+0x282>)
+343009aa:	4696      	mov	lr, r2
+343009ac:	4d2f      	ldr	r5, [pc, #188]	@ (34300a6c <isolated_main+0x286>)
+343009ae:	4b26      	ldr	r3, [pc, #152]	@ (34300a48 <isolated_main+0x262>)
+343009b0:	b90a      	cbnz	r2, 343009b6 <isolated_main+0x1d0>
+343009b2:	f04f 0e01 	mov.w	lr, #1
+343009b6:	f04e e001 	dls	lr, lr
+343009ba:	f101 0240 	add.w	r2, r1, #64	@ 0x40
+343009be:	f855 2022 	ldr.w	r2, [r5, r2, lsl #2]
+343009c2:	f840 2021 	str.w	r2, [r0, r1, lsl #2]
+343009c6:	f850 4021 	ldr.w	r4, [r0, r1, lsl #2]
+343009ca:	f8d3 2134 	ldr.w	r2, [r3, #308]	@ 0x134
+343009ce:	3101      	adds	r1, #1
+343009d0:	4322      	orrs	r2, r4
+343009d2:	f8c3 2134 	str.w	r2, [r3, #308]	@ 0x134
+343009d6:	f00f c011 	le	lr, 343009ba <isolated_main+0x1d4>
+343009da:	4a25      	ldr	r2, [pc, #148]	@ (34300a70 <isolated_main+0x28a>)
+343009dc:	6a11      	ldr	r1, [r2, #32]
+343009de:	6599      	str	r1, [r3, #88]	@ 0x58
+343009e0:	6a51      	ldr	r1, [r2, #36]	@ 0x24
+343009e2:	65d9      	str	r1, [r3, #92]	@ 0x5c
+343009e4:	f8d2 10c4 	ldr.w	r1, [r2, #196]	@ 0xc4
+343009e8:	6619      	str	r1, [r3, #96]	@ 0x60
+343009ea:	f8d2 1080 	ldr.w	r1, [r2, #128]	@ 0x80
+343009ee:	66d9      	str	r1, [r3, #108]	@ 0x6c
+343009f0:	f8d2 1084 	ldr.w	r1, [r2, #132]	@ 0x84
+343009f4:	6719      	str	r1, [r3, #112]	@ 0x70
+343009f6:	f8d2 1088 	ldr.w	r1, [r2, #136]	@ 0x88
+343009fa:	6759      	str	r1, [r3, #116]	@ 0x74
+343009fc:	6d98      	ldr	r0, [r3, #88]	@ 0x58
+343009fe:	491d      	ldr	r1, [pc, #116]	@ (34300a74 <isolated_main+0x28e>)
+34300a00:	4288      	cmp	r0, r1
+34300a02:	d113      	bne.n	34300a2c <isolated_main+0x246>
+34300a04:	6dd9      	ldr	r1, [r3, #92]	@ 0x5c
+34300a06:	f5b1 1f80 	cmp.w	r1, #1048576	@ 0x100000
+34300a0a:	d10f      	bne.n	34300a2c <isolated_main+0x246>
+34300a0c:	6ed8      	ldr	r0, [r3, #108]	@ 0x6c
+34300a0e:	491a      	ldr	r1, [pc, #104]	@ (34300a78 <isolated_main+0x292>)
+34300a10:	4288      	cmp	r0, r1
+34300a12:	d10b      	bne.n	34300a2c <isolated_main+0x246>
+34300a14:	6f19      	ldr	r1, [r3, #112]	@ 0x70
+34300a16:	b949      	cbnz	r1, 34300a2c <isolated_main+0x246>
+34300a18:	6f58      	ldr	r0, [r3, #116]	@ 0x74
+34300a1a:	4918      	ldr	r1, [pc, #96]	@ (34300a7c <isolated_main+0x296>)
+34300a1c:	4288      	cmp	r0, r1
+34300a1e:	d105      	bne.n	34300a2c <isolated_main+0x246>
+34300a20:	6e19      	ldr	r1, [r3, #96]	@ 0x60
+34300a22:	4b17      	ldr	r3, [pc, #92]	@ (34300a80 <isolated_main+0x29a>)
+34300a24:	400b      	ands	r3, r1
+34300a26:	f5b3 3f00 	cmp.w	r3, #131072	@ 0x20000
+34300a2a:	d001      	beq.n	34300a30 <isolated_main+0x24a>
+34300a2c:	2005      	movs	r0, #5
+34300a2e:	e73f      	b.n	343008b0 <isolated_main+0xca>
+34300a30:	6813      	ldr	r3, [r2, #0]
+34300a32:	05d8      	lsls	r0, r3, #23
+34300a34:	d506      	bpl.n	34300a44 <isolated_main+0x25e>
+34300a36:	6853      	ldr	r3, [r2, #4]
+34300a38:	05d9      	lsls	r1, r3, #23
+34300a3a:	d503      	bpl.n	34300a44 <isolated_main+0x25e>
+34300a3c:	f8d2 3240 	ldr.w	r3, [r2, #576]	@ 0x240
+34300a40:	07db      	lsls	r3, r3, #31
+34300a42:	d41f      	bmi.n	34300a84 <isolated_main+0x29e>
+34300a44:	2011      	movs	r0, #17
+34300a46:	e733      	b.n	343008b0 <isolated_main+0xca>
+34300a48:	343c2000 	.word	0x343c2000
+34300a4c:	314f5349 	.word	0x314f5349
+34300a50:	343c1000 	.word	0x343c1000
+34300a54:	e000ed00 	.word	0xe000ed00
+34300a58:	e000ef00 	.word	0xe000ef00
+34300a5c:	31514552 	.word	0x31514552
+34300a60:	17d78400 	.word	0x17d78400
+34300a64:	343c2380 	.word	0x343c2380
+34300a68:	343c23c0 	.word	0x343c23c0
+34300a6c:	e000e100 	.word	0xe000e100
+34300a70:	56028000 	.word	0x56028000
+34300a74:	33330000 	.word	0x33330000
+34300a78:	00404b00 	.word	0x00404b00
+34300a7c:	49000005 	.word	0x49000005
+34300a80:	30ff0000 	.word	0x30ff0000
+34300a84:	4ad6      	ldr	r2, [pc, #856]	@ (34300de0 <isolated_main+0x5fa>)
+34300a86:	4bd7      	ldr	r3, [pc, #860]	@ (34300de4 <isolated_main+0x5fe>)
+34300a88:	6811      	ldr	r1, [r2, #0]
+34300a8a:	2401      	movs	r4, #1
+34300a8c:	f8c3 1180 	str.w	r1, [r3, #384]	@ 0x180
+34300a90:	6851      	ldr	r1, [r2, #4]
+34300a92:	f8c3 1184 	str.w	r1, [r3, #388]	@ 0x184
+34300a96:	6a11      	ldr	r1, [r2, #32]
+34300a98:	f8c3 1188 	str.w	r1, [r3, #392]	@ 0x188
+34300a9c:	6a51      	ldr	r1, [r2, #36]	@ 0x24
+34300a9e:	f8c3 118c 	str.w	r1, [r3, #396]	@ 0x18c
+34300aa2:	f8d2 1080 	ldr.w	r1, [r2, #128]	@ 0x80
+34300aa6:	f8c3 1190 	str.w	r1, [r3, #400]	@ 0x190
+34300aaa:	f8d2 1084 	ldr.w	r1, [r2, #132]	@ 0x84
+34300aae:	f8c3 1194 	str.w	r1, [r3, #404]	@ 0x194
+34300ab2:	f8d2 1088 	ldr.w	r1, [r2, #136]	@ 0x88
+34300ab6:	f8c3 1198 	str.w	r1, [r3, #408]	@ 0x198
+34300aba:	f8d2 1090 	ldr.w	r1, [r2, #144]	@ 0x90
+34300abe:	f8c3 119c 	str.w	r1, [r3, #412]	@ 0x19c
+34300ac2:	f8d2 1094 	ldr.w	r1, [r2, #148]	@ 0x94
+34300ac6:	f8c3 11a0 	str.w	r1, [r3, #416]	@ 0x1a0
+34300aca:	f8d2 1098 	ldr.w	r1, [r2, #152]	@ 0x98
+34300ace:	f8c3 11a4 	str.w	r1, [r3, #420]	@ 0x1a4
+34300ad2:	f8d2 10a0 	ldr.w	r1, [r2, #160]	@ 0xa0
+34300ad6:	f8c3 11a8 	str.w	r1, [r3, #424]	@ 0x1a8
+34300ada:	f8d2 10a4 	ldr.w	r1, [r2, #164]	@ 0xa4
+34300ade:	f8c3 11ac 	str.w	r1, [r3, #428]	@ 0x1ac
+34300ae2:	f8d2 10a8 	ldr.w	r1, [r2, #168]	@ 0xa8
+34300ae6:	f8c3 11b0 	str.w	r1, [r3, #432]	@ 0x1b0
+34300aea:	f8d2 10b0 	ldr.w	r1, [r2, #176]	@ 0xb0
+34300aee:	f8c3 11b4 	str.w	r1, [r3, #436]	@ 0x1b4
+34300af2:	f8d2 10b4 	ldr.w	r1, [r2, #180]	@ 0xb4
+34300af6:	f8c3 11b8 	str.w	r1, [r3, #440]	@ 0x1b8
+34300afa:	f8d2 10b8 	ldr.w	r1, [r2, #184]	@ 0xb8
+34300afe:	f8c3 11bc 	str.w	r1, [r3, #444]	@ 0x1bc
+34300b02:	f8d2 10c4 	ldr.w	r1, [r2, #196]	@ 0xc4
+34300b06:	f8c3 11c0 	str.w	r1, [r3, #448]	@ 0x1c0
+34300b0a:	f8d2 10c8 	ldr.w	r1, [r2, #200]	@ 0xc8
+34300b0e:	f8c3 11c4 	str.w	r1, [r3, #452]	@ 0x1c4
+34300b12:	f8d2 10cc 	ldr.w	r1, [r2, #204]	@ 0xcc
+34300b16:	f8c3 11c8 	str.w	r1, [r3, #456]	@ 0x1c8
+34300b1a:	f8d2 10d0 	ldr.w	r1, [r2, #208]	@ 0xd0
+34300b1e:	f8c3 11cc 	str.w	r1, [r3, #460]	@ 0x1cc
+34300b22:	f8d2 10d4 	ldr.w	r1, [r2, #212]	@ 0xd4
+34300b26:	f8c3 11d0 	str.w	r1, [r3, #464]	@ 0x1d0
+34300b2a:	f8d2 10d8 	ldr.w	r1, [r2, #216]	@ 0xd8
+34300b2e:	f8c3 11d4 	str.w	r1, [r3, #468]	@ 0x1d4
+34300b32:	f8d2 10ec 	ldr.w	r1, [r2, #236]	@ 0xec
+34300b36:	f8c3 11d8 	str.w	r1, [r3, #472]	@ 0x1d8
+34300b3a:	f8d2 1104 	ldr.w	r1, [r2, #260]	@ 0x104
+34300b3e:	f8c3 11dc 	str.w	r1, [r3, #476]	@ 0x1dc
+34300b42:	f8d2 1108 	ldr.w	r1, [r2, #264]	@ 0x108
+34300b46:	f8c3 11e0 	str.w	r1, [r3, #480]	@ 0x1e0
+34300b4a:	f8d2 1240 	ldr.w	r1, [r2, #576]	@ 0x240
+34300b4e:	f8c3 11e4 	str.w	r1, [r3, #484]	@ 0x1e4
+34300b52:	f8d2 1244 	ldr.w	r1, [r2, #580]	@ 0x244
+34300b56:	f8c3 11e8 	str.w	r1, [r3, #488]	@ 0x1e8
+34300b5a:	f8d2 1248 	ldr.w	r1, [r2, #584]	@ 0x248
+34300b5e:	f8c3 11ec 	str.w	r1, [r3, #492]	@ 0x1ec
+34300b62:	f8d2 124c 	ldr.w	r1, [r2, #588]	@ 0x24c
+34300b66:	f8c3 11f0 	str.w	r1, [r3, #496]	@ 0x1f0
+34300b6a:	f8d2 1250 	ldr.w	r1, [r2, #592]	@ 0x250
+34300b6e:	f8c3 11f4 	str.w	r1, [r3, #500]	@ 0x1f4
+34300b72:	f8d2 1254 	ldr.w	r1, [r2, #596]	@ 0x254
+34300b76:	f8c3 11f8 	str.w	r1, [r3, #504]	@ 0x1f8
+34300b7a:	f8d2 1258 	ldr.w	r1, [r2, #600]	@ 0x258
+34300b7e:	f8c3 11fc 	str.w	r1, [r3, #508]	@ 0x1fc
+34300b82:	f8d2 125c 	ldr.w	r1, [r2, #604]	@ 0x25c
+34300b86:	f8c3 1200 	str.w	r1, [r3, #512]	@ 0x200
+34300b8a:	f8d2 1260 	ldr.w	r1, [r2, #608]	@ 0x260
+34300b8e:	f8c3 1204 	str.w	r1, [r3, #516]	@ 0x204
+34300b92:	f8d2 1264 	ldr.w	r1, [r2, #612]	@ 0x264
+34300b96:	f8c3 1208 	str.w	r1, [r3, #520]	@ 0x208
+34300b9a:	f8d2 1268 	ldr.w	r1, [r2, #616]	@ 0x268
+34300b9e:	f8c3 120c 	str.w	r1, [r3, #524]	@ 0x20c
+34300ba2:	f8d2 126c 	ldr.w	r1, [r2, #620]	@ 0x26c
+34300ba6:	f8c3 1210 	str.w	r1, [r3, #528]	@ 0x210
+34300baa:	f8d2 1270 	ldr.w	r1, [r2, #624]	@ 0x270
+34300bae:	f8c3 1214 	str.w	r1, [r3, #532]	@ 0x214
+34300bb2:	f8d2 1274 	ldr.w	r1, [r2, #628]	@ 0x274
+34300bb6:	f8c3 1218 	str.w	r1, [r3, #536]	@ 0x218
+34300bba:	f8d2 1278 	ldr.w	r1, [r2, #632]	@ 0x278
+34300bbe:	f8c3 121c 	str.w	r1, [r3, #540]	@ 0x21c
+34300bc2:	f8d2 127c 	ldr.w	r1, [r2, #636]	@ 0x27c
+34300bc6:	f8c3 1220 	str.w	r1, [r3, #544]	@ 0x220
+34300bca:	f8d2 1284 	ldr.w	r1, [r2, #644]	@ 0x284
+34300bce:	f8c3 1224 	str.w	r1, [r3, #548]	@ 0x224
+34300bd2:	f8d2 1288 	ldr.w	r1, [r2, #648]	@ 0x288
+34300bd6:	f8c3 1228 	str.w	r1, [r3, #552]	@ 0x228
+34300bda:	f8d2 128c 	ldr.w	r1, [r2, #652]	@ 0x28c
+34300bde:	f8c3 122c 	str.w	r1, [r3, #556]	@ 0x22c
+34300be2:	f8d2 1290 	ldr.w	r1, [r2, #656]	@ 0x290
+34300be6:	f8c3 1230 	str.w	r1, [r3, #560]	@ 0x230
+34300bea:	f8d2 1294 	ldr.w	r1, [r2, #660]	@ 0x294
+34300bee:	f8c3 1234 	str.w	r1, [r3, #564]	@ 0x234
+34300bf2:	f8d2 1298 	ldr.w	r1, [r2, #664]	@ 0x298
+34300bf6:	f8c3 1238 	str.w	r1, [r3, #568]	@ 0x238
+34300bfa:	f8d2 129c 	ldr.w	r1, [r2, #668]	@ 0x29c
+34300bfe:	f8c3 123c 	str.w	r1, [r3, #572]	@ 0x23c
+34300c02:	f8d2 12a0 	ldr.w	r1, [r2, #672]	@ 0x2a0
+34300c06:	f8c3 1240 	str.w	r1, [r3, #576]	@ 0x240
+34300c0a:	f8d2 12a4 	ldr.w	r1, [r2, #676]	@ 0x2a4
+34300c0e:	f8c3 1244 	str.w	r1, [r3, #580]	@ 0x244
+34300c12:	f8d2 12a8 	ldr.w	r1, [r2, #680]	@ 0x2a8
+34300c16:	f8c3 1248 	str.w	r1, [r3, #584]	@ 0x248
+34300c1a:	f8d2 12ac 	ldr.w	r1, [r2, #684]	@ 0x2ac
+34300c1e:	f8c3 124c 	str.w	r1, [r3, #588]	@ 0x24c
+34300c22:	f8d2 12b0 	ldr.w	r1, [r2, #688]	@ 0x2b0
+34300c26:	f8c3 1250 	str.w	r1, [r3, #592]	@ 0x250
+34300c2a:	f8d2 12b4 	ldr.w	r1, [r2, #692]	@ 0x2b4
+34300c2e:	f8c3 1254 	str.w	r1, [r3, #596]	@ 0x254
+34300c32:	f8d2 12b8 	ldr.w	r1, [r2, #696]	@ 0x2b8
+34300c36:	f8c3 1258 	str.w	r1, [r3, #600]	@ 0x258
+34300c3a:	f8d2 12bc 	ldr.w	r1, [r2, #700]	@ 0x2bc
+34300c3e:	f8c3 125c 	str.w	r1, [r3, #604]	@ 0x25c
+34300c42:	2138      	movs	r1, #56	@ 0x38
+34300c44:	f8c3 1128 	str.w	r1, [r3, #296]	@ 0x128
+34300c48:	f8c3 4124 	str.w	r4, [r3, #292]	@ 0x124
+34300c4c:	6e19      	ldr	r1, [r3, #96]	@ 0x60
+34300c4e:	6998      	ldr	r0, [r3, #24]
+34300c50:	f421 017f 	bic.w	r1, r1, #16711680	@ 0xff0000
+34300c54:	eb00 0040 	add.w	r0, r0, r0, lsl #1
+34300c58:	3801      	subs	r0, #1
+34300c5a:	ea41 4100 	orr.w	r1, r1, r0, lsl #16
+34300c5e:	f8c2 10c4 	str.w	r1, [r2, #196]	@ 0xc4
+34300c62:	f3bf 8f4f 	dsb	sy
+34300c66:	f3bf 8f6f 	isb	sy
+34300c6a:	f8d2 00c4 	ldr.w	r0, [r2, #196]	@ 0xc4
+34300c6e:	6658      	str	r0, [r3, #100]	@ 0x64
+34300c70:	6e58      	ldr	r0, [r3, #100]	@ 0x64
+34300c72:	4288      	cmp	r0, r1
+34300c74:	d001      	beq.n	34300c7a <isolated_main+0x494>
+34300c76:	2012      	movs	r0, #18
+34300c78:	e61a      	b.n	343008b0 <isolated_main+0xca>
+34300c7a:	f8d2 127c 	ldr.w	r1, [r2, #636]	@ 0x27c
+34300c7e:	6799      	str	r1, [r3, #120]	@ 0x78
+34300c80:	f8d2 1260 	ldr.w	r1, [r2, #608]	@ 0x260
+34300c84:	f8c3 1080 	str.w	r1, [r3, #128]	@ 0x80
+34300c88:	f8d2 124c 	ldr.w	r1, [r2, #588]	@ 0x24c
+34300c8c:	f8c3 1088 	str.w	r1, [r3, #136]	@ 0x88
+34300c90:	6f99      	ldr	r1, [r3, #120]	@ 0x78
+34300c92:	f011 0f44 	tst.w	r1, #68	@ 0x44
+34300c96:	d103      	bne.n	34300ca0 <isolated_main+0x4ba>
+34300c98:	f8d3 1080 	ldr.w	r1, [r3, #128]	@ 0x80
+34300c9c:	060f      	lsls	r7, r1, #24
+34300c9e:	d501      	bpl.n	34300ca4 <isolated_main+0x4be>
+34300ca0:	2006      	movs	r0, #6
+34300ca2:	e605      	b.n	343008b0 <isolated_main+0xca>
+34300ca4:	f8d2 128c 	ldr.w	r1, [r2, #652]	@ 0x28c
+34300ca8:	f8c3 1090 	str.w	r1, [r3, #144]	@ 0x90
+34300cac:	f8d2 1298 	ldr.w	r1, [r2, #664]	@ 0x298
+34300cb0:	f8c3 1094 	str.w	r1, [r3, #148]	@ 0x94
+34300cb4:	f8d2 1284 	ldr.w	r1, [r2, #644]	@ 0x284
+34300cb8:	f8c3 1098 	str.w	r1, [r3, #152]	@ 0x98
+34300cbc:	f8d2 1278 	ldr.w	r1, [r2, #632]	@ 0x278
+34300cc0:	f8c3 109c 	str.w	r1, [r3, #156]	@ 0x9c
+34300cc4:	f8d2 12b8 	ldr.w	r1, [r2, #696]	@ 0x2b8
+34300cc8:	f8c3 10a0 	str.w	r1, [r3, #160]	@ 0xa0
+34300ccc:	f8d3 109c 	ldr.w	r1, [r3, #156]	@ 0x9c
+34300cd0:	078e      	lsls	r6, r1, #30
+34300cd2:	d401      	bmi.n	34300cd8 <isolated_main+0x4f2>
+34300cd4:	2007      	movs	r0, #7
+34300cd6:	e5eb      	b.n	343008b0 <isolated_main+0xca>
+34300cd8:	210e      	movs	r1, #14
+34300cda:	f8c3 4158 	str.w	r4, [r3, #344]	@ 0x158
+34300cde:	f8c2 1a8c 	str.w	r1, [r2, #2700]	@ 0xa8c
+34300ce2:	f44f 4184 	mov.w	r1, #16896	@ 0x4200
+34300ce6:	f8c2 1a98 	str.w	r1, [r2, #2712]	@ 0xa98
+34300cea:	2103      	movs	r1, #3
+34300cec:	f8c2 1a84 	str.w	r1, [r2, #2692]	@ 0xa84
+34300cf0:	2102      	movs	r1, #2
+34300cf2:	f8c2 1ab8 	str.w	r1, [r2, #2744]	@ 0xab8
+34300cf6:	f3bf 8f4f 	dsb	sy
+34300cfa:	f8d2 128c 	ldr.w	r1, [r2, #652]	@ 0x28c
+34300cfe:	f8c3 1138 	str.w	r1, [r3, #312]	@ 0x138
+34300d02:	f8d2 1298 	ldr.w	r1, [r2, #664]	@ 0x298
+34300d06:	f8c3 1140 	str.w	r1, [r3, #320]	@ 0x140
+34300d0a:	f8d2 1284 	ldr.w	r1, [r2, #644]	@ 0x284
+34300d0e:	f8c3 1148 	str.w	r1, [r3, #328]	@ 0x148
+34300d12:	f8d2 12b8 	ldr.w	r1, [r2, #696]	@ 0x2b8
+34300d16:	f8c3 1150 	str.w	r1, [r3, #336]	@ 0x150
+34300d1a:	f8d3 0138 	ldr.w	r0, [r3, #312]	@ 0x138
+34300d1e:	f8d3 1090 	ldr.w	r1, [r3, #144]	@ 0x90
+34300d22:	f041 010e 	orr.w	r1, r1, #14
+34300d26:	4288      	cmp	r0, r1
+34300d28:	d117      	bne.n	34300d5a <isolated_main+0x574>
+34300d2a:	f8d3 0140 	ldr.w	r0, [r3, #320]	@ 0x140
+34300d2e:	f8d3 1094 	ldr.w	r1, [r3, #148]	@ 0x94
+34300d32:	f441 4184 	orr.w	r1, r1, #16896	@ 0x4200
+34300d36:	4288      	cmp	r0, r1
+34300d38:	d10f      	bne.n	34300d5a <isolated_main+0x574>
+34300d3a:	f8d3 0148 	ldr.w	r0, [r3, #328]	@ 0x148
+34300d3e:	f8d3 1098 	ldr.w	r1, [r3, #152]	@ 0x98
+34300d42:	f041 0103 	orr.w	r1, r1, #3
+34300d46:	4288      	cmp	r0, r1
+34300d48:	d107      	bne.n	34300d5a <isolated_main+0x574>
+34300d4a:	f8d3 1150 	ldr.w	r1, [r3, #336]	@ 0x150
+34300d4e:	f8d3 30a0 	ldr.w	r3, [r3, #160]	@ 0xa0
+34300d52:	f043 0302 	orr.w	r3, r3, #2
+34300d56:	4299      	cmp	r1, r3
+34300d58:	d001      	beq.n	34300d5e <isolated_main+0x578>
+34300d5a:	2013      	movs	r0, #19
+34300d5c:	e5a8      	b.n	343008b0 <isolated_main+0xca>
+34300d5e:	f8d2 3248 	ldr.w	r3, [r2, #584]	@ 0x248
+34300d62:	07dd      	lsls	r5, r3, #31
+34300d64:	d503      	bpl.n	34300d6e <isolated_main+0x588>
+34300d66:	f8d2 3208 	ldr.w	r3, [r2, #520]	@ 0x208
+34300d6a:	07dc      	lsls	r4, r3, #31
+34300d6c:	d501      	bpl.n	34300d72 <isolated_main+0x58c>
+34300d6e:	2008      	movs	r0, #8
+34300d70:	e59e      	b.n	343008b0 <isolated_main+0xca>
+34300d72:	4a1d      	ldr	r2, [pc, #116]	@ (34300de8 <isolated_main+0x602>)
+34300d74:	4b1b      	ldr	r3, [pc, #108]	@ (34300de4 <isolated_main+0x5fe>)
+34300d76:	6851      	ldr	r1, [r2, #4]
+34300d78:	6499      	str	r1, [r3, #72]	@ 0x48
+34300d7a:	2101      	movs	r1, #1
+34300d7c:	6559      	str	r1, [r3, #84]	@ 0x54
+34300d7e:	6959      	ldr	r1, [r3, #20]
+34300d80:	07c8      	lsls	r0, r1, #31
+34300d82:	bf42      	ittt	mi
+34300d84:	6851      	ldrmi	r1, [r2, #4]
+34300d86:	f021 0101 	bicmi.w	r1, r1, #1
+34300d8a:	6051      	strmi	r1, [r2, #4]
+34300d8c:	6852      	ldr	r2, [r2, #4]
+34300d8e:	64da      	str	r2, [r3, #76]	@ 0x4c
+34300d90:	6cd8      	ldr	r0, [r3, #76]	@ 0x4c
+34300d92:	6c9a      	ldr	r2, [r3, #72]	@ 0x48
+34300d94:	6959      	ldr	r1, [r3, #20]
+34300d96:	f001 0101 	and.w	r1, r1, #1
+34300d9a:	ea22 0201 	bic.w	r2, r2, r1
+34300d9e:	4290      	cmp	r0, r2
+34300da0:	d001      	beq.n	34300da6 <isolated_main+0x5c0>
+34300da2:	2009      	movs	r0, #9
+34300da4:	e584      	b.n	343008b0 <isolated_main+0xca>
+34300da6:	4c11      	ldr	r4, [pc, #68]	@ (34300dec <isolated_main+0x606>)
+34300da8:	6822      	ldr	r2, [r4, #0]
+34300daa:	f8c3 2110 	str.w	r2, [r3, #272]	@ 0x110
+34300dae:	f8d3 2110 	ldr.w	r2, [r3, #272]	@ 0x110
+34300db2:	07d1      	lsls	r1, r2, #31
+34300db4:	d504      	bpl.n	34300dc0 <isolated_main+0x5da>
+34300db6:	480e      	ldr	r0, [pc, #56]	@ (34300df0 <isolated_main+0x60a>)
+34300db8:	f8d0 20fc 	ldr.w	r2, [r0, #252]	@ 0xfc
+34300dbc:	01d2      	lsls	r2, r2, #7
+34300dbe:	d401      	bmi.n	34300dc4 <isolated_main+0x5de>
+34300dc0:	200a      	movs	r0, #10
+34300dc2:	e575      	b.n	343008b0 <isolated_main+0xca>
+34300dc4:	4906      	ldr	r1, [pc, #24]	@ (34300de0 <isolated_main+0x5fa>)
+34300dc6:	f8d1 225c 	ldr.w	r2, [r1, #604]	@ 0x25c
+34300dca:	f002 0248 	and.w	r2, r2, #72	@ 0x48
+34300dce:	2a48      	cmp	r2, #72	@ 0x48
+34300dd0:	d104      	bne.n	34300ddc <isolated_main+0x5f6>
+34300dd2:	f8d1 521c 	ldr.w	r5, [r1, #540]	@ 0x21c
+34300dd6:	f015 0548 	ands.w	r5, r5, #72	@ 0x48
+34300dda:	d00b      	beq.n	34300df4 <isolated_main+0x60e>
+34300ddc:	200b      	movs	r0, #11
+34300dde:	e567      	b.n	343008b0 <isolated_main+0xca>
+34300de0:	56028000 	.word	0x56028000
+34300de4:	343c2000 	.word	0x343c2000
+34300de8:	54001000 	.word	0x54001000
+34300dec:	e0001000 	.word	0xe0001000
+34300df0:	e000ed00 	.word	0xe000ed00
+34300df4:	2201      	movs	r2, #1
+34300df6:	f8c3 2118 	str.w	r2, [r3, #280]	@ 0x118
+34300dfa:	4a7c      	ldr	r2, [pc, #496]	@ (34300fec <isolated_main+0x806>)
+34300dfc:	497c      	ldr	r1, [pc, #496]	@ (34300ff0 <isolated_main+0x80a>)
+34300dfe:	6816      	ldr	r6, [r2, #0]
+34300e00:	4031      	ands	r1, r6
+34300e02:	4e7c      	ldr	r6, [pc, #496]	@ (34300ff4 <isolated_main+0x80e>)
+34300e04:	42b1      	cmp	r1, r6
+34300e06:	d001      	beq.n	34300e0c <isolated_main+0x626>
+34300e08:	200c      	movs	r0, #12
+34300e0a:	e551      	b.n	343008b0 <isolated_main+0xca>
+34300e0c:	6951      	ldr	r1, [r2, #20]
+34300e0e:	270a      	movs	r7, #10
+34300e10:	f8c3 1100 	str.w	r1, [r3, #256]	@ 0x100
+34300e14:	f240 5101 	movw	r1, #1281	@ 0x501
+34300e18:	6191      	str	r1, [r2, #24]
+34300e1a:	f04f 5180 	mov.w	r1, #268435456	@ 0x10000000
+34300e1e:	6952      	ldr	r2, [r2, #20]
+34300e20:	f8c3 2104 	str.w	r2, [r3, #260]	@ 0x104
+34300e24:	4a74      	ldr	r2, [pc, #464]	@ (34300ff8 <isolated_main+0x812>)
+34300e26:	6191      	str	r1, [r2, #24]
+34300e28:	6851      	ldr	r1, [r2, #4]
+34300e2a:	f421 5180 	bic.w	r1, r1, #4096	@ 0x1000
+34300e2e:	6051      	str	r1, [r2, #4]
+34300e30:	68d1      	ldr	r1, [r2, #12]
+34300e32:	f021 7140 	bic.w	r1, r1, #50331648	@ 0x3000000
+34300e36:	60d1      	str	r1, [r2, #12]
+34300e38:	6891      	ldr	r1, [r2, #8]
+34300e3a:	f021 7140 	bic.w	r1, r1, #50331648	@ 0x3000000
+34300e3e:	f041 7180 	orr.w	r1, r1, #16777216	@ 0x1000000
+34300e42:	6091      	str	r1, [r2, #8]
+34300e44:	6811      	ldr	r1, [r2, #0]
+34300e46:	f021 7140 	bic.w	r1, r1, #50331648	@ 0x3000000
+34300e4a:	f041 7180 	orr.w	r1, r1, #16777216	@ 0x1000000
+34300e4e:	6011      	str	r1, [r2, #0]
+34300e50:	6902      	ldr	r2, [r0, #16]
+34300e52:	f022 0216 	bic.w	r2, r2, #22
+34300e56:	6102      	str	r2, [r0, #16]
+34300e58:	6902      	ldr	r2, [r0, #16]
+34300e5a:	641a      	str	r2, [r3, #64]	@ 0x40
+34300e5c:	2202      	movs	r2, #2
+34300e5e:	60da      	str	r2, [r3, #12]
+34300e60:	f7ff faac 	bl	343003bc <timer_start>
+34300e64:	6866      	ldr	r6, [r4, #4]
+34300e66:	4865      	ldr	r0, [pc, #404]	@ (34300ffc <isolated_main+0x816>)
+34300e68:	4b65      	ldr	r3, [pc, #404]	@ (34301000 <isolated_main+0x81a>)
+34300e6a:	f8d0 20c4 	ldr.w	r2, [r0, #196]	@ 0xc4
+34300e6e:	2a02      	cmp	r2, #2
+34300e70:	d809      	bhi.n	34300e86 <isolated_main+0x6a0>
+34300e72:	6861      	ldr	r1, [r4, #4]
+34300e74:	f8d0 2120 	ldr.w	r2, [r0, #288]	@ 0x120
+34300e78:	1b89      	subs	r1, r1, r6
+34300e7a:	fbb2 f2f7 	udiv	r2, r2, r7
+34300e7e:	4291      	cmp	r1, r2
+34300e80:	d201      	bcs.n	34300e86 <isolated_main+0x6a0>
+34300e82:	3b01      	subs	r3, #1
+34300e84:	d111      	bne.n	34300eaa <isolated_main+0x6c4>
+34300e86:	f7ff fab9 	bl	343003fc <timer_stop>
+34300e8a:	4b5c      	ldr	r3, [pc, #368]	@ (34300ffc <isolated_main+0x816>)
+34300e8c:	f8d3 20c4 	ldr.w	r2, [r3, #196]	@ 0xc4
+34300e90:	f8c3 20c8 	str.w	r2, [r3, #200]	@ 0xc8
+34300e94:	4a5b      	ldr	r2, [pc, #364]	@ (34301004 <isolated_main+0x81e>)
+34300e96:	6852      	ldr	r2, [r2, #4]
+34300e98:	1b92      	subs	r2, r2, r6
+34300e9a:	f8c3 2114 	str.w	r2, [r3, #276]	@ 0x114
+34300e9e:	f8d3 30c8 	ldr.w	r3, [r3, #200]	@ 0xc8
+34300ea2:	2b03      	cmp	r3, #3
+34300ea4:	d003      	beq.n	34300eae <isolated_main+0x6c8>
+34300ea6:	200d      	movs	r0, #13
+34300ea8:	e502      	b.n	343008b0 <isolated_main+0xca>
+34300eaa:	bf00      	nop
+34300eac:	e7dd      	b.n	34300e6a <isolated_main+0x684>
+34300eae:	f44f 7e80 	mov.w	lr, #256	@ 0x100
+34300eb2:	2300      	movs	r3, #0
+34300eb4:	f04e e001 	dls	lr, lr
+34300eb8:	4a53      	ldr	r2, [pc, #332]	@ (34301008 <isolated_main+0x822>)
+34300eba:	4854      	ldr	r0, [pc, #336]	@ (3430100c <isolated_main+0x826>)
+34300ebc:	3301      	adds	r3, #1
+34300ebe:	fb00 f103 	mul.w	r1, r0, r3
+34300ec2:	f842 1023 	str.w	r1, [r2, r3, lsl #2]
+34300ec6:	f00f c807 	le	lr, 34300ebc <isolated_main+0x6d6>
+34300eca:	2303      	movs	r3, #3
+34300ecc:	4c4b      	ldr	r4, [pc, #300]	@ (34300ffc <isolated_main+0x816>)
+34300ece:	200b      	movs	r0, #11
+34300ed0:	60e3      	str	r3, [r4, #12]
+34300ed2:	f7ff fc49 	bl	34300768 <pulse>
+34300ed6:	f7ff fa71 	bl	343003bc <timer_start>
+34300eda:	484a      	ldr	r0, [pc, #296]	@ (34301004 <isolated_main+0x81e>)
+34300edc:	494c      	ldr	r1, [pc, #304]	@ (34301010 <isolated_main+0x82a>)
+34300ede:	6843      	ldr	r3, [r0, #4]
+34300ee0:	f8c4 30cc 	str.w	r3, [r4, #204]	@ 0xcc
+34300ee4:	6846      	ldr	r6, [r0, #4]
+34300ee6:	f8d4 30c4 	ldr.w	r3, [r4, #196]	@ 0xc4
+34300eea:	2b13      	cmp	r3, #19
+34300eec:	d949      	bls.n	34300f82 <isolated_main+0x79c>
+34300eee:	4e45      	ldr	r6, [pc, #276]	@ (34301004 <isolated_main+0x81e>)
+34300ef0:	f7ff fa84 	bl	343003fc <timer_stop>
+34300ef4:	6873      	ldr	r3, [r6, #4]
+34300ef6:	200c      	movs	r0, #12
+34300ef8:	f8c4 30d0 	str.w	r3, [r4, #208]	@ 0xd0
+34300efc:	f8d4 30c4 	ldr.w	r3, [r4, #196]	@ 0xc4
+34300f00:	f8c4 30d4 	str.w	r3, [r4, #212]	@ 0xd4
+34300f04:	f8c4 50d8 	str.w	r5, [r4, #216]	@ 0xd8
+34300f08:	f8c4 10dc 	str.w	r1, [r4, #220]	@ 0xdc
+34300f0c:	f7ff fc2c 	bl	34300768 <pulse>
+34300f10:	2304      	movs	r3, #4
+34300f12:	200d      	movs	r0, #13
+34300f14:	60e3      	str	r3, [r4, #12]
+34300f16:	f7ff fc27 	bl	34300768 <pulse>
+34300f1a:	f7ff fa4f 	bl	343003bc <timer_start>
+34300f1e:	6873      	ldr	r3, [r6, #4]
+34300f20:	f8c4 30e0 	str.w	r3, [r4, #224]	@ 0xe0
+34300f24:	4c35      	ldr	r4, [pc, #212]	@ (34300ffc <isolated_main+0x816>)
+34300f26:	f8d4 30c4 	ldr.w	r3, [r4, #196]	@ 0xc4
+34300f2a:	2b13      	cmp	r3, #19
+34300f2c:	d947      	bls.n	34300fbe <isolated_main+0x7d8>
+34300f2e:	f7ff fa65 	bl	343003fc <timer_stop>
+34300f32:	4b34      	ldr	r3, [pc, #208]	@ (34301004 <isolated_main+0x81e>)
+34300f34:	200e      	movs	r0, #14
+34300f36:	685b      	ldr	r3, [r3, #4]
+34300f38:	f8c4 30e4 	str.w	r3, [r4, #228]	@ 0xe4
+34300f3c:	f8d4 30c4 	ldr.w	r3, [r4, #196]	@ 0xc4
+34300f40:	f8c4 30e8 	str.w	r3, [r4, #232]	@ 0xe8
+34300f44:	f7ff fc10 	bl	34300768 <pulse>
+34300f48:	2305      	movs	r3, #5
+34300f4a:	60e3      	str	r3, [r4, #12]
+34300f4c:	f8d4 30d4 	ldr.w	r3, [r4, #212]	@ 0xd4
+34300f50:	2b13      	cmp	r3, #19
+34300f52:	d914      	bls.n	34300f7e <isolated_main+0x798>
+34300f54:	f8d4 30d4 	ldr.w	r3, [r4, #212]	@ 0xd4
+34300f58:	2b15      	cmp	r3, #21
+34300f5a:	d810      	bhi.n	34300f7e <isolated_main+0x798>
+34300f5c:	f8d4 30e8 	ldr.w	r3, [r4, #232]	@ 0xe8
+34300f60:	2b13      	cmp	r3, #19
+34300f62:	d90c      	bls.n	34300f7e <isolated_main+0x798>
+34300f64:	f8d4 30e8 	ldr.w	r3, [r4, #232]	@ 0xe8
+34300f68:	2b15      	cmp	r3, #21
+34300f6a:	d808      	bhi.n	34300f7e <isolated_main+0x798>
+34300f6c:	f8d4 30f0 	ldr.w	r3, [r4, #240]	@ 0xf0
+34300f70:	b12b      	cbz	r3, 34300f7e <isolated_main+0x798>
+34300f72:	f8d4 20f0 	ldr.w	r2, [r4, #240]	@ 0xf0
+34300f76:	f8d4 30ec 	ldr.w	r3, [r4, #236]	@ 0xec
+34300f7a:	429a      	cmp	r2, r3
+34300f7c:	d033      	beq.n	34300fe6 <isolated_main+0x800>
+34300f7e:	2010      	movs	r0, #16
+34300f80:	e496      	b.n	343008b0 <isolated_main+0xca>
+34300f82:	f44f 7e80 	mov.w	lr, #256	@ 0x100
+34300f86:	f04e e001 	dls	lr, lr
+34300f8a:	4b22      	ldr	r3, [pc, #136]	@ (34301014 <isolated_main+0x82e>)
+34300f8c:	ea81 3141 	eor.w	r1, r1, r1, lsl #13
+34300f90:	681a      	ldr	r2, [r3, #0]
+34300f92:	ea81 4151 	eor.w	r1, r1, r1, lsr #17
+34300f96:	ea81 1141 	eor.w	r1, r1, r1, lsl #5
+34300f9a:	404a      	eors	r2, r1
+34300f9c:	601a      	str	r2, [r3, #0]
+34300f9e:	f853 2b04 	ldr.w	r2, [r3], #4
+34300fa2:	4411      	add	r1, r2
+34300fa4:	f00f c00f 	le	lr, 34300f8c <isolated_main+0x7a6>
+34300fa8:	6843      	ldr	r3, [r0, #4]
+34300faa:	f8d4 2120 	ldr.w	r2, [r4, #288]	@ 0x120
+34300fae:	1b9b      	subs	r3, r3, r6
+34300fb0:	ebb3 0f52 	cmp.w	r3, r2, lsr #1
+34300fb4:	f505 7580 	add.w	r5, r5, #256	@ 0x100
+34300fb8:	d995      	bls.n	34300ee6 <isolated_main+0x700>
+34300fba:	200e      	movs	r0, #14
+34300fbc:	e478      	b.n	343008b0 <isolated_main+0xca>
+34300fbe:	f8d4 30ec 	ldr.w	r3, [r4, #236]	@ 0xec
+34300fc2:	3301      	adds	r3, #1
+34300fc4:	f8c4 30ec 	str.w	r3, [r4, #236]	@ 0xec
+34300fc8:	f3bf 8f4f 	dsb	sy
+34300fcc:	bf30      	wfi
+34300fce:	f8d4 30f0 	ldr.w	r3, [r4, #240]	@ 0xf0
+34300fd2:	3301      	adds	r3, #1
+34300fd4:	f8c4 30f0 	str.w	r3, [r4, #240]	@ 0xf0
+34300fd8:	f8d4 30ec 	ldr.w	r3, [r4, #236]	@ 0xec
+34300fdc:	f5b3 7f7a 	cmp.w	r3, #1000	@ 0x3e8
+34300fe0:	d9a1      	bls.n	34300f26 <isolated_main+0x740>
+34300fe2:	200f      	movs	r0, #15
+34300fe4:	e464      	b.n	343008b0 <isolated_main+0xca>
+34300fe6:	2000      	movs	r0, #0
+34300fe8:	e462      	b.n	343008b0 <isolated_main+0xca>
+34300fea:	bf00      	nop
+34300fec:	56021800 	.word	0x56021800
+34300ff0:	00330003 	.word	0x00330003
+34300ff4:	00110001 	.word	0x00110001
+34300ff8:	56020c00 	.word	0x56020c00
+34300ffc:	343c2000 	.word	0x343c2000
+34301000:	02625a00 	.word	0x02625a00
+34301004:	e0001000 	.word	0xe0001000
+34301008:	3430fffc 	.word	0x3430fffc
+3430100c:	9e3779b9 	.word	0x9e3779b9
+34301010:	a5f13579 	.word	0xa5f13579
+34301014:	34310000 	.word	0x34310000

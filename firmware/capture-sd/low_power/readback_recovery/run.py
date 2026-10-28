@@ -31,6 +31,31 @@ SECTOR_SHA="7fda9d00cc7ffb3fbb9e6aac6695cf18545754b5dbfce1520cf30b2da39c4e63"
 # command-line opt-in for unknown firmware. This table does not broaden the
 # bridge or READ-module identities, and check_park still verifies live code.
 APPROVED_RECOVERY={
+    # Exact single-frame sensor candidates independently audited October 28.
+    # Unchanged guard/literals/error engine; narrowly reviewed context burst
+    # and relocated post-guard SRAM-array pointers. READ bridge is unchanged.
+    '5330f1d1f606fb9dfd903dbdc39dac282360b1880d756931049eec1797ef6504':
+        dict(name='raw-25-single-frame-awake-qualification',prefix_bytes=6720,
+             sector_sha256='185d86f0cf2a17c6b1e81880c1ec0b3263e318d477701fa57496cb72cf706638'),
+    '6378483a91b560ffc6b31d74a9dd1205996a14c8030447ffddf7deddc9d23874':
+        dict(name='raw-25-single-frame-standby-qualification',prefix_bytes=6720,
+             sector_sha256='79a379470927135bc03841098fe070912cad8275e91c5d5985cc066c294cf64e'),
+    # Exact independently audited temporary post-STOP 200 ms gap profile.
+    'cedb4d9e7c38b90f805dbf24c1bad5cc8af8c1597f3cd9e58fd5e9b9c86cc6c6':
+        dict(name='raw-25-ethernet-sd-init-gap200-diagnostic',prefix_bytes=6720,
+             sector_sha256='9f1aafd3d2065dbf5ba4d255a8c4ec8402a5ec7ccc007266db5f0136946f0bc6'),
+    # Independently reviewed October 28 normal Ethernet power-down image;
+    # unchanged recovery guard/error engine, two receiver CRC words only.
+    '2b9724bc4b60af52b1c4ab45e1b232578e9640efc3a30a57772a810d99c3f344':
+        dict(name='raw-25-ethernet-powerdown-normal',prefix_bytes=6720,
+             sector_sha256='a10e4894d79cd3fe182b95b48eb56a308280f3201736d295860ecfe725a62645'),
+    # Exact relocated-handler candidates; early UART guard/literals unchanged.
+    '99dbb0f9ecdd56a9313e4e62bbbfec22ec8e5e5901c852d956315844cd066eba':
+        dict(name='raw-25-error-runtime-copy-normal',prefix_bytes=6720,
+             sector_sha256='232af9173262473021453f40ea944dfa4cafc2657443cd0b83ea9c8c8bb3b02c'),
+    'd329f4051c466f3d35c4b20ae0af3f22daef7e997b48fd5c3567f3ce9c2e73fb':
+        dict(name='raw-25-post-frame-error-regression',prefix_bytes=6720,
+             sector_sha256='7f21f21e8cf48f8a0cabc4bffb842b55e5960af136496133500e67f25b4ded08'),
     # Independently reviewed error-blink prefix: unchanged early guard and all
     # 20 literals; six failure-loop bytes plus two CRC words differ. The fixed
     # appended handler needs an exact longer length, not a broad size allowance.

@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "frozen_utc": "2026-10-26T21:58:21.756230+00:00",
+  "kind": "Post-frame diagnostic hardware qualification",
+  "hardware_scope": "Real full-frame DMA and STOP, production engine code4, shutdown and UART recovery",
+  "production_installed": true,
+  "normal_cycle_qualified": false,
+  "omitted_private_files": [
+    "interrupt-live-proof\\overwritten-prefix-private.bin",
+    "postframe-live-proof\\overwritten-prefix-private.bin"
+  ],
+  "pending": [
+    "Normal production capture/error-path observation and final recovery/closure"
+  ],
+  "limitations": [
+    "No SD transaction in diagnostic capture",
+    "No optical/LED GPIO probe",
+    "Read-only ST-LINK reads during current trace",
+    "Whole-session startup NaNs remain invalid",
+    "Guarded power flags retain trial_entry_proven:false",
+    "No power-loss or new energy qualification"
+  ]
+}

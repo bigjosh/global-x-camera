@@ -1,0 +1,185 @@
+{
+  "schema": 1,
+  "hardware_access": false,
+  "trace": "tmp\\bringup\\sd-cold-cmd-probe-20261027\\clk-only03-current.jsonl",
+  "trace_sha256": "05c715be985bc59ea99b7addc130ba82b6b4abb56e8dbe0ac23820037565c74c",
+  "observer": "tmp\\bringup\\sd-cold-cmd-probe-20261027\\clk-only03-observation\\observation.json",
+  "power_on": {
+    "event": "power_on",
+    "utc": "2026-10-27T17:30:11.914445+00:00",
+    "monotonic_ns": 687620687000000,
+    "range": 128,
+    "off_s": 15.016000000061467
+  },
+  "post_on_guard_s": 0.1,
+  "time_selection": "Device UTC bin starts at least100ms after the host power_on timestamp; complete finite bins only",
+  "post_on_current_A": {
+    "complete_finite_bins": 6963,
+    "samples": 69630000,
+    "weighted_mean": 0.04264461372575056,
+    "min_bin_mean": 0.008104943155124783,
+    "max_bin_mean": 0.12404772312417627,
+    "min_sample": 0.004569759592413902,
+    "max_sample": 0.15278175473213196,
+    "first_utc": "2026-10-27T17:30:12.014578+00:00",
+    "last_bin_end_utc": "2026-10-27T17:30:46.829474+00:00",
+    "complete_finite_bins_contiguous": true,
+    "excluded_partial_or_nonfinite_bins": 1,
+    "last_bin_mean": 0.008108436773251742
+  },
+  "post_on_js_input_voltage_V": {
+    "complete_finite_bins": 6965,
+    "samples": 69650000,
+    "weighted_mean": 4.886349751482441,
+    "min_bin_mean": 4.872150260591507,
+    "max_bin_mean": 4.892785080003739,
+    "min_sample": 4.86055326461792,
+    "max_sample": 4.915030002593994,
+    "first_utc": "2026-10-27T17:30:12.014578+00:00",
+    "last_bin_end_utc": "2026-10-27T17:30:46.839474+00:00",
+    "complete_finite_bins_contiguous": true,
+    "excluded_partial_or_nonfinite_bins": 1,
+    "last_bin_mean": 4.892112335109711
+  },
+  "voltage_location": "JS110 IN+ relative to IN-; this is NOT a target-board rail measurement",
+  "coverage": {
+    "checks": {
+      "both_signals_received": true,
+      "no_queue_drop": true,
+      "no_logger_error": true,
+      "contiguous_received_ids": true,
+      "all_received_samples_finite": false
+    },
+    "passed": false,
+    "signals": {
+      "current": {
+        "chunks": 1529,
+        "samples": 99987426,
+        "finite": 99987355,
+        "bins": 9999,
+        "first_sample_id": 0,
+        "end_sample_id_exclusive": 99987426,
+        "gap_native_samples": 0,
+        "discontinuities": 0,
+        "overlaps_or_resets": 0,
+        "sample_rate_hz": 2000000,
+        "decimate_factor": 1
+      },
+      "voltage": {
+        "chunks": 1529,
+        "samples": 99987426,
+        "finite": 99987426,
+        "bins": 10000,
+        "first_sample_id": 16128,
+        "end_sample_id_exclusive": 100003554,
+        "gap_native_samples": 0,
+        "discontinuities": 0,
+        "overlaps_or_resets": 0,
+        "sample_rate_hz": 2000000,
+        "decimate_factor": 1
+      }
+    },
+    "dropped_chunks": 0,
+    "logger_error": null,
+    "scope": "received intervals only; unobserved start/end not covered; no clipping or energy qualification"
+  },
+  "total_nonfinite_current_samples": 71,
+  "whole_session_valid": false,
+  "logger_returncode": 1,
+  "cleanup_errors": [],
+  "device_context_closed": true,
+  "driver_context_closed": true,
+  "initial_settings": {
+    "s/i/range/select": 128,
+    "h/fs": 2000000,
+    "s/i/ctrl": 0,
+    "s/v/ctrl": 0
+  },
+  "restoration_events": [
+    {
+      "event": "cleanup_setting_restore",
+      "utc": "2026-10-27T17:30:46.864149+00:00",
+      "monotonic_ns": 687655640000000,
+      "topic": "s/i/ctrl",
+      "value": 0,
+      "qualified_boot": false
+    },
+    {
+      "event": "cleanup_setting_restore",
+      "utc": "2026-10-27T17:30:46.864149+00:00",
+      "monotonic_ns": 687655640000000,
+      "topic": "s/v/ctrl",
+      "value": 0,
+      "qualified_boot": false
+    }
+  ],
+  "last_logged_power_range": 128,
+  "expected_final_range": 128,
+  "range_evidence": "Last power command128; reviewed logger queries/restores initial128 during clean cleanup. No independent final DUT voltage measurement.",
+  "observer_debug_reads": true,
+  "observer_reason": null,
+  "post_on_load_observed": true,
+  "powered_cold_boot_established": true,
+  "error_diagnosis_established": true,
+  "observer_summary": {
+    "result": 804,
+    "result_hex": "0x324",
+    "stage": 3,
+    "sd_error": 14,
+    "error_stage": 5,
+    "error_command": 17,
+    "error_sta": 2,
+    "error_sta_hex": "0x2",
+    "cleanup_error": 10,
+    "scan_headers": 0,
+    "image_sectors_written": 0,
+    "card_sectors_written": 0,
+    "frames": 1,
+    "timestamps": {
+      "begin": {
+        "cycles": 2576344,
+        "ms_from_runtime_begin": 0.0
+      },
+      "arm": {
+        "cycles": 2944243,
+        "ms_from_runtime_begin": 0.9197475
+      },
+      "frame_done": {
+        "cycles": 11716047,
+        "ms_from_runtime_begin": 22.8492575
+      },
+      "camera_stop": {
+        "cycles": 26095560,
+        "ms_from_runtime_begin": 58.79804
+      },
+      "sd_begin": {
+        "cycles": 5014522,
+        "ms_from_runtime_begin": 6.095445
+      },
+      "sd_ready": {
+        "cycles": 40976019,
+        "ms_from_runtime_begin": 95.9991875
+      },
+      "deinit_done": {
+        "cycles": 41494410,
+        "ms_from_runtime_begin": 97.295165
+      },
+      "end": {
+        "cycles": 41505828,
+        "ms_from_runtime_begin": 97.32371
+      }
+    },
+    "timestamp_scope": "Retained 400MHz DWT counters; not external cold power timing",
+    "last_argument": 1504968704,
+    "last_argument_caveat": "May belong to cleanup; not assumed to be the failed command argument",
+    "inferred_failed_slot_header_lba": 0,
+    "lba_basis": "Derived from zero-based sequential scan and successful-header count; not a retained command argument"
+  },
+  "conclusion": "Post-ON load and a fresh retained normal-cycle failure were observed. The attached observer summary attributes the failing operation; current alone does not. No successful image save or independent Standby attribution.",
+  "limits": [
+    "71 startup current samples are nonfinite; whole-session validity remains false.",
+    "Post-ON finite contiguous windows are described separately; no energy or clipping qualification.",
+    "A software ON/range command does not establish power reached the target.",
+    "Fresh retained SRAM status was read; no target rail or saved image was read."
+  ]
+}

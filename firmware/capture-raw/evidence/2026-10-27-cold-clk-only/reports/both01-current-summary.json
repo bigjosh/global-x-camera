@@ -1,0 +1,132 @@
+{
+  "schema": 1,
+  "hardware_access": false,
+  "trace": "tmp\\bringup\\sd-cold-cmd-probe-20261027\\both01-current.jsonl",
+  "trace_sha256": "701bb433318ef0fe6fb9a9af702e1e2ef13d13d66bfede67a0e139205cf49f09",
+  "observer": "tmp\\bringup\\sd-cold-cmd-probe-20261027\\both01-observation\\observation.json",
+  "power_on": {
+    "event": "power_on",
+    "utc": "2026-10-27T17:37:06.085331+00:00",
+    "monotonic_ns": 688034859000000,
+    "range": 128,
+    "off_s": 15.016000000061467
+  },
+  "post_on_guard_s": 0.1,
+  "time_selection": "Device UTC bin starts at least100ms after the host power_on timestamp; complete finite bins only",
+  "post_on_current_A": {
+    "complete_finite_bins": 6962,
+    "samples": 69620000,
+    "weighted_mean": 0.009600952239927048,
+    "min_bin_mean": 0.008193818418588489,
+    "max_bin_mean": 0.12717354677692055,
+    "min_sample": 0.004151255823671818,
+    "max_sample": 0.154074028134346,
+    "first_utc": "2026-10-27T17:37:06.186662+00:00",
+    "last_bin_end_utc": "2026-10-27T17:37:40.996505+00:00",
+    "complete_finite_bins_contiguous": true,
+    "excluded_partial_or_nonfinite_bins": 1,
+    "last_bin_mean": 0.008200097169354558
+  },
+  "post_on_js_input_voltage_V": {
+    "complete_finite_bins": 6957,
+    "samples": 69570000,
+    "weighted_mean": 4.891703460629555,
+    "min_bin_mean": 4.871819303894043,
+    "max_bin_mean": 4.892465965938568,
+    "min_sample": 4.86055326461792,
+    "max_sample": 4.912760257720947,
+    "first_utc": "2026-10-27T17:37:06.186662+00:00",
+    "last_bin_end_utc": "2026-10-27T17:37:40.971505+00:00",
+    "complete_finite_bins_contiguous": true,
+    "excluded_partial_or_nonfinite_bins": 1,
+    "last_bin_mean": 4.892088047647476
+  },
+  "voltage_location": "JS110 IN+ relative to IN-; this is NOT a target-board rail measurement",
+  "coverage": {
+    "checks": {
+      "both_signals_received": true,
+      "no_queue_drop": true,
+      "no_logger_error": true,
+      "contiguous_received_ids": true,
+      "all_received_samples_finite": false
+    },
+    "passed": false,
+    "signals": {
+      "current": {
+        "chunks": 1529,
+        "samples": 99987426,
+        "finite": 99987355,
+        "bins": 9999,
+        "first_sample_id": 0,
+        "end_sample_id_exclusive": 99987426,
+        "gap_native_samples": 0,
+        "discontinuities": 0,
+        "overlaps_or_resets": 0,
+        "sample_rate_hz": 2000000,
+        "decimate_factor": 1
+      },
+      "voltage": {
+        "chunks": 1528,
+        "samples": 99922032,
+        "finite": 99922032,
+        "bins": 9993,
+        "first_sample_id": 16128,
+        "end_sample_id_exclusive": 99938160,
+        "gap_native_samples": 0,
+        "discontinuities": 0,
+        "overlaps_or_resets": 0,
+        "sample_rate_hz": 2000000,
+        "decimate_factor": 1
+      }
+    },
+    "dropped_chunks": 0,
+    "logger_error": null,
+    "scope": "received intervals only; unobserved start/end not covered; no clipping or energy qualification"
+  },
+  "total_nonfinite_current_samples": 71,
+  "whole_session_valid": false,
+  "logger_returncode": 1,
+  "cleanup_errors": [],
+  "device_context_closed": true,
+  "driver_context_closed": true,
+  "initial_settings": {
+    "s/i/range/select": 128,
+    "h/fs": 2000000,
+    "s/i/ctrl": 0,
+    "s/v/ctrl": 0
+  },
+  "restoration_events": [
+    {
+      "event": "cleanup_setting_restore",
+      "utc": "2026-10-27T17:37:41.008627+00:00",
+      "monotonic_ns": 688069781000000,
+      "topic": "s/i/ctrl",
+      "value": 0,
+      "qualified_boot": false
+    },
+    {
+      "event": "cleanup_setting_restore",
+      "utc": "2026-10-27T17:37:41.008627+00:00",
+      "monotonic_ns": 688069781000000,
+      "topic": "s/v/ctrl",
+      "value": 0,
+      "qualified_boot": false
+    }
+  ],
+  "last_logged_power_range": 128,
+  "expected_final_range": 128,
+  "range_evidence": "Last power command128; reviewed logger queries/restores initial128 during clean cleanup. No independent final DUT voltage measurement.",
+  "observer_debug_reads": false,
+  "observer_reason": "Already at low current; skip debugger access and preserve the state",
+  "post_on_load_observed": true,
+  "powered_cold_boot_established": false,
+  "error_diagnosis_established": false,
+  "observer_summary": null,
+  "conclusion": "Input supply was present and post-ON target-path load was observed. No program state, SD command, failure cause or saved image was read; any blink association needs separate current-pattern analysis.",
+  "limits": [
+    "71 startup current samples are nonfinite; whole-session validity remains false.",
+    "Post-ON finite contiguous windows are described separately; no energy or clipping qualification.",
+    "A software ON/range command does not establish power reached the target.",
+    "No target rail, program state, fault record or image was read in this attempt."
+  ]
+}

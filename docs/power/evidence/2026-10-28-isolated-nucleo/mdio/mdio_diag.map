@@ -1,0 +1,81 @@
+
+Discarded input sections
+
+ .text          0x00000000        0x0 C:\Users\joshd\AppData\Local\Temp\ccs9fuVF.o
+ .data          0x00000000        0x0 C:\Users\joshd\AppData\Local\Temp\ccs9fuVF.o
+ .bss           0x00000000        0x0 C:\Users\joshd\AppData\Local\Temp\ccs9fuVF.o
+ .comment       0x00000000       0x44 C:\Users\joshd\AppData\Local\Temp\ccs9fuVF.o
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+PROBE            0x343c4000         0x00002000         xrw
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+LOAD C:\Users\joshd\AppData\Local\Temp\ccs9fuVF.o
+
+.text           0x343c4000      0x8d8
+ *(.text*)
+ .text.snapshot
+                0x343c4000       0x5c C:\Users\joshd\AppData\Local\Temp\ccs9fuVF.o
+ .text.delay.constprop.0
+                0x343c405c       0x24 C:\Users\joshd\AppData\Local\Temp\ccs9fuVF.o
+ .text.clock_bit
+                0x343c4080       0x70 C:\Users\joshd\AppData\Local\Temp\ccs9fuVF.o
+ .text.send_bits
+                0x343c40f0       0x1e C:\Users\joshd\AppData\Local\Temp\ccs9fuVF.o
+ .text.read_reg.constprop.0
+                0x343c410e       0x7c C:\Users\joshd\AppData\Local\Temp\ccs9fuVF.o
+ *fill*         0x343c418a        0x2 
+ .text.mdio_diag_main
+                0x343c418c      0x720 C:\Users\joshd\AppData\Local\Temp\ccs9fuVF.o
+                0x343c418c                mdio_diag_main
+                0x343c4862                mdio_diag_park
+ .text.mdio_diag_entry
+                0x343c48ac       0x2c C:\Users\joshd\AppData\Local\Temp\ccs9fuVF.o
+                0x343c48ac                mdio_diag_entry
+ *(.rodata*)
+
+.glue_7         0x343c48d8        0x0
+ .glue_7        0x343c48d8        0x0 linker stubs
+
+.glue_7t        0x343c48d8        0x0
+ .glue_7t       0x343c48d8        0x0 linker stubs
+
+.vfp11_veneer   0x343c48d8        0x0
+ .vfp11_veneer  0x343c48d8        0x0 linker stubs
+
+.v4_bx          0x343c48d8        0x0
+ .v4_bx         0x343c48d8        0x0 linker stubs
+
+.iplt           0x343c48d8        0x0
+ .iplt          0x343c48d8        0x0 C:\Users\joshd\AppData\Local\Temp\ccs9fuVF.o
+
+.rel.dyn        0x343c48d8        0x0
+ .rel.iplt      0x343c48d8        0x0 C:\Users\joshd\AppData\Local\Temp\ccs9fuVF.o
+
+.data
+ *(.data*)
+
+.igot.plt       0x343c48d8        0x0
+ .igot.plt      0x343c48d8        0x0 C:\Users\joshd\AppData\Local\Temp\ccs9fuVF.o
+
+.bss
+ *(.bss*)
+ *(COMMON)
+
+/DISCARD/
+ *(.comment*)
+ *(.ARM.exidx*)
+ *(.ARM.extab*)
+                0x00000001                        ASSERT ((SIZEOF (.data) == 0x0), No runtime data initialization permitted)
+                0x00000001                        ASSERT ((SIZEOF (.bss) == 0x0), No implicit BSS permitted)
+OUTPUT(D:\Github\global-x-camera\tmp\bringup\nucleo-isolated-20261028\mdio\mdio_diag.elf elf32-littlearm)
+LOAD linker stubs
+
+.ARM.attributes
+                0x00000000       0x36
+ .ARM.attributes
+                0x00000000       0x36 C:\Users\joshd\AppData\Local\Temp\ccs9fuVF.o

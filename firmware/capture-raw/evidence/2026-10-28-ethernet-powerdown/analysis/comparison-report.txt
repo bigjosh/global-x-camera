@@ -1,0 +1,59 @@
+Normal capture PHY power comparison
+3 baseline + 3 PHY-power-down cold cycles
+
+Measured baseline:
+
+BASELINE
+post5ms_energy_mJ: mean 265.878499; median 224.823948; range 221.684172..351.127375
+cycle_onset_to_plateau_ms: mean 458.963833; median 396.120000; range 389.727000..591.044500
+strobe_from_onset_ms: mean 24.942333; median 24.980000; range 24.796000..25.051000
+SD_init_ms: mean 91.472333; median 90.540500; range 87.293000..96.583500
+SD_ready_to_first_submission_ms: mean 82.142000; median 81.806000; range 81.170000..83.450000
+slot_transport_ms: mean 234.025000; median 166.641000; range 164.454000..370.980000
+slot_transport_mean_power_mW: mean 610.214825; median 603.393474; range 602.227535..625.023467
+Phase power (overlapping phase windows are not additive):
+receiver_to_strobe: power mean 602.968 mW, range 602.866..603.096; duration mean 1.131 ms, range 1.130..1.132
+strobe_to_frame_complete: power mean 715.465 mW, range 715.402..715.543; duration mean 21.863 ms, range 21.863..21.863
+SD_initialization: power mean 714.328 mW, range 707.507..721.539; duration mean 91.472 ms, range 87.293..96.584
+SD_ready_to_first_submission: power mean 525.533 mW, range 525.496..525.601; duration mean 82.142 ms, range 81.170..83.450
+slot_transport: power mean 610.215 mW, range 602.228..625.023; duration mean 234.025 ms, range 164.454..370.980
+post_transport_commit: power mean 516.338 mW, range 513.780..520.484; duration mean 0.022 ms, range 0.022..0.022
+storage_deinit: power mean 517.126 mW, range 516.319..518.616; duration mean 0.064 ms, range 0.064..0.064
+cleanup_to_pre_WFI: power mean 487.746 mW, range 487.663..487.853; duration mean 0.173 ms, range 0.173..0.173
+pre_WFI_to_low_plateau: power mean 137.432 mW, range 136.215..139.525; duration mean 21.136 ms, range 20.698..21.409
+
+CANDIDATE
+post5ms_energy_mJ: mean 177.477532; median 173.652615; range 172.016271..186.763711
+cycle_onset_to_plateau_ms: mean 422.432167; median 413.879500; range 409.870500..443.546500
+strobe_from_onset_ms: mean 24.982333; median 24.966000; range 24.883000..25.098000
+SD_init_ms: mean 107.744000; median 106.757000; range 103.291500..113.183500
+SD_ready_to_first_submission_ms: mean 85.203167; median 85.154000; range 84.583000..85.872500
+slot_transport_ms: mean 171.992667; median 164.597500; range 164.339000..187.041500
+slot_transport_mean_power_mW: mean 431.655557; median 431.933209; range 430.563793..432.469670
+Phase power (overlapping phase windows are not additive):
+receiver_to_strobe: power mean 603.122 mW, range 602.991..603.318; duration mean 1.130 ms, range 1.123..1.135
+strobe_to_frame_complete: power mean 613.226 mW, range 613.070..613.409; duration mean 21.864 ms, range 21.864..21.864
+SD_initialization: power mean 522.879 mW, range 518.826..525.206; duration mean 107.744 ms, range 103.291..113.184
+SD_ready_to_first_submission: power mean 349.559 mW, range 349.362..349.793; duration mean 85.203 ms, range 84.583..85.873
+slot_transport: power mean 431.656 mW, range 430.564..432.470; duration mean 171.993 ms, range 164.339..187.042
+post_transport_commit: power mean 350.020 mW, range 333.700..371.095; duration mean 0.022 ms, range 0.022..0.023
+storage_deinit: power mean 345.852 mW, range 343.117..350.741; duration mean 0.064 ms, range 0.064..0.065
+cleanup_to_pre_WFI: power mean 301.340 mW, range 300.948..301.928; duration mean 0.290 ms, range 0.289..0.291
+pre_WFI_to_low_plateau: power mean 138.043 mW, range 137.193..139.015; duration mean 20.948 ms, range 20.794..21.088
+
+BASELINE TO CANDIDATE (positive delta = candidate increase):
+post5ms_energy_mJ: mean delta -88.400966, median delta -51.171333; mean reduction 33.249%, median reduction 22.761%
+post5ms_duration_ms: mean delta -36.531667, median delta 17.759500; mean reduction 8.047%, median reduction -4.541%
+post5ms_mean_power_mW: mean delta -158.246555, median delta -151.344245; mean reduction 27.125%, median reduction 26.265%
+cycle_onset_to_plateau_ms: mean delta -36.531667, median delta 17.759500; mean reduction 7.960%, median reduction -4.483%
+strobe_from_onset_ms: mean delta 0.040000, median delta -0.014000; mean reduction -0.160%, median reduction 0.056%
+SD_init_ms: mean delta 16.271667, median delta 16.216500; mean reduction -17.789%, median reduction -17.911%
+SD_ready_to_first_submission_ms: mean delta 3.061167, median delta 3.348000; mean reduction -3.727%, median reduction -4.093%
+slot_transport_ms: mean delta -62.032333, median delta -2.043500; mean reduction 26.507%, median reduction 1.226%
+slot_transport_mean_power_mW: mean delta -178.559268, median delta -171.460265; mean reduction 29.262%, median reduction 28.416%
+slot_transport_energy_mJ: mean delta -69.572233, median delta -29.454966; mean reduction 48.375%, median reduction 29.294%
+plateau_mA: mean delta 0.026551, median delta -0.004125; mean reduction -0.307%, median reduction 0.048%
+
+SD_ready_to_first_submission includes SCR read, slot-header scan and write preparation; markers do not isolate the scan alone. Slot occupancy grows as images are saved.
+Qualification: all reported energy windows are finite/contiguous and bound by native sample IDs; initial current NaNs remain outside the qualified interval. First5ms/full-cycle raw energy remains unqualified. Source-side voltage is not a target-rail measurement. All digital edges are retained; unmatched startup edges are not labeled firmware. Firmware identity/installation, PHY proof, image readback and Standby flags remain separate evidence.
+Interpretation: per-run mean/median/range are descriptive, not statistical significance. SD timing varies enough to obscure small energy differences. Compare matched firmware phases and transport mean power, while preserving the observed duration distribution.

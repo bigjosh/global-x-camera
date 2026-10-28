@@ -1,0 +1,10 @@
+STARTUP RANGE COMPARISON — saved observations only
+Both runs completed ten expected phase markers; all raw stream hashes and sample-ID continuity passed.
+The final range chunk is excluded because the original uint4 valid tail is not independently known.
+
+fixed10a01: peak 7.872621 A at 35.0 us, range code 0; first5ms charge 0.934422 mC, raw energy 3.675787 mJ; negative charge -0.019858 mC.
+auto01: peak 7.902019 A at 35.5 us, range code 0; first5ms charge 0.945246 mC, raw energy 3.730833 mJ; negative charge -0.014275 mC.
+
+Fixed10A stayed on raw range code0 throughout the first5ms. Auto first changed from code0 to code1 at128.5us, well after its35.5us peak. The first peak therefore cannot be explained solely by subsequent autoranging.
+No additional boot is inferred from restoring fixed range1 to auto128; neither setting is OFF.
+Both retain negative-current and source-voltage extrema. A common switch-on/measurement response is not ruled out. Physical inrush and clipping remain unqualified; whole-cycle qualification is not claimed.

@@ -1,5 +1,56 @@
 # Prototype power cost: 5 V Nucleo, modified 3.3 V Nucleo, custom PCB
 
+The latest [October 28 complete-camera comparison](../../firmware/capture-raw/evidence/2026-10-28-ethernet-powerdown/README.md)
+qualifies Ethernet PHY power-down in installed normal firmware. Median energy
+over the measured window fell **224.82→173.65 mJ (22.8%)**, while median cycle
+duration changed **396.12→413.88 ms**. Median power during SD transport fell
+**603.39→431.93 mW (28.4%)**; the approximately 8.66 mA shutdown plateau did not
+improve. Each group has three cold cycles; card latency varies substantially.
+The energy window begins 5 ms after current onset and ends at the low plateau,
+so startup inrush and LTC/battery losses remain outside this comparison.
+
+The preceding [October 28 isolated-Nucleo measurements](evidence/2026-10-28-isolated-nucleo/README.md)
+identify **182.85 mW / 36.76 mA at 5 V** saved by Ethernet PHY power-down,
+roughly half its matched awake board load. CPU-only 400→50 MHz division saves
+13.31 mW but doubles energy per completed synthetic update; instruction cache
+reduces energy per update 38.76%. The shutdown plateau is 8.0766 mA / 40.3322 mW,
+with later retained Standby flags. Camera and SD were physically disconnected;
+these are separate controls from the complete-photo comparison above. Normal
+NOR was unchanged and JS output disabled at that historical checkpoint; use
+AGENTS.md for the current bench state.
+
+The preceding [aligned direct5V measurements and ablations](evidence/2026-10-28-aligned-ablation/README.md)
+quantify phase energies, camera/SD overlap and incremental sensor/receiver
+savings. The exact MCU-versus-regulator/board split remains unresolved; main
+3.3 V and auxiliary 1.8 V branch currents are the next useful hardware measurements.
+Component reference values below remain dated estimates, distinct from measured
+results; their earlier unmeasured-Ethernet caveat is superseded by the isolated test.
+
+## October 28: battery-side trace and remaining overhead
+
+The user now reports **four series CR2032 cells → JS110 → LTC3621/DC1863A → target**. The supplied [startup screenshot](../../research_notes/Camera%20power/startup%204x2032%20via%20LTC.png) measures upstream of LTC, unlike the older target-5-V recordings. The user confirms no further power-removal work beyond D2/R23: **U24, the LAN8742 Ethernet PHY itself, remains fitted**. It is not a separate Ethernet regulator. Exact USB/source isolation and target contacts were not independently checked. No instrument action or firmware change accompanied this analysis.
+
+The displayed pack-side voltage starts near 12.56 V and bottoms at 2.73 V; peak current is 280 mA. Approximate simultaneous points read visually are 70 mA at 8.3 V (0.58 W), 110 mA at 6.5 V (0.72 W), and 130 mA at 5.2 V (0.68 W). These are screenshot estimates, not raw-data integrations. Increasing current as voltage falls is consistent with a roughly constant-power load while the buck remains in regulation. All four series cells carry the full current. The recovery in voltage after the load falls suggests source impedance/polarization, not proof of permanent cell damage; holder, wiring and instrument drops have not been separated.
+
+DC1863A specifies its 5 V output for **5.2–17 V input**. LTC3621 is a buck, so it cannot sustain 5 V from a 2.73 V input. The actual 5 V output was not recorded, and resets, image success, or precise firmware phases cannot be established from this screenshot. Its 800 µs soft start and 1 A output capability do not constitute coin-cell current limiting. [DC1863A Table 1](https://www.analog.com/media/en/technical-documentation/user-guides/dc1863af.pdf), [LTC3621 datasheet](https://www.analog.com/media/en/technical-documentation/data-sheets/ltc3621-3621-2.pdf).
+
+| Contributor | What is established | Interpretation |
+|---|---|---|
+| Ethernet U24 | Still fitted; powered from auxiliary VDD3V3, which switches off in Standby. Active capture source contains no explicit PHY management/power-down sequence. LAN8742 reference is 103 mW in reset versus 11 mW in general power-down. Its reset releases with target NRST; actual subsequent state/current is unmeasured. | An order-0.1-W removable-load candidate, not a measured 103 mW attribution. At an assumed 90% auxiliary-buck efficiency, 103 mW corresponds to about 114 mW at target 5 V. |
+| Camera sensor and adapter | VD56G3 full-resolution 60 fps reference: 8.5 mA at 1.8 V, 57 mA at 1.15 V, 22.8 mA at 2.8 V, totaling about 145 mW. The three adapter LDOs draw approximately 291 mW from 3.3 V for those loads. | About 146 mW of adapter LDO loss while operating at that reference. Efficient rail generation can reduce it, but cannot remove the sensor's own consumption. This is a streaming reference, not a measured one-shot energy. |
+| Camera upstream rail | CN6.22/VDD_CAM receives auxiliary VDD3V3 through SB10; the alternative U42/SB31 supply path is not fitted in the C02 schematic. | With an assumed 90% auxiliary buck, the 291 mW sensor-rail load is about 324 mW at 5 V, excluding oscillator and small losses. Do not model it as a main 5-to-3.3 V LDO cascade. |
+| SD supply | Current user-selected CN3.5 is main VDDIO through U33, the 5-to-3.3 V LDO; the previous CN5.4 supply was the auxiliary buck. | Ideal linear efficiency is 66%: for every 100 mA the card draws, 330 mW reaches it and 170 mW is dissipated by U33. This is a scaling example, not measured card current. Preserve main/AUX sequencing when considering a different supply. |
+| MCU | Datasheet reference sums to about 62.5 mW across its rails at 600 MHz HSI, CoreMark in ITCM, peripherals disabled; core accounts for 53.5 mW. | Not our 400 MHz CSI/SDMMC workload, a lower bound, or a rail measurement. Core conversion, active peripherals, RAM/interconnect and external NOR add demand. |
+| ST-LINK and power LED | D2 and R23 already removed. | Do not count removal of their main loads again as prospective savings. Signal/sense paths remain unqualified. |
+
+Sources: [LAN8742 §5.4.2/Table 5-5](https://www.microchip.com/content/dam/mchp/documents/OTH/ProductDocuments/DataSheets/DS_LAN8742_00001989A.pdf); [VD56G3 Table 13](https://www.st.com/resource/en/datasheet/vd56g3.pdf); [camera adapter schematic](https://www.st.com/resource/en/schematic_pack/steval-cam-m0i-schematic.pdf); [Nucleo C02 schematic](https://www.st.com/resource/en/schematic_pack/mb1940-n657x0q-c02-schematic.pdf); [STM32N657 Tables 32/34/36/38](https://www.st.com/resource/en/datasheet/stm32n657x0.pdf). Board rail connections were also checked against the retained ST C02 manufacturing ODB++ data. Do not add these reference rows into a precise cycle budget: their operating conditions and active intervals differ.
+
+The earlier [three-cycle 25 MHz reference](../../firmware/capture-raw/evidence/2026-10-25-sd25-crc/QUALIFICATION.md) measured about 226–230 mJ over 410–420 ms at the target-5-V branch, roughly 0.55 W average. It used earlier card/wiring conditions and excludes LTC input losses; it is context, not a matched control for this trace. The October 14 model below suggested approximately 40% lower energy on a custom board, but used hypothetical NAND timings and excluded inrush. It cannot establish a 40% overhead fraction here.
+
+**Recommendation:** first quantify Ethernet removal or explicit power-down on a stable supply, then measure the camera and SD supply branches. Treat input inrush separately from sustained capture/save demand. Even substantial board savings leave a several-hundred-milliwatt camera/storage system plausible; a reservoir recharged with controlled battery current remains a candidate for direct coin-cell operation. No reservoir topology/value or additional board rework is selected here. Do not derive energy by multiplying the displayed average voltage and current: they are strongly correlated and need sample-by-sample power integration.
+
+## Historical October 14 model
+
 **October 14, 2026 — engineering estimate, not measurements or a voltage decision.** This answers the user's comparison request and supplements the [power-tree review](2026-10-14-power-tree-review.md). Calculations are reproducible in [estimate_prototype_power.py](../../tools/estimate_prototype_power.py). The accepted camera, battery, latency, readback and OFF-current requirements are unchanged.
 
 ## Result and recommendation

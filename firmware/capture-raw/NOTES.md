@@ -166,3 +166,294 @@ the updated [bench checkpoint](../../AGENTS.md).
 **Rejected:** replacing successful-save idle/commit checks with a permissive failure gate, reporting a reset SD controller as proof that the card is idle, entering late code on a stale `RLOK`, recursively cleaning storage from a camera callback, keeping NOR in deep power-down across ROM restart, or claiming unchanged cold-start latency. The failure engine may forcibly abandon the current transaction after bounded ordinary cleanup, as required by the new shutdown instruction, but preserves its nonzero error/ownership history. It does not qualify SD power-loss preservation. Invalid deep-mode prerequisites fall back to LEDs-off shallow WFI; arbitrary ROM failures, hangs and unrecoverable HardFaults remain outside the signaling guarantee. The existing post-arm allocation scan and full linear-frame buffering remain unchanged.
 
 **Evidence:** [error behavior and timing](ERROR_SIGNALS.md), `error_signal.c`, `error_codes.h`, `error_build.py` and six passing scheduler/safety tests in `test_error_signal.py`. The independently reviewed candidate retains all 20 recovery literals and 1,782 unchanged disassembly rows outside the six failure-loop bytes and two CRC words. Its prefix grows from 5,140 to 6,500 bytes; the early receiver remains 15,804 bytes. Exact new prefix/sector admission is recorded in `../capture-timing/recovery_gpio/check_park.py` and `../capture-sd/low_power/readback_recovery/run.py`; all 14 existing readback tests and both gates' altered/truncated/cross-pair rejection checks pass. Hardware qualification and final installed state belong to the experiment evidence and bench checkpoint, not this admission decision.
+
+## 2026-10-26  Runtime error code must survive frame DMA; prefix-only tests missed the overlap
+
+**Why:** a real CMD17 data CRC failure after the user removed the CLK resistor
+correctly selected code4, but camera DMA had overwritten the prefix-resident
+blink engine. The processor executed image bytes at0x34181846, incurred an
+unaligned access, and entered the permanent solid-red HardFault loop. The
+handler interval0x34181840..0x34181D64 lies inside the packed frame interval
+0x340000A0..0x341D2400. This supersedes the preceding decision's assumption
+that one prefix engine can serve both early and runtime failures. It violated
+the existing no-prefix-code-after-DMA constraint in capture-timing.
+
+**Rejected:** calling prefix code after receiver arm; treating pre-capture
+synthetic signaling or safe separately linked RAM tests as qualification of
+flash errors after DMA; interpreting solid red as a specific SD code; or
+inferring that removal of the resistor is the proven electrical cause from
+one CRC report. Runtime error code must be in verified persistent executable
+RAM outside frame and guard ranges, with an error regression after real DMA
+or equivalent full-frame overwrite. The early prefix path may remain separate.
+Implementation/reinstallation is deferred until after the requested no-reset
+diagnosis; the installed image remains defective at this checkpoint.
+
+**Evidence:** [saved registers, stack, correct SD record and overlap diagnosis](evidence/2026-10-26-error-handler-overlap/README.md).
+Current PC0x34301E2C, stacked PC0x34181846/LR0x34302307/r0=4,
+CFSR0x01000000/HFSR0x40000000, and live instruction13CE match the exact
+failure chain. SD error14/stage5/CMD17/STA2 confirms a data CRC failure;
+cleanup_error10 remains explicit. No reset, power change, target write or
+firmware download occurred during diagnosis. Prior frozen tests are retained
+as historical evidence with their uncovered lifetime gap, not rewritten.
+
+## 2026-10-26  Copy and verify the error engine into reserved SRAM before receiver work
+
+**Why:** only176 bytes remained in the fixed early receiver range, while the
+error engine occupies1316 bytes. Copying the self-contained engine, padded
+to1536 bytes, from the ROM-loaded prefix to reserved343C8000..343C8600 before
+any terminal/camera path keeps the15,804-byte early load and recovery guard
+unchanged. Each boot revokes prior proof, rejects enabled D-cache, copies and
+compares every word, invalidates I-cache, then publishes fresh ECP1. Runtime
+calls use that destination; only pre-arm copy/context failure may use the
+prefix. The linker reservation excludes the frame, stack and other helpers.
+
+**Rejected:** continuing post-arm calls into the prefix, trusting a retained
+copy after reset, duplicating the engine in the tightly bounded early load,
+or assuming relative code is relocatable without inspecting its linked
+branches/literals. Build audit rejects external dependencies, including M55
+hardware-loop targets. Prefix padding grows the ROM image to6720 raw bytes;
+no new boot-latency or energy claim is inferred from unchanged early-load size.
+
+**Evidence:** [corrected builds and complete qualification](evidence/2026-10-26-error-handler-fix/README.md).
+182 capture tests,33 reader/recovery tests and18 exact/rejected identity cases
+passed. An explicit post-frame flash regression acquired1,909,600 bytes,
+validated FRAME/STOP/guards, confirmed old prefix overwrite and exact copied
+engine bytes, then displayed code4 and entered Standby. Separate normal
+firmware reproduced the real CMD17 CRC failure with the resistor removed and
+also displayed five four-blink sets before about8.06mA. CFSR/HFSR stayed zero;
+UART recovery worked during signaling and after both shutdowns. Guarded
+SBF1/PDDS1/STOPF0 observations retain their attribution limits. Full NOR
+readbacks and following4KiB checks passed; the uninjected normal build is
+installed. The resistor-free SD link remains unreliable and is not qualified
+by this error-handling fix. Existing photos were not reread; no SD erase or
+image-sector write occurred in these tests.
+
+## 2026-10-28  Compare post-STOP power using bounded RAM-only holds before SD initialization
+
+**Why:** board-level power attribution needs matched observable states, not a
+guess from the shape of a complete-cycle trace. Explicit RAM-only modes wait
+for complete validated FRAME/STOP, hold for 200 ms between markers 11/12, then
+perform the normal save. Controls separate stopped sensor from sensor reset,
+and reset sensor with retained receiver from receiver/PHY disabled while
+retaining APB/kernel clocks. Exact RAM proofs bind the conditions to the frozen
+build and preserve existing camera, storage and terminal guards. Separate
+normal/preinitialized/long-exposure experiments measure scheduling effects.
+
+**Rejected:** inserting delays inside an active SD transaction, promoting
+diagnostic holds into normal flash firmware, interpreting sensor reset as
+removal of all camera power, or attributing the entire retained board current
+to the MCU. The optional Ethernet pair is identity-checked and bounded, but its
+first control failed MDIO turnaround before any BMCR write; do not infer a
+PHY power-down saving or retry with unchecked register writes. Its helper
+restores GPIO configuration and records exact BMCR cleanup when successful.
+
+**Evidence:** `build.py`, `runtime.c`, `magic_runtime.inc`, `power_csi.inc`,
+`power_phy.inc`, `bench.py`, and `test_power_probe.py`;
+[aligned ablation results](../../docs/power/evidence/2026-10-28-aligned-ablation/README.md).
+The normal installed NOR/recovery prefix was not modified. Measurements and
+same-image SD readback checks are scoped in the linked evidence rather than
+treated as production electrical qualification.
+
+## 2026-10-28  Qualify recovery before disabling both debug-in-sleep and the UART listener
+
+**Why:** a temporary RAM stub deliberately masked and cleared all interrupts,
+then performed a matched busy interval followed by shallow WFI with
+`DBG_SLEEP` clear and no rail/clock changes. The current trace showed a lower
+plateau, but the first HOTPLUG observation failed before reading any proof.
+With the UART interrupt disabled, a UART pattern alone could not request its
+software reset. ST-LINK hardware-reset attempts reported success without
+restoring verified AP1 access. A cold cycle with UART stimulus finally restored
+the exact unchanged flash early park; the retained sleep proof was abandoned.
+
+**Rejected:** calling that plateau proven WFI entry or total CPU power,
+claiming a live PC/register check that never succeeded, treating a successful
+reset CLI message as recovery, assuming SRAM survives ROM reset, or carrying
+this IRQ-masking diagnostic into production shutdown. Future experiments must
+first qualify an independent recovery path and a usable evidence channel.
+Normal firmware's UART recovery remains unchanged; this restriction belongs
+to the temporary diagnostic, which is not a normal build option.
+
+**Evidence:** [aligned ablation evidence and recovery limits](../../docs/power/evidence/2026-10-28-aligned-ablation/README.md);
+private `tmp/bringup/power-ablation-20261028/sleep-probe/`, `sleep01/`, and
+its subsequent recovery records. The prepared stub was independently read
+back before launch; no post-launch proof, live WFI PC or unchanged-register
+qualification was obtained.
+
+## 2026-10-28  Correct the shallow-sleep recovery attribution: no runtime UART listener was identified
+
+**Why:** a subsequent source review found that normal recovery uses the
+experimentally observed ST-LINK BREAK-to-NRST behavior and a polled C0 pulse
+detector in the early prefix. The normal capture runtime does not contain the
+UART interrupt-driven software-reset listener assumed in the preceding entry.
+Although the temporary sleep probe masked interrupts and its warm recovery
+attempts failed, that does not establish a causal connection between the two.
+The cause of unavailable AP1 after the attempted resets remains unresolved.
+
+**Rejected:** retaining the unsupported claim that masking a UART listener
+caused recovery failure; inventing a new listener as a purported restoration
+of existing functionality; or treating the lower current plateau as qualified
+sleep entry. Use finite timer-driven wake and an awake proof park for the next
+diagnostic, with cold recovery remaining the separately demonstrated fallback.
+
+**Evidence:** the early prefix's `recovery_gpio.c`,
+[VCP recovery design](../capture-timing/recovery_vcp/README.md), current
+`runtime.c`, and the [separate evidence correction](../../docs/power/evidence/2026-10-28-aligned-ablation/CORRECTION.md).
+Earlier sealed measurement bytes and the historical interpretation remain
+unchanged; this later entry supersedes that specific causal explanation.
+
+## 2026-10-28  Sample MDIO before the PHY advances on rising MDC
+
+**Why:** the original Ethernet probe sampled MDIO after the 5 us MDC-high
+wait. A standalone address scan returned `000F` and `8263` at address0:
+exactly the expected `0007/C131` shifted left one bit with an idle1 appended.
+The apparent second-register turnaround failure was its first data bit.
+LAN8742 timing allows PHY output to change immediately after MDC rises.
+Sampling the stable value before that edge returned correct IDs and repeated
+BMCR3000; separate isolated-board A/B/A runs verified power-down and exact
+BMCR restoration. The source helper now uses that qualified sample placement.
+
+**Rejected:** interpreting the initial error as an absent/unpowered PHY,
+wrong pin map or missing MCU-generated oscillator without evidence; retrying
+unchecked writes; or treating the earlier host model as timing coverage when
+it replaced `phy_clock_bit`. The new host model keeps that routine and tests
+the old sample placement as an intentional failing mutation. Exact BMCR
+restoration is not proof of identical negotiation state/current waveform,
+because clearing power-down resets the PHY internally. This experimental
+source fix is not installed in NOR, and its integrated capture/save profiles
+still need hardware reruns after camera/SD reconnection.
+
+**Evidence:** [isolated Nucleo results and frozen mdio02/mdio03/phy01/phy02 records](../../docs/power/evidence/2026-10-28-isolated-nucleo/README.md);
+LAN8742 [§5.6.5/table5-15](https://www.microchip.com/content/dam/mchp/documents/OTH/ProductDocuments/DataSheets/DS_LAN8742_00001989A.pdf#page=112);
+`power_phy.inc`, `test_power_phy.py`, and 13 passing MDIO/power-probe unit tests.
+Both corrected RAM Ethernet profiles compile offline. Historical campaign
+sources and evidence bytes remain unchanged; the normal installed firmware
+and all hardware were untouched by this source maintenance.
+
+## 2026-10-28  Keep the unused Nucleo Ethernet PHY powered down during normal capture
+
+**Why:** isolated-board measurements showed the unused LAN8742 is a material
+board load, and the user requested firmware power-down before making physical
+board changes. The corrected MDIO method supports a bounded one-shot helper
+after receiver arm and the checked late load, before SD initialization. It
+verifies identity and stable BMCR, sets power-down once, verifies it twice,
+then restores its GPIO configuration and only the clock bits it added. A
+stable already-down PHY is accepted without a write. Keeping the PHY down
+through save and shutdown preserves the benefit; clearing power-down would
+reset the PHY internally and reintroduce an unrelated camera load.
+
+**Rejected:** treating optional Ethernet failure as a failed photo; retrying
+uncertain writes; restoring BMCR at the end of the cycle; running the 200 ms
+hold-and-restore attribution experiment in production; adding MDIO work to
+the exposure-start path; or inferring PHY state during RAM READ operations.
+Warnings remain in the separate `ETH1` proof and capture continues. An
+unverified write or GPIO/clock cleanup is not a qualified power saving.
+Clock/profile changes require requalification. Fixed early-load size alone
+does not prove unchanged startup timing because late payload and BSS grow.
+
+**Evidence:** `board_eth_powerdown.inc`, `test_board_eth_powerdown.py`,
+`test_board_eth_bench.py`, the [selected build instructions](README.md#build-the-selected-profile-explicitly),
+and [installation/qualification evidence](evidence/2026-10-28-ethernet-powerdown/README.md).
+The RAM candidate saved slot 126 and passed full original-camera-RAM equality;
+baseline slot 122 also passed on the selected twisted CLK/GND wiring. The
+normal Standby receiver `69c5a5c0cc434eb7496371d9e5b9c007db346b8bb7b9a1a650c90f0eade79d28`
+was installed with independent physical NOR readback. Its recovery instructions,
+referenced literals and relocated error engine are preserved; only two prefix
+receiver-CRC words change. Full cold-cycle image checks and power comparisons
+are recorded separately in the campaign evidence as they complete. This
+production helper supersedes the preceding entry's installed-firmware status;
+the separate attribution probe and its historical evidence remain unchanged.
+
+## 2026-10-28  Keep the sensor-to-SD attribution gap an explicit diagnostic
+
+**Why:** the user requested a visible separation between camera capture/STOP
+and SD initialization so the synchronized current trace can distinguish their
+activity. The optional 200 ms gap waits for the existing FRAME validation and
+acknowledged sensor STOP before the first SD command. It retains the normal
+Ethernet power-down, storage, recovery and error paths, adds finite waits and
+a separate `GAP1` proof, and brackets the interval with existing-pin marker
+events 11/12. A FLASH form permits cold card startup to be measured, while an
+awake RAM form preserves the frame and proof for verification.
+
+**Rejected:** adding this delay to normal capture; substituting the older
+hold-and-PHY-restore experiment; beginning the gap at an assumed exposure
+deadline; inferring STOP solely from a current drop; or treating a zero host
+command count as proof the card consumes no power. The card remains powered
+but uninitialized by the host, the stopped camera/receiver rails remain on,
+and the CPU waits awake. This interval is an aggregate attribution baseline,
+not an isolated SD idle-current or sensor-only measurement. A warm RAM run
+does not establish cold SD initialization behavior. Total diagnostic energy
+includes the deliberate extra wait and is not a production improvement.
+
+**Evidence:** `sd_init_gap.inc`, `test_sd_init_gap.py`, build/host admission
+checks and [diagnostic instructions](README.md#diagnostic-gap-between-sensor-stop-and-sd-initialization).
+Offline tests cover completion, counter wrap/stall, readiness timeout, capture
+failure, unexpected storage ownership/commands and marker failure. With the
+option disabled, the rebuilt receiver, prefix and 64 KiB sector exactly match
+the installed Ethernet candidate (`69c5a5c0...`, `2b9724bc...`, `a10e4894...`).
+The gap build retains the 15,804-byte early load and relocated error engine;
+only the two approved receiver-CRC literals change in its recovery prefix.
+Exact build records and hardware qualification belong in the
+[gap campaign evidence](evidence/2026-10-28-sd-init-gap/README.md); these offline
+checks alone make no current, energy, image-integrity or installed-state claim.
+
+## 2026-10-28  Qualify sensor auto-stop in RAM without extending the recovery prefix
+
+**Why:** Context 0 repeat count 1 and next context 4 are documented to end a
+context sequence, but UM2602 also describes a first-two-frame exception. The
+firmware must measure the sensor's actual frame counter and exposure strobes
+instead of inferring single-frame behavior from the STM32's one-frame snapshot.
+The opt-in RAM experiment preserves normal frame validation, counts actual
+sensor STOP writes, observes autonomous FSM 2 with a finite timeout, and checks
+stable FSM/counter/strobes again after the SD save. Sensor count and STROBE
+count are independent observations; both must be one to qualify one exposure.
+
+**Rejected:** Promoting an unmeasured assumption of exactly one frame; silently
+issuing a fallback STOP on the tested success path; treating a two-frame
+diagnostic outcome as a capture error or a one-frame success; adding an
+intentional waiting gap; and extending the cold recovery prefix merely to
+answer this sensor-behavior question. Exploratory cold builds encountered the
+fixed early-load and error-engine boundaries. Their artifacts are preserved,
+but the unqualified layout adaptations were removed and FLASH/Standby use of
+`--sensor-autostop` is explicitly rejected. Cold-boot integration is deferred.
+
+**Evidence:** `sensor_autostop_transform.py`, `sensor_autostop.inc`,
+`test_sensor_autostop.py`, and the host proof validation in `bench.py`.
+[Campaign evidence](evidence/2026-10-28-sensor-autostop/README.md) owns measured
+results, original-frame/SD comparisons and qualification limits. Frozen RAM
+diagnostic `ram-auto-v2` is SHA-256
+`5bf9e515bb28d74efa3cdee21c9a9f373fedbc3c36b73dd954e136f6df348e65`;
+its separate manifest-description correction does not alter the bytes. The
+disabled default must reproduce the existing normal RAM binary and all three
+normal FLASH identities (receiver, prefix and sector). No new recovery
+allowlist or production auto-stop selection is part of this decision.
+
+## 2026-10-28  Integrate strict single-frame capture with one minimal prefix transaction
+
+**Why:** After the RAM qualification, the user explicitly requested automatic
+single-frame behavior in normal firmware. This supersedes the preceding
+decision to defer cold integration. The existing manual-exposure array already
+writes mode 2 at `0x044C`, and no intervening context command changes it. Reuse
+the later duplicate write for the consecutive little-endian context values
+`01 00 04 00` at `0x048C` rather than adding a new boot-prefix section. The
+production observer requires exactly one frame and one exposure strobe,
+zero explicit STOP writes, and stable standby after the save.
+
+**Rejected:** Expanding or relocating the recovery/error-engine architecture;
+silently relaxing the historical prefix checker; and claiming that a
+post-START register read proves the earlier counter was zero. The first
+attempt to use a four-byte `write_value` call expanded its shared helper and
+moved recovery code, so it was rejected. The existing byte-array writer avoids
+that change. A separate full-image prefix fingerprint and two fixed CRC-word
+locations bound the production change. AST schema 2 explicitly labels its
+post-START readback and counts from reset. The old explicit-STOP profile and
+AST schema-1 RAM experiment remain exactly reproducible.
+
+**Evidence:** `sensor_autostop_transform.py`, `sensor_autostop.inc`,
+`single_frame_prefix.py`, the late-code layout audit and native-C tests in
+`test_sensor_single_frame.py`. The [single-frame promotion
+campaign](evidence/2026-10-28-sensor-single-frame/README.md) owns cold
+qualification and installed-state results. Its offline packaged audits prove
+unchanged recovery instructions and all twenty recovery literals, unchanged
+fixed error bridge/engine, and the original 15,804-byte early receiver load.
+All five historical binary identity comparisons passed; 261 source-bound
+offline regression tests passed with no source changes during the run.

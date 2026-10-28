@@ -1,0 +1,776 @@
+{
+  "schema": 1,
+  "source": "tmp\\bringup\\sd-cold-cmd-probe-20261027\\clk-only03-current.jsonl",
+  "source_sha256": "05c715be985bc59ea99b7addc130ba82b6b4abb56e8dbe0ac23820037565c74c",
+  "source_bytes": 11833559,
+  "launch_host_utc": "2026-10-27T17:30:11.914445+00:00",
+  "launch_estimated_sample_s": 15.071459531784058,
+  "trace_first_utc_estimate": "2026-10-27T17:29:56.842985+00:00",
+  "trace_end_utc_estimate": "2026-10-27T17:30:46.836698+00:00",
+  "fault_window_duration_s": 34.92225346821594,
+  "native_sample_rate_hz": 2000000,
+  "bin_width_s": 0.005,
+  "method": {
+    "signal": "current",
+    "statistic": "bin minimum",
+    "median_filter_bins": 3,
+    "calibration_s": [
+      15.371459531784058,
+      20.071459531784058
+    ],
+    "lower_floor_A": 0.07783002406358719,
+    "upper_floor_A": 0.0807451456785202,
+    "cluster_separation_A": 0.002915121614933014,
+    "led_on_thresholds_A": [
+      0.0792875848710537,
+      0.08147392608225346
+    ],
+    "edge_uncertainty_s": 0.01,
+    "interval_uncertainty_s": 0.02,
+    "reason": "Positive periodic board-current spikes bias mean thresholds; minima separate the observed floor states. Higher startup current is a third state."
+  },
+  "checks": {
+    "no_queue_drop": true,
+    "no_logger_error": true,
+    "continuous_current_ids": true,
+    "continuous_voltage_ids": true,
+    "fault_window_current_finite": true,
+    "fault_window_voltage_finite": true,
+    "five_groups": true,
+    "expected_blinks_per_group": true,
+    "expected_total_blinks": true,
+    "no_censored_counted_pulses": true,
+    "low_current_after_final_group": true,
+    "cleanup_success": true
+  },
+  "complete_pattern_observed": true,
+  "timing_consistency": {
+    "on_100ms_consistent": true,
+    "between_blinks_400ms_consistent": true,
+    "between_sets_2000ms_consistent": true
+  },
+  "measured": {
+    "pulses": 20,
+    "groups": [
+      4,
+      4,
+      4,
+      4,
+      4
+    ],
+    "on_s": {
+      "count": 20,
+      "minimum": 0.0799999999999983,
+      "median": 0.09499999999999886,
+      "maximum": 0.09999999999999787
+    },
+    "interblink_off_s": {
+      "count": 15,
+      "minimum": 0.4049999999999976,
+      "median": 0.40500000000000114,
+      "maximum": 0.41000000000000014
+    },
+    "interset_off_s": {
+      "count": 4,
+      "minimum": 2.014999999999997,
+      "median": 2.0150000000000006,
+      "maximum": 2.0199999999999996
+    },
+    "rising_period_s": {
+      "count": 15,
+      "minimum": 0.48999999999999844,
+      "median": 0.5,
+      "maximum": 0.5050000000000026
+    }
+  },
+  "groups": [
+    {
+      "index": 1,
+      "pulses": [
+        {
+          "start_sample_id": 30420000,
+          "end_sample_id_exclusive": 30580000,
+          "start_s": 15.21,
+          "end_s": 15.29,
+          "start_utc_estimate": "2026-10-27T17:30:12.052985+00:00",
+          "end_utc_estimate": "2026-10-27T17:30:12.132985+00:00",
+          "duration_s": 0.0799999999999983,
+          "start_bounds_s": [
+            15.200000000000001,
+            15.22
+          ],
+          "end_bounds_s": [
+            15.28,
+            15.299999999999999
+          ],
+          "duration_bounds_s": [
+            0.05999999999999829,
+            0.0999999999999983
+          ],
+          "left_censored": false,
+          "right_censored": false,
+          "index": 1
+        },
+        {
+          "start_sample_id": 31400000,
+          "end_sample_id_exclusive": 31590000,
+          "start_s": 15.7,
+          "end_s": 15.795,
+          "start_utc_estimate": "2026-10-27T17:30:12.542985+00:00",
+          "end_utc_estimate": "2026-10-27T17:30:12.637985+00:00",
+          "duration_s": 0.09500000000000064,
+          "start_bounds_s": [
+            15.69,
+            15.709999999999999
+          ],
+          "end_bounds_s": [
+            15.785,
+            15.805
+          ],
+          "duration_bounds_s": [
+            0.07500000000000064,
+            0.11500000000000064
+          ],
+          "left_censored": false,
+          "right_censored": false,
+          "index": 2
+        },
+        {
+          "start_sample_id": 32410000,
+          "end_sample_id_exclusive": 32600000,
+          "start_s": 16.205,
+          "end_s": 16.3,
+          "start_utc_estimate": "2026-10-27T17:30:13.047985+00:00",
+          "end_utc_estimate": "2026-10-27T17:30:13.142985+00:00",
+          "duration_s": 0.09500000000000242,
+          "start_bounds_s": [
+            16.194999999999997,
+            16.215
+          ],
+          "end_bounds_s": [
+            16.29,
+            16.310000000000002
+          ],
+          "duration_bounds_s": [
+            0.07500000000000241,
+            0.11500000000000242
+          ],
+          "left_censored": false,
+          "right_censored": false,
+          "index": 3
+        },
+        {
+          "start_sample_id": 33410000,
+          "end_sample_id_exclusive": 33600000,
+          "start_s": 16.705,
+          "end_s": 16.8,
+          "start_utc_estimate": "2026-10-27T17:30:13.547985+00:00",
+          "end_utc_estimate": "2026-10-27T17:30:13.642985+00:00",
+          "duration_s": 0.09500000000000242,
+          "start_bounds_s": [
+            16.694999999999997,
+            16.715
+          ],
+          "end_bounds_s": [
+            16.79,
+            16.810000000000002
+          ],
+          "duration_bounds_s": [
+            0.07500000000000241,
+            0.11500000000000242
+          ],
+          "left_censored": false,
+          "right_censored": false,
+          "index": 4
+        }
+      ],
+      "count": 4,
+      "expected_count": 4
+    },
+    {
+      "index": 2,
+      "pulses": [
+        {
+          "start_sample_id": 37630000,
+          "end_sample_id_exclusive": 37820000,
+          "start_s": 18.815,
+          "end_s": 18.91,
+          "start_utc_estimate": "2026-10-27T17:30:15.657985+00:00",
+          "end_utc_estimate": "2026-10-27T17:30:15.752985+00:00",
+          "duration_s": 0.09499999999999886,
+          "start_bounds_s": [
+            18.805,
+            18.825000000000003
+          ],
+          "end_bounds_s": [
+            18.9,
+            18.92
+          ],
+          "duration_bounds_s": [
+            0.07499999999999886,
+            0.11499999999999887
+          ],
+          "left_censored": false,
+          "right_censored": false,
+          "index": 1
+        },
+        {
+          "start_sample_id": 38640000,
+          "end_sample_id_exclusive": 38830000,
+          "start_s": 19.32,
+          "end_s": 19.415,
+          "start_utc_estimate": "2026-10-27T17:30:16.162985+00:00",
+          "end_utc_estimate": "2026-10-27T17:30:16.257985+00:00",
+          "duration_s": 0.09499999999999886,
+          "start_bounds_s": [
+            19.31,
+            19.330000000000002
+          ],
+          "end_bounds_s": [
+            19.404999999999998,
+            19.425
+          ],
+          "duration_bounds_s": [
+            0.07499999999999886,
+            0.11499999999999887
+          ],
+          "left_censored": false,
+          "right_censored": false,
+          "index": 2
+        },
+        {
+          "start_sample_id": 39640000,
+          "end_sample_id_exclusive": 39830000,
+          "start_s": 19.82,
+          "end_s": 19.915,
+          "start_utc_estimate": "2026-10-27T17:30:16.662985+00:00",
+          "end_utc_estimate": "2026-10-27T17:30:16.757985+00:00",
+          "duration_s": 0.09499999999999886,
+          "start_bounds_s": [
+            19.81,
+            19.830000000000002
+          ],
+          "end_bounds_s": [
+            19.904999999999998,
+            19.925
+          ],
+          "duration_bounds_s": [
+            0.07499999999999886,
+            0.11499999999999887
+          ],
+          "left_censored": false,
+          "right_censored": false,
+          "index": 3
+        },
+        {
+          "start_sample_id": 40650000,
+          "end_sample_id_exclusive": 40840000,
+          "start_s": 20.325,
+          "end_s": 20.42,
+          "start_utc_estimate": "2026-10-27T17:30:17.167985+00:00",
+          "end_utc_estimate": "2026-10-27T17:30:17.262985+00:00",
+          "duration_s": 0.09500000000000242,
+          "start_bounds_s": [
+            20.314999999999998,
+            20.335
+          ],
+          "end_bounds_s": [
+            20.41,
+            20.430000000000003
+          ],
+          "duration_bounds_s": [
+            0.07500000000000241,
+            0.11500000000000242
+          ],
+          "left_censored": false,
+          "right_censored": false,
+          "index": 4
+        }
+      ],
+      "count": 4,
+      "expected_count": 4
+    },
+    {
+      "index": 3,
+      "pulses": [
+        {
+          "start_sample_id": 44870000,
+          "end_sample_id_exclusive": 45060000,
+          "start_s": 22.435,
+          "end_s": 22.53,
+          "start_utc_estimate": "2026-10-27T17:30:19.277985+00:00",
+          "end_utc_estimate": "2026-10-27T17:30:19.372985+00:00",
+          "duration_s": 0.09500000000000242,
+          "start_bounds_s": [
+            22.424999999999997,
+            22.445
+          ],
+          "end_bounds_s": [
+            22.52,
+            22.540000000000003
+          ],
+          "duration_bounds_s": [
+            0.07500000000000241,
+            0.11500000000000242
+          ],
+          "left_censored": false,
+          "right_censored": false,
+          "index": 1
+        },
+        {
+          "start_sample_id": 45880000,
+          "end_sample_id_exclusive": 46070000,
+          "start_s": 22.94,
+          "end_s": 23.035,
+          "start_utc_estimate": "2026-10-27T17:30:19.782985+00:00",
+          "end_utc_estimate": "2026-10-27T17:30:19.877985+00:00",
+          "duration_s": 0.09499999999999886,
+          "start_bounds_s": [
+            22.93,
+            22.950000000000003
+          ],
+          "end_bounds_s": [
+            23.025,
+            23.045
+          ],
+          "duration_bounds_s": [
+            0.07499999999999886,
+            0.11499999999999887
+          ],
+          "left_censored": false,
+          "right_censored": false,
+          "index": 2
+        },
+        {
+          "start_sample_id": 46880000,
+          "end_sample_id_exclusive": 47070000,
+          "start_s": 23.44,
+          "end_s": 23.535,
+          "start_utc_estimate": "2026-10-27T17:30:20.282985+00:00",
+          "end_utc_estimate": "2026-10-27T17:30:20.377985+00:00",
+          "duration_s": 0.09499999999999886,
+          "start_bounds_s": [
+            23.43,
+            23.450000000000003
+          ],
+          "end_bounds_s": [
+            23.525,
+            23.545
+          ],
+          "duration_bounds_s": [
+            0.07499999999999886,
+            0.11499999999999887
+          ],
+          "left_censored": false,
+          "right_censored": false,
+          "index": 3
+        },
+        {
+          "start_sample_id": 47880000,
+          "end_sample_id_exclusive": 48080000,
+          "start_s": 23.94,
+          "end_s": 24.04,
+          "start_utc_estimate": "2026-10-27T17:30:20.782985+00:00",
+          "end_utc_estimate": "2026-10-27T17:30:20.882985+00:00",
+          "duration_s": 0.09999999999999787,
+          "start_bounds_s": [
+            23.93,
+            23.950000000000003
+          ],
+          "end_bounds_s": [
+            24.029999999999998,
+            24.05
+          ],
+          "duration_bounds_s": [
+            0.07999999999999786,
+            0.11999999999999787
+          ],
+          "left_censored": false,
+          "right_censored": false,
+          "index": 4
+        }
+      ],
+      "count": 4,
+      "expected_count": 4
+    },
+    {
+      "index": 4,
+      "pulses": [
+        {
+          "start_sample_id": 52110000,
+          "end_sample_id_exclusive": 52300000,
+          "start_s": 26.055,
+          "end_s": 26.15,
+          "start_utc_estimate": "2026-10-27T17:30:22.897985+00:00",
+          "end_utc_estimate": "2026-10-27T17:30:22.992985+00:00",
+          "duration_s": 0.09499999999999886,
+          "start_bounds_s": [
+            26.044999999999998,
+            26.065
+          ],
+          "end_bounds_s": [
+            26.139999999999997,
+            26.16
+          ],
+          "duration_bounds_s": [
+            0.07499999999999886,
+            0.11499999999999887
+          ],
+          "left_censored": false,
+          "right_censored": false,
+          "index": 1
+        },
+        {
+          "start_sample_id": 53110000,
+          "end_sample_id_exclusive": 53300000,
+          "start_s": 26.555,
+          "end_s": 26.65,
+          "start_utc_estimate": "2026-10-27T17:30:23.397985+00:00",
+          "end_utc_estimate": "2026-10-27T17:30:23.492985+00:00",
+          "duration_s": 0.09499999999999886,
+          "start_bounds_s": [
+            26.544999999999998,
+            26.565
+          ],
+          "end_bounds_s": [
+            26.639999999999997,
+            26.66
+          ],
+          "duration_bounds_s": [
+            0.07499999999999886,
+            0.11499999999999887
+          ],
+          "left_censored": false,
+          "right_censored": false,
+          "index": 2
+        },
+        {
+          "start_sample_id": 54120000,
+          "end_sample_id_exclusive": 54310000,
+          "start_s": 27.06,
+          "end_s": 27.155,
+          "start_utc_estimate": "2026-10-27T17:30:23.902985+00:00",
+          "end_utc_estimate": "2026-10-27T17:30:23.997985+00:00",
+          "duration_s": 0.09500000000000242,
+          "start_bounds_s": [
+            27.049999999999997,
+            27.07
+          ],
+          "end_bounds_s": [
+            27.145,
+            27.165000000000003
+          ],
+          "duration_bounds_s": [
+            0.07500000000000241,
+            0.11500000000000242
+          ],
+          "left_censored": false,
+          "right_censored": false,
+          "index": 3
+        },
+        {
+          "start_sample_id": 55120000,
+          "end_sample_id_exclusive": 55310000,
+          "start_s": 27.56,
+          "end_s": 27.655,
+          "start_utc_estimate": "2026-10-27T17:30:24.402985+00:00",
+          "end_utc_estimate": "2026-10-27T17:30:24.497985+00:00",
+          "duration_s": 0.09500000000000242,
+          "start_bounds_s": [
+            27.549999999999997,
+            27.57
+          ],
+          "end_bounds_s": [
+            27.645,
+            27.665000000000003
+          ],
+          "duration_bounds_s": [
+            0.07500000000000241,
+            0.11500000000000242
+          ],
+          "left_censored": false,
+          "right_censored": false,
+          "index": 4
+        }
+      ],
+      "count": 4,
+      "expected_count": 4
+    },
+    {
+      "index": 5,
+      "pulses": [
+        {
+          "start_sample_id": 59350000,
+          "end_sample_id_exclusive": 59540000,
+          "start_s": 29.675,
+          "end_s": 29.77,
+          "start_utc_estimate": "2026-10-27T17:30:26.517985+00:00",
+          "end_utc_estimate": "2026-10-27T17:30:26.612985+00:00",
+          "duration_s": 0.09499999999999886,
+          "start_bounds_s": [
+            29.665,
+            29.685000000000002
+          ],
+          "end_bounds_s": [
+            29.759999999999998,
+            29.78
+          ],
+          "duration_bounds_s": [
+            0.07499999999999886,
+            0.11499999999999887
+          ],
+          "left_censored": false,
+          "right_censored": false,
+          "index": 1
+        },
+        {
+          "start_sample_id": 60350000,
+          "end_sample_id_exclusive": 60540000,
+          "start_s": 30.175,
+          "end_s": 30.27,
+          "start_utc_estimate": "2026-10-27T17:30:27.017985+00:00",
+          "end_utc_estimate": "2026-10-27T17:30:27.112985+00:00",
+          "duration_s": 0.09499999999999886,
+          "start_bounds_s": [
+            30.165,
+            30.185000000000002
+          ],
+          "end_bounds_s": [
+            30.259999999999998,
+            30.28
+          ],
+          "duration_bounds_s": [
+            0.07499999999999886,
+            0.11499999999999887
+          ],
+          "left_censored": false,
+          "right_censored": false,
+          "index": 2
+        },
+        {
+          "start_sample_id": 61360000,
+          "end_sample_id_exclusive": 61550000,
+          "start_s": 30.68,
+          "end_s": 30.775,
+          "start_utc_estimate": "2026-10-27T17:30:27.522985+00:00",
+          "end_utc_estimate": "2026-10-27T17:30:27.617985+00:00",
+          "duration_s": 0.09499999999999886,
+          "start_bounds_s": [
+            30.669999999999998,
+            30.69
+          ],
+          "end_bounds_s": [
+            30.764999999999997,
+            30.785
+          ],
+          "duration_bounds_s": [
+            0.07499999999999886,
+            0.11499999999999887
+          ],
+          "left_censored": false,
+          "right_censored": false,
+          "index": 3
+        },
+        {
+          "start_sample_id": 62360000,
+          "end_sample_id_exclusive": 62550000,
+          "start_s": 31.18,
+          "end_s": 31.275,
+          "start_utc_estimate": "2026-10-27T17:30:28.022985+00:00",
+          "end_utc_estimate": "2026-10-27T17:30:28.117985+00:00",
+          "duration_s": 0.09499999999999886,
+          "start_bounds_s": [
+            31.169999999999998,
+            31.19
+          ],
+          "end_bounds_s": [
+            31.264999999999997,
+            31.285
+          ],
+          "duration_bounds_s": [
+            0.07499999999999886,
+            0.11499999999999887
+          ],
+          "left_censored": false,
+          "right_censored": false,
+          "index": 4
+        }
+      ],
+      "count": 4,
+      "expected_count": 4
+    }
+  ],
+  "excluded_short_intervals": [],
+  "low_current_plateau": {
+    "start_s": 31.68,
+    "start_utc_estimate": "2026-10-27T17:30:28.522985+00:00",
+    "duration_s": 18.313713,
+    "median_current_A": 0.00810777015518397,
+    "scope": "observed current plateau only; not independent Standby attribution"
+  },
+  "session_whole_coverage": {
+    "checks": {
+      "both_signals_received": true,
+      "no_queue_drop": true,
+      "no_logger_error": true,
+      "contiguous_received_ids": true,
+      "all_received_samples_finite": false
+    },
+    "passed": false,
+    "signals": {
+      "current": {
+        "chunks": 1529,
+        "samples": 99987426,
+        "finite": 99987355,
+        "bins": 9999,
+        "first_sample_id": 0,
+        "end_sample_id_exclusive": 99987426,
+        "gap_native_samples": 0,
+        "discontinuities": 0,
+        "overlaps_or_resets": 0,
+        "sample_rate_hz": 2000000,
+        "decimate_factor": 1
+      },
+      "voltage": {
+        "chunks": 1529,
+        "samples": 99987426,
+        "finite": 99987426,
+        "bins": 10000,
+        "first_sample_id": 16128,
+        "end_sample_id_exclusive": 100003554,
+        "gap_native_samples": 0,
+        "discontinuities": 0,
+        "overlaps_or_resets": 0,
+        "sample_rate_hz": 2000000,
+        "decimate_factor": 1
+      }
+    },
+    "dropped_chunks": 0,
+    "logger_error": null,
+    "scope": "received intervals only; unobserved start/end not covered; no clipping or energy qualification"
+  },
+  "fault_window_nonfinite_current": 0,
+  "fault_window_nonfinite_voltage": 0,
+  "whole_session_ok": false,
+  "limits": [
+    "LED/error-code association is inferred from characteristic current changes of normal uninjected firmware and a prior validated trace; no optical/GPIO probe.",
+    "Driver UTC and host launch are approximate; pulse spacings use native sample ids.",
+    "Timing intervals include conservative bin/filter uncertainty, not precision calibration.",
+    "Whole-session startup NaNs are retained; scoped finite fault-window evidence is separate.",
+    "No energy, analog margin, general fault coverage, or independent Standby claim.",
+    "The four-blink category cannot identify a command, CRC error, failed LBA, or electrical cause. No successful-save or Standby claim."
+  ],
+  "normal_boot_scope": {
+    "hardware_access_by_analysis": false,
+    "firmware": "Unchanged installed normal firmware; no injected error",
+    "debug_status_obtained": true,
+    "observer": "tmp\\bringup\\sd-cold-cmd-probe-20261027\\clk-only03-observation\\observation.json",
+    "observer_summary": {
+      "result": 804,
+      "result_hex": "0x324",
+      "stage": 3,
+      "sd_error": 14,
+      "error_stage": 5,
+      "error_command": 17,
+      "error_sta": 2,
+      "error_sta_hex": "0x2",
+      "cleanup_error": 10,
+      "scan_headers": 0,
+      "image_sectors_written": 0,
+      "card_sectors_written": 0,
+      "frames": 1,
+      "timestamps": {
+        "begin": {
+          "cycles": 2576344,
+          "ms_from_runtime_begin": 0.0
+        },
+        "arm": {
+          "cycles": 2944243,
+          "ms_from_runtime_begin": 0.9197475
+        },
+        "frame_done": {
+          "cycles": 11716047,
+          "ms_from_runtime_begin": 22.8492575
+        },
+        "camera_stop": {
+          "cycles": 26095560,
+          "ms_from_runtime_begin": 58.79804
+        },
+        "sd_begin": {
+          "cycles": 5014522,
+          "ms_from_runtime_begin": 6.095445
+        },
+        "sd_ready": {
+          "cycles": 40976019,
+          "ms_from_runtime_begin": 95.9991875
+        },
+        "deinit_done": {
+          "cycles": 41494410,
+          "ms_from_runtime_begin": 97.295165
+        },
+        "end": {
+          "cycles": 41505828,
+          "ms_from_runtime_begin": 97.32371
+        }
+      },
+      "timestamp_scope": "Retained 400MHz DWT counters; not external cold power timing",
+      "last_argument": 1504968704,
+      "last_argument_caveat": "May belong to cleanup; not assumed to be the failed command argument",
+      "inferred_failed_slot_header_lba": 0,
+      "lba_basis": "Derived from zero-based sequential scan and successful-header count; not a retained command argument"
+    },
+    "interpretation": "Current changes are consistent with the existing four-blink error pattern if algorithm checks pass; no direct LED observation or command/error attribution.",
+    "analyzer": "tmp\\bringup\\error-blinks-20261026\\analyze_led_current.py",
+    "analyzer_sha256": "f01387be6a5d6d8074c8d1928b47b9f5fec67344c9c88fee329d46f29dfbb51b",
+    "reference": "tmp\\bringup\\error-relocate-20261026\\normal-analysis.json",
+    "reference_sha256": "d4219519d0d79e3be2555ebce2d6f222918fb74a655819083fcb68615976e72e",
+    "reference_measured": {
+      "pulses": 20,
+      "groups": [
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "on_s": {
+        "count": 20,
+        "minimum": 0.08000000000000007,
+        "median": 0.09499999999999886,
+        "maximum": 0.10000000000000142
+      },
+      "interblink_off_s": {
+        "count": 15,
+        "minimum": 0.4049999999999976,
+        "median": 0.41000000000000014,
+        "maximum": 0.41000000000000014
+      },
+      "interset_off_s": {
+        "count": 4,
+        "minimum": 2.0150000000000006,
+        "median": 2.0199999999999996,
+        "maximum": 2.0199999999999996
+      },
+      "rising_period_s": {
+        "count": 15,
+        "minimum": 0.4900000000000002,
+        "median": 0.504999999999999,
+        "maximum": 0.5050000000000026
+      }
+    },
+    "reference_timing_consistency": {
+      "on_100ms_consistent": true,
+      "between_blinks_400ms_consistent": true,
+      "between_sets_2000ms_consistent": true
+    },
+    "reference_complete_pattern_observed": true,
+    "reference_plateau": {
+      "start_s": 31.695,
+      "start_utc_estimate": "2026-10-26T21:56:15.137463+00:00",
+      "duration_s": 18.298713,
+      "median_current_A": 0.008062441254546866,
+      "scope": "observed current plateau only; not independent Standby attribution"
+    },
+    "same_group_counts_as_reference": true
+  }
+}
