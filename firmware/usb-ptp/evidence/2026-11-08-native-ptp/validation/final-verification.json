@@ -1,0 +1,92 @@
+{
+  "utc": "2026-11-08T16:57:22.100360+00:00",
+  "passed": true,
+  "photo_count_before": 190,
+  "photo_count_after": 189,
+  "deleted_object": "oB0",
+  "deleted_zero_based_slot": 175,
+  "deletion_persisted_after": "normal powered reset and SD reinitialization",
+  "survivor_object": "oBE",
+  "survivor_png_sha256": "21f47f3c25d6e7e0e2bc3ea9de5b0dc71a337b02bb41dd110fea9f968fa06f1e",
+  "neighbor_sha256": "a0fb448e7bd4f003015ffa98855403633fff1c8a7b89fb7916ea836baac84bb6",
+  "cancel_pending_api_results": [
+    {
+      "event": "download_async_cancel_observation",
+      "bytes": 0,
+      "pending_api_hresult": "0x800703e3",
+      "api_reported_cancellation": true,
+      "partial": "D:/Github/global-x-camera/tmp/bringup/usb-ptp-20261108/cancel08-100ms.png.partial",
+      "wire_cancel_proven": false,
+      "mono_us": 739421,
+      "thread_id": 26012
+    },
+    {
+      "event": "download_async_cancel_observation",
+      "bytes": 524288,
+      "pending_api_hresult": "0x800703e3",
+      "api_reported_cancellation": true,
+      "partial": "D:/Github/global-x-camera/tmp/bringup/usb-ptp-20261108/cancel08-1500ms.png.partial",
+      "wire_cancel_proven": false,
+      "mono_us": 1869644,
+      "thread_id": 9244
+    }
+  ],
+  "firmware_received_cancels": 2,
+  "cleanup_failures": 0,
+  "nor_regions_byte_equal": true,
+  "adjacent_4k_unchanged": true,
+  "independent_usb_build_equal": true,
+  "final_state": "Powered in final normal USB PTP service; SD idle, no active transfer, 189 photos, USB HS 480 Mbps.",
+  "final_js": {
+    "range": 128,
+    "current_mA": 93.1912362575531,
+    "voltage_V": 4.977210998535156
+  },
+  "firmware": {
+    "schema": 1,
+    "usb_sha256": "74c91b77062e899944941006e075ab76039055f5175bee5f497b8d1a242e3679",
+    "usb_build": "D:\\Github\\global-x-camera\\tmp\\bringup\\usb-ptp-20261108\\ram08",
+    "prefix_sha256": "4976a9e956095e3176ef4863b6c49225df271b231305e51069152baf731e4dd0",
+    "prefix_bytes": 7160,
+    "sector0_sha256": "dd69bc33981a35bebefaca4c1939b6334304a6ad72dcfb57492e539f0d1a0dad",
+    "sector1_sha256": "27cf627bb447cdd53ae82413e3bc4d504a84f242d182b9890dd958a0163480df",
+    "hook_bytes": 440,
+    "selector_bytes": 4284,
+    "selector_entry": 874512385,
+    "hook_entry": 873995840,
+    "patch_address": 873991718,
+    "patch_encoding": "B.W",
+    "original_instruction": "DSB",
+    "resumes_at": 873991722,
+    "original_prefix_sha256": "6378483a91b560ffc6b31d74a9dd1205996a14c8030447ffddf7deddc9d23874",
+    "original_sector_sha256": "79a379470927135bc03841098fe070912cad8275e91c5d5985cc066c294cf64e",
+    "unchanged_capture_from_offset": 8192,
+    "uart_guard_unchanged": true,
+    "force_capture": false,
+    "boot": {
+      "image_bytes": 8192,
+      "payload_bytes_including_alignment": 7616,
+      "vector_address": "0x34180400",
+      "stack_pointer": "0x34188000",
+      "entry_point": "0x34180441",
+      "checksum": "0x000b76fd",
+      "sha256": "8d794004f56c9b0286b992a23b7f1de0219636e170fa1b75dd297aea9366059c"
+    },
+    "recovery_directory": "recovery",
+    "recovery_allowlist_admission": false,
+    "sources": {
+      "boot_read.h": "33675d5b0f7b87f61aa76e33e2541141734dd3ef7a97d714b311955a3be6f0c5",
+      "boot_hook.c": "4e8777a4d0683e8a8346b145d9e017e0d71f80b9fda19e7fd2b86dfb39ed8663",
+      "boot_hook.S": "be477dc5a618310d5f7ea76dd45dd7b3ecf2314c5cfd727f5bdbdace6525a971",
+      "selector.c": "4d60d1efb9cf19c5496903c15131147171978e63cddf442c800508f076202a83",
+      "vbus.c": "7c1165d739479f0796e2d97b654409db40a01202950b5182549eb0ae3b03d560",
+      "package.py": "7bb0c6439a48455c72ea0da918abd9bddc87984360f7834fc6689e49b0a2afdc"
+    }
+  },
+  "limits": [
+    "No physical cable-removal or fully discharged cold-boot qualification.",
+    "Capture-control GPIO inputs were constant low; no phase or exposure-timing claim.",
+    "Capture tail is exact October28; normal-capture HOLD/DMA-sleep candidates remain uninstalled.",
+    "No live instrument calls from this replay."
+  ]
+}

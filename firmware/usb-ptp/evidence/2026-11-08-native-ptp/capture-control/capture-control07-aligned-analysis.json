@@ -1,0 +1,363 @@
+{
+  "schema": 1,
+  "source_folder": "tmp\\bringup\\usb-ptp-20261108\\capture-control07-aligned",
+  "excluded_recording": {
+    "name": "capture-control07-record",
+    "reason": "Root reports recording ended before reset; excluded completely"
+  },
+  "analyzer": {
+    "path": "docs\\power\\evidence\\2026-11-05-inrush\\support\\analyze_inrush.py",
+    "sha256": "d22dd6bfedb615303f8d078bf5e759cb87b6c869f47e59d8188b6a56c03c1fe1"
+  },
+  "source_files": {
+    "current": {
+      "sha256": "d0c31a11a0baca52914031a020505972eb3973e665df2eb803e511e7acb05e94",
+      "hash_passed": true,
+      "native_contiguity_passed": true,
+      "first_sample_id": 0,
+      "analyzed_end_exclusive": 13078800,
+      "analyzed_samples": 13078800,
+      "source_bytes": 52315200,
+      "source_chunks": 200,
+      "last_chunk_excluded": false,
+      "nonfinite_samples": 71
+    },
+    "voltage": {
+      "sha256": "6320d6d89a7b81766b7623735468492cefb99b47a95ec1e3b117d6b3d868a43f",
+      "hash_passed": true,
+      "native_contiguity_passed": true,
+      "first_sample_id": 40320,
+      "analyzed_end_exclusive": 13053726,
+      "analyzed_samples": 13013406,
+      "source_bytes": 52053624,
+      "source_chunks": 199,
+      "last_chunk_excluded": false,
+      "nonfinite_samples": 0
+    },
+    "power": {
+      "sha256": "0cadd9de98ea3d2c9e3d37c6fefe91e5e5bc3276a9d9eeecde54b8702b909c82",
+      "hash_passed": true,
+      "native_contiguity_passed": true,
+      "first_sample_id": 40320,
+      "analyzed_end_exclusive": 13053726,
+      "analyzed_samples": 13013406,
+      "source_bytes": 52053624,
+      "source_chunks": 199,
+      "last_chunk_excluded": false,
+      "nonfinite_samples": 0
+    },
+    "gpi0": {
+      "sha256": "12ca256c786f31ff1d78e3adfe45a8fbb00ccba2f375d53d2a68614175229f00",
+      "hash_passed": true,
+      "native_contiguity_passed": true,
+      "first_sample_id": 40320,
+      "analyzed_end_exclusive": 12940320,
+      "analyzed_samples": 12900000,
+      "source_bytes": 1625000,
+      "source_chunks": 130,
+      "last_chunk_excluded": true,
+      "nonfinite_samples": null
+    },
+    "gpi1": {
+      "sha256": "12ca256c786f31ff1d78e3adfe45a8fbb00ccba2f375d53d2a68614175229f00",
+      "hash_passed": true,
+      "native_contiguity_passed": true,
+      "first_sample_id": 40320,
+      "analyzed_end_exclusive": 12940320,
+      "analyzed_samples": 12900000,
+      "source_bytes": 1625000,
+      "source_chunks": 130,
+      "last_chunk_excluded": true,
+      "nonfinite_samples": null
+    },
+    "current_range": {
+      "sha256": "843bfac173fe8de45fd157101614aa63905c7abd51547ac05add581605103f42",
+      "hash_passed": true,
+      "native_contiguity_passed": true,
+      "first_sample_id": 40320,
+      "analyzed_end_exclusive": 12940320,
+      "analyzed_samples": 12900000,
+      "source_bytes": 13000000,
+      "source_chunks": 130,
+      "last_chunk_excluded": true,
+      "nonfinite_samples": null
+    }
+  },
+  "corrected_mapping": {
+    "phase": "physical IN1 / raw gpi1",
+    "exposure": "physical IN0 / raw gpi0",
+    "original_metadata_roles_incorrect": true,
+    "raw_files_changed": false,
+    "provenance": "Root supplied physical role correction; this trace has no transitions to independently verify wiring"
+  },
+  "digital": {
+    "gpi0": {
+      "physical_input": "IN0",
+      "intended_role": "PD0 exposure mirror",
+      "first_sample_id": 40320,
+      "end_sample_id_exclusive": 12940320,
+      "samples": 12900000,
+      "low_samples": 12900000,
+      "high_samples": 0,
+      "edge_count": 0
+    },
+    "gpi1": {
+      "physical_input": "IN1",
+      "intended_role": "PD12 phase markers",
+      "first_sample_id": 40320,
+      "end_sample_id_exclusive": 12940320,
+      "samples": 12900000,
+      "low_samples": 12900000,
+      "high_samples": 0,
+      "edge_count": 0
+    }
+  },
+  "marker_decode": {
+    "available": true,
+    "unique_complete_train": false,
+    "complete_train_count": 0,
+    "total_edges": 0,
+    "total_pulses": 0,
+    "pulse_rule": "Native0.5us grid, abs(width_us-(2*ID+0.24))<=0.80; contiguous unique10/11-ID train with semantic precedence",
+    "events": [],
+    "unclassified_pulse_preview": [],
+    "preview_truncated": false
+  },
+  "completion_markers_observed": false,
+  "exposure_count_verified": false,
+  "phase_timing_available": false,
+  "image_integrity_verified": false,
+  "actual_standby_verified": false,
+  "analog": {
+    "common_start_sample_id": 40320,
+    "common_end_sample_id_exclusive": 13053726,
+    "low_current_plateau": {
+      "first_sample_id": 5854000,
+      "time_from_recording_sample_zero_ms": 2927.0,
+      "definition": "First 50 consecutive 1 ms bin means in 2..6 mA; not a CPU-state measurement",
+      "first_100ms": {
+        "start_sample_id": 5854000,
+        "end_sample_id_exclusive": 6054000,
+        "start_ms": 2927.0,
+        "end_ms": 3027.0,
+        "duration_ms": 100.0,
+        "valid": true,
+        "streams": {
+          "current": {
+            "covered": true,
+            "finite": true,
+            "nonfinite_samples": 0
+          },
+          "voltage": {
+            "covered": true,
+            "finite": true,
+            "nonfinite_samples": 0
+          },
+          "power": {
+            "covered": true,
+            "finite": true,
+            "nonfinite_samples": 0
+          }
+        },
+        "current_mean": 0.0035236951061803847,
+        "current_min": 0.0022769570350646973,
+        "current_max": 0.004728192463517189,
+        "voltage_mean": 4.99447219246149,
+        "voltage_min": 4.989935874938965,
+        "voltage_max": 5.003554821014404,
+        "power_mean": 0.017599000024525448,
+        "power_min": 0.011372207663953304,
+        "power_max": 0.02361484430730343,
+        "current_mean_mA": 3.5236951061803845,
+        "charge_mC": 0.35236951061803845,
+        "positive_charge_mC": 0.35236951061803845,
+        "negative_charge_mC": 0.0,
+        "energy_mJ": 1.7599000024525449,
+        "native_peak_unqualified": {
+          "sample_id": 6015330,
+          "time_from_onset_us": 3007665.0,
+          "current_A": 0.004728192463517189,
+          "source_voltage_V": 4.994475364685059,
+          "range_code": 3
+        },
+        "current_above_A": {
+          "0.1": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "0.5": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "1": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "3": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "5": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "7": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          }
+        },
+        "range_covered": true,
+        "range_counts": {
+          "3": 200000
+        }
+      }
+    },
+    "final_500ms": {
+      "start_sample_id": 12053726,
+      "end_sample_id_exclusive": 13053726,
+      "start_ms": 6026.862999999999,
+      "end_ms": 6526.862999999999,
+      "duration_ms": 500.0,
+      "valid": true,
+      "streams": {
+        "current": {
+          "covered": true,
+          "finite": true,
+          "nonfinite_samples": 0
+        },
+        "voltage": {
+          "covered": true,
+          "finite": true,
+          "nonfinite_samples": 0
+        },
+        "power": {
+          "covered": true,
+          "finite": true,
+          "nonfinite_samples": 0
+        }
+      },
+      "current_mean": 0.003521247424766421,
+      "current_min": 0.002366635948419571,
+      "current_max": 0.004749118350446224,
+      "voltage_mean": 4.9944104327745436,
+      "voltage_min": 4.989935874938965,
+      "voltage_max": 4.9990153312683105,
+      "power_mean": 0.017586559441944583,
+      "power_min": 0.011820108629763126,
+      "power_max": 0.02371935546398163,
+      "current_mean_mA": 3.5212474247664214,
+      "charge_mC": 1.7606237123832107,
+      "positive_charge_mC": 1.7606237123832107,
+      "negative_charge_mC": 0.0,
+      "energy_mJ": 8.793279720972292,
+      "native_peak_unqualified": {
+        "sample_id": 12716441,
+        "time_from_onset_us": 6358220.5,
+        "current_A": 0.004749118350446224,
+        "source_voltage_V": 4.994475364685059
+      },
+      "current_above_A": {
+        "0.1": {
+          "samples": 0,
+          "duration_us": 0.0,
+          "longest_contiguous_us": 0,
+          "episodes": 0,
+          "first_time_us": null,
+          "last_end_time_us": null
+        },
+        "0.5": {
+          "samples": 0,
+          "duration_us": 0.0,
+          "longest_contiguous_us": 0,
+          "episodes": 0,
+          "first_time_us": null,
+          "last_end_time_us": null
+        },
+        "1": {
+          "samples": 0,
+          "duration_us": 0.0,
+          "longest_contiguous_us": 0,
+          "episodes": 0,
+          "first_time_us": null,
+          "last_end_time_us": null
+        },
+        "3": {
+          "samples": 0,
+          "duration_us": 0.0,
+          "longest_contiguous_us": 0,
+          "episodes": 0,
+          "first_time_us": null,
+          "last_end_time_us": null
+        },
+        "5": {
+          "samples": 0,
+          "duration_us": 0.0,
+          "longest_contiguous_us": 0,
+          "episodes": 0,
+          "first_time_us": null,
+          "last_end_time_us": null
+        },
+        "7": {
+          "samples": 0,
+          "duration_us": 0.0,
+          "longest_contiguous_us": 0,
+          "episodes": 0,
+          "first_time_us": null,
+          "last_end_time_us": null
+        }
+      },
+      "range_covered": false
+    },
+    "sleep_like_signature": true,
+    "reset_reference": "No NRST/marker edge exists in these streams; BREAK timestamps are host events only",
+    "reset_host_events": [
+      {
+        "event": "break_asserted",
+        "utc": "2026-11-08T16:49:07.164635+00:00",
+        "monotonic": 47357.0,
+        "reason": "warm reset",
+        "interpretation": "Historical bench BREAK-to-NRST qualification; no current NRST probe"
+      },
+      {
+        "event": "break_released",
+        "utc": "2026-11-08T16:49:07.671618+00:00",
+        "monotonic": 47357.5,
+        "reason": "planned warm reset release",
+        "interpretation": "Historical bench BREAK-to-NRST qualification; no current NRST probe"
+      }
+    ]
+  },
+  "conclusion": "Both GPIO inputs stayed LOW for the complete usable record. Analog load falls to a stable low-current plateau consistent with prior sleep-level observations, but no capture, commit, deinit, pre-WFI or exposure event can be decoded.",
+  "limitations": [
+    "Pre-WFI intent would not itself prove Standby, even if a marker were present.",
+    "The source was already powered: this is a warm reset recording, not a cold inrush measurement.",
+    "Analog stream sample IDs align current/voltage/power. Callback/host timestamps are not a measured NRST boundary.",
+    "The first current chunk has 71 nonfinite samples. All reported tail/plateau windows are independently finite.",
+    "No complete capture-cycle energy or image completion claim is made.",
+    "Final digital chunk is excluded because packed-bit endpoint padding is unresolved."
+  ]
+}

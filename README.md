@@ -1,12 +1,25 @@
 # Global X Camera
 
-An STM32N6-based, credit-card-size monochrome global-shutter camera project. This repository is the durable project record; chat and Page copies are working views. Latest checkpoint: October 28, 2026.
+An STM32N6-based, credit-card-size monochrome global-shutter camera project. This repository is the durable project record; chat and Page copies are working views. Latest firmware checkpoint: November 8, 2026.
 
 **Public repository:** [bigjosh/global-x-camera](https://github.com/bigjosh/global-x-camera), created at the user's explicit request on October 13, 2026. The default branch is `main`.
 
 ## Start here
 
-**Latest normal firmware (October 28):** automatic single-frame capture is
+**Latest installed firmware (November 8):** USB PTP photo access is installed in
+NOR alongside the unchanged October 28 capture payload. CN8 VBUS present at
+boot selects **Global X RAW Camera** in Windows; the native camera driver can
+browse thumbnails, download lossless 16-bit gray PNGs, and explicitly delete
+individual photos. No driver replacement or FAT filesystem is needed. Two
+new captures, deletion/slot reuse, preserved-neighbor hashes, reboot persistence
+and real transfer cancellation passed. UART recovery remains available.
+[Usage and limits](firmware/usb-ptp/README.md) and
+[qualification record](firmware/usb-ptp/evidence/2026-11-08-native-ptp/README.md).
+The target is left powered in USB mode. Physical USB-unplug shutdown and a
+fully discharged cold boot of the combined image remain unqualified; see
+AGENTS.md before touching the bench.
+
+**Capture baseline retained from October 28:** automatic single-frame capture is
 installed, retaining Ethernet power-down and four-bit 25 MHz SD saving. The
 cold awake proof showed one frame/exposure, zero explicit STOP writes and
 stable autonomous standby. Three normal cold cycles each passed all eleven

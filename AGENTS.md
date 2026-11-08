@@ -4,6 +4,50 @@ Read [NOTES.md](NOTES.md) at the root and in the relevant owning folder before c
 
 # Instrument access
 
+**Latest checkpoint — native USB PTP installed and qualified, November 8:**
+`package08 / ram08` now replaces the earlier normal-NOR identity. USB executable
+SHA `74c91b77062e899944941006e075ab76039055f5175bee5f497b8d1a242e3679`,
+prefix `4976a9e956095e3176ef4863b6c49225df271b231305e51069152baf731e4dd0`,
+sector0 `dd69bc33981a35bebefaca4c1939b6334304a6ad72dcfb57492e539f0d1a0dad`,
+sector1 `27cf627bb447cdd53ae82413e3bc4d504a84f242d182b9890dd958a0163480df`.
+Independent full64KiB reads of both regions matched; following4KiB preserved.
+Original October28 capture tail/early UART guard remain byte-exact. The new
+post-memory hook checks CN8 VBUS through PA11/ADC2; present selects PTP,
+absent resumes capture. The I-cache transition fix and exact recovery pins
+are in `firmware/usb-ptp/`; use its `recovery.py --package ...`, not the old
+normal-prefix allowlist. No OTP changed.
+
+Windows native WPD browse/PNG16 download/BMP thumbnail/per-photo delete passed.
+Two capture-control photos were validated and viewed; deleted slot175 was
+reused. Final explicit delete removed only `oB0`/slot175, persisted across
+normal reset and SD reinitialization; retained new slot189 and old slot174
+remained byte-identical. Two real final-build cancellations succeeded and
+subsequent downloads matched; no cleanup failure. Exact final UART park passed
+9good/0bad before the last normal USB reset. Synthetic unreadable-sector export
+passed independently; no real failing-card or retention qualification.
+[Durable report, frozen release and logs](firmware/usb-ptp/evidence/2026-11-08-native-ptp/README.md).
+
+**Final target is ON in normal persistent USB PTP service**, not a RAM helper,
+with189 recognized photos, USB HS480Mbps, SD25MHz initialized/media idle,
+active transaction0 and CPU/SD faults0 at the final read. JS stats at16:56UTC
+were93.19mA/4.977V; range128/settings restored and JSclosed. COM8closed/BREAK
+released; no active host client or helper. CN8 and CN10 are attached; target
+source remains external5V→JS→CN5.5/GND6, allCN9 shunts removed per user.
+No automated JS power cycle occurred; CN8 backfeed/discharge remains unmeasured.
+No physical change made; SPDT latch still not installed. USB asserts PD7, but
+the separate early-HOLD and DMA-sleep capture candidates remain offline.
+
+**Limits:** cable-removal shutdown and fully discharged combined-image cold
+boot remain unqualified. A temporary forced-capture selector tested returning
+to capture with CN8 attached; final selector uses actual VBUS. JS marker inputs
+were both constantLOW, so no fresh exposure/phase/50ms timing or Standby flag
+proof is claimed. USB catalogue scan fails on an unreadable header; unknown
+occupied slots remain hidden. Power-loss deletion remains unqualified. Full
+local photos/raw JS traces stay under `tmp/bringup/usb-ptp-20261108/`; public
+evidence excludes scene images. This resolves the active USB campaign below.
+Re-establish live ownership/state before the next hardware action.
+
+
 **Latest checkpoint — single-frame firmware installed; tests stopped at user request, October 28, 23:48 UTC:** normal NOR is `tmp/bringup/sensor-autostop-promote-20261028/flash-standby-v1`: receiver `560a8734306436fe95bc1407031e70f1bc5b448949366e1bd007779c1736f646`, prefix `6378483a91b560ffc6b31d74a9dd1205996a14c8030447ffddf7deddc9d23874`, sector `79a379470927135bc03841098fe070912cad8275e91c5d5985cc066c294cf64e`. Independent physical64KiB readback matched; following4KiB preserved. Sensor context0 repeat1/next4 now stops after one frame without an explicit successful-path STOP. Ethernet power-down, SD4bit25MHz, error engine, UART recovery and MCU Standby are retained. Three cold cycles passed all11markers/one exposure and exact UART recovery. Guarded SBF1/PDDS1/STOPF0 was observed after the third, with `trial_entry_proven:false` retained. Awake slot142 passed original-camera-RAM equality; cold slots143/144 passed all3730sectors and independent PNG decoding, and root viewed recognizable scenes. Slot145 has only2560sectors verified; the remaining readback was stopped at the user's explicit instruction. [Results and limits](firmware/capture-raw/evidence/2026-10-28-sensor-single-frame/README.md).261 offline tests and five historical binary comparisons passed before the stop; no further tests are pending in this task.
 
 **Live handoff is not a final normal cold boot or fresh Standby proof.** The target remains powered; the last successful operation was RAM READ slot145/payload2048. The next chunk's host preflight ended during a failed/cancelled ST-LINK core-identification attempt, before any new READ request; exact current PC/halt state is unverified. No retry, recovery, reset or power cycle followed the user's stop. No active bench helper remains; COM8 closed/BREAK released. Normal installed firmware runs on the next normal reset/power cycle. Check live ownership/state before further work; do not reuse the last READ proof as current execution permission. Campaign `tmp/bringup/sensor-autostop-promote-20261028/`, `final-state.json` and `cold-images-readback/partial-summary.json` preserve the boundary. No card erase or wiring change occurred.

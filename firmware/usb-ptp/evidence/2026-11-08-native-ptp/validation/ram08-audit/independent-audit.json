@@ -1,0 +1,65 @@
+{
+  "schema": 1,
+  "created_utc": "2026-11-08T16:49:18.689551+00:00",
+  "scope": "offline independent ram08 build, cancellation/buffer ownership review, protocol/transport/shutdown tests; no instruments",
+  "binary_bytes": 34462,
+  "binary_sha256": "74c91b77062e899944941006e075ab76039055f5175bee5f497b8d1a242e3679",
+  "matches_root_ram08_byte_for_byte": true,
+  "source_hashes_still_match_manifest": {
+    "firmware\\usb-ptp\\entry.S": true,
+    "firmware\\usb-ptp\\main.c": true,
+    "firmware\\usb-ptp\\vbus.c": true,
+    "firmware\\usb-ptp\\shutdown.c": true,
+    "firmware\\usb-ptp\\ptp.c": true,
+    "firmware\\usb-ptp\\storage\\photo_store.c": true,
+    "firmware\\usb-ptp\\thumbnail\\thumbnail_bmp.c": true,
+    "firmware\\usb-ptp\\transport\\usb_ptp_transport.c": true,
+    "firmware\\sd-storage\\sd_card.c": true,
+    "firmware\\usb-ptp\\transport\\vendor\\st-usbd\\Core\\Src\\usbd_core.c": true,
+    "firmware\\usb-ptp\\transport\\vendor\\st-usbd\\Core\\Src\\usbd_ctlreq.c": true,
+    "firmware\\usb-ptp\\transport\\vendor\\st-usbd\\Core\\Src\\usbd_ioreq.c": true,
+    "tmp\\bringup\\x-cube-n6-camera-capture\\STM32Cube_FW_N6\\Drivers\\STM32N6xx_HAL_Driver\\Src\\stm32n6xx_hal_adc.c": true,
+    "tmp\\bringup\\x-cube-n6-camera-capture\\STM32Cube_FW_N6\\Drivers\\STM32N6xx_HAL_Driver\\Src\\stm32n6xx_hal_adc_ex.c": true,
+    "tmp\\bringup\\x-cube-n6-camera-capture\\STM32Cube_FW_N6\\Drivers\\STM32N6xx_HAL_Driver\\Src\\stm32n6xx_hal_pcd.c": true,
+    "tmp\\bringup\\x-cube-n6-camera-capture\\STM32Cube_FW_N6\\Drivers\\STM32N6xx_HAL_Driver\\Src\\stm32n6xx_hal_pcd_ex.c": true,
+    "tmp\\bringup\\x-cube-n6-camera-capture\\STM32Cube_FW_N6\\Drivers\\STM32N6xx_HAL_Driver\\Src\\stm32n6xx_ll_usb.c": true,
+    "tmp\\bringup\\x-cube-n6-camera-capture\\STM32Cube_FW_N6\\Drivers\\STM32N6xx_HAL_Driver\\Src\\stm32n6xx_hal_rcc.c": true,
+    "tmp\\bringup\\x-cube-n6-camera-capture\\STM32Cube_FW_N6\\Drivers\\STM32N6xx_HAL_Driver\\Src\\stm32n6xx_hal_rcc_ex.c": true,
+    "tmp\\bringup\\x-cube-n6-camera-capture\\STM32Cube_FW_N6\\Drivers\\STM32N6xx_HAL_Driver\\Src\\stm32n6xx_hal_pwr.c": true,
+    "tmp\\bringup\\x-cube-n6-camera-capture\\STM32Cube_FW_N6\\Drivers\\STM32N6xx_HAL_Driver\\Src\\stm32n6xx_hal_pwr_ex.c": true,
+    "tmp\\bringup\\x-cube-n6-camera-capture\\STM32Cube_FW_N6\\Drivers\\STM32N6xx_HAL_Driver\\Src\\stm32n6xx_hal_cortex.c": true,
+    "tmp\\bringup\\x-cube-n6-camera-capture\\STM32Cube_FW_N6\\Drivers\\STM32N6xx_HAL_Driver\\Src\\stm32n6xx_hal_gpio.c": true,
+    "tmp\\bringup\\x-cube-n6-camera-capture\\STM32Cube_FW_N6\\Drivers\\STM32N6xx_HAL_Driver\\Src\\stm32n6xx_hal_rif.c": true,
+    "firmware\\usb-ptp\\usb.ld": true
+  },
+  "tests": {
+    "ptp": {
+      "passed": 21,
+      "log": "test-ptp.log"
+    },
+    "transport": {
+      "passed": 9,
+      "log": "test-transport.log"
+    },
+    "shutdown": {
+      "passed": 3,
+      "log": "test-shutdown.log"
+    }
+  },
+  "review": {
+    "blockers": [],
+    "confirmed": [
+      "All USB-owned data and response buffers have static lifetime.",
+      "Failed endpoint abort/flush retains Busy and active transaction ownership; later bounded polls retry before commands, events or idle ADC checks.",
+      "Response-phase cancel/reset uses same cleanup gate.",
+      "Successful cancel preserves endpoint toggles and pending OUT command.",
+      "Physical USB disconnect/reset invalidates old endpoint ownership."
+    ],
+    "limitations": [
+      "Offline tests do not qualify physical USB cancellation, VBUS rail detection or Standby power sequencing.",
+      "Existing linker RWX segment warning is unchanged."
+    ]
+  },
+  "source_edits_in_this_audit": false,
+  "instrument_access": false
+}

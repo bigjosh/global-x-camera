@@ -27,6 +27,7 @@ at this bootstrap.
 | Current RAW streaming, publication and shutdown | [RAW capture](firmware/capture-raw/NOTES.md) |
 | On-media object format and host interpretation | [RAW slots](firmware/raw-slots/NOTES.md) |
 | Native SD transport, DMA and card completion | [SD storage](firmware/sd-storage/NOTES.md) |
+| USB mode selection, native PTP and transfer ownership | [USB photo access](firmware/usb-ptp/NOTES.md) |
 | Earlier PNG/FAT32 integration and low-power qualification | [Capture to SD](firmware/capture-sd/NOTES.md) |
 | Encoder choices and rejected compression candidates | [PNG encoder](firmware/png-encoder/NOTES.md) |
 | Native SD logic decoding and raw DAT0 busy timing | [Saleae SD analyzer](tools/saleae-sd-native/NOTES.md) |

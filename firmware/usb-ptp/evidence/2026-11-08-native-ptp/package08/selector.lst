@@ -1,0 +1,1518 @@
+
+D:\Github\global-x-camera\tmp\bringup\usb-ptp-20261108\package08\selector.elf:     file format elf32-littlearm
+
+
+Disassembly of section .text:
+
+34200000 <usb_selector>:
+34200000:	4a4f      	ldr	r2, [pc, #316]	@ (34200140 <usb_selector+0x140>)
+34200002:	4950      	ldr	r1, [pc, #320]	@ (34200144 <usb_selector+0x144>)
+34200004:	e92d 4ff0 	stmdb	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
+34200008:	1a8b      	subs	r3, r1, r2
+3420000a:	3303      	adds	r3, #3
+3420000c:	089b      	lsrs	r3, r3, #2
+3420000e:	3103      	adds	r1, #3
+34200010:	428a      	cmp	r2, r1
+34200012:	f103 0301 	add.w	r3, r3, #1
+34200016:	f04f 0400 	mov.w	r4, #0
+3420001a:	bf94      	ite	ls
+3420001c:	4618      	movls	r0, r3
+3420001e:	2001      	movhi	r0, #1
+34200020:	b0a7      	sub	sp, #156	@ 0x9c
+34200022:	3801      	subs	r0, #1
+34200024:	f040 8088 	bne.w	34200138 <usb_selector+0x138>
+34200028:	4b47      	ldr	r3, [pc, #284]	@ (34200148 <usb_selector+0x148>)
+3420002a:	4c48      	ldr	r4, [pc, #288]	@ (3420014c <usb_selector+0x14c>)
+3420002c:	685a      	ldr	r2, [r3, #4]
+3420002e:	4b48      	ldr	r3, [pc, #288]	@ (34200150 <usb_selector+0x150>)
+34200030:	2100      	movs	r1, #0
+34200032:	601a      	str	r2, [r3, #0]
+34200034:	4b47      	ldr	r3, [pc, #284]	@ (34200154 <usb_selector+0x154>)
+34200036:	2260      	movs	r2, #96	@ 0x60
+34200038:	611c      	str	r4, [r3, #16]
+3420003a:	a80e      	add	r0, sp, #56	@ 0x38
+3420003c:	f001 f836 	bl	342010ac <memset>
+34200040:	f000 fd94 	bl	34200b6c <HAL_GetTick>
+34200044:	4b44      	ldr	r3, [pc, #272]	@ (34200158 <usb_selector+0x158>)
+34200046:	9001      	str	r0, [sp, #4]
+34200048:	f8d3 225c 	ldr.w	r2, [r3, #604]	@ 0x25c
+3420004c:	9202      	str	r2, [sp, #8]
+3420004e:	f8d3 2258 	ldr.w	r2, [r3, #600]	@ 0x258
+34200052:	f8d3 0250 	ldr.w	r0, [r3, #592]	@ 0x250
+34200056:	9203      	str	r2, [sp, #12]
+34200058:	4a40      	ldr	r2, [pc, #256]	@ (3420015c <usb_selector+0x15c>)
+3420005a:	f8c3 2a5c 	str.w	r2, [r3, #2652]	@ 0xa5c
+3420005e:	f44f 7200 	mov.w	r2, #512	@ 0x200
+34200062:	f8c3 2a58 	str.w	r2, [r3, #2648]	@ 0xa58
+34200066:	f3bf 8f4f 	dsb	sy
+3420006a:	4a3d      	ldr	r2, [pc, #244]	@ (34200160 <usb_selector+0x160>)
+3420006c:	0687      	lsls	r7, r0, #26
+3420006e:	6811      	ldr	r1, [r2, #0]
+34200070:	9104      	str	r1, [sp, #16]
+34200072:	68d1      	ldr	r1, [r2, #12]
+34200074:	9105      	str	r1, [sp, #20]
+34200076:	493b      	ldr	r1, [pc, #236]	@ (34200164 <usb_selector+0x164>)
+34200078:	698d      	ldr	r5, [r1, #24]
+3420007a:	9506      	str	r5, [sp, #24]
+3420007c:	4d3a      	ldr	r5, [pc, #232]	@ (34200168 <usb_selector+0x168>)
+3420007e:	6bee      	ldr	r6, [r5, #60]	@ 0x3c
+34200080:	f8d3 3144 	ldr.w	r3, [r3, #324]	@ 0x144
+34200084:	9607      	str	r6, [sp, #28]
+34200086:	9308      	str	r3, [sp, #32]
+34200088:	4b38      	ldr	r3, [pc, #224]	@ (3420016c <usb_selector+0x16c>)
+3420008a:	6023      	str	r3, [r4, #0]
+3420008c:	f04f 0301 	mov.w	r3, #1
+34200090:	6063      	str	r3, [r4, #4]
+34200092:	f04f 0300 	mov.w	r3, #0
+34200096:	60a3      	str	r3, [r4, #8]
+34200098:	d56a      	bpl.n	34200170 <usb_selector+0x170>
+3420009a:	f04f 34ff 	mov.w	r4, #4294967295
+3420009e:	4a2e      	ldr	r2, [pc, #184]	@ (34200158 <usb_selector+0x158>)
+342000a0:	9908      	ldr	r1, [sp, #32]
+342000a2:	f8d2 3144 	ldr.w	r3, [r2, #324]	@ 0x144
+342000a6:	f021 018f 	bic.w	r1, r1, #143	@ 0x8f
+342000aa:	f423 437f 	bic.w	r3, r3, #65280	@ 0xff00
+342000ae:	0409      	lsls	r1, r1, #16
+342000b0:	0c09      	lsrs	r1, r1, #16
+342000b2:	f023 0370 	bic.w	r3, r3, #112	@ 0x70
+342000b6:	430b      	orrs	r3, r1
+342000b8:	f8c2 3144 	str.w	r3, [r2, #324]	@ 0x144
+342000bc:	9a04      	ldr	r2, [sp, #16]
+342000be:	4b28      	ldr	r3, [pc, #160]	@ (34200160 <usb_selector+0x160>)
+342000c0:	9907      	ldr	r1, [sp, #28]
+342000c2:	601a      	str	r2, [r3, #0]
+342000c4:	9a05      	ldr	r2, [sp, #20]
+342000c6:	f421 617e 	bic.w	r1, r1, #4064	@ 0xfe0
+342000ca:	60da      	str	r2, [r3, #12]
+342000cc:	9a06      	ldr	r2, [sp, #24]
+342000ce:	4b25      	ldr	r3, [pc, #148]	@ (34200164 <usb_selector+0x164>)
+342000d0:	f021 010f 	bic.w	r1, r1, #15
+342000d4:	619a      	str	r2, [r3, #24]
+342000d6:	4a24      	ldr	r2, [pc, #144]	@ (34200168 <usb_selector+0x168>)
+342000d8:	04c9      	lsls	r1, r1, #19
+342000da:	6bd3      	ldr	r3, [r2, #60]	@ 0x3c
+342000dc:	0cc9      	lsrs	r1, r1, #19
+342000de:	f423 5380 	bic.w	r3, r3, #4096	@ 0x1000
+342000e2:	f023 0310 	bic.w	r3, r3, #16
+342000e6:	430b      	orrs	r3, r1
+342000e8:	63d3      	str	r3, [r2, #60]	@ 0x3c
+342000ea:	9b03      	ldr	r3, [sp, #12]
+342000ec:	f502 4290 	add.w	r2, r2, #18432	@ 0x4800
+342000f0:	f413 7f00 	tst.w	r3, #512	@ 0x200
+342000f4:	bf08      	it	eq
+342000f6:	f44f 7300 	moveq.w	r3, #512	@ 0x200
+342000fa:	9902      	ldr	r1, [sp, #8]
+342000fc:	bf08      	it	eq
+342000fe:	f8c2 3258 	streq.w	r3, [r2, #600]	@ 0x258
+34200102:	4b16      	ldr	r3, [pc, #88]	@ (3420015c <usb_selector+0x15c>)
+34200104:	ea23 0301 	bic.w	r3, r3, r1
+34200108:	f8c2 325c 	str.w	r3, [r2, #604]	@ 0x25c
+3420010c:	f3bf 8f4f 	dsb	sy
+34200110:	4d0e      	ldr	r5, [pc, #56]	@ (3420014c <usb_selector+0x14c>)
+34200112:	626c      	str	r4, [r5, #36]	@ 0x24
+34200114:	f000 fd2a 	bl	34200b6c <HAL_GetTick>
+34200118:	9b01      	ldr	r3, [sp, #4]
+3420011a:	1ac0      	subs	r0, r0, r3
+3420011c:	4b0d      	ldr	r3, [pc, #52]	@ (34200154 <usb_selector+0x154>)
+3420011e:	62a8      	str	r0, [r5, #40]	@ 0x28
+34200120:	615c      	str	r4, [r3, #20]
+34200122:	2c00      	cmp	r4, #0
+34200124:	f000 850b 	beq.w	34200b3e <usb_selector+0xb3e>
+34200128:	3401      	adds	r4, #1
+3420012a:	f040 847b 	bne.w	34200a24 <usb_selector+0xa24>
+3420012e:	f24e 0202 	movw	r2, #57346	@ 0xe002
+34200132:	605a      	str	r2, [r3, #4]
+34200134:	bf00      	nop
+34200136:	e7fd      	b.n	34200134 <usb_selector+0x134>
+34200138:	f842 4b04 	str.w	r4, [r2], #4
+3420013c:	e771      	b.n	34200022 <usb_selector+0x22>
+3420013e:	bf00      	nop
+34200140:	342010bc 	.word	0x342010bc
+34200144:	34201108 	.word	0x34201108
+34200148:	e0001000 	.word	0xe0001000
+3420014c:	342010bc 	.word	0x342010bc
+34200150:	34201104 	.word	0x34201104
+34200154:	343f9000 	.word	0x343f9000
+34200158:	56028000 	.word	0x56028000
+3420015c:	00040001 	.word	0x00040001
+34200160:	56020000 	.word	0x56020000
+34200164:	54024000 	.word	0x54024000
+34200168:	56024800 	.word	0x56024800
+3420016c:	31535542 	.word	0x31535542
+34200170:	6813      	ldr	r3, [r2, #0]
+34200172:	f443 0340 	orr.w	r3, r3, #12582912	@ 0xc00000
+34200176:	6013      	str	r3, [r2, #0]
+34200178:	68d3      	ldr	r3, [r2, #12]
+3420017a:	f423 0340 	bic.w	r3, r3, #12582912	@ 0xc00000
+3420017e:	60d3      	str	r3, [r2, #12]
+34200180:	698b      	ldr	r3, [r1, #24]
+34200182:	f043 0301 	orr.w	r3, r3, #1
+34200186:	618b      	str	r3, [r1, #24]
+34200188:	f3bf 8f4f 	dsb	sy
+3420018c:	6beb      	ldr	r3, [r5, #60]	@ 0x3c
+3420018e:	f043 0310 	orr.w	r3, r3, #16
+34200192:	63eb      	str	r3, [r5, #60]	@ 0x3c
+34200194:	6beb      	ldr	r3, [r5, #60]	@ 0x3c
+34200196:	02de      	lsls	r6, r3, #11
+34200198:	f140 81ea 	bpl.w	34200570 <usb_selector+0x570>
+3420019c:	6beb      	ldr	r3, [r5, #60]	@ 0x3c
+3420019e:	f443 5380 	orr.w	r3, r3, #4096	@ 0x1000
+342001a2:	63eb      	str	r3, [r5, #60]	@ 0x3c
+342001a4:	f3bf 8f4f 	dsb	sy
+342001a8:	2120      	movs	r1, #32
+342001aa:	4bda      	ldr	r3, [pc, #872]	@ (34200514 <usb_selector+0x514>)
+342001ac:	f8c3 1a10 	str.w	r1, [r3, #2576]	@ 0xa10
+342001b0:	f3bf 8f4f 	dsb	sy
+342001b4:	4ad8      	ldr	r2, [pc, #864]	@ (34200518 <usb_selector+0x518>)
+342001b6:	f8c2 1210 	str.w	r1, [r2, #528]	@ 0x210
+342001ba:	f3bf 8f4f 	dsb	sy
+342001be:	f8d3 2144 	ldr.w	r2, [r3, #324]	@ 0x144
+342001c2:	f422 427f 	bic.w	r2, r2, #65280	@ 0xff00
+342001c6:	f442 62e0 	orr.w	r2, r2, #1792	@ 0x700
+342001ca:	f8c3 2144 	str.w	r2, [r3, #324]	@ 0x144
+342001ce:	f8d3 2144 	ldr.w	r2, [r3, #324]	@ 0x144
+342001d2:	f022 0270 	bic.w	r2, r2, #112	@ 0x70
+342001d6:	f042 0250 	orr.w	r2, r2, #80	@ 0x50
+342001da:	f8c3 2144 	str.w	r2, [r3, #324]	@ 0x144
+342001de:	f8c3 1a50 	str.w	r1, [r3, #2640]	@ 0xa50
+342001e2:	f3bf 8f4f 	dsb	sy
+342001e6:	2200      	movs	r2, #0
+342001e8:	2104      	movs	r1, #4
+342001ea:	f8df b330 	ldr.w	fp, [pc, #816]	@ 3420051c <usb_selector+0x51c>
+342001ee:	e9cd 2217 	strd	r2, r2, [sp, #92]	@ 0x5c
+342001f2:	e9cd b20e 	strd	fp, r2, [sp, #56]	@ 0x38
+342001f6:	e9cd 2219 	strd	r2, r2, [sp, #100]	@ 0x64
+342001fa:	9211      	str	r2, [sp, #68]	@ 0x44
+342001fc:	921b      	str	r2, [sp, #108]	@ 0x6c
+342001fe:	2202      	movs	r2, #2
+34200200:	9112      	str	r1, [sp, #72]	@ 0x48
+34200202:	2101      	movs	r1, #1
+34200204:	6062      	str	r2, [r4, #4]
+34200206:	9a24      	ldr	r2, [sp, #144]	@ 0x90
+34200208:	9114      	str	r1, [sp, #80]	@ 0x50
+3420020a:	b912      	cbnz	r2, 34200212 <usb_selector+0x212>
+3420020c:	9225      	str	r2, [sp, #148]	@ 0x94
+3420020e:	f88d 208c 	strb.w	r2, [sp, #140]	@ 0x8c
+34200212:	48c2      	ldr	r0, [pc, #776]	@ (3420051c <usb_selector+0x51c>)
+34200214:	f000 fcd3 	bl	34200bbe <LL_ADC_IsEnabled.lto_priv.0>
+34200218:	2800      	cmp	r0, #0
+3420021a:	f040 8095 	bne.w	34200348 <usb_selector+0x348>
+3420021e:	f8db 2008 	ldr.w	r2, [fp, #8]
+34200222:	48be      	ldr	r0, [pc, #760]	@ (3420051c <usb_selector+0x51c>)
+34200224:	0094      	lsls	r4, r2, #2
+34200226:	bf41      	itttt	mi
+34200228:	f8db 2008 	ldrmi.w	r2, [fp, #8]
+3420022c:	f022 5200 	bicmi.w	r2, r2, #536870912	@ 0x20000000
+34200230:	f022 023f 	bicmi.w	r2, r2, #63	@ 0x3f
+34200234:	f8cb 2008 	strmi.w	r2, [fp, #8]
+34200238:	f000 fcc5 	bl	34200bc6 <LL_ADC_REG_IsConversionOngoing.lto_priv.0>
+3420023c:	9a24      	ldr	r2, [sp, #144]	@ 0x90
+3420023e:	f002 0210 	and.w	r2, r2, #16
+34200242:	4302      	orrs	r2, r0
+34200244:	9a24      	ldr	r2, [sp, #144]	@ 0x90
+34200246:	f040 81a0 	bne.w	3420058a <usb_selector+0x58a>
+3420024a:	f422 7281 	bic.w	r2, r2, #258	@ 0x102
+3420024e:	f042 0202 	orr.w	r2, r2, #2
+34200252:	9224      	str	r2, [sp, #144]	@ 0x90
+34200254:	f89d 2054 	ldrb.w	r2, [sp, #84]	@ 0x54
+34200258:	f89d 004d 	ldrb.w	r0, [sp, #77]	@ 0x4d
+3420025c:	2a01      	cmp	r2, #1
+3420025e:	ea4f 4102 	mov.w	r1, r2, lsl #16
+34200262:	bf08      	it	eq
+34200264:	9a16      	ldreq	r2, [sp, #88]	@ 0x58
+34200266:	ea41 3140 	orr.w	r1, r1, r0, lsl #13
+3420026a:	bf08      	it	eq
+3420026c:	f102 32ff 	addeq.w	r2, r2, #4294967295
+34200270:	f8db 000c 	ldr.w	r0, [fp, #12]
+34200274:	bf08      	it	eq
+34200276:	ea41 4142 	orreq.w	r1, r1, r2, lsl #17
+3420027a:	4aa9      	ldr	r2, [pc, #676]	@ (34200520 <usb_selector+0x520>)
+3420027c:	4002      	ands	r2, r0
+3420027e:	430a      	orrs	r2, r1
+34200280:	f8cb 200c 	str.w	r2, [fp, #12]
+34200284:	f8db 2010 	ldr.w	r2, [fp, #16]
+34200288:	48a4      	ldr	r0, [pc, #656]	@ (3420051c <usb_selector+0x51c>)
+3420028a:	f422 4220 	bic.w	r2, r2, #40960	@ 0xa000
+3420028e:	f8cb 2010 	str.w	r2, [fp, #16]
+34200292:	f000 fc98 	bl	34200bc6 <LL_ADC_REG_IsConversionOngoing.lto_priv.0>
+34200296:	f8db 2008 	ldr.w	r2, [fp, #8]
+3420029a:	f002 0208 	and.w	r2, r2, #8
+3420029e:	4302      	orrs	r2, r0
+342002a0:	d13f      	bne.n	34200322 <usb_selector+0x322>
+342002a2:	f8db 200c 	ldr.w	r2, [fp, #12]
+342002a6:	f89d 104c 	ldrb.w	r1, [sp, #76]	@ 0x4c
+342002aa:	f422 4280 	bic.w	r2, r2, #16384	@ 0x4000
+342002ae:	f022 0203 	bic.w	r2, r2, #3
+342002b2:	ea42 3281 	orr.w	r2, r2, r1, lsl #14
+342002b6:	f8cb 200c 	str.w	r2, [fp, #12]
+342002ba:	f8db 2070 	ldr.w	r2, [fp, #112]	@ 0x70
+342002be:	9910      	ldr	r1, [sp, #64]	@ 0x40
+342002c0:	f422 527f 	bic.w	r2, r2, #16320	@ 0x3fc0
+342002c4:	f022 023f 	bic.w	r2, r2, #63	@ 0x3f
+342002c8:	430a      	orrs	r2, r1
+342002ca:	3900      	subs	r1, #0
+342002cc:	bf18      	it	ne
+342002ce:	2101      	movne	r1, #1
+342002d0:	f8cb 2070 	str.w	r2, [fp, #112]	@ 0x70
+342002d4:	f8db 2070 	ldr.w	r2, [fp, #112]	@ 0x70
+342002d8:	f022 4200 	bic.w	r2, r2, #2147483648	@ 0x80000000
+342002dc:	ea42 72c1 	orr.w	r2, r2, r1, lsl #31
+342002e0:	f8cb 2070 	str.w	r2, [fp, #112]	@ 0x70
+342002e4:	f89d 2074 	ldrb.w	r2, [sp, #116]	@ 0x74
+342002e8:	2a01      	cmp	r2, #1
+342002ea:	f040 8149 	bne.w	34200580 <usb_selector+0x580>
+342002ee:	9a1e      	ldr	r2, [sp, #120]	@ 0x78
+342002f0:	f8db 1010 	ldr.w	r1, [fp, #16]
+342002f4:	1e54      	subs	r4, r2, #1
+342002f6:	e9dd 201f 	ldrd	r2, r0, [sp, #124]	@ 0x7c
+342002fa:	4302      	orrs	r2, r0
+342002fc:	9821      	ldr	r0, [sp, #132]	@ 0x84
+342002fe:	ea42 4204 	orr.w	r2, r2, r4, lsl #16
+34200302:	4302      	orrs	r2, r0
+34200304:	4887      	ldr	r0, [pc, #540]	@ (34200524 <usb_selector+0x524>)
+34200306:	4008      	ands	r0, r1
+34200308:	4302      	orrs	r2, r0
+3420030a:	f042 0201 	orr.w	r2, r2, #1
+3420030e:	f8cb 2010 	str.w	r2, [fp, #16]
+34200312:	f8db 2010 	ldr.w	r2, [fp, #16]
+34200316:	991c      	ldr	r1, [sp, #112]	@ 0x70
+34200318:	f022 4270 	bic.w	r2, r2, #4026531840	@ 0xf0000000
+3420031c:	430a      	orrs	r2, r1
+3420031e:	f8cb 2010 	str.w	r2, [fp, #16]
+34200322:	f8db 2030 	ldr.w	r2, [fp, #48]	@ 0x30
+34200326:	487d      	ldr	r0, [pc, #500]	@ (3420051c <usb_selector+0x51c>)
+34200328:	f022 020f 	bic.w	r2, r2, #15
+3420032c:	f8cb 2030 	str.w	r2, [fp, #48]	@ 0x30
+34200330:	9a24      	ldr	r2, [sp, #144]	@ 0x90
+34200332:	f022 0203 	bic.w	r2, r2, #3
+34200336:	f042 0201 	orr.w	r2, r2, #1
+3420033a:	9224      	str	r2, [sp, #144]	@ 0x90
+3420033c:	f000 fc3f 	bl	34200bbe <LL_ADC_IsEnabled.lto_priv.0>
+34200340:	4602      	mov	r2, r0
+34200342:	2800      	cmp	r0, #0
+34200344:	f000 8125 	beq.w	34200592 <usb_selector+0x592>
+34200348:	f04f 34ff 	mov.w	r4, #4294967295
+3420034c:	9925      	ldr	r1, [sp, #148]	@ 0x94
+3420034e:	4a76      	ldr	r2, [pc, #472]	@ (34200528 <usb_selector+0x528>)
+34200350:	a80e      	add	r0, sp, #56	@ 0x38
+34200352:	6191      	str	r1, [r2, #24]
+34200354:	f8db 1000 	ldr.w	r1, [fp]
+34200358:	61d1      	str	r1, [r2, #28]
+3420035a:	f8db 100c 	ldr.w	r1, [fp, #12]
+3420035e:	6211      	str	r1, [r2, #32]
+34200360:	f000 fcfa 	bl	34200d58 <HAL_ADC_Stop>
+34200364:	9a24      	ldr	r2, [sp, #144]	@ 0x90
+34200366:	a80e      	add	r0, sp, #56	@ 0x38
+34200368:	f042 0202 	orr.w	r2, r2, #2
+3420036c:	9224      	str	r2, [sp, #144]	@ 0x90
+3420036e:	f000 fc99 	bl	34200ca4 <ADC_ConversionStop.constprop.0>
+34200372:	b928      	cbnz	r0, 34200380 <usb_selector+0x380>
+34200374:	a80e      	add	r0, sp, #56	@ 0x38
+34200376:	f000 fc63 	bl	34200c40 <ADC_Disable>
+3420037a:	b908      	cbnz	r0, 34200380 <usb_selector+0x380>
+3420037c:	2201      	movs	r2, #1
+3420037e:	9224      	str	r2, [sp, #144]	@ 0x90
+34200380:	f8db 2008 	ldr.w	r2, [fp, #8]
+34200384:	4869      	ldr	r0, [pc, #420]	@ (3420052c <usb_selector+0x52c>)
+34200386:	f022 5200 	bic.w	r2, r2, #536870912	@ 0x20000000
+3420038a:	f022 023f 	bic.w	r2, r2, #63	@ 0x3f
+3420038e:	f042 5200 	orr.w	r2, r2, #536870912	@ 0x20000000
+34200392:	f8cb 2008 	str.w	r2, [fp, #8]
+34200396:	f8db 2004 	ldr.w	r2, [fp, #4]
+3420039a:	f422 727f 	bic.w	r2, r2, #1020	@ 0x3fc
+3420039e:	f022 0203 	bic.w	r2, r2, #3
+342003a2:	f8cb 2004 	str.w	r2, [fp, #4]
+342003a6:	f240 32ff 	movw	r2, #1023	@ 0x3ff
+342003aa:	f8cb 2000 	str.w	r2, [fp]
+342003ae:	f8db 2008 	ldr.w	r2, [fp, #8]
+342003b2:	f022 4280 	bic.w	r2, r2, #1073741824	@ 0x40000000
+342003b6:	f8cb 2008 	str.w	r2, [fp, #8]
+342003ba:	f8db 2008 	ldr.w	r2, [fp, #8]
+342003be:	f042 5200 	orr.w	r2, r2, #536870912	@ 0x20000000
+342003c2:	f8cb 2008 	str.w	r2, [fp, #8]
+342003c6:	f8db 100c 	ldr.w	r1, [fp, #12]
+342003ca:	4a59      	ldr	r2, [pc, #356]	@ (34200530 <usb_selector+0x530>)
+342003cc:	400a      	ands	r2, r1
+342003ce:	f8cb 200c 	str.w	r2, [fp, #12]
+342003d2:	f8db 1010 	ldr.w	r1, [fp, #16]
+342003d6:	4a57      	ldr	r2, [pc, #348]	@ (34200534 <usb_selector+0x534>)
+342003d8:	400a      	ands	r2, r1
+342003da:	f8cb 2010 	str.w	r2, [fp, #16]
+342003de:	f8db 2014 	ldr.w	r2, [fp, #20]
+342003e2:	4955      	ldr	r1, [pc, #340]	@ (34200538 <usb_selector+0x538>)
+342003e4:	f002 4240 	and.w	r2, r2, #3221225472	@ 0xc0000000
+342003e8:	f8cb 2014 	str.w	r2, [fp, #20]
+342003ec:	f8db 2018 	ldr.w	r2, [fp, #24]
+342003f0:	f002 4278 	and.w	r2, r2, #4160749568	@ 0xf8000000
+342003f4:	f8cb 2018 	str.w	r2, [fp, #24]
+342003f8:	f8db 20a8 	ldr.w	r2, [fp, #168]	@ 0xa8
+342003fc:	4002      	ands	r2, r0
+342003fe:	f8cb 20a8 	str.w	r2, [fp, #168]	@ 0xa8
+34200402:	f8db 20ac 	ldr.w	r2, [fp, #172]	@ 0xac
+34200406:	430a      	orrs	r2, r1
+34200408:	f8cb 20ac 	str.w	r2, [fp, #172]	@ 0xac
+3420040c:	f8db 20b0 	ldr.w	r2, [fp, #176]	@ 0xb0
+34200410:	4002      	ands	r2, r0
+34200412:	f8cb 20b0 	str.w	r2, [fp, #176]	@ 0xb0
+34200416:	f8db 20b4 	ldr.w	r2, [fp, #180]	@ 0xb4
+3420041a:	430a      	orrs	r2, r1
+3420041c:	f8cb 20b4 	str.w	r2, [fp, #180]	@ 0xb4
+34200420:	f8db 20b8 	ldr.w	r2, [fp, #184]	@ 0xb8
+34200424:	4002      	ands	r2, r0
+34200426:	f8cb 20b8 	str.w	r2, [fp, #184]	@ 0xb8
+3420042a:	f8db 20bc 	ldr.w	r2, [fp, #188]	@ 0xbc
+3420042e:	4843      	ldr	r0, [pc, #268]	@ (3420053c <usb_selector+0x53c>)
+34200430:	430a      	orrs	r2, r1
+34200432:	f8cb 20bc 	str.w	r2, [fp, #188]	@ 0xbc
+34200436:	f8db 1030 	ldr.w	r1, [fp, #48]	@ 0x30
+3420043a:	4a41      	ldr	r2, [pc, #260]	@ (34200540 <usb_selector+0x540>)
+3420043c:	400a      	ands	r2, r1
+3420043e:	f8cb 2030 	str.w	r2, [fp, #48]	@ 0x30
+34200442:	4940      	ldr	r1, [pc, #256]	@ (34200544 <usb_selector+0x544>)
+34200444:	f8db 2034 	ldr.w	r2, [fp, #52]	@ 0x34
+34200448:	400a      	ands	r2, r1
+3420044a:	f8cb 2034 	str.w	r2, [fp, #52]	@ 0x34
+3420044e:	f8db 2038 	ldr.w	r2, [fp, #56]	@ 0x38
+34200452:	400a      	ands	r2, r1
+34200454:	f8cb 2038 	str.w	r2, [fp, #56]	@ 0x38
+34200458:	f8db 203c 	ldr.w	r2, [fp, #60]	@ 0x3c
+3420045c:	f422 62fb 	bic.w	r2, r2, #2008	@ 0x7d8
+34200460:	f022 0207 	bic.w	r2, r2, #7
+34200464:	f8cb 203c 	str.w	r2, [fp, #60]	@ 0x3c
+34200468:	f8db 2050 	ldr.w	r2, [fp, #80]	@ 0x50
+3420046c:	f022 427c 	bic.w	r2, r2, #4227858432	@ 0xfc000000
+34200470:	f8cb 2050 	str.w	r2, [fp, #80]	@ 0x50
+34200474:	f8db 1060 	ldr.w	r1, [fp, #96]	@ 0x60
+34200478:	4a33      	ldr	r2, [pc, #204]	@ (34200548 <usb_selector+0x548>)
+3420047a:	4011      	ands	r1, r2
+3420047c:	f8cb 1060 	str.w	r1, [fp, #96]	@ 0x60
+34200480:	f8db 1054 	ldr.w	r1, [fp, #84]	@ 0x54
+34200484:	f021 417c 	bic.w	r1, r1, #4227858432	@ 0xfc000000
+34200488:	f8cb 1054 	str.w	r1, [fp, #84]	@ 0x54
+3420048c:	f8db 1064 	ldr.w	r1, [fp, #100]	@ 0x64
+34200490:	4011      	ands	r1, r2
+34200492:	f8cb 1064 	str.w	r1, [fp, #100]	@ 0x64
+34200496:	f8db 1058 	ldr.w	r1, [fp, #88]	@ 0x58
+3420049a:	f021 417c 	bic.w	r1, r1, #4227858432	@ 0xfc000000
+3420049e:	f8cb 1058 	str.w	r1, [fp, #88]	@ 0x58
+342004a2:	f8db 1068 	ldr.w	r1, [fp, #104]	@ 0x68
+342004a6:	4011      	ands	r1, r2
+342004a8:	f8cb 1068 	str.w	r1, [fp, #104]	@ 0x68
+342004ac:	f8db 105c 	ldr.w	r1, [fp, #92]	@ 0x5c
+342004b0:	f021 417c 	bic.w	r1, r1, #4227858432	@ 0xfc000000
+342004b4:	f8cb 105c 	str.w	r1, [fp, #92]	@ 0x5c
+342004b8:	f8db 106c 	ldr.w	r1, [fp, #108]	@ 0x6c
+342004bc:	400a      	ands	r2, r1
+342004be:	f8cb 206c 	str.w	r2, [fp, #108]	@ 0x6c
+342004c2:	f8db 1070 	ldr.w	r1, [fp, #112]	@ 0x70
+342004c6:	4a21      	ldr	r2, [pc, #132]	@ (3420054c <usb_selector+0x54c>)
+342004c8:	400a      	ands	r2, r1
+342004ca:	f8cb 2070 	str.w	r2, [fp, #112]	@ 0x70
+342004ce:	f8db 10a0 	ldr.w	r1, [fp, #160]	@ 0xa0
+342004d2:	4a1f      	ldr	r2, [pc, #124]	@ (34200550 <usb_selector+0x550>)
+342004d4:	4011      	ands	r1, r2
+342004d6:	f8cb 10a0 	str.w	r1, [fp, #160]	@ 0xa0
+342004da:	f8db 10a4 	ldr.w	r1, [fp, #164]	@ 0xa4
+342004de:	4011      	ands	r1, r2
+342004e0:	f8cb 10a4 	str.w	r1, [fp, #164]	@ 0xa4
+342004e4:	f8db 10c0 	ldr.w	r1, [fp, #192]	@ 0xc0
+342004e8:	4011      	ands	r1, r2
+342004ea:	f8cb 10c0 	str.w	r1, [fp, #192]	@ 0xc0
+342004ee:	f8db 101c 	ldr.w	r1, [fp, #28]
+342004f2:	400a      	ands	r2, r1
+342004f4:	f8cb 201c 	str.w	r2, [fp, #28]
+342004f8:	f8db 20c4 	ldr.w	r2, [fp, #196]	@ 0xc4
+342004fc:	f002 22fc 	and.w	r2, r2, #4227922944	@ 0xfc00fc00
+34200500:	f8cb 20c4 	str.w	r2, [fp, #196]	@ 0xc4
+34200504:	f000 fb5b 	bl	34200bbe <LL_ADC_IsEnabled.lto_priv.0>
+34200508:	4603      	mov	r3, r0
+3420050a:	4804      	ldr	r0, [pc, #16]	@ (3420051c <usb_selector+0x51c>)
+3420050c:	f000 fb57 	bl	34200bbe <LL_ADC_IsEnabled.lto_priv.0>
+34200510:	4303      	orrs	r3, r0
+34200512:	e01f      	b.n	34200554 <usb_selector+0x554>
+34200514:	56028000 	.word	0x56028000
+34200518:	56029000 	.word	0x56029000
+3420051c:	50022100 	.word	0x50022100
+34200520:	fff0c013 	.word	0xfff0c013
+34200524:	fc00f81e 	.word	0xfc00f81e
+34200528:	342010bc 	.word	0x342010bc
+3420052c:	ff800000 	.word	0xff800000
+34200530:	80208010 	.word	0x80208010
+34200534:	fc00181c 	.word	0xfc00181c
+34200538:	007fffff 	.word	0x007fffff
+3420053c:	50022000 	.word	0x50022000
+34200540:	e0820830 	.word	0xe0820830
+34200544:	e0820820 	.word	0xe0820820
+34200548:	ffc00000 	.word	0xffc00000
+3420054c:	7fffc000 	.word	0x7fffc000
+34200550:	fff00000 	.word	0xfff00000
+34200554:	bf01      	itttt	eq
+34200556:	4a97      	ldreq	r2, [pc, #604]	@ (342007b4 <usb_selector+0x7b4>)
+34200558:	6893      	ldreq	r3, [r2, #8]
+3420055a:	f023 73a0 	biceq.w	r3, r3, #20971520	@ 0x1400000
+3420055e:	6093      	streq	r3, [r2, #8]
+34200560:	2300      	movs	r3, #0
+34200562:	2220      	movs	r2, #32
+34200564:	9325      	str	r3, [sp, #148]	@ 0x94
+34200566:	9324      	str	r3, [sp, #144]	@ 0x90
+34200568:	4b93      	ldr	r3, [pc, #588]	@ (342007b8 <usb_selector+0x7b8>)
+3420056a:	f8c3 2250 	str.w	r2, [r3, #592]	@ 0x250
+3420056e:	e596      	b.n	3420009e <usb_selector+0x9e>
+34200570:	f000 fafc 	bl	34200b6c <HAL_GetTick>
+34200574:	9b01      	ldr	r3, [sp, #4]
+34200576:	1ac0      	subs	r0, r0, r3
+34200578:	2814      	cmp	r0, #20
+3420057a:	f67f ae0b 	bls.w	34200194 <usb_selector+0x194>
+3420057e:	e58c      	b.n	3420009a <usb_selector+0x9a>
+34200580:	f8db 2010 	ldr.w	r2, [fp, #16]
+34200584:	f022 0201 	bic.w	r2, r2, #1
+34200588:	e6c1      	b.n	3420030e <usb_selector+0x30e>
+3420058a:	f042 0210 	orr.w	r2, r2, #16
+3420058e:	9224      	str	r2, [sp, #144]	@ 0x90
+34200590:	e6da      	b.n	34200348 <usb_selector+0x348>
+34200592:	f89d 108c 	ldrb.w	r1, [sp, #140]	@ 0x8c
+34200596:	2901      	cmp	r1, #1
+34200598:	f43f aed6 	beq.w	34200348 <usb_selector+0x348>
+3420059c:	2101      	movs	r1, #1
+3420059e:	4887      	ldr	r0, [pc, #540]	@ (342007bc <usb_selector+0x7bc>)
+342005a0:	f88d 108c 	strb.w	r1, [sp, #140]	@ 0x8c
+342005a4:	f000 fb0f 	bl	34200bc6 <LL_ADC_REG_IsConversionOngoing.lto_priv.0>
+342005a8:	2800      	cmp	r0, #0
+342005aa:	d163      	bne.n	34200674 <usb_selector+0x674>
+342005ac:	f8db 201c 	ldr.w	r2, [fp, #28]
+342005b0:	4983      	ldr	r1, [pc, #524]	@ (342007c0 <usb_selector+0x7c0>)
+342005b2:	920d      	str	r2, [sp, #52]	@ 0x34
+342005b4:	9a0d      	ldr	r2, [sp, #52]	@ 0x34
+342005b6:	4881      	ldr	r0, [pc, #516]	@ (342007bc <usb_selector+0x7bc>)
+342005b8:	f442 5280 	orr.w	r2, r2, #4096	@ 0x1000
+342005bc:	f8cb 201c 	str.w	r2, [fp, #28]
+342005c0:	f8d1 2130 	ldr.w	r2, [r1, #304]	@ 0x130
+342005c4:	f422 62f8 	bic.w	r2, r2, #1984	@ 0x7c0
+342005c8:	f442 7240 	orr.w	r2, r2, #768	@ 0x300
+342005cc:	f8c1 2130 	str.w	r2, [r1, #304]	@ 0x130
+342005d0:	f000 faf9 	bl	34200bc6 <LL_ADC_REG_IsConversionOngoing.lto_priv.0>
+342005d4:	f8db 2008 	ldr.w	r2, [fp, #8]
+342005d8:	f002 0208 	and.w	r2, r2, #8
+342005dc:	4302      	orrs	r2, r0
+342005de:	d130      	bne.n	34200642 <usb_selector+0x642>
+342005e0:	f8d1 0118 	ldr.w	r0, [r1, #280]	@ 0x118
+342005e4:	f440 70e0 	orr.w	r0, r0, #448	@ 0x1c0
+342005e8:	f8c1 0118 	str.w	r0, [r1, #280]	@ 0x118
+342005ec:	f8db 000c 	ldr.w	r0, [fp, #12]
+342005f0:	f8d1 1150 	ldr.w	r1, [r1, #336]	@ 0x150
+342005f4:	0ec9      	lsrs	r1, r1, #27
+342005f6:	290c      	cmp	r1, #12
+342005f8:	d103      	bne.n	34200602 <usb_selector+0x602>
+342005fa:	4611      	mov	r1, r2
+342005fc:	486f      	ldr	r0, [pc, #444]	@ (342007bc <usb_selector+0x7bc>)
+342005fe:	f000 fad5 	bl	34200bac <LL_ADC_SetOffsetLevel.lto_priv.0>
+34200602:	4c6f      	ldr	r4, [pc, #444]	@ (342007c0 <usb_selector+0x7c0>)
+34200604:	f8d4 2154 	ldr.w	r2, [r4, #340]	@ 0x154
+34200608:	0ed2      	lsrs	r2, r2, #27
+3420060a:	2a0c      	cmp	r2, #12
+3420060c:	d104      	bne.n	34200618 <usb_selector+0x618>
+3420060e:	2200      	movs	r2, #0
+34200610:	2101      	movs	r1, #1
+34200612:	486a      	ldr	r0, [pc, #424]	@ (342007bc <usb_selector+0x7bc>)
+34200614:	f000 faca 	bl	34200bac <LL_ADC_SetOffsetLevel.lto_priv.0>
+34200618:	f8d4 2158 	ldr.w	r2, [r4, #344]	@ 0x158
+3420061c:	0ed2      	lsrs	r2, r2, #27
+3420061e:	2a0c      	cmp	r2, #12
+34200620:	d104      	bne.n	3420062c <usb_selector+0x62c>
+34200622:	2200      	movs	r2, #0
+34200624:	2102      	movs	r1, #2
+34200626:	4865      	ldr	r0, [pc, #404]	@ (342007bc <usb_selector+0x7bc>)
+34200628:	f000 fac0 	bl	34200bac <LL_ADC_SetOffsetLevel.lto_priv.0>
+3420062c:	4a64      	ldr	r2, [pc, #400]	@ (342007c0 <usb_selector+0x7c0>)
+3420062e:	f8d2 215c 	ldr.w	r2, [r2, #348]	@ 0x15c
+34200632:	0ed2      	lsrs	r2, r2, #27
+34200634:	2a0c      	cmp	r2, #12
+34200636:	d104      	bne.n	34200642 <usb_selector+0x642>
+34200638:	2200      	movs	r2, #0
+3420063a:	2103      	movs	r1, #3
+3420063c:	485f      	ldr	r0, [pc, #380]	@ (342007bc <usb_selector+0x7bc>)
+3420063e:	f000 fab5 	bl	34200bac <LL_ADC_SetOffsetLevel.lto_priv.0>
+34200642:	485e      	ldr	r0, [pc, #376]	@ (342007bc <usb_selector+0x7bc>)
+34200644:	f000 fabb 	bl	34200bbe <LL_ADC_IsEnabled.lto_priv.0>
+34200648:	b928      	cbnz	r0, 34200656 <usb_selector+0x656>
+3420064a:	f8db 20c0 	ldr.w	r2, [fp, #192]	@ 0xc0
+3420064e:	f422 5280 	bic.w	r2, r2, #4096	@ 0x1000
+34200652:	f8cb 20c0 	str.w	r2, [fp, #192]	@ 0xc0
+34200656:	2501      	movs	r5, #1
+34200658:	a80e      	add	r0, sp, #56	@ 0x38
+3420065a:	f88d 508c 	strb.w	r5, [sp, #140]	@ 0x8c
+3420065e:	f000 fab7 	bl	34200bd0 <ADC_Enable>
+34200662:	4604      	mov	r4, r0
+34200664:	4855      	ldr	r0, [pc, #340]	@ (342007bc <usb_selector+0x7bc>)
+34200666:	f000 faae 	bl	34200bc6 <LL_ADC_REG_IsConversionOngoing.lto_priv.0>
+3420066a:	b150      	cbz	r0, 34200682 <usb_selector+0x682>
+3420066c:	9a24      	ldr	r2, [sp, #144]	@ 0x90
+3420066e:	f042 0210 	orr.w	r2, r2, #16
+34200672:	e0d4      	b.n	3420081e <usb_selector+0x81e>
+34200674:	9924      	ldr	r1, [sp, #144]	@ 0x90
+34200676:	f041 0120 	orr.w	r1, r1, #32
+3420067a:	9124      	str	r1, [sp, #144]	@ 0x90
+3420067c:	f88d 208c 	strb.w	r2, [sp, #140]	@ 0x8c
+34200680:	e662      	b.n	34200348 <usb_selector+0x348>
+34200682:	2c00      	cmp	r4, #0
+34200684:	d1f2      	bne.n	3420066c <usb_selector+0x66c>
+34200686:	9a24      	ldr	r2, [sp, #144]	@ 0x90
+34200688:	484c      	ldr	r0, [pc, #304]	@ (342007bc <usb_selector+0x7bc>)
+3420068a:	f422 5288 	bic.w	r2, r2, #4352	@ 0x1100
+3420068e:	f022 0202 	bic.w	r2, r2, #2
+34200692:	f042 0202 	orr.w	r2, r2, #2
+34200696:	9224      	str	r2, [sp, #144]	@ 0x90
+34200698:	4a49      	ldr	r2, [pc, #292]	@ (342007c0 <usb_selector+0x7c0>)
+3420069a:	f8db 300c 	ldr.w	r3, [fp, #12]
+3420069e:	f8d2 1160 	ldr.w	r1, [r2, #352]	@ 0x160
+342006a2:	9309      	str	r3, [sp, #36]	@ 0x24
+342006a4:	f3c1 0815 	ubfx	r8, r1, #0, #22
+342006a8:	f8d2 1164 	ldr.w	r1, [r2, #356]	@ 0x164
+342006ac:	f8d2 7168 	ldr.w	r7, [r2, #360]	@ 0x168
+342006b0:	f8d2 616c 	ldr.w	r6, [r2, #364]	@ 0x16c
+342006b4:	f8db 200c 	ldr.w	r2, [fp, #12]
+342006b8:	f3c1 0315 	ubfx	r3, r1, #0, #22
+342006bc:	f422 5230 	bic.w	r2, r2, #11264	@ 0x2c00
+342006c0:	930a      	str	r3, [sp, #40]	@ 0x28
+342006c2:	f022 020f 	bic.w	r2, r2, #15
+342006c6:	f3c6 0315 	ubfx	r3, r6, #0, #22
+342006ca:	930b      	str	r3, [sp, #44]	@ 0x2c
+342006cc:	4621      	mov	r1, r4
+342006ce:	f8cb 200c 	str.w	r2, [fp, #12]
+342006d2:	4622      	mov	r2, r4
+342006d4:	f000 fa6a 	bl	34200bac <LL_ADC_SetOffsetLevel.lto_priv.0>
+342006d8:	4629      	mov	r1, r5
+342006da:	4838      	ldr	r0, [pc, #224]	@ (342007bc <usb_selector+0x7bc>)
+342006dc:	f000 fa66 	bl	34200bac <LL_ADC_SetOffsetLevel.lto_priv.0>
+342006e0:	2102      	movs	r1, #2
+342006e2:	4836      	ldr	r0, [pc, #216]	@ (342007bc <usb_selector+0x7bc>)
+342006e4:	f000 fa62 	bl	34200bac <LL_ADC_SetOffsetLevel.lto_priv.0>
+342006e8:	4834      	ldr	r0, [pc, #208]	@ (342007bc <usb_selector+0x7bc>)
+342006ea:	2103      	movs	r1, #3
+342006ec:	f000 fa5e 	bl	34200bac <LL_ADC_SetOffsetLevel.lto_priv.0>
+342006f0:	f8db 20c4 	ldr.w	r2, [fp, #196]	@ 0xc4
+342006f4:	4831      	ldr	r0, [pc, #196]	@ (342007bc <usb_selector+0x7bc>)
+342006f6:	f022 4200 	bic.w	r2, r2, #2147483648	@ 0x80000000
+342006fa:	f8cb 20c4 	str.w	r2, [fp, #196]	@ 0xc4
+342006fe:	f3c7 0715 	ubfx	r7, r7, #0, #22
+34200702:	f000 fa5c 	bl	34200bbe <LL_ADC_IsEnabled.lto_priv.0>
+34200706:	b380      	cbz	r0, 3420076a <usb_selector+0x76a>
+34200708:	f8db 2008 	ldr.w	r2, [fp, #8]
+3420070c:	4e2b      	ldr	r6, [pc, #172]	@ (342007bc <usb_selector+0x7bc>)
+3420070e:	f022 4280 	bic.w	r2, r2, #1073741824	@ 0x40000000
+34200712:	f022 023f 	bic.w	r2, r2, #63	@ 0x3f
+34200716:	f042 4200 	orr.w	r2, r2, #2147483648	@ 0x80000000
+3420071a:	f8cb 2008 	str.w	r2, [fp, #8]
+3420071e:	4622      	mov	r2, r4
+34200720:	4615      	mov	r5, r2
+34200722:	f04f 0908 	mov.w	r9, #8
+34200726:	f8db 2008 	ldr.w	r2, [fp, #8]
+3420072a:	f022 023f 	bic.w	r2, r2, #63	@ 0x3f
+3420072e:	f042 0204 	orr.w	r2, r2, #4
+34200732:	f8cb 2008 	str.w	r2, [fp, #8]
+34200736:	f000 fa19 	bl	34200b6c <HAL_GetTick>
+3420073a:	4682      	mov	sl, r0
+3420073c:	4630      	mov	r0, r6
+3420073e:	f000 fa42 	bl	34200bc6 <LL_ADC_REG_IsConversionOngoing.lto_priv.0>
+34200742:	b9b8      	cbnz	r0, 34200774 <usb_selector+0x774>
+34200744:	f8db 2040 	ldr.w	r2, [fp, #64]	@ 0x40
+34200748:	f1b9 0901 	subs.w	r9, r9, #1
+3420074c:	4415      	add	r5, r2
+3420074e:	d1ea      	bne.n	34200726 <usb_selector+0x726>
+34200750:	2d00      	cmp	r5, #0
+34200752:	f105 0207 	add.w	r2, r5, #7
+34200756:	bfa8      	it	ge
+34200758:	462a      	movge	r2, r5
+3420075a:	2d07      	cmp	r5, #7
+3420075c:	f8db 10c4 	ldr.w	r1, [fp, #196]	@ 0xc4
+34200760:	ea4f 02e2 	mov.w	r2, r2, asr #3
+34200764:	dc2e      	bgt.n	342007c4 <usb_selector+0x7c4>
+34200766:	2900      	cmp	r1, #0
+34200768:	da1d      	bge.n	342007a6 <usb_selector+0x7a6>
+3420076a:	9a24      	ldr	r2, [sp, #144]	@ 0x90
+3420076c:	f042 0210 	orr.w	r2, r2, #16
+34200770:	9224      	str	r2, [sp, #144]	@ 0x90
+34200772:	e012      	b.n	3420079a <usb_selector+0x79a>
+34200774:	f000 f9fa 	bl	34200b6c <HAL_GetTick>
+34200778:	eba0 000a 	sub.w	r0, r0, sl
+3420077c:	2805      	cmp	r0, #5
+3420077e:	d9dd      	bls.n	3420073c <usb_selector+0x73c>
+34200780:	4630      	mov	r0, r6
+34200782:	f000 fa20 	bl	34200bc6 <LL_ADC_REG_IsConversionOngoing.lto_priv.0>
+34200786:	2800      	cmp	r0, #0
+34200788:	d0d8      	beq.n	3420073c <usb_selector+0x73c>
+3420078a:	9a24      	ldr	r2, [sp, #144]	@ 0x90
+3420078c:	f042 0210 	orr.w	r2, r2, #16
+34200790:	9224      	str	r2, [sp, #144]	@ 0x90
+34200792:	9a25      	ldr	r2, [sp, #148]	@ 0x94
+34200794:	f042 0201 	orr.w	r2, r2, #1
+34200798:	9225      	str	r2, [sp, #148]	@ 0x94
+3420079a:	9a24      	ldr	r2, [sp, #144]	@ 0x90
+3420079c:	2401      	movs	r4, #1
+3420079e:	f042 0210 	orr.w	r2, r2, #16
+342007a2:	9224      	str	r2, [sp, #144]	@ 0x90
+342007a4:	e017      	b.n	342007d6 <usb_selector+0x7d6>
+342007a6:	f8db 10c4 	ldr.w	r1, [fp, #196]	@ 0xc4
+342007aa:	f041 4100 	orr.w	r1, r1, #2147483648	@ 0x80000000
+342007ae:	f8cb 10c4 	str.w	r1, [fp, #196]	@ 0xc4
+342007b2:	e7b5      	b.n	34200720 <usb_selector+0x720>
+342007b4:	50022300 	.word	0x50022300
+342007b8:	56029000 	.word	0x56029000
+342007bc:	50022100 	.word	0x50022100
+342007c0:	50022000 	.word	0x50022000
+342007c4:	f421 717f 	bic.w	r1, r1, #1020	@ 0x3fc
+342007c8:	f021 0103 	bic.w	r1, r1, #3
+342007cc:	f3c2 0209 	ubfx	r2, r2, #0, #10
+342007d0:	4311      	orrs	r1, r2
+342007d2:	f8cb 10c4 	str.w	r1, [fp, #196]	@ 0xc4
+342007d6:	f8db 2008 	ldr.w	r2, [fp, #8]
+342007da:	9b09      	ldr	r3, [sp, #36]	@ 0x24
+342007dc:	f022 4240 	bic.w	r2, r2, #3221225472	@ 0xc0000000
+342007e0:	f022 023f 	bic.w	r2, r2, #63	@ 0x3f
+342007e4:	f8cb 2008 	str.w	r2, [fp, #8]
+342007e8:	2100      	movs	r1, #0
+342007ea:	f8cb 300c 	str.w	r3, [fp, #12]
+342007ee:	4642      	mov	r2, r8
+342007f0:	4888      	ldr	r0, [pc, #544]	@ (34200a14 <usb_selector+0xa14>)
+342007f2:	f000 f9db 	bl	34200bac <LL_ADC_SetOffsetLevel.lto_priv.0>
+342007f6:	2101      	movs	r1, #1
+342007f8:	9a0a      	ldr	r2, [sp, #40]	@ 0x28
+342007fa:	4886      	ldr	r0, [pc, #536]	@ (34200a14 <usb_selector+0xa14>)
+342007fc:	f000 f9d6 	bl	34200bac <LL_ADC_SetOffsetLevel.lto_priv.0>
+34200800:	463a      	mov	r2, r7
+34200802:	2102      	movs	r1, #2
+34200804:	4883      	ldr	r0, [pc, #524]	@ (34200a14 <usb_selector+0xa14>)
+34200806:	f000 f9d1 	bl	34200bac <LL_ADC_SetOffsetLevel.lto_priv.0>
+3420080a:	9a0b      	ldr	r2, [sp, #44]	@ 0x2c
+3420080c:	2103      	movs	r1, #3
+3420080e:	4881      	ldr	r0, [pc, #516]	@ (34200a14 <usb_selector+0xa14>)
+34200810:	f000 f9cc 	bl	34200bac <LL_ADC_SetOffsetLevel.lto_priv.0>
+34200814:	9a24      	ldr	r2, [sp, #144]	@ 0x90
+34200816:	f022 0203 	bic.w	r2, r2, #3
+3420081a:	f042 0201 	orr.w	r2, r2, #1
+3420081e:	9224      	str	r2, [sp, #144]	@ 0x90
+34200820:	2200      	movs	r2, #0
+34200822:	f88d 208c 	strb.w	r2, [sp, #140]	@ 0x8c
+34200826:	2c00      	cmp	r4, #0
+34200828:	f47f ad8e 	bne.w	34200348 <usb_selector+0x348>
+3420082c:	2403      	movs	r4, #3
+3420082e:	f8df 81e8 	ldr.w	r8, [pc, #488]	@ 34200a18 <usb_selector+0xa18>
+34200832:	4e7a      	ldr	r6, [pc, #488]	@ (34200a1c <usb_selector+0xa1c>)
+34200834:	4f77      	ldr	r7, [pc, #476]	@ (34200a14 <usb_selector+0xa14>)
+34200836:	f8c8 4004 	str.w	r4, [r8, #4]
+3420083a:	4638      	mov	r0, r7
+3420083c:	68b5      	ldr	r5, [r6, #8]
+3420083e:	f000 f9c2 	bl	34200bc6 <LL_ADC_REG_IsConversionOngoing.lto_priv.0>
+34200842:	4681      	mov	r9, r0
+34200844:	2800      	cmp	r0, #0
+34200846:	f47f ad7f 	bne.w	34200348 <usb_selector+0x348>
+3420084a:	f89d 208c 	ldrb.w	r2, [sp, #140]	@ 0x8c
+3420084e:	2a01      	cmp	r2, #1
+34200850:	f43f ad7a 	beq.w	34200348 <usb_selector+0x348>
+34200854:	2201      	movs	r2, #1
+34200856:	a80e      	add	r0, sp, #56	@ 0x38
+34200858:	f88d 208c 	strb.w	r2, [sp, #140]	@ 0x8c
+3420085c:	f000 f9b8 	bl	34200bd0 <ADC_Enable>
+34200860:	2800      	cmp	r0, #0
+34200862:	d159      	bne.n	34200918 <usb_selector+0x918>
+34200864:	9a24      	ldr	r2, [sp, #144]	@ 0x90
+34200866:	f015 051f 	ands.w	r5, r5, #31
+3420086a:	f422 6270 	bic.w	r2, r2, #3840	@ 0xf00
+3420086e:	f022 0201 	bic.w	r2, r2, #1
+34200872:	f442 7280 	orr.w	r2, r2, #256	@ 0x100
+34200876:	9224      	str	r2, [sp, #144]	@ 0x90
+34200878:	bf02      	ittt	eq
+3420087a:	9a24      	ldreq	r2, [sp, #144]	@ 0x90
+3420087c:	f422 1280 	biceq.w	r2, r2, #1048576	@ 0x100000
+34200880:	9224      	streq	r2, [sp, #144]	@ 0x90
+34200882:	9a24      	ldr	r2, [sp, #144]	@ 0x90
+34200884:	f412 5280 	ands.w	r2, r2, #4096	@ 0x1000
+34200888:	bf1c      	itt	ne
+3420088a:	9a25      	ldrne	r2, [sp, #148]	@ 0x94
+3420088c:	f022 0206 	bicne.w	r2, r2, #6
+34200890:	9225      	str	r2, [sp, #148]	@ 0x94
+34200892:	221c      	movs	r2, #28
+34200894:	f8cb 2000 	str.w	r2, [fp]
+34200898:	2200      	movs	r2, #0
+3420089a:	f88d 208c 	strb.w	r2, [sp, #140]	@ 0x8c
+3420089e:	f240 2221 	movw	r2, #545	@ 0x221
+342008a2:	fa22 f505 	lsr.w	r5, r2, r5
+342008a6:	07e8      	lsls	r0, r5, #31
+342008a8:	d527      	bpl.n	342008fa <usb_selector+0x8fa>
+342008aa:	f8db 200c 	ldr.w	r2, [fp, #12]
+342008ae:	0191      	lsls	r1, r2, #6
+342008b0:	bf41      	itttt	mi
+342008b2:	9a24      	ldrmi	r2, [sp, #144]	@ 0x90
+342008b4:	f422 5240 	bicmi.w	r2, r2, #12288	@ 0x3000
+342008b8:	f442 5280 	orrmi.w	r2, r2, #4096	@ 0x1000
+342008bc:	9224      	strmi	r2, [sp, #144]	@ 0x90
+342008be:	f8db 2008 	ldr.w	r2, [fp, #8]
+342008c2:	f022 023f 	bic.w	r2, r2, #63	@ 0x3f
+342008c6:	f042 0204 	orr.w	r2, r2, #4
+342008ca:	f8cb 2008 	str.w	r2, [fp, #8]
+342008ce:	f8dd 9048 	ldr.w	r9, [sp, #72]	@ 0x48
+342008d2:	68b5      	ldr	r5, [r6, #8]
+342008d4:	f1b9 0f08 	cmp.w	r9, #8
+342008d8:	f005 051f 	and.w	r5, r5, #31
+342008dc:	d025      	beq.n	3420092a <usb_selector+0x92a>
+342008de:	f240 2221 	movw	r2, #545	@ 0x221
+342008e2:	40ea      	lsrs	r2, r5
+342008e4:	07d3      	lsls	r3, r2, #31
+342008e6:	d51a      	bpl.n	3420091e <usb_selector+0x91e>
+342008e8:	f8db 200c 	ldr.w	r2, [fp, #12]
+342008ec:	f012 0f01 	tst.w	r2, #1
+342008f0:	d019      	beq.n	34200926 <usb_selector+0x926>
+342008f2:	9a24      	ldr	r2, [sp, #144]	@ 0x90
+342008f4:	f042 0220 	orr.w	r2, r2, #32
+342008f8:	e649      	b.n	3420058e <usb_selector+0x58e>
+342008fa:	9a24      	ldr	r2, [sp, #144]	@ 0x90
+342008fc:	f442 1280 	orr.w	r2, r2, #1048576	@ 0x100000
+34200900:	9224      	str	r2, [sp, #144]	@ 0x90
+34200902:	4a47      	ldr	r2, [pc, #284]	@ (34200a20 <usb_selector+0xa20>)
+34200904:	68d2      	ldr	r2, [r2, #12]
+34200906:	0192      	lsls	r2, r2, #6
+34200908:	d5e1      	bpl.n	342008ce <usb_selector+0x8ce>
+3420090a:	9a24      	ldr	r2, [sp, #144]	@ 0x90
+3420090c:	f422 5240 	bic.w	r2, r2, #12288	@ 0x3000
+34200910:	f442 5280 	orr.w	r2, r2, #4096	@ 0x1000
+34200914:	9224      	str	r2, [sp, #144]	@ 0x90
+34200916:	e7da      	b.n	342008ce <usb_selector+0x8ce>
+34200918:	f88d 908c 	strb.w	r9, [sp, #140]	@ 0x8c
+3420091c:	e514      	b.n	34200348 <usb_selector+0x348>
+3420091e:	68b2      	ldr	r2, [r6, #8]
+34200920:	f412 4f40 	tst.w	r2, #49152	@ 0xc000
+34200924:	e7e4      	b.n	342008f0 <usb_selector+0x8f0>
+34200926:	f04f 0904 	mov.w	r9, #4
+3420092a:	f000 f91f 	bl	34200b6c <HAL_GetTick>
+3420092e:	4682      	mov	sl, r0
+34200930:	f8db 2000 	ldr.w	r2, [fp]
+34200934:	ea19 0f02 	tst.w	r9, r2
+34200938:	d054      	beq.n	342009e4 <usb_selector+0x9e4>
+3420093a:	9a24      	ldr	r2, [sp, #144]	@ 0x90
+3420093c:	f442 7200 	orr.w	r2, r2, #512	@ 0x200
+34200940:	9224      	str	r2, [sp, #144]	@ 0x90
+34200942:	f8db 200c 	ldr.w	r2, [fp, #12]
+34200946:	f412 6f40 	tst.w	r2, #3072	@ 0xc00
+3420094a:	d111      	bne.n	34200970 <usb_selector+0x970>
+3420094c:	f89d 204d 	ldrb.w	r2, [sp, #77]	@ 0x4d
+34200950:	b972      	cbnz	r2, 34200970 <usb_selector+0x970>
+34200952:	f8db 2000 	ldr.w	r2, [fp]
+34200956:	0710      	lsls	r0, r2, #28
+34200958:	d50a      	bpl.n	34200970 <usb_selector+0x970>
+3420095a:	9a24      	ldr	r2, [sp, #144]	@ 0x90
+3420095c:	f422 7280 	bic.w	r2, r2, #256	@ 0x100
+34200960:	9224      	str	r2, [sp, #144]	@ 0x90
+34200962:	9a24      	ldr	r2, [sp, #144]	@ 0x90
+34200964:	04d1      	lsls	r1, r2, #19
+34200966:	bf5e      	ittt	pl
+34200968:	9a24      	ldrpl	r2, [sp, #144]	@ 0x90
+3420096a:	f042 0201 	orrpl.w	r2, r2, #1
+3420096e:	9224      	strpl	r2, [sp, #144]	@ 0x90
+34200970:	f240 2221 	movw	r2, #545	@ 0x221
+34200974:	40ea      	lsrs	r2, r5
+34200976:	07d2      	lsls	r2, r2, #31
+34200978:	bf56      	itet	pl
+3420097a:	4a29      	ldrpl	r2, [pc, #164]	@ (34200a20 <usb_selector+0xa20>)
+3420097c:	f8db 200c 	ldrmi.w	r2, [fp, #12]
+34200980:	68d2      	ldrpl	r2, [r2, #12]
+34200982:	f1b9 0f08 	cmp.w	r9, #8
+34200986:	d13c      	bne.n	34200a02 <usb_selector+0xa02>
+34200988:	f8cb 9000 	str.w	r9, [fp]
+3420098c:	f8db 2040 	ldr.w	r2, [fp, #64]	@ 0x40
+34200990:	a80e      	add	r0, sp, #56	@ 0x38
+34200992:	f848 2024 	str.w	r2, [r8, r4, lsl #2]
+34200996:	f000 f9df 	bl	34200d58 <HAL_ADC_Stop>
+3420099a:	2800      	cmp	r0, #0
+3420099c:	f47f acd4 	bne.w	34200348 <usb_selector+0x348>
+342009a0:	3401      	adds	r4, #1
+342009a2:	2c06      	cmp	r4, #6
+342009a4:	f47f af49 	bne.w	3420083a <usb_selector+0x83a>
+342009a8:	f8d8 200c 	ldr.w	r2, [r8, #12]
+342009ac:	f8d8 0010 	ldr.w	r0, [r8, #16]
+342009b0:	f8d8 1014 	ldr.w	r1, [r8, #20]
+342009b4:	4402      	add	r2, r0
+342009b6:	440a      	add	r2, r1
+342009b8:	2103      	movs	r1, #3
+342009ba:	fbb2 f2f1 	udiv	r2, r2, r1
+342009be:	f8c8 2008 	str.w	r2, [r8, #8]
+342009c2:	f240 2225 	movw	r2, #549	@ 0x225
+342009c6:	f8d8 1008 	ldr.w	r1, [r8, #8]
+342009ca:	4291      	cmp	r1, r2
+342009cc:	d81f      	bhi.n	34200a0e <usb_selector+0xa0e>
+342009ce:	f8d8 4008 	ldr.w	r4, [r8, #8]
+342009d2:	2cc7      	cmp	r4, #199	@ 0xc7
+342009d4:	bf94      	ite	ls
+342009d6:	2400      	movls	r4, #0
+342009d8:	2401      	movhi	r4, #1
+342009da:	4264      	negs	r4, r4
+342009dc:	2204      	movs	r2, #4
+342009de:	f8c8 2004 	str.w	r2, [r8, #4]
+342009e2:	e4b3      	b.n	3420034c <usb_selector+0x34c>
+342009e4:	f000 f8c2 	bl	34200b6c <HAL_GetTick>
+342009e8:	eba0 000a 	sub.w	r0, r0, sl
+342009ec:	2814      	cmp	r0, #20
+342009ee:	d99f      	bls.n	34200930 <usb_selector+0x930>
+342009f0:	f8db 2000 	ldr.w	r2, [fp]
+342009f4:	ea12 0209 	ands.w	r2, r2, r9
+342009f8:	d19a      	bne.n	34200930 <usb_selector+0x930>
+342009fa:	9924      	ldr	r1, [sp, #144]	@ 0x90
+342009fc:	f041 0104 	orr.w	r1, r1, #4
+34200a00:	e63b      	b.n	3420067a <usb_selector+0x67a>
+34200a02:	0453      	lsls	r3, r2, #17
+34200a04:	bf5c      	itt	pl
+34200a06:	220c      	movpl	r2, #12
+34200a08:	f8cb 2000 	strpl.w	r2, [fp]
+34200a0c:	e7be      	b.n	3420098c <usb_selector+0x98c>
+34200a0e:	2401      	movs	r4, #1
+34200a10:	e7e4      	b.n	342009dc <usb_selector+0x9dc>
+34200a12:	bf00      	nop
+34200a14:	50022100 	.word	0x50022100
+34200a18:	342010bc 	.word	0x342010bc
+34200a1c:	50022300 	.word	0x50022300
+34200a20:	50022000 	.word	0x50022000
+34200a24:	4d47      	ldr	r5, [pc, #284]	@ (34200b44 <usb_selector+0xb44>)
+34200a26:	4b48      	ldr	r3, [pc, #288]	@ (34200b48 <usb_selector+0xb48>)
+34200a28:	686c      	ldr	r4, [r5, #4]
+34200a2a:	695b      	ldr	r3, [r3, #20]
+34200a2c:	f413 3f40 	tst.w	r3, #196608	@ 0x30000
+34200a30:	d17f      	bne.n	34200b32 <usb_selector+0xb32>
+34200a32:	4a46      	ldr	r2, [pc, #280]	@ (34200b4c <usb_selector+0xb4c>)
+34200a34:	4b46      	ldr	r3, [pc, #280]	@ (34200b50 <usb_selector+0xb50>)
+34200a36:	6811      	ldr	r1, [r2, #0]
+34200a38:	4299      	cmp	r1, r3
+34200a3a:	d17a      	bne.n	34200b32 <usb_selector+0xb32>
+34200a3c:	f8d2 1100 	ldr.w	r1, [r2, #256]	@ 0x100
+34200a40:	f103 4371 	add.w	r3, r3, #4043309056	@ 0xf1000000
+34200a44:	f503 5304 	add.w	r3, r3, #8448	@ 0x2100
+34200a48:	4299      	cmp	r1, r3
+34200a4a:	d172      	bne.n	34200b32 <usb_selector+0xb32>
+34200a4c:	f8d2 3110 	ldr.w	r3, [r2, #272]	@ 0x110
+34200a50:	2b0b      	cmp	r3, #11
+34200a52:	d16e      	bne.n	34200b32 <usb_selector+0xb32>
+34200a54:	f647 7120 	movw	r1, #32544	@ 0x7f20
+34200a58:	6a13      	ldr	r3, [r2, #32]
+34200a5a:	400b      	ands	r3, r1
+34200a5c:	d169      	bne.n	34200b32 <usb_selector+0xb32>
+34200a5e:	2103      	movs	r1, #3
+34200a60:	6251      	str	r1, [r2, #36]	@ 0x24
+34200a62:	f248 619d 	movw	r1, #34461	@ 0x869d
+34200a66:	6411      	str	r1, [r2, #64]	@ 0x40
+34200a68:	f44f 3190 	mov.w	r1, #73728	@ 0x12000
+34200a6c:	f248 669e 	movw	r6, #34462	@ 0x869e
+34200a70:	6491      	str	r1, [r2, #72]	@ 0x48
+34200a72:	f04f 31ff 	mov.w	r1, #4294967295
+34200a76:	4f37      	ldr	r7, [pc, #220]	@ (34200b54 <usb_selector+0xb54>)
+34200a78:	f8df c0dc 	ldr.w	ip, [pc, #220]	@ 34200b58 <usb_selector+0xb58>
+34200a7c:	6a10      	ldr	r0, [r2, #32]
+34200a7e:	f010 0f01 	tst.w	r0, #1
+34200a82:	d156      	bne.n	34200b32 <usb_selector+0xb32>
+34200a84:	f410 4ffe 	tst.w	r0, #32512	@ 0x7f00
+34200a88:	d015      	beq.n	34200ab6 <usb_selector+0xab6>
+34200a8a:	f892 0050 	ldrb.w	r0, [r2, #80]	@ 0x50
+34200a8e:	f103 0801 	add.w	r8, r3, #1
+34200a92:	f103 5350 	add.w	r3, r3, #872415232	@ 0x34000000
+34200a96:	b2c0      	uxtb	r0, r0
+34200a98:	f503 1340 	add.w	r3, r3, #3145728	@ 0x300000
+34200a9c:	7018      	strb	r0, [r3, #0]
+34200a9e:	2308      	movs	r3, #8
+34200aa0:	f043 e001 	dls	lr, r3
+34200aa4:	4041      	eors	r1, r0
+34200aa6:	f341 0300 	sbfx	r3, r1, #0, #1
+34200aaa:	403b      	ands	r3, r7
+34200aac:	ea83 0151 	eor.w	r1, r3, r1, lsr #1
+34200ab0:	f00f c807 	le	lr, 34200aa6 <usb_selector+0xaa6>
+34200ab4:	4643      	mov	r3, r8
+34200ab6:	6868      	ldr	r0, [r5, #4]
+34200ab8:	1b00      	subs	r0, r0, r4
+34200aba:	4560      	cmp	r0, ip
+34200abc:	d839      	bhi.n	34200b32 <usb_selector+0xb32>
+34200abe:	42b3      	cmp	r3, r6
+34200ac0:	d1dc      	bne.n	34200a7c <usb_selector+0xa7c>
+34200ac2:	4b22      	ldr	r3, [pc, #136]	@ (34200b4c <usb_selector+0xb4c>)
+34200ac4:	481f      	ldr	r0, [pc, #124]	@ (34200b44 <usb_selector+0xb44>)
+34200ac6:	4d24      	ldr	r5, [pc, #144]	@ (34200b58 <usb_selector+0xb58>)
+34200ac8:	6a1a      	ldr	r2, [r3, #32]
+34200aca:	0796      	lsls	r6, r2, #30
+34200acc:	d52d      	bpl.n	34200b2a <usb_selector+0xb2a>
+34200ace:	6a1a      	ldr	r2, [r3, #32]
+34200ad0:	0692      	lsls	r2, r2, #26
+34200ad2:	d42a      	bmi.n	34200b2a <usb_selector+0xb2a>
+34200ad4:	f647 7201 	movw	r2, #32513	@ 0x7f01
+34200ad8:	6a1b      	ldr	r3, [r3, #32]
+34200ada:	4013      	ands	r3, r2
+34200adc:	d129      	bne.n	34200b32 <usb_selector+0xb32>
+34200ade:	4a1f      	ldr	r2, [pc, #124]	@ (34200b5c <usb_selector+0xb5c>)
+34200ae0:	4291      	cmp	r1, r2
+34200ae2:	d126      	bne.n	34200b32 <usb_selector+0xb32>
+34200ae4:	2104      	movs	r1, #4
+34200ae6:	4a1e      	ldr	r2, [pc, #120]	@ (34200b60 <usb_selector+0xb60>)
+34200ae8:	6051      	str	r1, [r2, #4]
+34200aea:	4916      	ldr	r1, [pc, #88]	@ (34200b44 <usb_selector+0xb44>)
+34200aec:	6849      	ldr	r1, [r1, #4]
+34200aee:	6191      	str	r1, [r2, #24]
+34200af0:	f5a2 5200 	sub.w	r2, r2, #8192	@ 0x2000
+34200af4:	f8c2 3f00 	str.w	r3, [r2, #3840]	@ 0xf00
+34200af8:	f8c2 3f04 	str.w	r3, [r2, #3844]	@ 0xf04
+34200afc:	f8c2 3f08 	str.w	r3, [r2, #3848]	@ 0xf08
+34200b00:	f8c2 3f0c 	str.w	r3, [r2, #3852]	@ 0xf0c
+34200b04:	f8c2 3f10 	str.w	r3, [r2, #3856]	@ 0xf10
+34200b08:	f8c2 3f14 	str.w	r3, [r2, #3860]	@ 0xf14
+34200b0c:	f8c2 3f18 	str.w	r3, [r2, #3864]	@ 0xf18
+34200b10:	f8c2 3f1c 	str.w	r3, [r2, #3868]	@ 0xf1c
+34200b14:	4b13      	ldr	r3, [pc, #76]	@ (34200b64 <usb_selector+0xb64>)
+34200b16:	f8c2 3f00 	str.w	r3, [r2, #3840]	@ 0xf00
+34200b1a:	f3bf 8f4f 	dsb	sy
+34200b1e:	f3bf 8f6f 	isb	sy
+34200b22:	4b11      	ldr	r3, [pc, #68]	@ (34200b68 <usb_selector+0xb68>)
+34200b24:	4798      	blx	r3
+34200b26:	bf00      	nop
+34200b28:	e7fd      	b.n	34200b26 <usb_selector+0xb26>
+34200b2a:	6842      	ldr	r2, [r0, #4]
+34200b2c:	1b12      	subs	r2, r2, r4
+34200b2e:	42aa      	cmp	r2, r5
+34200b30:	d9ca      	bls.n	34200ac8 <usb_selector+0xac8>
+34200b32:	f24e 0203 	movw	r2, #57347	@ 0xe003
+34200b36:	4b0a      	ldr	r3, [pc, #40]	@ (34200b60 <usb_selector+0xb60>)
+34200b38:	605a      	str	r2, [r3, #4]
+34200b3a:	bf00      	nop
+34200b3c:	e7fd      	b.n	34200b3a <usb_selector+0xb3a>
+34200b3e:	b027      	add	sp, #156	@ 0x9c
+34200b40:	e8bd 8ff0 	ldmia.w	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, pc}
+34200b44:	e0001000 	.word	0xe0001000
+34200b48:	e000ed00 	.word	0xe000ed00
+34200b4c:	58025000 	.word	0x58025000
+34200b50:	10000001 	.word	0x10000001
+34200b54:	edb88320 	.word	0xedb88320
+34200b58:	02625a00 	.word	0x02625a00
+34200b5c:	6247f671 	.word	0x6247f671
+34200b60:	343f9000 	.word	0x343f9000
+34200b64:	31505450 	.word	0x31505450
+34200b68:	34300381 	.word	0x34300381
+
+34200b6c <HAL_GetTick>:
+34200b6c:	4a0a      	ldr	r2, [pc, #40]	@ (34200b98 <HAL_GetTick+0x2c>)
+34200b6e:	4b0b      	ldr	r3, [pc, #44]	@ (34200b9c <HAL_GetTick+0x30>)
+34200b70:	b510      	push	{r4, lr}
+34200b72:	6859      	ldr	r1, [r3, #4]
+34200b74:	6813      	ldr	r3, [r2, #0]
+34200b76:	6011      	str	r1, [r2, #0]
+34200b78:	1acb      	subs	r3, r1, r3
+34200b7a:	2100      	movs	r1, #0
+34200b7c:	4c08      	ldr	r4, [pc, #32]	@ (34200ba0 <HAL_GetTick+0x34>)
+34200b7e:	4a09      	ldr	r2, [pc, #36]	@ (34200ba4 <HAL_GetTick+0x38>)
+34200b80:	6820      	ldr	r0, [r4, #0]
+34200b82:	18c0      	adds	r0, r0, r3
+34200b84:	4149      	adcs	r1, r1
+34200b86:	2300      	movs	r3, #0
+34200b88:	f000 f904 	bl	34200d94 <__aeabi_uldivmod>
+34200b8c:	4906      	ldr	r1, [pc, #24]	@ (34200ba8 <HAL_GetTick+0x3c>)
+34200b8e:	6022      	str	r2, [r4, #0]
+34200b90:	680b      	ldr	r3, [r1, #0]
+34200b92:	4418      	add	r0, r3
+34200b94:	6008      	str	r0, [r1, #0]
+34200b96:	bd10      	pop	{r4, pc}
+34200b98:	34201104 	.word	0x34201104
+34200b9c:	e0001000 	.word	0xe0001000
+34200ba0:	34201100 	.word	0x34201100
+34200ba4:	00061a80 	.word	0x00061a80
+34200ba8:	342010fc 	.word	0x342010fc
+
+34200bac <LL_ADC_SetOffsetLevel.lto_priv.0>:
+34200bac:	3060      	adds	r0, #96	@ 0x60
+34200bae:	f850 3021 	ldr.w	r3, [r0, r1, lsl #2]
+34200bb2:	0d9b      	lsrs	r3, r3, #22
+34200bb4:	059b      	lsls	r3, r3, #22
+34200bb6:	4313      	orrs	r3, r2
+34200bb8:	f840 3021 	str.w	r3, [r0, r1, lsl #2]
+34200bbc:	4770      	bx	lr
+
+34200bbe <LL_ADC_IsEnabled.lto_priv.0>:
+34200bbe:	6880      	ldr	r0, [r0, #8]
+34200bc0:	f000 0001 	and.w	r0, r0, #1
+34200bc4:	4770      	bx	lr
+
+34200bc6 <LL_ADC_REG_IsConversionOngoing.lto_priv.0>:
+34200bc6:	6880      	ldr	r0, [r0, #8]
+34200bc8:	f3c0 0080 	ubfx	r0, r0, #2, #1
+34200bcc:	4770      	bx	lr
+	...
+
+34200bd0 <ADC_Enable>:
+34200bd0:	b570      	push	{r4, r5, r6, lr}
+34200bd2:	6805      	ldr	r5, [r0, #0]
+34200bd4:	4604      	mov	r4, r0
+34200bd6:	4628      	mov	r0, r5
+34200bd8:	f7ff fff1 	bl	34200bbe <LL_ADC_IsEnabled.lto_priv.0>
+34200bdc:	b108      	cbz	r0, 34200be2 <ADC_Enable+0x12>
+34200bde:	2000      	movs	r0, #0
+34200be0:	bd70      	pop	{r4, r5, r6, pc}
+34200be2:	68aa      	ldr	r2, [r5, #8]
+34200be4:	4b15      	ldr	r3, [pc, #84]	@ (34200c3c <ADC_Enable+0x6c>)
+34200be6:	421a      	tst	r2, r3
+34200be8:	d009      	beq.n	34200bfe <ADC_Enable+0x2e>
+34200bea:	6da3      	ldr	r3, [r4, #88]	@ 0x58
+34200bec:	2001      	movs	r0, #1
+34200bee:	f043 0310 	orr.w	r3, r3, #16
+34200bf2:	65a3      	str	r3, [r4, #88]	@ 0x58
+34200bf4:	6de3      	ldr	r3, [r4, #92]	@ 0x5c
+34200bf6:	f043 0301 	orr.w	r3, r3, #1
+34200bfa:	65e3      	str	r3, [r4, #92]	@ 0x5c
+34200bfc:	e7f0      	b.n	34200be0 <ADC_Enable+0x10>
+34200bfe:	68ab      	ldr	r3, [r5, #8]
+34200c00:	f023 033f 	bic.w	r3, r3, #63	@ 0x3f
+34200c04:	f043 0301 	orr.w	r3, r3, #1
+34200c08:	60ab      	str	r3, [r5, #8]
+34200c0a:	f7ff ffaf 	bl	34200b6c <HAL_GetTick>
+34200c0e:	4606      	mov	r6, r0
+34200c10:	682b      	ldr	r3, [r5, #0]
+34200c12:	07db      	lsls	r3, r3, #31
+34200c14:	d4e3      	bmi.n	34200bde <ADC_Enable+0xe>
+34200c16:	4628      	mov	r0, r5
+34200c18:	f7ff ffd1 	bl	34200bbe <LL_ADC_IsEnabled.lto_priv.0>
+34200c1c:	b928      	cbnz	r0, 34200c2a <ADC_Enable+0x5a>
+34200c1e:	68ab      	ldr	r3, [r5, #8]
+34200c20:	f023 033f 	bic.w	r3, r3, #63	@ 0x3f
+34200c24:	f043 0301 	orr.w	r3, r3, #1
+34200c28:	60ab      	str	r3, [r5, #8]
+34200c2a:	f7ff ff9f 	bl	34200b6c <HAL_GetTick>
+34200c2e:	1b80      	subs	r0, r0, r6
+34200c30:	2802      	cmp	r0, #2
+34200c32:	d9ed      	bls.n	34200c10 <ADC_Enable+0x40>
+34200c34:	682b      	ldr	r3, [r5, #0]
+34200c36:	07da      	lsls	r2, r3, #31
+34200c38:	d4ea      	bmi.n	34200c10 <ADC_Enable+0x40>
+34200c3a:	e7d6      	b.n	34200bea <ADC_Enable+0x1a>
+34200c3c:	8000003f 	.word	0x8000003f
+
+34200c40 <ADC_Disable>:
+34200c40:	b570      	push	{r4, r5, r6, lr}
+34200c42:	6805      	ldr	r5, [r0, #0]
+34200c44:	4604      	mov	r4, r0
+34200c46:	4628      	mov	r0, r5
+34200c48:	68ab      	ldr	r3, [r5, #8]
+34200c4a:	f7ff ffb8 	bl	34200bbe <LL_ADC_IsEnabled.lto_priv.0>
+34200c4e:	b908      	cbnz	r0, 34200c54 <ADC_Disable+0x14>
+34200c50:	2000      	movs	r0, #0
+34200c52:	bd70      	pop	{r4, r5, r6, pc}
+34200c54:	0799      	lsls	r1, r3, #30
+34200c56:	d4fb      	bmi.n	34200c50 <ADC_Disable+0x10>
+34200c58:	68ab      	ldr	r3, [r5, #8]
+34200c5a:	f003 030d 	and.w	r3, r3, #13
+34200c5e:	2b01      	cmp	r3, #1
+34200c60:	d115      	bne.n	34200c8e <ADC_Disable+0x4e>
+34200c62:	68ab      	ldr	r3, [r5, #8]
+34200c64:	f023 033f 	bic.w	r3, r3, #63	@ 0x3f
+34200c68:	f043 0302 	orr.w	r3, r3, #2
+34200c6c:	60ab      	str	r3, [r5, #8]
+34200c6e:	2303      	movs	r3, #3
+34200c70:	602b      	str	r3, [r5, #0]
+34200c72:	f7ff ff7b 	bl	34200b6c <HAL_GetTick>
+34200c76:	4606      	mov	r6, r0
+34200c78:	68ab      	ldr	r3, [r5, #8]
+34200c7a:	07db      	lsls	r3, r3, #31
+34200c7c:	d5e8      	bpl.n	34200c50 <ADC_Disable+0x10>
+34200c7e:	f7ff ff75 	bl	34200b6c <HAL_GetTick>
+34200c82:	1b80      	subs	r0, r0, r6
+34200c84:	2802      	cmp	r0, #2
+34200c86:	d9f7      	bls.n	34200c78 <ADC_Disable+0x38>
+34200c88:	68ab      	ldr	r3, [r5, #8]
+34200c8a:	07da      	lsls	r2, r3, #31
+34200c8c:	d5f4      	bpl.n	34200c78 <ADC_Disable+0x38>
+34200c8e:	6da3      	ldr	r3, [r4, #88]	@ 0x58
+34200c90:	2001      	movs	r0, #1
+34200c92:	f043 0310 	orr.w	r3, r3, #16
+34200c96:	65a3      	str	r3, [r4, #88]	@ 0x58
+34200c98:	6de3      	ldr	r3, [r4, #92]	@ 0x5c
+34200c9a:	f043 0301 	orr.w	r3, r3, #1
+34200c9e:	65e3      	str	r3, [r4, #92]	@ 0x5c
+34200ca0:	e7d7      	b.n	34200c52 <ADC_Disable+0x12>
+	...
+
+34200ca4 <ADC_ConversionStop.constprop.0>:
+34200ca4:	b5f8      	push	{r3, r4, r5, r6, r7, lr}
+34200ca6:	6804      	ldr	r4, [r0, #0]
+34200ca8:	4605      	mov	r5, r0
+34200caa:	4620      	mov	r0, r4
+34200cac:	f7ff ff8b 	bl	34200bc6 <LL_ADC_REG_IsConversionOngoing.lto_priv.0>
+34200cb0:	68a3      	ldr	r3, [r4, #8]
+34200cb2:	f003 0308 	and.w	r3, r3, #8
+34200cb6:	4303      	orrs	r3, r0
+34200cb8:	d101      	bne.n	34200cbe <ADC_ConversionStop.constprop.0+0x1a>
+34200cba:	2000      	movs	r0, #0
+34200cbc:	bdf8      	pop	{r3, r4, r5, r6, r7, pc}
+34200cbe:	68e3      	ldr	r3, [r4, #12]
+34200cc0:	019e      	lsls	r6, r3, #6
+34200cc2:	d504      	bpl.n	34200cce <ADC_ConversionStop.constprop.0+0x2a>
+34200cc4:	f240 1301 	movw	r3, #257	@ 0x101
+34200cc8:	8aaa      	ldrh	r2, [r5, #20]
+34200cca:	429a      	cmp	r2, r3
+34200ccc:	d00d      	beq.n	34200cea <ADC_ConversionStop.constprop.0+0x46>
+34200cce:	2203      	movs	r2, #3
+34200cd0:	e012      	b.n	34200cf8 <ADC_ConversionStop.constprop.0+0x54>
+34200cd2:	3b01      	subs	r3, #1
+34200cd4:	d10a      	bne.n	34200cec <ADC_ConversionStop.constprop.0+0x48>
+34200cd6:	6dab      	ldr	r3, [r5, #88]	@ 0x58
+34200cd8:	2001      	movs	r0, #1
+34200cda:	f043 0310 	orr.w	r3, r3, #16
+34200cde:	65ab      	str	r3, [r5, #88]	@ 0x58
+34200ce0:	6deb      	ldr	r3, [r5, #92]	@ 0x5c
+34200ce2:	f043 0301 	orr.w	r3, r3, #1
+34200ce6:	65eb      	str	r3, [r5, #92]	@ 0x5c
+34200ce8:	e7e8      	b.n	34200cbc <ADC_ConversionStop.constprop.0+0x18>
+34200cea:	4b1a      	ldr	r3, [pc, #104]	@ (34200d54 <ADC_ConversionStop.constprop.0+0xb0>)
+34200cec:	6822      	ldr	r2, [r4, #0]
+34200cee:	0650      	lsls	r0, r2, #25
+34200cf0:	d5ef      	bpl.n	34200cd2 <ADC_ConversionStop.constprop.0+0x2e>
+34200cf2:	2340      	movs	r3, #64	@ 0x40
+34200cf4:	2201      	movs	r2, #1
+34200cf6:	6023      	str	r3, [r4, #0]
+34200cf8:	4620      	mov	r0, r4
+34200cfa:	f7ff ff64 	bl	34200bc6 <LL_ADC_REG_IsConversionOngoing.lto_priv.0>
+34200cfe:	b140      	cbz	r0, 34200d12 <ADC_ConversionStop.constprop.0+0x6e>
+34200d00:	68a3      	ldr	r3, [r4, #8]
+34200d02:	0799      	lsls	r1, r3, #30
+34200d04:	bf5f      	itttt	pl
+34200d06:	68a3      	ldrpl	r3, [r4, #8]
+34200d08:	f023 033f 	bicpl.w	r3, r3, #63	@ 0x3f
+34200d0c:	f043 0310 	orrpl.w	r3, r3, #16
+34200d10:	60a3      	strpl	r3, [r4, #8]
+34200d12:	2a01      	cmp	r2, #1
+34200d14:	d01b      	beq.n	34200d4e <ADC_ConversionStop.constprop.0+0xaa>
+34200d16:	68a3      	ldr	r3, [r4, #8]
+34200d18:	071a      	lsls	r2, r3, #28
+34200d1a:	d508      	bpl.n	34200d2e <ADC_ConversionStop.constprop.0+0x8a>
+34200d1c:	68a3      	ldr	r3, [r4, #8]
+34200d1e:	079b      	lsls	r3, r3, #30
+34200d20:	bf5f      	itttt	pl
+34200d22:	68a3      	ldrpl	r3, [r4, #8]
+34200d24:	f023 033f 	bicpl.w	r3, r3, #63	@ 0x3f
+34200d28:	f043 0320 	orrpl.w	r3, r3, #32
+34200d2c:	60a3      	strpl	r3, [r4, #8]
+34200d2e:	260c      	movs	r6, #12
+34200d30:	f7ff ff1c 	bl	34200b6c <HAL_GetTick>
+34200d34:	4607      	mov	r7, r0
+34200d36:	68a3      	ldr	r3, [r4, #8]
+34200d38:	421e      	tst	r6, r3
+34200d3a:	d0be      	beq.n	34200cba <ADC_ConversionStop.constprop.0+0x16>
+34200d3c:	f7ff ff16 	bl	34200b6c <HAL_GetTick>
+34200d40:	1bc0      	subs	r0, r0, r7
+34200d42:	2805      	cmp	r0, #5
+34200d44:	d9f7      	bls.n	34200d36 <ADC_ConversionStop.constprop.0+0x92>
+34200d46:	68a3      	ldr	r3, [r4, #8]
+34200d48:	4233      	tst	r3, r6
+34200d4a:	d0f4      	beq.n	34200d36 <ADC_ConversionStop.constprop.0+0x92>
+34200d4c:	e7c3      	b.n	34200cd6 <ADC_ConversionStop.constprop.0+0x32>
+34200d4e:	2604      	movs	r6, #4
+34200d50:	e7ee      	b.n	34200d30 <ADC_ConversionStop.constprop.0+0x8c>
+34200d52:	bf00      	nop
+34200d54:	a3400001 	.word	0xa3400001
+
+34200d58 <HAL_ADC_Stop>:
+34200d58:	b510      	push	{r4, lr}
+34200d5a:	f890 3054 	ldrb.w	r3, [r0, #84]	@ 0x54
+34200d5e:	4604      	mov	r4, r0
+34200d60:	2b01      	cmp	r3, #1
+34200d62:	d015      	beq.n	34200d90 <HAL_ADC_Stop+0x38>
+34200d64:	2301      	movs	r3, #1
+34200d66:	f880 3054 	strb.w	r3, [r0, #84]	@ 0x54
+34200d6a:	f7ff ff9b 	bl	34200ca4 <ADC_ConversionStop.constprop.0>
+34200d6e:	b958      	cbnz	r0, 34200d88 <HAL_ADC_Stop+0x30>
+34200d70:	4620      	mov	r0, r4
+34200d72:	f7ff ff65 	bl	34200c40 <ADC_Disable>
+34200d76:	b938      	cbnz	r0, 34200d88 <HAL_ADC_Stop+0x30>
+34200d78:	6da3      	ldr	r3, [r4, #88]	@ 0x58
+34200d7a:	f423 5388 	bic.w	r3, r3, #4352	@ 0x1100
+34200d7e:	f023 0301 	bic.w	r3, r3, #1
+34200d82:	f043 0301 	orr.w	r3, r3, #1
+34200d86:	65a3      	str	r3, [r4, #88]	@ 0x58
+34200d88:	2300      	movs	r3, #0
+34200d8a:	f884 3054 	strb.w	r3, [r4, #84]	@ 0x54
+34200d8e:	bd10      	pop	{r4, pc}
+34200d90:	2002      	movs	r0, #2
+34200d92:	e7fc      	b.n	34200d8e <HAL_ADC_Stop+0x36>
+
+34200d94 <__aeabi_uldivmod>:
+34200d94:	b953      	cbnz	r3, 34200dac <__aeabi_uldivmod+0x18>
+34200d96:	b94a      	cbnz	r2, 34200dac <__aeabi_uldivmod+0x18>
+34200d98:	2900      	cmp	r1, #0
+34200d9a:	bf08      	it	eq
+34200d9c:	2800      	cmpeq	r0, #0
+34200d9e:	bf1c      	itt	ne
+34200da0:	f04f 31ff 	movne.w	r1, #4294967295
+34200da4:	f04f 30ff 	movne.w	r0, #4294967295
+34200da8:	f000 b97e 	b.w	342010a8 <__aeabi_idiv0>
+34200dac:	f1ad 0c08 	sub.w	ip, sp, #8
+34200db0:	e96d ce04 	strd	ip, lr, [sp, #-16]!
+34200db4:	f000 f806 	bl	34200dc4 <__udivmoddi4>
+34200db8:	f8dd e004 	ldr.w	lr, [sp, #4]
+34200dbc:	e9dd 2302 	ldrd	r2, r3, [sp, #8]
+34200dc0:	b004      	add	sp, #16
+34200dc2:	4770      	bx	lr
+
+34200dc4 <__udivmoddi4>:
+34200dc4:	e92d 4ff0 	stmdb	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
+34200dc8:	9d09      	ldr	r5, [sp, #36]	@ 0x24
+34200dca:	460c      	mov	r4, r1
+34200dcc:	2b00      	cmp	r3, #0
+34200dce:	d14d      	bne.n	34200e6c <__udivmoddi4+0xa8>
+34200dd0:	428a      	cmp	r2, r1
+34200dd2:	460f      	mov	r7, r1
+34200dd4:	4684      	mov	ip, r0
+34200dd6:	4696      	mov	lr, r2
+34200dd8:	fab2 f382 	clz	r3, r2
+34200ddc:	d960      	bls.n	34200ea0 <__udivmoddi4+0xdc>
+34200dde:	b14b      	cbz	r3, 34200df4 <__udivmoddi4+0x30>
+34200de0:	fa02 fe03 	lsl.w	lr, r2, r3
+34200de4:	f1c3 0220 	rsb	r2, r3, #32
+34200de8:	409f      	lsls	r7, r3
+34200dea:	fa00 fc03 	lsl.w	ip, r0, r3
+34200dee:	fa20 f202 	lsr.w	r2, r0, r2
+34200df2:	4317      	orrs	r7, r2
+34200df4:	ea4f 461e 	mov.w	r6, lr, lsr #16
+34200df8:	fa1f f48e 	uxth.w	r4, lr
+34200dfc:	ea4f 421c 	mov.w	r2, ip, lsr #16
+34200e00:	fbb7 f1f6 	udiv	r1, r7, r6
+34200e04:	fb06 7711 	mls	r7, r6, r1, r7
+34200e08:	fb01 f004 	mul.w	r0, r1, r4
+34200e0c:	ea42 4207 	orr.w	r2, r2, r7, lsl #16
+34200e10:	4290      	cmp	r0, r2
+34200e12:	d908      	bls.n	34200e26 <__udivmoddi4+0x62>
+34200e14:	eb1e 0202 	adds.w	r2, lr, r2
+34200e18:	f101 37ff 	add.w	r7, r1, #4294967295
+34200e1c:	d202      	bcs.n	34200e24 <__udivmoddi4+0x60>
+34200e1e:	4290      	cmp	r0, r2
+34200e20:	f200 812d 	bhi.w	3420107e <__udivmoddi4+0x2ba>
+34200e24:	4639      	mov	r1, r7
+34200e26:	1a12      	subs	r2, r2, r0
+34200e28:	fa1f fc8c 	uxth.w	ip, ip
+34200e2c:	fbb2 f0f6 	udiv	r0, r2, r6
+34200e30:	fb06 2210 	mls	r2, r6, r0, r2
+34200e34:	fb00 f404 	mul.w	r4, r0, r4
+34200e38:	ea4c 4c02 	orr.w	ip, ip, r2, lsl #16
+34200e3c:	4564      	cmp	r4, ip
+34200e3e:	d908      	bls.n	34200e52 <__udivmoddi4+0x8e>
+34200e40:	eb1e 0c0c 	adds.w	ip, lr, ip
+34200e44:	f100 32ff 	add.w	r2, r0, #4294967295
+34200e48:	d202      	bcs.n	34200e50 <__udivmoddi4+0x8c>
+34200e4a:	4564      	cmp	r4, ip
+34200e4c:	f200 811a 	bhi.w	34201084 <__udivmoddi4+0x2c0>
+34200e50:	4610      	mov	r0, r2
+34200e52:	ea40 4001 	orr.w	r0, r0, r1, lsl #16
+34200e56:	ebac 0c04 	sub.w	ip, ip, r4
+34200e5a:	2100      	movs	r1, #0
+34200e5c:	b125      	cbz	r5, 34200e68 <__udivmoddi4+0xa4>
+34200e5e:	fa2c f303 	lsr.w	r3, ip, r3
+34200e62:	2200      	movs	r2, #0
+34200e64:	e9c5 3200 	strd	r3, r2, [r5]
+34200e68:	e8bd 8ff0 	ldmia.w	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, pc}
+34200e6c:	428b      	cmp	r3, r1
+34200e6e:	d905      	bls.n	34200e7c <__udivmoddi4+0xb8>
+34200e70:	b10d      	cbz	r5, 34200e76 <__udivmoddi4+0xb2>
+34200e72:	e9c5 0100 	strd	r0, r1, [r5]
+34200e76:	2100      	movs	r1, #0
+34200e78:	4608      	mov	r0, r1
+34200e7a:	e7f5      	b.n	34200e68 <__udivmoddi4+0xa4>
+34200e7c:	fab3 f183 	clz	r1, r3
+34200e80:	2900      	cmp	r1, #0
+34200e82:	d14d      	bne.n	34200f20 <__udivmoddi4+0x15c>
+34200e84:	42a3      	cmp	r3, r4
+34200e86:	f0c0 80f2 	bcc.w	3420106e <__udivmoddi4+0x2aa>
+34200e8a:	4290      	cmp	r0, r2
+34200e8c:	f080 80ef 	bcs.w	3420106e <__udivmoddi4+0x2aa>
+34200e90:	4606      	mov	r6, r0
+34200e92:	4623      	mov	r3, r4
+34200e94:	4608      	mov	r0, r1
+34200e96:	2d00      	cmp	r5, #0
+34200e98:	d0e6      	beq.n	34200e68 <__udivmoddi4+0xa4>
+34200e9a:	e9c5 6300 	strd	r6, r3, [r5]
+34200e9e:	e7e3      	b.n	34200e68 <__udivmoddi4+0xa4>
+34200ea0:	2b00      	cmp	r3, #0
+34200ea2:	f040 80a2 	bne.w	34200fea <__udivmoddi4+0x226>
+34200ea6:	1a8a      	subs	r2, r1, r2
+34200ea8:	ea4f 471e 	mov.w	r7, lr, lsr #16
+34200eac:	fa1f f68e 	uxth.w	r6, lr
+34200eb0:	2101      	movs	r1, #1
+34200eb2:	fbb2 f4f7 	udiv	r4, r2, r7
+34200eb6:	fb07 2014 	mls	r0, r7, r4, r2
+34200eba:	ea4f 421c 	mov.w	r2, ip, lsr #16
+34200ebe:	ea42 4200 	orr.w	r2, r2, r0, lsl #16
+34200ec2:	fb06 f004 	mul.w	r0, r6, r4
+34200ec6:	4290      	cmp	r0, r2
+34200ec8:	d90f      	bls.n	34200eea <__udivmoddi4+0x126>
+34200eca:	eb1e 0202 	adds.w	r2, lr, r2
+34200ece:	f104 38ff 	add.w	r8, r4, #4294967295
+34200ed2:	bf2c      	ite	cs
+34200ed4:	f04f 0901 	movcs.w	r9, #1
+34200ed8:	f04f 0900 	movcc.w	r9, #0
+34200edc:	4290      	cmp	r0, r2
+34200ede:	d903      	bls.n	34200ee8 <__udivmoddi4+0x124>
+34200ee0:	f1b9 0f00 	cmp.w	r9, #0
+34200ee4:	f000 80c8 	beq.w	34201078 <__udivmoddi4+0x2b4>
+34200ee8:	4644      	mov	r4, r8
+34200eea:	1a12      	subs	r2, r2, r0
+34200eec:	fa1f fc8c 	uxth.w	ip, ip
+34200ef0:	fbb2 f0f7 	udiv	r0, r2, r7
+34200ef4:	fb07 2210 	mls	r2, r7, r0, r2
+34200ef8:	fb00 f606 	mul.w	r6, r0, r6
+34200efc:	ea4c 4c02 	orr.w	ip, ip, r2, lsl #16
+34200f00:	4566      	cmp	r6, ip
+34200f02:	d908      	bls.n	34200f16 <__udivmoddi4+0x152>
+34200f04:	eb1e 0c0c 	adds.w	ip, lr, ip
+34200f08:	f100 32ff 	add.w	r2, r0, #4294967295
+34200f0c:	d202      	bcs.n	34200f14 <__udivmoddi4+0x150>
+34200f0e:	4566      	cmp	r6, ip
+34200f10:	f200 80bb 	bhi.w	3420108a <__udivmoddi4+0x2c6>
+34200f14:	4610      	mov	r0, r2
+34200f16:	ebac 0c06 	sub.w	ip, ip, r6
+34200f1a:	ea40 4004 	orr.w	r0, r0, r4, lsl #16
+34200f1e:	e79d      	b.n	34200e5c <__udivmoddi4+0x98>
+34200f20:	f1c1 0620 	rsb	r6, r1, #32
+34200f24:	408b      	lsls	r3, r1
+34200f26:	fa04 fe01 	lsl.w	lr, r4, r1
+34200f2a:	fa22 f706 	lsr.w	r7, r2, r6
+34200f2e:	fa20 fc06 	lsr.w	ip, r0, r6
+34200f32:	40f4      	lsrs	r4, r6
+34200f34:	408a      	lsls	r2, r1
+34200f36:	431f      	orrs	r7, r3
+34200f38:	ea4e 030c 	orr.w	r3, lr, ip
+34200f3c:	fa00 fe01 	lsl.w	lr, r0, r1
+34200f40:	ea4f 4817 	mov.w	r8, r7, lsr #16
+34200f44:	ea4f 4913 	mov.w	r9, r3, lsr #16
+34200f48:	fa1f fc87 	uxth.w	ip, r7
+34200f4c:	fbb4 f0f8 	udiv	r0, r4, r8
+34200f50:	fb08 4410 	mls	r4, r8, r0, r4
+34200f54:	ea49 4404 	orr.w	r4, r9, r4, lsl #16
+34200f58:	fb00 f90c 	mul.w	r9, r0, ip
+34200f5c:	45a1      	cmp	r9, r4
+34200f5e:	d90e      	bls.n	34200f7e <__udivmoddi4+0x1ba>
+34200f60:	193c      	adds	r4, r7, r4
+34200f62:	f100 3aff 	add.w	sl, r0, #4294967295
+34200f66:	bf2c      	ite	cs
+34200f68:	f04f 0b01 	movcs.w	fp, #1
+34200f6c:	f04f 0b00 	movcc.w	fp, #0
+34200f70:	45a1      	cmp	r9, r4
+34200f72:	d903      	bls.n	34200f7c <__udivmoddi4+0x1b8>
+34200f74:	f1bb 0f00 	cmp.w	fp, #0
+34200f78:	f000 8093 	beq.w	342010a2 <__udivmoddi4+0x2de>
+34200f7c:	4650      	mov	r0, sl
+34200f7e:	eba4 0409 	sub.w	r4, r4, r9
+34200f82:	fa1f f983 	uxth.w	r9, r3
+34200f86:	fbb4 f3f8 	udiv	r3, r4, r8
+34200f8a:	fb08 4413 	mls	r4, r8, r3, r4
+34200f8e:	fb03 fc0c 	mul.w	ip, r3, ip
+34200f92:	ea49 4404 	orr.w	r4, r9, r4, lsl #16
+34200f96:	45a4      	cmp	ip, r4
+34200f98:	d906      	bls.n	34200fa8 <__udivmoddi4+0x1e4>
+34200f9a:	193c      	adds	r4, r7, r4
+34200f9c:	f103 38ff 	add.w	r8, r3, #4294967295
+34200fa0:	d201      	bcs.n	34200fa6 <__udivmoddi4+0x1e2>
+34200fa2:	45a4      	cmp	ip, r4
+34200fa4:	d87a      	bhi.n	3420109c <__udivmoddi4+0x2d8>
+34200fa6:	4643      	mov	r3, r8
+34200fa8:	ea43 4000 	orr.w	r0, r3, r0, lsl #16
+34200fac:	eba4 040c 	sub.w	r4, r4, ip
+34200fb0:	fba0 9802 	umull	r9, r8, r0, r2
+34200fb4:	4544      	cmp	r4, r8
+34200fb6:	46cc      	mov	ip, r9
+34200fb8:	4643      	mov	r3, r8
+34200fba:	d302      	bcc.n	34200fc2 <__udivmoddi4+0x1fe>
+34200fbc:	d106      	bne.n	34200fcc <__udivmoddi4+0x208>
+34200fbe:	45ce      	cmp	lr, r9
+34200fc0:	d204      	bcs.n	34200fcc <__udivmoddi4+0x208>
+34200fc2:	3801      	subs	r0, #1
+34200fc4:	ebb9 0c02 	subs.w	ip, r9, r2
+34200fc8:	eb68 0307 	sbc.w	r3, r8, r7
+34200fcc:	b15d      	cbz	r5, 34200fe6 <__udivmoddi4+0x222>
+34200fce:	ebbe 020c 	subs.w	r2, lr, ip
+34200fd2:	eb64 0403 	sbc.w	r4, r4, r3
+34200fd6:	fa04 f606 	lsl.w	r6, r4, r6
+34200fda:	fa22 f301 	lsr.w	r3, r2, r1
+34200fde:	40cc      	lsrs	r4, r1
+34200fe0:	431e      	orrs	r6, r3
+34200fe2:	e9c5 6400 	strd	r6, r4, [r5]
+34200fe6:	2100      	movs	r1, #0
+34200fe8:	e73e      	b.n	34200e68 <__udivmoddi4+0xa4>
+34200fea:	fa02 fe03 	lsl.w	lr, r2, r3
+34200fee:	f1c3 0120 	rsb	r1, r3, #32
+34200ff2:	fa04 f203 	lsl.w	r2, r4, r3
+34200ff6:	fa00 fc03 	lsl.w	ip, r0, r3
+34200ffa:	40cc      	lsrs	r4, r1
+34200ffc:	ea4f 471e 	mov.w	r7, lr, lsr #16
+34201000:	fa20 f101 	lsr.w	r1, r0, r1
+34201004:	fa1f f68e 	uxth.w	r6, lr
+34201008:	fbb4 f0f7 	udiv	r0, r4, r7
+3420100c:	430a      	orrs	r2, r1
+3420100e:	fb07 4410 	mls	r4, r7, r0, r4
+34201012:	0c11      	lsrs	r1, r2, #16
+34201014:	ea41 4104 	orr.w	r1, r1, r4, lsl #16
+34201018:	fb00 f406 	mul.w	r4, r0, r6
+3420101c:	428c      	cmp	r4, r1
+3420101e:	d90e      	bls.n	3420103e <__udivmoddi4+0x27a>
+34201020:	eb1e 0101 	adds.w	r1, lr, r1
+34201024:	f100 38ff 	add.w	r8, r0, #4294967295
+34201028:	bf2c      	ite	cs
+3420102a:	f04f 0901 	movcs.w	r9, #1
+3420102e:	f04f 0900 	movcc.w	r9, #0
+34201032:	428c      	cmp	r4, r1
+34201034:	d902      	bls.n	3420103c <__udivmoddi4+0x278>
+34201036:	f1b9 0f00 	cmp.w	r9, #0
+3420103a:	d02c      	beq.n	34201096 <__udivmoddi4+0x2d2>
+3420103c:	4640      	mov	r0, r8
+3420103e:	1b09      	subs	r1, r1, r4
+34201040:	b292      	uxth	r2, r2
+34201042:	fbb1 f4f7 	udiv	r4, r1, r7
+34201046:	fb07 1114 	mls	r1, r7, r4, r1
+3420104a:	ea42 4201 	orr.w	r2, r2, r1, lsl #16
+3420104e:	fb04 f106 	mul.w	r1, r4, r6
+34201052:	4291      	cmp	r1, r2
+34201054:	d907      	bls.n	34201066 <__udivmoddi4+0x2a2>
+34201056:	eb1e 0202 	adds.w	r2, lr, r2
+3420105a:	f104 38ff 	add.w	r8, r4, #4294967295
+3420105e:	d201      	bcs.n	34201064 <__udivmoddi4+0x2a0>
+34201060:	4291      	cmp	r1, r2
+34201062:	d815      	bhi.n	34201090 <__udivmoddi4+0x2cc>
+34201064:	4644      	mov	r4, r8
+34201066:	1a52      	subs	r2, r2, r1
+34201068:	ea44 4100 	orr.w	r1, r4, r0, lsl #16
+3420106c:	e721      	b.n	34200eb2 <__udivmoddi4+0xee>
+3420106e:	1a86      	subs	r6, r0, r2
+34201070:	eb64 0303 	sbc.w	r3, r4, r3
+34201074:	2001      	movs	r0, #1
+34201076:	e70e      	b.n	34200e96 <__udivmoddi4+0xd2>
+34201078:	3c02      	subs	r4, #2
+3420107a:	4472      	add	r2, lr
+3420107c:	e735      	b.n	34200eea <__udivmoddi4+0x126>
+3420107e:	3902      	subs	r1, #2
+34201080:	4472      	add	r2, lr
+34201082:	e6d0      	b.n	34200e26 <__udivmoddi4+0x62>
+34201084:	44f4      	add	ip, lr
+34201086:	3802      	subs	r0, #2
+34201088:	e6e3      	b.n	34200e52 <__udivmoddi4+0x8e>
+3420108a:	44f4      	add	ip, lr
+3420108c:	3802      	subs	r0, #2
+3420108e:	e742      	b.n	34200f16 <__udivmoddi4+0x152>
+34201090:	3c02      	subs	r4, #2
+34201092:	4472      	add	r2, lr
+34201094:	e7e7      	b.n	34201066 <__udivmoddi4+0x2a2>
+34201096:	3802      	subs	r0, #2
+34201098:	4471      	add	r1, lr
+3420109a:	e7d0      	b.n	3420103e <__udivmoddi4+0x27a>
+3420109c:	3b02      	subs	r3, #2
+3420109e:	443c      	add	r4, r7
+342010a0:	e782      	b.n	34200fa8 <__udivmoddi4+0x1e4>
+342010a2:	3802      	subs	r0, #2
+342010a4:	443c      	add	r4, r7
+342010a6:	e76a      	b.n	34200f7e <__udivmoddi4+0x1ba>
+
+342010a8 <__aeabi_idiv0>:
+342010a8:	4770      	bx	lr
+342010aa:	bf00      	nop
+
+342010ac <memset>:
+342010ac:	4402      	add	r2, r0
+342010ae:	4603      	mov	r3, r0
+342010b0:	4293      	cmp	r3, r2
+342010b2:	d100      	bne.n	342010b6 <memset+0xa>
+342010b4:	4770      	bx	lr
+342010b6:	f803 1b01 	strb.w	r1, [r3], #1
+342010ba:	e7f9      	b.n	342010b0 <memset+0x4>
