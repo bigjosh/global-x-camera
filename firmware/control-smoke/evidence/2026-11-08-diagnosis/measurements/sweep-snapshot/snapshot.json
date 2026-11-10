@@ -1,0 +1,51 @@
+{
+  "snapshot_started_utc": "2026-11-08T05:16:05.997380+00:00",
+  "snapshot_finished_utc": "2026-11-08T05:16:07.446772+00:00",
+  "source_directory": "tmp/bringup/control-smoke-20261107/live-console-fixed",
+  "source_monitor_remained_running": true,
+  "monitor_pid_reported_by_root": 9240,
+  "launch_session": "launches/launch07/session.json",
+  "complete_reading_records": 177,
+  "first_record_utc": "2026-11-08T05:13:53.480276+00:00",
+  "last_record_utc": "2026-11-08T05:16:05.489848+00:00",
+  "last_status_file": "status-00176.bin",
+  "firmware_sha256": "3bed14f57abf64211d5ea8794cacf45741797c6163c42b3abf8ae1bfddefc86a",
+  "nonce": 3145793244,
+  "sample_count_at_last_record": 1518,
+  "observed_raw_min": 0,
+  "observed_raw_max": 3841,
+  "firmware_accumulated_min": 0,
+  "firmware_accumulated_max": 3841,
+  "error_codes": [
+    0
+  ],
+  "fault_cfsr": [
+    0
+  ],
+  "fault_hfsr": [
+    0
+  ],
+  "sequence_and_matching_raw_status_checked": true,
+  "user_confirmation": "User confirmed the control is fixed, per root message during this archive task.",
+  "limits": [
+    "Snapshot of a running monitor, not its final terminal state.",
+    "Travel response is confirmed; analog accuracy, endpoint calibration and gain-control wiring are not qualified.",
+    "No fresh cold-start test; VREFBUF clock enable from earlier RAM experiments may remain inherited."
+  ],
+  "prefixes": [
+    {
+      "source": "readings.jsonl",
+      "source_bytes_at_read": 228140,
+      "archived_bytes": 228140,
+      "sha256": "cd7f737a3ded5f1cf004a5be36d5537017e6d47a7760ae27fec7dde608696668",
+      "rule": "complete newline-terminated prefix"
+    },
+    {
+      "source": "calls.jsonl",
+      "source_bytes_at_read": 72088,
+      "archived_bytes": 72088,
+      "sha256": "d04aaafdc3e22d3d6413912955ad9d351cff60f9dc50f0f158bccfc5031a2659",
+      "rule": "complete prefix through raw status matching final archived reading"
+    }
+  ]
+}

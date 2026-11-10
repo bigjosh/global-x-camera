@@ -1,5 +1,29 @@
 # Hardware / firmware interface: current contract and recovered pin map
 
+**November 10 canonical pin map:** **HOLD = A3 / CN4.4 / PA2**;
+exposure knob **A0 / CN4.1 / PF5 LOW**, **A1 / CN4.2 wiper**, and
+**A2 / CN4.3 / PF6 HIGH**. A1 feeds buffered PA9 / ADC1 channel 10;
+its digital companion PC10 stays input/no-pull. The added **ASA / analog-gain
+knob has its high end on A4 / CN4.5 / PC12, low end on GND, and wiper on
+A5 / CN4.6**, through the buffer to PG15 / ADC1 channel 7; PH2 stays
+input/no-pull. ASA sampling and sensor-gain integration are not implemented.
+These assignments supersede
+D9/PD7 HOLD and the old A3–A5 knob hookup. The new combined package is
+**installed and readback-verified**. Direct5V smoke tests verified A3 HIGH,
+A0 LOW/A2 HIGH and A1 sweep0–3840; stopping the ADC diagnostic set A2 LOW
+while retaining A3 HIGH. UART recovery passed after installation, the
+diagnostic and a JS power cycle. [Live evidence](../firmware/control-smoke/evidence/2026-11-09-a3-live/README.md).
+The sensor and MCU USB were disconnected during those automated tests; no
+new image/USB transfer was tested. The user subsequently confirmed the
+manual trigger/error/HOLD/cutoff sequence with zero indicated current.
+That report does not measure pin timing or the leakage floor. The earlier
+JS output-OFF checkpoint is historical; the user retains bench control.
+[Owning record](prototype/NOTES.md#2026-11-09--reserve-a3-for-hold-and-confirm-a0-a1-a2-exposure-roles).
+
+**November 10 power contract:** the current prototype retains the [LiPo SPDT capacitor latch](power/2026-10-14-power-tree-review.md#november-7-lipo-button-and-pd7-hold-wiring), replacing the older LTC/divider implementation below. The user removed the USB-controlled battery-cutoff MOSFET Q3 and installed a separate **manual source selector SW2**: one throw receives USB power, the other receives **LiPo → Q1 → R0 / 2.2 Ω**, and COM feeds **CN5.5 / 5V** (through JS when measuring). Q1 source and R1 high end now connect directly to LiPo+. USB and battery branches are selected rather than joined; R0 remains battery-only. Use a break-before-make selector so the sources are not briefly tied together; the installed switch's contact timing is not reported. Retention/removal of the former USB-branch diode was not specified. **The PCB version will use automatic MOSFET source control instead of this manual switch.**
+
+**PA2 / Arduino A3 / CN4.4** must remain HIGH from the earliest custom boot code through capture/save, USB service, error blinks and UART recovery, then become input/no-pull immediately before final Standby. R2=100 kΩ pulls Q2 off; C1/C2/D1/R4 are omitted by choice; PA2 connects directly to Q2 gate. SW1 remains the separate momentary trigger with C3=2.2 µF and R5=1 kΩ reset, so a held trigger eventually permits power-off after HOLD releases; it is not a firmware-hang timeout. Historical runs support a 30 ms takeover allowance, not a new A3/latch measurement. The [historical timing evidence](../firmware/capture-raw/evidence/2026-11-08-spdt-hold/README.md) remains separate from the installed November9 A3 build. Both NOR regions matched readback, and GPIO/ADC/UART smoke tests passed on direct5V. The subsequent manual missing-sensor cycle confirms functional latch cutoff; exact takeover, release and rail timing still need measurement. AUX-before-main timing is not established by this circuit.
+
 **Updated: October 14, 2026.** Current behavior follows the [project decision register](decisions/2026-10-13-project-baseline.md), [specification](../spec.md) and [power implementation study](../power.md). Accepted behavior is not implemented or measured firmware. The existing firmware design still needs integration; its absence does not block justified hardware corrections.
 
 **Historical pin-map evidence:** the connection table below preserves the September 5 EDIF/recovered CAD, not the newly selected CAM-6G3-073CLR/LTC3621 circuit. The [full design review](DESIGN-REVIEW.md) and its physical pin/voltage tables identify confirmed faults. Preserve that evidence while revising the affected connections; this document does not certify them.
@@ -32,18 +56,63 @@ The early boot stage must retain HOLD takeover, required rail/clock setup, senso
 
 **Timing and input:** with USB disconnected, a shutter press starts the main supply; it must last until early firmware establishes GPIO HOLD. From fully powered off, **start of exposure must occur within ≤50 ms of the shutter-button press**. Qualify this deterministic design budget; no runtime timing-error code is selected. Exposure duration, frame readout, save and shutdown are measured separately afterward. Ignore additional presses during capture/save, finish the current operation unless a fault requires abort, and queue no exposure. A new capture requires an actual power cycle of the main capture electronics after shutdown and a fresh press after ready; a busy press held through completion must not become a deferred shot.
 
-**D-36 — prototype exposure time:** use a potentiometer connected to an MCU ADC input. Sample it before acquiring the image, map the reading to exposure time and apply that setting before the saved exposure begins. D-50 (October 24) supersedes D-38 with a second slider for manual 1×–8× analog gain, keeping digital gain at 1×. D-39 retains exponential exposure from the fastest supported setting to 1 s. Sample and latch both controls before applying sensor parameters for the first exposure; D-51 selects the ADC arrangement below while gain-control firmware remains to implement. See the [gain decision](prototype/NOTES.md#2026-10-24--give-the-gain-slider-the-full-analog-range-while-retaining-unity-digital-gain). D-51 selects 10 kΩ linear sliders: exposure on conditioned Arduino A0/CN4.1, gain on A1/CN4.2, bottoms at ground and high ends together on switched 3.3 V PE11 (Arduino D7/CN13.8; also CN15.23). Keep companion PF5/PC10 high impedance/no pulls. After the analog supply is ready, enable the pots, allow settling while independent initialization runs, sample and latch both, drive the pot supply LOW, then apply the sensor settings. Calibrate endpoints and test variation between the separate GPIO-supply and ADC-reference rails. The exact part, filtering, invalid-input handling and measured ADC/sensor timing remain to qualify. See [D-51 control-interface decision](prototype/NOTES.md#2026-10-24--use-conditioned-arduino-analog-inputs-and-switch-both-control-pots-together). Include input/reference startup, settling, sampling and sensor setting application in the existing ≤50 ms exposure-start budget. The control circuit must meet the existing main-path OFF-current requirement; no permanently battery-powered divider is selected. Record the exposure/configuration actually used in the existing single photo object. A0/CN4.1 reaches PA8/ADC12_INP5 and A1/CN4.2 reaches PA9/ADC12_INP10 through the board conditioning; do not apply header-level 3.3 V directly to those raw ADC pins. The shared supply is PE11/D7; the historical pin table below does not define these new controls.
+**D-36 — prototype exposure time:** sample a potentiometer through the MCU ADC before acquiring the image, map its reading and apply the setting before exposure. D-50 selects manual 1×–8× analog gain with digital gain at 1×; D-39 retains exponential exposure from the fastest supported setting to 1 s. The actual parts are 50 kΩ uxcell thumbwheels. Exposure uses **A0 LOW, A1 wiper, A2 HIGH**. The November10 ASA knob uses **A4 switched HIGH, A5 wiper, GND low** and will control sensor **analog gain**, not digital gain. The ASA scale/calibration and exact curve remain to implement and qualify. See the [ASA wiring decision](prototype/NOTES.md#2026-11-10--put-the-asa-analog-gain-knob-on-a4-a5-and-ground).
 
-**Slider wiring, selected October 24:**
+After analog-supply startup, hold PF5/A0 LOW, enable PF6/A2, allow settling, sample/latch A1 through buffered PA9/ADC1 channel 10, then drive PF6 LOW. Keep PC10 input/no-pull and PA8/PA10/PA12 analog/Hi-Z. Never use PA2/A3 as the knob's LOW endpoint: it now holds system power. Do not apply header-level 3.3 V directly to raw ADC pins. Calibrate endpoints and rail variation, qualify filtering/invalid-input handling, and include ADC settling and sensor application in the ≤50 ms exposure-start budget when integrating the knob into capture. Preserve the OFF-current requirement and record actual exposure/gain in the photo object. The earlier A4 diagnostic's ADC-isolation fix is retained. The November9 A1 sweep covered0–3840 with the expected LOW/HIGH endpoints; stopping the diagnostic drove A2 LOW and kept A3 HIGH. This is a functional smoke test, not exposure calibration or settling/temperature qualification. Normal capture still uses fixed exposure; the remapped RAM diagnostic does not program the sensor.
 
-| Connection | Nucleo header |
+**Current control wiring — November 10:**
+
+The user now has uxcell B07JLFC7FC 50 kOhm duplex thumbwheels rather than the
+originally proposed 10 kOhm sliders. The exposure knob now uses adjacent
+A0/A1/A2 contacts. The added ASA knob uses A4 as its switched supply,
+A5 as its wiper and a fixed GND return. The earlier shared-supply/gain-on-A1
+hookup is superseded; each knob now has its own excitation GPIO.
+Use one resistive track per separate knob; the two tracks inside one wheel
+move together. Exact delivered-part pin numbering remains unverified, as
+recorded in the [thumbwheel identification note](prototype/NOTES.md#2026-11-07--verify-the-supplied-uxcell-thumbwheel-electrically-before-assigning-physical-pins).
+
+| Connection | Nucleo header / function |
 |---|---|
-| Both high ends, joined | **D7 / CN13 pin 8 / PE11** (same net at CN15 pin 23) |
-| Both low ends, joined | **GND / CN5 pin 6** |
-| Exposure wiper | **A0 / CN4 pin 1** |
-| Gain wiper | **A1 / CN4 pin 2** |
+| Exposure low | **A0 / CN4 pin 1 / PF5**, driven LOW |
+| Exposure wiper | **A1 / CN4 pin 2**, buffered **PA9 / ADC1 channel 10**; PC10 input/no-pull |
+| Exposure high | **A2 / CN4 pin 3 / PF6**, switched HIGH during sampling |
+| Power HOLD | **A3 / CN4 pin 4 / PA2**, direct to Q2 gate with 100 kΩ to GND |
+| Latch and power return | **GND / CN5 pin 6**; A0 is a driven LOW endpoint, not a fixed ground contact |
+| ASA / analog-gain high | **A4 / CN4 pin 5 / PC12**, future switched HIGH during sampling; buffered PF3 companion analog/Hi-Z |
+| ASA / analog-gain wiper | **A5 / CN4 pin 6**, buffered **PG15 / ADC1 channel 7**; PH2 input/no-pull |
+| ASA / analog-gain low | **GND**, common with power return; CN5 pin 6 is a convenient equivalent |
 
-PE11 must be configured as a low-speed push-pull output, initially LOW, HIGH only during settling/sampling and LOW afterward. The current firmware does not implement this control or ADC sampling yet. D2/PD0 and D4/PE0 remain capture diagnostic outputs. See the [supply-pin rationale](prototype/NOTES.md#2026-10-24--reserve-arduino-d7-pe11-for-the-shared-slider-supply).
+Using the [firsthand teardown's illustrated numbering](https://theblinkyledblog.blogspot.com/2016/04/uxcell-b503-b501-audio-duplex.html),
+the conditional single-track physical numbering is pin 1 to A0/LOW,
+pin 5 to A2/HIGH, and pin 2 (wiper) to A1. Leave pot pins 3 and 4 unconnected. This is
+conditional on a meter confirming the delivered part: pins 1-5 stay near
+50 kOhm during rotation and pin 2 varies between them. Do not infer physical
+left-to-right numbering from an arbitrary viewing direction. The Nucleo
+connector mapping is independently confirmed by UM3417 Rev4 tables 16, 17
+and its default-routing footnote. The new A1 hookup passed the November9
+functional sweep from0 to3840. Delivered-part physical lug numbering, ADC
+accuracy and exposure mapping remain unqualified; the sweep is not a
+calibrated sensor-exposure result.
+
+The exposure knob has three wires. A2 is a switched approximately 3.3 V logic supply,
+separate from A3/PA2 power HOLD. A0 is a GPIO-driven LOW endpoint, not a fixed
+ground contact: configure PF5 LOW before enabling A2 and retain it LOW while
+sampling. Use the conditioned A1 input and qualify settling/calibration for
+the actual 50 kOhm track.
+
+PF6 must be configured as a low-speed push-pull output, initially LOW, HIGH only during settling/sampling and LOW afterward. Stock A0/A2 GPIO routing and fitted SB6 for A3 need no board rework. Keep the board's GPIO supplies at 3.3 V. PA8 and PA10 are A0/A2's buffered ADC companions, not the outputs to drive. One 50 kOhm track draws about 66 µA at 3.3 V, plus board-divider loads. The standalone [RAM diagnostic](../firmware/control-smoke/README.md) is remapped to A1; it does not set camera exposure or change NOR. D2/PD0 and D4/PE0 remain capture diagnostic outputs; PE6 remains UART recovery. See the [superseding wiring rationale](prototype/NOTES.md#2026-11-09--reserve-a3-for-hold-and-confirm-a0-a1-a2-exposure-roles).
+
+For the ASA knob, the future sampling code will drive **PC12/A4** LOW initially,
+HIGH for settling/sampling, and LOW afterward. **PH2/A5 must remain an input
+with no pulls**, while buffered **PG15/ADC1 input7** is the analog input to read.
+PF3, A4's buffered companion, is not the output to drive. Stock C02 routing
+uses fitted SB5/SB3 and open SB4/SB2; retain the present 3.3 V VDDIO4 bank.
+This mapping comes from MB1940 C02 sheet10 and the earlier A5 endpoint ADC
+diagnostic, not a new ASA smoke test. The current schema3 diagnostic exercises
+only exposure and HOLD; it does not excite/read the new ASA pot. Normal
+capture still uses fixed settings. Do not run the historical A3–A5 diagnostic:
+it both lowers HOLD and drives the newly assigned A5 wiper. Calibration,
+settling and the ASA-to-analog-gain mapping remain pending.
 
 An initial firmware mapping candidate for normalized knob position `x` from 0 to 1 is `t(x) = t_min * (1 s / t_min)^x`. This gives equal exposure ratios for equal knob movements and smaller absolute time changes at the fast end. Clamp/quantize to supported sensor timings and record the actual applied exposure. The user selected the exponential behavior and endpoints, not a frozen formula, numeric minimum or physical logarithmic potentiometer. Verify that the selected clock/mode and frame-length settings permit one-second integration. The ≤50 ms deadline concerns exposure start; the exposure itself may last one second. D-50 selects manual analog gain from 1× to 8×, quantized to the 29 supported codes; digital gain remains 1×. Latch both settings for the photograph; no automatic gain/exposure loop is selected.
 
@@ -57,7 +126,7 @@ An initial firmware mapping candidate for normalized knob position `x` from 0 to
 
 **Storage:** preserve existing committed photos and refuse new captures when no usable slot remains; show seven red flashes for full and enter shutdown (D-42), without taking a new photo or showing green success. Capacity exhaustion alone does not retire slots or authorize erasure. Full payload readback plus checksum comparison is configurable and enabled by default during bring-up/initial testing; it may be disabled later. In either mode, generate integrity metadata/checksums, wait for program completion, check status/failures, perform required ECC/bad-block/recovery handling, and read back and verify the final durable commit record before successful-save shutdown. ECC status does not verify an unread payload. The criterion for later disabling full readback remains unsettled; firmware and the final storage format remain unimplemented.
 
-**Power and shutdown:** four series CR2032 cells through LTC3621 are selected. The room-temperature 100 nA OFF target applies to the complete main path, including regulator and external pack-connected leakage; retained RTC cell-tap backup is additional and must be measured/budgeted separately. After safe save, prepare peripherals and shutdown configuration, then enter genuine N6 Standby while an ordinary HOLD GPIO remains driven until entry. Standby makes that GPIO high impedance; Stop retains its configuration. Retain external pulldowns, select a pin outside the documented exceptions and prevent held-button wake retriggering. In the existing divider/HOLD concept, a held button keeps the buck enabled until release. External PWR_ON/AUX sequencing and any optional RUN-to-ground shutdown delay remain unimplemented: AUX must discharge below 0.6 V before main supplies leave their valid range. See [power.md §6](../power.md#6-camera-integration-requirements).
+**Power and shutdown, November 9 prototype:** use the 500 mAh LiPo/SPDT latch described above. Keep PA2/A3 HIGH until the final Standby entry, then explicitly float it; R2 pulls Q2 off. C1/C2/D1/R4 are omitted; PA2 connects directly to Q2 gate. A held trigger can now time out after HOLD release instead of indefinitely overriding shutdown, but a stuck HIGH firmware HOLD still retains power. The room-temperature 100 nA main-path OFF target remains unproved and covers the whole battery-connected circuit. Retained RTC power is additional. The new latch, direct-LiPo rail margins and AUX-before-main ordering are not hardware-qualified.
 
 **Shutdown definition and F-01, approved October 13:** shutdown is the lowest attainable power state, with an actual power cycle of the main capture electronics required before another image; RTC backup may remain powered. A held button waits for release to permit main power-off, with no automatic wake/retake. At any phase of a cycle, including post-save shutdown, detected low battery requires **one red LED flash**, then abort to shutdown. This abnormal abort must not wait for successful image commit. Preserve existing committed photos, including the current image if already valid and durably committed; never report an incomplete or unverified image as saved. Interrupted writes follow the accepted USED/DONE policy; physical encoding, conservative recovery and device qualification remain open. Indication and controlled shutdown require enough remaining power, not a guarantee after rail collapse. Battery sensing, thresholds and warning/hold-up energy remain to be implemented and qualified. The recovered [BOM](../bom.txt) has green/yellow-green **LED1, ROHM SML-P11MTT86R**; a red-capable indication must be selected and qualified, with no CAD/BOM change made here.
 

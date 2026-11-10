@@ -9,12 +9,15 @@ These figures locate the parts and connector pins used by the consolidated Nucle
 - `mb1940-c02-assembly.pdf`: source assembly pages 16-17 extracted from the official C02 schematic pack, retaining ST's drawing titles and revision information.
 - `locations.json`: physical coordinates, PDF annotation coordinates, exact ODB++ pad records and source hashes.
 - `build_diagrams.py`: regenerates the PNG/SVG diagrams from the two local input files; requires Python, PyMuPDF, Matplotlib and NumPy. Run from any directory with `python build_diagrams.py` using its full path; use `--only header-connections` to update just the header figure.
+- `u42-location.png` / `.svg`: underside overview and close-up for the unused U42 camera LDO, added November 5. Regenerate with `build_u42_locator.py`; it uses the same assembly PDF, with U42's body rectangle verified directly from the bottom-page vector geometry. This is separate from the historical NAND rework diagrams.
 
 The guide, not a diagram alone, determines the rework order and electrical prerequisites. The diagrams separate the basic five-part work from U24 Ethernet removal. **R32/R33 and the U14 regulator circuit are not modification targets.** The generic manufacturing pick-and-place file includes unfitted parts and must not be used as proof of C02 population; use the C02 BOM, schematic and actual board inspection.
 
 **Canonical NAND power route, selected October 18:** CN12.14 → CN3.10/VDDIO4 → CN14.8/AREF → NAND pin 8/VCC. The first two arrows are board supply jumpers; the last is the NAND supply lead. Keep R104 fitted and R125 absent, and verify 1.71–1.89 V at CN14.8 before attaching NAND. Label AREF 1.8 V. NAND ground remains CN14.7. The figures describe the selected plan, not completed physical work.
 
 **Canonical target power contacts, selected October 27:** regulated 5 V source → JS110 IN+; JS110 OUT+ → **Arduino CN5 pin 5 / 5V**; common return → **CN5 pin 6 / GND**. Keep all CN9 shunts removed and preserve the JS110 ground/voltage-sense arrangement. CN5.5 and old CN9.2 share the target `5V` net. Upstream power may remain CN8 → CN9.3 → JS110 IN+ for bench work; with an external/LTC source, unplug CN8 and leave VIN disconnected. Use one source and no second feed to the target. This records the selected plan, not confirmation of a physical move or LTC installation. The active SD prototype remains at 3.3 V: the NAND conversion shown in these older assembly figures is deferred.
+
+**November 7 LiPo/latch plan:** keep all latch connections to the board on Arduino headers: **HOLD = D9/CN14 pin2 (PD7)**, **target input = CN5 pin5**, and **ground = CN5 pin6**. Use the [current GPIO-latch diagram and power plan](../../power/2026-10-14-power-tree-review.md#november-7-lipo-button-and-pd7-hold-wiring), which retains the 2.2-ohm resistor and series Joulescope. External HOLD does not use PWR_ON/TP19. HOLD firmware and LiPo/latch qualification are pending; the October source diagram above is historical for this proposed assembly.
 
 ## Sources and coordinate verification
 
@@ -43,3 +46,15 @@ Coordinates use ST's PCB origin, in millimetres. They are for reproducible annot
 ## Limitations
 
 This is a board-revision-specific location guide. It does not confirm the user's board revision or record any physical modification. The diagram's component outlines are assembly geometry, so a designator may appear inside a body outline even if the real silkscreen is elsewhere. Use magnification and the adjacent landmarks, then confirm the reference and connections before removing a part. No board, instrument, power setting, or firmware was changed to make these figures.
+
+## November 5: unused U42 removal plan
+
+**Subsequent user confirmation, November 5:** U42 has been removed successfully and the user reports3.3mA after sleep. The instructions below describe the performed user modification; no agent instrument readback or matched measurement was made. [Result and remaining-load review](../../power/power-cost-comparison.md#november-5-u42-removal-and-remaining-sleep-loads). The locator's "not yet performed" footer reflects its pre-removal creation time.
+
+For the default C02 camera supply configuration (SB10 fitted, SB31 open), removing **U42 / LD1117S33TR** removes its powered but unused regulator branch without interrupting the camera feed. ODB++ net388 contains only U42 output pins2/4, C155.2 and SB31.1; U42.3 is target5V and U42.1 is ground. The actual camera supply remains AUX VDD3V3 through SB10. The C02 BOM independently lists U42 and SB10 fitted, SB31 not fitted.
+
+View the underside with the ST-LINK end at the top. U42 is in the lower-right area near the camera connector on the opposite face, beside C155 and above C17. It has three small leads and a broad soldered tab (SOT-223). Pick/place center is X16.8686mm/Y29.0750mm, BottomLayer, rotation180. The highlighted body rectangle on assembly sheet17 is x561.2512–624.3273/y988.3437–1023.2563 PDF points; no assumed mirroring transform was used.
+
+Disconnect all power and USB feeds before soldering. Remove U42 completely, leaving its pads unconnected and without solder bridges. Leave SB10, the open SB31 and surrounding capacitors unchanged. The loss is only the unused alternative camera-supply option. The LD1117 datasheet's 5mA typical quiescent current suggests about25mW at5V, but the actual saving must be measured. Physical removal, revised idle current and capture regression have **not** been reported or tested. [Reason and evidence](../../power/NOTES.md#2026-11-05--account-for-the-powered-but-unused-camera-regulator-u42).
+
+![U42 underside location](u42-location.png)

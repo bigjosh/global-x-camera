@@ -1,8 +1,86 @@
 # Power-tree review: Nucleo prototype and compact camera
 
+**November 9 canonical controls:** HOLD is now **A3/CN4.4/PA2**;
+the exposure knob is **A0/CN4.1/PF5 LOW**, **A1/CN4.2 wiper** and
+**A2/CN4.3/PF6 HIGH**, as confirmed by the user. A1's conditioned analog
+path is PA9/ADC1 channel 10; leave PC10 input/no-pull. New A3 capture/USB
+firmware is **installed and readback-verified**. A3 HIGH, the A0/A1/A2 ADC
+sweep and UART recovery passed on direct5V through JS. In the subsequent
+manual trigger test, the user confirmed the missing-sensor two-flash code,
+completion, camera power-off and **zero indicated current**. This provides
+functional trigger/HOLD/cutoff confirmation; precise takeover/release timing,
+held-button behavior and the off-current measurement floor remain unmeasured.
+[Manual result](NOTES.md#2026-11-09--manual-trigger-test-confirms-missing-sensor-shutdown-and-load-cutoff).
+[Installation and smoke evidence](../../firmware/control-smoke/evidence/2026-11-09-a3-live/README.md).
+[Owning pin decision](../prototype/NOTES.md#2026-11-09--reserve-a3-for-hold-and-confirm-a0-a1-a2-exposure-roles).
+
+**November 10 canonical prototype source selection:** the user replaced Q3,
+the USB-controlled battery-cutoff MOSFET, with a separate **SPDT power
+selector SW2** to simplify assembly. SW2 selects either USB power or the
+output of the battery's 2.2-ohm R0 and feeds **CN5 pin5 / 5V**. There is no
+direct USB/battery merge. Q1/AO3401, Q2/AO3400 and the momentary SPDT trigger
+SW1 remain; Q1 source and R1 high end now connect directly to LiPo+.
+Q3 and its R6 gate-bias network are no longer part of the canonical prototype.
+The [complete diagram](lipo-latch-wiring.svg) shows SW1 and SW2 separately.
+
+**PCB direction:** implement automatic MOSFET source control on the custom
+PCB, replacing the prototype's physical selector. The prior Q3 circuit is
+design history in [power notes](NOTES.md), not current prototype wiring.
+The U6 [architecture SVG](u6-consolidated-power.svg) remains a deferred
+alternative. Exact production source-control implementation remains to design.
+
+The existing protected USB takeoff is **SB12 pad1 / CN9 pin3**. The user did
+not report whether the former series D_USB remains; if present it stays only
+in the USB throw's feed, with its cathode toward SW2. It must not connect USB
+to the battery throw. All CN9 jumpers remain out. SW2 should be non-shorting
+(break-before-make); its actual part and contact timing have not been checked.
+Source switching may interrupt power and is not a seamless-handover claim.
+R0 still limits only battery-path inrush; USB bypasses R0.
+
+**ASA control added November 10:** a second pot has its high end on
+**A4/CN4.5**, low end on **GND**, and wiper on **A5/CN4.6**. It will control
+sensor **analog gain**, retaining the selected 1×–8× range and fixed 1×
+digital gain. ASA calibration and knob-to-sensor integration remain pending.
+Exposure remains A0 LOW/A1 wiper/A2 HIGH; A3 remains HOLD. This hardware
+documentation update does not change the installed firmware.
+
+**Firmware status, November 9, 23:01 EST:** the PA2/A3 combined capture/USB
+package is installed; both NOR regions matched full readback. UART recovery
+passed after flashing, after the ADC diagnostic and after an actual JS power
+cycle. GPIO readback verified A3 HIGH, and stopping the control diagnostic
+retained it while turning A2 LOW. With the sensor absent, error17 reached a
+low plateau near3.21mA and retained SBF=1. This does not directly measure
+physical A3 release, latch takeover/cutoff or AUX/main rail sequencing.
+Tests used direct5V through JS with MCU USB and sensor disconnected, not
+the physical trigger latch. At the end of that automated test JS output was
+OFF with measured current zero and COM8 closed. The user has since operated
+and modified the circuit; that is not a current bench-state report. The firmware
+contract retains early assertion before the original UART guard and HOLD
+through capture/save/USB/recovery/error display, with input/no-pull release
+immediately before Standby.
+The [earlier PD7 timing estimate](../../firmware/capture-raw/evidence/2026-11-08-spdt-hold/README.md)
+is historical evidence, not a measurement of the new build.
+
+**Current prototype assembly:** a 500 mAh single-cell LiPo feeds the Q1/Q2
+latch and manual source selector, with the tested 2.2-ohm R0 retained in
+the battery branch. All selected latch board contacts are on Arduino headers:
+HOLD A3/CN4.4, target input CN5.5, common ground CN5.6. TP19/PWR_ON remains
+onboard supply control, not the external HOLD connection.
+
+**Exposure control:** A0 LOW / A1 wiper / A2 HIGH replaces the November 7
+A3–A5 diagnostic hookup. Configure PF5 LOW before enabling PF6; after settling
+and sampling the buffered PA9 input, drive PF6 LOW. PA2 is exclusively HOLD
+and must not be driven LOW by the obsolete diagnostic. One 50 kohm track draws
+about 66 µA at 3.3 V plus board-divider loads. Gain's old proposed A1 assignment
+is superseded by A4 HIGH / GND / A5 wiper, reported November10. The remapped
+RAM diagnostic does
+not yet apply exposure to the camera. Its November9 functional sweep read
+A1 from0 to3840 with A0 LOW/A2 HIGH; stop drove A2 LOW and retained A3 HIGH.
+Settling, accuracy and sensor-exposure calibration remain to qualify.
+
 **October 18 selected direction, D-47:** use **LTC3621 at 5.0 V**, retain the Nucleo/camera adapter downstream regulator tree, and exclude unnecessary loads from the capture path. The board is in hand; the earlier wait-for-arrival pause is superseded. The [consolidated assembly guide](../prototype/nucleo-assembly-guide.md) provides the current rework path and component-location diagrams. The user has confirmed the DC1863A adjustable LTC3621 evaluation board. No physical rework, battery performance, complete isolation or 100 nA OFF-current result is claimed.
 
-**Original review October 14, updated October 18.** The findings below explain the selected 5.0 V prototype architecture and preserve the unselected direct-3.3 V/custom-board alternatives. The four-series-CR2032/LTC3621 choice, 50 ms exposure-start deadline, 100 nA main-path OFF target and separately powered RTC remain in force. Assembly and qualification remain distinct from this voltage decision.
+**Historical review October 14, updated October 18.** The findings below explain the earlier 5.0 V LTC prototype architecture and preserve the direct-3.3 V/custom-board alternatives. The November LiPo/manual-selector plan above supersedes the four-series-CR2032/LTC prototype supply. The 50 ms exposure-start deadline, main-path OFF-current target and separate RTC budget are distinct requirements; the older voltage studies are not instructions to restore the old power path.
 
 Review in order: (1) required rails and their activity through a cycle; (2) LTC3621 output; (3) downstream conversion, sequencing and USB source selection. Discuss one decision at a time. The September [recovered power tree](power-tree.md) and [RUN/HOLD study](../../power.md) remain historical implementation evidence, not a completed design for the selected camera and Nucleo.
 
@@ -66,7 +144,7 @@ Expected savings depend on load distribution: the core and existing auxiliary 3.
 | Boot NOR | **Board-specific; Nucleo flash uses 1.8 V** | Must be available for boot. Historical custom CAD uses 3.3 V NOR; a 1.8 V custom replacement was researched but not selected. Sleeping NOR later depends on execution/memory placement. |
 | Accelerometer | **1.8 V candidate** | LIS2DW12 supports this supply/IO level. Required around orientation sampling; verify startup/sample latency and unpowered-bus behavior. |
 | RTC main / backup | **3.3 V switched main / approximately one cell on backup** | Retained RV-3028-C8 architecture. Backup survives full main OFF and is budgeted separately. Reconcile the C7 evaluation-board recommendation with actual purchased hardware. |
-| Exposure potentiometer | **Within the ADC/reference range, nominally 1.8 V at the MCU** | Feed from an appropriate switched analog supply/reference, not a permanent battery divider. The N6 ADC analog domain is 1.8 V; a 3.3 V GPIO bank does not make a 3.3 V ADC input valid. Check Nucleo header conditioning before selecting a connection. |
+| Exposure potentiometer | **Switched 3.3 V at the header; nominal 1.8 V ADC domain after onboard conditioning** | A0/PF5 LOW, A1/PA9 ADC1 channel 10 wiper, A2/PF6 HIGH; 50 kohm track. Settle/sample/latch, then PF6 LOW. PC10 stays input/no-pull; PA8/PA10/PA12 stay analog/Hi-Z. A3/PA2 is separate HOLD. ASA uses separate A4 HIGH/GND/A5 wiper; both camera-control integrations remain deferred. |
 | USB PHY | **3.3 V and 1.8 V** | Required for target-USB operation. Nucleo provides these; final gating/isolation is architecture-dependent. |
 | Status/error LED | **Drive-dependent; no new rail selected** | Use the board LED for initial bring-up if suitable. Exact external LED/drive is open. Photographic flash remains deferred. |
 
@@ -134,3 +212,149 @@ Using an efficient buck for a substantial 1.8 V load avoids dissipating the whol
 5. **Leakage:** the LTC3621's typical shutdown current already equals the 100 nA main-path target; its maximum and demo-board extras differ. DC1863A's complete leakage cannot be inferred from the IC alone. Budget and measure every battery-side path; use the Nucleo setup to establish function and timing, and separately qualify an appropriately implemented low-leakage power stage.
 
 No hardware tests or schematic changes were performed for this review. The original October 14 findings used some indexed schematic text; the October 18 selection and assembly guide supersede those earlier proposal/status statements. Electrical compliance remains to be measured.
+
+## November 3 single-cell LiPo and 3.3 V LDO feasibility
+
+The user is considering a single-cell LiPo and direct 3.3 V supplies. This is a feasibility review, not a selected or performed modification. The existing main regulator U33 is already a 3.3 V LD39020 LDO. A simpler candidate than replacing both 3.3 V sources is therefore raw LiPo into the existing target `5V` distribution bus, retaining U33, U23 (1.8 V AON), and U17 (core buck), and replacing the function of U34 with a separate 3.3 V LDO enabled by `PWR_ON`. U26 remains downstream of the switched auxiliary 3.3 V rail. This input would be the battery voltage, not regulated 5 V; all alternative target sources must remain disconnected.
+
+The now-available C02 sheet 9 image and manufacturing ODB++ confirm the isolation links below, superseding the tentative link identification in the original direct-3.3 V study:
+
+| Link | Verified connection | Implication |
+|---|---|---|
+| R102, 0 ohm | U33 measurement/output side to main `VDDIO`; pin 2 is net11/VDDIO | Can isolate the existing main LDO if a separate main source is eventually used. |
+| R115, 0 ohm | U34 output net315 to auxiliary net20/`VDD3V3`; pin 2 is the load side | Separates the auxiliary buck output from TP5, CN5.4 and the downstream auxiliary loads. |
+| R132, 0 ohm | Input net380/`5V` to U34 input net8 | Input disconnect, **not** an output bypass link. |
+| R134, 560 ohm | U34 PG net243 to its output net315 | Power-good pull-up; not an input-to-output connection. |
+
+For an initial reversible trial, remove only R115, retain U34's input/enable connections, and supply auxiliary `VDD3V3` at TP5 or CN5.4 from the new LDO. Connect the new LDO input to raw LiPo and its enable to `PWR_ON` (TP19). The original buck then operates unloaded during the awake interval; its remaining consumption is unmeasured. Its C75/C73 output capacitors remain on the isolated side of R115: the new LDO needs its own specified input/output decoupling and must be stable with the actual downstream board capacitance. Component selection and waveform qualification are prerequisites to treating this as assembly instructions.
+
+For a later removal of the redundant buck, removing U34 avoids leaving its control input driven while unpowered. **Do not merely remove R132 while retaining the direct PWR_ON connection:** ST1S31 absolute ratings limit EN to VIN. Removing R132 and R115 together does not fix that enable-pin condition. Alternatively, separate and safely terminate its enable as well as its supply/output.
+
+Do not join main `VDDIO` and auxiliary `VDD3V3` into one permanently powered rail. The replacement auxiliary LDO must support the required enable timing and active discharge, with main/AON remaining valid until auxiliary supplies are below 0.6 V. Main `VDDIO` is at CN3.5; auxiliary `VDD3V3` is at CN5.4. A single external 3.3 V source feeding both domains would instead require a separately controlled auxiliary load switch and feeds for the retained core/AON regulators.
+
+A LiPo/LDO solution stops providing regulated 3.3 V when the loaded cell voltage falls below 3.3 V plus the actual dropout. It does not use the full discharge range as a buck-boost can. LDO current capacity and pulse response must cover each rail's load, including SD peaks on U33's 200 mA-rated main branch. No precise battery cutoff or energy improvement is measured. The earlier approximately 4 V board-input estimate was only a test starting point: ST1S31's typical 94 ns off-time description and its 95%-minimum/100%-typical maximum-duty table do not justify a guaranteed 3.84 V cutoff.
+
+**November5, direct500mAh LiPo follow-up:** a fully charged cell may operate the present board, but operation through approximatelyhalfSOC cannot be guaranteed from capacity or nominal voltage. ST1S31 Figure4 onpage9 is more restrictive than a simple reading of its maximum-duty table: its zero-load maximum-output curve crosses3.3V around4.1V input and shows roughly3.1V at3.8V input; load reduces output further. These are approximate graphical readings, not a guaranteed board cutoff. The apparent inconsistency between Figure4, the typical94ns explanation and the duty-cycle table remains unresolved. U34PG does not gate U26; U26EN connects directly toPWR_ON. Thus reduced AUX3.3 does not by itself prove failure, but downstream camera2.8V regulation and all required rail limits must be measured during startup/capture/save before selecting direct LiPo.
+
+MainU33/LD39020 is less concerning at3.8V: its table lists200mV typical/350mV maximum dropout at200mA under the specified2.8V-output test conditions, not a universal guarantee for this3.3V branch. MainSD current is also limited by its200mA rating. CoreTPS62088 operates from2.4–5.5V and the1.8VAON path has substantial nominal headroom. The measured historical133mA1ms peak at5V corresponds to about175mA at3.8V under a rough constant-power assumption, or0.35C for500mAh; actual branch current, battery resistance/protection and the separate unqualified7–8A startup transient still matter. No direct-LiPo test or supply change occurred. Proposed qualification sweeps regulated4.2/4.0/3.8/3.6V while observing main3.3,AUX3.3 and camera2.8V plus complete-image readback; do not infer success from input voltage/current alone.
+
+### Button start and GPIO shutdown without LTC3621
+
+The selected LiPo feed uses a master high-side switch upstream of **all** battery-fed main/AON/core/auxiliary branches. Its control replaces the LTC RUN function: a capacitor-coupled SPDT shutter starts the supply, and an isolated MCU HOLD signal maintains it after boot. The November 8 circuit below uses Q1/AO3401, Q2/AO3400 and the existing 2.2-ohm series resistor. It omits the former C1/D1 shutdown delay and C2 gate-source capacitor by explicit user choice.
+
+Firmware releases HOLD immediately before Standby. With the trigger released, there is no deliberately added main-supply off-delay; with it held, the trigger capacitor charges and eventually allows cutoff. This prototype choice does not resolve the separate AN5967 AUX-before-main shutdown-order question. [Selected tradeoff](NOTES.md#2026-11-08--accept-no-separate-q2-shutdown-delay-for-the-spdt-prototype).
+
+PWR_ON was considered as an automatic master-HOLD source because it asserts before firmware and falls on Standby. **The user instead selected GPIO HOLD to keep the power assembly on Arduino headers.** Do not add a TP19 connection to this plan. PWR_ON continues its onboard role controlling core/auxiliary regulators; the external latch uses PA2/A3.
+
+TPS22919 is a candidate master switch (1.6–5.5 V, 1.5 A, 90 milliohm typical at 3.6 V, 2 nA typical shutdown current), not a selected part or a demonstrated 100 nA whole-system OFF result. Its approximately 1.75 ms typical turn-on time at 3.6 V belongs in the startup budget. Package, actual startup current, output-discharge connection, off-delay behavior, USB isolation and all battery-side leakage paths still require circuit qualification. Switching only the new auxiliary LDO would leave main/AON and other input branches connected to the battery. [TPS22919 datasheet](https://www.ti.com/lit/ds/symlink/tps22919.pdf).
+
+Sources: [MB1940 C02 schematic, sheet 9](https://www.st.com/resource/en/schematic_pack/mb1940-n657x0q-c02-schematic.pdf), local `tmp/hardware-review/nucleo-modifications/power-sheet9.png` and the accompanying `odb/odb/steps/pcb/` component/net records; [LD39020](https://www.st.com/resource/en/datasheet/ld39020.pdf); [ST1S31, tables 2 and 4 and section 4.1](https://www.st.com/resource/en/datasheet/st1s31.pdf); [AN5967, section 3.5](https://www.st.com/resource/en/application_note/an5967-getting-started-with-hardware-development-for-stm32n6-mcus-stmicroelectronics.pdf). No firmware or instrument action accompanied this review.
+
+<a id="november-7-lipo-button-and-pd7-hold-wiring"></a>
+
+## Canonical LiPo, USB and A3 HOLD wiring — November 10
+
+**Canonical November 10 revision:** the prototype uses the manual source
+selector SW2 after the battery-path R0, in place of Q3 and the wired USB
+merge. SW2 COM feeds CN5.5, optionally through JS110 for measurement.
+The separate momentary trigger SW1 retains C3=2.2uF: COM to C3 top,
+NC/released through R5=1kohm to ground, NO/pressed to Q1 gate/Q2 drain.
+**C1, C2, D1 and R4 remain omitted.** Component numbers below refer to the
+external circuit, not identically named Nucleo PCB components.
+
+![Prototype wiring with manual USB or battery selector, SPDT trigger, A3 HOLD and both control knobs](lipo-latch-wiring.png)
+
+[Vector version](lipo-latch-wiring.svg). Regenerate both drawings with `tools/build_lipo_usb_power_wiring.py` (the older `tools/build_lipo_latch_wiring.py` entry point also regenerates this complete circuit). The picture uses pin-labelled functional blocks, with physical SOT-23 orientation in the inset.
+
+**Canonical HOLD contact:** **Arduino A3 / CN4 pin4 (PA2)**, through fitted
+SB6. Target input remains **CN5 pin5** and common ground **CN5 pin6**.
+PA2 belongs to main VDD (3.3V on this board), not selectable VDDIO4; no PCB
+rework is needed. CN3.34 is the same MCU-side signal but is not the selected
+assembly endpoint. A3's existing 470 kohm / 560 kohm conditioning branch adds
+about 3.2 µA load at 3.3 V and feeds PA12; keep that buffered analog companion
+analog/Hi-Z. PE6 UART recovery is unchanged. A0/PF5 LOW, conditioned A1/PA9
+wiper and A2/PF6 HIGH are reserved for the exposure knob; the old gain-on-A1
+proposal and old A3–A5 diagnostic must not be reused. [Current control table](../hardware-firmware-interface.md#current-behavior-and-firmware-contract).
+
+| External component | Value | Exact connection |
+|---|---|---|
+| Q1, main switch | AO3401 P-channel, kit A19T | Pin2 source directly to LiPo+ and R1 high end; pin3 drain to R0; pin1 gate to Q2 drain, R1 and SW1 NO. |
+| Q2, control | AO3400 N-channel, kit A09T | Pin3 drain to Q1 gate; pin2 source to GND; pin1 gate directly to PA2 and the top of R2. |
+| SW2, source selector | SPDT; use non-shorting/break-before-make contacts | COM to CN5.5/5V, or JS IN+ then JS OUT+ to CN5.5 when measuring. Battery throw to R0 output; USB throw to protected USB feed. Physical lug numbers/contact timing not supplied. |
+| Q3 / R6 | Q3 removed; R6 no longer required | Automatic MOSFET source selection is for the PCB version, not the prototype. R6 physical removal was not reported. |
+| D_USB, previous USB feed diode | Presence after SW2 installation not reported | If retained: anode A to SB12 pad1; cathode K/band to SW2 USB throw only. No connection to the battery throw. This diode is not the source selector. Board D2 remains removed. |
+| R0 | Existing 2.2 ohm pulse-rated resistor | Q1 drain to SW2 battery throw. USB throw bypasses R0. |
+| R1 | 100kohm | Q1 gate to Q1 source / raw LiPo+. Defaults Q1 OFF. |
+| SW1 | Momentary SPDT, break-before-make | **COM** to C3 top; **NC/released** to R5; **NO/pressed** to Q1 pin1 gate / Q2 pin3 drain. Identify the actual switch contacts by continuity; their physical order is not specified here. |
+| C3, trigger | 2.2uF X7R ceramic, 10–16V | Top to SW1 COM; bottom to GND. This capacitor has no polarity. |
+| R5, trigger reset | 1kohm | SW1 NC/released contact to GND; limits C3 discharge current. It is not in the pressed/NO path. |
+| R4 | Omitted; direct wire | PA2 / Arduino A3 / CN4 pin4 directly to Q2 pin1 gate. No diode or series resistor. |
+| R2 | 100kohm | Q2 pin1 gate to GND; defaults Q2 OFF when PA2 floats. |
+| C1, C2, D1, R3 | Omitted | No separate Q2-gate off-delay, Q1 gate-source capacitor, diode or old button-feed resistor. |
+
+Both fitted MOSFETs use the standard SOT-23 assignment1=gate,2=source,3=drain. Viewed from the marking side with the single lead at the top: top=3/drain, bottom-left=1/gate, bottom-right=2/source. Verify actual kit parts before attachment. The exact SPDT part is unspecified, so use verified COM/NC/NO contacts rather than invented physical lug numbers.
+
+**Power boundary:** LiPo+ goes directly to Q1 source and R1 high end;
+Q1 drain feeds R0, whose output feeds SW2's battery throw. USB feeds the
+other throw. SW2 COM feeds CN5 pin5, optionally through JS IN+/OUT+ when
+measuring. A JS in that position measures selected target current but misses
+the upstream R1/trigger/Q2 bias branch; it cannot establish total battery
+OFF leakage. LiPo negative, latch GND, USB GND, measurement return and
+CN5 pin6 share ground. The exact current JS placement was not reported.
+Leave SB12 fitted, all CN9 shunts OUT and board D2/R23 removed; no parallel
+target feed should bypass SW2. CN10 separately powers the debugger and is
+not the selected USB takeoff.
+
+**Manual USB selection:** protected SB12 pad1 is the same net as CN9 pin3
+(`5V_USB_SNK`). Route that USB feed to SW2's USB throw, through the previous
+D_USB only if it remains fitted. Selecting USB powers the camera independently
+of Q1/HOLD, while the battery branch is disconnected from the target by SW2.
+Selecting battery connects only R0 output to the target; USB cable presence
+alone no longer selects the power source. Firmware still selects PTP from
+CN8 VBUS at boot, independently of the physical selector position. Thus a
+USB cable left connected in battery position can select PTP while the battery
+supplies the target. For USB operation, select the USB throw. The switch does
+not charge the LiPo or guarantee uninterrupted handover; change sources when
+the card is idle. USB inrush bypasses R0. Automatic MOSFET selection is the
+custom-PCB plan, with the exact circuit and qualification still pending.
+
+SW2 disconnects the battery's **load branch**, not its Q1/R1/Q2 control
+network. While USB-powered firmware asserts HOLD, Q2 still pulls R1 low;
+the nominal battery bias is `VBAT / 100kohm` (about37 µA at3.7 V), plus
+leakage. This is a circuit estimate, not a measurement or a zero-battery-drain
+claim for USB mode.
+
+**Operation:** released SW1 connects C3 to ground through R5. Pressing it connects the discharged C3 to Q1 gate, initially pulling that gate low and turning on the supply. Firmware drives PA2 HIGH directly into Q2 gate, turning Q2 on to maintain power after button release. **The press must last until GPIO takeover:** releasing SW1 disconnects C3 from Q1, so this circuit does not stretch a too-short tap. Contact bounce can interrupt or retrigger the pulse.
+
+**November 8 simplification:** omit R4 by user choice; retain R2=100kohm and R5=1kohm. Direct GPIO drive is the prototype baseline. If gate ringing, overshoot or GPIO-drive trouble is observed, restore a series resistor starting with the previous1kohm value and recheck the waveform. Transient amplitude at the GPIO transition matters; settling before the button is released is not proof of harmless transients. No gate waveform or hardware change was measured here. R4 does not set the R1/C3 trigger window, and its omission needs no firmware change. [Decision and revisit condition](NOTES.md#2026-11-08--omit-r4-and-retain-gate-damping-as-a-measured-follow-up).
+
+When PA2 floats before Standby, R2 pulls Q2 gate low. If SW1 is released, R1 pulls Q1 gate toward LiPo+ without a deliberate external delay. If SW1 is held, C3 charges through R1 until Q1 turns off; the held-trigger path then draws only leakage. Q2 keeps C3 discharged while HOLD is HIGH, so this timeout begins after HOLD releases and does not stop firmware stuck asserting HOLD. This cuts power in SW2 battery mode; SW2 USB mode maintains target power independently of Q1. No independent AUX/main shutdown interval is claimed. The user explicitly accepts this prototype tradeoff; [the shutdown-order question remains open](NOTES.md#2026-11-08--accept-no-separate-q2-shutdown-delay-for-the-spdt-prototype).
+
+**Initial timing estimates:** R1/C3 gives a nominal220ms time constant. With ideal constant VBAT, the gate-drive magnitude is `VBAT × exp(-t / 220ms)` before Q2 takeover. It remains at least2.5V for approximately40/86/114ms at3.0/3.7/4.2V, respectively. This uses the AO3401's specified on-resistance gate voltage, not its low-current threshold, and does not predict the actual cutoff instant or prove board operation at those battery voltages. Effective capacitance under bias, tolerance, battery droop and actual kit devices need measurement. R5/C3 resets to within1% in about11ms nominal; a partial reset can weaken the next startup pulse.
+
+**Press-duration estimate from earlier runs:** expect the early HOLD hook at roughly25ms after input power arrives. The older approximately23ms first-GPIO measurements used a much smaller image; allowing for the current prefix's additional ROM loading gives about 25 ms. Approximately26ms is a rounded allowance based on later observed events in the current camera startup, not a guaranteed bound for this untested latch. Allow about30ms for assembly planning and use roughly100ms presses for the first manual tests, so firmware can establish HOLD before release. These estimates do not replace a new PA2/power trace. The November9 direct5V GPIO/ADC/UART smoke test does not establish real-latch takeover time. [Historical timing basis and current firmware boundary](../../firmware/capture-raw/evidence/2026-11-08-spdt-hold/README.md).
+
+**Firmware contract:** preload PA2 HIGH before selecting low-speed push-pull
+output/no pulls, at the earliest custom bootstrap point and before UART
+recovery parking. Keep HIGH through capture, final card acknowledgement/deinit,
+USB service, error display and recovery. Float it immediately before the final
+Standby instruction; no long software delay follows release. Refused Standby
+or an unexpected WFI return retains/reasserts HOLD. The November9 package is
+installed and its direct5V GPIO/ADC/UART smoke tests passed. The no-sensor
+error path reached a low-current state with retained SBF=1, but physical A3
+release timing was not measured. The subsequent user-operated trigger test
+confirmed the two-flash missing-sensor error followed by cutoff and zero
+indicated current; that result predates the SW2 hardware update. A held SPDT is not a permanent
+programming-power bypass.
+
+**Limits for first test:** repeated shots require actual power removal/reset and sufficient released time to reset C3. Removing C2 gives up its battery-attachment transient suppression even if the battery is normally soldered in. Minimum press, actual held-button cutoff, low-state current, main/AUX rail falls, UART recovery continuity and direct-LiPo headroom remain to measure. The previous5V+2.2ohm image tests do not establish LiPo margins. [Canonical circuit selection](NOTES.md#2026-11-08--make-the-capacitor-spdt-latch-the-canonical-prototype-wiring).
+
+Sources: [UM3417 Rev4 Table17](https://www.st.com/resource/en/user_manual/um3417-stm32n6-nucleo144-board-mb1940-stmicroelectronics.pdf#page=31), [DS14791 PA2 and supply note2](https://www.st.com/resource/en/datasheet/stm32n657x0.pdf#page=90), MB1940 C02 sheet10/SB6/R159/R158/U8B and ODB PA2 net213, [AO3401](https://www.aosmd.com/sites/default/files/res/datasheets/AO3401.pdf), [AO3400](https://www.aosmd.com/sites/default/files/res/datasheets/AO3400.pdf), [AN5967 section3.5.2 power-off ordering](https://www.st.com/resource/en/application_note/an5967-getting-started-with-hardware-development-for-stm32n6-mcus-stmicroelectronics.pdf#page=9). This diagram preserves the selected circuit; the November9 firmware installation and direct5V smoke evidence are linked above. Precise latch timing, held-button behavior and source switching remain unqualified.
+
+### Q1 current versus gate voltage
+
+![AO3401 typical transfer curves, with conditions and resistor reference](ao3401-gate-current.png)
+
+[Vector chart](ao3401-gate-current.svg), [digitized data and provenance](ao3401-transfer-data.json); regenerate with `tools/plot_ao3401_gate_current.py`. The curves follow the vector centerlines of Figure2 in the official AO3401 Rev6.1 datasheet (February2024), at **VDS=-5V** and 25/125°C. They are typical transistor characteristics, not measured kit-device behavior or a prediction of camera current. The low-current region is approximate because the original figure spans 20A; do not interpret the stored interpolation precision as device accuracy.
+
+The upper axis only translates VGS into gate-to-ground voltage assuming a 3.7V source; it does not change the datasheet's drain-source test voltage. Gate equal to source selects OFF; pulling the gate near ground gives VGS approximately -3.7V and strongly enhances Q1. Actual current then depends on the load and supply rails. The independent dotted reference, 3.7V/2.2ohms=1.68A, is an ideal initial-charging ceiling with the board input discharged; at 4.2V it is 1.91A. MOSFET, battery and wiring losses reduce those ceilings. The 0.20A line is an illustrative operating load, not a LiPo measurement. No clipping of the transfer curve into a supposed board-current model is justified. No hardware or firmware changes accompanied this chart.

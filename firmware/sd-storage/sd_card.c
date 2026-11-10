@@ -612,6 +612,12 @@ static uint32_t dma_wait_context(void)
     if ((R->MEMLPENR&ram)!=ram) faults|=SD_WAIT_RAM_CLOCKS;
     if ((R->AHB3LPENR&rif)!=rif) faults|=SD_WAIT_RIF_CLOCKS;
     if (!(R->AHB5LPENR&RCC_AHB5LPENR_SDMMC2LPEN)) faults|=SD_WAIT_SD_CLOCK;
+#if SD_DMA_SLEEP_PROFILE
+    /* Retain the BSEC clock as in the independently qualified finite WFI
+     * probe. This does not retroactively relax the older failed experiment. */
+    if (!(R->APB4ENR2&RCC_APB4ENR2_BSECEN) ||
+        !(R->APB4LPENR2&RCC_APB4LPENR2_BSECLPEN)) faults|=SD_WAIT_BSEC_CLOCK;
+#endif
     /* RM0486 14.6.11: both NoC paths must remain available for AXISRAM3..6. */
     if ((R->BUSLPENR&bus)!=bus) faults|=SD_WAIT_BUS_CLOCKS;
     /* Never read a clock-gated/reset peripheral. Debug Sleep emulation keeps
@@ -1862,8 +1868,13 @@ static int stream_publish(sd_card_t *c,sd_stream_t *s,uint32_t bytes,uint32_t ap
     return SD_OK;
 }
 
+#if SD_DMA_SLEEP_PROFILE
+static int stream_preerase(sd_card_t *c,uint32_t lba,const void *buffer,
+                            uint32_t count,sd_stream_t *s,sd_dma_wait_t *wait)
+#else
 int sd_write_blocks_stream_preerase(sd_card_t *c,uint32_t lba,const void *buffer,
                                     uint32_t count,sd_stream_t *s)
+#endif
 {
     if(!s || !s->publish) return SD_ERR_ARGUMENT;
     s->mode=s->initial_available_bytes=s->published_bytes=s->queued_bytes=0;
@@ -1871,6 +1882,16 @@ int sd_write_blocks_stream_preerase(sd_card_t *c,uint32_t lba,const void *buffer
     s->producer_wait_cycles=s->max_wait_cycles=0;
     int result=dma_source_checks(c,lba,buffer,count);
     if(result) return result;
+#if SD_DMA_SLEEP_PROFILE
+    if(wait) {
+        uint32_t context_faults=dma_wait_context();
+        if(!wait->milliseconds) context_faults|=SD_WAIT_NO_CLOCK;
+        if(context_faults) {
+            wait->context_faults|=context_faults;
+            return fault(c,SD_ERR_WAIT);
+        }
+    }
+#endif
     if(count<2U || count>SD_DMA_PREERASE_MAX_SECTORS) return fault(c,SD_ERR_ARGUMENT);
 #if SD_HIGH_SPEED
     if(c->clock_hz!=50000000UL || !sd_high_speed_proof.qualified) return fault(c,SD_ERR_CLOCK);
@@ -1896,7 +1917,11 @@ int sd_write_blocks_stream_preerase(sd_card_t *c,uint32_t lba,const void *buffer
     if(s->published_bytes==bytes) {
         s->mode=SD_STREAM_IDMA;
         CYCLE_MARK(SD_IDMA_SELECTED);
+#if SD_DMA_SLEEP_PROFILE
+        result=dma_request(c,lba,buffer,count,wait,1);
+#else
         result=sd_write_blocks_dma_preerase(c,lba,buffer,count);
+#endif
         if(!result) s->queued_bytes=bytes;
         return result;
     }
@@ -1992,6 +2017,21 @@ int sd_write_blocks_stream_preerase(sd_card_t *c,uint32_t lba,const void *buffer
     }
     return result;
 }
+
+#if SD_DMA_SLEEP_PROFILE
+int sd_write_blocks_stream_preerase(sd_card_t *c,uint32_t lba,const void *buffer,
+                                    uint32_t count,sd_stream_t *s)
+{
+    return stream_preerase(c,lba,buffer,count,s,NULL);
+}
+
+int sd_write_blocks_stream_preerase_wait(sd_card_t *c,uint32_t lba,const void *buffer,
+                                         uint32_t count,sd_stream_t *s,sd_dma_wait_t *wait)
+{
+    if(!wait) return SD_ERR_ARGUMENT;
+    return stream_preerase(c,lba,buffer,count,s,wait);
+}
+#endif
 
 int sd_sync(sd_card_t *c)
 {

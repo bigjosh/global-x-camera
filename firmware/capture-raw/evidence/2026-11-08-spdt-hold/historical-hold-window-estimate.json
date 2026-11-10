@@ -1,0 +1,446 @@
+{
+  "schema": 1,
+  "created_utc": "2026-11-08T05:34:42.191640+00:00",
+  "scope": "Offline historical timing extraction and ideal RC estimate. No instrument, firmware, NOR, allowlist or documentation changes. New SPDT hardware is not connected.",
+  "sources": {
+    "early_gpio": {
+      "path": "firmware/boot-timing/evidence/boot-matrix-20261017/analysis/matrix-analysis.json",
+      "sha256": "cb63e29a9b80e5e56c9fd080904fe87d48c877e206a58e916c4475f2d75bff2d"
+    },
+    "nov6_resistor": {
+      "path": "docs/power/evidence/2026-11-06-series-resistor-tested/comparison-report/summary.json",
+      "sha256": "5bbb6506313d79ddea3bc3007d07aa0252c1aa94d5f688160a2f15f5acf68de9"
+    },
+    "current_boot": {
+      "path": "firmware/capture-raw/evidence/2026-10-28-sensor-single-frame/flash-standby-v1/staged/stage1_boot.bin",
+      "sha256": "6b9276b1a3d039b4f7bb91b7f293bfe4a9809ec5a373221c840ae9b1861e2b5e"
+    },
+    "hold_boot": {
+      "path": "firmware/capture-raw/evidence/2026-11-07-gpio-hold/hold-standby/staged/stage1_boot.bin",
+      "sha256": "4b9dbf03a60f077d15cc26c440dc5d223b9c4098c098e13aa04d9def75b3c983"
+    },
+    "hold_prefix_audit": {
+      "path": "firmware/capture-raw/evidence/2026-11-07-gpio-hold/results.json",
+      "sha256": "0566f5f4d3928d7e5e763ef91b77c8924be8db2d5d6408362a553767272c3e13"
+    },
+    "circuit_document": {
+      "path": "docs/power/2026-10-14-power-tree-review.md",
+      "sha256": "049e6ead4daffe273181f47d663546e3f7a490a8676ef7f191ab8cf53a2403f7",
+      "sha256_at_extraction": "d888ae6f7b24528ac91a254bef704035bd1891132e13e31841a36f5d771bd268",
+      "refreshed_for_final_archive": true
+    },
+    "historical_baseline_manifest": {
+      "path": "firmware/boot-timing/evidence/optimization-20261017/debug-awake-payload-size-20261017/manifest.json",
+      "sha256": "4adde58e1af3c79ac44b2833811aa9a3acf5409636ba5f6b604836d4cd99a524"
+    },
+    "historical_baseline_boot": {
+      "path": "tmp/bringup/debug-awake-payload-size-20261017/first_gpio_debug_plus_0_boot.bin",
+      "sha256": "d8eb5dbc35532c76209056fdb291c7ca2f5da63d4e1dd1c53532ecd5fef62738"
+    },
+    "historical_baseline_sector": {
+      "path": "tmp/bringup/debug-awake-payload-size-20261017/first_gpio_debug_plus_0_sector_0.bin",
+      "sha256": "4f22cc11e9819dd499489abb1f3c6a884098c70fcf0e16960b30705c098fa758"
+    }
+  },
+  "historical_early_gpio": {
+    "runs": [
+      {
+        "run": "baseline-1",
+        "passed": true,
+        "power_0_5V_crossing_to_GPIO_ms": 23.22839800000054,
+        "NRST_to_GPIO_ms": 15.67168000000052,
+        "added_image_bytes": 0
+      },
+      {
+        "run": "baseline-2",
+        "passed": true,
+        "power_0_5V_crossing_to_GPIO_ms": 22.56311800000077,
+        "NRST_to_GPIO_ms": 15.063200000000165,
+        "added_image_bytes": 0
+      },
+      {
+        "run": "tiny-1",
+        "passed": true,
+        "power_0_5V_crossing_to_GPIO_ms": 22.56679799999972,
+        "NRST_to_GPIO_ms": 15.095840000000749,
+        "added_image_bytes": -64
+      },
+      {
+        "run": "tiny-2",
+        "passed": true,
+        "power_0_5V_crossing_to_GPIO_ms": 22.62423800000235,
+        "NRST_to_GPIO_ms": 15.164640000001839,
+        "added_image_bytes": -64
+      },
+      {
+        "run": "tiny-3",
+        "passed": true,
+        "power_0_5V_crossing_to_GPIO_ms": 22.398958000000135,
+        "NRST_to_GPIO_ms": 14.957439999999878,
+        "added_image_bytes": -64
+      },
+      {
+        "run": "baseline-3",
+        "passed": true,
+        "power_0_5V_crossing_to_GPIO_ms": 22.759117999999745,
+        "NRST_to_GPIO_ms": 15.308160000000015,
+        "added_image_bytes": 0
+      }
+    ],
+    "groups": {
+      "baseline": {
+        "power_0_5V_crossing_to_GPIO_ms": {
+          "min": 22.56311800000077,
+          "max": 23.22839800000054,
+          "median": 22.759117999999745
+        },
+        "NRST_to_GPIO_ms": {
+          "min": 15.063200000000165,
+          "max": 15.67168000000052,
+          "median": 15.308160000000015
+        }
+      },
+      "tiny": {
+        "power_0_5V_crossing_to_GPIO_ms": {
+          "min": 22.398958000000135,
+          "max": 22.62423800000235,
+          "median": 22.56679799999972
+        },
+        "NRST_to_GPIO_ms": {
+          "min": 14.957439999999878,
+          "max": 15.164640000001839,
+          "median": 15.095840000000749
+        }
+      }
+    },
+    "baseline_boot_bytes": 1472,
+    "tiny_boot_bytes": 1408,
+    "supply": "Historical CN8 5V route via Joulescope; three rail-discharge checks,20second off dwell",
+    "analog_sample_spacing_us": 32,
+    "digital_sample_spacing_us": 0.16,
+    "baseline_identity": {
+      "verified_boot_bytes": 1472,
+      "verified_boot_sha256": "d8eb5dbc35532c76209056fdb291c7ca2f5da63d4e1dd1c53532ecd5fef62738",
+      "verified_sector_sha256": "4f22cc11e9819dd499489abb1f3c6a884098c70fcf0e16960b30705c098fa758",
+      "programming_records": [
+        {
+          "request": {
+            "path": "firmware/boot-timing/evidence/boot-matrix-20261017/program-trials/nor-program-baseline-01/request.json",
+            "sha256": "15366bd9a8b447de0e0173e79d32687793c9bedc311950d977dae6eb42822c2c"
+          },
+          "verified": {
+            "path": "firmware/boot-timing/evidence/boot-matrix-20261017/program-trials/nor-program-baseline-01/verified.json",
+            "sha256": "5c7e9dc2a2308d6e13412404368b3528bf5129a3180743f7a0a6788d06796bd9"
+          },
+          "verification_record": {
+            "byte_for_byte_match": true,
+            "bytes": 65536,
+            "sha256": "4f22cc11e9819dd499489abb1f3c6a884098c70fcf0e16960b30705c098fa758",
+            "changed_mask": 1,
+            "erased_mask": 1,
+            "completed_mask": 1,
+            "pages_programmed": 6
+          }
+        },
+        {
+          "request": {
+            "path": "firmware/boot-timing/evidence/boot-matrix-20261017/program-trials/nor-program-baseline-02/request.json",
+            "sha256": "7a1256861ef6d16e220b1eabd459fc953ca78f9845f33a177db79964d3ebf4fe"
+          },
+          "verified": {
+            "path": "firmware/boot-timing/evidence/boot-matrix-20261017/program-trials/nor-program-baseline-02/verified.json",
+            "sha256": "47e50e9b88fae4a79b3a23584514a63adc16365fc01bde44797d4d03603b12c6"
+          },
+          "verification_record": {
+            "byte_for_byte_match": true,
+            "bytes": 65536,
+            "sha256": "4f22cc11e9819dd499489abb1f3c6a884098c70fcf0e16960b30705c098fa758",
+            "changed_mask": 511,
+            "erased_mask": 511,
+            "completed_mask": 511,
+            "pages_programmed": 6
+          }
+        },
+        {
+          "request": {
+            "path": "firmware/boot-timing/evidence/boot-matrix-20261017/program-trials/nor-program-baseline-03/request.json",
+            "sha256": "fe92dfc87eff13ce637c9b5d31b277e50bb2a2f2d569fdd883699e78a745bf1c"
+          },
+          "verified": {
+            "path": "firmware/boot-timing/evidence/boot-matrix-20261017/program-trials/nor-program-baseline-03/verified.json",
+            "sha256": "5c7e9dc2a2308d6e13412404368b3528bf5129a3180743f7a0a6788d06796bd9"
+          },
+          "verification_record": {
+            "byte_for_byte_match": true,
+            "bytes": 65536,
+            "sha256": "4f22cc11e9819dd499489abb1f3c6a884098c70fcf0e16960b30705c098fa758",
+            "changed_mask": 1,
+            "erased_mask": 1,
+            "completed_mask": 1,
+            "pages_programmed": 6
+          }
+        }
+      ]
+    }
+  },
+  "nov6_resistor_runs": [
+    {
+      "run": "cold-normal01",
+      "first_exposure_mirror_ms_from_current_onset": 24.584000000000003,
+      "receiver_marker_ms_from_current_onset": 23.470000000000002
+    },
+    {
+      "run": "cold-normal02",
+      "first_exposure_mirror_ms_from_current_onset": 25.122,
+      "receiver_marker_ms_from_current_onset": 24.0045
+    },
+    {
+      "run": "cold-normal03",
+      "first_exposure_mirror_ms_from_current_onset": 25.2675,
+      "receiver_marker_ms_from_current_onset": 24.148
+    }
+  ],
+  "new_hold_boot_rom_load": {
+    "old_bytes": 7744,
+    "new_bytes": 7840,
+    "extra_bytes": 96,
+    "assumed_spi_bits_per_second": 32000000,
+    "extra_wire_time_ms": 0.024,
+    "comparison_to_historical_baseline": {
+      "historical_baseline_bytes": 1472,
+      "hold_bytes": 7840,
+      "extra_bytes": 6368,
+      "assumed_single_data_line_bits_per_second": 32000000,
+      "first_order_extra_copy_time_ms": 1.592,
+      "load_adjusted_historical_power_to_GPIO_ms": {
+        "min": 24.15511800000077,
+        "max": 24.820398000000537,
+        "median": 24.351117999999744
+      },
+      "limitation": "First-order size/copy model, not an exact ROM-clock measurement or guarantee across changed supply/board conditions; executable code and ROM polling also differ."
+    }
+  },
+  "interpretation": {
+    "rough_takeover_expectation_ms": 25,
+    "historical_later_event_allowance_ms": 26,
+    "design_allowance_ms": 30,
+    "later_event_max_measured_ms": 25.2675,
+    "expectation_scope": "Approximately 25 ms is an estimate for the prepared HOLD prefix: historical 1472-byte first-GPIO boots took 22.563-23.228 ms from the target 5 V rail crossing 0.5 V, and 6368 extra packaged bytes at an assumed 4 MB/s add 1.592 ms. This models 24.155-24.820 ms, not a live measurement of PD7 HOLD on the new latch.",
+    "allowance_scope": "26 ms rounds above all three November 6 exposure-start observations. Exposure follows the proposed earliest HOLD hook; this is a later-event historical comparison on 5 V, not a guaranteed LiPo bound.",
+    "design_scope": "30 ms is a provisional design allowance for evaluating the RC window, not hardware qualification. Button press must last until GPIO takeover; the released SPDT disconnects C3 from Q1 gate."
+  },
+  "circuit": {
+    "R1_ohms": 100000,
+    "C3_nominal_uF": 2.2,
+    "R5_reset_ohms": 1000,
+    "pressed": "Discharged C3 connected directly to Q1 gate/Q2 drain; gate charges through R1 from constant VBAT until Q2 takeover.",
+    "released": "C3 disconnects from Q1 and resets through R5. The circuit does not stretch a too-short press.",
+    "Q1": "AO3401 P-channel",
+    "drive_criterion_V": 2.5,
+    "drive_criterion_meaning": "Magnitude of specified gate-drive Rds(on) characterization point, not low-current VGS(th) or actual cutoff voltage.",
+    "formula": "abs(VGS)=VBAT*exp(-t/(R1*C3)); t_strong=R1*C3*ln(VBAT/2.5)"
+  },
+  "rc_estimates": [
+    {
+      "effective_C_uF": 2.2,
+      "R_ohms": 100000,
+      "VBAT_V": 3.0,
+      "tau_ms": 220.00000000000003,
+      "time_until_abs_VGS_2_5V_ms": 40.11074249467001,
+      "margin_after_26ms_ms": 14.110742494670014,
+      "abs_VGS_at_26ms_V": 2.665603458607328,
+      "minimum_effective_C_for_26ms_uF": 1.4260518864142404,
+      "margin_after_25ms_ms": 15.110742494670014,
+      "abs_VGS_at_25ms_V": 2.6777474169609716,
+      "minimum_effective_C_for_25ms_uF": 1.3712037369367696,
+      "margin_after_30ms_ms": 10.110742494670014,
+      "abs_VGS_at_30ms_V": 2.6175758786082715,
+      "minimum_effective_C_for_30ms_uF": 1.6454444843241234
+    },
+    {
+      "effective_C_uF": 2.2,
+      "R_ohms": 100000,
+      "VBAT_V": 3.3,
+      "tau_ms": 220.00000000000003,
+      "time_until_abs_VGS_2_5V_ms": 61.07898205162147,
+      "margin_after_26ms_ms": 35.07898205162147,
+      "abs_VGS_at_26ms_V": 2.9321638044680607,
+      "minimum_effective_C_for_26ms_uF": 0.9364923592154318,
+      "margin_after_25ms_ms": 36.07898205162147,
+      "abs_VGS_at_25ms_V": 2.9455221586570683,
+      "minimum_effective_C_for_25ms_uF": 0.9004734223225306,
+      "margin_after_30ms_ms": 31.078982051621473,
+      "abs_VGS_at_30ms_V": 2.8793334664690984,
+      "minimum_effective_C_for_30ms_uF": 1.0805681067870365
+    },
+    {
+      "effective_C_uF": 2.2,
+      "R_ohms": 100000,
+      "VBAT_V": 3.7,
+      "tau_ms": 220.00000000000003,
+      "time_until_abs_VGS_2_5V_ms": 86.24925931072522,
+      "margin_after_26ms_ms": 60.24925931072522,
+      "abs_VGS_at_26ms_V": 3.287577598949038,
+      "minimum_effective_C_for_26ms_uF": 0.6631941011102352,
+      "margin_after_25ms_ms": 61.24925931072522,
+      "abs_VGS_at_25ms_V": 3.302555147585198,
+      "minimum_effective_C_for_25ms_uF": 0.6376866356829186,
+      "margin_after_30ms_ms": 56.24925931072522,
+      "abs_VGS_at_30ms_V": 3.2283435836168684,
+      "minimum_effective_C_for_30ms_uF": 0.7652239628195022
+    },
+    {
+      "effective_C_uF": 2.2,
+      "R_ohms": 100000,
+      "VBAT_V": 4.2,
+      "tau_ms": 220.00000000000003,
+      "time_until_abs_VGS_2_5V_ms": 114.13463455133689,
+      "margin_after_26ms_ms": 88.13463455133689,
+      "abs_VGS_at_26ms_V": 3.7318448420502595,
+      "minimum_effective_C_for_26ms_uF": 0.5011625106161082,
+      "margin_after_25ms_ms": 89.13463455133689,
+      "abs_VGS_at_25ms_V": 3.7488463837453603,
+      "minimum_effective_C_for_25ms_uF": 0.48188702943856565,
+      "margin_after_30ms_ms": 84.13463455133689,
+      "abs_VGS_at_30ms_V": 3.66460623005158,
+      "minimum_effective_C_for_30ms_uF": 0.5782644353262788
+    },
+    {
+      "effective_C_uF": 1.76,
+      "R_ohms": 100000,
+      "VBAT_V": 3.0,
+      "tau_ms": 176.0,
+      "time_until_abs_VGS_2_5V_ms": 32.088593995736005,
+      "margin_after_26ms_ms": 6.088593995736005,
+      "abs_VGS_at_26ms_V": 2.587999066514217,
+      "minimum_effective_C_for_26ms_uF": 1.4260518864142404,
+      "margin_after_25ms_ms": 7.088593995736005,
+      "abs_VGS_at_25ms_V": 2.6027454601570894,
+      "minimum_effective_C_for_25ms_uF": 1.3712037369367696,
+      "margin_after_30ms_ms": 2.088593995736005,
+      "abs_VGS_at_30ms_V": 2.529844259193277,
+      "minimum_effective_C_for_30ms_uF": 1.6454444843241234
+    },
+    {
+      "effective_C_uF": 1.76,
+      "R_ohms": 100000,
+      "VBAT_V": 3.3,
+      "tau_ms": 176.0,
+      "time_until_abs_VGS_2_5V_ms": 48.86318564129717,
+      "margin_after_26ms_ms": 22.86318564129717,
+      "abs_VGS_at_26ms_V": 2.846798973165639,
+      "minimum_effective_C_for_26ms_uF": 0.9364923592154318,
+      "margin_after_25ms_ms": 23.86318564129717,
+      "abs_VGS_at_25ms_V": 2.8630200061727984,
+      "minimum_effective_C_for_25ms_uF": 0.9004734223225306,
+      "margin_after_30ms_ms": 18.86318564129717,
+      "abs_VGS_at_30ms_V": 2.7828286851126043,
+      "minimum_effective_C_for_30ms_uF": 1.0805681067870365
+    },
+    {
+      "effective_C_uF": 1.76,
+      "R_ohms": 100000,
+      "VBAT_V": 3.7,
+      "tau_ms": 176.0,
+      "time_until_abs_VGS_2_5V_ms": 68.99940744858017,
+      "margin_after_26ms_ms": 42.99940744858017,
+      "abs_VGS_at_26ms_V": 3.191865515367535,
+      "minimum_effective_C_for_26ms_uF": 0.6631941011102352,
+      "margin_after_25ms_ms": 43.99940744858017,
+      "abs_VGS_at_25ms_V": 3.2100527341937437,
+      "minimum_effective_C_for_25ms_uF": 0.6376866356829186,
+      "margin_after_30ms_ms": 38.99940744858017,
+      "abs_VGS_at_30ms_V": 3.1201412530050416,
+      "minimum_effective_C_for_30ms_uF": 0.7652239628195022
+    },
+    {
+      "effective_C_uF": 1.76,
+      "R_ohms": 100000,
+      "VBAT_V": 4.2,
+      "tau_ms": 176.0,
+      "time_until_abs_VGS_2_5V_ms": 91.3077076410695,
+      "margin_after_26ms_ms": 65.3077076410695,
+      "abs_VGS_at_26ms_V": 3.6231986931199045,
+      "minimum_effective_C_for_26ms_uF": 0.5011625106161082,
+      "margin_after_25ms_ms": 66.3077076410695,
+      "abs_VGS_at_25ms_V": 3.6438436442199253,
+      "minimum_effective_C_for_25ms_uF": 0.48188702943856565,
+      "margin_after_30ms_ms": 61.3077076410695,
+      "abs_VGS_at_30ms_V": 3.5417819628705876,
+      "minimum_effective_C_for_30ms_uF": 0.5782644353262788
+    },
+    {
+      "effective_C_uF": 1.1,
+      "R_ohms": 100000,
+      "VBAT_V": 3.0,
+      "tau_ms": 110.00000000000001,
+      "time_until_abs_VGS_2_5V_ms": 20.055371247335007,
+      "margin_after_26ms_ms": -5.944628752664993,
+      "abs_VGS_at_26ms_V": 2.3684805995131164,
+      "minimum_effective_C_for_26ms_uF": 1.4260518864142404,
+      "margin_after_25ms_ms": -4.944628752664993,
+      "abs_VGS_at_25ms_V": 2.3901104096803847,
+      "minimum_effective_C_for_25ms_uF": 1.3712037369367696,
+      "margin_after_30ms_ms": -9.944628752664993,
+      "abs_VGS_at_30ms_V": 2.283901160090621,
+      "minimum_effective_C_for_30ms_uF": 1.6454444843241234
+    },
+    {
+      "effective_C_uF": 1.1,
+      "R_ohms": 100000,
+      "VBAT_V": 3.3,
+      "tau_ms": 110.00000000000001,
+      "time_until_abs_VGS_2_5V_ms": 30.539491025810737,
+      "margin_after_26ms_ms": 4.539491025810737,
+      "abs_VGS_at_26ms_V": 2.605328659464428,
+      "minimum_effective_C_for_26ms_uF": 0.9364923592154318,
+      "margin_after_25ms_ms": 5.539491025810737,
+      "abs_VGS_at_25ms_V": 2.629121450648423,
+      "minimum_effective_C_for_25ms_uF": 0.9004734223225306,
+      "margin_after_30ms_ms": 0.5394910258107366,
+      "abs_VGS_at_30ms_V": 2.512291276099683,
+      "minimum_effective_C_for_30ms_uF": 1.0805681067870365
+    },
+    {
+      "effective_C_uF": 1.1,
+      "R_ohms": 100000,
+      "VBAT_V": 3.7,
+      "tau_ms": 110.00000000000001,
+      "time_until_abs_VGS_2_5V_ms": 43.12462965536261,
+      "margin_after_26ms_ms": 17.12462965536261,
+      "abs_VGS_at_26ms_V": 2.921126072732844,
+      "minimum_effective_C_for_26ms_uF": 0.6631941011102352,
+      "margin_after_25ms_ms": 18.12462965536261,
+      "abs_VGS_at_25ms_V": 2.947802838605808,
+      "minimum_effective_C_for_25ms_uF": 0.6376866356829186,
+      "margin_after_30ms_ms": 13.124629655362611,
+      "abs_VGS_at_30ms_V": 2.816811430778433,
+      "minimum_effective_C_for_30ms_uF": 0.7652239628195022
+    },
+    {
+      "effective_C_uF": 1.1,
+      "R_ohms": 100000,
+      "VBAT_V": 4.2,
+      "tau_ms": 110.00000000000001,
+      "time_until_abs_VGS_2_5V_ms": 57.067317275668444,
+      "margin_after_26ms_ms": 31.067317275668444,
+      "abs_VGS_at_26ms_V": 3.3158728393183634,
+      "minimum_effective_C_for_26ms_uF": 0.5011625106161082,
+      "margin_after_25ms_ms": 32.067317275668444,
+      "abs_VGS_at_25ms_V": 3.346154573552539,
+      "minimum_effective_C_for_25ms_uF": 0.48188702943856565,
+      "margin_after_30ms_ms": 27.067317275668444,
+      "abs_VGS_at_30ms_V": 3.19746162412687,
+      "minimum_effective_C_for_30ms_uF": 0.5782644353262788
+    }
+  ],
+  "limitations": [
+    "Ideal constant VBAT, initially discharged C3, nominal R1, no switch bounce, negligible MOSFET gate capacitance/leakage.",
+    "Effective C3 values1.76uF and1.1uF are illustrative80%/50% cases, not a measured capacitor derating curve or combined tolerance guarantee.",
+    "Supply droop, startup ramp differences, component tolerance, temperature, Q1/Q2 authenticity and kit-device behavior can reduce margin.",
+    "No claim the Nucleo/camera operates correctly from3.0V,3.3V,3.7V or4.2V with the2.2ohm resistor. Regulator headroom and electrical startup remain separate qualification.",
+    "Strong-on RC window is not an actual power-off time prediction.",
+    "The source-reference events differ: old measurements start at target5V crossing0.5V; November6 starts at measured current onset. Neither is the physical switch contact event."
+  ],
+  "updated_utc": "2026-11-08T05:36:47.683766+00:00"
+}

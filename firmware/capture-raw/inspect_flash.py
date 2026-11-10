@@ -24,6 +24,75 @@ _trace_spec=importlib.util.spec_from_file_location('raw_cycle_trace_decoder',HER
 cycle_trace=importlib.util.module_from_spec(_trace_spec);_trace_spec.loader.exec_module(cycle_trace)
 
 
+def _gpio_hold_auditor(name):
+    spec=importlib.util.spec_from_file_location('raw_flash_'+name,HERE/(name+'.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+    return module
+
+
+def gpio_hold_artifacts(folder,m,p,code=None):
+    """Recheck the opt-in HOLD package without reading or controlling a target.
+
+    Both FLASH completion profiles use this offline gate. The live inspector
+    below remains awake-only; an accepted contract does not prove a physical
+    pin level, successful shutdown, storage idle, or permission to reset.
+    """
+    if not bench.gpio_hold_layout(m):
+        if any(key in p for key in ('gpio_hold_prefix_audit','gpio_hold_source_audit','gpio_hold_binary_audit')):
+            raise ValueError('Unexpected GPIO HOLD prefix audit')
+        return None
+    folder=Path(folder).resolve()
+    transform,prefix_audit=(_gpio_hold_auditor(name) for name in ('gpio_hold_transform','gpio_hold_prefix'))
+    spec=importlib.util.spec_from_file_location('raw_flash_hold_boot_header',
+        ROOT/'firmware/boot-timing/add_boot_header.py')
+    header=importlib.util.module_from_spec(spec);spec.loader.exec_module(header)
+    pin=transform.contract_pin(m['gpio_hold_contract'],m['standby'])
+    if (p.get('raw_slots')!=m or
+        [flag for flag in p.get('compile_flags',[]) if flag=='-DRAW_GPIO_HOLD' or
+            flag.startswith('-DRAW_GPIO_HOLD=')]!=['-DRAW_GPIO_HOLD=1']):
+        raise ValueError('GPIO HOLD prefix and receiver selections differ')
+    actual=(folder/'capture.bin').read_bytes()
+    if code is None:code=actual
+    if actual!=code or sha(code)!=m.get('binary_sha256') or len(code)!=m.get('binary_bytes'):
+        raise ValueError('GPIO HOLD receiver identity differs')
+    prefix=(folder/'staged/stage1.bin').read_bytes()
+    boot=(folder/'staged/stage1_boot.bin').read_bytes()
+    sector=(folder/'staged/capture_sector_0.bin').read_bytes()
+    if (sha(prefix)!=p.get('stage1_raw_sha256') or len(prefix)!=p.get('stage1_raw_bytes') or
+        p.get('stage2_full_sha256')!=sha(code) or p.get('stage2_full_bytes')!=len(code) or
+        p.get('stage2_manifest_sha256')!=sha((folder/'manifest.json').read_bytes()) or
+        len(sector)!=65536 or sha(sector)!=p.get('program_sha256') or
+        sector[0x2000:0x2000+len(code)]!=code or sector[:len(boot)]!=boot or
+        header.make_image(prefix)!=boot):
+        raise ValueError('GPIO HOLD packaged prefix/receiver binding differs')
+    for name,want in m['source_hashes'].items():
+        path=(folder/name).resolve();path.relative_to(folder)
+        if sha(path.read_bytes())!=want:raise ValueError('GPIO HOLD frozen receiver source changed: '+name)
+    for rel,want in p['sources'].items():
+        path=folder/'staged'/Path(rel).name
+        if sha(path.read_bytes())!=want:raise ValueError('GPIO HOLD frozen prefix source changed: '+str(rel))
+    runtime=transform.audit_sources(folder,m['standby'],pin=pin)
+    for name,digest in runtime['source_sha256'].items():
+        if name.startswith('staged/'):
+            recorded=[want for rel,want in p['sources'].items() if Path(rel).name==Path(name).name]
+            if recorded!=[digest]:raise ValueError('GPIO HOLD shutdown source is not bound by the prefix manifest')
+        elif m['source_hashes'].get(name)!=digest:
+            raise ValueError('GPIO HOLD completion source is not bound by the receiver manifest')
+    if p.get('gpio_hold_source_audit')!=runtime:
+        raise ValueError('GPIO HOLD source audit differs from the packaged sources')
+    linked=transform.audit_binary(folder,m['standby'],pin=pin)
+    if p.get('gpio_hold_binary_audit')!=linked:
+        raise ValueError('GPIO HOLD binary audit differs from the packaged instructions')
+    checked=prefix_audit.check(folder/'staged',prefix,pin=pin)
+    if any(struct.unpack_from('<I',prefix,offset)[0]!=zlib.crc32(code[:15804])
+            for offset in prefix_audit.CRC_OFFSETS):
+        raise ValueError('GPIO HOLD prefix CRC literals do not identify the early receiver')
+    if p.get('gpio_hold_prefix_audit')!=checked:
+        raise ValueError('GPIO HOLD prefix audit differs from the packaged bytes')
+    return dict(runtime=runtime,binary=linked,prefix=checked,
+        scope='Offline package only; no live GPIO, shutdown, storage-idle, or recovery qualification')
+
+
 def checked_build(folder,receiver_sha,sector_sha):
     folder=Path(folder).resolve()
     if any(not re.fullmatch('[0-9a-f]{64}',s) for s in (receiver_sha,sector_sha)):
@@ -87,6 +156,7 @@ def checked_build(folder,receiver_sha,sector_sha):
     bench.gpio_layout(m)
     bench.compensation_layout(m)
     bench.diagnostic_layout(m,1)
+    gpio_hold_artifacts(folder,m,p,code)
     return m,p,code
 
 
@@ -214,6 +284,7 @@ def inspect(b,folder,m,code,*,download_frame=False):
     whole=bench.frame_guards(b,m,p)
     sensor_autostop=bench.sensor_autostop_snapshot(b,m,p,'before')
     board_eth=bench.board_eth_snapshot(b,m,p,'before')
+    sleep=bench.dma_sleep_snapshot(b,m,p)
     if struct.unpack('<I',b.upload(m['system_core_clock'],4,'clock.bin'))!=(400000000,):
         raise ValueError('CPU clock differs from qualified profile')
     if bench.decode(b.upload(bench.PROOF,384,'proof-before-halt.bin'),names)!=p:
@@ -224,6 +295,11 @@ def inspect(b,folder,m,code,*,download_frame=False):
         slots=slots,loader_words=loader,sd_payload_integrity_verified=False,
         binary_sha256=sha(code),halt_after_success_idle_only=True,whole_image=whole,
         sensor_autostop=sensor_autostop,board_eth=board_eth)
+    if sleep is not None:
+        wait_raw,clocks_raw,result['dma_sleep']=sleep
+        (b.output.parent/'dma-wait.bin').write_bytes(wait_raw)
+        (b.output.parent/'dma-sleep-clocks.bin').write_bytes(clocks_raw)
+        result['dma_wait']=result['dma_sleep']['wait']
     result['camera_telemetry']=camera_telemetry(b,folder,m)
     if m.get('cycle_trace'):
         expected=dict(address=0x343FB000,words=256,schema=1,clock_hz=400000000,
@@ -258,7 +334,7 @@ def inspect(b,folder,m,code,*,download_frame=False):
         if m.get('producer_bytes')!=416 or not m['bss_start']<=m['producer']<=m['bss_end']-416:
             raise ValueError('Producer telemetry outside BSS')
         data=b.upload(m['producer'],416,'producer.bin');(b.output.parent/'producer.bin').write_bytes(data)
-    if m.get('dma_sleep'):
+    if m.get('dma_sleep') and sleep is None:
         data,stats=bench.dma_wait_snapshot(b,m)
         (b.output.parent/'dma-wait.bin').write_bytes(data)
         result['dma_wait']=stats

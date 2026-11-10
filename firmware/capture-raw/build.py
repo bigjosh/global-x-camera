@@ -18,6 +18,8 @@ from cycle_trace_transform import transform as transform_cycle_trace
 import sensor_autostop_transform
 import single_frame_prefix
 import error_build
+import gpio_hold_prefix
+import gpio_hold_transform
 
 HERE=Path(__file__).resolve().parent
 ROOT=HERE.parents[1]
@@ -34,7 +36,7 @@ BASE_RECEIVER='20c5ddaef2e1bf6b78d272e3ee23f891ead2d41f88e922538962e218987f4e99'
 
 def sha(data): return hashlib.sha256(data).hexdigest()
 
-def relocate_prefix_crc(folder,prefix,compiled_crc,actual_crc,single_frame=False):
+def relocate_prefix_crc(folder,prefix,compiled_crc,actual_crc,single_frame=False,gpio_hold=False):
     """Patch only two reviewed literal words, preserving compiler instruction layout.
 
     Arbitrary CRC constants can change GCC instruction selection and literal
@@ -43,7 +45,8 @@ def relocate_prefix_crc(folder,prefix,compiled_crc,actual_crc,single_frame=False
     The generated ELF, raw image and disassembly remain mutually consistent.
     """
     offsets=single_frame_prefix.CRC_OFFSETS if single_frame else (0xC9C,0x1354)
-    if single_frame: single_frame_prefix.check(folder,prefix)
+    if gpio_hold: gpio_hold_prefix.check(folder,prefix)
+    elif single_frame: single_frame_prefix.check(folder,prefix)
     old=struct.pack('<I',compiled_crc); new=struct.pack('<I',actual_crc)
     if compiled_crc!=0x3E97C7F7 or not 5140<=len(prefix)<=0x1C00:
         raise ValueError('Unreviewed prefix CRC relocation geometry')
@@ -244,6 +247,8 @@ def main():
     p.add_argument('--cycle-trace',action='store_true',help='Fixed RAM timestamps; awake diagnostic completion preserves logs for ST-LINK')
     p.add_argument('--async-stop',action='store_true')
     p.add_argument('--dma-sleep',action='store_true',help='Experimental shallow WFI during SD DMA, after sensor STOP')
+    p.add_argument('--dma-sleep-probe',action='store_true',
+                   help='RAM-only finite idle-card WFI qualification; ends before any image write')
     p.add_argument('--line-stream',action='store_true',help='Experimental conservative 64-line producer')
     p.add_argument('--preinit',action='store_true',help='RAM diagnostic: initialize SD before sensor start')
     p.add_argument('--snapshot',action='store_true',help='RAM diagnostic: copy the last 512 B at each published prefix')
@@ -258,7 +263,15 @@ def main():
                    help='Diagnostic: context0 repeat1/next4; observe autonomous standby without explicit STOP')
     p.add_argument('--sensor-single-frame',action='store_true',
                    help='Single-frame capture: minimal pre-START context write, strict one-frame autonomous standby')
+    p.add_argument('--gpio-hold',action='store_true',
+                   help='Candidate: assert PA2/A3 before UART recovery; float immediately before Standby')
     a=p.parse_args()
+    if a.gpio_hold and (not a.flash or not a.sensor_single_frame or not a.error_blinks or
+            a.dma_sleep or a.dma_sleep_probe or a.cycle_trace or a.sd_init_gap_ms):
+        p.error('GPIO HOLD requires normal single-frame FLASH with error shutdown, without DMA sleep or diagnostics')
+    dma_sleep_profile=a.dma_sleep and a.magic_format
+    if a.dma_sleep_probe and (not dma_sleep_profile or a.flash or a.standby or a.error_blinks):
+        p.error('DMA sleep probe requires RAM-awake magic DMA sleep without error shutdown')
     autostop_enabled=a.sensor_autostop or a.sensor_single_frame
     if a.sensor_single_frame and (a.sensor_autostop or not a.ethernet_powerdown or a.cycle_trace or a.sd_init_gap_ms):
         p.error('Single-frame capture requires the normal Ethernet-powerdown profile without other diagnostics')
@@ -272,7 +285,7 @@ def main():
             a.sd_bus_width!=4 or a.sd_clock_hz!=25000000 or a.sd_gpio_speed!=3 or
             not a.sd_clock_negedge or not a.sd_clock_negedge_init or not a.magic_format or
             not a.line_stream or not a.async_stop or a.transport!='idma' or a.preinit or
-            a.snapshot or a.poison or a.whole_image_preerase or a.dma_sleep or a.raw_dma_tail_wait or
+            a.snapshot or a.poison or a.whole_image_preerase or (a.dma_sleep and not dma_sleep_profile) or a.raw_dma_tail_wait or
             a.sd_early_run_clock or a.sd_idma_read or a.sd_read_diagnostics or a.sd_clk_gpio_speed is not None or
             a.sd_fixed_compensation or a.sd_high_speed_mixed_slew or a.sd_high_speed_fixed_compensation or
             a.sd_high_speed_combined_electrical or a.power_probe or a.error_test_code or a.error_after_frame_test or
@@ -290,6 +303,10 @@ def main():
             a.sd_high_speed_combined_electrical or a.error_blinks or a.error_test_code or a.error_after_frame_test or
             a.pattern!='scene' or a.exposure_coarse!=1428):
         p.error('Power probe requires the exact reviewed startup 25 MHz RAM scene profile')
+    if dma_sleep_profile and (not a.sensor_single_frame or not a.ethernet_powerdown or
+            not a.sd_review_profile or not a.sd_startup_opt or a.sd_bus_width!=4 or
+            a.sd_clock_hz!=25000000 or a.cycle_trace or a.sd_init_gap_ms):
+        p.error('Magic DMA sleep requires the single-frame Ethernet-down reviewed 25 MHz profile')
     if a.error_blinks and not a.magic_format:
         p.error('Error signaling currently requires the selected magic-slot layout')
     if a.error_test_code and (not a.error_blinks or a.flash or a.standby):
@@ -329,7 +346,7 @@ def main():
         a.sd_clock_hz in (12500000,25000000) and a.sd_clock_negedge and a.sd_clock_negedge_init and
         a.sd_gpio_speed==3 and not a.sd_fixed_compensation and not a.sd_high_speed_mixed_slew and
         not a.sd_high_speed_fixed_compensation and not a.sd_high_speed_combined_electrical and
-        not a.sd_idma_read and not a.raw_dma_tail_wait and not a.dma_sleep and
+        not a.sd_idma_read and not a.raw_dma_tail_wait and (not a.dma_sleep or dma_sleep_profile) and
         a.magic_format and a.line_stream and a.async_stop and a.transport=='idma' and
         a.pattern=='scene' and a.exposure_coarse==1428 and not a.preinit and not a.snapshot and
         not a.poison and not a.whole_image_preerase and not a.cycle_trace)
@@ -368,8 +385,8 @@ def main():
         p.error('Initial clock phase requires falling-edge run phase and speed3')
     if a.sd_clock_negedge and a.sd_clock_hz==12500000 and not a.sd_clock_negedge_init:
         p.error('12.5 MHz clock phase requires explicit falling-edge identification')
-    if a.magic_format and (a.transport!='idma' or a.dma_sleep or a.whole_image_preerase or not a.line_stream):
-        p.error('Magic format requires LINE producer and polling IDMA/flow-controlled stream, without legacy whole-image option')
+    if a.magic_format and (a.transport!='idma' or (a.dma_sleep and not dma_sleep_profile) or a.whole_image_preerase or not a.line_stream):
+        p.error('Magic format requires LINE producer and reviewed IDMA/flow-controlled stream, without legacy whole-image option')
     if not 1<=a.exposure_coarse<=63000 or (a.flash and a.exposure_coarse!=1428):
         p.error('Nondefault exposure is RAM diagnostic only; coarse range1..63000')
     if a.standby and not a.flash: p.error('First qualify RAM awake; Standby currently flash-only')
@@ -443,6 +460,10 @@ def main():
         (out/'power_phy.inc').write_bytes((HERE/'power_phy.inc').read_bytes())
     if a.ethernet_powerdown:
         (out/'board_eth_powerdown.inc').write_bytes((HERE/'board_eth_powerdown.inc').read_bytes())
+    if dma_sleep_profile:
+        (out/'dma_sleep.inc').write_bytes((HERE/'dma_sleep.inc').read_bytes())
+    if a.dma_sleep_probe:
+        (out/'dma_sleep_probe.inc').write_bytes((HERE/'dma_sleep_probe.inc').read_bytes())
     if a.sd_init_gap_ms:
         (out/'sd_init_gap.inc').write_bytes((HERE/'sd_init_gap.inc').read_bytes())
     if autostop_enabled:
@@ -470,6 +491,7 @@ def main():
                 data=replace(data,'#include "status_leds.h"','#include "status_leds.h"\n#include "phase_gpio.h"')
                 data=replace(data,'    LP[LPC_ARM_CYCLES]=DWT->CYCCNT;',
                     '    (void)phase_gpio_emit(10U);\n    LP[LPC_ARM_CYCLES]=DWT->CYCCNT;')
+                if a.gpio_hold: data=gpio_hold_transform.completion_source(data)
             (out/name).write_text(data,newline='\n')
             if name.endswith('.c'): compiled.append(out/name)
     flags=[f for f in m['compile_flags'] if f!='-I'+str(rbase)]
@@ -480,9 +502,12 @@ def main():
     if a.sd_read_diagnostics: flags.append('-DSD_READ_DIAGNOSTICS=1')
     if a.power_probe: flags.append(f'-DRAW_POWER_PROBE={power_probe_mode}')
     if a.ethernet_powerdown: flags.append('-DRAW_BOARD_ETH_POWERDOWN=1')
+    if dma_sleep_profile: flags.append('-DSD_DMA_SLEEP_PROFILE=1')
+    if a.dma_sleep_probe: flags.append('-DRAW_DMA_SLEEP_PROBE=1')
     if a.sd_init_gap_ms: flags.append(f'-DRAW_SD_INIT_GAP_MS={a.sd_init_gap_ms}U')
     if autostop_enabled: flags.append('-DRAW_SENSOR_AUTOSTOP=1')
     if a.sensor_single_frame: flags.append('-DRAW_SENSOR_SINGLE_FRAME=1')
+    if a.gpio_hold: flags.append('-DRAW_GPIO_HOLD=1')
     flags += [f'-DRAW_PATTERN={int(a.pattern=="diagonal")}',f'-DRAW_FLASH={int(a.flash)}',
               f'-DSD_BUS_WIDTH={a.sd_bus_width}',
               f'-DRAW_SD_CLOCK_HZ={a.sd_clock_hz}U',
@@ -600,12 +625,16 @@ def main():
         error_after_frame_proof=error_build.POST_FRAME_PROOF if a.error_after_frame_test else None,
         error_after_frame_proof_bytes=64 if a.error_after_frame_test else 0,
         error_after_frame_enable=symbol('raw_error_after_frame_enable',a.error_after_frame_test),
-        dma_sleep=a.dma_sleep,dma_wait=symbol('raw_dma_wait',a.dma_sleep),dma_wait_bytes=24,
+        dma_sleep=a.dma_sleep,dma_sleep_profile=dma_sleep_profile,
+        dma_sleep_probe=a.dma_sleep_probe,
+        dma_sleep_probe_address=symbol('raw_dma_sleep_probe',a.dma_sleep_probe),
+        dma_sleep_probe_words=24,
+        dma_wait=symbol('raw_dma_wait',a.dma_sleep),dma_wait_bytes=24,
         raw_dma_tail_wait=a.raw_dma_tail_wait,
         raw_dma_tail_wait_proof=symbol('raw_dma_tail_wait_proof',a.raw_dma_tail_wait),
         raw_dma_tail_wait_proof_bytes=64 if a.raw_dma_tail_wait else 0,
-        dma_wait_clock=(symbol('HAL_GetTick')|1) if a.dma_sleep else None,
-        dma_sleep_clocks=symbol('raw_dma_sleep_clocks',a.dma_sleep),dma_sleep_clocks_words=14,
+        dma_wait_clock=(symbol('raw_dma_milliseconds' if dma_sleep_profile else 'HAL_GetTick')|1) if a.dma_sleep else None,
+        dma_sleep_clocks=symbol('raw_dma_sleep_clocks',a.dma_sleep),dma_sleep_clocks_words=16 if dma_sleep_profile else 14,
         preinit=a.preinit,line_snapshots=a.snapshot,line_poison=a.poison,
         power_probe=a.power_probe,
         board_eth_powerdown=a.ethernet_powerdown,
@@ -654,10 +683,18 @@ def main():
         manifest['phase_markers']=copy.deepcopy(PHASE_PROTOCOL)
         manifest['phase_markers']['events']['11']='sensor_autonomous_standby_observed'
         manifest['storage_overlap']='Normal concurrent SD initialization/save; autonomous sensor standby observation and stable recheck after payload completion; no intentional gap'
+    if dma_sleep_profile:
+        manifest['dma_sleep_timebase']='1 ms SysTick; DWT intervals spanning WFI are active CPU cycles, not wall time'
+        manifest['dma_sleep_selection']='Complete validated/stopped frame at transport entry: shallow WFI during IDMA; otherwise unchanged awake stream'
+    if a.dma_sleep_probe:
+        manifest['storage_overlap']='RAM-only idle-card WFI probe; intentional error terminal before any image write'
     if a.cycle_trace:
         manifest['cycle_trace']=dict(address=0x343FB000,words=256,schema=1,
             clock_hz=400000000,headers=['cycle_trace_events.h','cycle_trace_sd.h'],
             completion='awake terminal; no Standby entry timing')
+    if a.gpio_hold:
+        manifest['gpio_hold']=True
+        manifest['gpio_hold_contract']=gpio_hold_transform.contract(a.standby)
     (out/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
     if a.flash:
         pd=out/'staged'; pd.mkdir(); sources=[]
@@ -670,17 +707,24 @@ def main():
             else: dst.write_bytes(src.read_bytes())
             sources.append(dst)
         if a.error_blinks: sources.extend(error_build.prefix_sources(pd,HERE))
+        if a.gpio_hold:
+            error_path=pd/'error_signal.c'
+            error_path.write_text(gpio_hold_transform.error_source(error_path.read_text()),newline='\n')
+            sources.extend(gpio_hold_prefix.prepare(pd))
         pf=[f for f in pm['compile_flags'] if not f.startswith(('-DSTAGE2_BYTES=','-DSTAGE2_EXPECTED_CRC32='))]
         pf.insert(0,'-I'+str(pd))
         early_code=code[:late_meta['early_bytes']]
         if len(early_code)!=15804: raise ValueError('Prefix layout requires fixed v66c early load size')
         pf += [f'-DSTAGE2_BYTES={len(early_code)}U','-DSTAGE2_EXPECTED_CRC32=0x3e97c7f7U',
                f'-DRAW_PATTERN={int(a.pattern=="diagonal")}']
+        if a.gpio_hold: pf.append('-DRAW_GPIO_HOLD=1')
         prefix,psize=compile_sources(pd,[s for s in sources if s.suffix.lower() in ('.c','.s')],pf,pd/'stage1.ld','stage1')
-        single_prefix_audit=single_frame_prefix.check(pd,prefix) if a.sensor_single_frame else None
-        prefix,crc_relocation=relocate_prefix_crc(pd,prefix,0x3E97C7F7,zlib.crc32(early_code),a.sensor_single_frame)
+        hold_prefix_audit=gpio_hold_prefix.check(pd,prefix) if a.gpio_hold else None
+        single_prefix_audit=single_frame_prefix.check(pd,prefix) if a.sensor_single_frame and not a.gpio_hold else None
+        prefix,crc_relocation=relocate_prefix_crc(pd,prefix,0x3E97C7F7,zlib.crc32(early_code),a.sensor_single_frame,a.gpio_hold)
         original=(pbase/'stage1.bin').read_bytes()
-        literals=(single_prefix_audit['recovery_literal_offsets'] if a.sensor_single_frame else
+        literals=(hold_prefix_audit['recovery_literal_offsets'] if a.gpio_hold else
+            single_prefix_audit['recovery_literal_offsets'] if a.sensor_single_frame else
             error_build.check_prefix(pd,prefix,original,len(early_code),check_recovery_identity)
             if a.error_blinks else check_recovery_identity(pd,prefix,original,len(early_code)))
         if a.error_blinks:
@@ -713,6 +757,10 @@ def main():
             hardware_status='untested')
         pmanifest['recovery_gpio']['receiver_unchanged']=False
         pmanifest['recovery_gpio']['receiver_comparison']='RAW integration; exact early recovery bytes preserved'
+        if a.gpio_hold:
+            pmanifest['gpio_hold_prefix_audit']=gpio_hold_prefix.check(pd,prefix)
+            pmanifest['gpio_hold_source_audit']=gpio_hold_transform.audit_sources(out,a.standby)
+            pmanifest['gpio_hold_binary_audit']=gpio_hold_transform.audit_binary(out,a.standby)
         write_manifest(pd,pmanifest,sources)
     print(json.dumps(manifest,indent=2))
 

@@ -10,20 +10,20 @@
 #include "shutdown_test_platform.h"
 #else
 #include "stm32n657xx.h"
-_Static_assert(GPIOD_BASE==0x56020C00UL,"HOLD requires secure GPIOD");
+_Static_assert(GPIOA_BASE==0x56020000UL,"HOLD requires secure GPIOA");
 _Static_assert(offsetof(GPIO_TypeDef,MODER)==0U,"HOLD MODER offset");
 _Static_assert(offsetof(GPIO_TypeDef,PUPDR)==12U,"HOLD PUPDR offset");
 _Static_assert(offsetof(GPIO_TypeDef,BSRR)==24U,"HOLD BSRR offset");
 #endif
 
-#define HOLD (1UL<<7)
-#define HOLD_MODE (3UL<<14)
+#define HOLD (1UL<<2)
+#define HOLD_MODE (3UL<<4)
 #define LEDS ((1UL<<10)|(1UL<<8)|1UL)
 #define LED_MODES ((3UL<<20)|(3UL<<16)|3UL)
 #define SD_MODES ((3UL<<0)|(3UL<<4)|(3UL<<6)|(3UL<<8)|(3UL<<10))
 #define NOR_MODES ((3UL<<4)|(3UL<<6)|(3UL<<12))
-#define GPIO_CLOCKS (RCC_AHB4ENR_GPIOBEN|RCC_AHB4ENR_GPIOCEN|RCC_AHB4ENR_GPIODEN|RCC_AHB4ENR_GPIOEEN|RCC_AHB4ENR_GPIOGEN|RCC_AHB4ENR_GPIONEN|RCC_AHB4ENR_GPIOOEN)
-#define GPIO_RESETS (RCC_AHB4RSTR_GPIOBRST|RCC_AHB4RSTR_GPIOCRST|RCC_AHB4RSTR_GPIODRST|RCC_AHB4RSTR_GPIOERST|RCC_AHB4RSTR_GPIOGRST|RCC_AHB4RSTR_GPIONRST|RCC_AHB4RSTR_GPIOORST)
+#define GPIO_CLOCKS (RCC_AHB4ENR_GPIOAEN|RCC_AHB4ENR_GPIOBEN|RCC_AHB4ENR_GPIOCEN|RCC_AHB4ENR_GPIODEN|RCC_AHB4ENR_GPIOEEN|RCC_AHB4ENR_GPIOGEN|RCC_AHB4ENR_GPIONEN|RCC_AHB4ENR_GPIOOEN)
+#define GPIO_RESETS (RCC_AHB4RSTR_GPIOARST|RCC_AHB4RSTR_GPIOBRST|RCC_AHB4RSTR_GPIOCRST|RCC_AHB4RSTR_GPIODRST|RCC_AHB4RSTR_GPIOERST|RCC_AHB4RSTR_GPIOGRST|RCC_AHB4RSTR_GPIONRST|RCC_AHB4RSTR_GPIOORST)
 #define DEBUG_EMULATION (DBGMCU_CR_DBG_SLEEP|DBGMCU_CR_DBG_STOP|DBGMCU_CR_DBG_STANDBY)
 #define USB_CLOCKS (RCC_AHB5ENR_OTG1EN|RCC_AHB5ENR_OTGPHY1EN)
 #define USB_RESETS (RCC_AHB5RSTR_OTG1RST|RCC_AHB5RSTR_OTGPHY1RST|RCC_AHB5RSTR_OTG1PHYCTLRST)
@@ -46,15 +46,15 @@ static void publish(uint32_t state)
 
 static int assert_hold(void)
 {
-    if(!(RCC->AHB4ENR&RCC_AHB4ENR_GPIODEN) ||
-       (RCC->AHB4RSTR&RCC_AHB4RSTR_GPIODRST)) return 0;
-    GPIOD->BSRR=HOLD; /* preload HIGH before changing mode */
-    GPIOD->OTYPER&=~HOLD; GPIOD->PUPDR&=~HOLD_MODE;
-    GPIOD->MODER=(GPIOD->MODER&~HOLD_MODE)|(1UL<<14); __DSB();
-    S.hold_moder=GPIOD->MODER; S.hold_pupdr=GPIOD->PUPDR;
-    S.hold_odr=GPIOD->ODR; S.hold_idr=GPIOD->IDR;
-    return (S.hold_moder&HOLD_MODE)==(1UL<<14) &&
-           !(S.hold_pupdr&HOLD_MODE) && !(GPIOD->OTYPER&HOLD) &&
+    if(!(RCC->AHB4ENR&RCC_AHB4ENR_GPIOAEN) ||
+       (RCC->AHB4RSTR&RCC_AHB4RSTR_GPIOARST)) return 0;
+    GPIOA->BSRR=HOLD; /* preload HIGH before changing mode */
+    GPIOA->OTYPER&=~HOLD; GPIOA->PUPDR&=~HOLD_MODE;
+    GPIOA->MODER=(GPIOA->MODER&~HOLD_MODE)|(1UL<<4); __DSB();
+    S.hold_moder=GPIOA->MODER; S.hold_pupdr=GPIOA->PUPDR;
+    S.hold_odr=GPIOA->ODR; S.hold_idr=GPIOA->IDR;
+    return (S.hold_moder&HOLD_MODE)==(1UL<<4) &&
+           !(S.hold_pupdr&HOLD_MODE) && !(GPIOA->OTYPER&HOLD) &&
            (S.hold_odr&HOLD) && (S.hold_idr&HOLD);
 }
 
@@ -88,7 +88,7 @@ static void peripherals_off(void)
             !(RCC->APB1ENR1&RCC_APB1ENR1_I2C2EN),USB_SHUTDOWN_OTHER_CLIENT_ACTIVE);
 
     /* Do not retain internal pulls into switched-off card/sensor supplies.
-     * Only the named pins change; PE6 UART and PD7 HOLD remain untouched. */
+     * Only the named pins change; PE6 UART and PA2 HOLD remain untouched. */
     GPIOC->MODER|=SD_MODES; GPIOC->PUPDR&=~SD_MODES;
     GPIOE->MODER|=3UL<<8; GPIOE->PUPDR&=~(3UL<<8);
     GPIOB->MODER|=(3UL<<20)|(3UL<<22); GPIOB->PUPDR&=~((3UL<<20)|(3UL<<22));
@@ -173,7 +173,7 @@ __attribute__((noreturn,noinline)) void usb_shutdown_enter(uint32_t prerequisite
     __disable_irq();
     volatile uint32_t *p=(volatile uint32_t *)&S;
     for(unsigned i=0;i<sizeof(S)/4U;i++)p[i]=0;
-    S.magic=USB_SHUTDOWN_MAGIC;S.schema=1;S.words=sizeof(S)/4U;
+    S.magic=USB_SHUTDOWN_MAGIC;S.schema=USB_SHUTDOWN_SCHEMA;S.words=sizeof(S)/4U;
     S.prerequisites=prerequisites; S.state=USB_SHUTDOWN_BEGIN;
     S.ccr=SCB->CCR; S.control=__get_CONTROL(); S.ipsr=__get_IPSR();
     S.faultmask=__get_FAULTMASK(); S.fpccr=FPU->FPCCR;
@@ -195,16 +195,16 @@ __attribute__((noreturn,noinline)) void usb_shutdown_enter(uint32_t prerequisite
     usb_shutdown_test_hold_wfi();
 #else
     /* Keep this contiguous, reviewed Thumb-2 group byte-identical to the
-     * capture HOLD sequence. No logging/call can occur after PD7 floats. */
+     * capture HOLD sequence. No logging/call can occur after PA2 floats. */
     __asm volatile(
         ".global usb_shutdown_hold_release\nusb_shutdown_hold_release:\n"
-        "movw r0, #0x0c00\nmovt r0, #0x5602\n"
-        "ldr.w r1, [r0, #12]\nbic.w r1, r1, #0xc000\nstr.w r1, [r0, #12]\n"
-        "ldr.w r1, [r0]\nbic.w r1, r1, #0xc000\nstr.w r1, [r0]\n"
+        "movw r0, #0x0000\nmovt r0, #0x5602\n"
+        "ldr.w r1, [r0, #12]\nbic.w r1, r1, #0x30\nstr.w r1, [r0, #12]\n"
+        "ldr.w r1, [r0]\nbic.w r1, r1, #0x30\nstr.w r1, [r0]\n"
         "dsb sy\nisb sy\n.global usb_shutdown_wfi\nusb_shutdown_wfi:\nwfi\n"
         ".global usb_shutdown_hold_reassert\nusb_shutdown_hold_reassert:\n"
-        "mov.w r1, #0x80\nstr.w r1, [r0, #24]\n"
-        "ldr.w r1, [r0]\nbic.w r1, r1, #0xc000\norr.w r1, r1, #0x4000\nstr.w r1, [r0]\ndsb sy\n"
+        "mov.w r1, #0x04\nstr.w r1, [r0, #24]\n"
+        "ldr.w r1, [r0]\nbic.w r1, r1, #0x30\norr.w r1, r1, #0x10\nstr.w r1, [r0]\ndsb sy\n"
         ".global usb_shutdown_hold_end\nusb_shutdown_hold_end:\n"
         ::: "r0", "r1", "memory");
 #endif

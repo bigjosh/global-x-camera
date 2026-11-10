@@ -115,3 +115,27 @@ capture Standby state is deferred; the user starts a new cycle with USB attached
 
 **Evidence:** `package07-control`, the two final08 PNG validations, delete/reuse
 and reboot tests, exact capture-tail comparison, and the qualification record.
+
+## 2026-11-09  Compose USB with the reviewed early A3 HOLD capture build
+
+**Why:** the canonical latch moved to A3/PA2, and must remain asserted through
+the earliest custom boot code, UART recovery, capture/error handling and USB.
+The prior USB package used plain October 28 capture plus a later PD7 assertion
+inside USB, so changing USB alone would not hold power during battery capture.
+The new package binds the exact PA2 capture image and preserves its payload.
+The 76-byte early hook occupies verified unused error-reservation padding at
+0x34181DF0; the 440-byte USB hook retains 0x34181E40. The UART guard and its
+park remain byte-identical. The owning early-hook layout audit is in
+[RAW capture notes](../capture-raw/NOTES.md).
+
+**Rejected:** silently packaging the legacy no-HOLD capture image, overlapping
+the two hooks in the 448-byte prefix tail, moving UART recovery, trusting an
+arbitrary updated manifest, or changing the ADC's PA11 VBUS path to drive PA2.
+The builder now requires an explicit reviewed capture input. USB shutdown
+proof schema 2 distinguishes PA2 from historical PD7 records. Refused shutdown
+and unexpected WFI return retain/reassert HOLD; PA2's WKUP2 source is disabled.
+
+**Evidence:** `package.py`, `main.c`, `shutdown.c`, `test_boot_package.py`,
+`test_shutdown.py` and [the offline candidate](evidence/2026-11-09-a3-hold/README.md).
+The user confirmed the board is disconnected for assembly; no instrument,
+NOR, SD, live recovery allowlist or installed-firmware state was changed.

@@ -1,0 +1,463 @@
+{
+  "schema": 1,
+  "created_utc": "2026-11-08T05:37:25.850383+00:00",
+  "scope": "Offline metadata and build verification only; no hardware access, NOR write, or recovery allowlist change",
+  "current_contract_schema": 2,
+  "hardware_qualified": false,
+  "package_audits": {
+    "current/hold-standby": {
+      "contract": {
+        "schema": 2,
+        "port": "GPIOD",
+        "pin": 7,
+        "header": "Arduino D9 / CN14.2",
+        "active": "push_pull_high",
+        "release": "input_no_pull_immediately_before_standby_wfi",
+        "success_release": true,
+        "error_release": true,
+        "awake_completion": "hold_high",
+        "shallow_fallback": "hold_high",
+        "unexpected_wfi_return": "reassert_high",
+        "external_off_delay_required": false,
+        "external_off_delay": "omitted_user_accepted_prototype",
+        "aux_before_main_shutdown_qualified": false
+      },
+      "audit": {
+        "runtime": {
+          "schema": 1,
+          "source_sha256": {
+            "staged/error_signal.c": "df99191e58a8fec4ec85f24ce24902b2e322175a04de4a0fdbdb4e22dedfe2ea",
+            "completion.c": "f55f55513f7edd897f9c7957d56f69558ea855a6ec041a1e47d2886c6ff381b6"
+          },
+          "release_sites": [
+            "error",
+            "success"
+          ]
+        },
+        "binary": {
+          "schema": 1,
+          "sites": {
+            "error": {
+              "release": 873995436,
+              "wfi": 873995476,
+              "reassert": 873995478,
+              "end": 873995506,
+              "bytes": 70,
+              "sha256": "b3a374932c572dd82c6d8cb373de852f77e294180d065b4dc7553364980f028b"
+            },
+            "success": {
+              "release": 875592456,
+              "wfi": 875592496,
+              "reassert": 875592498,
+              "end": 875592526,
+              "bytes": 70,
+              "sha256": "b3a374932c572dd82c6d8cb373de852f77e294180d065b4dc7553364980f028b"
+            }
+          }
+        },
+        "prefix": {
+          "schema": 1,
+          "reference_sha256": "6378483a91b560ffc6b31d74a9dd1205996a14c8030447ffddf7deddc9d23874",
+          "reset_vector_offset": 4,
+          "entry": 873995840,
+          "resume_entry": 873989184,
+          "boot_bytes": 76,
+          "boot_sha256": "c3b7aeb3f1919b556441d6369fd8bb5bdabbe7ad85ec3b3927b3eda2259e34db",
+          "error_engine_sha256": "7082e54d435a68288d44979abd40aa18668dc436395dfa9e00e43cf517b72d94",
+          "startup_recovery_loader_bridge_equal": true,
+          "recovery_literal_offsets": [
+            1660,
+            1664,
+            1668,
+            1672,
+            1676,
+            1680,
+            1684,
+            1688,
+            1692,
+            1696,
+            1700,
+            1704,
+            1708,
+            1712,
+            1716,
+            1720,
+            1724,
+            1728,
+            1732,
+            1736
+          ],
+          "crc_literal_offsets": [
+            3228,
+            4952
+          ],
+          "early_load_bytes": 15804,
+          "assertion_before_stack_and_uart": true,
+          "pin": "PD7",
+          "header": "Arduino D9 / CN14.2",
+          "mode": "push-pull output",
+          "speed": "low",
+          "pulls": "none"
+        },
+        "scope": "Offline package only; no live GPIO, shutdown, storage-idle, or recovery qualification"
+      }
+    },
+    "historical/hold-standby": {
+      "contract": {
+        "schema": 1,
+        "port": "GPIOD",
+        "pin": 7,
+        "header": "Arduino D9 / CN14.2",
+        "active": "push_pull_high",
+        "release": "input_no_pull_immediately_before_standby_wfi",
+        "success_release": true,
+        "error_release": true,
+        "awake_completion": "hold_high",
+        "shallow_fallback": "hold_high",
+        "unexpected_wfi_return": "reassert_high",
+        "external_off_delay_required": true
+      },
+      "audit": {
+        "runtime": {
+          "schema": 1,
+          "source_sha256": {
+            "staged/error_signal.c": "df99191e58a8fec4ec85f24ce24902b2e322175a04de4a0fdbdb4e22dedfe2ea",
+            "completion.c": "f55f55513f7edd897f9c7957d56f69558ea855a6ec041a1e47d2886c6ff381b6"
+          },
+          "release_sites": [
+            "error",
+            "success"
+          ]
+        },
+        "binary": {
+          "schema": 1,
+          "sites": {
+            "error": {
+              "release": 873995436,
+              "wfi": 873995476,
+              "reassert": 873995478,
+              "end": 873995506,
+              "bytes": 70,
+              "sha256": "b3a374932c572dd82c6d8cb373de852f77e294180d065b4dc7553364980f028b"
+            },
+            "success": {
+              "release": 875592456,
+              "wfi": 875592496,
+              "reassert": 875592498,
+              "end": 875592526,
+              "bytes": 70,
+              "sha256": "b3a374932c572dd82c6d8cb373de852f77e294180d065b4dc7553364980f028b"
+            }
+          }
+        },
+        "prefix": {
+          "schema": 1,
+          "reference_sha256": "6378483a91b560ffc6b31d74a9dd1205996a14c8030447ffddf7deddc9d23874",
+          "reset_vector_offset": 4,
+          "entry": 873995840,
+          "resume_entry": 873989184,
+          "boot_bytes": 76,
+          "boot_sha256": "c3b7aeb3f1919b556441d6369fd8bb5bdabbe7ad85ec3b3927b3eda2259e34db",
+          "error_engine_sha256": "7082e54d435a68288d44979abd40aa18668dc436395dfa9e00e43cf517b72d94",
+          "startup_recovery_loader_bridge_equal": true,
+          "recovery_literal_offsets": [
+            1660,
+            1664,
+            1668,
+            1672,
+            1676,
+            1680,
+            1684,
+            1688,
+            1692,
+            1696,
+            1700,
+            1704,
+            1708,
+            1712,
+            1716,
+            1720,
+            1724,
+            1728,
+            1732,
+            1736
+          ],
+          "crc_literal_offsets": [
+            3228,
+            4952
+          ],
+          "early_load_bytes": 15804,
+          "assertion_before_stack_and_uart": true,
+          "pin": "PD7",
+          "header": "Arduino D9 / CN14.2",
+          "mode": "push-pull output",
+          "speed": "low",
+          "pulls": "none"
+        },
+        "scope": "Offline package only; no live GPIO, shutdown, storage-idle, or recovery qualification"
+      }
+    },
+    "current/hold-awake": {
+      "contract": {
+        "schema": 2,
+        "port": "GPIOD",
+        "pin": 7,
+        "header": "Arduino D9 / CN14.2",
+        "active": "push_pull_high",
+        "release": "input_no_pull_immediately_before_standby_wfi",
+        "success_release": false,
+        "error_release": true,
+        "awake_completion": "hold_high",
+        "shallow_fallback": "hold_high",
+        "unexpected_wfi_return": "reassert_high",
+        "external_off_delay_required": false,
+        "external_off_delay": "omitted_user_accepted_prototype",
+        "aux_before_main_shutdown_qualified": false
+      },
+      "audit": {
+        "runtime": {
+          "schema": 1,
+          "source_sha256": {
+            "staged/error_signal.c": "df99191e58a8fec4ec85f24ce24902b2e322175a04de4a0fdbdb4e22dedfe2ea"
+          },
+          "release_sites": [
+            "error"
+          ]
+        },
+        "binary": {
+          "schema": 1,
+          "sites": {
+            "error": {
+              "release": 873995436,
+              "wfi": 873995476,
+              "reassert": 873995478,
+              "end": 873995506,
+              "bytes": 70,
+              "sha256": "b3a374932c572dd82c6d8cb373de852f77e294180d065b4dc7553364980f028b"
+            }
+          }
+        },
+        "prefix": {
+          "schema": 1,
+          "reference_sha256": "6378483a91b560ffc6b31d74a9dd1205996a14c8030447ffddf7deddc9d23874",
+          "reset_vector_offset": 4,
+          "entry": 873995840,
+          "resume_entry": 873989184,
+          "boot_bytes": 76,
+          "boot_sha256": "c3b7aeb3f1919b556441d6369fd8bb5bdabbe7ad85ec3b3927b3eda2259e34db",
+          "error_engine_sha256": "7082e54d435a68288d44979abd40aa18668dc436395dfa9e00e43cf517b72d94",
+          "startup_recovery_loader_bridge_equal": true,
+          "recovery_literal_offsets": [
+            1660,
+            1664,
+            1668,
+            1672,
+            1676,
+            1680,
+            1684,
+            1688,
+            1692,
+            1696,
+            1700,
+            1704,
+            1708,
+            1712,
+            1716,
+            1720,
+            1724,
+            1728,
+            1732,
+            1736
+          ],
+          "crc_literal_offsets": [
+            3228,
+            4952
+          ],
+          "early_load_bytes": 15804,
+          "assertion_before_stack_and_uart": true,
+          "pin": "PD7",
+          "header": "Arduino D9 / CN14.2",
+          "mode": "push-pull output",
+          "speed": "low",
+          "pulls": "none"
+        },
+        "scope": "Offline package only; no live GPIO, shutdown, storage-idle, or recovery qualification"
+      }
+    },
+    "historical/hold-awake": {
+      "contract": {
+        "schema": 1,
+        "port": "GPIOD",
+        "pin": 7,
+        "header": "Arduino D9 / CN14.2",
+        "active": "push_pull_high",
+        "release": "input_no_pull_immediately_before_standby_wfi",
+        "success_release": false,
+        "error_release": true,
+        "awake_completion": "hold_high",
+        "shallow_fallback": "hold_high",
+        "unexpected_wfi_return": "reassert_high",
+        "external_off_delay_required": true
+      },
+      "audit": {
+        "runtime": {
+          "schema": 1,
+          "source_sha256": {
+            "staged/error_signal.c": "df99191e58a8fec4ec85f24ce24902b2e322175a04de4a0fdbdb4e22dedfe2ea"
+          },
+          "release_sites": [
+            "error"
+          ]
+        },
+        "binary": {
+          "schema": 1,
+          "sites": {
+            "error": {
+              "release": 873995436,
+              "wfi": 873995476,
+              "reassert": 873995478,
+              "end": 873995506,
+              "bytes": 70,
+              "sha256": "b3a374932c572dd82c6d8cb373de852f77e294180d065b4dc7553364980f028b"
+            }
+          }
+        },
+        "prefix": {
+          "schema": 1,
+          "reference_sha256": "6378483a91b560ffc6b31d74a9dd1205996a14c8030447ffddf7deddc9d23874",
+          "reset_vector_offset": 4,
+          "entry": 873995840,
+          "resume_entry": 873989184,
+          "boot_bytes": 76,
+          "boot_sha256": "c3b7aeb3f1919b556441d6369fd8bb5bdabbe7ad85ec3b3927b3eda2259e34db",
+          "error_engine_sha256": "7082e54d435a68288d44979abd40aa18668dc436395dfa9e00e43cf517b72d94",
+          "startup_recovery_loader_bridge_equal": true,
+          "recovery_literal_offsets": [
+            1660,
+            1664,
+            1668,
+            1672,
+            1676,
+            1680,
+            1684,
+            1688,
+            1692,
+            1696,
+            1700,
+            1704,
+            1708,
+            1712,
+            1716,
+            1720,
+            1724,
+            1728,
+            1732,
+            1736
+          ],
+          "crc_literal_offsets": [
+            3228,
+            4952
+          ],
+          "early_load_bytes": 15804,
+          "assertion_before_stack_and_uart": true,
+          "pin": "PD7",
+          "header": "Arduino D9 / CN14.2",
+          "mode": "push-pull output",
+          "speed": "low",
+          "pulls": "none"
+        },
+        "scope": "Offline package only; no live GPIO, shutdown, storage-idle, or recovery qualification"
+      }
+    }
+  },
+  "binary_comparisons": {
+    "hold-standby": {
+      "capture.bin": {
+        "sha256": "d7a8202318d95183d7b09b97b728dd50d2e986e5a0ef668cc24f2e4dc320d3d1",
+        "bytes": 34332,
+        "byte_identical_to_november7": true
+      },
+      "staged/stage1.bin": {
+        "sha256": "8614089a69fb0ca49d4a4d608159129079458a71b0be21f178574869377672f5",
+        "bytes": 6796,
+        "byte_identical_to_november7": true
+      },
+      "staged/capture_sector_0.bin": {
+        "sha256": "909bc2f5e272a0216940e80f61dc8511c0ff4555df9e4e08c5b59af6b2c83f8c",
+        "bytes": 65536,
+        "byte_identical_to_november7": true
+      }
+    },
+    "hold-awake": {
+      "capture.bin": {
+        "sha256": "298a65b0ab2a00a6256826604bf0ebb0656922ee84c3ebe1237c35666ddf3f60",
+        "bytes": 30600,
+        "byte_identical_to_november7": true
+      },
+      "staged/stage1.bin": {
+        "sha256": "ab908088afd6a1a33fcb4ade8358bba130294a4b4a431c7aa4fc9137e00af30d",
+        "bytes": 6796,
+        "byte_identical_to_november7": true
+      },
+      "staged/capture_sector_0.bin": {
+        "sha256": "ae1ed6bac82b1ba39b31f81578726689065209a744e33523c9aa4ff19a4696cc",
+        "bytes": 65536,
+        "byte_identical_to_november7": true
+      }
+    },
+    "default-standby": {
+      "capture.bin": {
+        "sha256": "560a8734306436fe95bc1407031e70f1bc5b448949366e1bd007779c1736f646",
+        "bytes": 34244,
+        "byte_identical_to_october28": true
+      },
+      "staged/stage1.bin": {
+        "sha256": "6378483a91b560ffc6b31d74a9dd1205996a14c8030447ffddf7deddc9d23874",
+        "bytes": 6720,
+        "byte_identical_to_october28": true
+      },
+      "staged/capture_sector_0.bin": {
+        "sha256": "79a379470927135bc03841098fe070912cad8275e91c5d5985cc066c294cf64e",
+        "bytes": 65536,
+        "byte_identical_to_october28": true
+      }
+    }
+  },
+  "frozen_archive": {
+    "path": "firmware\\capture-raw\\evidence\\2026-11-07-gpio-hold",
+    "sha256_manifest": "a71daa3e544935aaf81278e6e29b4861f2c95d11831f019f7130fbd24c15ed80",
+    "files_verified": 173,
+    "all_unchanged": true
+  },
+  "tests": {
+    "tests": 320,
+    "passed": 320,
+    "skipped": 0,
+    "real_linked_candidate": "hold-standby",
+    "log_sha256": "484260947fbb008c5870c8a491a177863cd09cf267cd269effe68003e51f80b0"
+  },
+  "timing_estimate": {
+    "method": "Historical first-GPIO cold timing plus observed ROM image-size slope; no new PD7 timing measurement",
+    "first_gpio_source": "firmware/boot-timing/optimization-results-2026-10-17.md",
+    "first_gpio_reference": "Target 5 V first crosses 0.5 V",
+    "baseline_boot_bytes": 1472,
+    "hold_boot_bytes": 7840,
+    "slope_ms_per_KiB": 0.262,
+    "baseline_min_ms": 22.563,
+    "baseline_max_ms": 23.228,
+    "estimated_min_ms": 24.1923125,
+    "estimated_max_ms": 24.857312500000003,
+    "planning_budget_ms": 30,
+    "later_event_crosscheck_source": "docs/power/evidence/2026-11-06-series-resistor-tested/README.md",
+    "later_exposure_from_current_onset_ms": [
+      24.584,
+      25.122,
+      25.268
+    ],
+    "limits": [
+      "Different supply routes, ramp thresholds and board population",
+      "No installed SPDT latch; no current PD7 assertion measurement",
+      "Planning budget is not worst-case or rail-sequencing qualification"
+    ]
+  }
+}

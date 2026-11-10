@@ -1,0 +1,2 @@
+ENTRY(usb_selector)
+SECTIONS { . = 0x34200000; .text : { KEEP(*(.text.entry)) KEEP(*(.text.hook)) *(.text*) *(.rodata*) } .data : { *(.data*) } . = ALIGN(4); __bss_start__ = .; .bss (NOLOAD) : { *(.bss*) *(COMMON) } . = ALIGN(4); __bss_end__ = .; /DISCARD/ : { *(.ARM.exidx*) *(.ARM.extab*) *(.comment*) *(.note*) } ASSERT(. < 0x34210000,"overflow") }

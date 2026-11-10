@@ -1,0 +1,455 @@
+{
+  "kind": "Offline timing/energy accounting; no causal component attribution",
+  "summary_sha256": "5bbb6506313d79ddea3bc3007d07aa0252c1aa94d5f688160a2f15f5acf68de9",
+  "reference_pair": {
+    "baseline": "cold-normal02",
+    "candidate": "cold-normal02",
+    "reason": "These are the actual median-total-energy runs of each three-run group; do not combine independently selected phase medians."
+  },
+  "delta_post5ms_energy_mJ": 62.21199022413697,
+  "delta_cycle_ms": 126.85999999999996,
+  "disjoint_phase_accounting": [
+    {
+      "phase": "SD_init",
+      "baseline": {
+        "start_ms": 36.561499999999995,
+        "end_ms": 139.556,
+        "duration_ms": 102.9945,
+        "energy_mJ": 42.15049303147942,
+        "current_mean_mA": 82.0760696912435
+      },
+      "candidate": {
+        "start_ms": 36.7925,
+        "end_ms": 146.249,
+        "duration_ms": 109.45649999999999,
+        "energy_mJ": 46.57307320453972,
+        "current_mean_mA": 85.30918349661346
+      },
+      "baseline_mean_power_mW": 409.2499408364468,
+      "candidate_mean_power_mW": 425.4939012716442,
+      "delta_duration_ms": 6.461999999999989,
+      "delta_energy_mJ": 4.422580173060297,
+      "duration_term_at_baseline_mean_power_mJ": 2.6445731176851144,
+      "power_term_at_candidate_duration_mJ": 1.7780070553751819
+    },
+    {
+      "phase": "scan_preparation",
+      "baseline": {
+        "start_ms": 139.556,
+        "end_ms": 251.19449999999998,
+        "duration_ms": 111.63850000000001,
+        "energy_mJ": 35.77497424280644,
+        "current_mean_mA": 64.24694810987191
+      },
+      "candidate": {
+        "start_ms": 146.249,
+        "end_ms": 262.7765,
+        "duration_ms": 116.5275,
+        "energy_mJ": 38.21540947221965,
+        "current_mean_mA": 65.72721415506024
+      },
+      "baseline_mean_power_mW": 320.4537345342909,
+      "candidate_mean_power_mW": 327.9518523285889,
+      "delta_duration_ms": 4.888999999999996,
+      "delta_energy_mJ": 2.440435229413211,
+      "duration_term_at_baseline_mean_power_mJ": 1.5666983081381467,
+      "power_term_at_candidate_duration_mJ": 0.8737369212750632
+    },
+    {
+      "phase": "slot_transport",
+      "baseline": {
+        "start_ms": 251.19449999999998,
+        "end_ms": 416.054,
+        "duration_ms": 164.8595,
+        "energy_mJ": 66.00855801057816,
+        "current_mean_mA": 80.2873417724615
+      },
+      "candidate": {
+        "start_ms": 262.7765,
+        "end_ms": 543.2175,
+        "duration_ms": 280.441,
+        "energy_mJ": 120.71783100700378,
+        "current_mean_mA": 86.29444611260543
+      },
+      "baseline_mean_power_mW": 400.3928072727271,
+      "candidate_mean_power_mW": 430.45714074262963,
+      "delta_duration_ms": 115.58149999999998,
+      "delta_energy_mJ": 54.709272996425625,
+      "duration_term_at_baseline_mean_power_mJ": 46.278001253792695,
+      "power_term_at_candidate_duration_mJ": 8.431271742632934
+    }
+  ],
+  "three_phases_duration_term_mJ": 50.48927267961596,
+  "three_phases_power_term_mJ": 11.083015719283178,
+  "remaining_cycle_delta_mJ": 0.6397018252378324,
+  "formula": "DeltaE = Pbaseline*(Tcandidate-Tbaseline) + (Pcandidate-Pbaseline)*Tcandidate; this reference-dependent identity is not causal isolation.",
+  "rows": [
+    {
+      "group": "No resistor",
+      "run": "cold-normal01",
+      "phase_means": [
+        {
+          "phase": "receiver_to_strobe",
+          "duration_ms": 1.1235,
+          "energy_mJ": 0.6455538105219603,
+          "mean_power_mW": 574.5917316617359
+        },
+        {
+          "phase": "strobe_to_frame",
+          "duration_ms": 21.863500000000002,
+          "energy_mJ": 12.80030581919849,
+          "mean_power_mW": 585.4646245659885
+        },
+        {
+          "phase": "SD_init",
+          "duration_ms": 102.885,
+          "energy_mJ": 41.777830521788445,
+          "mean_power_mW": 406.06337679728284
+        },
+        {
+          "phase": "scan_preparation",
+          "duration_ms": 111.026,
+          "energy_mJ": 35.392086524084206,
+          "mean_power_mW": 318.7729588032011
+        },
+        {
+          "phase": "slot_transport",
+          "duration_ms": 164.609,
+          "energy_mJ": 65.65687980505824,
+          "mean_power_mW": 398.865674447073
+        },
+        {
+          "phase": "commit",
+          "duration_ms": 0.16349999999999998,
+          "energy_mJ": 0.05218422155082226,
+          "mean_power_mW": 319.16955076955514
+        },
+        {
+          "phase": "SD_deinit",
+          "duration_ms": 0.064,
+          "energy_mJ": 0.01998838867992163,
+          "mean_power_mW": 312.3185731237754
+        },
+        {
+          "phase": "cleanup",
+          "duration_ms": 0.3235,
+          "energy_mJ": 0.08700789903104306,
+          "mean_power_mW": 268.9579568192985
+        },
+        {
+          "phase": "frame_to_sensor_standby_observed",
+          "duration_ms": 3.0755,
+          "energy_mJ": 1.1707769687511027,
+          "mean_power_mW": 380.67857868675105
+        }
+      ]
+    },
+    {
+      "group": "No resistor",
+      "run": "cold-normal02",
+      "phase_means": [
+        {
+          "phase": "receiver_to_strobe",
+          "duration_ms": 1.1235,
+          "energy_mJ": 0.64847893448174,
+          "mean_power_mW": 577.1953132903783
+        },
+        {
+          "phase": "strobe_to_frame",
+          "duration_ms": 21.863500000000002,
+          "energy_mJ": 12.829901594087481,
+          "mean_power_mW": 586.8182859143083
+        },
+        {
+          "phase": "SD_init",
+          "duration_ms": 102.9945,
+          "energy_mJ": 42.15049303147942,
+          "mean_power_mW": 409.2499408364468
+        },
+        {
+          "phase": "scan_preparation",
+          "duration_ms": 111.63850000000001,
+          "energy_mJ": 35.77497424280644,
+          "mean_power_mW": 320.4537345342909
+        },
+        {
+          "phase": "slot_transport",
+          "duration_ms": 164.8595,
+          "energy_mJ": 66.00855801057816,
+          "mean_power_mW": 400.3928072727271
+        },
+        {
+          "phase": "commit",
+          "duration_ms": 0.164,
+          "energy_mJ": 0.0520937922000885,
+          "mean_power_mW": 317.6450743907835
+        },
+        {
+          "phase": "SD_deinit",
+          "duration_ms": 0.064,
+          "energy_mJ": 0.02098068930953741,
+          "mean_power_mW": 327.82327046152204
+        },
+        {
+          "phase": "cleanup",
+          "duration_ms": 0.3235,
+          "energy_mJ": 0.08678188733756542,
+          "mean_power_mW": 268.25931170808474
+        },
+        {
+          "phase": "frame_to_sensor_standby_observed",
+          "duration_ms": 3.0705,
+          "energy_mJ": 1.171394900918007,
+          "mean_power_mW": 381.49972347109815
+        }
+      ]
+    },
+    {
+      "group": "No resistor",
+      "run": "cold-normal03",
+      "phase_means": [
+        {
+          "phase": "receiver_to_strobe",
+          "duration_ms": 1.1150000000000002,
+          "energy_mJ": 0.6448888114094734,
+          "mean_power_mW": 578.3756156138774
+        },
+        {
+          "phase": "strobe_to_frame",
+          "duration_ms": 21.863500000000002,
+          "energy_mJ": 12.857366617381572,
+          "mean_power_mW": 588.0744902408842
+        },
+        {
+          "phase": "SD_init",
+          "duration_ms": 109.384,
+          "energy_mJ": 44.80601403447054,
+          "mean_power_mW": 409.6212794784479
+        },
+        {
+          "phase": "scan_preparation",
+          "duration_ms": 113.42349999999999,
+          "energy_mJ": 36.451011120676995,
+          "mean_power_mW": 321.37088981275485
+        },
+        {
+          "phase": "slot_transport",
+          "duration_ms": 179.37349999999998,
+          "energy_mJ": 72.054715408111,
+          "mean_power_mW": 401.70212103856477
+        },
+        {
+          "phase": "commit",
+          "duration_ms": 0.165,
+          "energy_mJ": 0.05367233657091856,
+          "mean_power_mW": 325.2868883085973
+        },
+        {
+          "phase": "SD_deinit",
+          "duration_ms": 0.0645,
+          "energy_mJ": 0.020000693842768667,
+          "mean_power_mW": 310.08827663207234
+        },
+        {
+          "phase": "cleanup",
+          "duration_ms": 0.3125,
+          "energy_mJ": 0.08444917648285627,
+          "mean_power_mW": 270.23736474514004
+        },
+        {
+          "phase": "frame_to_sensor_standby_observed",
+          "duration_ms": 2.991,
+          "energy_mJ": 1.1601373097263277,
+          "mean_power_mW": 387.8760647697518
+        }
+      ]
+    },
+    {
+      "group": "2.2 ohms",
+      "run": "cold-normal01",
+      "phase_means": [
+        {
+          "phase": "receiver_to_strobe",
+          "duration_ms": 1.1195000000000002,
+          "energy_mJ": 0.6731041753888131,
+          "mean_power_mW": 601.254287975715
+        },
+        {
+          "phase": "strobe_to_frame",
+          "duration_ms": 21.863500000000002,
+          "energy_mJ": 13.458947116330265,
+          "mean_power_mW": 615.5897782299387
+        },
+        {
+          "phase": "SD_init",
+          "duration_ms": 106.1095,
+          "energy_mJ": 44.9835643319115,
+          "mean_power_mW": 423.93531523484234
+        },
+        {
+          "phase": "scan_preparation",
+          "duration_ms": 116.82199999999999,
+          "energy_mJ": 38.45022756259144,
+          "mean_power_mW": 329.13515915316844
+        },
+        {
+          "phase": "slot_transport",
+          "duration_ms": 164.7445,
+          "energy_mJ": 68.38591308774055,
+          "mean_power_mW": 415.10285980861613
+        },
+        {
+          "phase": "commit",
+          "duration_ms": 0.1655,
+          "energy_mJ": 0.0567552872300148,
+          "mean_power_mW": 342.93224912395647
+        },
+        {
+          "phase": "SD_deinit",
+          "duration_ms": 0.0645,
+          "energy_mJ": 0.021617751777172088,
+          "mean_power_mW": 335.15894228173784
+        },
+        {
+          "phase": "cleanup",
+          "duration_ms": 0.3115,
+          "energy_mJ": 0.08678837587684393,
+          "mean_power_mW": 278.6143687860158
+        },
+        {
+          "phase": "frame_to_sensor_standby_observed",
+          "duration_ms": 2.9855,
+          "energy_mJ": 1.195754342660308,
+          "mean_power_mW": 400.5206306013425
+        }
+      ]
+    },
+    {
+      "group": "2.2 ohms",
+      "run": "cold-normal02",
+      "phase_means": [
+        {
+          "phase": "receiver_to_strobe",
+          "duration_ms": 1.1235,
+          "energy_mJ": 0.676892620831728,
+          "mean_power_mW": 602.4856438199627
+        },
+        {
+          "phase": "strobe_to_frame",
+          "duration_ms": 21.863,
+          "energy_mJ": 13.44496643447876,
+          "mean_power_mW": 614.9643888980817
+        },
+        {
+          "phase": "SD_init",
+          "duration_ms": 109.45649999999999,
+          "energy_mJ": 46.57307320453972,
+          "mean_power_mW": 425.4939012716442
+        },
+        {
+          "phase": "scan_preparation",
+          "duration_ms": 116.5275,
+          "energy_mJ": 38.21540947221965,
+          "mean_power_mW": 327.9518523285889
+        },
+        {
+          "phase": "slot_transport",
+          "duration_ms": 280.441,
+          "energy_mJ": 120.71783100700378,
+          "mean_power_mW": 430.45714074262963
+        },
+        {
+          "phase": "commit",
+          "duration_ms": 0.164,
+          "energy_mJ": 0.05439925275743008,
+          "mean_power_mW": 331.70276071603706
+        },
+        {
+          "phase": "SD_deinit",
+          "duration_ms": 0.064,
+          "energy_mJ": 0.02175203178077936,
+          "mean_power_mW": 339.87549657467747
+        },
+        {
+          "phase": "cleanup",
+          "duration_ms": 0.324,
+          "energy_mJ": 0.08929705478996038,
+          "mean_power_mW": 275.608193796174
+        },
+        {
+          "phase": "frame_to_sensor_standby_observed",
+          "duration_ms": 3.084,
+          "energy_mJ": 1.220965207375586,
+          "mean_power_mW": 395.9031152320318
+        }
+      ]
+    },
+    {
+      "group": "2.2 ohms",
+      "run": "cold-normal03",
+      "phase_means": [
+        {
+          "phase": "receiver_to_strobe",
+          "duration_ms": 1.125,
+          "energy_mJ": 0.6768290222585202,
+          "mean_power_mW": 601.625797563129
+        },
+        {
+          "phase": "strobe_to_frame",
+          "duration_ms": 21.863500000000002,
+          "energy_mJ": 13.434950220376253,
+          "mean_power_mW": 614.4922002596222
+        },
+        {
+          "phase": "SD_init",
+          "duration_ms": 89.9725,
+          "energy_mJ": 37.969227314092215,
+          "mean_power_mW": 422.0092507609794
+        },
+        {
+          "phase": "scan_preparation",
+          "duration_ms": 117.6155,
+          "energy_mJ": 38.550243851400914,
+          "mean_power_mW": 327.76499569700354
+        },
+        {
+          "phase": "slot_transport",
+          "duration_ms": 381.94800000000004,
+          "energy_mJ": 170.16292980732024,
+          "mean_power_mW": 445.51334162587636
+        },
+        {
+          "phase": "commit",
+          "duration_ms": 0.164,
+          "energy_mJ": 0.05583061130344868,
+          "mean_power_mW": 340.4305567283456
+        },
+        {
+          "phase": "SD_deinit",
+          "duration_ms": 0.064,
+          "energy_mJ": 0.02118756704032421,
+          "mean_power_mW": 331.0557350050658
+        },
+        {
+          "phase": "cleanup",
+          "duration_ms": 0.3235,
+          "energy_mJ": 0.08987806991487741,
+          "mean_power_mW": 277.83020066422694
+        },
+        {
+          "phase": "frame_to_sensor_standby_observed",
+          "duration_ms": 3.0875,
+          "energy_mJ": 1.217500887811184,
+          "mean_power_mW": 394.33227135584906
+        }
+      ]
+    }
+  ],
+  "limits": [
+    "Phase measurements are whole-board, including CPU work, card current and regulator losses.",
+    "Only SD_init, scan_preparation and slot_transport are summed: other listed windows overlap.",
+    "Mean power can change with workload/busy proportion, so its difference is not isolated resistor loss.",
+    "Same-length transport run01 is a useful close-duration comparison, not a randomized A/B.",
+    "New slots are farther along linear header scan, so scan duration does not isolate resistor overhead."
+  ]
+}

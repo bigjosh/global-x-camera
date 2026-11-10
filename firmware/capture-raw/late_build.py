@@ -44,6 +44,7 @@ def audit_layout(code,symbols,listing,begin,end):
     # or become callable before the independently checked late load.
     for name,address in parsed.items():
         if name.startswith(('beth_','ast_')) or name in ('board_eth_powerdown_once','magic_sd_init_gap',
+                'raw_dma_sleep_prepare','raw_dma_milliseconds',
                 'raw_sensor_autostop_begin','raw_sensor_autostop_finish'):
             if not begin<=address<end:
                 raise ValueError('Board Ethernet helper outside late range: '+name)

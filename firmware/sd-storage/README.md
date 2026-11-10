@@ -150,6 +150,41 @@ its prefix. A late callback cannot trigger IDMA or send additional FIFO words;
 an active transaction follows the normal CMD12/idle-proof cleanup. Simulation
 covers 3.1-second callbacks both before CMD25 and after a partial prefix was sent.
 
+## Bounded shallow sleep during complete-buffer writes
+
+`SD_DMA_SLEEP_PROFILE=1` (requiring `SD_REVIEW_PROFILE=1`) adds
+`sd_write_blocks_stream_preerase_wait(..., stream, wait)`. A complete first
+publication uses the same single ACMD23/CMD25 IDMA write, allowing the CPU to
+execute shallow WFI between hardware-status polls. A partially published frame
+keeps the existing progressive PIO path without WFI; it does not wait for the
+full frame or change transfer engines while a transaction is active. The old
+stream entry point remains polling, even with this feature compiled in.
+
+The caller owns a functioning 1 ms core-clock SysTick handler and monotonic
+millisecond counter, and must finish DWT-timed camera work before publishing a
+complete buffer. The driver checks the interrupt masks, thread context, shallow
+sleep configuration, SysTick settings, SRAM/security/NoC/SDMMC sleep clocks,
+BSEC run and sleep clocks, and disabled debug Sleep emulation. A failed check
+rejects the operation; checks repeat before each WFI. This driver neither
+changes interrupt masks nor installs an SD interrupt. If completion occurs
+between polling and WFI, the next SysTick wakes the CPU; latency is one tick
+plus interrupt service latency. The five-second wall-clock timeout remains
+effective when the CPU cycle counter stops in WFI. Command exchange and final
+CMD12/card-ready cleanup still poll without WFI.
+
+The existing 24-byte `sd_dma_wait_t` records wait calls, coarse wall milliseconds,
+DWT active cycles, same-tick wakes and failed prerequisites. Its wall time is
+the transaction window, **not a direct measurement of time asleep**. Existing
+`sd_card_t` and `sd_stream_t` layouts do not change. Disabled and omitted build
+options produce identical allocatable ARM object sections.
+
+Register-model tests cover a complete 3730-sector image, exact command counts
+and payload, PIO fallback, prerequisites, interrupted/failed transfers, timeout,
+counter wrap and completion immediately before WFI. These are offline software
+checks. They do not qualify actual wakeup, image integrity or energy savings;
+the previous failed WFI experiment requires a fresh finite idle-card WFI proof
+before any hardware write trial. See the [owning decision](NOTES.md#2026-10-30--gate-streaming-dma-sleep-on-complete-publication-and-a-bounded-wakeup).
+
 ## SCR and explicit whole-card erase
 
 `sd_read_scr(card, &scr)` is a read-only CMD55/ACMD51 operation. It returns

@@ -530,6 +530,8 @@ static sd_card_t reset_model()
     test_rcc.MEMLPENR.value=0x18FU;
     test_rcc.AHB3LPENR.value=RCC_AHB3LPENR_RIFSCLPEN|RCC_AHB3LPENR_RISAFLPEN;
     test_rcc.AHB5LPENR.value=RCC_AHB5LPENR_SDMMC2LPEN;
+    test_rcc.APB4ENR2.value=RCC_APB4ENR2_BSECEN;
+    test_rcc.APB4LPENR2.value=RCC_APB4LPENR2_BSECLPEN;
     test_rcc.BUSLPENR.value=RCC_BUSLPENR_ACLKNLPEN|RCC_BUSLPENR_ACLKNCLPEN;
     test_rcc.MISCENR.value=RCC_MISCENR_DBGEN;
     test_gpio_c.IDR.value=1U<<4;

@@ -48,6 +48,15 @@
 #ifndef RAW_DMA_SLEEP
 #define RAW_DMA_SLEEP 0
 #endif
+#ifndef RAW_DMA_SLEEP_PROBE
+#define RAW_DMA_SLEEP_PROBE 0
+#endif
+#if SD_DMA_SLEEP_PROFILE && (!RAW_DMA_SLEEP || !RAW_MAGIC_FORMAT || !RAW_SENSOR_SINGLE_FRAME || !RAW_BOARD_ETH_POWERDOWN)
+#error Magic DMA sleep requires the selected single-frame Ethernet-down profile
+#endif
+#if RAW_DMA_SLEEP_PROBE && (!SD_DMA_SLEEP_PROFILE || RAW_FLASH || RAW_STANDBY)
+#error DMA sleep probe requires RAM-awake magic DMA sleep
+#endif
 #ifndef RAW_SD_CLOCK_HZ
 #define RAW_SD_CLOCK_HZ 25000000U
 #endif
@@ -67,7 +76,7 @@
     SD_BUS_WIDTH != 4 || RAW_SD_CLOCK_HZ != 25000000U || SD_GPIO_SPEED != 3 || \
     !SD_CLOCK_NEGEDGE || !SD_CLOCK_NEGEDGE_INIT || !RAW_MAGIC_FORMAT || !RAW_LINE_STREAM || \
     !RAW_ASYNC_STOP || !RAW_DMA || RAW_PREINIT || RAW_LINE_SNAPSHOTS || RAW_LINE_POISON || \
-    RAW_WHOLE_IMAGE_PREERASE || RAW_DMA_SLEEP || RAW_DMA_TAIL_WAIT || SD_EARLY_RUN_CLOCK || \
+    RAW_WHOLE_IMAGE_PREERASE || (RAW_DMA_SLEEP && !SD_DMA_SLEEP_PROFILE) || RAW_DMA_TAIL_WAIT || SD_EARLY_RUN_CLOCK || \
     SD_IDMA_READ || SD_READ_DIAGNOSTICS || SD_CLK_GPIO_SPEED >= 0 || SD_FIXED_COMPENSATION || \
     SD_HIGH_SPEED || RAW_PATTERN || RAW_EXPOSURE_COARSE != 1428U)
 #error Board Ethernet power-down requires the reviewed normal 25 MHz capture profile
@@ -114,7 +123,7 @@
      (RAW_SD_CLOCK_HZ != 12500000U && RAW_SD_CLOCK_HZ != 25000000U) || \
      !SD_CLOCK_NEGEDGE || !SD_CLOCK_NEGEDGE_INIT || SD_GPIO_SPEED != 3 || SD_FIXED_COMPENSATION || \
      SD_HIGH_SPEED || SD_HIGH_SPEED_MIXED_SLEW || SD_HIGH_SPEED_FIXED_COMPENSATION || \
-     SD_HIGH_SPEED_COMBINED_ELECTRICAL || SD_IDMA_READ || RAW_DMA_TAIL_WAIT || RAW_DMA_SLEEP || \
+     SD_HIGH_SPEED_COMBINED_ELECTRICAL || SD_IDMA_READ || RAW_DMA_TAIL_WAIT || (RAW_DMA_SLEEP && !SD_DMA_SLEEP_PROFILE) || \
      !RAW_MAGIC_FORMAT || !RAW_LINE_STREAM || !RAW_ASYNC_STOP || !RAW_DMA || RAW_PATTERN || \
      RAW_PREINIT || RAW_LINE_SNAPSHOTS || RAW_LINE_POISON || RAW_WHOLE_IMAGE_PREERASE || \
      RAW_EXPOSURE_COARSE != 1428U || RAW_CYCLE_TRACE)
@@ -167,8 +176,11 @@ volatile uint32_t raw_whole_proof[8];
 sd_dma_wait_t raw_dma_wait;
 /* 0..7: memory/RIF/SD clocks before+after, configured, readback faults.
  * 8/9: BUSLP before/after; 10/11: debug clock/reset; 12/13: DBGCR before/after. */
-volatile uint32_t raw_dma_sleep_clocks[14];
+volatile uint32_t raw_dma_sleep_clocks[SD_DMA_SLEEP_PROFILE?16:14];
 _Static_assert(sizeof(sd_dma_wait_t)==24U,"Update the wait-proof manifest when its ABI changes");
+#endif
+#if SD_DMA_SLEEP_PROFILE
+static uint32_t raw_dma_milliseconds(void);
 #endif
 static uint32_t operation, capture_active, storage_call_depth;
 #if RAW_BOARD_ETH_POWERDOWN
@@ -387,6 +399,10 @@ static void complete_storage(int result)
 
 static void init_card(void)
 {
+#if SD_DMA_SLEEP_PROFILE
+    /* Late-loaded setup leaves the fixed early recovery/camera image intact. */
+    raw_dma_wait.milliseconds=raw_dma_milliseconds;
+#endif
     P[RP_STAGE]=2U; P[RP_SD_BEGIN]=DWT->CYCCNT;
     if(operation==RAW_OP_CAPTURE) (void)phase_gpio_emit(4U);
     CYCLE_MARK(SD_MASTER_BEGIN);
@@ -495,7 +511,7 @@ void raw_runtime_dispatch(void)
     P[RP_FLAGS]=(RAW_ASYNC_STOP?1U:0U)|(RAW_LINE_STREAM?2U:0U)|
         (RAW_PREINIT?4U:0U)|(RAW_LINE_SNAPSHOTS?8U:0U)|(RAW_LINE_POISON?16U:0U)|
         (RAW_DMA_SLEEP?32U:0U)|(RAW_WHOLE_IMAGE_PREERASE?64U:0U)|(RAW_MAGIC_FORMAT?128U:0U);
-#if RAW_DMA_SLEEP
+#if RAW_DMA_SLEEP && !SD_DMA_SLEEP_PROFILE
     raw_dma_wait.milliseconds=HAL_GetTick;
 #endif
     raw_producer_init(&raw_producer,RAW_LINE_STREAM);
@@ -657,6 +673,12 @@ static int payload_transport(sd_card_t *card,uint32_t lba,const void *data,uint3
 }
 
 #if RAW_MAGIC_FORMAT
+#if SD_DMA_SLEEP_PROFILE
+#include "dma_sleep.inc"
+#if RAW_DMA_SLEEP_PROBE
+#include "dma_sleep_probe.inc"
+#endif
+#endif
 #include "magic_runtime.inc"
 #endif
 

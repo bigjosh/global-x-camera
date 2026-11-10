@@ -1,0 +1,109 @@
+{
+  "passed": true,
+  "hardware_access": false,
+  "build": "tmp\\bringup\\sd-dma-sleep-20261030\\sleep-standby-v4",
+  "receiver_sha256": "05835210616c3453a2703472b2db81e7ed291f4dda831db85e39afa6e8c9319d",
+  "prefix_sha256": "296ebf716138c08be27c76ccc2831835e3f65273339cac1b84c4d9f49e3e6d4f",
+  "sector_sha256": "3c26603fc7405d3d57ad30075d3d8bb45ac8621291efeb5f2275db14c3defa41",
+  "unrelocated_prefix_sha256": "41216a3b2f921e80f401da7cb82806e350149c50fc132c2266ae3706dd2c2de7",
+  "bytes": {
+    "receiver": 34704,
+    "prefix": 6720,
+    "early": 15804
+  },
+  "recovery_guard_identical": true,
+  "recovery_literal_offsets": [
+    1660,
+    1664,
+    1668,
+    1672,
+    1676,
+    1680,
+    1684,
+    1688,
+    1692,
+    1696,
+    1700,
+    1704,
+    1708,
+    1712,
+    1716,
+    1720,
+    1724,
+    1728,
+    1732,
+    1736
+  ],
+  "changed_wider_boundary_literal_words": [
+    2440,
+    2448
+  ],
+  "changed_literal_targets_verified": true,
+  "crc_literal_offsets": [
+    3228,
+    4952
+  ],
+  "error_engine_sha256": "247ad0ddd76963039ed01a2e14beb3499ee9097a8df86f62ad5751047835454e",
+  "error_engine_identical": true,
+  "prefix_sensor_source_only_one_redundant_write_replaced": true,
+  "context_burst": {
+    "address": 1164,
+    "bytes": [
+      1,
+      0,
+      4,
+      0
+    ],
+    "before_start": true
+  },
+  "checked_late_load_before_readback": true,
+  "early_irqs_preserved": true,
+  "readback_semantics": "post-START; no pre-START runtime readback claimed",
+  "sensor_counter_and_strobes_exact_one_required": true,
+  "no_explicit_stop_success_path": true,
+  "late_layout": {
+    "vectors_early": true,
+    "early_irq_symbols": true,
+    "direct_crossings": [
+      {
+        "address": 875570394,
+        "target": 875591848,
+        "name": "status_led_complete_sleep",
+        "owner": "raw_context_refused_park"
+      },
+      {
+        "address": 875570518,
+        "target": 875582364,
+        "name": "complete_storage",
+        "owner": "raw_capture_fail"
+      },
+      {
+        "address": 875575656,
+        "target": 875582488,
+        "name": "raw_sensor_autostop_begin",
+        "owner": "main"
+      },
+      {
+        "address": 875575960,
+        "target": 875583312,
+        "name": "raw_storage_execute",
+        "owner": "main"
+      }
+    ],
+    "loader_call": 875575644,
+    "storage_call": 875575960
+  },
+  "immutable_ranges": [
+    [
+      875560960,
+      875576752
+    ],
+    [
+      875576764,
+      875595664
+    ]
+  ],
+  "normal_ram_runner_still_rejects_flash": true,
+  "host_sha256": "af7c36cb82108ceb1d9201def262a8b253effb1686f1dd292508bc542bc95e19",
+  "inspector_sha256": "484713ea7116732b582d36b3310167c5f285639fe06b1531abe48e07d8625885"
+}

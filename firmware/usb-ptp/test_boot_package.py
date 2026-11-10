@@ -243,12 +243,35 @@ class LinkedPackageTests(unittest.TestCase):
   self.assertEqual(p.branch_target(self.hook[32:36],p.HOOK_BASE+32),p.RESUME_ADDRESS)
   self.assertEqual((14+2)*4%8,0)  # The hook preserves ABI stack alignment.
  def test_linked_patch_and_original_capture_exact(self):
-  original=(p.REFERENCE/'stage1.bin').read_bytes();prefix=(self.out/'stage1.bin').read_bytes()
+  capture=Path(self.m.get('capture_build',p.REFERENCE))
+  original=(capture/'stage1.bin').read_bytes();prefix=(self.out/'stage1.bin').read_bytes()
   self.assertEqual(p.branch_target(prefix[p.PATCH_OFFSET:p.PATCH_OFFSET+4],p.PATCH_ADDRESS),p.HOOK_BASE)
   self.assertEqual(prefix[:p.PATCH_OFFSET],original[:p.PATCH_OFFSET])
   self.assertEqual(prefix[p.PATCH_OFFSET+4:len(original)],original[p.PATCH_OFFSET+4:])
-  sector=(self.out/'sector0.bin').read_bytes();self.assertEqual(sector[p.CAPTURE_OFFSET:],(p.REFERENCE/'capture_sector_0.bin').read_bytes()[p.CAPTURE_OFFSET:])
+  sector=(self.out/'sector0.bin').read_bytes();self.assertEqual(sector[p.CAPTURE_OFFSET:],(capture/'capture_sector_0.bin').read_bytes()[p.CAPTURE_OFFSET:])
   self.assertEqual(p.sha(prefix),self.m['prefix_sha256']);self.assertEqual(p.sha(sector),self.m['sector0_sha256'])
+ def test_early_uart_guard_is_identical_to_original(self):
+  prefix=(self.out/'stage1.bin').read_bytes();legacy=(p.REFERENCE/'stage1.bin').read_bytes()
+  # Reset startup through the complete PE6/UART park/recovery block remains
+  # fixed. PA2 may change only the reset vector before this range.
+  self.assertEqual(prefix[0x40:p.PATCH_OFFSET],legacy[0x40:p.PATCH_OFFSET])
+  self.assertEqual(prefix[0x38C:0x38E],bytes.fromhex('fee7'))
+ def test_pa2_capture_reference_and_usb_contract(self):
+  if self.m.get('capture_profile')!='pa2-hold':self.skipTest('Legacy package has no early HOLD')
+  capture=Path(self.m['capture_build']);original=(capture/'stage1.bin').read_bytes()
+  sector=(capture/'capture_sector_0.bin').read_bytes();manifest=json.loads((capture/'manifest.json').read_text(encoding='utf-8'))
+  self.assertEqual(p.validate_reference(original,sector,manifest),'pa2-hold')
+  self.assertEqual(struct.unpack_from('<I',original,4)[0],0x34181DF1)
+  self.assertEqual(self.m['gpio_hold'],manifest['raw_slots']['gpio_hold_contract'])
+  usb=json.loads((Path(self.m['usb_build'])/'manifest.json').read_text(encoding='utf-8'))
+  self.assertEqual((usb['gpio_hold']['port'],usb['gpio_hold']['pin']),('GPIOA',2))
+  self.assertEqual(usb['gpio_hold']['shutdown_proof_schema'],2)
+  # A self-consistent manifest cannot admit corrupted code or old PD7 claims.
+  bad=bytearray(original);bad[0x19F0]^=1
+  with self.assertRaises(ValueError):p.validate_reference(bad,sector,{**manifest,'stage1_raw_sha256':p.sha(bad)})
+  for change in ({'port':'GPIOD'},{'pin':7},{'schema':2}):
+   with self.subTest(change=change),self.assertRaises(ValueError):
+    p.validate_reference(original,sector,{**manifest,'raw_slots':{**manifest['raw_slots'],'gpio_hold_contract':{**manifest['raw_slots']['gpio_hold_contract'],**change}}})
  def test_linked_loaders_guard_caches_and_sync_before_executable_branch(self):
   self.assertRegex(self.hl,r'tst\.w\s+r3, #196608')
   guard=self.hl.index('#196608');first_nor_store=self.hl.index('str\tr1, [r2, #36]')

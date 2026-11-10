@@ -1,0 +1,31 @@
+actual DMA tail-wait eligibility/deadline/fault cases passed
+generated capture, nested failures and magic footer cases passed
+generated capture, nested failures and magic footer cases passed
+RAW producer: all boundary assertions passed
+..............................................................................................................................................................................F..........................................................................................E...............
+======================================================================
+ERROR: test_only_exact_no_tail_125_and_25_flash_profiles_are_admitted (test_sd_startup.StartupAdmission.test_only_exact_no_tail_125_and_25_flash_profiles_are_admitted) (change={'dma_sleep': True})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\Github\global-x-camera\firmware\capture-raw\test_sd_startup.py", line 105, in test_only_exact_no_tail_125_and_25_flash_profiles_are_admitted
+    self.assertFalse(bench.startup_flash_profile(bad))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Github\global-x-camera\firmware\capture-raw\bench.py", line 350, in startup_flash_profile
+    return ((not m.get('dma_sleep') or dma_sleep_profile(m)) and
+                                       ^^^^^^^^^^^^^^^^^^^^
+  File "D:\Github\global-x-camera\firmware\capture-raw\bench.py", line 79, in dma_sleep_profile
+    raise ValueError('Magic DMA Sleep needs its explicit reviewed profile')
+ValueError: Magic DMA Sleep needs its explicit reviewed profile
+
+======================================================================
+FAIL: test_builder_refuses_combination_before_creating_directory (test_power_probe.PowerProbe.test_builder_refuses_combination_before_creating_directory)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\Github\global-x-camera\firmware\capture-raw\test_power_probe.py", line 101, in test_builder_refuses_combination_before_creating_directory
+    self.assertIn('Power probe requires',run.stderr)
+AssertionError: 'Power probe requires' not found in 'usage: build.py [-h] --out OUT [--base BASE] [--pattern {scene,diagonal}]\n                [--transport {pio,idma}] [--sd-bus-width {1,4}]\n                [--sd-clock-hz {12500000,25000000,50000000}]\n                [--sd-gpio-speed {0,1,2,3}] [--sd-clk-gpio-speed {1,2,3}]\n                [--sd-fixed-compensation] [--sd-clock-negedge]\n                [--sd-clock-negedge-init] [--sd-review-profile]\n                [--sd-high-speed-mixed-slew]\n                [--sd-high-speed-fixed-compensation]\n                [--sd-high-speed-combined-electrical] [--sd-idma-read]\n                [--sd-read-diagnostics] [--sd-startup-opt]\n                [--sd-early-run-clock] [--raw-dma-tail-wait]\n                [--chunk-sectors CHUNK_SECTORS] [--whole-image-preerase]\n                [--magic-format] [--exposure-coarse EXPOSURE_COARSE] [--flash]\n                [--standby] [--error-blinks]\n                [--error-test-code {0,1,2,3,4,5,6,7,8,9}]\n                [--error-after-frame-test] [--cycle-trace] [--async-stop]\n                [--dma-sleep] [--dma-sleep-probe] [--line-stream] [--preinit]\n                [--snapshot] [--poison]\n                [--power-probe {hold-after-stop,reset-after-stop,ethernet-control,ethernet-powerdown,receiver-off}]\n                [--ethernet-powerdown] [--sd-init-gap-ms {0,200}]\n                [--sensor-autostop] [--sensor-single-frame]\nbuild.py: error: Magic DMA sleep requires the single-frame Ethernet-down reviewed 25 MHz profile\n'
+
+----------------------------------------------------------------------
+Ran 281 tests in 27.074s
+
+FAILED (failures=1, errors=1)

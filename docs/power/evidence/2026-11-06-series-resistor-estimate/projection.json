@@ -1,0 +1,92 @@
+{
+  "kind": "offline frozen-current-waveform projection; no new hardware test",
+  "source_voltage_V": 5,
+  "nominal_direct_input_capacitance_uF": 44,
+  "rows": [
+    {
+      "run": 1,
+      "analysis_path": "tmp/bringup/c17-removed-20261106/cold-normal01/analysis.json",
+      "analysis_sha256": "6a002ea957d849aaba8e5f64460fb2ed4d89a735be9f6f5d089f6c0a4f2abe59",
+      "current_path": "D:\\Github\\global-x-camera\\tmp\\bringup\\c17-removed-20261106\\cold-normal01\\trace\\current.f32",
+      "current_sha256_recorded_in_analysis": "83d2346591be143f0a4bbd0ffb3cfba3e0f1e944e857c9be801d010c96940f24",
+      "window_start_sample_id": 34058225,
+      "window_end_sample_id_exclusive": 34922000,
+      "sample_rate_Hz": 2000000,
+      "I_squared_integral_A2_s": 0.0027415281732221905,
+      "resistor_heat_mJ_by_ohms": {
+        "1": 2.7415281732221906,
+        "2.2": 6.0313619810888195,
+        "4.7": 12.885182414144296
+      },
+      "secondary_startup_peak_unqualified_A": 1.3123754262924194,
+      "secondary_startup_peak_ms": 1.4855
+    },
+    {
+      "run": 2,
+      "analysis_path": "tmp/bringup/c17-removed-20261106/cold-normal02/analysis.json",
+      "analysis_sha256": "83e019d7311eb2ec0402f36ce07bf1cb516f031fd613bcb08233167d6415a946",
+      "current_path": "D:\\Github\\global-x-camera\\tmp\\bringup\\c17-removed-20261106\\cold-normal02\\trace\\current.f32",
+      "current_sha256_recorded_in_analysis": "7bf405ad92c6b5af34b60f0a9ef5f63d77ad22c74e410c3aabff08aee409d047",
+      "window_start_sample_id": 34070566,
+      "window_end_sample_id_exclusive": 34936000,
+      "sample_rate_Hz": 2000000,
+      "I_squared_integral_A2_s": 0.0027669812417534948,
+      "resistor_heat_mJ_by_ohms": {
+        "1": 2.766981241753495,
+        "2.2": 6.087358731857688,
+        "4.7": 13.004811836241425
+      },
+      "secondary_startup_peak_unqualified_A": 1.3108282089233398,
+      "secondary_startup_peak_ms": 1.4905
+    },
+    {
+      "run": 3,
+      "analysis_path": "tmp/bringup/c17-removed-20261106/cold-normal03/analysis.json",
+      "analysis_sha256": "b8196add8549eff540c21456552c8e4bb9576b5eb7dc04a8a77e18a2760848a7",
+      "current_path": "D:\\Github\\global-x-camera\\tmp\\bringup\\c17-removed-20261106\\cold-normal03\\trace\\current.f32",
+      "current_sha256_recorded_in_analysis": "4a6f8682fd68e3c3c0e8e188e75b4a8fa1d8814d1b5cf2fe1128a79cc0e3762a",
+      "window_start_sample_id": 34068800,
+      "window_end_sample_id_exclusive": 34980000,
+      "sample_rate_Hz": 2000000,
+      "I_squared_integral_A2_s": 0.002939789802813892,
+      "resistor_heat_mJ_by_ohms": {
+        "1": 2.939789802813892,
+        "2.2": 6.467537566190563,
+        "4.7": 13.817012073225293
+      },
+      "secondary_startup_peak_unqualified_A": 1.3108282089233398,
+      "secondary_startup_peak_ms": 1.491
+    }
+  ],
+  "resistor_options": [
+    {
+      "ohms": 1,
+      "ideal_initial_current_A": 5.0,
+      "drop_at_130mA_V": 0.13,
+      "drop_at_200mA_V": 0.2,
+      "unloaded_t99_ms": 0.20262748818347603
+    },
+    {
+      "ohms": 2.2,
+      "ideal_initial_current_A": 2.2727272727272725,
+      "drop_at_130mA_V": 0.28600000000000003,
+      "drop_at_200mA_V": 0.44000000000000006,
+      "unloaded_t99_ms": 0.44578047400364734
+    },
+    {
+      "ohms": 4.7,
+      "ideal_initial_current_A": 1.0638297872340425,
+      "drop_at_130mA_V": 0.6110000000000001,
+      "drop_at_200mA_V": 0.9400000000000001,
+      "unloaded_t99_ms": 0.9523491944623375
+    }
+  ],
+  "limitations": [
+    "Running resistor dissipation is not a measured increase in source energy; changed input voltage changes converter current and replaces some LDO loss.",
+    "First 5 ms excluded from I-squared projection because the resistor reshapes startup.",
+    "Nominal capacitance is not measured effective capacitance.",
+    "Secondary startup peak is a native JS observation, not independently qualified DUT current.",
+    "JS voltage is upstream; downstream rail observation is required for voltage-drop qualification.",
+    "No resistor installed or MOSFET selected; target remains at prior OFF checkpoint."
+  ]
+}

@@ -1,0 +1,2023 @@
+{
+  "purpose": "Context for repeated high active current, not isolated C14 effect",
+  "limitations": [
+    "Historical control differs in U42 and possibly SD LED population and card history.",
+    "Time zero is current-onset threshold. First5ms omitted from contextual cycle energy.",
+    "Phase-dependent intervals overlap and are not component-only power measurements.",
+    "Mean-current and energy changes are not explained solely by duration differences.",
+    "No independent target-rail measurement or attribution of abnormal load."
+  ],
+  "sources": [
+    {
+      "label": "Oct28 single-frame candidate02",
+      "trace": "D:\\Github\\global-x-camera\\tmp\\bringup\\sensor-autostop-promote-20261028\\candidate02\\trace",
+      "checks": {
+        "current": {
+          "path": "D:\\Github\\global-x-camera\\tmp\\bringup\\sensor-autostop-promote-20261028\\candidate02\\trace\\current.f32",
+          "sha256": "bef8bd475f8912514897f91cfeb66bfd6a8fcef92a97fc0d092a9f21be63a355",
+          "hash_passed": true,
+          "native_contiguity_passed": true,
+          "first_sample_id": 0,
+          "analyzed_end_exclusive": 46233558,
+          "analyzed_samples": 46233558,
+          "source_bytes": 184934232,
+          "source_chunks": 707,
+          "last_chunk_excluded": false,
+          "nonfinite_samples": 71
+        },
+        "voltage": {
+          "path": "D:\\Github\\global-x-camera\\tmp\\bringup\\sensor-autostop-promote-20261028\\candidate02\\trace\\voltage.f32",
+          "sha256": "ce40cd98f097098f6914eb0d7e6655830a38a43992c45102efe17d4210355d3c",
+          "hash_passed": true,
+          "native_contiguity_passed": true,
+          "first_sample_id": 16128,
+          "analyzed_end_exclusive": 46249686,
+          "analyzed_samples": 46233558,
+          "source_bytes": 184934232,
+          "source_chunks": 707,
+          "last_chunk_excluded": false,
+          "nonfinite_samples": 0
+        },
+        "power": {
+          "path": "D:\\Github\\global-x-camera\\tmp\\bringup\\sensor-autostop-promote-20261028\\candidate02\\trace\\power.f32",
+          "sha256": "082d1033c727086fefd27f80fab0cf4499135af4f66f6c4350697c0cf26c282e",
+          "hash_passed": true,
+          "native_contiguity_passed": true,
+          "first_sample_id": 16128,
+          "analyzed_end_exclusive": 46249686,
+          "analyzed_samples": 46233558,
+          "source_bytes": 184934232,
+          "source_chunks": 707,
+          "last_chunk_excluded": false,
+          "nonfinite_samples": 0
+        },
+        "gpi0": {
+          "path": "D:\\Github\\global-x-camera\\tmp\\bringup\\sensor-autostop-promote-20261028\\candidate02\\trace\\gpi0.u1",
+          "sha256": "1f89a40d81fe48877e1ca686e70547cc62177aa8fd9a8b30e5cc1e48048856b1",
+          "hash_passed": true,
+          "native_contiguity_passed": true,
+          "first_sample_id": 16128,
+          "analyzed_end_exclusive": 46116128,
+          "analyzed_samples": 46100000,
+          "source_bytes": 5775000,
+          "source_chunks": 462,
+          "last_chunk_excluded": true,
+          "nonfinite_samples": null
+        },
+        "gpi1": {
+          "path": "D:\\Github\\global-x-camera\\tmp\\bringup\\sensor-autostop-promote-20261028\\candidate02\\trace\\gpi1.u1",
+          "sha256": "633d1e1f3299c3c7833d27de657ffd3676477540cc5d829a4cc8abf324c6c004",
+          "hash_passed": true,
+          "native_contiguity_passed": true,
+          "first_sample_id": 16128,
+          "analyzed_end_exclusive": 46116128,
+          "analyzed_samples": 46100000,
+          "source_bytes": 5775000,
+          "source_chunks": 462,
+          "last_chunk_excluded": true,
+          "nonfinite_samples": null
+        }
+      }
+    },
+    {
+      "label": "Nov5 run01",
+      "trace": "D:\\Github\\global-x-camera\\tmp\\bringup\\inrush-20261105\\c14-removed\\run01\\trace",
+      "checks": {
+        "current": {
+          "path": "D:\\Github\\global-x-camera\\tmp\\bringup\\inrush-20261105\\c14-removed\\run01\\trace\\current.f32",
+          "sha256": "8f9a8ae048181a609e18b9b9695cd7f91574d892ac9b9095385fe1f7aabe6983",
+          "hash_passed": true,
+          "native_contiguity_passed": true,
+          "first_sample_id": 0,
+          "analyzed_end_exclusive": 46102770,
+          "analyzed_samples": 46102770,
+          "source_bytes": 184411080,
+          "source_chunks": 705,
+          "last_chunk_excluded": false,
+          "nonfinite_samples": 71
+        },
+        "voltage": {
+          "path": "D:\\Github\\global-x-camera\\tmp\\bringup\\inrush-20261105\\c14-removed\\run01\\trace\\voltage.f32",
+          "sha256": "93091c0d56389bc2156eebfca1184a9293a65f97b978d4bcd32c70476893bf43",
+          "hash_passed": true,
+          "native_contiguity_passed": true,
+          "first_sample_id": 16128,
+          "analyzed_end_exclusive": 46053504,
+          "analyzed_samples": 46037376,
+          "source_bytes": 184149504,
+          "source_chunks": 704,
+          "last_chunk_excluded": false,
+          "nonfinite_samples": 0
+        },
+        "power": {
+          "path": "D:\\Github\\global-x-camera\\tmp\\bringup\\inrush-20261105\\c14-removed\\run01\\trace\\power.f32",
+          "sha256": "9728c4219b8bd9a9f2f80cd8647c0e7de55af15a04e7ac4e259a53a4d4455aec",
+          "hash_passed": true,
+          "native_contiguity_passed": true,
+          "first_sample_id": 16128,
+          "analyzed_end_exclusive": 46053504,
+          "analyzed_samples": 46037376,
+          "source_bytes": 184149504,
+          "source_chunks": 704,
+          "last_chunk_excluded": false,
+          "nonfinite_samples": 0
+        },
+        "gpi0": {
+          "path": "D:\\Github\\global-x-camera\\tmp\\bringup\\inrush-20261105\\c14-removed\\run01\\trace\\gpi0.u1",
+          "sha256": "1b6f05d9a2411a355617c924e1a4316798dc09761adfae0fc0c63686ebb1001d",
+          "hash_passed": true,
+          "native_contiguity_passed": true,
+          "first_sample_id": 16128,
+          "analyzed_end_exclusive": 46016128,
+          "analyzed_samples": 46000000,
+          "source_bytes": 5762500,
+          "source_chunks": 461,
+          "last_chunk_excluded": true,
+          "nonfinite_samples": null
+        },
+        "gpi1": {
+          "path": "D:\\Github\\global-x-camera\\tmp\\bringup\\inrush-20261105\\c14-removed\\run01\\trace\\gpi1.u1",
+          "sha256": "03b65b4fcfafbcd447a8e00a4665473422dbaf84ed00c840588b412db71eb351",
+          "hash_passed": true,
+          "native_contiguity_passed": true,
+          "first_sample_id": 16128,
+          "analyzed_end_exclusive": 46016128,
+          "analyzed_samples": 46000000,
+          "source_bytes": 5762500,
+          "source_chunks": 461,
+          "last_chunk_excluded": true,
+          "nonfinite_samples": null
+        },
+        "current_range": {
+          "path": "D:\\Github\\global-x-camera\\tmp\\bringup\\inrush-20261105\\c14-removed\\run01\\trace\\current_range.u8",
+          "sha256": "2308639a6cee2dcadfef05bdf05ec1dbe7a40a1b800ad8bbbe42094a4504f620",
+          "hash_passed": true,
+          "native_contiguity_passed": true,
+          "first_sample_id": 16128,
+          "analyzed_end_exclusive": 46016128,
+          "analyzed_samples": 46000000,
+          "source_bytes": 46100000,
+          "source_chunks": 461,
+          "last_chunk_excluded": true,
+          "nonfinite_samples": null
+        }
+      }
+    },
+    {
+      "label": "Nov5 run02",
+      "trace": "D:\\Github\\global-x-camera\\tmp\\bringup\\inrush-20261105\\c14-removed\\run02\\trace",
+      "checks": {
+        "current": {
+          "path": "D:\\Github\\global-x-camera\\tmp\\bringup\\inrush-20261105\\c14-removed\\run02\\trace\\current.f32",
+          "sha256": "4a31cce2df8dbb6a92e5fd4fab921b457b812ec8672cb0182cf798885407770d",
+          "hash_passed": true,
+          "native_contiguity_passed": true,
+          "first_sample_id": 0,
+          "analyzed_end_exclusive": 46037376,
+          "analyzed_samples": 46037376,
+          "source_bytes": 184149504,
+          "source_chunks": 704,
+          "last_chunk_excluded": false,
+          "nonfinite_samples": 71
+        },
+        "voltage": {
+          "path": "D:\\Github\\global-x-camera\\tmp\\bringup\\inrush-20261105\\c14-removed\\run02\\trace\\voltage.f32",
+          "sha256": "4fd920352fd6ee7ee5f04d2d865bc1ab41ee09b73cba820fd307e02d8f1f4b46",
+          "hash_passed": true,
+          "native_contiguity_passed": true,
+          "first_sample_id": 16128,
+          "analyzed_end_exclusive": 46053504,
+          "analyzed_samples": 46037376,
+          "source_bytes": 184149504,
+          "source_chunks": 704,
+          "last_chunk_excluded": false,
+          "nonfinite_samples": 0
+        },
+        "power": {
+          "path": "D:\\Github\\global-x-camera\\tmp\\bringup\\inrush-20261105\\c14-removed\\run02\\trace\\power.f32",
+          "sha256": "10a2c6ecf58b6ca16acdc2121891635751d1a6e9626f6aa932c237827dce6589",
+          "hash_passed": true,
+          "native_contiguity_passed": true,
+          "first_sample_id": 16128,
+          "analyzed_end_exclusive": 46053504,
+          "analyzed_samples": 46037376,
+          "source_bytes": 184149504,
+          "source_chunks": 704,
+          "last_chunk_excluded": false,
+          "nonfinite_samples": 0
+        },
+        "gpi0": {
+          "path": "D:\\Github\\global-x-camera\\tmp\\bringup\\inrush-20261105\\c14-removed\\run02\\trace\\gpi0.u1",
+          "sha256": "291c084c114b4069c6a975862fa55dc7d0e3d327e1908a8a5938c145b02a8bb7",
+          "hash_passed": true,
+          "native_contiguity_passed": true,
+          "first_sample_id": 16128,
+          "analyzed_end_exclusive": 45916128,
+          "analyzed_samples": 45900000,
+          "source_bytes": 5750000,
+          "source_chunks": 460,
+          "last_chunk_excluded": true,
+          "nonfinite_samples": null
+        },
+        "gpi1": {
+          "path": "D:\\Github\\global-x-camera\\tmp\\bringup\\inrush-20261105\\c14-removed\\run02\\trace\\gpi1.u1",
+          "sha256": "b5880c2b0fc4bb23237d64933ae09811ec74a22b014073ae3a8a6faa16156041",
+          "hash_passed": true,
+          "native_contiguity_passed": true,
+          "first_sample_id": 16128,
+          "analyzed_end_exclusive": 45916128,
+          "analyzed_samples": 45900000,
+          "source_bytes": 5750000,
+          "source_chunks": 460,
+          "last_chunk_excluded": true,
+          "nonfinite_samples": null
+        },
+        "current_range": {
+          "path": "D:\\Github\\global-x-camera\\tmp\\bringup\\inrush-20261105\\c14-removed\\run02\\trace\\current_range.u8",
+          "sha256": "1fdbb8289d981be1b1bb809fec3d1de1d531f44129415559622871bd7f5e4abc",
+          "hash_passed": true,
+          "native_contiguity_passed": true,
+          "first_sample_id": 16128,
+          "analyzed_end_exclusive": 45916128,
+          "analyzed_samples": 45900000,
+          "source_bytes": 46000000,
+          "source_chunks": 460,
+          "last_chunk_excluded": true,
+          "nonfinite_samples": null
+        }
+      }
+    },
+    {
+      "label": "Nov5 run03",
+      "trace": "D:\\Github\\global-x-camera\\tmp\\bringup\\inrush-20261105\\c14-removed\\run03\\trace",
+      "checks": {
+        "current": {
+          "path": "D:\\Github\\global-x-camera\\tmp\\bringup\\inrush-20261105\\c14-removed\\run03\\trace\\current.f32",
+          "sha256": "5310d528955f5db48c754d861536375948c4969d5995ed80e13929210e80ff48",
+          "hash_passed": true,
+          "native_contiguity_passed": true,
+          "first_sample_id": 0,
+          "analyzed_end_exclusive": 46037376,
+          "analyzed_samples": 46037376,
+          "source_bytes": 184149504,
+          "source_chunks": 704,
+          "last_chunk_excluded": false,
+          "nonfinite_samples": 71
+        },
+        "voltage": {
+          "path": "D:\\Github\\global-x-camera\\tmp\\bringup\\inrush-20261105\\c14-removed\\run03\\trace\\voltage.f32",
+          "sha256": "f6f5070363f7cb77b6c6938053865d6d8243a186dc9cc7713623394de1aadbfc",
+          "hash_passed": true,
+          "native_contiguity_passed": true,
+          "first_sample_id": 32256,
+          "analyzed_end_exclusive": 46004238,
+          "analyzed_samples": 45971982,
+          "source_bytes": 183887928,
+          "source_chunks": 703,
+          "last_chunk_excluded": false,
+          "nonfinite_samples": 0
+        },
+        "power": {
+          "path": "D:\\Github\\global-x-camera\\tmp\\bringup\\inrush-20261105\\c14-removed\\run03\\trace\\power.f32",
+          "sha256": "8c5a32e1bbfc97c293d756ea4b4a1eec84a2861c814581a9c0d458f09b934c8d",
+          "hash_passed": true,
+          "native_contiguity_passed": true,
+          "first_sample_id": 32256,
+          "analyzed_end_exclusive": 46004238,
+          "analyzed_samples": 45971982,
+          "source_bytes": 183887928,
+          "source_chunks": 703,
+          "last_chunk_excluded": false,
+          "nonfinite_samples": 0
+        },
+        "gpi0": {
+          "path": "D:\\Github\\global-x-camera\\tmp\\bringup\\inrush-20261105\\c14-removed\\run03\\trace\\gpi0.u1",
+          "sha256": "43634967f28ee76421c56617f3a118453c0b517834d3a2b5cc08ebe672f672e2",
+          "hash_passed": true,
+          "native_contiguity_passed": true,
+          "first_sample_id": 32256,
+          "analyzed_end_exclusive": 45932256,
+          "analyzed_samples": 45900000,
+          "source_bytes": 5750000,
+          "source_chunks": 460,
+          "last_chunk_excluded": true,
+          "nonfinite_samples": null
+        },
+        "gpi1": {
+          "path": "D:\\Github\\global-x-camera\\tmp\\bringup\\inrush-20261105\\c14-removed\\run03\\trace\\gpi1.u1",
+          "sha256": "e091d2ab2c9feffaf8f103303ddeb7e041a36de4883187bb670ab7b43ac2a68d",
+          "hash_passed": true,
+          "native_contiguity_passed": true,
+          "first_sample_id": 32256,
+          "analyzed_end_exclusive": 45932256,
+          "analyzed_samples": 45900000,
+          "source_bytes": 5750000,
+          "source_chunks": 460,
+          "last_chunk_excluded": true,
+          "nonfinite_samples": null
+        },
+        "current_range": {
+          "path": "D:\\Github\\global-x-camera\\tmp\\bringup\\inrush-20261105\\c14-removed\\run03\\trace\\current_range.u8",
+          "sha256": "10c19465ea5d8405512fb300f023bef80b015bbf6d937aeb2257716df5e92438",
+          "hash_passed": true,
+          "native_contiguity_passed": true,
+          "first_sample_id": 32256,
+          "analyzed_end_exclusive": 45932256,
+          "analyzed_samples": 45900000,
+          "source_bytes": 46000000,
+          "source_chunks": 460,
+          "last_chunk_excluded": true,
+          "nonfinite_samples": null
+        }
+      }
+    }
+  ],
+  "fixed_windows": [
+    {
+      "label": "Oct28 single-frame candidate02",
+      "interval_ms": [
+        5,
+        10
+      ],
+      "metrics": {
+        "start_sample_id": 34253416,
+        "end_sample_id_exclusive": 34263416,
+        "start_ms": 5.0,
+        "end_ms": 10.0,
+        "duration_ms": 5.0,
+        "valid": true,
+        "streams": {
+          "current": {
+            "covered": true,
+            "finite": true,
+            "nonfinite_samples": 0
+          },
+          "voltage": {
+            "covered": true,
+            "finite": true,
+            "nonfinite_samples": 0
+          },
+          "power": {
+            "covered": true,
+            "finite": true,
+            "nonfinite_samples": 0
+          }
+        },
+        "current_mean": 0.04891184535212815,
+        "current_min": 0.0359063446521759,
+        "current_max": 0.05559093877673149,
+        "voltage_mean": 5.006329169034958,
+        "voltage_min": 4.991070747375488,
+        "voltage_max": 5.0330634117126465,
+        "power_mean": 0.2448593912795186,
+        "power_min": 0.1797001212835312,
+        "power_max": 0.2780649960041046,
+        "current_mean_mA": 48.91184535212815,
+        "charge_mC": 0.24455922676064074,
+        "positive_charge_mC": 0.24455922676064074,
+        "negative_charge_mC": 0.0,
+        "energy_mJ": 1.224296956397593,
+        "native_peak_unqualified": {
+          "sample_id": 34259987,
+          "time_from_onset_us": 8285.5,
+          "current_A": 0.05559093877673149,
+          "source_voltage_V": 4.997880458831787
+        },
+        "current_above_A": {
+          "0.1": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "0.5": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "1": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "3": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "5": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "7": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          }
+        },
+        "range_covered": false
+      }
+    },
+    {
+      "label": "Oct28 single-frame candidate02",
+      "interval_ms": [
+        10,
+        15
+      ],
+      "metrics": {
+        "start_sample_id": 34263416,
+        "end_sample_id_exclusive": 34273416,
+        "start_ms": 10.0,
+        "end_ms": 15.0,
+        "duration_ms": 5.0,
+        "valid": true,
+        "streams": {
+          "current": {
+            "covered": true,
+            "finite": true,
+            "nonfinite_samples": 0
+          },
+          "voltage": {
+            "covered": true,
+            "finite": true,
+            "nonfinite_samples": 0
+          },
+          "power": {
+            "covered": true,
+            "finite": true,
+            "nonfinite_samples": 0
+          }
+        },
+        "current_mean": 0.05836264495067298,
+        "current_min": 0.03620687127113342,
+        "current_max": 0.08257836848497391,
+        "voltage_mean": 4.98882034778595,
+        "voltage_min": 4.972911834716797,
+        "voltage_max": 5.002419948577881,
+        "power_mean": 0.2911009839698672,
+        "power_min": 0.1809576153755188,
+        "power_max": 0.41140472888946533,
+        "current_mean_mA": 58.36264495067298,
+        "charge_mC": 0.2918132247533649,
+        "positive_charge_mC": 0.2918132247533649,
+        "negative_charge_mC": 0.0,
+        "energy_mJ": 1.4555049198493362,
+        "native_peak_unqualified": {
+          "sample_id": 34273044,
+          "time_from_onset_us": 14814.0,
+          "current_A": 0.08257836848497391,
+          "source_voltage_V": 4.981991291046143
+        },
+        "current_above_A": {
+          "0.1": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "0.5": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "1": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "3": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "5": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "7": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          }
+        },
+        "range_covered": false
+      }
+    },
+    {
+      "label": "Oct28 single-frame candidate02",
+      "interval_ms": [
+        15,
+        20
+      ],
+      "metrics": {
+        "start_sample_id": 34273416,
+        "end_sample_id_exclusive": 34283416,
+        "start_ms": 15.0,
+        "end_ms": 20.0,
+        "duration_ms": 5.0,
+        "valid": true,
+        "streams": {
+          "current": {
+            "covered": true,
+            "finite": true,
+            "nonfinite_samples": 0
+          },
+          "voltage": {
+            "covered": true,
+            "finite": true,
+            "nonfinite_samples": 0
+          },
+          "power": {
+            "covered": true,
+            "finite": true,
+            "nonfinite_samples": 0
+          }
+        },
+        "current_mean": 0.08148042904436588,
+        "current_min": 0.07392315566539764,
+        "current_max": 0.0870261862874031,
+        "voltage_mean": 4.981162365865708,
+        "voltage_min": 4.975181579589844,
+        "voltage_max": 4.986530780792236,
+        "power_mean": 0.4058645834684372,
+        "power_min": 0.3684523105621338,
+        "power_max": 0.43336614966392517,
+        "current_mean_mA": 81.48042904436588,
+        "charge_mC": 0.40740214522182944,
+        "positive_charge_mC": 0.40740214522182944,
+        "negative_charge_mC": 0.0,
+        "energy_mJ": 2.029322917342186,
+        "native_peak_unqualified": {
+          "sample_id": 34283406,
+          "time_from_onset_us": 19995.0,
+          "current_A": 0.0870261862874031,
+          "source_voltage_V": 4.979721546173096
+        },
+        "current_above_A": {
+          "0.1": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "0.5": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "1": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "3": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "5": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "7": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          }
+        },
+        "range_covered": false
+      }
+    },
+    {
+      "label": "Nov5 run01",
+      "interval_ms": [
+        5,
+        10
+      ],
+      "metrics": {
+        "start_sample_id": 34058603,
+        "end_sample_id_exclusive": 34068603,
+        "start_ms": 5.0,
+        "end_ms": 10.0,
+        "duration_ms": 5.0,
+        "valid": true,
+        "streams": {
+          "current": {
+            "covered": true,
+            "finite": true,
+            "nonfinite_samples": 0
+          },
+          "voltage": {
+            "covered": true,
+            "finite": true,
+            "nonfinite_samples": 0
+          },
+          "power": {
+            "covered": true,
+            "finite": true,
+            "nonfinite_samples": 0
+          }
+        },
+        "current_mean": 0.3083877627462149,
+        "current_min": 0.25948700308799744,
+        "current_max": 0.32292336225509644,
+        "voltage_mean": 4.970452545118332,
+        "voltage_min": 4.962697505950928,
+        "voltage_max": 4.985395908355713,
+        "power_mean": 1.5328186665654182,
+        "power_min": 1.291878581047058,
+        "power_max": 1.60257089138031,
+        "current_mean_mA": 308.3877627462149,
+        "charge_mC": 1.5419388137310743,
+        "positive_charge_mC": 1.5419388137310743,
+        "negative_charge_mC": 0.0,
+        "energy_mJ": 7.664093332827091,
+        "native_peak_unqualified": {
+          "sample_id": 34067396,
+          "time_from_onset_us": 9396.5,
+          "current_A": 0.32292336225509644,
+          "source_voltage_V": 4.962697505950928,
+          "range_code": 0
+        },
+        "current_above_A": {
+          "0.1": {
+            "samples": 10000,
+            "duration_us": 5000.0,
+            "longest_contiguous_us": 5000.0,
+            "episodes": 1,
+            "first_time_us": 5000.0,
+            "last_end_time_us": 10000.0
+          },
+          "0.5": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "1": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "3": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "5": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "7": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          }
+        },
+        "range_covered": true,
+        "range_counts": {
+          "0": 10000
+        }
+      }
+    },
+    {
+      "label": "Nov5 run01",
+      "interval_ms": [
+        10,
+        15
+      ],
+      "metrics": {
+        "start_sample_id": 34068603,
+        "end_sample_id_exclusive": 34078603,
+        "start_ms": 10.0,
+        "end_ms": 15.0,
+        "duration_ms": 5.0,
+        "valid": true,
+        "streams": {
+          "current": {
+            "covered": true,
+            "finite": true,
+            "nonfinite_samples": 0
+          },
+          "voltage": {
+            "covered": true,
+            "finite": true,
+            "nonfinite_samples": 0
+          },
+          "power": {
+            "covered": true,
+            "finite": true,
+            "nonfinite_samples": 0
+          }
+        },
+        "current_mean": 0.31933316100239756,
+        "current_min": 0.25793978571891785,
+        "current_max": 0.3832652270793915,
+        "voltage_mean": 4.970581436157227,
+        "voltage_min": 4.94907808303833,
+        "voltage_max": 4.985395908355713,
+        "power_mean": 1.587239406120777,
+        "power_min": 1.285931944847107,
+        "power_max": 1.8985495567321777,
+        "current_mean_mA": 319.33316100239756,
+        "charge_mC": 1.5966658050119877,
+        "positive_charge_mC": 1.5966658050119877,
+        "negative_charge_mC": 0.0,
+        "energy_mJ": 7.9361970306038865,
+        "native_peak_unqualified": {
+          "sample_id": 34074243,
+          "time_from_onset_us": 12820.0,
+          "current_A": 0.3832652270793915,
+          "source_voltage_V": 4.953618049621582,
+          "range_code": 0
+        },
+        "current_above_A": {
+          "0.1": {
+            "samples": 10000,
+            "duration_us": 5000.0,
+            "longest_contiguous_us": 5000.0,
+            "episodes": 1,
+            "first_time_us": 10000.0,
+            "last_end_time_us": 15000.0
+          },
+          "0.5": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "1": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "3": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "5": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "7": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          }
+        },
+        "range_covered": true,
+        "range_counts": {
+          "0": 10000
+        }
+      }
+    },
+    {
+      "label": "Nov5 run01",
+      "interval_ms": [
+        15,
+        20
+      ],
+      "metrics": {
+        "start_sample_id": 34078603,
+        "end_sample_id_exclusive": 34088603,
+        "start_ms": 15.0,
+        "end_ms": 20.0,
+        "duration_ms": 5.0,
+        "valid": true,
+        "streams": {
+          "current": {
+            "covered": true,
+            "finite": true,
+            "nonfinite_samples": 0
+          },
+          "voltage": {
+            "covered": true,
+            "finite": true,
+            "nonfinite_samples": 0
+          },
+          "power": {
+            "covered": true,
+            "finite": true,
+            "nonfinite_samples": 0
+          }
+        },
+        "current_mean": 0.34021353991031644,
+        "current_min": 0.3275650441646576,
+        "current_max": 0.35541513562202454,
+        "voltage_mean": 4.969532876157761,
+        "voltage_min": 4.964967250823975,
+        "voltage_max": 4.975181579589844,
+        "power_mean": 1.6907014367938042,
+        "power_min": 1.6278367042541504,
+        "power_max": 1.76543128490448,
+        "current_mean_mA": 340.21353991031646,
+        "charge_mC": 1.7010676995515823,
+        "positive_charge_mC": 1.7010676995515823,
+        "negative_charge_mC": 0.0,
+        "energy_mJ": 8.453507183969021,
+        "native_peak_unqualified": {
+          "sample_id": 34088390,
+          "time_from_onset_us": 19893.5,
+          "current_A": 0.35541513562202454,
+          "source_voltage_V": 4.9672369956970215,
+          "range_code": 0
+        },
+        "current_above_A": {
+          "0.1": {
+            "samples": 10000,
+            "duration_us": 5000.0,
+            "longest_contiguous_us": 5000.0,
+            "episodes": 1,
+            "first_time_us": 15000.0,
+            "last_end_time_us": 20000.0
+          },
+          "0.5": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "1": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "3": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "5": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "7": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          }
+        },
+        "range_covered": true,
+        "range_counts": {
+          "0": 10000
+        }
+      }
+    },
+    {
+      "label": "Nov5 run02",
+      "interval_ms": [
+        5,
+        10
+      ],
+      "metrics": {
+        "start_sample_id": 34070072,
+        "end_sample_id_exclusive": 34080072,
+        "start_ms": 5.0,
+        "end_ms": 10.0,
+        "duration_ms": 5.0,
+        "valid": true,
+        "streams": {
+          "current": {
+            "covered": true,
+            "finite": true,
+            "nonfinite_samples": 0
+          },
+          "voltage": {
+            "covered": true,
+            "finite": true,
+            "nonfinite_samples": 0
+          },
+          "power": {
+            "covered": true,
+            "finite": true,
+            "nonfinite_samples": 0
+          }
+        },
+        "current_mean": 0.3058118612855673,
+        "current_min": 0.25639256834983826,
+        "current_max": 0.31982889771461487,
+        "voltage_mean": 4.970662952709198,
+        "voltage_min": 4.962697505950928,
+        "voltage_max": 4.985395908355713,
+        "power_mean": 1.520079458785057,
+        "power_min": 1.2770545482635498,
+        "power_max": 1.5886659622192383,
+        "current_mean_mA": 305.8118612855673,
+        "charge_mC": 1.5290593064278364,
+        "positive_charge_mC": 1.5290593064278364,
+        "negative_charge_mC": 0.0,
+        "energy_mJ": 7.600397293925285,
+        "native_peak_unqualified": {
+          "sample_id": 34077691,
+          "time_from_onset_us": 8809.5,
+          "current_A": 0.31982889771461487,
+          "source_voltage_V": 4.9672369956970215,
+          "range_code": 0
+        },
+        "current_above_A": {
+          "0.1": {
+            "samples": 10000,
+            "duration_us": 5000.0,
+            "longest_contiguous_us": 5000.0,
+            "episodes": 1,
+            "first_time_us": 5000.0,
+            "last_end_time_us": 10000.0
+          },
+          "0.5": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "1": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "3": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "5": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "7": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          }
+        },
+        "range_covered": true,
+        "range_counts": {
+          "0": 10000
+        }
+      }
+    },
+    {
+      "label": "Nov5 run02",
+      "interval_ms": [
+        10,
+        15
+      ],
+      "metrics": {
+        "start_sample_id": 34080072,
+        "end_sample_id_exclusive": 34090072,
+        "start_ms": 10.0,
+        "end_ms": 15.0,
+        "duration_ms": 5.0,
+        "valid": true,
+        "streams": {
+          "current": {
+            "covered": true,
+            "finite": true,
+            "nonfinite_samples": 0
+          },
+          "voltage": {
+            "covered": true,
+            "finite": true,
+            "nonfinite_samples": 0
+          },
+          "power": {
+            "covered": true,
+            "finite": true,
+            "nonfinite_samples": 0
+          }
+        },
+        "current_mean": 0.3152950520336628,
+        "current_min": 0.25793978571891785,
+        "current_max": 0.3910013735294342,
+        "voltage_mean": 4.97102519865036,
+        "voltage_min": 4.946808338165283,
+        "voltage_max": 4.985395908355713,
+        "power_mean": 1.5673106356739999,
+        "power_min": 1.2841755151748657,
+        "power_max": 1.9368714094161987,
+        "current_mean_mA": 315.29505203366284,
+        "charge_mC": 1.5764752601683139,
+        "positive_charge_mC": 1.5764752601683139,
+        "negative_charge_mC": 0.0,
+        "energy_mJ": 7.836553178369999,
+        "native_peak_unqualified": {
+          "sample_id": 34085716,
+          "time_from_onset_us": 12822.0,
+          "current_A": 0.3910013735294342,
+          "source_voltage_V": 4.953618049621582,
+          "range_code": 0
+        },
+        "current_above_A": {
+          "0.1": {
+            "samples": 10000,
+            "duration_us": 5000.0,
+            "longest_contiguous_us": 5000.0,
+            "episodes": 1,
+            "first_time_us": 10000.0,
+            "last_end_time_us": 15000.0
+          },
+          "0.5": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "1": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "3": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "5": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "7": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          }
+        },
+        "range_covered": true,
+        "range_counts": {
+          "0": 10000
+        }
+      }
+    },
+    {
+      "label": "Nov5 run02",
+      "interval_ms": [
+        15,
+        20
+      ],
+      "metrics": {
+        "start_sample_id": 34090072,
+        "end_sample_id_exclusive": 34100072,
+        "start_ms": 15.0,
+        "end_ms": 20.0,
+        "duration_ms": 5.0,
+        "valid": true,
+        "streams": {
+          "current": {
+            "covered": true,
+            "finite": true,
+            "nonfinite_samples": 0
+          },
+          "voltage": {
+            "covered": true,
+            "finite": true,
+            "nonfinite_samples": 0
+          },
+          "power": {
+            "covered": true,
+            "finite": true,
+            "nonfinite_samples": 0
+          }
+        },
+        "current_mean": 0.33745939797759056,
+        "current_min": 0.324470579624176,
+        "current_max": 0.3476789891719818,
+        "voltage_mean": 4.9698271847248074,
+        "voltage_min": 4.964967250823975,
+        "voltage_max": 4.975181579589844,
+        "power_mean": 1.6771139174342156,
+        "power_min": 1.6124588251113892,
+        "power_max": 1.7281877994537354,
+        "current_mean_mA": 337.4593979775906,
+        "charge_mC": 1.6872969898879528,
+        "positive_charge_mC": 1.6872969898879528,
+        "negative_charge_mC": 0.0,
+        "energy_mJ": 8.385569587171078,
+        "native_peak_unqualified": {
+          "sample_id": 34094906,
+          "time_from_onset_us": 17417.0,
+          "current_A": 0.3476789891719818,
+          "source_voltage_V": 4.97064208984375,
+          "range_code": 0
+        },
+        "current_above_A": {
+          "0.1": {
+            "samples": 10000,
+            "duration_us": 5000.0,
+            "longest_contiguous_us": 5000.0,
+            "episodes": 1,
+            "first_time_us": 15000.0,
+            "last_end_time_us": 20000.0
+          },
+          "0.5": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "1": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "3": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "5": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "7": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          }
+        },
+        "range_covered": true,
+        "range_counts": {
+          "0": 10000
+        }
+      }
+    },
+    {
+      "label": "Nov5 run03",
+      "interval_ms": [
+        5,
+        10
+      ],
+      "metrics": {
+        "start_sample_id": 34063530,
+        "end_sample_id_exclusive": 34073530,
+        "start_ms": 5.0,
+        "end_ms": 10.0,
+        "duration_ms": 5.0,
+        "valid": true,
+        "streams": {
+          "current": {
+            "covered": true,
+            "finite": true,
+            "nonfinite_samples": 0
+          },
+          "voltage": {
+            "covered": true,
+            "finite": true,
+            "nonfinite_samples": 0
+          },
+          "power": {
+            "covered": true,
+            "finite": true,
+            "nonfinite_samples": 0
+          }
+        },
+        "current_mean": 0.30638387067615985,
+        "current_min": 0.25793978571891785,
+        "current_max": 0.32137611508369446,
+        "voltage_mean": 4.970692460680008,
+        "voltage_min": 4.962697505950928,
+        "voltage_max": 4.985395908355713,
+        "power_mean": 1.522931516599655,
+        "power_min": 1.2841755151748657,
+        "power_max": 1.5963513851165771,
+        "current_mean_mA": 306.38387067615986,
+        "charge_mC": 1.5319193533807993,
+        "positive_charge_mC": 1.5319193533807993,
+        "negative_charge_mC": 0.0,
+        "energy_mJ": 7.614657582998276,
+        "native_peak_unqualified": {
+          "sample_id": 34071524,
+          "time_from_onset_us": 8997.0,
+          "current_A": 0.32137611508369446,
+          "source_voltage_V": 4.9672369956970215,
+          "range_code": 0
+        },
+        "current_above_A": {
+          "0.1": {
+            "samples": 10000,
+            "duration_us": 5000.0,
+            "longest_contiguous_us": 5000.0,
+            "episodes": 1,
+            "first_time_us": 5000.0,
+            "last_end_time_us": 10000.0
+          },
+          "0.5": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "1": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "3": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "5": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "7": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          }
+        },
+        "range_covered": true,
+        "range_counts": {
+          "0": 10000
+        }
+      }
+    },
+    {
+      "label": "Nov5 run03",
+      "interval_ms": [
+        10,
+        15
+      ],
+      "metrics": {
+        "start_sample_id": 34073530,
+        "end_sample_id_exclusive": 34083530,
+        "start_ms": 10.0,
+        "end_ms": 15.0,
+        "duration_ms": 5.0,
+        "valid": true,
+        "streams": {
+          "current": {
+            "covered": true,
+            "finite": true,
+            "nonfinite_samples": 0
+          },
+          "voltage": {
+            "covered": true,
+            "finite": true,
+            "nonfinite_samples": 0
+          },
+          "power": {
+            "covered": true,
+            "finite": true,
+            "nonfinite_samples": 0
+          }
+        },
+        "current_mean": 0.3162309699803591,
+        "current_min": 0.25948700308799744,
+        "current_max": 0.38481244444847107,
+        "voltage_mean": 4.970754175758362,
+        "voltage_min": 4.94907808303833,
+        "voltage_max": 4.985395908355713,
+        "power_mean": 1.5718757970452308,
+        "power_min": 1.291878581047058,
+        "power_max": 1.9070873260498047,
+        "current_mean_mA": 316.2309699803591,
+        "charge_mC": 1.5811548499017953,
+        "positive_charge_mC": 1.5811548499017953,
+        "negative_charge_mC": 0.0,
+        "energy_mJ": 7.859378985226154,
+        "native_peak_unqualified": {
+          "sample_id": 34079195,
+          "time_from_onset_us": 12832.5,
+          "current_A": 0.38481244444847107,
+          "source_voltage_V": 4.955887794494629,
+          "range_code": 0
+        },
+        "current_above_A": {
+          "0.1": {
+            "samples": 10000,
+            "duration_us": 5000.0,
+            "longest_contiguous_us": 5000.0,
+            "episodes": 1,
+            "first_time_us": 10000.0,
+            "last_end_time_us": 15000.0
+          },
+          "0.5": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "1": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "3": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "5": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "7": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          }
+        },
+        "range_covered": true,
+        "range_counts": {
+          "0": 10000
+        }
+      }
+    },
+    {
+      "label": "Nov5 run03",
+      "interval_ms": [
+        15,
+        20
+      ],
+      "metrics": {
+        "start_sample_id": 34083530,
+        "end_sample_id_exclusive": 34093530,
+        "start_ms": 15.0,
+        "end_ms": 20.0,
+        "duration_ms": 5.0,
+        "valid": true,
+        "streams": {
+          "current": {
+            "covered": true,
+            "finite": true,
+            "nonfinite_samples": 0
+          },
+          "voltage": {
+            "covered": true,
+            "finite": true,
+            "nonfinite_samples": 0
+          },
+          "power": {
+            "covered": true,
+            "finite": true,
+            "nonfinite_samples": 0
+          }
+        },
+        "current_mean": 0.3378064410239458,
+        "current_min": 0.324470579624176,
+        "current_max": 0.3492262363433838,
+        "voltage_mean": 4.969580445241928,
+        "voltage_min": 4.964967250823975,
+        "voltage_max": 4.97404670715332,
+        "power_mean": 1.6787551289081573,
+        "power_min": 1.6131953001022339,
+        "power_max": 1.7350858449935913,
+        "current_mean_mA": 337.8064410239458,
+        "charge_mC": 1.689032205119729,
+        "positive_charge_mC": 1.689032205119729,
+        "negative_charge_mC": 0.0,
+        "energy_mJ": 8.393775644540787,
+        "native_peak_unqualified": {
+          "sample_id": 34088686,
+          "time_from_onset_us": 17578.0,
+          "current_A": 0.3492262363433838,
+          "source_voltage_V": 4.968371868133545,
+          "range_code": 0
+        },
+        "current_above_A": {
+          "0.1": {
+            "samples": 10000,
+            "duration_us": 5000.0,
+            "longest_contiguous_us": 5000.0,
+            "episodes": 1,
+            "first_time_us": 15000.0,
+            "last_end_time_us": 20000.0
+          },
+          "0.5": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "1": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "3": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "5": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "7": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          }
+        },
+        "range_covered": true,
+        "range_counts": {
+          "0": 10000
+        }
+      }
+    }
+  ],
+  "cycle_comparisons": [
+    {
+      "label": "Oct28 single-frame candidate02",
+      "post5ms_to_plateau": {
+        "start_sample_id": 34253416,
+        "end_sample_id_exclusive": 35500000,
+        "start_ms": 5.0,
+        "end_ms": 628.2919999999999,
+        "duration_ms": 623.2919999999999,
+        "valid": true,
+        "streams": {
+          "current": {
+            "covered": true,
+            "finite": true,
+            "nonfinite_samples": 0
+          },
+          "voltage": {
+            "covered": true,
+            "finite": true,
+            "nonfinite_samples": 0
+          },
+          "power": {
+            "covered": true,
+            "finite": true,
+            "nonfinite_samples": 0
+          }
+        },
+        "current_mean": 0.08576022726701243,
+        "current_min": 0.0046803634613752365,
+        "current_max": 0.14983657002449036,
+        "voltage_mean": 4.9785410584204675,
+        "voltage_min": 4.953618049621582,
+        "voltage_max": 5.0330634117126465,
+        "power_mean": 0.4268644059067916,
+        "power_min": 0.023413147777318954,
+        "power_max": 0.7435935735702515,
+        "current_mean_mA": 85.76022726701244,
+        "charge_mC": 53.45366357371071,
+        "positive_charge_mC": 53.45366357371071,
+        "negative_charge_mC": 0.0,
+        "energy_mJ": 266.06116928645594,
+        "native_peak_unqualified": {
+          "sample_id": 34481509,
+          "time_from_onset_us": 119046.5,
+          "current_A": 0.14983657002449036,
+          "source_voltage_V": 4.962697505950928
+        },
+        "current_above_A": {
+          "0.1": {
+            "samples": 254547,
+            "duration_us": 127273.50000000001,
+            "longest_contiguous_us": 13071.0,
+            "episodes": 2990,
+            "first_time_us": 22089.5,
+            "last_end_time_us": 606779.0
+          },
+          "0.5": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "1": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "3": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "5": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "7": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          }
+        },
+        "range_covered": false
+      },
+      "plateau_from_onset_ms": 628.2919999999999
+    },
+    {
+      "label": "Nov5 run01",
+      "post5ms_to_plateau": {
+        "start_sample_id": 34058603,
+        "end_sample_id_exclusive": 35306000,
+        "start_ms": 5.0,
+        "end_ms": 628.6985000000001,
+        "duration_ms": 623.6985000000001,
+        "valid": true,
+        "streams": {
+          "current": {
+            "covered": true,
+            "finite": true,
+            "nonfinite_samples": 0
+          },
+          "voltage": {
+            "covered": true,
+            "finite": true,
+            "nonfinite_samples": 0
+          },
+          "power": {
+            "covered": true,
+            "finite": true,
+            "nonfinite_samples": 0
+          }
+        },
+        "current_mean": 0.3323862222454227,
+        "current_min": -0.02442927472293377,
+        "current_max": 0.4428335130214691,
+        "voltage_mean": 4.969984662857666,
+        "voltage_min": 4.939998626708984,
+        "voltage_max": 5.064841270446777,
+        "power_mean": 1.6515430437717646,
+        "power_min": -0.12356404960155487,
+        "power_max": 2.190612554550171,
+        "current_mean_mA": 332.3862222454227,
+        "charge_mC": 207.30878823513677,
+        "positive_charge_mC": 207.30910444979136,
+        "negative_charge_mC": -0.00031621465459465977,
+        "energy_mJ": 1030.064919085884,
+        "native_peak_unqualified": {
+          "sample_id": 34239436,
+          "time_from_onset_us": 95416.5,
+          "current_A": 0.4428335130214691,
+          "source_voltage_V": 4.946808338165283,
+          "range_code": 0
+        },
+        "current_above_A": {
+          "0.1": {
+            "samples": 1205369,
+            "duration_us": 602684.5,
+            "longest_contiguous_us": 602684.5,
+            "episodes": 1,
+            "first_time_us": 5000.0,
+            "last_end_time_us": 607684.5
+          },
+          "0.5": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "1": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "3": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "5": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "7": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          }
+        },
+        "range_covered": true,
+        "range_counts": {
+          "0": 1247397
+        }
+      },
+      "plateau_from_onset_ms": 628.6985000000001
+    },
+    {
+      "label": "Nov5 run02",
+      "post5ms_to_plateau": {
+        "start_sample_id": 34070072,
+        "end_sample_id_exclusive": 35326000,
+        "start_ms": 5.0,
+        "end_ms": 632.9639999999999,
+        "duration_ms": 627.9639999999999,
+        "valid": true,
+        "streams": {
+          "current": {
+            "covered": true,
+            "finite": true,
+            "nonfinite_samples": 0
+          },
+          "voltage": {
+            "covered": true,
+            "finite": true,
+            "nonfinite_samples": 0
+          },
+          "power": {
+            "covered": true,
+            "finite": true,
+            "nonfinite_samples": 0
+          }
+        },
+        "current_mean": 0.33082503933685137,
+        "current_min": -0.032165415585041046,
+        "current_max": 0.4350973665714264,
+        "voltage_mean": 4.97011767577978,
+        "voltage_min": 4.939998626708984,
+        "voltage_max": 5.064841270446777,
+        "power_mean": 1.6438414656239002,
+        "power_min": -0.1626206785440445,
+        "power_max": 2.1543185710906982,
+        "current_mean_mA": 330.8250393368514,
+        "charge_mC": 207.74621500212652,
+        "positive_charge_mC": 207.7465881257625,
+        "negative_charge_mC": -0.00037312363600358367,
+        "energy_mJ": 1032.2732621190469,
+        "native_peak_unqualified": {
+          "sample_id": 34266261,
+          "time_from_onset_us": 103094.5,
+          "current_A": 0.4350973665714264,
+          "source_voltage_V": 4.951347827911377,
+          "range_code": 0
+        },
+        "current_above_A": {
+          "0.1": {
+            "samples": 1214693,
+            "duration_us": 607346.5,
+            "longest_contiguous_us": 607346.5,
+            "episodes": 1,
+            "first_time_us": 5000.0,
+            "last_end_time_us": 612346.5
+          },
+          "0.5": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "1": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "3": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "5": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "7": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          }
+        },
+        "range_covered": true,
+        "range_counts": {
+          "0": 1255928
+        }
+      },
+      "plateau_from_onset_ms": 632.9639999999999
+    },
+    {
+      "label": "Nov5 run03",
+      "post5ms_to_plateau": {
+        "start_sample_id": 34063530,
+        "end_sample_id_exclusive": 35334000,
+        "start_ms": 5.0,
+        "end_ms": 640.235,
+        "duration_ms": 635.235,
+        "valid": true,
+        "streams": {
+          "current": {
+            "covered": true,
+            "finite": true,
+            "nonfinite_samples": 0
+          },
+          "voltage": {
+            "covered": true,
+            "finite": true,
+            "nonfinite_samples": 0
+          },
+          "power": {
+            "covered": true,
+            "finite": true,
+            "nonfinite_samples": 0
+          }
+        },
+        "current_mean": 0.33081388517507077,
+        "current_min": -0.032165415585041046,
+        "current_max": 0.43973904848098755,
+        "voltage_mean": 4.970121310777305,
+        "voltage_min": 4.939998626708984,
+        "voltage_max": 5.067111015319824,
+        "power_mean": 1.6437973415402782,
+        "power_min": -0.16269367933273315,
+        "power_max": 2.175304651260376,
+        "current_mean_mA": 330.81388517507077,
+        "charge_mC": 210.14455834918607,
+        "positive_charge_mC": 210.14494111278188,
+        "negative_charge_mC": -0.00038276359578594564,
+        "energy_mJ": 1044.1976042533388,
+        "native_peak_unqualified": {
+          "sample_id": 34264388,
+          "time_from_onset_us": 105429.0,
+          "current_A": 0.43973904848098755,
+          "source_voltage_V": 4.944538593292236,
+          "range_code": 0
+        },
+        "current_above_A": {
+          "0.1": {
+            "samples": 1230079,
+            "duration_us": 615039.5,
+            "longest_contiguous_us": 615039.5,
+            "episodes": 1,
+            "first_time_us": 5000.0,
+            "last_end_time_us": 620039.5
+          },
+          "0.5": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "1": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "3": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "5": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          },
+          "7": {
+            "samples": 0,
+            "duration_us": 0.0,
+            "longest_contiguous_us": 0,
+            "episodes": 0,
+            "first_time_us": null,
+            "last_end_time_us": null
+          }
+        },
+        "range_covered": true,
+        "range_counts": {
+          "0": 1270470
+        }
+      },
+      "plateau_from_onset_ms": 640.235
+    }
+  ]
+}

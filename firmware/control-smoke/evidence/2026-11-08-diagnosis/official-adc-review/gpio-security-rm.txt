@@ -1,0 +1,96 @@
+Source: datasheets/processor/STM32N6_RM0486_reference_manual.pdf
+SHA256: 83cb7e9c7f784a4c5dbbedec428adf58d2cbac8cd802d11e2cdc4d504cceaa86
+
+PAGE 791
+RM0486 Rev 4 791/4669
+RM0486 General-purpose I/Os (GPIO)
+807
+15.3.13 Using HSE or LSE oscillator pins as GPIOs
+When the HSE or LSE oscillator is switched off (default state after reset), the related 
+oscillator pins can be used as normal GPIOs, but only in input mode (output mode is not 
+supported).
+When the HSE or LSE oscillator is switched on (HSEON or LSEON set in RCC_CSR), the 
+oscillator takes control of its associated pins, and the GPIO configuration of these pins has 
+no effect.
+When the oscillator is configured in a user external clock mode, only the pin is reserved for 
+clock input (OSC_OUT or OSC32_OUT pins can still be used, in input mode only).
+15.3.14 Using GPIO pins in V SW supply domain
+The functionality of PC13, PC14, PC15, and PQ7 GPIOs is lost when the core supply 
+domain is powered off (the device enters Standby mode). If their GPIO configuration is not 
+bypassed by the RTC/TAMP configuration or by the RCC (LSE), these pins are set in analog 
+input mode.
+For details about I/O control by the RTC, refer to Section 61.3: RTC functional description.
+15.3.15 Advanced I/O configurations
+I/O compensation cell
+The I/O commutation slew rate (tfall/trise) can be adapted by software depending on process, 
+voltage, and temperature conditions, to reduce the I/O noise on the power supply. Refer to 
+Section 16: System configuration controller (SYSCFG) for more details.
+Input/output path configurable delay
+A delay programmed in GPIOx_DELAYRL/H can be applied to either input or output path, 
+based on DLYPATH in GPIOx_ADVCFGRL/R.
+Input/output data double edge selection
+Input and output data can be managed as single- or double-edge, according to DE in 
+GPIOx_ADVCFGRL/R.
+Input/output data retiming
+When RET is set in GPIOx_ADVCFGRL/R, input and output data are retimed to either rising 
+or falling clock edge, depending upon INVCLK value.
+15.3.16 I/O pin isol ation using TrustZone
+As TrustZone-aware peripheral, each I/O pin of GPIO port x can be individually configured 
+as secure through GPIOx_SECCFGR. After reset, all GPIO ports are secure.
+The I/Os connected to peripheral functions can be conditioned by the peripheral security 
+configuration: 
+• Peripherals for which the I/O pin selection is done through GPIOx_AFRL/H
+If the peripheral is configured as secure, it cannot be connected to a nonsecure I/O pin. 
+If this is not respected, input data to the secure peripheral are forced to 0 (I/O input pin 
+value ignored), and the output pin value is forced to 0, thus avoiding any secure 
+PAGE 792
+General-purpose I/Os (GPIO) RM0486
+792/4669 RM0486 Rev 4
+information leak through nonsecure I/Os. TrustZone-aware logic around GPIO ports is 
+summarized in Table 79.
+• Peripherals (like ADC) with embedded analog functions that directly select/enable its 
+allocated I/O ports using analog switches
+If the I/O is secure, this analog switch cannot be controlled by a nonsecure peripheral. 
+If the peripheral is configured as nonsecure and the I/O is secure, the switch remains 
+open. This prevents the redirection of secure data to a nonsecure peripheral or I/O 
+through analog path. Refer to Section 3: System security for the list of peripherals 
+using this security.
+• The list of I/Os without a hardware protection linked to TrustZone is given in Section 3: 
+System security. More specifically, the listed signals (input and/or outputs) are not 
+blocked when the I/O is set as secure, and the associated peripheral is non secure. For 
+each of these listed I/Os, a secure application must decide if a potential effect on data 
+integrity or confidentiality is critical or not.
+Refer to the pins definitions table in the datasheet for more information about AFs and 
+additional functions mapping.
+         
+Table 80 gives a summary of the I/O port y secured bits, following the setting of SECy 
+in GPIOx_SECCFGR. The following is valid for each register in the table:
+• When a bit is secured, read/write operations are only allowed by a secure access. 
+Non-secure read or write accesses on secured bits are RAZ/WI, with no illegal access 
+event generated.
+• When a bit is nonsecure, there is no TrustZone restriction. Read/write operations are 
+allowed by both secure and nonsecure accesses.
+         
+Table 79. Secure AF between peripherals and allocated I/Os
+Security configuration AF logic
+Comment
+Peripheral Allocated I/O pin Input Output
+Secure
+Secure I/O data Peripheral data
+-
+Nonsecure Out of reset configuration
+Secure
+Nonsecure
+Zero Zero
+-
+Nonsecure I/O data Peripheral data
+Table 80. GPIO secured bits
+Secured bitfield(s) Register name Nonsecure access on secure bits
+MODEy[1:0] GPIOx_MODER
+RAZ/WI
+OTy GPIOx_OTYPER
+OSPEEDy[1:0] GPIOx_OSPEEDR
+PUPDy[1:0] GPIOx_PUPDR
+IDy GPIOx_IDR
+ODy GPIOx_ODR
+BSy and BRy GPIOx_BSRR

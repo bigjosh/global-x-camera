@@ -1,13 +1,20 @@
 # Global X Camera
 
-An STM32N6-based, credit-card-size monochrome global-shutter camera project. This repository is the durable project record; chat and Page copies are working views. Latest firmware checkpoint: November 8, 2026.
+An STM32N6-based, credit-card-size monochrome global-shutter camera project. This repository is the durable project record; chat and Page copies are working views. Latest hardware wiring update: November 10, 2026. Installed firmware and control smoke test: November 9, 2026.
 
 **Public repository:** [bigjosh/global-x-camera](https://github.com/bigjosh/global-x-camera), created at the user's explicit request on October 13, 2026. The default branch is `main`.
 
 ## Start here
 
-**Latest installed firmware (November 8):** USB PTP photo access is installed in
-NOR alongside the unchanged October 28 capture payload. CN8 VBUS present at
+**Latest installed firmware (November 9):** the combined capture/USB package now
+uses A3/CN4.4/PA2 HOLD before the original UART guard and through operation.
+Both programmed NOR regions matched full readback. UART recovery passed after
+installation, the ADC diagnostic and an actual JS power cycle. The knob
+sweep read A1 from0 to3840 with A0 LOW/A2 HIGH; stopping the diagnostic
+drove A2 LOW while retaining A3 HIGH. Normal capture exposure remains fixed.
+[Installation and smoke evidence](firmware/control-smoke/evidence/2026-11-09-a3-live/README.md).
+
+**USB baseline (November 8):** native PTP photo access remains in the package. CN8 VBUS present at
 boot selects **Global X RAW Camera** in Windows; the native camera driver can
 browse thumbnails, download lossless 16-bit gray PNGs, and explicitly delete
 individual photos. No driver replacement or FAT filesystem is needed. Two
@@ -15,9 +22,11 @@ new captures, deletion/slot reuse, preserved-neighbor hashes, reboot persistence
 and real transfer cancellation passed. UART recovery remains available.
 [Usage and limits](firmware/usb-ptp/README.md) and
 [qualification record](firmware/usb-ptp/evidence/2026-11-08-native-ptp/README.md).
-The target is left powered in USB mode. Physical USB-unplug shutdown and a
-fully discharged cold boot of the combined image remain unqualified; see
-AGENTS.md before touching the bench.
+The November9 tests used direct5V through JS with CN8/MCU USB and the sensor
+disconnected. The no-sensor error path reached about3.21mA with retained SBF=1;
+physical A3 release and real-latch takeover/cutoff were not measured. JS was
+left OFF, measured current zero, and COM8 closed. USB service and image capture
+were not repeated in this sensor-absent test. See AGENTS.md before bench work.
 
 **Capture baseline retained from October 28:** automatic single-frame capture is
 installed, retaining Ethernet power-down and four-bit 25 MHz SD saving. The
@@ -42,6 +51,20 @@ contains CPU/cache/sleep controls and hardware-modification estimates.
 See AGENTS.md before bench work.
 
 **Canonical prototype power connection (October 27):** regulated source -> JS110 IN+ -> JS110 OUT+ -> **Arduino CN5.5/5V**; common return -> **CN5.6/GND**, with all CN9 shunts absent. [Source options, wiring and measurement limits](docs/power/nucleo-debug-isolation.md#canonical-target-power-connection--october-27).
+
+**November 10 canonical hardware:** a manual SPDT power selector replaces
+the USB-controlled cutoff MOSFET Q3. It selects USB power or the output of
+battery-path R0=2.2 ohm into CN5.5/5V, with common ground at CN5.6. Q1/Q2,
+the separate momentary SPDT trigger, C3=2.2uF and R5=1kohm remain. The PCB
+will use **automatic MOSFET source control** rather than the manual selector.
+HOLD remains **A3/CN4.4/PA2**; exposure is **A0 LOW / A1 wiper / A2 HIGH**.
+The new ASA pot is **A4 high end / GND low end / A5 wiper** and will set
+**analog gain**. ASA sampling and both knobs' camera integration are pending;
+the installed firmware is unchanged. The user confirmed trigger/HOLD/error
+cutoff with zero indicated current before this hardware update.
+[Canonical wiring and diagram](docs/power/2026-10-14-power-tree-review.md#november-7-lipo-button-and-pd7-hold-wiring),
+[control pin table](docs/hardware-firmware-interface.md).
+Do not run old A3–A5 diagnostics against the new latch.
 
 Read [NOTES.md](NOTES.md) for the reasons behind decisions, rejected approaches and hard-won constraints. Its map leads to the owning folder; the [bootstrap coverage record](docs/notes-bootstrap-2026-10-24.md) explains which sources were reviewed.
 

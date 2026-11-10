@@ -1,0 +1,141 @@
+{
+  "plan": {
+    "recovery": {
+      "name": "raw-25-single-frame-standby-qualification",
+      "prefix_bytes": 6720,
+      "sector_sha256": "79a379470927135bc03841098fe070912cad8275e91c5d5985cc066c294cf64e",
+      "prefix_sha256": "6378483a91b560ffc6b31d74a9dd1205996a14c8030447ffddf7deddc9d23874"
+    },
+    "bridge": {
+      "schema": 1,
+      "load": 874381312,
+      "entry": 874381313,
+      "park": 874381334,
+      "stack_floor": 874209280,
+      "stack_top": 874217472,
+      "request": 874201088,
+      "proof": 874201344,
+      "proof_words": 23,
+      "binary_bytes": 1324,
+      "binary_sha256": "9d0a4553845dbf033264bde3629e2601aac561799cac9e34ed841f32485abdb6",
+      "source_hashes": {
+        "boot.c": "9507318fd4e78a42f01f14737e7da07da3aa8e05b1860b06c5ca78bfa1b6ee22",
+        "entry.S": "fd3cfeda8922458d209a4badec9840c7c3f80bb6cad99b726ab595f9fcb251e7",
+        "boot.ld": "1ec5220dd179b7b0010f393995674466652b99e8400fdde3327421adc291abf0",
+        "raw10_memory.c": "0f97b344e25728702636bc17560a0b663ce3a0636e34027e3351223f43d6bc13"
+      },
+      "vendor_commit": "e9441cdbb5072a6d3bcef1a5ca4e4d80f850283a",
+      "flags": [
+        "-mcpu=cortex-m55",
+        "-mthumb",
+        "-mcmse",
+        "-mfloat-abi=soft",
+        "-mgeneral-regs-only",
+        "-Os",
+        "-ffreestanding",
+        "-fno-builtin",
+        "-fno-stack-protector",
+        "-fno-unwind-tables",
+        "-fno-asynchronous-unwind-tables",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-nostdlib",
+        "-nostartfiles",
+        "-DSTM32N657xx"
+      ],
+      "sd_commands": false,
+      "nor_commands": false,
+      "reset": false,
+      "power_switch": false,
+      "initialization": "expanded SRAM and DWT only"
+    },
+    "diagnostic": {
+      "schema": 1,
+      "load": 876363776,
+      "entry": 876365997,
+      "park": 876365922,
+      "proof": 876371968,
+      "proof_words": 512,
+      "bytes": 2264,
+      "sha256": "ebe2fa414c75c11081fa07ed2ba518c3622b1b95cddb019f460f7c28aece4027",
+      "sources": {
+        "mdio_diag.c": "ef2552e9000612a2068fa434ef11148a88b518b2411e44ad29953874c063b2b7",
+        "mdio_diag.ld": "128310408ce57e6ff4e438307d1da580056494ea4358326fa1e2484e28491574"
+      },
+      "scope": "read-only PHY frames plus GPIO pad toggles; no hardware performed by builder"
+    },
+    "diagnostic_source_directory": "D:\\Github\\global-x-camera\\tmp\\bringup\\nucleo-isolated-20261028\\mdio\\v2",
+    "host_sha256": "2eef76ecca5f30d8b5c82985e656a06e4f4171cb8a4d01a0edae768db66c4b13",
+    "phy_register_coverage": "IDs reg2/reg3 at all32 addresses; BMCR reg0 twice at each matching LAN8742",
+    "omitted_registers": [
+      1,
+      17,
+      18,
+      31
+    ],
+    "no_phy_write_frames": true,
+    "no_camera_sd_nor_commands": true,
+    "no_reset_or_power_switch": true,
+    "changes": "Temporary RAM code/stack, expanded SRAM clocks/init, and restored PF4/PG11 GPIO ownership",
+    "final_park": "0x343c4862",
+    "final_stack": "0x343AF000..0x343B0000",
+    "final_limit": "No return to old caller stack or automatic reset/recovery; root performs separate fresh recovery"
+  },
+  "bridge_terminal": {
+    "magic": 1380078129,
+    "schema": 1,
+    "words": 23,
+    "nonce": 3408359357,
+    "result": 0,
+    "stage": 3,
+    "ccr": 513,
+    "control": 0,
+    "ipsr": 0,
+    "primask": 1,
+    "faultmask": 0,
+    "fpccr": 3221225476,
+    "mpu": 4,
+    "cfgr1": 858980352,
+    "cfgr2": 1048576,
+    "ahb5enr": 8224,
+    "ahb5rstr": 0,
+    "xspi_sr": 2,
+    "memory_result": 0,
+    "memenr": 6143,
+    "dwt_ctrl": 2147483649,
+    "dwt_delta": 2260,
+    "terminal": 1380074574
+  },
+  "context": {
+    "registers": {
+      "PC": 874381334,
+      "XPSR": 1090519040,
+      "PRIMASK": 1,
+      "FAULTMASK": 0,
+      "CONTROL": 0
+    },
+    "ccr": 513,
+    "fpccr": 3221225476
+  },
+  "memenr": 6143,
+  "memrstr": 0,
+  "cfgr": [
+    858980352,
+    1048576
+  ],
+  "pll": [
+    4213504,
+    0,
+    1224736773
+  ],
+  "ic1": 131072,
+  "faults": [
+    0,
+    0
+  ],
+  "apb5enr": 0,
+  "ahb5enr": 1073750048,
+  "helper_sha256": "ebe2fa414c75c11081fa07ed2ba518c3622b1b95cddb019f460f7c28aece4027",
+  "launched": false
+}

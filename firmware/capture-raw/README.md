@@ -1,5 +1,28 @@
 # Packed RAW capture to fixed SD slots
 
+**November 9 canonical A3 HOLD implementation:** `--gpio-hold` asserts **PA2 /
+Arduino A3 / CN4.4** before the original startup/UART guard, retains HIGH
+through capture, saving, error display and recovery, and floats only this
+pin immediately before Standby. An unexpected WFI return reasserts it.
+The exposure potentiometer has moved to A0–A2, freeing A3; this capture
+change does not itself integrate exposure ADC sampling. D9/PD7 is historical.
+
+Contract schema 3 binds PA2; exact schemas 1/2 still describe frozen PD7
+packages. The stackless 76-byte hook uses reserved padding at 0x34181DF0,
+leaving the USB selector's tail at 0x34181E40 free. Original UART instructions,
+addresses and all twenty literals remain exact. The combined capture/USB
+package was subsequently installed with both NOR regions readback-verified;
+A3 HIGH, exposure-knob diagnostic and UART recovery smoke tests passed.
+The user then confirmed manual trigger, missing-sensor error and latch cutoff
+with zero indicated current. The capture-only package remains an offline
+artifact; the optional DMA-sleep candidate is not hardware-qualified.
+Normal exposure remains fixed and the November10 ASA wiring is not yet
+integrated. See [installed-package and live evidence](../control-smoke/evidence/2026-11-09-a3-live/README.md)
+and AGENTS.md for the latest user-owned bench state.
+See [A3 implementation and offline evidence](evidence/2026-11-09-a3-hold/README.md),
+[canonical power wiring](../../docs/power/lipo-latch-wiring.svg), and
+[USB integration](../usb-ptp/README.md).
+
 **Single-frame normal firmware installed October 28:** the sensor automatically
 stops after one exposure. The normal capture path retains unused Ethernet PHY
 power-down, four-bit 25 MHz SD saving, guarded Standby, UART recovery and the
@@ -9,6 +32,13 @@ camera RAM; cold slots 143 and 144 passed complete SD readback and visual
 inspection. Slot 145 passed its first 2,560 of 3,730 sectors before testing
 stopped at the user's request; that partial read is not full-image verification.
 [Current build and qualification](evidence/2026-10-28-sensor-single-frame/README.md).
+
+**October 30 DMA-sleep implementation:** `--dma-sleep` now supports the selected
+single-frame 25 MHz profile as an opt-in candidate. Hardware qualification and
+promotion are pending; this option does not change the installed firmware.
+See [DMA sleep qualification](#sleep-during-complete-frame-sd-dma).
+The [offline results and resume checkpoint](evidence/2026-10-30-sd-dma-sleep/README.md)
+record the completed checks and the disconnected-bench boundary.
 
 This integration captures the sensor's unchanged ten-bit samples as packed MIPI
 RAW10 bytes, writes them directly to the native SDMMC2 interface, and retains
@@ -1216,3 +1246,38 @@ cold-image, recovery and power results belong to the linked evidence, not to
 the presence of this build option. PD0 still mirrors exposure IRQs until
 shutdown masks interrupts; later low level through marker 10 is output
 continuity, not ongoing sensor observation.
+
+## Sleep during complete-frame SD DMA
+
+Add `--dma-sleep` to the normal single-frame build command above. The CPU may
+enter shallow WFI while SDMMC2's internal DMA sends the complete immutable
+slot. The existing 1 ms SysTick wakes it to recheck transfer completion, errors
+and the 5 s wall-time bound. The card still receives one preannounced CMD25
+write, followed by CMD12 and the existing final-ready checks. Card/DMA, all
+six AXI SRAM banks, interconnect/security and BSEC clocks remain enabled in
+shallow sleep. No deep sleep occurs until the usual completed-save shutdown.
+
+Sleep is selected only when frame validation and sensor standby are already
+complete at transport entry. If capture is still producing data, the unchanged
+progressive PIO path runs awake. A frame that finishes between this decision
+and initial publication may use awake DMA. There is no extra wait to force
+DMA, no new interrupt-vector routing and no change to the ST-LINK/UART reset
+and early recovery guard. Its reset recovery still needs hardware verification
+with this candidate; it is not a runtime UART interrupt wake source.
+
+The 24-byte `raw_dma_wait` record counts WFI calls, immediate returns, elapsed
+SysTick milliseconds, active CPU cycles and context failures. The new
+16-word clock record adds BSEC low-power-clock snapshots to the legacy
+14-word record. These records describe the wait path; they are not permission
+to reset active storage. DWT intervals spanning WFI are **active CPU time**,
+not wall time. Compare cycle duration and energy using the external Joulescope
+phase markers. WFI calls alone do not prove that clocks actually stopped.
+
+First qualify the separate no-write diagnostic on the connected board:
+build the same profile with `--dma-sleep --dma-sleep-probe`, omitting
+`--flash`, `--standby` and `--error-blinks`. This RAM-only diagnostic waits for
+three normal timer ticks, then performs a bounded 20 ms idle-card WFI test.
+It retains a 24-word `DSP1` result and deliberately returns a storage error
+before CMD25, leaving the diagnostic awake for inspection. It must never be
+promoted as normal capture firmware. The next qualification steps are complete
+image readback, external time/energy comparison and recovery checks.

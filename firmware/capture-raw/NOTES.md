@@ -457,3 +457,156 @@ unchanged recovery instructions and all twenty recovery literals, unchanged
 fixed error bridge/engine, and the original 15,804-byte early receiver load.
 All five historical binary identity comparisons passed; 261 source-bound
 offline regression tests passed with no source changes during the run.
+
+## 2026-10-30  Reintroduce SD DMA sleep only after complete-frame publication and finite wake qualification
+
+**Why:** The user explicitly requested CPU sleep during DMA on the current SD
+hardware. The older disabled experiment cannot simply be enabled: its failed
+WFI attempts remain unresolved evidence. The new opt-in magic-slot profile
+retains the current single-frame/Ethernet-down/25 MHz configuration, adds BSEC
+run/sleep-clock checks, and uses the existing 1 ms SysTick for bounded wake and
+wall-time accounting. BSEC was retained in the successful isolated-board WFI
+probe; this difference is a hypothesis, not proof of the old failure's cause.
+Sleep requires an already validated frame and stopped sensor, so camera
+deadlines never depend on a CPU cycle counter that pauses in WFI.
+
+**Rejected:** Forcing a completed frame by delaying the existing streaming
+path; sleeping while the PIO producer still needs service; treating WFI counts
+as proof of actual clock gating; interpreting DWT sleep spans as wall time;
+adding storage interrupts before the timer-wake path is qualified; expanding
+the fixed early boot/recovery image; and installing a candidate based only on
+offline tests. The address-taken millisecond callback lives in late-loaded
+storage code to preserve the 15,804-byte early receiver boundary. The
+RAM-only no-write probe deliberately retains a failed photo outcome even
+when its sleep test passes.
+
+**Evidence:** `dma_sleep.inc`, `dma_sleep_probe.inc`, the opt-in integration in
+`magic_runtime.inc`, driver/host/native tests, and campaign
+`tmp/bringup/sd-dma-sleep-20261030/`. Hardware qualification was initially
+blocked by zero measured Joulescope input voltage and absent ST-LINK; no
+candidate was installed at that boundary. Measured results and final installed
+state must be recorded separately before promoting the option.
+
+## 2026-11-07  Assert PD7 before the existing boot guard and float it only at Standby entry
+
+**Why:** the user selected Arduino D9/CN14.2 (PD7) to hold the new button/MOSFET
+latch on through capture and saving. A fixed 76-byte stackless hook after the
+existing padded error engine asserts HIGH before the original reset handler,
+then resumes its exact startup and UART-recovery path. Only the reset vector
+redirects entry; original recovery instructions, twenty literals, loader and
+bridge stay at their reviewed addresses. The option remains explicit and
+disabled builds reproduce the qualified October 28 firmware.
+
+**Rejected:** inserting early HOLD code into a shared C routine that could
+relocate the tightly bound recovery layout; allowing a LOW glitch while
+changing PD7 to output; releasing HOLD during UART park, capture/save or error
+flashes; and relying solely on implicit Standby pin behavior. Success and error
+shutdown explicitly select input/no-pull immediately before WFI, preserving
+ODR HIGH. Refused Standby retains HOLD; an unexpected WFI return immediately
+reasserts it. GPIO assertion cannot persist through hardware reset or precede
+ROM execution, and firmware cannot guarantee the external RC's rail ordering.
+
+**Evidence:** `gpio_hold_prefix.py`, `gpio_hold_transform.py`, opt-in builder
+and host package audits, and their mutation/native tests. The
+[offline evidence](evidence/2026-11-07-gpio-hold/README.md) freezes both
+candidate builds, exact machine-code checks, 318-test regression result plus
+the separately enabled linked-artifact test, and unchanged rollback hashes.
+The copied error engine remains position independent and within its original
+1,536-byte reservation; early receiver loading remains 15,804 bytes.
+The user disconnected the board for assembly, so no new image was installed,
+no live recovery admission was added, and physical GPIO/RC/AUX shutdown
+qualification is consciously deferred until reconnection. No DMA-sleep or
+potentiometer-ADC implementation is bundled into this change.
+
+## 2026-11-08  Keep HOLD code unchanged while recording the accepted no-delay latch policy
+
+**Why:** the user selected an SPDT trigger capacitor and explicitly omitted
+the separate Q2-gate C1/D1 shutdown delay. PD7's existing input/no-pull
+release lets R2=100kohm discharge Q2's gate without changing any firmware
+instruction. Contract schema 2 therefore records that an extra off delay is
+not required by the accepted prototype policy, while explicitly retaining
+unqualified AUX-before-main shutdown ordering. The exact schema-1 contract
+remains recognizable for historical package inspection; it is not rewritten
+or silently interpreted as the newer hardware choice.
+
+**Rejected:** treating the old manifest's off-delay requirement as current
+user policy; changing executable release behavior unnecessarily; altering
+frozen November 7 evidence; or admitting arbitrary combinations of old/new
+contract fields. Both schemas require exact values and types. Neither
+metadata acceptance nor an offline package audit adds a live recovery
+allowlist entry or establishes the state of the physical latch.
+
+**Evidence:** `gpio_hold_transform.py`, the strict contract checks in
+`bench.py`/`inspect_flash.py`, and the updated HOLD tests. All 320 offline
+capture tests passed, including the real linked Standby release code.
+Rebuilds in `tmp/bringup/gpio-hold-spdt-20261108/` reproduced both November 7
+HOLD candidates byte for byte and the disabled October 28 receiver, prefix
+and sector byte for byte. Independent package audits passed for both current
+and both frozen candidates; all 173 files bound by the November 7 archive's
+SHA256SUMS remained unchanged. The [power notes](../../docs/power/NOTES.md)
+own the external circuit decision. No instrument, installed firmware, NOR,
+SD, or live recovery permission was changed.
+
+The startup check remains an estimate: the [October 17 cold-boot size
+matrix](../boot-timing/optimization-results-2026-10-17.md) measured
+22.563–23.228ms from the target supply's 0.5V crossing to first GPIO for a
+1,472-byte ROM image. Its observed 0.262ms/KiB slope predicts about
+24.19–24.86ms for the 7,840-byte HOLD image. Use roughly 25ms as an estimate
+and 30ms as a planning budget, not a worst-case guarantee. The later
+[2.2-ohm runs](../../docs/power/evidence/2026-11-06-series-resistor-tested/README.md)
+reached exposure at 24.584–25.268ms from current onset, a different reference
+and later firmware event. The new SPDT latch is not connected yet; its
+LiPo/ramp, capacitor tolerance/bias, physical PD7 transition and minimum
+press duration are unmeasured. Reset-only or RAM-entry timing cannot replace
+power-on-to-HOLD measurement. No ADC or DMA-sleep work is bundled here.
+
+
+## 2026-11-09  Make PA2/A3 HOLD canonical while preserving exact UART recovery
+
+**Why:** the user moved the exposure potentiometer to Arduino A0–A2 and
+selected adjacent A3/CN4.4/PA2 for the power latch. Schema 3 binds this pin,
+while exact schemas 1/2 remain historical PD7 profiles. Startup preloads HIGH,
+selects push-pull/no-pull low-speed output, and branches to the original reset
+handler without a stack. Only PA2's fields change. Capture, saving, error
+flashes, recovery, awake completion and refused-Standby paths keep HOLD HIGH;
+success/error WFI paths float it, and an unexpected return reasserts it.
+
+**Rejected:** retaining PD7 as the current wire plan; driving the old A3 pot
+LOW after it became HOLD; moving existing UART guard instructions/literals;
+or using the original HOLD tail address because the native USB selector
+already occupies it. The 76-byte PA2 entry is instead at 0x34181DF0 inside
+unused fixed error-copy padding. Actual error instructions end at 0x34181DC8,
+with 40 bytes of zero fill before HOLD and four after it. The complete
+1,536-byte copy remains fixed; only its real error engine is executable in
+that copied context. Branches and PC-relative references into the boot-only
+padding are refused, as are changed boundary symbols, hook bytes or fill.
+The USB tail at 0x34181E40 remains available. No GPIO-HOLD pin alias is accepted
+as hardware qualification or added to any live recovery allowlist.
+
+**Evidence:** [offline build, audits and regression results](evidence/2026-11-09-a3-hold/README.md),
+`gpio_hold_prefix.py`, `gpio_hold_transform.py`, `error_build.py`, and strict
+package inspection. PA2 success/error release groups are 70 bytes with WFI
+at offset 40; all original early startup/UART/loader/bridge bytes (apart from
+the reset vector and two receiver CRC words) remain identical to October 28.
+All twenty UART literals and 15,804-byte early receiver loading are unchanged.
+The user confirms the board is disconnected: pin transitions, latch timing,
+rail ordering and live recovery remain unmeasured, and no instrument, NOR,
+SD or installed firmware was touched. The disabled-HOLD receiver, prefix and
+sector reproduce October 28 exactly; historical PD7 artifacts stay unchanged.
+
+## 2026-11-09  Keep the exposure-pin migration diagnostic-only
+
+**Why:** after the A3 HOLD and A0–A2 pin migration, the user explicitly chose
+“Remap existing diagnostic; integrate exposure control later.” Normal captures
+therefore retain their fixed exposure. The diagnostic uses A0 LOW, A1 wiper
+and A2 HIGH; it does not apply readings to the sensor.
+
+**Rejected:** expanding this wiring update to include the planned exponential
+shortest-exposure-to-1-second mapping, or treating the remapped ADC diagnostic
+as commissioned capture control. ADC settling, endpoint calibration and its
+effect on the cold-start budget remain part of that later integration.
+
+**Evidence:** user's November 9 clarification; the current
+[control diagnostic](../control-smoke/README.md) and
+[offline combined candidate](../usb-ptp/evidence/2026-11-09-a3-hold/README.md).
+This confirmation changes no firmware binary or hardware state.

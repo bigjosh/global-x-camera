@@ -126,3 +126,159 @@
 **Rejected:** restoring the separated CLK/ground wiring or previous CN3.19/CN5.4 power endpoints as the current assembly plan; treating successful cycles as measured analog margin or complete image-readback qualification; assuming both 3.3 V supply contacts use the same regulator branch. CN3.5 is main VDDIO, while old CN5.4 is auxiliary VDD3V3. Account for the branch change in subsequent power comparisons; no voltage-bank conversion is selected.
 
 **Evidence:** direct user instruction on October27 to lock in the twisted connections, explicitly reporting GND→CN3.8 and VCC→CN3.5. [Canonical wiring and diagram](sd-breakout-benchmark.md); [UM3417 Rev4 Table20](https://www.st.com/resource/en/user_manual/um3417-stm32n6-nucleo144-board-mb1940-stmicroelectronics.pdf) lists CN3.3=PC2, CN3.5=VDDIO and CN3.8=GND. MB1940 C02 manufacturing ODB++ independently maps those contacts to PC2/net186, VDDIO/net11 and GND/net358. [Electrical interpretation and earlier uncertainty](../../firmware/sd-storage/NOTES.md#2026-10-27--treat-clockground-routing-as-an-experimental-variable). No agent bench operation, firmware change, new energy measurement or full-image readback accompanied this documentation change.
+
+## 2026-11-07  Verify the supplied uxcell thumbwheel electrically before assigning physical pins
+
+**Why:** the user identified the actual control as Amazon B07JLFC7FC, uxcell
+50 kOhm 16 x 2 mm five-pin duplex thumbwheel, replacing the earlier assumed
+10 kOhm slider hardware. The matching product listing identifies B503 and SKU
+a18081800ux0125 but supplies no pinout. The search did not establish a
+manufacturer datasheet tied to this SKU. A firsthand uxcell B503 teardown
+draws a shared end (1), wipers (2/3), and opposite ends (5/4 respectively),
+but does not qualify the user's delivered batch or physical viewing direction.
+
+**Rejected:** presenting an ALPS RK14J lookalike datasheet or a generic B503
+pin diagram as authoritative for this uxcell part; wiring by an assumed
+left-to-right numbering. Confirm constant end-to-end resistance near 50 kOhm
+and complementary variable wiper resistances with the unpowered part isolated.
+Use one verified track for each independent knob; a duplex wheel moves both
+tracks together. Revisit ADC settling/loading for 50 kOhm during control
+bring-up rather than silently retaining a 10 kOhm qualification.
+
+**Evidence:** user product photograph and [exact purchase link](https://www.amazon.com/dp/B07JLFC7FC);
+[matching uxcell product listing](https://www.harfington.com/products/p-1100763);
+[firsthand teardown and internal-track photograph](https://theblinkyledblog.blogspot.com/2016/04/uxcell-b503-b501-audio-duplex.html).
+No meter measurements, control firmware, or new canonical pot pin assignment
+were made in this lookup. Existing MCU-side A0/A1 and PE11 assignments remain
+the proposed interface, not proof of this component's internal connections.
+
+## 2026-11-07  Move the shared control supply to Arduino A5 PH2
+
+**Why:** the user prefers the shared switched supply beside the A0/A1 wipers
+for neater assembly. A5/CN4.6 connects to PH2 through fitted SB3 on the stock
+C02 board. SB2 is open, isolating PH9/I2C SCL and its pull-up. PH2's VDDIO4
+remains at 3.3 V in this SD prototype. Two separate 50 kOhm pot tracks draw
+132 uA nominal together; the A0/A1/A5 470 kOhm + 560 kOhm conditioning
+dividers add at most about 10 uA nominal. This is well below the 6.5 mA
+load specified for low-speed GPIO output-high performance at 3.3 V.
+
+**Rejected:** retaining the more distant PE11/D7 assignment solely because it
+was selected earlier; driving PG15 (the buffered ADC companion) or PH9
+instead of PH2; assuming the historical 1.8 V NAND-bank conversion happened.
+Use PH2 low-speed push-pull, initially LOW, HIGH for settling/sampling,
+then LOW before analog-rail shutdown. The high ends are supplied; the wipers
+remain A0 and A1. D9/PD7 power HOLD is unchanged. If VDDIO4 is later converted
+to 1.8 V, revisit the control range and calibration rather than retaining a
+3.3 V assumption.
+
+**Evidence:** [UM3417 Rev4 table 17 and default bridge footnote](https://www.st.com/resource/en/user_manual/um3417-stm32n6-nucleo144-board-mb1940-stmicroelectronics.pdf#page=31);
+saved MB1940 C02 schematic sheet 10 (SB3/SB2, A5 divider and U9B);
+[DS14791 Rev11 table 66](https://www.st.com/resource/en/datasheet/stm32n657x0.pdf#page=172);
+[current wiring](../hardware-firmware-interface.md#current-behavior-and-firmware-contract).
+This supersedes the October 24 PE11/D7 supply choice. Component pin numbering
+still needs the meter check recorded above. ADC firmware, settling and
+accuracy remain unqualified; no firmware or bench operation accompanied this
+wiring update, and the board remains disconnected for assembly.
+
+## 2026-11-07  Group the exposure control on A3 A4 and A5
+
+**Why:** the user wired the exposure thumbwheel to three adjacent Arduino
+contacts: low end A3/CN4.4, wiper A4/CN4.5, high end A5/CN4.6, and confirmed
+that A4 is the input to read. Stock C02 routing gives PA2 for the LOW drive,
+PH2 for the switched HIGH drive, and buffered PF3/ADC1_INP16 for the wiper.
+Keep A4's PC12 digital companion input/no-pull. Configure PA2 LOW before
+enabling PH2 and retain it LOW during sampling; A3 is not a fixed ground pin.
+
+**Rejected:** retaining A0/GND as the current exposure hookup, reading A3's
+analog companion instead of the A4 wiper, or treating successful raw samples
+as camera exposure integration. Gain's A1/CN4.2 wiper, CN5.6/GND return and
+shared A5 high remain proposed, not newly confirmed. The earlier physical
+thumbwheel pin-numbering caution and endpoint/settling qualification remain.
+
+**Evidence:** direct user wiring statement and A4 clarification on November 7;
+saved MB1940 C02 sheet 10 (SB6, SB5/SB4, SB3/SB2 and U9A) and DS14791
+PF3/ADC1_INP16 mapping; [current wiring table](../hardware-firmware-interface.md#current-behavior-and-firmware-contract)
+and [RAM-only diagnostic](../../firmware/control-smoke/README.md). The first
+v5 diagnostic reads A4 at 10 Hz with raw values around 1190, PA2 LOW and PH2
+HIGH, without reported errors. Full-travel validation is pending. No NOR
+programming or integration into capture firmware accompanied this smoke test.
+This supersedes only the exposure A0/GND plan in earlier notes; A5 remains
+the selected shared supply and D9/PD7 power HOLD is unchanged.
+
+## 2026-11-09  Exposure control now occupies A0 through A2, freeing A3
+
+**Why:** while reviewing whether HOLD could move to A3, the user reports
+that the exposure knob has physically moved to A0–A2. This supersedes the
+previous A3–A5 exposure hookup and frees A3 from that knob connection.
+Exact low/wiper/high roles within the new group were not restated; do not
+invent them or assume the older proposed gain use of A1 remains available.
+
+**Rejected:** reusing the old control-smoke program unchanged with the new
+hookup, or claiming it already supports A3 HOLD. That diagnostic explicitly
+drives PA2/A3 LOW. Installed USB HOLD remains PD7; an A3 migration needs
+capture/USB/recovery/shutdown firmware updates before use.
+
+**Evidence:** direct November9 user clarification; current
+`firmware/control-smoke/control.c` drives `output(GPIOA,2,0)` and the current
+manifest names A3-low/A4-wiper/A5-high. A3 is CN4.4/PA2 through fitted SB6
+on MB1940 C02. Its R159=470kohm/R158=560kohm analog-conditioning branch
+loads a3.3V HIGH by approximately3.2uA. This report records the knob move,
+not a selected/installed HOLD relocation or a bench test.
+
+## 2026-11-09  Reserve A3 for HOLD and confirm A0 A1 A2 exposure roles
+
+**Why:** the user explicitly selects A3/CN4.4/PA2 for HOLD and confirms the
+adjacent exposure contacts as A0 LOW, A1 wiper and A2 HIGH. Grouping the
+control wiring on CN4 simplifies assembly. Stock C02 routing provides PF5
+for A0 LOW, buffered PA9/ADC1 channel10 for the A1 wiper and PF6 for A2 HIGH;
+A1's digital companion PC10 stays input/no-pull. PA2 is a main-VDD GPIO
+through fitted SB6, so no PCB or voltage-bank conversion is needed.
+
+**Rejected:** retaining D9/PD7 as the canonical HOLD endpoint; running the
+old A3–A5 diagnostic, which deliberately drives PA2 LOW; or keeping the
+earlier gain-on-A1 proposal when exposure now occupies A1. No gain replacement
+is selected in this pin migration. The conditioned PA8/PA10/PA12 companions
+remain analog/Hi-Z and are not the GPIO outputs to drive. A3's existing
+470kohm/560kohm divider adds about3.2uA load at3.3V; it does not prevent
+driving Q2, but it belongs in any future HOLD-current accounting.
+
+**Evidence:** direct user selection and explicit A0 LOW/A1 wiper/A2 HIGH
+confirmation; UM3417 Rev4 Table17, MB1940 C02 sheet10/SB6/U8B and DS14791
+PA2 main-VDD supply note2. [Current interface](../hardware-firmware-interface.md)
+and [canonical SVG](../power/lipo-latch-wiring.svg) use the new assignments.
+The power topology is unchanged: Q3 before Q1; R0 in the battery branch;
+D_USB joins after R0. New firmware changes are offline while the user has
+the board disconnected for assembly. Package08 remains the last installed
+PD7 image; new A3 takeover, recovery, ADC endpoints and latch cutoff require
+hardware tests after reconnection. No instrument operation or installation
+accompanied this documentation update.
+
+## 2026-11-10  Put the ASA analog-gain knob on A4 A5 and ground
+
+**Why:** the user installed an additional potentiometer for ASA control,
+with its track between A4 and GND and its wiper on A5. It will set sensor
+analog gain. This assigns the remaining nearby Arduino analog-header
+contacts while preserving exposure on A0 LOW/A1 wiper/A2 HIGH and power
+HOLD on A3. A4/CN4.5 uses PC12 for future switched excitation; A5/CN4.6
+feeds the conditioned PG15/ADC1 channel7 input, with PH2 input/no-pull.
+
+**Rejected:** leaving gain wiring unassigned or retaining gain on A1;
+sharing exposure's A2 supply after the user's separate A4 connection;
+driving A5/PH2 as in the historical exposure diagnostic; mapping ASA to
+digital gain; or claiming the added wiring already changes sensor settings.
+Keep the accepted 1×–8× analog range and unity digital gain. Exact ASA scale,
+endpoint calibration, curve and settling remain implementation work.
+Normal capture still uses fixed settings, and the current RAM diagnostic
+tests only exposure. The older A3–A5 helper also lowers A3 HOLD and must
+not be used with this wiring.
+
+**Evidence:** direct November10 user hardware report; saved MB1940 C02
+schematic sheet10 (A4 PC12/SB5, A5 PH2/SB3 and divider/U9B to PG15), default
+SB4/SB2 open; historical [A5 endpoint manifest](../../firmware/control-smoke/evidence/2026-11-08-diagnosis/builds/v11-default-secure/manifest.json)
+names ADC1_INP7/PG15. The current SD prototype retains 3.3V VDDIO4 for
+PC12/PH2. PF3, A4's buffered ADC companion, stays analog/Hi-Z rather than
+driving the header. Future firmware should drive PC12 LOW initially, HIGH
+for settling/sampling, then LOW; never feed header-level3.3V directly into
+an unconditioned ADC pin. [Current interface](../hardware-firmware-interface.md)
+records both knobs. No firmware, instrument or hardware-test operation
+accompanied this documentation update.

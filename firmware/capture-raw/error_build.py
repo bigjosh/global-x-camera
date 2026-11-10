@@ -1,4 +1,5 @@
 """Opt-in error signaling integration; preserve the existing recovery path."""
+import hashlib
 import re
 import struct
 
@@ -173,12 +174,31 @@ def audit_engine(folder):
     """
     listing=(folder/'stage1.lst').read_text()
     engine=listing.split('34181840 <error_signal_shutdown>:',1)[1]
+    # The canonical PA2 boot hook lives in reserved copy padding. Exclude it
+    # from engine decoding, but prohibit every engine branch/literal from
+    # reaching it. Its bytes and reset-only entry are separately authenticated
+    # by gpio_hold_prefix.check(). Legacy engines retain their exact audit.
+    engine_end=ENTRY+COPY_BYTES
+    if re.search(r'^34181df0 <gpio_hold_boot>:', listing, re.M):
+        symbols=(folder/'symbols.txt').read_text()
+        matches=re.findall(r'^([0-9a-fA-F]+) [A-Za-z] _error_engine_end$',symbols,re.M)
+        if len(matches)!=1:
+            raise ValueError('Missing actual error-engine end for embedded HOLD hook')
+        engine_end=int(matches[0],16)
+        if engine_end!=0x34181DC8:
+            raise ValueError('Error engine boundary differs from reviewed embedded HOLD layout')
+        image=(folder/'stage1.bin').read_bytes()
+        hook=image[0x19F0:0x1A3C]
+        if (any(image[engine_end-0x34180400:0x19F0]) or
+            hashlib.sha256(hook).hexdigest()!='1c2487687bdd4e11737492c68f50f2409722b319cc4a67c6dd4efe4867489f1e'):
+            raise ValueError('Unreviewed executable in reserved error-copy padding')
+
     instructions=0; literals=0; branches=0; pc_loads=0
     for line in engine.splitlines():
         m=re.match(r'^([0-9a-f]+):\s+((?:[0-9a-f]{4,8}\s+)+)\s*(.*)$',line)
         if not m: continue
         address=int(m[1],16)
-        if not ENTRY<=address<ENTRY+COPY_BYTES: continue
+        if not ENTRY<=address<engine_end: continue
         op=m[3].strip()
         if op.startswith('.word'):
             word=int(op.split()[1],16); literals+=1
@@ -194,12 +214,12 @@ def audit_engine(folder):
                 re.fullmatch(r'(?:wls|le|letp|wlstp)(?:\.[a-z0-9]+)*',mnemonic))
         if branch:
             target=re.search(r'\b([0-9a-f]{8})\s+<',op)
-            if not target or not ENTRY<=int(target[1],16)<ENTRY+COPY_BYTES:
+            if not target or not ENTRY<=int(target[1],16)<engine_end:
                 raise ValueError('Copied error engine branches outside its section: '+line)
             branches+=1
         if re.search(r'\bpc\b',op):
             target=re.search(r'@\s*\(?([0-9a-f]{8})\s+<',op)
-            if not mnemonic.startswith('ldr') or '[pc,' not in op or not target or not ENTRY<=int(target[1],16)<ENTRY+COPY_BYTES:
+            if not mnemonic.startswith('ldr') or '[pc,' not in op or not target or not ENTRY<=int(target[1],16)<engine_end:
                 raise ValueError('Unreviewed PC dependency in copied error engine: '+line)
             pc_loads+=1
         if mnemonic.startswith(('tbb','tbh','adr')) or re.match(r'\w+(?:\.\w+)?\s+(?:pc|r15)\b',op):

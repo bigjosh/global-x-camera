@@ -1,5 +1,109 @@
 # Prototype power cost: 5 V Nucleo, modified 3.3 V Nucleo, custom PCB
 
+## November 6: 2.2-ohm input resistor tested
+
+Three cold cycles with the user-installed 2.2-ohm series resistor reduced
+median sampled peaks **6.140→1.743 A** initially and **1.311→1.051 A** at the
+secondary startup pulse. All three images passed complete 25 MHz readback,
+independent decoding and visual review. Sleep current remains **3.309 mA**;
+first exposure is **24.58–25.27 ms** after measured current onset. Normal
+firmware is unchanged. The target was left intentionally powered off.
+
+Post-5-ms cycle energy ranged **168–263 mJ**, versus **159–169 mJ** previously.
+Longer SD activity dominates the median increase; the closest-duration run
+used about5.3% more whole-cycle energy. This does not isolate resistor loss.
+Actual board-side voltage and MCU rail rise times remain unmeasured.
+[Measured comparison, images, interpretation and final handoff](evidence/2026-11-06-series-resistor-tested/README.md).
+
+## November 6: C17 removed, repeated startup comparison
+
+The user removed **C17 / 10 µF**, with C14 and U42 already removed. Three
+cold cycles on the unchanged normal firmware reduced the median JS110 sampled
+peak from **6.497 to 6.140 A (5.5%)**, first-250-µs net charge from **0.18540
+to 0.14588 mC (21.3%)**, and time above 5 A from **18 to 13.5 µs**. These are
+fixed-10-A, native-2-MS/s observations on direct regulated 5 V, with the latest
+three LOW-current runs as control. The preceding suspected-short runs are
+excluded. Source-side voltage and instrument response do not qualify actual
+target-rail extrema or LiPo operation.
+
+Sleep current remains **3.310 mA**, versus 3.311 mA before removal. Post-5-ms
+energy fell from a median 256.77 to 159.97 mJ, but SD transport shortened from
+383.68 to 164.86 ms and accounts for that difference; this is **not a C17
+whole-cycle energy-saving claim**. Firmware and SD format are unchanged.
+[Three-run results, saved-image checks and measurement limits](evidence/2026-11-06-c17-removed/README.md).
+
+## November 6: remaining input-capacitance candidates for a stiff LiPo
+
+**Update after testing:** C17 has now been removed and tested as described
+above. Its [verified underside locator](evidence/2026-11-05-inrush/cap-locations/c17-location.png)
+remains available for reference. The next untested candidate is **C12 (10 µF)**,
+keeping C28 (1 µF), because U14 is already
+disabled and its output is disconnected in the fitted C02 configuration (R22
+and R10 absent). **C12/C28 remain unchanged.** The principal nominal direct-input
+inventory is now about 44 µF after C14/C17 removal; removing C12 would take it
+to 34 µF, versus 54 µF after C14 alone. This is not the whole board's capacitance and does
+not predict a 37% peak-current reduction. Effective ceramic capacitance varies
+with bias, and removing caps changes the transient circuit itself.
+
+An additional later experiment could reduce U17's C19/C23 pair from 20 µF to
+10 µF, retaining the capacitor with the best local VIN/GND loop. This requires
+layout confirmation and input/core rail startup, ripple and load-step tests.
+TI says 4.7 µF is sufficient for most TPS62088 applications, but that is not a
+board-specific guarantee. Keep U34's C76/C82, regulator output capacitors and
+MCU/sensor bypass capacitors for now. A stiff LiPo lowers low-frequency source
+impedance; its leads and protection/switch circuitry cannot replace local
+high-frequency decoupling or regulator output-filter stability requirements.
+[TPS62088 section 8.2.2.6](https://www.ti.com/lit/ds/symlink/tps62088.pdf#page=13),
+[ST1S31 input-capacitor guidance](https://www.st.com/resource/en/datasheet/st1s31.pdf#page=16).
+
+Full U14 input isolation would require R32, R33 **and C26** to be opened, with
+no external feed across CN12.5/6; C26 bridges the same input nodes. LNK2 ties
+the positive measurement node to 5V and is not another bypass into U14 VIN.
+That three-part rework is deferred in favor of the simpler C12-only candidate.
+The original candidate review did not change hardware or firmware; the later
+C17 experiment above supersedes its prior untested status.
+Capacitance reduction lowers charge demand; a controlled input ramp is still
+the more direct way to bound the peak. Retest startup/shutdown rail sequencing
+as well as image capture after any input-capacitance change.
+
+## November 6: excess active current is absent after a suspected short correction
+
+Three unchanged cold capture/save cycles now average **79.65–80.03 mA** and use
+**256.56–260.89 mJ**, measured from 5 ms after current onset through the low
+plateau. The previous approximately 331 mA / 1.03–1.04 J results had an extra
+load that is now absent. During testing the user reported an inadvertent short
+may have been fixed; its exact location and repair timing were not inspected.
+C14 remains removed and normal firmware is unchanged. Do not use the abnormal
+runs as the ordinary C14-removed power budget or attribute their offset to C14.
+The final auto-range shutdown plateau is **3.311 mA at 4.99554 V**.
+[Three-cycle comparison, controls and limits](evidence/2026-11-06-active-current/README.md).
+
+C79 is a **1 nF, 2 kV Ethernet cable-termination capacitor**, not a power-rail
+reservoir. Leave it fitted: removing it offers no relevant DC or supply-inrush
+saving. No C79 removal is reported. The initial multiampere startup transient
+remains a separate inrush issue.
+
+## November 5: U42 removal and remaining sleep loads
+
+The user reports successful U42 removal and **3.3 mA after sleep**. The November5 API check now independently confirms **3.31mA at4.995V**, or16.53mW, with direct regulated5V through JS110. This is about5.2mA below the earlier roughly8.5mA plateau, consistent with LD1117 bias, but is not a matched before/after isolation of U42 or a fresh MCU Standby-flag proof. Earlier U42-fitted estimates and measurements below remain historical. [New baseline, inrush capacitor audit, prepared experiments and missing-debugger boundary](evidence/2026-11-05-inrush/README.md).
+
+The user subsequently clarified that the SD carrier power LED was **already removed**. Its removal date and individual saving were not supplied; do not count it as another available reduction.
+
+Remaining-load review:
+
+| Item | Evidence and expected scale | Tradeoff / next step |
+|---|---|---|
+| SD carrier power LED | User confirms already removed. Its historical individual current is unmeasured. | No further saving available from this removal; preserve signal pull-ups. |
+| SD card and carrier supply | `sd_deinit()` disables the controller, not the supply. Historical disconnected/connected tests suggest an order0.5mA difference, but are not matched controls and do not isolate the former LED from card. | Next attribution: after a successful save and completed shutdown, remove only the card and observe the current change, leaving the carrier and wires intact. No measurement has yet been reported. Moving supply to AUX3.3V requires GPIO release/backfeed, cold-init and sequencing qualification. |
+| ST-LINK voltage dividers | R73/R74=5.1k/10k draw331uA at5V; R65/R70=10k/10k draw165uA at3.3V. Main LDO passes the latter current, giving about496uA input total. | Do not remove them while relying on ST-LINK voltage detection. Tenfold ratio-preserving resistance could save about446uA ideally, but input leakage and ADC settling/recovery must be checked. No resistor substitution selected. |
+| Main/AON regulator bias | U33/U23 LD39020:20uA typical no-load each. U14 already disabled; U34 and core are controlled by PWR_ON; U25 is unpowered with VIN unused/CN9 shunts absent. | No second U42-like unused milliamps regulator found. Keep these parts; confirm actual AUX/core rail collapse if unexplained residual persists. |
+
+The last installed source leaves SD CMD/DAT pins as inputs with pull-ups after deinit, only CLK pulled down; the final normal Standby preparation does not introduce data-line pull-downs. Thus the carrier's10k data pull-ups are not established static-current loads. Ethernet, camera and analog-buffer supplies are auxiliary and should already be off in true Standby; their active-current reductions are separate from this3.3mA plateau. Do not attribute the remaining current entirely to intrinsic MCU Standby or to the already-removed SD LED.
+
+Sources: [C02 schematic](https://www.st.com/resource/en/schematic_pack/mb1940-n657x0q-c02-schematic.pdf), [LD39020](https://www.st.com/resource/en/datasheet/ld39020.pdf), [ST1S31](https://www.st.com/resource/en/datasheet/st1s31.pdf), [divider audit](nucleo-debug-isolation.md), [carrier LED observation](../../firmware/capture-raw/evidence/2026-10-25-sd-fourbit/README.md), [current SD wiring](../prototype/sd-breakout-benchmark.md). No new hardware test, firmware change or further removal occurred.
+
+## Earlier measured baselines
+
 The latest [October 28 complete-camera comparison](../../firmware/capture-raw/evidence/2026-10-28-ethernet-powerdown/README.md)
 qualifies Ethernet PHY power-down in installed normal firmware. Median energy
 over the measured window fell **224.82→173.65 mJ (22.8%)**, while median cycle
@@ -38,7 +142,8 @@ DC1863A specifies its 5 V output for **5.2–17 V input**. LTC3621 is a buck, so
 |---|---|---|
 | Ethernet U24 | Still fitted; powered from auxiliary VDD3V3, which switches off in Standby. Active capture source contains no explicit PHY management/power-down sequence. LAN8742 reference is 103 mW in reset versus 11 mW in general power-down. Its reset releases with target NRST; actual subsequent state/current is unmeasured. | An order-0.1-W removable-load candidate, not a measured 103 mW attribution. At an assumed 90% auxiliary-buck efficiency, 103 mW corresponds to about 114 mW at target 5 V. |
 | Camera sensor and adapter | VD56G3 full-resolution 60 fps reference: 8.5 mA at 1.8 V, 57 mA at 1.15 V, 22.8 mA at 2.8 V, totaling about 145 mW. The three adapter LDOs draw approximately 291 mW from 3.3 V for those loads. | About 146 mW of adapter LDO loss while operating at that reference. Efficient rail generation can reduce it, but cannot remove the sensor's own consumption. This is a streaming reference, not a measured one-shot energy. |
-| Camera upstream rail | CN6.22/VDD_CAM receives auxiliary VDD3V3 through SB10; the alternative U42/SB31 supply path is not fitted in the C02 schematic. | With an assumed 90% auxiliary buck, the 291 mW sensor-rail load is about 324 mW at 5 V, excluding oscillator and small losses. Do not model it as a main 5-to-3.3 V LDO cascade. |
+| Camera upstream rail | CN6.22/VDD_CAM receives auxiliary VDD3V3 through SB10. November 5 correction: the C02 BOM marks U42 fitted and only its output link SB31 not fitted; the alternative path does not supply the camera, but U42 remains powered from 5 V. | With an assumed 90% auxiliary buck, the 291 mW sensor-rail load is about 324 mW at 5 V, excluding oscillator and small losses. Do not model it as a main 5-to-3.3 V LDO cascade or omit the separate unused-U42 overhead below. |
+| Unused camera LDO U42 (identified November 5) | LD1117S33TR input is directly on target 5 V; its output supplies only the local capacitor and open SB31 in the default C02 configuration. BOM population and schematic/ODB connectivity are verified; the delivered board has not been newly inspected. | Datasheet Table 6 gives 5 mA typical / 10 mA maximum quiescent current under its stated conditions, suggesting roughly 25 mW typical at 5 V. This is a candidate contribution to the residual board current, not a measured attribution or qualified removal saving. No rework performed. |
 | SD supply | Current user-selected CN3.5 is main VDDIO through U33, the 5-to-3.3 V LDO; the previous CN5.4 supply was the auxiliary buck. | Ideal linear efficiency is 66%: for every 100 mA the card draws, 330 mW reaches it and 170 mW is dissipated by U33. This is a scaling example, not measured card current. Preserve main/AUX sequencing when considering a different supply. |
 | MCU | Datasheet reference sums to about 62.5 mW across its rails at 600 MHz HSI, CoreMark in ITCM, peripherals disabled; core accounts for 53.5 mW. | Not our 400 MHz CSI/SDMMC workload, a lower bound, or a rail measurement. Core conversion, active peripherals, RAM/interconnect and external NOR add demand. |
 | ST-LINK and power LED | D2 and R23 already removed. | Do not count removal of their main loads again as prospective savings. Signal/sense paths remain unqualified. |

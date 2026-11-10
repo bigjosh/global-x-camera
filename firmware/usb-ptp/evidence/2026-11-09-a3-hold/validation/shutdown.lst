@@ -1,0 +1,628 @@
+
+D:\Github\global-x-camera\tmp\usb-shutdown-offline\shutdown.elf:     file format elf32-littlearm
+
+
+Disassembly of section .text:
+
+34300000 <publish>:
+34300000:	4b10      	ldr	r3, [pc, #64]	@ (34300044 <publish+0x44>)
+34300002:	2200      	movs	r2, #0
+34300004:	b570      	push	{r4, r5, r6, lr}
+34300006:	461c      	mov	r4, r3
+34300008:	490f      	ldr	r1, [pc, #60]	@ (34300048 <publish+0x48>)
+3430000a:	4d10      	ldr	r5, [pc, #64]	@ (3430004c <publish+0x4c>)
+3430000c:	f8c3 20a0 	str.w	r2, [r3, #160]	@ 0xa0
+34300010:	60d8      	str	r0, [r3, #12]
+34300012:	2604      	movs	r6, #4
+34300014:	f046 e001 	dls	lr, r6
+34300018:	6818      	ldr	r0, [r3, #0]
+3430001a:	b2c6      	uxtb	r6, r0
+3430001c:	4071      	eors	r1, r6
+3430001e:	4369      	muls	r1, r5
+34300020:	0a00      	lsrs	r0, r0, #8
+34300022:	f00f c007 	le	lr, 3430001a <publish+0x1a>
+34300026:	3201      	adds	r2, #1
+34300028:	2a27      	cmp	r2, #39	@ 0x27
+3430002a:	f103 0304 	add.w	r3, r3, #4
+3430002e:	d1f0      	bne.n	34300012 <publish+0x12>
+34300030:	f8c4 109c 	str.w	r1, [r4, #156]	@ 0x9c
+34300034:	f3bf 8f5f 	dmb	sy
+34300038:	4b05      	ldr	r3, [pc, #20]	@ (34300050 <publish+0x50>)
+3430003a:	f8c4 30a0 	str.w	r3, [r4, #160]	@ 0xa0
+3430003e:	f3bf 8f4f 	dsb	sy
+34300042:	bd70      	pop	{r4, r5, r6, pc}
+34300044:	34300674 	.word	0x34300674
+34300048:	811c9dc5 	.word	0x811c9dc5
+3430004c:	01000193 	.word	0x01000193
+34300050:	44455355 	.word	0x44455355
+
+34300054 <assert_hold>:
+34300054:	4b20      	ldr	r3, [pc, #128]	@ (343000d8 <assert_hold+0x84>)
+34300056:	f8d3 225c 	ldr.w	r2, [r3, #604]	@ 0x25c
+3430005a:	07d2      	lsls	r2, r2, #31
+3430005c:	d401      	bmi.n	34300062 <assert_hold+0xe>
+3430005e:	2000      	movs	r0, #0
+34300060:	4770      	bx	lr
+34300062:	f8d3 321c 	ldr.w	r3, [r3, #540]	@ 0x21c
+34300066:	07d8      	lsls	r0, r3, #31
+34300068:	d4f9      	bmi.n	3430005e <assert_hold+0xa>
+3430006a:	2204      	movs	r2, #4
+3430006c:	4b1b      	ldr	r3, [pc, #108]	@ (343000dc <assert_hold+0x88>)
+3430006e:	619a      	str	r2, [r3, #24]
+34300070:	685a      	ldr	r2, [r3, #4]
+34300072:	f022 0204 	bic.w	r2, r2, #4
+34300076:	605a      	str	r2, [r3, #4]
+34300078:	68da      	ldr	r2, [r3, #12]
+3430007a:	f022 0230 	bic.w	r2, r2, #48	@ 0x30
+3430007e:	60da      	str	r2, [r3, #12]
+34300080:	681a      	ldr	r2, [r3, #0]
+34300082:	f022 0230 	bic.w	r2, r2, #48	@ 0x30
+34300086:	f042 0210 	orr.w	r2, r2, #16
+3430008a:	601a      	str	r2, [r3, #0]
+3430008c:	f3bf 8f4f 	dsb	sy
+34300090:	4a13      	ldr	r2, [pc, #76]	@ (343000e0 <assert_hold+0x8c>)
+34300092:	6819      	ldr	r1, [r3, #0]
+34300094:	f8c2 108c 	str.w	r1, [r2, #140]	@ 0x8c
+34300098:	68d9      	ldr	r1, [r3, #12]
+3430009a:	f8c2 1090 	str.w	r1, [r2, #144]	@ 0x90
+3430009e:	6959      	ldr	r1, [r3, #20]
+343000a0:	f8c2 1094 	str.w	r1, [r2, #148]	@ 0x94
+343000a4:	6919      	ldr	r1, [r3, #16]
+343000a6:	f8c2 1098 	str.w	r1, [r2, #152]	@ 0x98
+343000aa:	f8d2 108c 	ldr.w	r1, [r2, #140]	@ 0x8c
+343000ae:	f001 0130 	and.w	r1, r1, #48	@ 0x30
+343000b2:	2910      	cmp	r1, #16
+343000b4:	d1d3      	bne.n	3430005e <assert_hold+0xa>
+343000b6:	f8d2 1090 	ldr.w	r1, [r2, #144]	@ 0x90
+343000ba:	f011 0f30 	tst.w	r1, #48	@ 0x30
+343000be:	d1ce      	bne.n	3430005e <assert_hold+0xa>
+343000c0:	685b      	ldr	r3, [r3, #4]
+343000c2:	0759      	lsls	r1, r3, #29
+343000c4:	d4cb      	bmi.n	3430005e <assert_hold+0xa>
+343000c6:	f8d2 3094 	ldr.w	r3, [r2, #148]	@ 0x94
+343000ca:	075b      	lsls	r3, r3, #29
+343000cc:	d5c7      	bpl.n	3430005e <assert_hold+0xa>
+343000ce:	f8d2 0098 	ldr.w	r0, [r2, #152]	@ 0x98
+343000d2:	f3c0 0080 	ubfx	r0, r0, #2, #1
+343000d6:	4770      	bx	lr
+343000d8:	56028000 	.word	0x56028000
+343000dc:	56020000 	.word	0x56020000
+343000e0:	34300674 	.word	0x34300674
+
+343000e4 <refuse>:
+343000e4:	4d07      	ldr	r5, [pc, #28]	@ (34300104 <usb_shutdown_refused_park+0x2>)
+343000e6:	b508      	push	{r3, lr}
+343000e8:	460c      	mov	r4, r1
+343000ea:	6128      	str	r0, [r5, #16]
+343000ec:	f7ff ffb2 	bl	34300054 <assert_hold>
+343000f0:	4a05      	ldr	r2, [pc, #20]	@ (34300108 <usb_shutdown_refused_park+0x6>)
+343000f2:	61e8      	str	r0, [r5, #28]
+343000f4:	6913      	ldr	r3, [r2, #16]
+343000f6:	4620      	mov	r0, r4
+343000f8:	f023 0316 	bic.w	r3, r3, #22
+343000fc:	6113      	str	r3, [r2, #16]
+343000fe:	f7ff ff7f 	bl	34300000 <publish>
+
+34300102 <usb_shutdown_refused_park>:
+34300102:	e7fe      	b.n	34300102 <usb_shutdown_refused_park>
+34300104:	34300674 	.word	0x34300674
+34300108:	e000ed00 	.word	0xe000ed00
+
+3430010c <usb_shutdown_enter>:
+3430010c:	b580      	push	{r7, lr}
+3430010e:	4603      	mov	r3, r0
+34300110:	b672      	cpsid	i
+34300112:	2200      	movs	r2, #0
+34300114:	f04f 0e29 	mov.w	lr, #41	@ 0x29
+34300118:	499e      	ldr	r1, [pc, #632]	@ (34300394 <usb_shutdown_enter+0x288>)
+3430011a:	4610      	mov	r0, r2
+3430011c:	460c      	mov	r4, r1
+3430011e:	f04e e001 	dls	lr, lr
+34300122:	f841 0b04 	str.w	r0, [r1], #4
+34300126:	3201      	adds	r2, #1
+34300128:	f00f c805 	le	lr, 34300122 <usb_shutdown_enter+0x16>
+3430012c:	499a      	ldr	r1, [pc, #616]	@ (34300398 <usb_shutdown_enter+0x28c>)
+3430012e:	2001      	movs	r0, #1
+34300130:	6021      	str	r1, [r4, #0]
+34300132:	2102      	movs	r1, #2
+34300134:	6061      	str	r1, [r4, #4]
+34300136:	60a2      	str	r2, [r4, #8]
+34300138:	4a98      	ldr	r2, [pc, #608]	@ (3430039c <usb_shutdown_enter+0x290>)
+3430013a:	6163      	str	r3, [r4, #20]
+3430013c:	60e0      	str	r0, [r4, #12]
+3430013e:	6952      	ldr	r2, [r2, #20]
+34300140:	6222      	str	r2, [r4, #32]
+34300142:	f3ef 8214 	mrs	r2, CONTROL
+34300146:	6262      	str	r2, [r4, #36]	@ 0x24
+34300148:	f3ef 8205 	mrs	r2, IPSR
+3430014c:	62a2      	str	r2, [r4, #40]	@ 0x28
+3430014e:	f3ef 8213 	mrs	r2, FAULTMASK
+34300152:	62e2      	str	r2, [r4, #44]	@ 0x2c
+34300154:	4a92      	ldr	r2, [pc, #584]	@ (343003a0 <usb_shutdown_enter+0x294>)
+34300156:	2b0f      	cmp	r3, #15
+34300158:	6b52      	ldr	r2, [r2, #52]	@ 0x34
+3430015a:	6322      	str	r2, [r4, #48]	@ 0x30
+3430015c:	d002      	beq.n	34300164 <usb_shutdown_enter+0x58>
+3430015e:	2104      	movs	r1, #4
+34300160:	f7ff ffc0 	bl	343000e4 <refuse>
+34300164:	6aa3      	ldr	r3, [r4, #40]	@ 0x28
+34300166:	b963      	cbnz	r3, 34300182 <usb_shutdown_enter+0x76>
+34300168:	6ae3      	ldr	r3, [r4, #44]	@ 0x2c
+3430016a:	b953      	cbnz	r3, 34300182 <usb_shutdown_enter+0x76>
+3430016c:	6a63      	ldr	r3, [r4, #36]	@ 0x24
+3430016e:	f033 030c 	bics.w	r3, r3, #12
+34300172:	d106      	bne.n	34300182 <usb_shutdown_enter+0x76>
+34300174:	6a23      	ldr	r3, [r4, #32]
+34300176:	f413 3f40 	tst.w	r3, #196608	@ 0x30000
+3430017a:	d102      	bne.n	34300182 <usb_shutdown_enter+0x76>
+3430017c:	6b23      	ldr	r3, [r4, #48]	@ 0x30
+3430017e:	07db      	lsls	r3, r3, #31
+34300180:	d502      	bpl.n	34300188 <usb_shutdown_enter+0x7c>
+34300182:	2104      	movs	r1, #4
+34300184:	2002      	movs	r0, #2
+34300186:	e7eb      	b.n	34300160 <usb_shutdown_enter+0x54>
+34300188:	4b86      	ldr	r3, [pc, #536]	@ (343003a4 <usb_shutdown_enter+0x298>)
+3430018a:	4a87      	ldr	r2, [pc, #540]	@ (343003a8 <usb_shutdown_enter+0x29c>)
+3430018c:	f8c3 1a78 	str.w	r1, [r3, #2680]	@ 0xa78
+34300190:	f8c3 2a5c 	str.w	r2, [r3, #2652]	@ 0xa5c
+34300194:	f3bf 8f4f 	dsb	sy
+34300198:	f8d3 1278 	ldr.w	r1, [r3, #632]	@ 0x278
+3430019c:	6461      	str	r1, [r4, #68]	@ 0x44
+3430019e:	f8d3 125c 	ldr.w	r1, [r3, #604]	@ 0x25c
+343001a2:	6361      	str	r1, [r4, #52]	@ 0x34
+343001a4:	f8d3 321c 	ldr.w	r3, [r3, #540]	@ 0x21c
+343001a8:	63a3      	str	r3, [r4, #56]	@ 0x38
+343001aa:	6c63      	ldr	r3, [r4, #68]	@ 0x44
+343001ac:	079f      	lsls	r7, r3, #30
+343001ae:	d507      	bpl.n	343001c0 <usb_shutdown_enter+0xb4>
+343001b0:	6b63      	ldr	r3, [r4, #52]	@ 0x34
+343001b2:	ea03 0102 	and.w	r1, r3, r2
+343001b6:	439a      	bics	r2, r3
+343001b8:	d102      	bne.n	343001c0 <usb_shutdown_enter+0xb4>
+343001ba:	6ba3      	ldr	r3, [r4, #56]	@ 0x38
+343001bc:	420b      	tst	r3, r1
+343001be:	d002      	beq.n	343001c6 <usb_shutdown_enter+0xba>
+343001c0:	2104      	movs	r1, #4
+343001c2:	2003      	movs	r0, #3
+343001c4:	e7cc      	b.n	34300160 <usb_shutdown_enter+0x54>
+343001c6:	f7ff ff45 	bl	34300054 <assert_hold>
+343001ca:	61e0      	str	r0, [r4, #28]
+343001cc:	69e3      	ldr	r3, [r4, #28]
+343001ce:	b913      	cbnz	r3, 343001d6 <usb_shutdown_enter+0xca>
+343001d0:	2104      	movs	r1, #4
+343001d2:	4608      	mov	r0, r1
+343001d4:	e7c4      	b.n	34300160 <usb_shutdown_enter+0x54>
+343001d6:	4873      	ldr	r0, [pc, #460]	@ (343003a4 <usb_shutdown_enter+0x298>)
+343001d8:	f8d0 3260 	ldr.w	r3, [r0, #608]	@ 0x260
+343001dc:	63e3      	str	r3, [r4, #60]	@ 0x3c
+343001de:	6be3      	ldr	r3, [r4, #60]	@ 0x3c
+343001e0:	061e      	lsls	r6, r3, #24
+343001e2:	d502      	bpl.n	343001ea <usb_shutdown_enter+0xde>
+343001e4:	2104      	movs	r1, #4
+343001e6:	2005      	movs	r0, #5
+343001e8:	e7ba      	b.n	34300160 <usb_shutdown_enter+0x54>
+343001ea:	6be2      	ldr	r2, [r4, #60]	@ 0x3c
+343001ec:	4b6f      	ldr	r3, [pc, #444]	@ (343003ac <usb_shutdown_enter+0x2a0>)
+343001ee:	421a      	tst	r2, r3
+343001f0:	d108      	bne.n	34300204 <usb_shutdown_enter+0xf8>
+343001f2:	f8d0 327c 	ldr.w	r3, [r0, #636]	@ 0x27c
+343001f6:	f013 0f44 	tst.w	r3, #68	@ 0x44
+343001fa:	d103      	bne.n	34300204 <usb_shutdown_enter+0xf8>
+343001fc:	f8d0 3264 	ldr.w	r3, [r0, #612]	@ 0x264
+34300200:	025d      	lsls	r5, r3, #9
+34300202:	d502      	bpl.n	3430020a <usb_shutdown_enter+0xfe>
+34300204:	2104      	movs	r1, #4
+34300206:	2006      	movs	r0, #6
+34300208:	e7aa      	b.n	34300160 <usb_shutdown_enter+0x54>
+3430020a:	4a69      	ldr	r2, [pc, #420]	@ (343003b0 <usb_shutdown_enter+0x2a4>)
+3430020c:	f240 5101 	movw	r1, #1281	@ 0x501
+34300210:	6813      	ldr	r3, [r2, #0]
+34300212:	4d68      	ldr	r5, [pc, #416]	@ (343003b4 <usb_shutdown_enter+0x2a8>)
+34300214:	f443 637f 	orr.w	r3, r3, #4080	@ 0xff0
+34300218:	f043 0303 	orr.w	r3, r3, #3
+3430021c:	6013      	str	r3, [r2, #0]
+3430021e:	68d3      	ldr	r3, [r2, #12]
+34300220:	f423 637f 	bic.w	r3, r3, #4080	@ 0xff0
+34300224:	f023 0303 	bic.w	r3, r3, #3
+34300228:	60d3      	str	r3, [r2, #12]
+3430022a:	4b63      	ldr	r3, [pc, #396]	@ (343003b8 <usb_shutdown_enter+0x2ac>)
+3430022c:	681a      	ldr	r2, [r3, #0]
+3430022e:	f5a3 6340 	sub.w	r3, r3, #3072	@ 0xc00
+34300232:	f442 7240 	orr.w	r2, r2, #768	@ 0x300
+34300236:	f8c3 2c00 	str.w	r2, [r3, #3072]	@ 0xc00
+3430023a:	f8d3 2c0c 	ldr.w	r2, [r3, #3084]	@ 0xc0c
+3430023e:	f422 7240 	bic.w	r2, r2, #768	@ 0x300
+34300242:	f8c3 2c0c 	str.w	r2, [r3, #3084]	@ 0xc0c
+34300246:	681a      	ldr	r2, [r3, #0]
+34300248:	f442 0270 	orr.w	r2, r2, #15728640	@ 0xf00000
+3430024c:	601a      	str	r2, [r3, #0]
+3430024e:	68da      	ldr	r2, [r3, #12]
+34300250:	f422 0270 	bic.w	r2, r2, #15728640	@ 0xf00000
+34300254:	60da      	str	r2, [r3, #12]
+34300256:	f44f 1300 	mov.w	r3, #2097152	@ 0x200000
+3430025a:	4a58      	ldr	r2, [pc, #352]	@ (343003bc <usb_shutdown_enter+0x2b0>)
+3430025c:	6193      	str	r3, [r2, #24]
+3430025e:	6853      	ldr	r3, [r2, #4]
+34300260:	f023 0320 	bic.w	r3, r3, #32
+34300264:	6053      	str	r3, [r2, #4]
+34300266:	68d3      	ldr	r3, [r2, #12]
+34300268:	f423 6340 	bic.w	r3, r3, #3072	@ 0xc00
+3430026c:	60d3      	str	r3, [r2, #12]
+3430026e:	6813      	ldr	r3, [r2, #0]
+34300270:	f423 6340 	bic.w	r3, r3, #3072	@ 0xc00
+34300274:	f443 6380 	orr.w	r3, r3, #1024	@ 0x400
+34300278:	6013      	str	r3, [r2, #0]
+3430027a:	4b51      	ldr	r3, [pc, #324]	@ (343003c0 <usb_shutdown_enter+0x2b4>)
+3430027c:	6199      	str	r1, [r3, #24]
+3430027e:	6859      	ldr	r1, [r3, #4]
+34300280:	f421 61a0 	bic.w	r1, r1, #1280	@ 0x500
+34300284:	f021 0101 	bic.w	r1, r1, #1
+34300288:	6059      	str	r1, [r3, #4]
+3430028a:	68d9      	ldr	r1, [r3, #12]
+3430028c:	4029      	ands	r1, r5
+3430028e:	60d9      	str	r1, [r3, #12]
+34300290:	6819      	ldr	r1, [r3, #0]
+34300292:	4029      	ands	r1, r5
+34300294:	f441 1188 	orr.w	r1, r1, #1114112	@ 0x110000
+34300298:	f041 0101 	orr.w	r1, r1, #1
+3430029c:	6019      	str	r1, [r3, #0]
+3430029e:	2102      	movs	r1, #2
+343002a0:	f503 53e0 	add.w	r3, r3, #7168	@ 0x1c00
+343002a4:	6199      	str	r1, [r3, #24]
+343002a6:	6859      	ldr	r1, [r3, #4]
+343002a8:	f021 0102 	bic.w	r1, r1, #2
+343002ac:	6059      	str	r1, [r3, #4]
+343002ae:	6819      	ldr	r1, [r3, #0]
+343002b0:	f021 010c 	bic.w	r1, r1, #12
+343002b4:	f041 0104 	orr.w	r1, r1, #4
+343002b8:	6019      	str	r1, [r3, #0]
+343002ba:	f3bf 8f4f 	dsb	sy
+343002be:	6919      	ldr	r1, [r3, #16]
+343002c0:	0789      	lsls	r1, r1, #30
+343002c2:	d502      	bpl.n	343002ca <usb_shutdown_enter+0x1be>
+343002c4:	6912      	ldr	r2, [r2, #16]
+343002c6:	0692      	lsls	r2, r2, #26
+343002c8:	d502      	bpl.n	343002d0 <usb_shutdown_enter+0x1c4>
+343002ca:	2104      	movs	r1, #4
+343002cc:	2007      	movs	r0, #7
+343002ce:	e747      	b.n	34300160 <usb_shutdown_enter+0x54>
+343002d0:	4a3c      	ldr	r2, [pc, #240]	@ (343003c4 <usb_shutdown_enter+0x2b8>)
+343002d2:	f8c0 2a20 	str.w	r2, [r0, #2592]	@ 0xa20
+343002d6:	f3bf 8f4f 	dsb	sy
+343002da:	4a3b      	ldr	r2, [pc, #236]	@ (343003c8 <usb_shutdown_enter+0x2bc>)
+343002dc:	493b      	ldr	r1, [pc, #236]	@ (343003cc <usb_shutdown_enter+0x2c0>)
+343002de:	f8c2 1260 	str.w	r1, [r2, #608]	@ 0x260
+343002e2:	f8c2 12a0 	str.w	r1, [r2, #672]	@ 0x2a0
+343002e6:	681a      	ldr	r2, [r3, #0]
+343002e8:	f442 5243 	orr.w	r2, r2, #12480	@ 0x30c0
+343002ec:	f042 0230 	orr.w	r2, r2, #48	@ 0x30
+343002f0:	601a      	str	r2, [r3, #0]
+343002f2:	68da      	ldr	r2, [r3, #12]
+343002f4:	f422 5243 	bic.w	r2, r2, #12480	@ 0x30c0
+343002f8:	f022 023c 	bic.w	r2, r2, #60	@ 0x3c
+343002fc:	60da      	str	r2, [r3, #12]
+343002fe:	4a34      	ldr	r2, [pc, #208]	@ (343003d0 <usb_shutdown_enter+0x2c4>)
+34300300:	6bd3      	ldr	r3, [r2, #60]	@ 0x3c
+34300302:	f423 6380 	bic.w	r3, r3, #1024	@ 0x400
+34300306:	f023 0304 	bic.w	r3, r3, #4
+3430030a:	63d3      	str	r3, [r2, #60]	@ 0x3c
+3430030c:	f3bf 8f4f 	dsb	sy
+34300310:	6bd3      	ldr	r3, [r2, #60]	@ 0x3c
+34300312:	f8c4 3088 	str.w	r3, [r4, #136]	@ 0x88
+34300316:	f8d0 3260 	ldr.w	r3, [r0, #608]	@ 0x260
+3430031a:	6423      	str	r3, [r4, #64]	@ 0x40
+3430031c:	6c22      	ldr	r2, [r4, #64]	@ 0x40
+3430031e:	4b2d      	ldr	r3, [pc, #180]	@ (343003d4 <usb_shutdown_enter+0x2c8>)
+34300320:	4013      	ands	r3, r2
+34300322:	bb23      	cbnz	r3, 3430036e <usb_shutdown_enter+0x262>
+34300324:	f8d0 3220 	ldr.w	r3, [r0, #544]	@ 0x220
+34300328:	f003 6348 	and.w	r3, r3, #209715200	@ 0xc800000
+3430032c:	f1b3 6f48 	cmp.w	r3, #209715200	@ 0xc800000
+34300330:	d11d      	bne.n	3430036e <usb_shutdown_enter+0x262>
+34300332:	f240 4304 	movw	r3, #1028	@ 0x404
+34300336:	f8d4 2088 	ldr.w	r2, [r4, #136]	@ 0x88
+3430033a:	421a      	tst	r2, r3
+3430033c:	d117      	bne.n	3430036e <usb_shutdown_enter+0x262>
+3430033e:	f640 73f3 	movw	r3, #4083	@ 0xff3
+34300342:	4a1b      	ldr	r2, [pc, #108]	@ (343003b0 <usb_shutdown_enter+0x2a4>)
+34300344:	6811      	ldr	r1, [r2, #0]
+34300346:	ea01 0003 	and.w	r0, r1, r3
+3430034a:	438b      	bics	r3, r1
+3430034c:	d10f      	bne.n	3430036e <usb_shutdown_enter+0x262>
+3430034e:	68d3      	ldr	r3, [r2, #12]
+34300350:	4203      	tst	r3, r0
+34300352:	d10c      	bne.n	3430036e <usb_shutdown_enter+0x262>
+34300354:	f8d2 3800 	ldr.w	r3, [r2, #2048]	@ 0x800
+34300358:	f502 6200 	add.w	r2, r2, #2048	@ 0x800
+3430035c:	f403 7340 	and.w	r3, r3, #768	@ 0x300
+34300360:	f5b3 7f40 	cmp.w	r3, #768	@ 0x300
+34300364:	d103      	bne.n	3430036e <usb_shutdown_enter+0x262>
+34300366:	68d3      	ldr	r3, [r2, #12]
+34300368:	f413 7f40 	tst.w	r3, #768	@ 0x300
+3430036c:	d002      	beq.n	34300374 <usb_shutdown_enter+0x268>
+3430036e:	2104      	movs	r1, #4
+34300370:	2008      	movs	r0, #8
+34300372:	e6f5      	b.n	34300160 <usb_shutdown_enter+0x54>
+34300374:	2002      	movs	r0, #2
+34300376:	f7ff fe43 	bl	34300000 <publish>
+3430037a:	4b0a      	ldr	r3, [pc, #40]	@ (343003a4 <usb_shutdown_enter+0x298>)
+3430037c:	f8d3 2248 	ldr.w	r2, [r3, #584]	@ 0x248
+34300380:	07d7      	lsls	r7, r2, #31
+34300382:	d503      	bpl.n	3430038c <usb_shutdown_enter+0x280>
+34300384:	f8d3 3208 	ldr.w	r3, [r3, #520]	@ 0x208
+34300388:	07de      	lsls	r6, r3, #31
+3430038a:	d525      	bpl.n	343003d8 <usb_shutdown_enter+0x2cc>
+3430038c:	2104      	movs	r1, #4
+3430038e:	2009      	movs	r0, #9
+34300390:	e6e6      	b.n	34300160 <usb_shutdown_enter+0x54>
+34300392:	bf00      	nop
+34300394:	34300674 	.word	0x34300674
+34300398:	31534455 	.word	0x31534455
+3430039c:	e000ed00 	.word	0xe000ed00
+343003a0:	e000ef00 	.word	0xe000ef00
+343003a4:	56028000 	.word	0x56028000
+343003a8:	0004605f 	.word	0x0004605f
+343003ac:	30021000 	.word	0x30021000
+343003b0:	56020800 	.word	0x56020800
+343003b4:	ffccfffc 	.word	0xffccfffc
+343003b8:	56021000 	.word	0x56021000
+343003bc:	56023800 	.word	0x56023800
+343003c0:	56021800 	.word	0x56021800
+343003c4:	0c800020 	.word	0x0c800020
+343003c8:	56029000 	.word	0x56029000
+343003cc:	0c002020 	.word	0x0c002020
+343003d0:	56024800 	.word	0x56024800
+343003d4:	0c0020a0 	.word	0x0c0020a0
+343003d8:	4b9e      	ldr	r3, [pc, #632]	@ (34300654 <usb_shutdown_hold_end+0x6>)
+343003da:	685a      	ldr	r2, [r3, #4]
+343003dc:	64a2      	str	r2, [r4, #72]	@ 0x48
+343003de:	685a      	ldr	r2, [r3, #4]
+343003e0:	f022 0207 	bic.w	r2, r2, #7
+343003e4:	605a      	str	r2, [r3, #4]
+343003e6:	f3bf 8f4f 	dsb	sy
+343003ea:	685b      	ldr	r3, [r3, #4]
+343003ec:	64e3      	str	r3, [r4, #76]	@ 0x4c
+343003ee:	6ce3      	ldr	r3, [r4, #76]	@ 0x4c
+343003f0:	075d      	lsls	r5, r3, #29
+343003f2:	d002      	beq.n	343003fa <usb_shutdown_enter+0x2ee>
+343003f4:	2104      	movs	r1, #4
+343003f6:	200a      	movs	r0, #10
+343003f8:	e6b2      	b.n	34300160 <usb_shutdown_enter+0x54>
+343003fa:	4b97      	ldr	r3, [pc, #604]	@ (34300658 <usb_shutdown_hold_end+0xa>)
+343003fc:	f8d3 294c 	ldr.w	r2, [r3, #2380]	@ 0x94c
+34300400:	f002 5280 	and.w	r2, r2, #268435456	@ 0x10000000
+34300404:	6522      	str	r2, [r4, #80]	@ 0x50
+34300406:	f8d3 28cc 	ldr.w	r2, [r3, #2252]	@ 0x8cc
+3430040a:	f002 5280 	and.w	r2, r2, #268435456	@ 0x10000000
+3430040e:	6562      	str	r2, [r4, #84]	@ 0x54
+34300410:	6d22      	ldr	r2, [r4, #80]	@ 0x50
+34300412:	b10a      	cbz	r2, 34300418 <usb_shutdown_enter+0x30c>
+34300414:	6d62      	ldr	r2, [r4, #84]	@ 0x54
+34300416:	b912      	cbnz	r2, 3430041e <usb_shutdown_enter+0x312>
+34300418:	2104      	movs	r1, #4
+3430041a:	200b      	movs	r0, #11
+3430041c:	e6a0      	b.n	34300160 <usb_shutdown_enter+0x54>
+3430041e:	f8d3 31f0 	ldr.w	r3, [r3, #496]	@ 0x1f0
+34300422:	65a3      	str	r3, [r4, #88]	@ 0x58
+34300424:	6da3      	ldr	r3, [r4, #88]	@ 0x58
+34300426:	0518      	lsls	r0, r3, #20
+34300428:	d502      	bpl.n	34300430 <usb_shutdown_enter+0x324>
+3430042a:	2104      	movs	r1, #4
+3430042c:	200c      	movs	r0, #12
+3430042e:	e697      	b.n	34300160 <usb_shutdown_enter+0x54>
+34300430:	4a8a      	ldr	r2, [pc, #552]	@ (3430065c <usb_shutdown_hold_end+0xe>)
+34300432:	6d95      	ldr	r5, [r2, #88]	@ 0x58
+34300434:	f015 0501 	ands.w	r5, r5, #1
+34300438:	d002      	beq.n	34300440 <usb_shutdown_enter+0x334>
+3430043a:	2104      	movs	r1, #4
+3430043c:	200d      	movs	r0, #13
+3430043e:	e68f      	b.n	34300160 <usb_shutdown_enter+0x54>
+34300440:	f04f 23e0 	mov.w	r3, #3758153728	@ 0xe000e000
+34300444:	611d      	str	r5, [r3, #16]
+34300446:	619d      	str	r5, [r3, #24]
+34300448:	685e      	ldr	r6, [r3, #4]
+3430044a:	4629      	mov	r1, r5
+3430044c:	f006 060f 	and.w	r6, r6, #15
+34300450:	3601      	adds	r6, #1
+34300452:	f04f 30ff 	mov.w	r0, #4294967295
+34300456:	f046 e001 	dls	lr, r6
+3430045a:	008b      	lsls	r3, r1, #2
+3430045c:	f103 4360 	add.w	r3, r3, #3758096384	@ 0xe0000000
+34300460:	f503 4361 	add.w	r3, r3, #57600	@ 0xe100
+34300464:	f8c3 0080 	str.w	r0, [r3, #128]	@ 0x80
+34300468:	3101      	adds	r1, #1
+3430046a:	f8c3 0180 	str.w	r0, [r3, #384]	@ 0x180
+3430046e:	f00f c00d 	le	lr, 3430045a <usb_shutdown_enter+0x34e>
+34300472:	f04f 6120 	mov.w	r1, #167772160	@ 0xa000000
+34300476:	4b7a      	ldr	r3, [pc, #488]	@ (34300660 <usb_shutdown_hold_end+0x12>)
+34300478:	2703      	movs	r7, #3
+3430047a:	6059      	str	r1, [r3, #4]
+3430047c:	6919      	ldr	r1, [r3, #16]
+3430047e:	f021 0116 	bic.w	r1, r1, #22
+34300482:	6119      	str	r1, [r3, #16]
+34300484:	2100      	movs	r1, #0
+34300486:	4b77      	ldr	r3, [pc, #476]	@ (34300664 <usb_shutdown_hold_end+0x16>)
+34300488:	f8c3 1080 	str.w	r1, [r3, #128]	@ 0x80
+3430048c:	f8c3 1090 	str.w	r1, [r3, #144]	@ 0x90
+34300490:	f8c3 10a0 	str.w	r1, [r3, #160]	@ 0xa0
+34300494:	f8c3 1084 	str.w	r1, [r3, #132]	@ 0x84
+34300498:	f8c3 1094 	str.w	r1, [r3, #148]	@ 0x94
+3430049c:	f8c3 10a4 	str.w	r1, [r3, #164]	@ 0xa4
+343004a0:	6019      	str	r1, [r3, #0]
+343004a2:	6219      	str	r1, [r3, #32]
+343004a4:	6419      	str	r1, [r3, #64]	@ 0x40
+343004a6:	6059      	str	r1, [r3, #4]
+343004a8:	6259      	str	r1, [r3, #36]	@ 0x24
+343004aa:	6459      	str	r1, [r3, #68]	@ 0x44
+343004ac:	68d8      	ldr	r0, [r3, #12]
+343004ae:	60d8      	str	r0, [r3, #12]
+343004b0:	6ad8      	ldr	r0, [r3, #44]	@ 0x2c
+343004b2:	62d8      	str	r0, [r3, #44]	@ 0x2c
+343004b4:	6cd8      	ldr	r0, [r3, #76]	@ 0x4c
+343004b6:	64d8      	str	r0, [r3, #76]	@ 0x4c
+343004b8:	6918      	ldr	r0, [r3, #16]
+343004ba:	6118      	str	r0, [r3, #16]
+343004bc:	6b18      	ldr	r0, [r3, #48]	@ 0x30
+343004be:	6318      	str	r0, [r3, #48]	@ 0x30
+343004c0:	6d18      	ldr	r0, [r3, #80]	@ 0x50
+343004c2:	6518      	str	r0, [r3, #80]	@ 0x50
+343004c4:	4868      	ldr	r0, [pc, #416]	@ (34300668 <usb_shutdown_hold_end+0x1a>)
+343004c6:	6d84      	ldr	r4, [r0, #88]	@ 0x58
+343004c8:	f024 040f 	bic.w	r4, r4, #15
+343004cc:	6584      	str	r4, [r0, #88]	@ 0x58
+343004ce:	240f      	movs	r4, #15
+343004d0:	6504      	str	r4, [r0, #80]	@ 0x50
+343004d2:	4c66      	ldr	r4, [pc, #408]	@ (3430066c <usb_shutdown_hold_end+0x1e>)
+343004d4:	60a7      	str	r7, [r4, #8]
+343004d6:	6b04      	ldr	r4, [r0, #48]	@ 0x30
+343004d8:	65d4      	str	r4, [r2, #92]	@ 0x5c
+343004da:	6dd4      	ldr	r4, [r2, #92]	@ 0x5c
+343004dc:	68c7      	ldr	r7, [r0, #12]
+343004de:	f024 1401 	bic.w	r4, r4, #65537	@ 0x10001
+343004e2:	f027 0711 	bic.w	r7, r7, #17
+343004e6:	f044 0403 	orr.w	r4, r4, #3
+343004ea:	60c7      	str	r7, [r0, #12]
+343004ec:	6304      	str	r4, [r0, #48]	@ 0x30
+343004ee:	f3bf 8f4f 	dsb	sy
+343004f2:	f3bf 8f6f 	isb	sy
+343004f6:	68dc      	ldr	r4, [r3, #12]
+343004f8:	f8d3 902c 	ldr.w	r9, [r3, #44]	@ 0x2c
+343004fc:	f8d3 804c 	ldr.w	r8, [r3, #76]	@ 0x4c
+34300500:	f8d3 e010 	ldr.w	lr, [r3, #16]
+34300504:	f8d3 c030 	ldr.w	ip, [r3, #48]	@ 0x30
+34300508:	6d1f      	ldr	r7, [r3, #80]	@ 0x50
+3430050a:	ea44 0309 	orr.w	r3, r4, r9
+3430050e:	ea43 0308 	orr.w	r3, r3, r8
+34300512:	ea43 030e 	orr.w	r3, r3, lr
+34300516:	ea43 030c 	orr.w	r3, r3, ip
+3430051a:	433b      	orrs	r3, r7
+3430051c:	66d3      	str	r3, [r2, #108]	@ 0x6c
+3430051e:	6d83      	ldr	r3, [r0, #88]	@ 0x58
+34300520:	46b6      	mov	lr, r6
+34300522:	67d3      	str	r3, [r2, #124]	@ 0x7c
+34300524:	6d43      	ldr	r3, [r0, #84]	@ 0x54
+34300526:	f8c2 3080 	str.w	r3, [r2, #128]	@ 0x80
+3430052a:	6b03      	ldr	r3, [r0, #48]	@ 0x30
+3430052c:	6613      	str	r3, [r2, #96]	@ 0x60
+3430052e:	68c3      	ldr	r3, [r0, #12]
+34300530:	6653      	str	r3, [r2, #100]	@ 0x64
+34300532:	4b4f      	ldr	r3, [pc, #316]	@ (34300670 <usb_shutdown_hold_end+0x22>)
+34300534:	689b      	ldr	r3, [r3, #8]
+34300536:	f8c2 3084 	str.w	r3, [r2, #132]	@ 0x84
+3430053a:	6711      	str	r1, [r2, #112]	@ 0x70
+3430053c:	6751      	str	r1, [r2, #116]	@ 0x74
+3430053e:	b90e      	cbnz	r6, 34300544 <usb_shutdown_enter+0x438>
+34300540:	f04f 0e01 	mov.w	lr, #1
+34300544:	f04e e001 	dls	lr, lr
+34300548:	00ab      	lsls	r3, r5, #2
+3430054a:	f103 4360 	add.w	r3, r3, #3758096384	@ 0xe0000000
+3430054e:	f503 4361 	add.w	r3, r3, #57600	@ 0xe100
+34300552:	6819      	ldr	r1, [r3, #0]
+34300554:	6f10      	ldr	r0, [r2, #112]	@ 0x70
+34300556:	3501      	adds	r5, #1
+34300558:	4301      	orrs	r1, r0
+3430055a:	6711      	str	r1, [r2, #112]	@ 0x70
+3430055c:	f8d3 3100 	ldr.w	r3, [r3, #256]	@ 0x100
+34300560:	6f51      	ldr	r1, [r2, #116]	@ 0x74
+34300562:	430b      	orrs	r3, r1
+34300564:	6753      	str	r3, [r2, #116]	@ 0x74
+34300566:	f00f c811 	le	lr, 34300548 <usb_shutdown_enter+0x43c>
+3430056a:	f04f 23e0 	mov.w	r3, #3758153728	@ 0xe000e000
+3430056e:	691b      	ldr	r3, [r3, #16]
+34300570:	6793      	str	r3, [r2, #120]	@ 0x78
+34300572:	6ed3      	ldr	r3, [r2, #108]	@ 0x6c
+34300574:	b9f3      	cbnz	r3, 343005b4 <usb_shutdown_enter+0x4a8>
+34300576:	6f13      	ldr	r3, [r2, #112]	@ 0x70
+34300578:	b9e3      	cbnz	r3, 343005b4 <usb_shutdown_enter+0x4a8>
+3430057a:	6f53      	ldr	r3, [r2, #116]	@ 0x74
+3430057c:	b9d3      	cbnz	r3, 343005b4 <usb_shutdown_enter+0x4a8>
+3430057e:	6f93      	ldr	r3, [r2, #120]	@ 0x78
+34300580:	b9c3      	cbnz	r3, 343005b4 <usb_shutdown_enter+0x4a8>
+34300582:	4938      	ldr	r1, [pc, #224]	@ (34300664 <usb_shutdown_hold_end+0x16>)
+34300584:	f8d1 3080 	ldr.w	r3, [r1, #128]	@ 0x80
+34300588:	f8d1 6090 	ldr.w	r6, [r1, #144]	@ 0x90
+3430058c:	f8d1 50a0 	ldr.w	r5, [r1, #160]	@ 0xa0
+34300590:	4333      	orrs	r3, r6
+34300592:	f8d1 4084 	ldr.w	r4, [r1, #132]	@ 0x84
+34300596:	432b      	orrs	r3, r5
+34300598:	f8d1 0094 	ldr.w	r0, [r1, #148]	@ 0x94
+3430059c:	4323      	orrs	r3, r4
+3430059e:	f8d1 10a4 	ldr.w	r1, [r1, #164]	@ 0xa4
+343005a2:	4303      	orrs	r3, r0
+343005a4:	430b      	orrs	r3, r1
+343005a6:	d105      	bne.n	343005b4 <usb_shutdown_enter+0x4a8>
+343005a8:	6fd3      	ldr	r3, [r2, #124]	@ 0x7c
+343005aa:	0719      	lsls	r1, r3, #28
+343005ac:	d102      	bne.n	343005b4 <usb_shutdown_enter+0x4a8>
+343005ae:	f8d2 3080 	ldr.w	r3, [r2, #128]	@ 0x80
+343005b2:	b113      	cbz	r3, 343005ba <usb_shutdown_enter+0x4ae>
+343005b4:	2104      	movs	r1, #4
+343005b6:	200e      	movs	r0, #14
+343005b8:	e5d2      	b.n	34300160 <usb_shutdown_enter+0x54>
+343005ba:	6e13      	ldr	r3, [r2, #96]	@ 0x60
+343005bc:	f003 1301 	and.w	r3, r3, #65537	@ 0x10001
+343005c0:	2b01      	cmp	r3, #1
+343005c2:	d002      	beq.n	343005ca <usb_shutdown_enter+0x4be>
+343005c4:	2104      	movs	r1, #4
+343005c6:	200f      	movs	r0, #15
+343005c8:	e5ca      	b.n	34300160 <usb_shutdown_enter+0x54>
+343005ca:	f8d2 3084 	ldr.w	r3, [r2, #132]	@ 0x84
+343005ce:	079b      	lsls	r3, r3, #30
+343005d0:	d1f8      	bne.n	343005c4 <usb_shutdown_enter+0x4b8>
+343005d2:	6e53      	ldr	r3, [r2, #100]	@ 0x64
+343005d4:	f013 0f11 	tst.w	r3, #17
+343005d8:	d1f4      	bne.n	343005c4 <usb_shutdown_enter+0x4b8>
+343005da:	4b21      	ldr	r3, [pc, #132]	@ (34300660 <usb_shutdown_hold_end+0x12>)
+343005dc:	6919      	ldr	r1, [r3, #16]
+343005de:	f041 0104 	orr.w	r1, r1, #4
+343005e2:	6119      	str	r1, [r3, #16]
+343005e4:	f3bf 8f4f 	dsb	sy
+343005e8:	f3bf 8f6f 	isb	sy
+343005ec:	691b      	ldr	r3, [r3, #16]
+343005ee:	6693      	str	r3, [r2, #104]	@ 0x68
+343005f0:	6e93      	ldr	r3, [r2, #104]	@ 0x68
+343005f2:	f003 0316 	and.w	r3, r3, #22
+343005f6:	2b04      	cmp	r3, #4
+343005f8:	d1e4      	bne.n	343005c4 <usb_shutdown_enter+0x4b8>
+343005fa:	f3ef 8310 	mrs	r3, PRIMASK
+343005fe:	2b01      	cmp	r3, #1
+34300600:	d1e0      	bne.n	343005c4 <usb_shutdown_enter+0x4b8>
+34300602:	2003      	movs	r0, #3
+34300604:	f7ff fcfc 	bl	34300000 <publish>
+
+34300608 <usb_shutdown_hold_release>:
+34300608:	f240 0000 	movw	r0, #0
+3430060c:	f2c5 6002 	movt	r0, #22018	@ 0x5602
+34300610:	f8d0 100c 	ldr.w	r1, [r0, #12]
+34300614:	f021 0130 	bic.w	r1, r1, #48	@ 0x30
+34300618:	f8c0 100c 	str.w	r1, [r0, #12]
+3430061c:	f8d0 1000 	ldr.w	r1, [r0]
+34300620:	f021 0130 	bic.w	r1, r1, #48	@ 0x30
+34300624:	f8c0 1000 	str.w	r1, [r0]
+34300628:	f3bf 8f4f 	dsb	sy
+3430062c:	f3bf 8f6f 	isb	sy
+
+34300630 <usb_shutdown_wfi>:
+34300630:	bf30      	wfi
+
+34300632 <usb_shutdown_hold_reassert>:
+34300632:	f04f 0104 	mov.w	r1, #4
+34300636:	f8c0 1018 	str.w	r1, [r0, #24]
+3430063a:	f8d0 1000 	ldr.w	r1, [r0]
+3430063e:	f021 0130 	bic.w	r1, r1, #48	@ 0x30
+34300642:	f041 0110 	orr.w	r1, r1, #16
+34300646:	f8c0 1000 	str.w	r1, [r0]
+3430064a:	f3bf 8f4f 	dsb	sy
+
+3430064e <usb_shutdown_hold_end>:
+3430064e:	2105      	movs	r1, #5
+34300650:	2010      	movs	r0, #16
+34300652:	e585      	b.n	34300160 <usb_shutdown_enter+0x54>
+34300654:	54001000 	.word	0x54001000
+34300658:	56009000 	.word	0x56009000
+3430065c:	34300674 	.word	0x34300674
+34300660:	e000ed00 	.word	0xe000ed00
+34300664:	56025000 	.word	0x56025000
+34300668:	56024800 	.word	0x56024800
+3430066c:	56029000 	.word	0x56029000
+34300670:	56028000 	.word	0x56028000

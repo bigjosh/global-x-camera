@@ -1,0 +1,103 @@
+{
+  "schema": 1,
+  "completed_utc": "2026-11-06T05:53:43.156882+00:00",
+  "task": "C17 removal three cold cycles and image verification",
+  "cold_slots": [
+    166,
+    167,
+    168
+  ],
+  "warm_allocation_slot": 165,
+  "all_three_full_3730_sector_reads_passed": true,
+  "all_three_independent_decodes_passed": true,
+  "all_three_images_visually_inspected": true,
+  "original_cold_sensor_ram_equality_proven": false,
+  "installed_normal_build": "tmp/bringup/sensor-autostop-promote-20261028/flash-standby-v1",
+  "installed_prefix_sha256": "6378483a91b560ffc6b31d74a9dd1205996a14c8030447ffddf7deddc9d23874",
+  "normal_firmware_changed": false,
+  "nor_programming": false,
+  "full_physical_nor_reread_this_campaign": false,
+  "explicit_sd_erase": false,
+  "offline_dma_sleep_installed": false,
+  "target_power": "JS output intentionally OFF",
+  "js_final_settings": {
+    "s/i/range/select": 0,
+    "s/sstats/ctrl": 1
+  },
+  "js_closed": true,
+  "other_measurement_settings_restored": true,
+  "final_input_current_A": 0.0,
+  "final_source_voltage_V": 4.995513916015625,
+  "target_rail_zero_proven": false,
+  "last_verified_execution_before_off": "normal UART recovery park 0x3418078C",
+  "com8_closed": true,
+  "break_released": true,
+  "active_helper": false,
+  "ownership_hold": false,
+  "next_boot": "unchanged normal single-frame capture/RAW save/Standby",
+  "standby_observation": {
+    "sbf": true,
+    "pdds": true,
+    "stopf": false,
+    "trial_entry_proven": false
+  },
+  "user_removed": [
+    "C14",
+    "C17",
+    "U42",
+    "D2",
+    "R23",
+    "SD carrier LED"
+  ],
+  "unchanged_candidates": [
+    "C12",
+    "C28",
+    "C79"
+  ],
+  "source": "regulated bench 5 V through JS110 to CN5.5; return CN5.6; CN8/LTC disconnected; CN9 shunts absent; CN10 separately powered",
+  "sd_wiring": "twisted CLK/GND CN3.3/8, VCC CN3.5; no series resistor or SD signal probes",
+  "observed_js_input_roles": {
+    "IN1": "PD12 / CN15.21 phases",
+    "IN0": "PD0 / CN15.33 exposure mirror",
+    "GPIO_GND": "CN15.20"
+  },
+  "limits": [
+    "Initial transient values are unqualified instrument observations with source-side voltage only.",
+    "Shorter SD transport confounds whole-cycle energy; do not credit that saving to C17.",
+    "Three successful cycles do not qualify all operating conditions or LiPo operation."
+  ],
+  "evidence": [
+    {
+      "path": "images/summary.json",
+      "sha256": "fb4e87c28c262fd5af6cfb1923d001a3e7dceacd4b27914ec18377f0e2316e2f"
+    },
+    {
+      "path": "visual-inspection.json",
+      "sha256": "983fc845726cf78befc5c96fdf04a102d5ccaae307293926daae24be0052c16d"
+    },
+    {
+      "path": "report/summary.json",
+      "sha256": "fcbf57ff16cfee3cda3c046912f40943acc85ca0f952d7a145ac768b6813571c"
+    },
+    {
+      "path": "report/sd-timing-context.json",
+      "sha256": "b3f42d6400a389a7599e31aaa5101056984855267d6a1f0491d0723e55c7557f"
+    },
+    {
+      "path": "after-cycles-sleep.json",
+      "sha256": "80aa92f69c0d616b9787f42fbb9b08fc2d1415bc6da81a138134a8a7abf32881"
+    },
+    {
+      "path": "standby-flags/result.json",
+      "sha256": "249aeb44b991d4229cd030c4375139d02826f82bf7718977aa1b6faa85aea65e"
+    },
+    {
+      "path": "final-off/result.json",
+      "sha256": "d47cb225f15fb107473fb0e2a762d43bcfdd8031051ba8999afc60b25b8c4e54"
+    },
+    {
+      "path": "final-off/park/result.json",
+      "sha256": "a3291cd17d6b468e38ce1f5a815f82f1372bda611519acd6b23165f82de0b261"
+    }
+  ]
+}

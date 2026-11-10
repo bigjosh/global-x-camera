@@ -4,6 +4,101 @@ Read [NOTES.md](NOTES.md) at the root and in the relevant owning folder before c
 
 # Instrument access
 
+**Latest user hardware update — November 10, manual source selector and ASA knob:**
+the user removed the USB-controlled battery-cutoff MOSFET Q3 and installed a
+separate SPDT power selector (SW2): one throw receives USB power, the other
+receives the output of battery-path R0=2.2 ohm, and COM feeds CN5.5/5V.
+Q1/Q2, the momentary SPDT trigger SW1 and A3/CN4.4 HOLD remain. Automatic
+MOSFET source selection is retained for the future PCB, not this prototype.
+An added ASA/analog-gain pot connects between A4/CN4.5 and GND, with its
+wiper on A5/CN4.6; exposure remains A0 LOW/A1 wiper/A2 HIGH. ASA sampling
+and camera-control integration are not implemented by this documentation
+update. The installed November9 firmware is unchanged. The USB branch's
+previous diode, exact selector contact timing and current JS placement were
+not reconfirmed. **The user retains bench control; no instrument access
+occurred.** Re-establish actual wiring/source/ownership before bench work.
+[Current wiring](docs/power/2026-10-14-power-tree-review.md),
+[control assignment](docs/hardware-firmware-interface.md).
+
+**Latest user observation — November 9, manual trigger/latch test passed:**
+after taking manual bench control, the user reports the trigger works,
+the expected two-red-flash missing-sensor indication appears, and the cycle
+ends with camera power off and zero indicated current. This is the first
+user-confirmed functional trigger/HOLD/cutoff result with the installed A3
+firmware. No new instrument access or firmware change accompanied the report.
+Camera remains absent; exact supply arrangement, button release/hold duration,
+current measurement boundary/resolution and pin/rail waveforms were not supplied.
+[Owning result and limits](docs/power/NOTES.md#2026-11-09--manual-trigger-test-confirms-missing-sensor-shutdown-and-load-cutoff).
+**The user has bench control.** The prior automated JS range0 checkpoint is
+historical after their manual test, not a fresh device setting. Re-establish
+actual source, connections and ownership before the next hardware operation.
+
+**Latest checkpoint — A3 firmware installed and controls smoke-tested,
+November 9 23:01 EST / November 10 04:01:21 UTC:** both 64 KiB NOR regions
+match the reviewed PA2 package; following 4 KiB preserved. Prefix
+`852bc7724a9fc0267fb37e3f93ba52f22137c65c55f2cece47d17dd352093084`,
+sector0 `c822d2333ce265ded2ea420fd4c78e2a20e01c4b392b1decb99b80d9a040516d`,
+sector1 `347aa3c1db62cb95bd6b66d421c0d9c3db5a706e493baf2f515ac13cb9f4670f`.
+UART first-attempt recovery passed after programming (9 good/0 bad), after
+ADC (9/0), and after a 15 s JS power interruption/error cycle (10/0).
+A3/PA2 read HIGH in early park, bridge, ADC, clean diagnostic stop and camera
+error handling. User-swept A1 range0–3840, middle about2000; A0 LOW/A2 HIGH,
+endpoint ADC near0/3840; no ADC errors. Cooperative stop turned A2 LOW and
+kept A3 HIGH. Normal capture exposure remains fixed, knob integration deferred.
+
+**Final JS output intentionally OFF (range0)**, measured current0; other settings
+restored, device closed, COM8closed/BREAKreleased, no active helper. Last
+pre-off PC/prefix matched the new exact UART park. Direct external supply
+through JS into5V, CN10/ST-LINK connected, **CN8/MCU USB and camera absent**.
+Physical latch wiring/takeover were not tested; IN0 probe connection was not
+confirmed, so no physical HOLD-release waveform is claimed. Missing-camera
+boot recorded S1ER17, SEN1phase2/result−3, A3HIGH; low plateau3.2055mA, retained
+CPUCR0x10201/SBF1/PDDS1/STOPF0 with `trial_entry_proven:false`. No SD commands
+or new images. Zero JS current does not prove all rails zero via debug paths.
+[Live evidence and final state](firmware/control-smoke/evidence/2026-11-09-a3-live/README.md).
+Campaign `tmp/bringup/a3-smoke-20261109/`. This supersedes active/offline and
+package08 installed-state statements below; recheck actual wiring/ownership
+before future operation. Use USB recovery.py with the exact new package;
+the old A3-LOW knob diagnostic remains prohibited on this wiring.
+
+**A3 HOLD/control smoke test active — November 9:** user confirms the board
+is reconnected, target powered directly through JS into 5 V, ST-LINK connected,
+MCU USB disconnected, and camera sensor physically disconnected. User closed
+the JS desktop app for API ownership. Root exclusively owns instruments;
+subagents are offline only. This supersedes the disconnected boundary below
+for the authorized firmware installation and A3/A0–A2/UART smoke tests.
+First establish fresh power/context and exact current package08 identity;
+then preserve/read back both NOR sectors and following 4 KiB when installing
+the reviewed PA2 package. Do not claim image capture with the absent sensor.
+Normal exposure remains fixed; only the ADC diagnostic exercises the knob.
+Campaign `tmp/bringup/a3-smoke-20261109/`; final checkpoint will supersede this
+active state. Actual trigger latch wiring is not inferred from direct JS power.
+
+**Latest user boundary — November 9: board disconnected for assembly.**
+The user explicitly confirms the board is disconnected while requesting
+canonical HOLD on A3/CN4.4/PA2 and exposure control A0 LOW / A1 wiper /
+A2 HIGH. Work in this campaign is offline only until reconnection and actual
+power/wiring/ownership are re-established. Do not operate the instruments.
+The last installed package08 USB image remains historical, not freshly read;
+no November9 build is installed yet. Root owns USB/package integration and
+docs; subagents own offline capture-HOLD and control-diagnostic changes.
+Campaign: `tmp/bringup/a3-hold-controls-20261109/`.
+
+**November 9 offline candidate complete:** canonical combined capture/USB
+HOLD is A3/CN4.4/PA2, with A0/PF5 LOW, A1/buffered PA9 ADC1 channel10 wiper,
+and A2/PF6 HIGH in the remapped control diagnostic. Normal capture exposure
+remains fixed. Exact early UART guard/park are preserved; HOLD is asserted
+before them and floats immediately before successful/error/USB Standby WFI.
+Refusal and unexpected return retain/reassert HIGH. New prefix
+`852bc7724a9fc0267fb37e3f93ba52f22137c65c55f2cece47d17dd352093084`,
+sector0 `c822d2333ce265ded2ea420fd4c78e2a20e01c4b392b1decb99b80d9a040516d`,
+sector1 `347aa3c1db62cb95bd6b66d421c0d9c3db5a706e493baf2f515ac13cb9f4670f`.
+26 linked package tests, 21 PTP tests and 34 shutdown-model cases/519 checks
+passed; separate capture/control suites and independent layout review passed.
+[Candidate, sources, identities and reconnection procedure](firmware/usb-ptp/evidence/2026-11-09-a3-hold/README.md).
+**Not installed or hardware-tested; no instrument or live allowlist change.**
+Do not use the old A3-LOW/A4-wiper/A5-HIGH control diagnostic with the new latch.
+
 **Latest checkpoint — native USB PTP installed and qualified, November 8:**
 `package08 / ram08` now replaces the earlier normal-NOR identity. USB executable
 SHA `74c91b77062e899944941006e075ab76039055f5175bee5f497b8d1a242e3679`,
@@ -47,6 +142,173 @@ local photos/raw JS traces stay under `tmp/bringup/usb-ptp-20261108/`; public
 evidence excludes scene images. This resolves the active USB campaign below.
 Re-establish live ownership/state before the next hardware action.
 
+
+**USB PTP implementation active — November 8:** user requests autonomous
+browse/download/per-photo-delete firmware and confirms CN8/MCU USB is now
+connected to this local Windows host, CN10/ST-LINK connected, target power
+through JS to CN5.5/GND6 and all CN9 shunts removed. User closed the JS app
+and explicitly authorizes erasing test photos, taking new photos and JS
+power cycling as needed. Root exclusively owns instruments; subagents are
+offline only. Preserve exact UART recovery and existing capture path;
+start with RAM USB qualification and explicit host-driven deletion. CN8
+VBUS may create partial backfeed even without CN9 shunts: establish actual
+power-off behavior before treating a JS switch as a cold start. Firmware
+HOLD/latch remain prepared but not installed; SPDT is not yet connected.
+Campaign: `tmp/bringup/usb-ptp-20261108/`. Re-establish target identity and
+ownership before mutation; latest ADC/normal-FLASH state below is historical.
+The final checkpoint will record installed identity, power and helper state.
+
+
+
+**Latest preparation — SPDT trigger and HOLD, November 8:** user confirms the
+new latch is not connected yet and requests a timing estimate from previous
+runs. Canonical circuit is C3=2.2 µF/R5=1 kΩ SPDT reset, R1=100 kΩ, Q1/AO3401,
+Q2/AO3400, PD7 directly to Q2 gate with R2=100 kΩ, retained 2.2 Ω input resistor,
+**no C1/C2/D1/R4**. R5=1 kΩ remains in the switch-reset path. The later
+November8 user instruction omits R4 and retains it as an option to restore
+if measured gate transients cause trouble; no firmware change is needed.
+HOLD remains Arduino D9/CN14.2/PD7; power/ground CN5.5/6. Historical ROM-size
+and current-camera timings support about 25 ms takeover and a 30 ms planning
+allowance, not a guaranteed new-latch time. Ideal 3.7 V strong-on window is 86 ms.
+[Canonical diagram](docs/power/lipo-latch-wiring.png) and
+[estimate/build evidence](firmware/capture-raw/evidence/2026-11-08-spdt-hold/README.md).
+
+**No bench operation or firmware installation occurred in this preparation.**
+Both current HOLD builds reproduce November 7 executable bytes; disabled
+default reproduces October 28. All 320 offline tests pass. Current schema 2
+records accepted no-extra-off-delay hardware and unqualified AUX timing;
+exact historical schema 1 remains inspectable. No live recovery allowlist
+changed. Normal FLASH remains presumed October 28, not newly reread; install
+and verify the HOLD candidate on a stable supply before relying on the latch.
+Process-only inspection found the previous ADC console PID9240 absent and the
+Joulescope desktop app still open. ST-LINK/COM8/JS/LP8 were enumerated, but
+current PC, supply source, voltage and target execution were not read.
+The ADC ON/console statements below are historical, not live ownership proof.
+
+
+**Latest checkpoint — ADC input isolation fixed, November 8:** the RAM knob
+diagnostic now explicitly sets ADC12 secure to match its secure GPIO pins.
+The previous nonsecure ADC left external analog switches open (RM0486
+15.3.16), despite successful calibration and internal-reference readings.
+Measured RIF SEC2 changed only bit0, 0→1; GPIO security and privilege were
+unchanged. User measured VREF+=1.79V and confirmed TP9 follows the wiper.
+Final v11 default HCLK/32 reads A3 near0, A5=3841 and A4 spanning0–3841
+during the observed sweep, with no reported faults. [Evidence](firmware/control-smoke/evidence/2026-11-08-diagnosis/README.md).
+
+**Target remains ON running RAM v11, not normal capture/Standby.** Binary
+`3bed14f57abf64211d5ea8794cacf45741797c6163c42b3abf8ae1bfddefc86a`,
+session `tmp/bringup/control-smoke-20261107/launch07/session.json`;
+visible live console PID9240 owns ST-LINK and logs `live-console-fixed/`
+under that campaign. Close that console before another debugger client.
+PD7 HOLD stays HIGH; A3 LOW/A5 HIGH while sampling. The finite36000-sample
+test expires after about1hour, drives A5 LOW and parks awake with HOLD HIGH.
+COM8 closed/BREAK released; Joulescope desktop app and power output were
+untouched. Exact upstream power source remains unspecified. No reset,
+power cycle, NOR programming, camera or SD command occurred in this
+diagnosis. Normal October28 FLASH and offline production HOLD integration
+remain unchanged. Reset loses this RAM diagnostic. Recheck actual process
+and target state before subsequent bench work; earlier checkpoints below
+are historical.
+
+**ADC diagnosis active — November7 local:** user reports A4 moves0–3.28V on
+the meter but rawADC remains near1200. Prior smoke proved conversions/console
+only, not wiper tracking. Root stopped its own consolePID10228 to freeST-LINK;
+v5RAMADC remains powered/running, noNORchange. Subagentsoffline. Investigate
+ADC/bufferpath withoutpowerswitch; externalVREFP is VDDA1V8 throughfittedR146,
+so do notenableinternalVREFBUF against it. Campaign remains
+`tmp/bringup/control-smoke-20261107/`. A latercheckpoint willrecordoutcome.
+
+**Latest checkpoint — exposure knob ADC smoke passed, November7 local / November8 UTC:**
+User wiring is **A3/CN4.4 PA2 LOW, A4/CN4.5 buffered PF3 ADC1_INP16 wiper,
+A5/CN4.6 PH2 HIGH**; PC12 stays Hi-Z. Exact October28 UART park/prefix and
+reviewed SRAM bridge passed, then RAM-only v5 was fully readback-verified and
+started. Firstfive host reads1190–1196, endpoint digital0/1, noerrors; archived
+snapshot2119samples/current1198/min1094/max1225. Full-travel sweep not yet
+reported. [Evidence](firmware/control-smoke/evidence/2026-11-07/README.md).
+
+**Target remains ON running the RAM ADC diagnostic, not normal capture or
+Standby.** PD7HOLD staysHIGH; noNOR/SD/camera commands. Visible Python console
+PID10228 ownsST-LINK and logs `tmp/bringup/control-smoke-20261107/live-console/`.
+Close that console before other debugger clients. COM8closed/BREAKreleased;
+Joulescopeapp remainsopen/untouched. Testexpires after36000samples at100ms
+(approximately1hour), drivesA5LOW and parksawake withHOLDHIGH. Stop mailbox
+and exactidentity are in `firmware/control-smoke/README.md`; do not reuse this
+checkpoint as freshexecution proof. ResetlosesRAMtest and boots unchanged
+normalOctober28NOR. ST-LINKtarget3.28V; actualupstreamsource notspecified,
+noautomatedpowerswitch issued. VDDIO4PVMready is notphysicalvoltage proof due
+toES0620§2.2.29. NormalPD7HOLD/ADC captureintegration stillnotinstalled.
+CLI2.23 restored locally under campaign`tools/programmer-2.23.0/bin/` because
+historicalAppData pathwasabsent; no globalinstall/PATHchange. This supersedes
+the active/disconnected boundaries below for the currenthand-off.
+
+**Knob ADC smoke test active — November 7:** user reports exposure control
+wired to A3 LOW / A4 wiper / A5 HIGH and confirms READ A4 and bench readiness.
+Root alone owns debugger/serial access; subagents are offline. Exact present
+power source is not specified. Joulescope desktop app is open, so leave its
+API, output and source wiring untouched. Begin with read-only ST-LINK state,
+then exact UART recovery and a RAM-only ADC diagnostic; no NOR programming or
+SD writes are intended. PD7 HOLD remains an offline candidate, not assumed
+installed. Campaign `tmp/bringup/control-smoke-20261107/`. This supersedes the
+disconnected boundary below only for the confirmed knob smoke test; establish
+actual power/latch behavior before any automated power cycling.
+
+**Latest user boundary — November 7: board disconnected for latch/control assembly.**
+The user explicitly disconnected the board while adding the power trigger and
+exposure controls. No instrument access occurred during subsequent offline
+PD7 HOLD implementation. Do not operate the bench until reconnection is
+confirmed and actual wiring/source/ownership are re-established. Historical
+ON/OFF and wiring statements below are not a fresh physical-state check.
+
+**PD7 HOLD is ready offline, not installed:** opt-in `--gpio-hold` on the normal
+single-frame/Ethernet-down/25 MHz FLASH profile asserts D9/CN14.2 before the
+original startup/UART guard and floats it immediately before successful/error
+Standby WFI. Awake/recovery/refused-Standby paths retain HIGH; an unexpected WFI
+return reasserts it. 318 regression tests ran (one optional artifact skip),
+then all 14 linked shutdown tests passed with the final candidate. Default
+receiver/prefix/sector reproduce October 28 exactly. Final candidates and
+independent package checks are in
+[the HOLD evidence](firmware/capture-raw/evidence/2026-11-07-gpio-hold/README.md).
+No live recovery allowlist, NOR, SD or instrument state was changed. Current
+installed firmware remains presumed October 28, not reread in this task.
+The new latch's reset/ROM hold-up and AUX-before-main power-off timing still
+need hardware qualification. The user also identified uxcell B07JLFC7FC
+50 kOhm thumbwheels; exact physical pot pinout remains meter-unverified.
+
+**Latest checkpoint — 2.2-ohm resistor tests complete, November6 17:03:19UTC:** user-installed series resistor reduced three-run median initial/secondary sampled peaks **6.140→1.743A /1.311→1.051A**. All11markers/oneexposure passed each cold cycle; slots174/175/176 passed every3730sector at25MHz, independent RAW10/PNG decoding and root visual inspection. Warmallocation173 is excluded from coldmetrics. Sleep3.309mA; exposures24.58–25.27ms; cycle445.5–647.6ms. Post5msenergy168–263mJ; longerSDwork dominatesmedianincrease, so no isolatedresistorpenaltyclaim. [Report and evidence](docs/power/evidence/2026-11-06-series-resistor-tested/README.md).
+
+**Target intentionally OFF (JS range0)** after final exactUARTpark0x3418078C and freshparkcheck. JSclosed17:03:19.096403UTC; other settingsrestored, COM8closed/BREAKreleased, noactivehelper/hold. Measuredinputcurrentzero doesnotproveallrailszero. NormalOctober28firmwareunchanged, exactprefix `6378483a91b560ffc6b31d74a9dd1205996a14c8030447ffddf7deddc9d23874`; noNORprogramming/fullNORreread, noexplicitSDerase/deletion. No freshSBFread; originalcoldcameraRAMlost, so sourceframeequalitynotclaimed. Directbench5V→JS→2.2ohm→CN5.5/GND6 inferredfromuserinstallation/priorplan; actualresistorplacement/railslopesnotindependentlymeasured. CN8/LTCdisconnected,noCN9shunts,CN10separatelypowered,JP1/JP2normal. C14/C17/U42/D2/R23/SDLEDremoved,C12/C28unchanged,C79removalnotreported. Camera/SDconnected; twistedCLK/GND CN3.3/8,VCCCN3.5,noSDresistor/signalsprobes. JSIN1phaseCN15.21,IN0exposureCN15.33,GND20. Campaign `tmp/bringup/resistor-2r2-20261106/`, [finalstate](docs/power/evidence/2026-11-06-series-resistor-tested/final-state.json). This resolves the activecampaign below; recheck actualstate/ownership before more hardwarework.
+
+**2.2-ohm series-resistor qualification active — November 6:** user reports installing2.2ohms and seeing approximately1.7A/1A startup peaks with a successful-looking cycle, and requests confirmation. Root exclusively owns instruments; subagents are offline. Re-establish actual source/ownership/UART recovery, preserve installedOctober28normal firmware, run three cold captures and complete saved-image readback. Proposed resistor location is JSOUT+→resistor→CN5.5; exact physical placement and downstream rail slopes are not independently measured. Compare with latestC17-removed baseline, all other wiring/removals presumedunchanged pendingpreflight. NoNORprogramming or explicitSDerase planned. Campaign `tmp/bringup/resistor-2r2-20261106/`. The prior OFF checkpoint is historical because the user has since operated the board; finalcheckpoint will supersede this active state.
+
+**Latest checkpoint — C17 removal qualification complete, November 6, 05:53:43 UTC:** user removed C17/10 µF; C14/U42/D2/R23/SD LED were already removed. Three unchanged normal cold cycles show median sampled peak **6.497→6.140 A**, first250µs net charge **0.18540→0.14588 mC**, and time above5A **18→13.5µs** versus the latest LOW-current controls. Startup values remain unqualified instrument observations. All11 phase markers/one exposure passed each time; cold slots166/167/168 passed every3730sector at25MHz, independent decoding and root visual inspection. Original cold camera RAM is unavailable, so source-frame equality is not claimed. Sleep current3.310mA; guardedSBF1/PDDS1/STOPF0 retains `trial_entry_proven:false`. Cycle energy256.77→159.97mJ is confounded by SD transport383.68→164.86ms, not a C17 saving claim. [Complete report and evidence](docs/power/evidence/2026-11-06-c17-removed/README.md).
+
+**JS output intentionally OFF (range0)** after fresh reader-idle and exact normal UART park checks, then a further live park check before off. Measured input current zero; this does not establish every target rail is0V via debug paths. Other settings restored, JS closed, COM8closed/BREAKreleased, no active helper/ownership hold. NormalOctober28single-frame firmware unchanged; prefix freshly verified `6378483a91b560ffc6b31d74a9dd1205996a14c8030447ffddf7deddc9d23874`, final pre-offPC `0x3418078C`. No NOR programming or new fullNORreadback, noSDerase/deletion; warm allocation165 and cold166–168 saved. DMA-sleep remains offline only. Directbench5V→JS→CN5.5,returnCN5.6; CN8/LTCdisconnected,noCN9shunts,CN10separatelypowered,JP1/JP2normal. Camera/SDconnected; twistedSDCLK/GND CN3.3/8,VCCCN3.5,noresistor/signalsprobes. C12/C28 unchanged; C79 removal not reported. Observed JS roles **IN1=PD12/CN15.21 phases; IN0=PD0/CN15.33 exposure**, GPIOGND20. Campaign `tmp/bringup/c17-removed-20261106/`; [final-state record](docs/power/evidence/2026-11-06-c17-removed/final-state.json). This supersedes the active/live states below; recheck ownership and actual power before the next bench operation.
+
+**C17 removal qualification active — November 6:** user confirms C17 removed and requests several cold cycles, comparison with the latest baseline and saved-image verification. Root exclusively owns instruments; subagents offline. Preserve installed October28 normal single-frame FLASH. Campaign `tmp/bringup/c17-removed-20261106/`; compare against the three LOW-current `active-current-20261106/cold-normal01..03` runs, not the preceding suspected-short runs. C14/U42/D2/R23/SD LED also removed, C12/C28 unchanged. Intended source remains direct regulated5V through JS to CN5.5/GND6, not an assumed LiPo change. Re-establish actual source/ownership/recovery, identify fresh FREE slots, run three fixed10A/native2MS/s cold captures and complete 25MHz readbacks. No explicit erase or NOR programming planned. Final checkpoint will supersede this active state.
+
+**Latest checkpoint — excess active current absent, November 6, 05:16:34 UTC:** three unchanged normal cold cycles measured **79.654–80.033 mA and 256.557–260.894 mJ** from 5 ms after current onset through the low plateau, versus about 331 mA/1.03–1.04 J in the preceding abnormal runs. All eleven markers, one exposure, commit, SD deinit and pre-WFI appeared each time. The user reports a suspected inadvertent short may now be fixed; its location and exact repair timing were not inspected. Do not attribute the earlier extra approximately 250 mA to C14 removal or firmware. No new-image readback or final SBF/PC proof was taken. [Evidence and limits](docs/power/evidence/2026-11-06-active-current/README.md).
+
+**Target remains ON after normal cold run 3**, final stats **3.311 mA at 4.99554 V**, JS range128/settings restored and device closed, COM8 closed/BREAK released, no active helper or ownership hold. Exact current-prefix UART park passed before mutations and after the read-only RAM MDIO diagnostic; normal October28 single-frame firmware is unchanged, no NOR programming or explicit SD erase. Cold-recovery controls stayed approximately75 mA; EXTIO/range controls did not reproduce excess draw. Guarded power snapshot had SDEN0/VOS1; MDIO IDs0007/C131 and BMCR3000 twice, GPIO restoration/zero faults verified. The earlier BMCR0000 remains historical, not proven causal. No additional diagnostic firmware is installed; DMA-sleep remains offline. C79 should stay fitted (1 nF Ethernet termination capacitor); no removal reported. Directbench5V→JS→CN5.5/GND6, CN8/LTC disconnected/noCN9 shunts, CN10 separately powered; C14/U42/D2/R23/SD LED removed. Camera/SD connected; twistedCLK/GND CN3.3/8, VCC CN3.5. Observed JS IN1=PD12 phase, IN0=PD0 exposure. Campaign `tmp/bringup/active-current-20261106/`, final-state.json. Recheck live state/ownership before further work; this supersedes the active checkpoint below.
+
+**Active-current isolation campaign active — November 6:** user requests experiments to locate the additional approximately250mA seen in the C14-removed runs. Root exclusively owns instruments; subagents are offline. Preserve normal October28 firmware, no NOR programming or SD erase planned. Begin with fresh ownership/source checks, bounded UART recovery from the previously intentional OFF state, and no-camera/no-SD early-park controls before targeted RAM ablations. Current wiring assumed unchanged only until fresh evidence: direct5V/JS/CN5.5/GND6, C14/U42/D2/R23/SD LED removed, IN1 phase/IN0 exposure. Separate C79 removal question is being researched; **no new physical removal confirmed or requested for the experiment**. Campaign `tmp/bringup/active-current-20261106/`. Final checkpoint will supersede this ownership and record actual terminal/power state.
+
+**Latest checkpoint — C14-removed three-cycle qualification complete, November 5 local / 2026-11-06 04:53:26 UTC:** user removed C14 and reconnected CN10. Three direct-5-V cold captures measured fixed-range peaks 6.480–6.489 A, first250us charge0.1836–0.1839mC (historical reference0.6476mC), all11 markers and one exposure each. Slots156/157/158 passed all3730 sectors each at25MHz, independent PNG decoding and root visual inspection. Guarded SBF1/PDDS1/STOPF0 retained `trial_entry_proven:false`. Full physical64KiB NOR matched `79a379470927135bc03841098fe070912cad8275e91c5d5985cc066c294cf64e`; prefix `6378483a91b560ffc6b31d74a9dd1205996a14c8030447ffddf7deddc9d23874`. Normal October28 single-frame build unchanged; DMA-sleep remains offline only. No NOR programming or SD erase/deletion. [Results and limits](docs/power/evidence/2026-11-05-c14-removed/README.md).
+
+**JS output intentionally OFF (range0)** after final exact UART recovery, zero measured input current and4.996V source; other settings restored, JS closed, COM8 closed/BREAK released, no active helper/ownership hold. This is not proof all target rails are0V via debug paths. Power remains bench5V→JS→CN5.5, returnCN5.6, CN8/LTC disconnected/noCN9 shunts, CN10 separately powered; C14/U42/D2/R23/SD LED removed, other rail components not changed. Observed marker roles are **IN1=PD12/CN15.21 phases; IN0=PD0/CN15.33 exposure mirror**, opposite the earlier assumed hookup; inferred from all3protocol traces, not a physical wiring inspection. SD twistedCLK/GND CN3.3/8 andVCC CN3.5, noresistor/signalsprobes; camera/SD connected. **Unresolved:** normal active current is about331mA/1.03–1.04J, roughly250mA above the comparable historical profile; not attributed toC14. Preliminary warm PHY power-down warned BMCR0/0 (error7). Final warm recovery75.6mA versus earlier331–394mA also shows state variation. Precharge resistor/bypass and controlled-slew switch remain proposals, not installed. Recheck ownership/live state before enabling output. Campaign `tmp/bringup/inrush-20261105/c14-removed/`; final-state.json is authoritative and supersedes active checkpoints below.
+
+**C14-removed qualification active — November5:** user confirms C14 physically removed and CN10/ST-LINK USB reconnected, and requests several cold cycles, inrush comparison and saved-image verification. Root exclusively owns instruments; subagents are offline. Intended source remains directregulated5V→JS→CN5.5/GND6, with prior CN15 markers; verify fresh source/ownership/recovery before mutation. U42, D2/R23 and SD LED also removed; no other new wiring or LiPo-source change is reported. Preserve installedOctober28single-frame normalFLASH and do not promote offlineDMA-sleep candidate. Campaign `tmp/bringup/inrush-20261105/c14-removed/`. Three fixed10A cold starts and fullSD readbacks planned, noerase orNORprogramming. HistoricalC14-fitted baseline also hadU42 fitted, so comparison is not a freshly matched one-componentA/B. Final checkpoint supersedes this active ownership.
+
+**Latest checkpoint — November5 inrush preparation; debugger connection pending,22:19:31UTC:** JS110 API checks and passive2MS/s recording independently found3.31mA at4.995V after the user-reportedU42/SD-LED removals. User confirms directregulated5V→JS→CN5.5/GND6 and previousCN15 IN0/IN1 markers reconnected. Windows detectsJS110/LP8 but noST-LINK/VCP; UART helper exited before opening a port/sending stimulus. CN10 reconnection question is pending. **No reset,power toggle,firmware load,NOR/SD command or physical modification occurred.** Target leftpowered, range128 and allmeasurement/EXTIOsettings restored; JSclosed, noactivehelper. This is a current signature, not freshSBF, wire-identity, image orcodeproof. [Report,capacitorlocators and preparedrecorder/analyzer](docs/power/evidence/2026-11-05-inrush/README.md); campaign `tmp/bringup/inrush-20261105/`.21offline tests passed; historicalstartup/11-marker analyses reproduced. NormalOctober28single-frameFLASH presumedunchanged, notreread; SD-DMA-sleepstillofflineonly. Resume by freshdevice/ownership check and exactcurrentprefixUARTpark, then controlledcold/warm/reset-held matrix. This supersedes the active campaign below; no ownership hold remains.
+
+**Inrush campaign active — November 5:** the user authorizes autonomous exploration and confirms direct regulated5V through JS110, with the previous CN15 debug markers reconnected to JS inputs. Root exclusively owns instruments; subagents are offline. U42 and the SD carrier LED are user-confirmed removed. Establish fresh live supply/ownership and exact installed UART recovery before controlled cold/warm comparisons. Preserve normal October28 single-frame firmware; no physical changes or NOR promotion planned. Campaign `tmp/bringup/inrush-20261105/`. JS110 has no documented programmable output ramp; never use low-current measurement shunts as precharge resistors. The final checkpoint will supersede this active state.
+
+**Additional user hardware clarification — November 5:** the SD breakout power LED was **already removed**. Do not include it as a remaining load or recommend its removal again. Exact removal date/current delta unreported; card and carrier wiring otherwise unchanged by this clarification. See the power notes. No bench action or live state check occurred.
+
+**User hardware update — November 5:** the user reports removing U42 successfully and measuring **3.3 mA after sleep**. D2/R23 were previously removed; U42 is now also confirmed removed by the user. This supersedes earlier U42-fitted assumptions. The approximate decrease versus the earlier ~8.5 mA plateau is consistent with its regulator bias, but no raw trace, same-run baseline, supply boundary, live rail/state or instrument ownership was independently checked. No further component change or bench operation accompanied the remaining-load audit. [Recorded result and candidates](docs/power/power-cost-comparison.md#november-5-u42-removal-and-remaining-sleep-loads). The October 30 DMA-sleep candidate is still not hardware-qualified or installed by this task; re-establish current connections before any bench operation.
+
+**Latest checkpoint — SD DMA sleep implemented offline; hardware blocked, October 30:** candidate source, RAM/Standby builds, finite no-write probe and host qualification tools are ready. 281 source-bound capture tests and 38 storage tests passed; exact baseline receiver/prefix/sector reproduced, and candidate recovery/error-engine/early-load audits passed. **No candidate was executed or installed.** Stats-only JS reads at17:40 and17:59UTC found approximately0V IN+ and zero current; Windows sees JS110/LP8 but no ST-LINK/COM8. JS range128/stats settings restored unchanged and device closed. No target memory/SD/NOR commands, reset or power toggle occurred. User reconnection question remains pending: directbench5V→JS→CN5.5,returnCN5.6 and CN10USB, with camera/SD/CN15 markers retained. No active bench helper or ownership hold remains. Current PC/rail state is unknown; do not reuse the old slot145 READ proof. Last verified normal NOR remains the October28 single-frame build and was not reread today. [Implementation, hashes, tests and resume workflow](firmware/capture-raw/evidence/2026-10-30-sd-dma-sleep/README.md). Campaign `tmp/bringup/sd-dma-sleep-20261030/`; begin fresh exact recovery and idle-card WFI qualification once connections return. This supersedes the active integration checkpoint below, not the pending hardware qualification.
+
+**SD DMA sleep integration active — October 30:** the user explicitly requests implementing sleep during DMA writes on the current SD hardware. This authorizes a new root-owned qualification campaign and supersedes the earlier test-stop for this work. Subagents are offline only. Preserve the installed single-frame/Ethernet-down/25MHz/error-engine/UART-recovery profile. First re-establish actual power/ownership and exact recovery from the previously unverified RAM-reader state; do not reuse its old READ proof. Qualify finite idle-card shallow sleep and timer wake before live DMA, then complete image equality/readback, externally aligned time/energy and recovery before any normal-FLASH promotion. Existing historical WFI failures remain evidence, not waived checks. No erase or physical changes planned. Campaign `tmp/bringup/sd-dma-sleep-20261030/`; final checkpoint will supersede this active state.
 
 **Latest checkpoint — single-frame firmware installed; tests stopped at user request, October 28, 23:48 UTC:** normal NOR is `tmp/bringup/sensor-autostop-promote-20261028/flash-standby-v1`: receiver `560a8734306436fe95bc1407031e70f1bc5b448949366e1bd007779c1736f646`, prefix `6378483a91b560ffc6b31d74a9dd1205996a14c8030447ffddf7deddc9d23874`, sector `79a379470927135bc03841098fe070912cad8275e91c5d5985cc066c294cf64e`. Independent physical64KiB readback matched; following4KiB preserved. Sensor context0 repeat1/next4 now stops after one frame without an explicit successful-path STOP. Ethernet power-down, SD4bit25MHz, error engine, UART recovery and MCU Standby are retained. Three cold cycles passed all11markers/one exposure and exact UART recovery. Guarded SBF1/PDDS1/STOPF0 was observed after the third, with `trial_entry_proven:false` retained. Awake slot142 passed original-camera-RAM equality; cold slots143/144 passed all3730sectors and independent PNG decoding, and root viewed recognizable scenes. Slot145 has only2560sectors verified; the remaining readback was stopped at the user's explicit instruction. [Results and limits](firmware/capture-raw/evidence/2026-10-28-sensor-single-frame/README.md).261 offline tests and five historical binary comparisons passed before the stop; no further tests are pending in this task.
 

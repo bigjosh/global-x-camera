@@ -31,7 +31,7 @@ FRONT_MAGIC_FRAME, FRONT_MAGIC_BUFFER = 0x340000A0, 0x34000004
 DMA_WAIT_FAULTS = ('missing_clock', 'exception', 'primask', 'basepri', 'faultmask',
     'deep_sleep', 'sleep_on_exit', 'systick_control', 'systick_load',
     'ram_sleep_clocks', 'rif_sleep_clocks', 'sd_sleep_clock', 'bus_sleep_clocks',
-    'debug_access', 'debug_sleep_emulation')
+    'debug_access', 'debug_sleep_emulation', 'bsec_sleep_clock')
 
 
 def sha(raw):
@@ -60,6 +60,185 @@ def dma_wait_snapshot(b,m):
         timing_scope='DMA phases including CMD24/25 launch; excludes post-DATAEND CMD12/card-ready waits',
         cycle_qualification='Processor-clock cycles, not wall time or executed-instruction time; sleep emulation can keep this clock running')
     return raw,result
+
+
+def dma_sleep_profile(m, *, diagnostic_probe=False):
+    """Recognize only the new single-frame magic/IDMA Sleep profile.
+
+    This is an admission predicate, not execution-state or idle evidence.
+    Historical non-magic DMA-wait builds remain a separate profile.
+    """
+    enabled=m.get('dma_sleep_profile',False)
+    selected=[f for f in m.get('flags',[]) if f.startswith('-DSD_DMA_SLEEP_PROFILE=')]
+    if type(enabled) is not bool:
+        raise ValueError('DMA Sleep profile selector type differs')
+    if not enabled:
+        if selected not in ([],['-DSD_DMA_SLEEP_PROFILE=0']):
+            raise ValueError('Unexpected DMA Sleep profile compiler flag')
+        if m.get('magic_format') and m.get('dma_sleep'):
+            raise ValueError('Magic DMA Sleep needs its explicit reviewed profile')
+        return False
+    true_keys=('dma_sleep','magic_format','line_stream','async_stop','sd_review_profile',
+        'sd_startup_opt','sd_clock_negedge','sd_clock_negedge_init','sensor_autostop',
+        'sensor_single_frame','board_eth_powerdown')
+    false_keys=('sd_high_speed','sd_fixed_compensation','sd_compensation_modified',
+        'sd_high_speed_mixed_slew','sd_high_speed_fixed_compensation','sd_high_speed_combined_electrical',
+        'sd_early_run_clock','sd_idma_read','sd_read_diagnostics','raw_dma_tail_wait',
+        'preinit','line_snapshots','line_poison','whole_image_preerase','error_test_code',
+        'error_after_frame_test','power_probe','cycle_trace','sd_init_gap_ms')
+    probe_flags=[f for f in m.get('flags',[]) if f.startswith('-DRAW_DMA_SLEEP_PROBE=')]
+    if diagnostic_probe:
+        completion=(m.get('dma_sleep_probe') is True and m.get('error_blinks') is False and
+            m.get('flash') is False and m.get('standby') is False and probe_flags==['-DRAW_DMA_SLEEP_PROBE=1'] and
+            not any(f.startswith('-DRAW_ERROR_PREFIX=') for f in m.get('flags',[])))
+    else:
+        completion=(m.get('dma_sleep_probe',False) is False and m.get('error_blinks') is True and
+            probe_flags in ([],['-DRAW_DMA_SLEEP_PROBE=0']))
+    if (selected!=['-DSD_DMA_SLEEP_PROFILE=1'] or
+        not all(m.get(k) is True for k in true_keys) or any(m.get(k,False) for k in false_keys) or
+        m.get('transport')!='idma' or m.get('sd_bus_width')!=4 or m.get('sd_clock_hz')!=25000000 or
+        m.get('sd_gpio_speed')!=3 or m.get('sd_clk_gpio_speed') is not None or
+        m.get('pattern')!=0 or m.get('exposure_coarse')!=1428 or m.get('chunk_sectors')!=3730 or
+        m.get('magic_layout_version')!=2 or not completion):
+        raise ValueError('DMA Sleep requires the exact single-frame Ethernet-down 25 MHz magic profile')
+    return True
+
+
+def dma_sleep_layout(m,operation=None, *, diagnostic_probe=False):
+    """Bind new Sleep telemetry without broadening legacy DMA-wait admission."""
+    if not dma_sleep_profile(m,diagnostic_probe=diagnostic_probe):return False
+    if operation not in (None,1,3):
+        raise ValueError('DMA Sleep profile supports capture/read only')
+    flash=m.get('flash',False);standby=m.get('standby',False)
+    if type(flash) is not bool or type(standby) is not bool or standby and not flash:
+        raise ValueError('DMA Sleep RAM/FLASH completion profile differs')
+    required=dict(RAW_DMA_SLEEP='1',SD_DMA_SLEEP_PROFILE='1',RAW_MAGIC_FORMAT='1',
+        RAW_DMA='1',RAW_LINE_STREAM='1',RAW_ASYNC_STOP='1',RAW_SENSOR_AUTOSTOP='1',
+        RAW_SENSOR_SINGLE_FRAME='1',RAW_BOARD_ETH_POWERDOWN='1')
+    if not diagnostic_probe:required['RAW_ERROR_PREFIX']=str(int(flash))
+    for key,value in required.items():
+        if [f for f in m.get('flags',[]) if f.startswith('-D'+key+'=')]!=[f'-D{key}={value}']:
+            raise ValueError('DMA Sleep compiler flag differs: '+key)
+    clock=m.get('dma_wait_clock')
+    if (type(clock) is not int or not clock&1 or
+        not LOAD<=clock-1<LOAD+m.get('binary_bytes',0)):
+        raise ValueError('DMA Sleep callback is outside the frozen executable')
+    if m.get('dma_wait_bytes')!=24 or m.get('dma_sleep_clocks_words')!=16:
+        raise ValueError('DMA Sleep telemetry ABI differs')
+    owners=(('card',200),('slots',640),('producer',416),('magic_slots',576),('sd_scr',16),
+        ('sd_erase',32),('sd_stream',44),('magic_proof',32),('sd_startup_proof',64),
+        ('sd_width_proof',24),('board_eth_proof',256),('sensor_autostop_proof',160))
+    spans=[]
+    for key,size in (('dma_wait',24),('dma_sleep_clocks',64)):
+        address=m.get(key)
+        if (type(address) is not int or address%4 or
+            not LOAD<=m['bss_start']<=address<=m['bss_end']-size or
+            m['bss_end']>m.get('stack_floor',0x343AF000)):
+            raise ValueError('DMA Sleep telemetry bounds differ: '+key)
+        for other,length in owners:
+            begin=m.get(other)
+            if begin is not None and address<begin+length and begin<address+size:
+                raise ValueError('DMA Sleep telemetry overlaps '+other)
+        spans.append((address,size))
+    if spans[0][0]<spans[1][0]+spans[1][1] and spans[1][0]<spans[0][0]+spans[0][1]:
+        raise ValueError('DMA Sleep telemetry objects overlap')
+    return True
+
+
+def dma_sleep_probe_layout(m):
+    """Exact RAM-only diagnostic exception; never normal capture admission.
+
+    Error blinking must be absent so the intentional failure stays
+    in the ordinary awake failure park and retains its SRAM evidence.
+    """
+    if (m.get('dma_sleep_probe') is not True or m.get('flash') is not False or
+        m.get('standby') is not False or m.get('error_blinks') is not False or
+        [f for f in m.get('flags',[]) if f.startswith('-DRAW_DMA_SLEEP_PROBE=')]!=['-DRAW_DMA_SLEEP_PROBE=1'] or
+        any(f.startswith('-DRAW_ERROR_PREFIX=') for f in m.get('flags',[])) or
+        'dma_sleep_probe.inc' not in m.get('source_hashes',{}) or
+        m.get('failure_park_policy')!='Same terminal loop; nonzero result is failure, never idle permission'):
+        raise ValueError('DMA Sleep probe requires its exact RAM awake non-blinking diagnostic')
+    dma_sleep_layout(m,1,diagnostic_probe=True)
+    address=m.get('dma_sleep_probe_address')
+    if (type(address) is not int or address%4 or m.get('dma_sleep_probe_words')!=24 or
+        not m['bss_start']<=address<=m['bss_end']-96):
+        raise ValueError('DMA Sleep probe telemetry bounds differ')
+    for key,size in (('card',200),('slots',640),('producer',416),('magic_slots',576),('sd_scr',16),
+            ('sd_erase',32),('sd_stream',44),('magic_proof',32),('sd_startup_proof',64),
+            ('sd_width_proof',24),('board_eth_proof',256),('sensor_autostop_proof',160),
+            ('dma_wait',24),('dma_sleep_clocks',64)):
+        other=m.get(key)
+        if other is not None and address<other+size and other<address+96:
+            raise ValueError('DMA Sleep probe telemetry overlaps '+key)
+    return True
+
+
+DMA_SLEEP_CLOCK_FIELDS=('mem_before ahb3_before ahb5_before mem_after ahb3_after ahb5_after '
+    'applied faults bus_before bus_after debug_clock debug_reset debug_before debug_after '
+    'apb4_before apb4_after').split()
+
+
+def dma_sleep_clocks_snapshot(b,m):
+    """Decode the separate frozen 14/16-word clocks record; no idle authority."""
+    count=m.get('dma_sleep_clocks_words');address=m.get('dma_sleep_clocks')
+    if (count not in (14,16) or type(address) is not int or address%4 or
+        not m['bss_start']<=address<=m['bss_end']-count*4):
+        raise ValueError('DMA Sleep clocks telemetry bounds differ')
+    raw=b.upload(address,count*4,'dma-sleep-clocks.bin')
+    if len(raw)!=count*4:raise ValueError('Incomplete DMA Sleep clocks telemetry')
+    return raw,dict(zip(DMA_SLEEP_CLOCK_FIELDS,struct.unpack('<'+str(count)+'I',raw)))
+
+
+def validate_dma_sleep_clocks(clocks):
+    if clocks['applied']!=1 or clocks['faults']:
+        raise ValueError('DMA Sleep clock proof is incomplete or failed')
+    for before,after,mask in (('mem_before','mem_after',0x18F),('ahb3_before','ahb3_after',0x4200),
+            ('ahb5_before','ahb5_after',0x80),('bus_before','bus_after',3),
+            ('apb4_before','apb4_after',2)):
+        if clocks[after]!=(clocks[before]|mask):
+            raise ValueError('DMA Sleep clock preparation differs: '+after)
+    if (not clocks['debug_clock']&1 or clocks['debug_reset']&1 or
+        clocks['debug_before']==0xFFFFFFFF or clocks['debug_after']!=(clocks['debug_before']&~1)):
+        raise ValueError('DMA Sleep debug-clock/emulation proof differs')
+
+
+def dma_sleep_snapshot(b,m,p):
+    """Validate optional Sleep evidence after independent completion gates.
+
+    WFI counts prove instructions ran, not that clocks stopped. This result
+    never replaces existing operation, card, exact-park or image checks.
+    """
+    if not dma_sleep_layout(m,p['operation']):return None
+    wait_raw,wait=dma_wait_snapshot(b,m)
+    clocks_raw,clocks=dma_sleep_clocks_snapshot(b,m)
+    result=dict(wait=wait,clocks=clocks,idle_permission=False,sleep_entered_proven=False,
+        cycle_qualification='DWT intervals spanning WFI are active-clock counts, not wall time; use external JS markers and wait.wall_ms',
+        scope='Capture DMA data phase only; card-ready cleanup stays awake')
+    counters=tuple(wait[k] for k in ('wait_calls','wall_ms','active_cycles','immediate_wakes','context_faults'))
+    if p['operation']==3:
+        if any(counters) or any(clocks.values()):
+            raise ValueError('READ unexpectedly entered DMA Sleep or clock preparation')
+        result.update(attempted=False,wfi_instructions_executed=False)
+        return wait_raw,clocks_raw,result
+    stream=b.upload(m['sd_stream'],44,'dma-sleep-stream.bin')
+    if len(stream)!=44:raise ValueError('Incomplete DMA Sleep stream evidence')
+    sw=struct.unpack('<11I',stream);mode,initial,published,queued=sw[2:6]
+    if (mode not in (1,2) or published!=SLOT_BYTES or queued!=SLOT_BYTES or
+        sw[8] or (mode==1 and initial!=SLOT_BYTES) or (mode==2 and not 512<=initial<SLOT_BYTES)):
+        raise ValueError('DMA Sleep stream completion/initial publication differs')
+    if wait['immediate_wakes']>wait['wait_calls']:
+        raise ValueError('DMA Sleep immediate wake count exceeds WFI count')
+    prepared=bool(clocks['applied'])
+    if mode==1 and prepared:
+        validate_dma_sleep_clocks(clocks)
+        if wait['context_faults']:
+            raise ValueError('DMA Sleep context proof failed')
+    elif any(counters) or any(clocks.values()):
+        raise ValueError('Awake fallback unexpectedly entered DMA Sleep or clock preparation')
+    result.update(attempted=prepared,transport='idma' if mode==1 else 'pio',
+        wfi_instructions_executed=bool(wait['wait_calls']),stream_words=list(sw),
+        wait_calls_are_not_sleep_entries=True)
+    return wait_raw,clocks_raw,result
 
 
 def fields(folder):
@@ -100,7 +279,7 @@ def frame_layout(m):
                 guard_bytes=32,allocation_bytes=SLOT_BYTES if m.get('whole_image_preerase') else FRAME_BYTES)
 
 
-def checked_build(folder, digest):
+def checked_build(folder, digest, *, diagnostic_probe=False):
     m = json.loads((folder/'manifest.json').read_text())
     code = (folder/'capture.bin').read_bytes()
     exact = dict(schema=1, kind='raw-slots', load=LOAD, stack=0x343B0000,
@@ -150,35 +329,104 @@ def checked_build(folder, digest):
             (m.get('snapshot_address'),m.get('snapshot_capacity'),m.get('snapshot_bytes')) !=
             (0x343D0000,20,512)):
         raise ValueError('Snapshot layout differs')
+    if diagnostic_probe:dma_sleep_probe_layout(m)
     whole_layout(m)
-    magic_layout(m)
+    magic_layout(m,diagnostic_probe=diagnostic_probe)
     width_layout(m)
     gpio_layout(m)
     compensation_layout(m)
-    diagnostic_layout(m)
+    diagnostic_layout(m,diagnostic_probe=diagnostic_probe)
     return m, code
 
 
 def startup_flash_profile(m):
     """Narrow flash admission after separate RAM source/readback tests."""
+    try:
+        sleep_allowed=not m.get('dma_sleep') or dma_sleep_profile(m)
+    except ValueError:
+        # This existing predicate reports unsupported profiles as False.
+        # The dedicated layout validators still raise on malformed selectors.
+        return False
     true_keys=('flash','sd_startup_opt','sd_review_profile','sd_clock_negedge','sd_clock_negedge_init',
                'magic_format','line_stream','async_stop')
     false_keys=('sd_high_speed','sd_fixed_compensation','sd_compensation_modified','sd_high_speed_mixed_slew',
                 'sd_high_speed_fixed_compensation','sd_high_speed_combined_electrical','sd_idma_read',
-                'raw_dma_tail_wait','dma_sleep','preinit','line_snapshots','line_poison','whole_image_preerase',
+                'raw_dma_tail_wait','preinit','line_snapshots','line_poison','whole_image_preerase',
                 'sd_early_run_clock','sd_read_diagnostics')
-    return (all(m.get(k) is True for k in true_keys) and
+    return (sleep_allowed and
+            all(m.get(k) is True for k in true_keys) and
             all(m.get(k,False) is False for k in false_keys) and
             m.get('sd_clock_hz') in (12500000,25000000) and m.get('sd_bus_width')==4 and m.get('sd_gpio_speed')==3 and
             m.get('transport')=='idma' and m.get('pattern')==0 and m.get('exposure_coarse')==1428 and
             not m.get('cycle_trace') and m.get('sd_clk_gpio_speed') is None)
 
 
-def diagnostic_layout(m,operation=None):
+def gpio_hold_layout(m,operation=None):
+    """Admit only the explicit FLASH HOLD profile, never a recovery permission.
+
+    The contract is independently recomputed from the packaged prefix and
+    receiver by inspect_flash. This selector check alone is not binary or pin
+    state evidence, and performs no instrument reads.
+    """
+    enabled=m.get('gpio_hold',False)
+    selected=[f for f in m.get('flags',[]) if f=='-DRAW_GPIO_HOLD' or f.startswith('-DRAW_GPIO_HOLD=')]
+    if type(enabled) is not bool:
+        raise ValueError('GPIO HOLD selector type differs')
+    if not enabled:
+        if selected or 'gpio_hold_contract' in m:
+            raise ValueError('Unexpected GPIO HOLD compiler flag or contract')
+        return False
+    contract=m.get('gpio_hold_contract')
+    if selected!=['-DRAW_GPIO_HOLD=1'] or type(contract) is not dict or not contract:
+        raise ValueError('GPIO HOLD needs its explicit compiler flag and bound contract')
+    true_keys=('flash','sensor_autostop','sensor_single_frame','board_eth_powerdown','error_blinks',
+        'sd_review_profile','sd_startup_opt','sd_clock_negedge','sd_clock_negedge_init',
+        'magic_format','line_stream','async_stop')
+    false_keys=('dma_sleep','dma_sleep_profile','dma_sleep_probe','sd_high_speed',
+        'sd_fixed_compensation','sd_compensation_modified','sd_high_speed_mixed_slew',
+        'sd_high_speed_fixed_compensation','sd_high_speed_combined_electrical','sd_early_run_clock',
+        'sd_idma_read','sd_read_diagnostics','raw_dma_tail_wait','preinit','line_snapshots',
+        'line_poison','whole_image_preerase','error_test_code','error_after_frame_test',
+        'power_probe','cycle_trace','sd_init_gap_ms')
+    standby=m.get('standby')
+    if (not all(m.get(k) is True for k in true_keys) or any(m.get(k,False) for k in false_keys) or
+        type(standby) is not bool or m.get('transport')!='idma' or m.get('sd_bus_width')!=4 or
+        m.get('sd_clock_hz')!=25000000 or m.get('sd_gpio_speed')!=3 or
+        m.get('sd_clk_gpio_speed') is not None or m.get('pattern')!=0 or
+        m.get('exposure_coarse')!=1428 or m.get('chunk_sectors')!=3730 or
+        m.get('magic_layout_version')!=2 or operation not in (None,1,3)):
+        raise ValueError('GPIO HOLD requires the normal single-frame FLASH 25 MHz capture/read profile')
+    forbidden=('SD_DMA_SLEEP_PROFILE','RAW_DMA_SLEEP_PROBE','RAW_CYCLE_TRACE','SD_CLK_GPIO_SPEED',
+        'SD_READ_DIAGNOSTICS','RAW_POWER_PROBE','RAW_SD_INIT_GAP_MS')
+    if any(f=='-D'+key or f.startswith('-D'+key+'=') for key in forbidden for f in m.get('flags',[])):
+        raise ValueError('GPIO HOLD does not admit diagnostic compiler flags')
+    required=dict(RAW_GPIO_HOLD='1',RAW_FLASH='1',RAW_STANDBY=str(int(standby)),
+        RAW_SENSOR_AUTOSTOP='1',RAW_SENSOR_SINGLE_FRAME='1',RAW_BOARD_ETH_POWERDOWN='1',
+        RAW_ERROR_PREFIX='1',SD_REVIEW_PROFILE='1',SD_STARTUP_OPT='1',SD_BUS_WIDTH='4',
+        RAW_SD_CLOCK_HZ='25000000U',SD_GPIO_SPEED='3',SD_CLOCK_NEGEDGE='1',
+        SD_CLOCK_NEGEDGE_INIT='1',RAW_MAGIC_FORMAT='1',RAW_LINE_STREAM='1',RAW_ASYNC_STOP='1',
+        RAW_DMA='1',RAW_PREINIT='0',RAW_LINE_SNAPSHOTS='0',RAW_LINE_POISON='0',
+        RAW_WHOLE_IMAGE_PREERASE='0',RAW_DMA_SLEEP='0',RAW_DMA_TAIL_WAIT='0',
+        SD_EARLY_RUN_CLOCK='0',SD_IDMA_READ='0',SD_FIXED_COMPENSATION='0',SD_HIGH_SPEED='0',
+        SD_HIGH_SPEED_MIXED_SLEW='0',SD_HIGH_SPEED_FIXED_COMPENSATION='0',
+        SD_HIGH_SPEED_COMBINED_ELECTRICAL='0',RAW_PATTERN='0',RAW_EXPOSURE_COARSE='1428U',
+        RAW_CHUNK_SECTORS='3730U',STAGE1_SENSOR_TRIM='1',LOW_POWER_MODE='3',LOW_POWER_ENTRY_DELAY_US='0')
+    for key,value in required.items():
+        if [f for f in m.get('flags',[]) if f.startswith('-D'+key+'=')]!=[f'-D{key}={value}']:
+            raise ValueError('GPIO HOLD profile compiler flag differs: '+key)
+    spec=importlib.util.spec_from_file_location('raw_hold_contract',HERE/'gpio_hold_transform.py')
+    transform=importlib.util.module_from_spec(spec);spec.loader.exec_module(transform)
+    transform.validate_contract(contract,standby)
+    return True
+
+
+def diagnostic_layout(m,operation=None, *, diagnostic_probe=False):
     """Bind the separate RAM-only receive and capture-tail experiments."""
-    board_eth_layout(m,operation)
+    gpio_hold_layout(m,operation)
+    dma_sleep_layout(m,operation,diagnostic_probe=diagnostic_probe)
+    board_eth_layout(m,operation,diagnostic_probe=diagnostic_probe)
     sd_init_gap_layout(m,operation)
-    sensor_autostop_layout(m,operation)
+    sensor_autostop_layout(m,operation,diagnostic_probe=diagnostic_probe)
     power_probe_layout(m,operation)
     clk_gpio_layout(m,operation)
     read_diagnostics_layout(m,operation)
@@ -540,7 +788,7 @@ POWER_PROBE_FIELDS=('magic version mode state wait_begin camera_ready hold_begin
     'gpio_mode gpio_odr_before gpio_idr_before gpio_odr_after gpio_idr_after faults preconditions hold_cycles').split()
 
 
-def board_eth_layout(m,operation=None):
+def board_eth_layout(m,operation=None, *, diagnostic_probe=False):
     """Optional board power saving has separate admission from RAM experiments."""
     enabled=m.get('board_eth_powerdown',False)
     selected=[f for f in m.get('flags',[]) if f.startswith('-DRAW_BOARD_ETH_POWERDOWN=')]
@@ -556,11 +804,13 @@ def board_eth_layout(m,operation=None):
                'magic_format','line_stream','async_stop')
     false_keys=('sd_high_speed','sd_fixed_compensation','sd_compensation_modified',
         'sd_high_speed_mixed_slew','sd_high_speed_fixed_compensation','sd_high_speed_combined_electrical',
-        'sd_early_run_clock','sd_idma_read','sd_read_diagnostics','raw_dma_tail_wait','dma_sleep',
+        'sd_early_run_clock','sd_idma_read','sd_read_diagnostics','raw_dma_tail_wait',
         'preinit','line_snapshots','line_poison','whole_image_preerase','error_test_code',
         'error_after_frame_test','power_probe','cycle_trace')
     flash=m.get('flash',False);standby=m.get('standby',False)
-    if (type(flash) is not bool or type(standby) is not bool or standby and not flash or
+    sleep=dma_sleep_profile(m,diagnostic_probe=diagnostic_probe)
+    if (m.get('dma_sleep') and not sleep or
+        type(flash) is not bool or type(standby) is not bool or standby and not flash or
         not all(m.get(k) is True for k in true_keys) or any(m.get(k,False) for k in false_keys) or
         m.get('sd_bus_width')!=4 or m.get('sd_clock_hz')!=25000000 or m.get('sd_gpio_speed')!=3 or
         m.get('sd_clk_gpio_speed') is not None or m.get('transport')!='idma' or m.get('pattern')!=0 or
@@ -570,7 +820,7 @@ def board_eth_layout(m,operation=None):
         SD_REVIEW_PROFILE='1',SD_STARTUP_OPT='1',SD_BUS_WIDTH='4',RAW_SD_CLOCK_HZ='25000000U',
         SD_GPIO_SPEED='3',SD_CLOCK_NEGEDGE='1',SD_CLOCK_NEGEDGE_INIT='1',RAW_MAGIC_FORMAT='1',
         RAW_LINE_STREAM='1',RAW_ASYNC_STOP='1',RAW_DMA='1',RAW_PREINIT='0',RAW_LINE_SNAPSHOTS='0',
-        RAW_LINE_POISON='0',RAW_WHOLE_IMAGE_PREERASE='0',RAW_DMA_SLEEP='0',RAW_DMA_TAIL_WAIT='0',
+        RAW_LINE_POISON='0',RAW_WHOLE_IMAGE_PREERASE='0',RAW_DMA_SLEEP=str(int(sleep)),RAW_DMA_TAIL_WAIT='0',
         SD_EARLY_RUN_CLOCK='0',SD_IDMA_READ='0',SD_FIXED_COMPENSATION='0',SD_HIGH_SPEED='0',
         RAW_PATTERN='0',RAW_EXPOSURE_COARSE='1428U')
     for key,value in required.items():
@@ -727,7 +977,7 @@ SENSOR_AUTOSTOP_FIELDS=('magic version words state error config_begin config_end
     'reserved34 reserved35 reserved36 reserved37 reserved38 reserved39').split()
 
 
-def sensor_autostop_layout(m,operation=None):
+def sensor_autostop_layout(m,operation=None, *, diagnostic_probe=False):
     """Bind historical AST1 diagnostics or the explicit production AST2 profile."""
     enabled=m.get('sensor_autostop',False)
     selected=[f for f in m.get('flags',[]) if f.startswith('-DRAW_SENSOR_AUTOSTOP=')]
@@ -742,7 +992,7 @@ def sensor_autostop_layout(m,operation=None):
                 m.get('sensor_autostop_readback_timing') is not None):
             raise ValueError('Unexpected sensor auto-stop feature or telemetry')
         return False
-    if (selected!=['-DRAW_SENSOR_AUTOSTOP=1'] or not board_eth_layout(m,operation) or
+    if (selected!=['-DRAW_SENSOR_AUTOSTOP=1'] or not board_eth_layout(m,operation,diagnostic_probe=diagnostic_probe) or
             m.get('sd_init_gap_ms',0)):
         raise ValueError('Sensor auto-stop requires the exact Ethernet-down normal profile without a gap')
     if single:
@@ -1253,11 +1503,11 @@ def whole_layout(m):
         raise ValueError('Whole-image preerase layout/features differ')
 
 
-def magic_layout(m):
+def magic_layout(m, *, diagnostic_probe=False):
     if not m.get('magic_format'): return
     g=magic_geometry(m)
     if (m['magic_format'] is not True or m.get('whole_image_preerase') or
-            m.get('transport')!='idma' or m.get('dma_sleep') or m.get('chunk_sectors')!=3730 or
+            m.get('transport')!='idma' or (m.get('dma_sleep') and not dma_sleep_profile(m,diagnostic_probe=diagnostic_probe)) or m.get('chunk_sectors')!=3730 or
             m.get('slot_buffer')!=g['buffer'] or m.get('original_guard')!=g['frame']+FRAME_BYTES or
             any(m.get(k)!=v for k,v in frame_layout(m).items()) or
             m.get('magic_proof_words')!=8):
@@ -1659,6 +1909,12 @@ def run(a):
     if power_csi is not None:result['power_csi']=power_csi
     if read_diagnostics is not None:result['read_diagnostics']=read_diagnostics
     if magic is not None: result['magic_format']=magic
+    sleep=dma_sleep_snapshot(b,m,p)
+    if sleep is not None:
+        wait_raw,clocks_raw,result['dma_sleep']=sleep
+        (a.out/'dma-wait.bin').write_bytes(wait_raw)
+        (a.out/'dma-sleep-clocks.bin').write_bytes(clocks_raw)
+        result['dma_wait']=result['dma_sleep']['wait']
     if op==1:
         result['whole_image']=frame_guards(b,m,p)
         if p['chunk_overflow'] or not 1 <= p['chunk_count'] <= 128:
@@ -1668,7 +1924,7 @@ def run(a):
             (a.out/'producer.bin').write_bytes(b.upload(m['producer'],416,'producer.bin'))
         if m.get('line_snapshots'):
             (a.out/'snapshots.bin').write_bytes(b.upload(0x343D0000,10240,'snapshots.bin'))
-        if m.get('dma_sleep'):
+        if m.get('dma_sleep') and sleep is None:
             raw,stats=dma_wait_snapshot(b,m)
             (a.out/'dma-wait.bin').write_bytes(raw);result['dma_wait']=stats
         if a.download_frame:

@@ -1,0 +1,93 @@
+{
+  "source": "docs\\prototype\\nucleo-assembly\\mb1940-c02-assembly.pdf",
+  "source_sha256": "644107323fe035ec2eb640ff7d12b6acae7199103f7f6ea57bb590c1ce948991",
+  "orientation": "Each face viewed directly, ST-LINK end at top; bottom is left-right flip of top.",
+  "parts": {
+    "C14": {
+      "page": 0,
+      "side": "TOP",
+      "center_mm": [
+        20.066,
+        111.2796
+      ],
+      "rotation": 90,
+      "body": [
+        278.9804992675781,
+        214.1500244140625,
+        295.9270324707031,
+        246.2298583984375
+      ],
+      "value": "220 \u00b5F input bulk capacitor",
+      "package": "1206",
+      "mfr": "Murata GRM31CR60J227ME11",
+      "crop": [
+        215,
+        165,
+        350,
+        280
+      ],
+      "ground": [
+        287.454,
+        217.0
+      ],
+      "supply": [
+        287.454,
+        243.4
+      ],
+      "ground_pin": 2,
+      "supply_pin": 1,
+      "description": "Between the removed D2 and R23 sites.\nDo not confuse it with C2 above D2.\nChanging C14 requires startup/shutdown qualification."
+    },
+    "C17": {
+      "page": 1,
+      "side": "UNDERSIDE",
+      "center_mm": [
+        16.4084,
+        23.2918
+      ],
+      "rotation": 180,
+      "body": [
+        586.7658081054688,
+        1053.76171875,
+        607.4786376953125,
+        1066.9688720703125
+      ],
+      "value": "10 \u00b5F former U42 input capacitor",
+      "package": "0805",
+      "mfr": "Yageo CC0805KRX5R8BB106",
+      "crop": [
+        535,
+        965,
+        655,
+        1100
+      ],
+      "ground": [
+        589.12,
+        1060.365
+      ],
+      "supply": [
+        605.124,
+        1060.365
+      ],
+      "ground_pin": 1,
+      "supply_pin": 2,
+      "description": "Directly below the removed U42 footprint.\nC155 beside U42 is its output capacitor; leave it alone.\nC17 is still connected to 5 V after U42 removal."
+    }
+  },
+  "odb_nets": {
+    "358": "GND",
+    "380": "target 5V"
+  },
+  "pin_records": {
+    "C14": [
+      "TOP 0 0.79 4.3259669 180 N 380 36 C14-1",
+      "TOP 1 0.79 4.4362031 180 N 358 252 C14-2"
+    ],
+    "C17": [
+      "TOP 0 0.6794646 0.917 270 N 358 128 C17-1",
+      "TOP 1 0.6125354 0.917 270 N 380 15 C17-2"
+    ]
+  },
+  "population": "C02 BOM marks both fitted; generic pick/place alone is insufficient population proof.",
+  "limits": "CAD locator, not a delivered-board photograph or authorization to remove parts."
+}

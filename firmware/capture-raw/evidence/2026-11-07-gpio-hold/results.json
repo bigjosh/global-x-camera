@@ -1,0 +1,179 @@
+{
+  "schema": 1,
+  "hardware_access": false,
+  "installed": false,
+  "board": "Disconnected by user while adding latch and controls",
+  "default_binary_reproduction": {
+    "capture.bin": "560a8734306436fe95bc1407031e70f1bc5b448949366e1bd007779c1736f646",
+    "staged/stage1.bin": "6378483a91b560ffc6b31d74a9dd1205996a14c8030447ffddf7deddc9d23874",
+    "staged/capture_sector_0.bin": "79a379470927135bc03841098fe070912cad8275e91c5d5985cc066c294cf64e"
+  },
+  "candidates": {
+    "hold-standby": {
+      "source_build": "hold-standby-v2",
+      "receiver_sha256": "d7a8202318d95183d7b09b97b728dd50d2e986e5a0ef668cc24f2e4dc320d3d1",
+      "prefix_sha256": "8614089a69fb0ca49d4a4d608159129079458a71b0be21f178574869377672f5",
+      "sector_sha256": "909bc2f5e272a0216940e80f61dc8511c0ff4555df9e4e08c5b59af6b2c83f8c",
+      "receiver_bytes": 34332,
+      "prefix_bytes": 6796,
+      "early_bytes": 15804,
+      "package_audit": {
+        "runtime": {
+          "schema": 1,
+          "source_sha256": {
+            "staged/error_signal.c": "df99191e58a8fec4ec85f24ce24902b2e322175a04de4a0fdbdb4e22dedfe2ea",
+            "completion.c": "f55f55513f7edd897f9c7957d56f69558ea855a6ec041a1e47d2886c6ff381b6"
+          },
+          "release_sites": [
+            "error",
+            "success"
+          ]
+        },
+        "binary": {
+          "schema": 1,
+          "sites": {
+            "error": {
+              "release": 873995436,
+              "wfi": 873995476,
+              "reassert": 873995478,
+              "end": 873995506,
+              "bytes": 70,
+              "sha256": "b3a374932c572dd82c6d8cb373de852f77e294180d065b4dc7553364980f028b"
+            },
+            "success": {
+              "release": 875592456,
+              "wfi": 875592496,
+              "reassert": 875592498,
+              "end": 875592526,
+              "bytes": 70,
+              "sha256": "b3a374932c572dd82c6d8cb373de852f77e294180d065b4dc7553364980f028b"
+            }
+          }
+        },
+        "prefix": {
+          "schema": 1,
+          "reference_sha256": "6378483a91b560ffc6b31d74a9dd1205996a14c8030447ffddf7deddc9d23874",
+          "reset_vector_offset": 4,
+          "entry": 873995840,
+          "resume_entry": 873989184,
+          "boot_bytes": 76,
+          "boot_sha256": "c3b7aeb3f1919b556441d6369fd8bb5bdabbe7ad85ec3b3927b3eda2259e34db",
+          "error_engine_sha256": "7082e54d435a68288d44979abd40aa18668dc436395dfa9e00e43cf517b72d94",
+          "startup_recovery_loader_bridge_equal": true,
+          "recovery_literal_offsets": [
+            1660,
+            1664,
+            1668,
+            1672,
+            1676,
+            1680,
+            1684,
+            1688,
+            1692,
+            1696,
+            1700,
+            1704,
+            1708,
+            1712,
+            1716,
+            1720,
+            1724,
+            1728,
+            1732,
+            1736
+          ],
+          "crc_literal_offsets": [
+            3228,
+            4952
+          ],
+          "early_load_bytes": 15804,
+          "assertion_before_stack_and_uart": true,
+          "pin": "PD7",
+          "header": "Arduino D9 / CN14.2",
+          "mode": "push-pull output",
+          "speed": "low",
+          "pulls": "none"
+        },
+        "scope": "Offline package only; no live GPIO, shutdown, storage-idle, or recovery qualification"
+      }
+    },
+    "hold-awake": {
+      "source_build": "hold-awake-v1",
+      "receiver_sha256": "298a65b0ab2a00a6256826604bf0ebb0656922ee84c3ebe1237c35666ddf3f60",
+      "prefix_sha256": "ab908088afd6a1a33fcb4ade8358bba130294a4b4a431c7aa4fc9137e00af30d",
+      "sector_sha256": "ae1ed6bac82b1ba39b31f81578726689065209a744e33523c9aa4ff19a4696cc",
+      "receiver_bytes": 30600,
+      "prefix_bytes": 6796,
+      "early_bytes": 15804,
+      "package_audit": {
+        "runtime": {
+          "schema": 1,
+          "source_sha256": {
+            "staged/error_signal.c": "df99191e58a8fec4ec85f24ce24902b2e322175a04de4a0fdbdb4e22dedfe2ea"
+          },
+          "release_sites": [
+            "error"
+          ]
+        },
+        "binary": {
+          "schema": 1,
+          "sites": {
+            "error": {
+              "release": 873995436,
+              "wfi": 873995476,
+              "reassert": 873995478,
+              "end": 873995506,
+              "bytes": 70,
+              "sha256": "b3a374932c572dd82c6d8cb373de852f77e294180d065b4dc7553364980f028b"
+            }
+          }
+        },
+        "prefix": {
+          "schema": 1,
+          "reference_sha256": "6378483a91b560ffc6b31d74a9dd1205996a14c8030447ffddf7deddc9d23874",
+          "reset_vector_offset": 4,
+          "entry": 873995840,
+          "resume_entry": 873989184,
+          "boot_bytes": 76,
+          "boot_sha256": "c3b7aeb3f1919b556441d6369fd8bb5bdabbe7ad85ec3b3927b3eda2259e34db",
+          "error_engine_sha256": "7082e54d435a68288d44979abd40aa18668dc436395dfa9e00e43cf517b72d94",
+          "startup_recovery_loader_bridge_equal": true,
+          "recovery_literal_offsets": [
+            1660,
+            1664,
+            1668,
+            1672,
+            1676,
+            1680,
+            1684,
+            1688,
+            1692,
+            1696,
+            1700,
+            1704,
+            1708,
+            1712,
+            1716,
+            1720,
+            1724,
+            1728,
+            1732,
+            1736
+          ],
+          "crc_literal_offsets": [
+            3228,
+            4952
+          ],
+          "early_load_bytes": 15804,
+          "assertion_before_stack_and_uart": true,
+          "pin": "PD7",
+          "header": "Arduino D9 / CN14.2",
+          "mode": "push-pull output",
+          "speed": "low",
+          "pulls": "none"
+        },
+        "scope": "Offline package only; no live GPIO, shutdown, storage-idle, or recovery qualification"
+      }
+    }
+  }
+}

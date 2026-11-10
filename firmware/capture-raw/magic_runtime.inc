@@ -100,7 +100,27 @@ MAGIC_LATE static int magic_transport(sd_card_t *card,uint32_t lba,const void *d
     (void)context;
     P[RP_FIRST_WRITE]=DWT->CYCCNT; (void)phase_gpio_emit(6U);
     uint32_t start=DWT->CYCCNT;
+#if SD_DMA_SLEEP_PROFILE
+    sd_dma_wait_t *wait=0;
+    /* Do not wait for the frame to finish just to obtain DMA. Incomplete
+     * producers retain the existing progressive PIO path with no sleep. */
+    if(raw_capture_frame_validated() && raw_capture_sensor_stopped()) {
+        int prepared=raw_dma_sleep_prepare();
+        if(prepared) return prepared;
+        wait=&raw_dma_wait;
+    }
+#if RAW_DMA_SLEEP_PROBE
+    /* Deliberately terminates before CMD25: a finite no-write qualification. */
+    (void)lba; (void)data;
+    int r=raw_dma_sleep_probe_run(card,wait);
+    return r;
+#else
+    int r=wait?sd_write_blocks_stream_preerase_wait(card,lba,data,count,&raw_stream,wait):
+        sd_write_blocks_stream_preerase(card,lba,data,count,&raw_stream);
+#endif
+#else
     int r=sd_write_blocks_stream_preerase(card,lba,data,count,&raw_stream);
+#endif
     volatile uint32_t *row=(volatile uint32_t *)RAW_CHUNK_TRACE_ADDRESS;
     row[0]=start;row[1]=DWT->CYCCNT;row[2]=0;row[3]=count;
     row[4]=raw_capture_available();row[5]=card->last_ready_r1;

@@ -25,6 +25,7 @@ at this bootstrap.
 | Sensor/PHY sequencing and autonomous recovery | [Capture timing](firmware/capture-timing/NOTES.md) |
 | Packed sensor data and validation | [Packed capture](firmware/capture-packed/NOTES.md) |
 | Current RAW streaming, publication and shutdown | [RAW capture](firmware/capture-raw/NOTES.md) |
+| Exposure control ADC bring-up and input isolation | [Control diagnostic](firmware/control-smoke/NOTES.md) |
 | On-media object format and host interpretation | [RAW slots](firmware/raw-slots/NOTES.md) |
 | Native SD transport, DMA and card completion | [SD storage](firmware/sd-storage/NOTES.md) |
 | USB mode selection, native PTP and transfer ownership | [USB photo access](firmware/usb-ptp/NOTES.md) |

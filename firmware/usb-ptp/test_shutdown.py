@@ -19,15 +19,12 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 sys.path.insert(0, str(ROOT / 'firmware/capture-timing'))
 from build_raw10 import TC
-# Independent oracle for the reviewed November 8 USB HOLD-release group,
-# frozen in evidence/2026-11-08-native-ptp/ram08/source/firmware/usb-ptp/shutdown.c.
-# The guarded shutdown sequence derives from the October 28 capture baseline;
-# these PD7 release/reassert instructions are the later addition, not a claim
-# that the October 28 binary already contains HOLD. Keep this oracle local so
-# USB tests do not depend on the separate uncommitted capture-HOLD tooling.
+# Independent PA2/A3 release/WFI/reassert instruction oracle. The November 8
+# frozen evidence remains the PD7 implementation; schema 2 identifies PA2.
+# Keep this local so the USB audit does not share its implementation oracle.
 STANDBY_OPCODES = bytes.fromhex(
-    '40f60040c5f20260d0f80c1021f44041c0f80c10d0f8001021f44041c0f80010'
-    'bff34f8fbff36f8f30bf4ff08001c0f81810d0f8001021f4404141f48041'
+    '40f20000c5f20260d0f80c1021f03001c0f80c10d0f8001021f03001c0f80010'
+    'bff34f8fbff36f8f30bf4ff00401c0f81810d0f8001021f0300141f01001'
     'c0f80010bff34f8f')
 
 OUT = ROOT / 'tmp/usb-shutdown-offline'
@@ -55,6 +52,7 @@ def make_platform(macros):
     gpio = set().union(*(v for k, v in members.items() if k.startswith('GPIO')))
     # Extra model state is used to observe rather than emulate source logic.
     gpio |= {'ODR', 'IDR', 'BSRR', 'MODER', 'PUPDR', 'OTYPER'}
+    members.setdefault('GPIOD', set())  # historical HOLD bank must be untouched
     members['RCC'] |= {'AHB5LPENR'}
     for name in members:
         if name.startswith('GPIO'):
@@ -116,11 +114,11 @@ void __DSB(void){
  for(unsigned i=0;i<16;i++){NVIC->ISER[i]&=~NVIC->ICER[i];NVIC->ISPR[i]&=~NVIC->ICPR[i];NVIC->ICER[i]=0;NVIC->ICPR[i]=0;}
  EXTI->RPR1=EXTI->RPR2=EXTI->RPR3=EXTI->FPR1=EXTI->FPR2=EXTI->FPR3=0;
  #define GPIO_APPLY(g) gpio(&g->BSRR,&g->ODR,&g->IDR,g->MODER)
- GPIO_APPLY(GPIOB);GPIO_APPLY(GPIOC);GPIO_APPLY(GPIOD);GPIO_APPLY(GPIOE);
+ GPIO_APPLY(GPIOB);GPIO_APPLY(GPIOC);GPIO_APPLY(GPIOA);GPIO_APPLY(GPIOE);
  GPIO_APPLY(GPIOG);GPIO_APPLY(GPION);GPIO_APPLY(GPIOO);
  if(fault==1)RCC->APB4ENR2&=~RCC_APB4ENR2_BSECEN;
  if(fault==2)RCC->AHB4ENR&=~RCC_AHB4ENR_PWREN;
- if(fault==3)GPIOD->IDR&=~(1U<<7);
+ if(fault==3)GPIOA->IDR&=~(1U<<2);
  if(fault==4)GPION->IDR&=~(1U<<1);
  if(fault==5)RCC->AHB5ENR|=RCC_AHB5ENR_OTG1EN;
  if(fault==6)DBGMCU->CR|=DBGMCU_CR_DBG_STANDBY;
@@ -135,15 +133,15 @@ void usb_shutdown_test_hold_wfi(void){
  CHECK(usb_shutdown_proof.state==USB_SHUTDOWN_ARMED);
  CHECK(usb_shutdown_proof.error==0 && usb_shutdown_proof.trial_entry_proven==0);
  CHECK(mock_primask==1 && (SCB->SCR&SCB_SCR_SLEEPDEEP_Msk));
- GPIOD->PUPDR&=~(3U<<14);GPIOD->MODER&=~(3U<<14);__DSB();
- CHECK(GPIOD->ODR&(1U<<7));wfi_count++;
+ GPIOA->PUPDR&=~(3U<<4);GPIOA->MODER&=~(3U<<4);__DSB();
+ CHECK(GPIOA->ODR&(1U<<2));wfi_count++;
  if(!wfi_return)longjmp(terminal,2);
- GPIOD->BSRR=1U<<7;GPIOD->MODER=(GPIOD->MODER&~(3U<<14))|(1U<<14);__DSB();
+ GPIOA->BSRR=1U<<2;GPIOA->MODER=(GPIOA->MODER&~(3U<<4))|(1U<<4);__DSB();
 }
 static void init(void){
  CLEARS
  mock_control=mock_ipsr=mock_faultmask=mock_primask=0;fault=wfi_return=wfi_count=0;
- RCC->AHB4ENR=RCC_AHB4ENR_GPIODEN;
+ RCC->AHB4ENR=RCC_AHB4ENR_GPIOAEN;
  RCC->MISCENR=RCC_MISCENR_DBGEN;
  RCC->AHB5ENR=RCC_AHB5ENR_OTG1EN|RCC_AHB5ENR_OTGPHY1EN|RCC_AHB5ENR_XSPI1EN|RCC_AHB5ENR_XSPIMEN;
  RCC->AHB5LPENR=RCC->AHB5ENR;
@@ -153,7 +151,8 @@ static void init(void){
  PWR->CR4=PWR_CR4_TCMRBSEN|PWR_CR4_TCMFLXRBSEN|0x80000000U;
  PWR->CPUCR=PWR_CPUCR_SVOS|0x80000000U;
  GPIOE->MODER=0xA5555555U;GPIOE->PUPDR=0x5AAAAAAAU;GPIOE->ODR=0x1234;
- GPIOD->MODER=0xA5555555U;GPIOD->PUPDR=0x5AAAAAAAU;GPIOD->ODR=0x1234;
+ GPIOA->MODER=0xA5555555U;GPIOA->PUPDR=0x5AAAAAAAU;GPIOA->ODR=0x1234;
+ GPIOD->MODER=0x13579BDFU;GPIOD->PUPDR=0x2468ACE0U;GPIOD->ODR=0x1234;
  ICB->ICTR=3;for(unsigned i=0;i<4;i++){NVIC->ISER[i]=~0U;NVIC->ISPR[i]=~0U;}
  SysTick->CTRL=7;
 }
@@ -163,7 +162,7 @@ static void check_proof(void){
  for(unsigned i=0;i<offsetof(usb_shutdown_proof_t,checksum)/4;i++)
   for(unsigned b=0;b<4;b++)hash=(hash^((p[i]>>(b*8))&255U))*16777619U;
  CHECK(usb_shutdown_proof.magic==USB_SHUTDOWN_MAGIC);
- CHECK(usb_shutdown_proof.schema==1 && usb_shutdown_proof.words==sizeof(usb_shutdown_proof)/4);
+ CHECK(usb_shutdown_proof.schema==2 && usb_shutdown_proof.words==sizeof(usb_shutdown_proof)/4);
  CHECK(usb_shutdown_proof.seal==USB_SHUTDOWN_SEAL && usb_shutdown_proof.checksum==hash);
  CHECK(usb_shutdown_proof.trial_entry_proven==0);
 }
@@ -173,20 +172,24 @@ static void execute(unsigned flags,unsigned error){
  check_proof();CHECK(usb_shutdown_proof.error==error);
  if(!error){
   CHECK(exit_kind==2 && wfi_count==1 && usb_shutdown_proof.state==USB_SHUTDOWN_ARMED);
-  CHECK((GPIOD->MODER&(3U<<14))==0 && (GPIOD->PUPDR&(3U<<14))==0);
+  CHECK((GPIOA->MODER&(3U<<4))==0 && (GPIOA->PUPDR&(3U<<4))==0);
   CHECK((GPIOE->MODER&~(3U<<8))==(0xA5555555U&~(3U<<8)));
   CHECK((GPIOE->PUPDR&~(3U<<8))==(0x5AAAAAAAU&~(3U<<8)));
-  CHECK((GPIOD->MODER&~(3U<<14))==(0xA5555555U&~(3U<<14)));
+  CHECK((GPIOA->MODER&~(3U<<4))==(0xA5555555U&~(3U<<4)));
   CHECK(DBGMCU->CR==0x80000000U && PWR->SVMCR3==PWR_SVMCR3_ASV);
   CHECK(PWR->CR4==0x80000000U);
  }else{
   CHECK(exit_kind==1);
-  CHECK((GPIOD->MODER&(3U<<14))==(1U<<14));CHECK(GPIOD->ODR&(1U<<7));
+  CHECK((GPIOA->MODER&(3U<<4))==(1U<<4));CHECK(GPIOA->ODR&(1U<<2));
   CHECK(!(SCB->SCR&SCB_SCR_SLEEPDEEP_Msk));
   CHECK(wfi_count==(error==USB_SHUTDOWN_UNEXPECTED_RETURN?1:0));
   CHECK(usb_shutdown_proof.state==(error==USB_SHUTDOWN_UNEXPECTED_RETURN?USB_SHUTDOWN_RETURNED:USB_SHUTDOWN_REFUSED));
  }
  CHECK(!(RCC->AHB5RSTR&RCC_AHB5RSTR_SDMMC2RST));
+ CHECK(GPIOD->MODER==0x13579BDFU && GPIOD->PUPDR==0x2468ACE0U && GPIOD->ODR==0x1234);
+ /* A1 buffered PA9 and A3 buffered PA12 modes/pulls are not latch outputs. */
+ CHECK((GPIOA->MODER&((3U<<18)|(3U<<24)))==(0xA5555555U&((3U<<18)|(3U<<24))));
+ CHECK((GPIOA->PUPDR&~(3U<<4))==(0x5AAAAAAAU&~(3U<<4)));
 }
 int main(void){
  unsigned cases=0;

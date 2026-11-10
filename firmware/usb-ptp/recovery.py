@@ -12,6 +12,11 @@ sys.path.insert(0,str(ROOT/'firmware/boot-timing'))
 import nor_bench
 nor_bench.CLI=ROOT/'tmp/bringup/control-smoke-20261107/tools/programmer-2.23.0/bin/STM32_Programmer_CLI.exe'
 APPROVED={
+ # November9 PA2/A3 HOLD: independent prefix/layout/CRC review, 26 linked
+ # package tests, 324 capture tests; original early UART block is byte-exact.
+ # Exact candidate admission for installation/verification, not hardware proof.
+ '852bc7724a9fc0267fb37e3f93ba52f22137c65c55f2cece47d17dd352093084':
+  dict(bytes=7160,sector='c822d2333ce265ded2ea420fd4c78e2a20e01c4b392b1decb99b80d9a040516d'),
  # Final cancellation cleanup gate; independently reproduced USB executable,
  # 24 linked package tests, original capture tail and UART guard unchanged.
  '4976a9e956095e3176ef4863b6c49225df271b231305e51069152baf731e4dd0':

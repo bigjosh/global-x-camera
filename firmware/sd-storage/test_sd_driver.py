@@ -53,7 +53,7 @@ def mock_header():
         'struct MockRcc { MockReg CFGR1,CFGR2,PLL1CFGR1,PLL1CFGR2,PLL1CFGR3,'
         'IC1CFGR,IC2CFGR,DIVENR,HSICFGR,AHB5ENR,AHB4ENR,AHB4ENSR,AHB3ENR,'
         'CCIPR8,AHB5ENSR,AHB5RSTSR,AHB5RSTCR,AHB5ENCR,MEMLPENR,AHB3LPENR,AHB5LPENR,'
-        'BUSLPENR,MISCENR,MISCRSTR,APB4ENR2,APB4ENSR2,APB4RSTR2,CR,SR,IC5CFGR,CCIPR5,CCIPR7,DIVENSR,DIVENCR; };',
+        'BUSLPENR,MISCENR,MISCRSTR,APB4ENR2,APB4LPENR2,APB4ENSR2,APB4RSTR2,CR,SR,IC5CFGR,CCIPR5,CCIPR7,DIVENSR,DIVENCR; };',
         'struct MockGpio { MockReg MODER,OTYPER,OSPEEDR,PUPDR,IDR,BSRR,AFR[2]; };',
         'struct MockPwr { MockReg SVMCR2,SVMCR3; };',
         'struct MockSyscfg { MockReg VDDIO5CCCR; }; extern MockSyscfg test_syscfg;',
@@ -85,7 +85,7 @@ def mock_header():
 
 
 class SdDriverTests(unittest.TestCase):
-    def run_scripted_register_protocol_and_failures(self, width, speed=3, compensation=0, negedge=0, initial_negedge=0, review_profile=0, high_speed=0, mixed_slew=0, high_fixed=0, combined=0, idma_read=0, startup_opt=0, early_run_clock=0, clk_speed=-1, read_diagnostics=0):
+    def run_scripted_register_protocol_and_failures(self, width, speed=3, compensation=0, negedge=0, initial_negedge=0, review_profile=0, high_speed=0, mixed_slew=0, high_fixed=0, combined=0, idma_read=0, startup_opt=0, early_run_clock=0, clk_speed=-1, read_diagnostics=0, dma_sleep=0):
         compiler = shutil.which('clang++') or shutil.which('g++')
         self.assertIsNotNone(compiler, 'Native C++ compiler required')
         with tempfile.TemporaryDirectory(prefix='sd-driver-') as temp:
@@ -108,14 +108,45 @@ class SdDriverTests(unittest.TestCase):
                             f'-DSD_EARLY_RUN_CLOCK={early_run_clock}',
                             f'-DSD_CLK_GPIO_SPEED={clk_speed}',
                             f'-DSD_READ_DIAGNOSTICS={read_diagnostics}',
+                            f'-DSD_DMA_SLEEP_PROFILE={dma_sleep}',
                             f'-DSD_HIGH_SPEED_COMBINED_ELECTRICAL={combined}',
                             '-I', str(temp), '-I', str(HERE),
-                            str(HERE/('test_sd_read_diagnostics.cpp' if read_diagnostics else 'test_sd_clk_slew.cpp' if clk_speed != -1 else 'test_sd_early_clock.cpp' if early_run_clock else 'test_sd_startup.cpp' if startup_opt else 'test_sd_idma_read.cpp' if idma_read else 'test_sd_high_speed.cpp' if high_speed else 'test_sd_driver.cpp')), str(hook),
+                            str(HERE/('test_sd_dma_sleep.cpp' if dma_sleep else 'test_sd_read_diagnostics.cpp' if read_diagnostics else 'test_sd_clk_slew.cpp' if clk_speed != -1 else 'test_sd_early_clock.cpp' if early_run_clock else 'test_sd_startup.cpp' if startup_opt else 'test_sd_idma_read.cpp' if idma_read else 'test_sd_high_speed.cpp' if high_speed else 'test_sd_driver.cpp')), str(hook),
                             '-o', str(executable)],
                            check=True)
             completed = subprocess.run([str(executable)], text=True, capture_output=True)
             self.assertEqual(completed.returncode, 0, completed.stdout+completed.stderr)
             self.assertIn('protocol cases passed', completed.stdout)
+
+    def test_stream_dma_sleep_protocol_and_failures(self):
+        self.run_scripted_register_protocol_and_failures(4,negedge=1,initial_negedge=1,
+            review_profile=1,startup_opt=1,dma_sleep=1)
+
+    def test_arm_dma_sleep_compile_and_disabled_equivalence(self):
+        from test_cycle_trace_driver import ARM_BIN, allocatable_sections
+        with tempfile.TemporaryDirectory(prefix='sd-dma-sleep-arm-') as temp:
+            sections=[]
+            for option in (None,0,1,2):
+                obj=Path(temp)/f'sleep-{option}.o'
+                command=[str(ARM_BIN/'arm-none-eabi-gcc.exe'),'-std=c11','-Os',
+                    '-Wall','-Wextra','-Werror','-mcpu=cortex-m55','-mthumb',
+                    '-DSTM32N657xx','-DCPU_IN_SECURE_STATE','-DSD_BUS_WIDTH=4',
+                    '-DSD_REVIEW_PROFILE=1','-DSD_STARTUP_OPT=1','-DSD_CLOCK_NEGEDGE=1',
+                    '-DSD_CLOCK_NEGEDGE_INIT=1',
+                    *([] if option is None else [f'-DSD_DMA_SLEEP_PROFILE={option}']),
+                    '-I'+str(CMSIS/'Include'),'-I'+str(CMSIS/'Device/ST/STM32N6xx/Include'),
+                    '-c',str(HERE/'sd_card.c'),'-o',str(obj)]
+                result=subprocess.run(command,capture_output=True,text=True)
+                self.assertEqual(result.returncode==0,option!=2,result.stderr)
+                if option!=2: sections.append(allocatable_sections(obj))
+            self.assertEqual(sections[0],sections[1])
+            self.assertNotEqual(sections[0],sections[2])
+            command=[x if x!='-DSD_REVIEW_PROFILE=1' else '-DSD_REVIEW_PROFILE=0'
+                     for x in command if x!='-DSD_DMA_SLEEP_PROFILE=2']
+            command.insert(1,'-DSD_DMA_SLEEP_PROFILE=1')
+            result=subprocess.run(command,capture_output=True,text=True)
+            self.assertNotEqual(result.returncode,0)
+            self.assertIn('explicit reviewed driver profile',result.stderr)
 
     def test_read_diagnostics_pio_and_idma(self):
         for idma in (0,1):

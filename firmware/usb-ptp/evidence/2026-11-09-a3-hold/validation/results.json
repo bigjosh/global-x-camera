@@ -1,0 +1,37 @@
+{
+  "date": "2026-11-09",
+  "hardware_access": false,
+  "firmware_installed": false,
+  "source_boundary": "User reports board disconnected for assembly",
+  "tests": [
+    {
+      "command": "python firmware/usb-ptp/test_shutdown.py",
+      "tests": 3,
+      "passed": true,
+      "native_cases": 34,
+      "native_checks": 519,
+      "linked_arm_release_bytes": 70
+    },
+    {
+      "command": "USB_BOOT_TEST_PACKAGE=tmp/bringup/a3-hold-controls-20261109/package-pa2 python firmware/usb-ptp/test_boot_package.py",
+      "tests": 26,
+      "skips": 0,
+      "passed": true
+    },
+    {
+      "command": "python firmware/usb-ptp/test_ptp.py",
+      "tests": 21,
+      "skips": 0,
+      "passed": true
+    }
+  ],
+  "independent_review": "PA2 GPIO/ADC/shutdown and combined binary layout/CRC reviews passed; no blocking issue",
+  "recovery_allowlist_changed": false,
+  "limits": [
+    "No new hardware run",
+    "No cold timing or latch-window measurement",
+    "No new SD photo or PTP download verification",
+    "No physical shutdown or rail-sequencing proof",
+    "Normal capture exposure remains fixed; knob remapping is diagnostic only"
+  ]
+}

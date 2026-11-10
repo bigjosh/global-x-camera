@@ -11,6 +11,17 @@
 #if SD_REVIEW_PROFILE != 0 && SD_REVIEW_PROFILE != 1
 #error "SD_REVIEW_PROFILE must be 0 or 1"
 #endif
+/* Bounded shallow CPU sleep for the complete-publication streaming IDMA path.
+ * This does not change historical polling builds or the PIO producer path. */
+#ifndef SD_DMA_SLEEP_PROFILE
+#define SD_DMA_SLEEP_PROFILE 0
+#endif
+#if SD_DMA_SLEEP_PROFILE != 0 && SD_DMA_SLEEP_PROFILE != 1
+#error "SD_DMA_SLEEP_PROFILE must be 0 or 1"
+#endif
+#if SD_DMA_SLEEP_PROFILE && !SD_REVIEW_PROFILE
+#error "DMA sleep requires the explicit reviewed driver profile"
+#endif
 #ifndef SD_IDMA_READ
 #define SD_IDMA_READ 0
 #endif
@@ -398,7 +409,7 @@ enum {
     SD_WAIT_SYSTICK_LOAD=256U, SD_WAIT_RAM_CLOCKS=512U,
     SD_WAIT_RIF_CLOCKS=1024U, SD_WAIT_SD_CLOCK=2048U,
     SD_WAIT_BUS_CLOCKS=4096U, SD_WAIT_DEBUG_ACCESS=8192U,
-    SD_WAIT_DEBUG_SLEEP=16384U
+    SD_WAIT_DEBUG_SLEEP=16384U, SD_WAIT_BSEC_CLOCK=32768U
 };
 /* Opt-in shallow WFI during the DMA data phase only. The caller owns a working
  * 1 ms SysTick handler and supplies its monotonic counter (e.g. HAL_GetTick).
@@ -419,6 +430,22 @@ enum {
  */
 int sd_write_blocks_dma_wait(sd_card_t *card, uint32_t lba, const void *buffer,
                              uint32_t count, sd_dma_wait_t *wait);
+#if SD_DMA_SLEEP_PROFILE
+/* Wait-enabled version of stream_preerase. A complete first publication uses
+ * one preannounced IDMA transaction with the same bounded 1 ms SysTick WFI
+ * contract as dma_wait above. Incomplete publication keeps the existing PIO
+ * path without WFI or waiting for the full image. The caller must therefore
+ * only offer a complete publication once all DWT-timed camera work is finished.
+ * The wait clock and context are checked before any command and again by the
+ * DMA path. BSEC must retain its APB4 run and sleep clocks in this profile.
+ * SD flags remain polled; periodic SysTick bounds a completion-before-WFI race
+ * to one tick, without masking interrupts or installing an SD interrupt.
+ * A non-null wait and milliseconds callback are required. Existing sd_card_t,
+ * sd_stream_t and sd_dma_wait_t layouts are unchanged. */
+int sd_write_blocks_stream_preerase_wait(sd_card_t *card, uint32_t lba,
+                                         const void *buffer, uint32_t count,
+                                         sd_stream_t *stream, sd_dma_wait_t *wait);
+#endif
 /* Wait for ready/TRANSFER, DAT0 HIGH and idle host state. This driver never
  * enables the optional SD card cache. No cache-flush feature is assumed. */
 int sd_sync(sd_card_t *card);

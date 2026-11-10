@@ -1,0 +1,161 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2400" height="2000" viewBox="0 0 2400 2000">
+<title>Prototype wiring: manual USB/battery selector, SPDT trigger, A3 HOLD, exposure A0-A2 and ASA A4-A5</title>
+<rect width="100%" height="100%" fill="white"/>
+<text x="45" y="61.6" font-family="Segoe UI,Arial,sans-serif" font-size="40" font-weight="700" fill="#1c3044">Prototype power and controls</text>
+<text x="45" y="107.84" font-family="Segoe UI,Arial,sans-serif" font-size="26" font-weight="700" fill="#136b9b">Canonical wiring — November 10, 2026  |  SW2 manually selects USB or battery; Q3 removed</text>
+<text x="45" y="152.16" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="700" fill="#b13b35">The PCB version will use automatic MOSFET source selection instead of SW2.</text>
+<text x="45" y="191.64" font-family="Segoe UI,Arial,sans-serif" font-size="21" font-weight="400" fill="#5d7080">A3 HOLD installed; manual missing-sensor shutdown passed. Exposure and ASA capture integration remain pending.</text>
+<rect x="45" y="235" width="455" height="125" fill="#fff5f3" stroke="#b13b35" stroke-width="2"/>
+<text x="65" y="273.84" font-family="Segoe UI,Arial,sans-serif" font-size="26" font-weight="700" fill="#b13b35">CN8 USB → board protection</text>
+<text x="65" y="317.0" font-family="Segoe UI,Arial,sans-serif" font-size="25" font-weight="700" fill="#b13b35">TAP: SB12 pad 1</text>
+<text x="65" y="351.8" font-family="Segoe UI,Arial,sans-serif" font-size="20" font-weight="400" fill="#b13b35">5V_USB_SNK; same net as CN9 pin 3</text>
+<polyline points="500,300 610,300" fill="none" stroke="#b13b35" stroke-width="4"/>
+<rect x="610" y="252" width="540" height="96" fill="#fff5f3" stroke="#b13b35" stroke-width="2"/>
+<text x="632" y="290.0" font-family="Segoe UI,Arial,sans-serif" font-size="25" font-weight="700" fill="#b13b35">USB feed to selector</text>
+<text x="632" y="328.8" font-family="Segoe UI,Arial,sans-serif" font-size="20" font-weight="400" fill="#5d7080">Existing D_USB may remain in series; see note.</text>
+<polyline points="1150,300 1590,300 1590,410" fill="none" stroke="#b13b35" stroke-width="4"/>
+<text x="1190" y="272.0" font-family="Segoe UI,Arial,sans-serif" font-size="25" font-weight="700" fill="#b13b35">USB</text>
+<text x="45" y="406.8" font-family="Segoe UI,Arial,sans-serif" font-size="20" font-weight="400" fill="#5d7080">D_USB: the earlier plan used BAT20JFILM, anode at USB, cathode toward load.</text>
+<text x="45" y="440.8" font-family="Segoe UI,Arial,sans-serif" font-size="20" font-weight="400" fill="#5d7080">Its removal was not reported. Do not infer fitted status from this simplified source-selection drawing.</text>
+<text x="45" y="529.36" font-family="Segoe UI,Arial,sans-serif" font-size="29" font-weight="700" fill="#b13b35">1S LiPo +</text>
+<text x="45" y="624.32" font-family="Segoe UI,Arial,sans-serif" font-size="23" font-weight="400" fill="#5d7080">500 mAh</text>
+<polyline points="45,560 710,560" fill="none" stroke="#b13b35" stroke-width="4"/>
+<circle cx="500" cy="560" r="5" fill="#b13b35"/>
+<text x="370" y="529.16" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="700" fill="#b13b35">VBAT</text>
+<rect x="710" y="485" width="320" height="170" fill="#fff5f3" stroke="#b13b35" stroke-width="2"/>
+<text x="790" y="528.52" font-family="Segoe UI,Arial,sans-serif" font-size="28" font-weight="700" fill="#b13b35">Q1 AO3401</text>
+<text x="731" y="576.16" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="700" fill="#b13b35">2 S</text>
+<text x="964" y="576.16" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="700" fill="#b13b35">3 D</text>
+<text x="779" y="618.16" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="400" fill="#b13b35">Battery ON/OFF</text>
+<text x="849" y="646.64" font-family="Segoe UI,Arial,sans-serif" font-size="21" font-weight="700" fill="#136b9b">1 G</text>
+<polyline points="1030,560 1110,560" fill="none" stroke="#b13b35" stroke-width="4"/>
+<polyline points="1110,560 1215.0,560" fill="none" stroke="#b13b35" stroke-width="3"/>
+<rect x="1215.0" y="548" width="80" height="24" fill="white" stroke="#b13b35" stroke-width="2"/>
+<polyline points="1295.0,560 1400,560" fill="none" stroke="#b13b35" stroke-width="3"/>
+<text x="1180.0" y="530.64" font-family="Segoe UI,Arial,sans-serif" font-size="21" font-weight="700" fill="#b13b35">R0  2.2 Ω</text>
+<polyline points="1400,560 1590,560" fill="none" stroke="#b13b35" stroke-width="4"/>
+<text x="1100" y="627.64" font-family="Segoe UI,Arial,sans-serif" font-size="21" font-weight="400" fill="#5d7080">Existing pulse-rated resistor</text>
+<circle cx="1590" cy="410" r="7" fill="white" stroke="#136b9b" stroke-width="3"/>
+<circle cx="1590" cy="560" r="7" fill="white" stroke="#136b9b" stroke-width="3"/>
+<circle cx="1770" cy="485" r="5" fill="#b13b35"/>
+<polyline points="1770,485 1598,558" fill="none" stroke="#b13b35" stroke-width="4"/>
+<text x="1562" y="385.32" font-family="Segoe UI,Arial,sans-serif" font-size="23" font-weight="700" fill="#b13b35">USB throw</text>
+<text x="1505" y="612.32" font-family="Segoe UI,Arial,sans-serif" font-size="23" font-weight="700" fill="#b13b35">BAT throw</text>
+<text x="1715" y="458.48" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="700" fill="#b13b35">COM</text>
+<text x="1775" y="302.68" font-family="Segoe UI,Arial,sans-serif" font-size="27" font-weight="700" fill="#b13b35">SW2 — source selector</text>
+<text x="1775" y="340.48" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#5d7080">Maintained SPDT; shown BAT</text>
+<text x="1775" y="381.48" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="700" fill="#b13b35">Use break-before-make contacts.</text>
+<text x="1775" y="417.96" font-family="Segoe UI,Arial,sans-serif" font-size="19" font-weight="400" fill="#5d7080">Actual installed switch type unverified.</text>
+<polyline points="1770,485 1960,485" fill="none" stroke="#b13b35" stroke-width="4"/>
+<rect x="1960" y="440" width="245" height="92" fill="#fff5f3" stroke="#b13b35" stroke-width="2"/>
+<text x="1980" y="476.16" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="700" fill="#b13b35">JS110 (optional)</text>
+<text x="1980" y="513.64" font-family="Segoe UI,Arial,sans-serif" font-size="21" font-weight="400" fill="#b13b35">IN+             OUT+</text>
+<polyline points="2205,485 2320,485 2320,655 2225,655" fill="none" stroke="#b13b35" stroke-width="4"/>
+<rect x="1775" y="615" width="450" height="95" fill="#fff5f3" stroke="#b13b35" stroke-width="2"/>
+<text x="1795" y="656.36" font-family="Segoe UI,Arial,sans-serif" font-size="29" font-weight="700" fill="#b13b35">CN5 pin 5  /  5V input</text>
+<text x="1795" y="692.8" font-family="Segoe UI,Arial,sans-serif" font-size="20" font-weight="400" fill="#5d7080">Actual rail voltage follows selected source</text>
+<text x="1775" y="761.64" font-family="Segoe UI,Arial,sans-serif" font-size="21" font-weight="400" fill="#5d7080">Without JS, connect SW2 COM directly to CN5.5.</text>
+<text x="1775" y="798.64" font-family="Segoe UI,Arial,sans-serif" font-size="21" font-weight="700" fill="#b13b35">R0 limits battery inrush only; USB bypasses it.</text>
+<text x="1775" y="835.64" font-family="Segoe UI,Arial,sans-serif" font-size="21" font-weight="700" fill="#b13b35">No permanent electrical merge of the two sources.</text>
+<polyline points="500,560 500,675" fill="none" stroke="#136b9b" stroke-width="3"/>
+<polyline points="500,675 500,698.0" fill="none" stroke="#136b9b" stroke-width="3"/>
+<rect x="488" y="698.0" width="24" height="64" fill="white" stroke="#136b9b" stroke-width="2"/>
+<polyline points="500,762.0 500,785" fill="none" stroke="#136b9b" stroke-width="3"/>
+<polyline points="500,785 500,805 870,805 870,655" fill="none" stroke="#136b9b" stroke-width="3"/>
+<circle cx="870" cy="805" r="5" fill="#136b9b"/>
+<polyline points="870,805 870,1030" fill="none" stroke="#136b9b" stroke-width="3"/>
+<text x="275" y="732.0" font-family="Segoe UI,Arial,sans-serif" font-size="25" font-weight="700" fill="#136b9b">R1  100 kΩ</text>
+<text x="275" y="772.48" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#5d7080">Q1 OFF pull-up</text>
+<rect x="750" y="1030" width="240" height="180" fill="#f4f8fb" stroke="#136b9b" stroke-width="2"/>
+<text x="850" y="1061.48" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="700" fill="#136b9b">3 D</text>
+<text x="791" y="1105.16" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="700" fill="#136b9b">Q2 AO3400</text>
+<text x="943" y="1152.64" font-family="Segoe UI,Arial,sans-serif" font-size="21" font-weight="700" fill="#136b9b">1 G</text>
+<text x="793" y="1158.8" font-family="Segoe UI,Arial,sans-serif" font-size="20" font-weight="400" fill="#136b9b">N-channel</text>
+<text x="850" y="1198.48" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="700" fill="#136b9b">2 S</text>
+<polyline points="870,1210 870,1255" fill="none" stroke="#526474" stroke-width="3"/>
+<polyline points="870,1255 870,1267" fill="none" stroke="#526474" stroke-width="3"/>
+<polyline points="854,1267 886,1267" fill="none" stroke="#526474" stroke-width="2"/>
+<polyline points="860,1275 880,1275" fill="none" stroke="#526474" stroke-width="2"/>
+<polyline points="866,1283 874,1283" fill="none" stroke="#526474" stroke-width="2"/>
+<text x="45" y="872.68" font-family="Segoe UI,Arial,sans-serif" font-size="27" font-weight="700" fill="#136b9b">SW1 — momentary SPDT trigger</text>
+<text x="45" y="911.64" font-family="Segoe UI,Arial,sans-serif" font-size="21" font-weight="400" fill="#5d7080">Break-before-make; shown RELEASED</text>
+<circle cx="870" cy="933" r="5" fill="#136b9b"/>
+<polyline points="870,933 585,933 585,975" fill="none" stroke="#136b9b" stroke-width="3"/>
+<polyline points="335,975 225,975 225,1055" fill="none" stroke="#136b9b" stroke-width="3"/>
+<circle cx="335" cy="975" r="7" fill="white" stroke="#136b9b" stroke-width="3"/>
+<circle cx="585" cy="975" r="7" fill="white" stroke="#136b9b" stroke-width="3"/>
+<polyline points="460,1060 341,979" fill="none" stroke="#136b9b" stroke-width="4"/>
+<circle cx="460" cy="1060" r="5" fill="#136b9b"/>
+<text x="310" y="957.32" font-family="Segoe UI,Arial,sans-serif" font-size="23" font-weight="700" fill="#136b9b">NC</text>
+<text x="595" y="966.32" font-family="Segoe UI,Arial,sans-serif" font-size="23" font-weight="700" fill="#136b9b">NO</text>
+<text x="482" y="1063.32" font-family="Segoe UI,Arial,sans-serif" font-size="23" font-weight="700" fill="#136b9b">COM</text>
+<text x="45" y="1026.48" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#136b9b">Released: NC</text>
+<text x="514" y="1017.64" font-family="Segoe UI,Arial,sans-serif" font-size="21" font-weight="400" fill="#136b9b">Pressed: NO</text>
+<polyline points="225,1055 225,1078.0" fill="none" stroke="#136b9b" stroke-width="3"/>
+<rect x="213" y="1078.0" width="24" height="64" fill="white" stroke="#136b9b" stroke-width="2"/>
+<polyline points="225,1142.0 225,1165" fill="none" stroke="#136b9b" stroke-width="3"/>
+<polyline points="225,1165 225,1177" fill="none" stroke="#526474" stroke-width="3"/>
+<polyline points="209,1177 241,1177" fill="none" stroke="#526474" stroke-width="2"/>
+<polyline points="215,1185 235,1185" fill="none" stroke="#526474" stroke-width="2"/>
+<polyline points="221,1193 229,1193" fill="none" stroke="#526474" stroke-width="2"/>
+<text x="55" y="1115.16" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="700" fill="#136b9b">R5  1 kΩ</text>
+<polyline points="460,1060 460,1150.5" fill="none" stroke="#136b9b" stroke-width="3"/>
+<polyline points="436,1150.5 484,1150.5" fill="none" stroke="#136b9b" stroke-width="3"/>
+<polyline points="436,1164.5 484,1164.5" fill="none" stroke="#136b9b" stroke-width="3"/>
+<polyline points="460,1164.5 460,1255" fill="none" stroke="#526474" stroke-width="3"/>
+<polyline points="460,1255 460,1267" fill="none" stroke="#526474" stroke-width="3"/>
+<polyline points="444,1267 476,1267" fill="none" stroke="#526474" stroke-width="2"/>
+<polyline points="450,1275 470,1275" fill="none" stroke="#526474" stroke-width="2"/>
+<polyline points="456,1283 464,1283" fill="none" stroke="#526474" stroke-width="2"/>
+<text x="495" y="1149.32" font-family="Segoe UI,Arial,sans-serif" font-size="23" font-weight="700" fill="#136b9b">C3  2.2 µF</text>
+<text x="495" y="1189.8" font-family="Segoe UI,Arial,sans-serif" font-size="20" font-weight="400" fill="#5d7080">X7R, 10–16 V</text>
+<text x="495" y="1224.8" font-family="Segoe UI,Arial,sans-serif" font-size="20" font-weight="400" fill="#5d7080">Non-polarized</text>
+<text x="45" y="1336.68" font-family="Segoe UI,Arial,sans-serif" font-size="27" font-weight="700" fill="#136b9b">HOLD: A3 / CN4 pin 4 / PA2 → Q2 gate pin 1</text>
+<polyline points="45,1374 1120,1374 1120,1138 990,1138" fill="none" stroke="#136b9b" stroke-width="3"/>
+<circle cx="1120" cy="1215" r="5" fill="#136b9b"/>
+<polyline points="1120,1215 1030,1215" fill="none" stroke="#136b9b" stroke-width="3"/>
+<polyline points="1030,1215 1030,1238.0" fill="none" stroke="#136b9b" stroke-width="3"/>
+<rect x="1018" y="1238.0" width="24" height="64" fill="white" stroke="#136b9b" stroke-width="2"/>
+<polyline points="1030,1302.0 1030,1325" fill="none" stroke="#136b9b" stroke-width="3"/>
+<polyline points="1030,1325 1030,1337" fill="none" stroke="#526474" stroke-width="3"/>
+<polyline points="1014,1337 1046,1337" fill="none" stroke="#526474" stroke-width="2"/>
+<polyline points="1020,1345 1040,1345" fill="none" stroke="#526474" stroke-width="2"/>
+<polyline points="1026,1353 1034,1353" fill="none" stroke="#526474" stroke-width="2"/>
+<text x="827" y="1310.16" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="700" fill="#136b9b">R2  100 kΩ</text>
+<rect x="1220" y="890" width="1130" height="510" fill="#f7fafc" stroke="#526474" stroke-width="2"/>
+<text x="1245" y="936.68" font-family="Segoe UI,Arial,sans-serif" font-size="27" font-weight="700" fill="#1c3044">Q1 / Q2: SOT-23, marking-side TOP VIEW</text>
+<rect x="1280" y="1022" width="215" height="115" fill="#263947" stroke="#1c3044" stroke-width="2"/>
+<rect x="1368" y="991" width="40" height="31" fill="#c5ced4" stroke="#526474" stroke-width="2"/>
+<rect x="1295" y="1137" width="40" height="31" fill="#c5ced4" stroke="#526474" stroke-width="2"/>
+<rect x="1438" y="1137" width="40" height="31" fill="#c5ced4" stroke="#526474" stroke-width="2"/>
+<text x="1378" y="1058.84" font-family="Segoe UI,Arial,sans-serif" font-size="26" font-weight="700" fill="white">3</text>
+<text x="1300" y="1118.84" font-family="Segoe UI,Arial,sans-serif" font-size="26" font-weight="700" fill="white">1</text>
+<text x="1446" y="1118.84" font-family="Segoe UI,Arial,sans-serif" font-size="26" font-weight="700" fill="white">2</text>
+<text x="1555" y="1015.16" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="700" fill="#1c3044">3 = Drain (single leg)</text>
+<text x="1555" y="1061.16" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="700" fill="#1c3044">1 = Gate (lower left)</text>
+<text x="1555" y="1107.16" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="700" fill="#1c3044">2 = Source (lower right)</text>
+<text x="1245" y="1219.32" font-family="Segoe UI,Arial,sans-serif" font-size="23" font-weight="700" fill="#b13b35">Q1: S2 → LiPo+ / R1; D3 → R0 → SW2 BAT throw.</text>
+<text x="1245" y="1263.32" font-family="Segoe UI,Arial,sans-serif" font-size="23" font-weight="700" fill="#136b9b">Q2: S2 → GND; G1 → A3; D3 → Q1 G1 / SW1 NO.</text>
+<text x="1245" y="1309.32" font-family="Segoe UI,Arial,sans-serif" font-size="23" font-weight="700" fill="#136b9b">Q3 / R6 omitted. No C1, C2, old D1, R3 or R4.</text>
+<text x="1245" y="1352.64" font-family="Segoe UI,Arial,sans-serif" font-size="21" font-weight="400" fill="#5d7080">Switch lug numbering is part-specific: identify COM/throws by continuity.</text>
+<rect x="45" y="1445" width="1130" height="295" fill="#f7fafc" stroke="#526474" stroke-width="2"/>
+<text x="70" y="1490.52" font-family="Segoe UI,Arial,sans-serif" font-size="28" font-weight="700" fill="#136b9b">EXPOSURE — A0 / A1 / A2</text>
+<text x="70" y="1540.16" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="700" fill="#136b9b">LOW end: A0 / CN4.1 / PF5 (GPIO LOW)</text>
+<text x="70" y="1589.32" font-family="Segoe UI,Arial,sans-serif" font-size="23" font-weight="700" fill="#136b9b">Wiper: A1 / CN4.2 → buffered PA9 / ADC1 channel 10</text>
+<text x="70" y="1640.16" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="700" fill="#136b9b">HIGH end: A2 / CN4.3 / PF6 (GPIO supply)</text>
+<text x="70" y="1688.48" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#5d7080">Diagnostic verified. Normal capture still uses fixed exposure.</text>
+<text x="70" y="1724.8" font-family="Segoe UI,Arial,sans-serif" font-size="20" font-weight="400" fill="#5d7080">Keep A1 digital companion PC10 input / no pull.</text>
+<rect x="1220" y="1445" width="1130" height="295" fill="#f7fafc" stroke="#526474" stroke-width="2"/>
+<text x="1245" y="1490.52" font-family="Segoe UI,Arial,sans-serif" font-size="28" font-weight="700" fill="#136b9b">ASA → ANALOG GAIN — new knob</text>
+<text x="1245" y="1540.16" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="700" fill="#136b9b">LOW end: GND (common return)</text>
+<text x="1245" y="1589.32" font-family="Segoe UI,Arial,sans-serif" font-size="23" font-weight="700" fill="#136b9b">Wiper: A5 / CN4.6 → buffered PG15 / ADC1 channel 7</text>
+<text x="1245" y="1640.16" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="700" fill="#136b9b">HIGH end: A4 / CN4.5 / PC12 (GPIO supply)</text>
+<text x="1245" y="1687.64" font-family="Segoe UI,Arial,sans-serif" font-size="21" font-weight="400" fill="#5d7080">User-installed wiring; gain integration pending. PH2 input / no pull.</text>
+<text x="1245" y="1725.64" font-family="Segoe UI,Arial,sans-serif" font-size="21" font-weight="400" fill="#5d7080">ASA calibration TBD; analog gain planned 1–8×, digital gain 1×.</text>
+<polyline points="45,1780 2350,1780" fill="none" stroke="#526474" stroke-width="2"/>
+<text x="45" y="1821.0" font-family="Segoe UI,Arial,sans-serif" font-size="25" font-weight="700" fill="#526474">COMMON GROUND</text>
+<text x="335" y="1818.48" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#526474">LiPo −, latch / ASA GND and CN5 pin 6; JS return if fitted. USB ground is common through the board.</text>
+<text x="45" y="1865.32" font-family="Segoe UI,Arial,sans-serif" font-size="23" font-weight="700" fill="#b13b35">Keep all CN9 jumpers OUT and SB12 fitted; board D2 / R23 remain removed. No parallel target supply.</text>
+<text x="45" y="1910.32" font-family="Segoe UI,Arial,sans-serif" font-size="23" font-weight="400" fill="#1c3044">A3 stays HIGH through capture/save/USB/recovery and floats before Standby. SW2 USB power bypasses the latch.</text>
+<text x="45" y="1953.48" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#5d7080">A3 is exclusively HOLD. Do not run the old A3–A5 knob diagnostic. No firmware change or bench operation in this update.</text>
+</svg>

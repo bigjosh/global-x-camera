@@ -4,6 +4,16 @@ Bare-metal PTP over the Nucleo's **CN8 MCU USB connector**. Windows uses its
 native Portable Devices camera driver; no custom driver, drive emulation or
 SD filesystem is required. The SD still holds the existing fixed RAW slots.
 
+**November 9:** the canonical HOLD connection is now **A3 / CN4.4 / PA2**.
+The installed combined capture/USB firmware asserts it before the unchanged early UART
+guard, retains it throughout recovery, capture/save and USB service, and floats
+it immediately before final Standby. Both NOR regions now match the reviewed
+PA2 package; A3, the remapped knob diagnostic and UART recovery passed smoke
+tests. Camera and CN8 were absent, so capture and USB mode were not requalified.
+Target power was left OFF through the JS. See the
+[live installation record](../control-smoke/evidence/2026-11-09-a3-live/README.md)
+and [original offline candidate](evidence/2026-11-09-a3-hold/README.md).
+
 ## Using the installed prototype
 
 1. Connect **CN8** to the computer before starting the target. Keep its existing
@@ -51,11 +61,16 @@ same native driver used by Explorer.
 
 ```powershell
 python firmware/usb-ptp/build.py --out tmp/my-usb-build
-python firmware/usb-ptp/package.py --usb tmp/my-usb-build --out tmp/my-usb-package
+python firmware/usb-ptp/package.py --usb tmp/my-usb-build --capture tmp/my-reviewed-pa2-capture/staged --out tmp/my-usb-package
 ```
 
-The dual-mode package preserves the exact October 28 single-frame capture
-payload and early UART recovery guard. A small branch after SRAM preparation
+The canonical dual-mode package includes the reviewed PA2 HOLD capture build
+and preserves its capture payload and the original early UART recovery guard.
+The standalone capture build uses `--gpio-hold`; see the [capture build](../capture-raw/README.md).
+The package builder requires an explicit capture directory and admits only
+independently reviewed exact prefix/sector hashes, not a self-consistent manifest.
+The legacy October 28 input is retained for explicit historical reproductions;
+it does not implement the A3 capture latch. A small branch after SRAM preparation
 loads a checked selector from a separate NOR region. It samples **CN8 VBUS
 through R80/R81 → PA11/ADC2 channel 12**. Present USB power selects the PTP
 app; absent power resumes capture. A powered charger also selects USB mode.
@@ -87,7 +102,8 @@ No OTP settings or standard external-loader initialization are changed.
   capture, DMA-sleep and physical HOLD-latch qualification remain separate.
 - USB disconnect handling waits until protocol/storage work is quiescent,
   samples absent VBUS twice, deinitializes SD/USB, and attempts guarded
-  Standby with PD7 floated at the final boundary. The code and isolated
+  Standby with PA2 floated at the final boundary. Shutdown proof schema 2
+  identifies PA2; frozen schema 1 records still describe PD7. The code and isolated
   shutdown checks pass; physical cable-removal/shutdown is not yet tested.
 - A failed header read during initial catalogue scanning currently prevents
   USB service from starting. Unknown/torn header markers stay occupied and
@@ -97,7 +113,7 @@ No OTP settings or standard external-loader initialization are changed.
 - CN9 shunts must remain removed in this bench setup. CN8 can still cause
   partial backfeed; a Joulescope OFF command is not proof of a cold reset.
 
-The installed November 8 release is **package08 / ram08**, USB executable
+The previously installed November 8 release was **package08 / ram08**, USB executable
 SHA256 `74c91b77062e899944941006e075ab76039055f5175bee5f497b8d1a242e3679`.
 Both NOR regions were independently reread; the following 4 KiB was preserved.
 See the [durable qualification record](evidence/2026-11-08-native-ptp/README.md)

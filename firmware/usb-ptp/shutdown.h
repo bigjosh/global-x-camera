@@ -17,6 +17,7 @@
 #define USB_SHUTDOWN_REQUIRED         15U
 #define USB_SHUTDOWN_MAGIC            0x31534455U /* UDS1 */
 #define USB_SHUTDOWN_SEAL             0x44455355U /* USED: snapshot published */
+#define USB_SHUTDOWN_SCHEMA           2U /* schema 1: PD7; schema 2: PA2/A3 */
 
 enum usb_shutdown_state {
     USB_SHUTDOWN_BEGIN=1, USB_SHUTDOWN_PERIPHERALS_OFF=2,
