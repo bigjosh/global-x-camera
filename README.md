@@ -79,6 +79,7 @@ Read [NOTES.md](NOTES.md) for the reasons behind decisions, rejected approaches 
 8. [50 ms cold-start risk review](docs/decisions/50ms-cold-start-review.md) — sensor revision, MCU boot load, power startup and storage recovery risks; no measured timing compliance yet.
 9. [First camera capture](firmware/bringup/README.md) — working RAM-only Nucleo/VD56G3 test, reproduction scripts, sensor identity and measured results.
 10. [Automated power cycling and first GPIO](firmware/boot-timing/bench-results-2026-10-17.md) — three recorded CN8-powered autonomous starts, 15.20–15.43 ms from NRST rising to the first GPIO; includes the earlier source/reset problem and measurement limits.
+11. [PCB readiness punch list](docs/review/2026-11-10-pcb-readiness-punch-list.md) — November 10 hardware review before custom-PCB design: open clarifications, problems and improvements in severity order. Review findings for discussion; nothing in it is a decision.
 
 ## Current position
 
