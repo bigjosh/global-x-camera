@@ -20,8 +20,8 @@
 | ID | Sev | Type | Item |
 |---|---|---|---|
 | PL-01 | S1 | C | Energy source and the CR2032 budget. Inputs settled November 11; cell count still open |
-| PL-02 | S1 | C | What this board spin is for, and what is on it |
-| PL-03 | S1 | C | Storage medium on the PCB (SD, SPI NAND or both) |
+| PL-02 | S1 | C | What this board spin is for, and what is on it. Purpose settled November 11 |
+| PL-03 | S1 | C | Storage: raw NAND only, no SD fallback (settled November 11). Serial or parallel, and the part, still open |
 | PL-04 | S1 | P | The recovered KiCad design is not the system that works |
 | PL-05 | S1 | P | Missing primary documents and tooling for doing the design here |
 | PL-06 | S2 | P | STM32N6 main/AUX sequencing, shutdown order and rail limits |
@@ -32,12 +32,12 @@
 | PL-11 | S2 | P | The 50 ms requirement has never been measured end to end |
 | PL-12 | S2 | C | Mechanical envelope: nothing closes at 5 mm yet |
 | PL-13 | S3 | P | Boot flash, straps and a programming path without ST-LINK |
-| PL-14 | S3 | P | SD electrical design (if SD stays) |
+| PL-14 | S3 | P | SD electrical design. Closed November 11: no SD on this board |
 | PL-15 | S3 | P | USB: VBUS sense, PHY supplies, inrush |
 | PL-16 | S3 | P | Battery monitoring and brown-out protection do not exist |
 | PL-17 | S3 | C | User controls: real parts for the thumbwheels and the SPDT shutter |
 | PL-18 | S3 | C | Indicators: three colours required, one LED in the old design |
-| PL-19 | S3 | C | RTC and accelerometer: on this board or not |
+| PL-19 | S3 | C | RTC is the RV-3032 (settled November 11); accelerometer on this board or not |
 | PL-20 | S3 | C | Board technology, fabricator and assembler |
 | PL-21 | S4 | I | Bring-up and measurement provisions |
 | PL-22 | S4 | I | Improvements worth deciding on now |
@@ -136,7 +136,9 @@ The ceiling scales with the total face area of the cells, whatever their size or
 
 **Settled by the user, November 11.** The purpose of this spin is to execute all of the possible power-saving strategies, including power-efficient storage, probably raw NAND ([owning note](../../NOTES.md#2026-11-11--the-custom-pcb-spin-exists-to-execute-every-power-saving-strategy)). That takes priority over staying close to the Nucleo's electrical arrangement, and it changes the recommendations in PL-03 and PL-07. No charger (PL-01).
 
-**Still needed.** The quantity, whether this spin must meet 5 mm, and a yes/no on each remaining block: a microSD footprint alongside the NAND, RTC (the user's reply names an RV3032, where the recovered design has an RV-3028-C8), accelerometer, both knobs, three LEDs, USB-C.
+**Also settled November 11.** There is no fallback: the new PCB will need extensive firmware changes and carries no Nucleo-compatible or SD path. The RTC is the RV-3032.
+
+**Still needed.** The quantity, whether this spin must meet 5 mm, and a yes/no on the accelerometer, both knobs, three LEDs and USB-C.
 
 ### PL-03 · Storage medium on the PCB
 
@@ -148,7 +150,32 @@ The ceiling scales with the total face area of the cells, whatever their size or
 
 **Direction from the user, November 11.** Power-efficient storage, probably raw NAND. The [peak-power exploration](../power/custom-pcb-peak-power.md) agrees: an SD save does not fit the coin-cell budget and a NAND save does.
 
-**Still needed.** Serial (SPI) or parallel raw NAND, the part, and whether a microSD footprint stays on the board as a bring-up fallback. No NAND firmware exists yet, so a board with NAND only cannot save a photo on the day it arrives.
+**Settled November 11.** Raw NAND only. No microSD footprint and no fallback ([owning note](../decisions/NOTES.md#2026-11-11--raw-nand-only-on-the-custom-pcb-with-no-sd-fallback)).
+
+**Serial or parallel.** Figures are from the datasheets stored in `datasheets/memory/`, all 1.8 V parts. Programming time is for the 1.91 MB photo and excludes loading the pages.
+
+| | Micron MT29F4G01ABBFD | Winbond W25N04KW | Macronix MX35UF4G24AD | Macronix MX30UF4G28AD |
+|---|---|---|---|---|
+| Interface | Serial, 1/2/4-bit | Serial, 1/2/4-bit | Serial, 1/2/4-bit | Parallel, 8-bit |
+| Program current, typical / maximum | 20 / 25 mA | 25 / 35 mA | 23 / 30 mA | 30 mA maximum |
+| Page size | 4 KiB | 2 KiB | 4 KiB | 4 KiB |
+| Page program time, typical / maximum | 240 / 600 µs with ECC | 250 / 700 µs | 320 / 700 µs | 320 µs typical |
+| Programming time for one photo | about 0.11 s | about 0.23 s | about 0.15 s | about 0.15 s |
+| Error correction | On the chip | On the chip | Host must supply 8-bit | Host must supply 8-bit |
+| MCU pins | 6 | 6 | 6 | about 15 |
+| Package | WSON-8, 8 × 6 mm | WSON-8, 8 × 6 mm | WSON-8, 8 × 6 mm | BGA-63, 9 × 11 mm, or TSOP-48 |
+| Busy indication | Status poll | Status poll | Status poll | Ready/busy pin |
+| Endurance and retention, datasheet | 100,000 cycles; 10 years | 60,000 cycles; 10 years | 60,000 cycles; 10 years | 60,000 cycles; 10 years |
+
+- Peak power is the same for all of them: 20–35 mA at 1.8 V. The choice turns on firmware effort, board area and pins.
+- A 4 Gbit part gives 256 two-megabyte slots before bad blocks, against the 200-photo requirement.
+- The parallel part's ready/busy pin could wake a sleeping MCU directly. A serial part needs a timed wake and a status poll, which costs little.
+
+**Recommendation.** Serial NAND with on-chip error correction in the WSON-8 package: the Micron part first, since it is the fastest and draws the least, with the Winbond part as a second source on the same footprint. Three vendors share that footprint, which protects the board against supply trouble. The September sourcing check found the Micron part's factory supply uncertain, so availability needs rechecking before it is committed.
+
+**Option for the pin map (PL-10).** The NAND can share the boot flash's bus on that port's second chip select, saving five MCU pins.
+
+**Still needed.** Agreement on serial NAND and the part.
 
 ### PL-04 · The recovered KiCad design is not the system that works
 
@@ -156,14 +183,15 @@ The ceiling scales with the total face area of the cells, whatever their size or
 
 **Recommendation.** Start a new schematic from the hardware the firmware actually runs on (the Nucleo and camera-adapter subsets in use, plus the new power stage). Reuse verified symbols and footprints from the recovered library where they survive checking. Then close each of the 47 findings as fixed, carried over or superseded.
 
-**Need from you.** Agreement on a new schematic rather than editing the recovered one.
+**Settled in effect, November 11.** With no fallback and extensive firmware change accepted (PL-02), the new schematic is not bound to the Nucleo's pin assignments either. Pins can be chosen for the board (PL-10).
 
 ### PL-05 · Missing primary documents and tooling
 
 The new schematic of PL-04 would be derived from two of these documents (the Nucleo and camera-adapter schematics), and the camera pinout, rail limits and mechanics come from the others.
 
 - Stored November 11, all supplied by the user: the [VD56G3 datasheet](../../datasheets/camera/VD56G3_DS12968_datasheet.pdf) (DS12968 Rev 12), the [CAM-56G3 module data brief](../../datasheets/camera/CAM-56G3_DB5264_module_brief.pdf) (DB5264 Rev 3) and the [camera-adapter schematic](../../datasheets/camera/STEVAL-CAM-M0I_PCB4280D_schematic.pdf) (PCB4280D, version 1.1).
-- Still not in the repo: the Nucleo schematic (MB1940) and manual (UM3417), a mechanical drawing or STEP of the module showing the flex and connector face, and the VD56G3 register and integration manual.
+- Stored November 10 by the user: the [Nucleo reference bundle](../../datasheets/boards/nucleo-n657x0-q/README.md), with the MB1940 C02 schematic, bill of materials, manufacturing files and UM3417 Rev 4.
+- Still not in the repo: a mechanical drawing or STEP of the module showing the flex and connector face, the VD56G3 register and integration manual, and datasheets for the RV-3032 and the parts yet to be chosen.
 - This cloud session cannot reach st.com, ti.com, analog.com, hirose.com, the distributors or JLCPCB.
 - KiCad is not installed here. The repo's files are KiCad 9 format; the package available here is KiCad 7, which cannot open them. Without it I can generate files but cannot run ERC or DRC.
 
@@ -284,15 +312,11 @@ Some present assignments also sit on boot-ROM serial pins: PA2 (HOLD) is USART2_
 - The project has programmed no OTP fuses, and the firmware checks that two OTP bits are at their defaults before Standby. A new MCU should behave the same; verify on first power-up. Whether a 3.3 V flash would need an OTP setting is unresolved in the record.
 - The custom board has no ST-LINK. Recovery today is a 1 Mbaud pulse train into PE6 from the ST-LINK serial port (or PE1 held low), followed by reprogramming over SWD. The board needs SWD pads, NRST, BOOT0 and BOOT1 access, those two recovery pins, and a way to power the board without the latch.
 
-**Recommendation.** Use the same flash part and VDDIO3 voltage as the Nucleo for this spin.
+**Recommendation, revised November 11.** With no fallback (PL-02), the flash need not match the Nucleo's. The ROM only needs a 1.8 V serial NOR that answers a single-line fast read with a 24-bit address, so a small, low-current part can replace the 512 Mbit octal one. The loader's register checks and the NOR tools change with it.
 
-### PL-14 · SD electrical design (if SD stays)
+### PL-14 · SD electrical design
 
-- The 25 MHz CRC failures on jumper wires went away with a clock probe, a 27 Ω series resistor or a twisted clock/ground pair. Root cause is unresolved. 50 MHz mode fails read CRC and is unqualified.
-- Pull-ups today are the MCU's internal ones, absent during reset.
-- The card is never power-cycled and stays powered through Standby. Card current has never been measured.
-
-**Recommendation.** Series-resistor footprint at the clock source, external pull-ups on CMD and all four data lines, short referenced routing, and a decision on a card load switch (it removes the card from the Standby and OFF budgets, but firmware assumes a stable card rail at boot).
+**Closed November 11.** There is no SD card on this board (PL-03). The findings from the jumper-wire prototype stay in the SD storage notes.
 
 ### PL-15 · USB
 
@@ -323,7 +347,9 @@ D-48 uses red, blue and green; fault codes need red. The recovered design has on
 
 Both are still required by the specification (D-06, D-20) and neither exists on the prototype; the metadata bytes are written as zero. If they go on this board, note that the old RTC pins (PE5/PE6) include the recovery input (PE6), the old accelerometer pins collide with SDMMC2, and the RTC backup tap on one cell of a series pack unbalances it slightly.
 
-**Need from you.** In or out for this spin.
+**Settled November 11.** The RTC is the RV-3032, which also supplies the temperature reading the user proposes for the exposure limit (PL-16). Its datasheet is not yet in the repo.
+
+**Need from you.** Accelerometer in or out for this spin.
 
 ### PL-20 · Board technology, fabricator and assembler
 

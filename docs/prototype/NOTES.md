@@ -322,3 +322,20 @@ constraint ("I think"), not a statement that no alternative can ever exist.
 That the module carries no regulators is the repository's second-hand record
 of ST's module documents, which are still not stored locally. No hardware,
 firmware or CAD change.
+
+## 2026-11-11  The RTC for the custom PCB is the RV-3032
+
+**Why:** the user named the RV3032 as the source of temperature for a possible
+exposure limit, and confirmed on request that the RV-3032 is the intended RTC.
+The recovered design carries an RV-3028-C8, which that choice replaces for the
+custom PCB.
+
+**Rejected:** carrying the RV-3028-C8 forward by default from the recovered
+schematic. Not decided: the backup supply arrangement, pins, or whether the
+accelerometer is on this board spin.
+
+**Evidence:** direct user replies, November 11, in the PCB readiness review;
+[punch-list item PL-19](../review/2026-11-10-pcb-readiness-punch-list.md).
+No RV-3032 datasheet is stored yet, so its backup current, temperature
+accuracy and footprint are unverified here. No hardware, firmware or CAD
+change.
