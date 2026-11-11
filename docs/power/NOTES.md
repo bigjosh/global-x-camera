@@ -948,3 +948,31 @@ typical values with marked assumptions; it found the 1.8 V main rail worth
 little on power alone, and the sensor-core LDO, NAND in place of SD and MCU
 sleep during page programming worth more. No bench operation, firmware
 change or CAD change.
+
+## 2026-11-11  The armed sensor is a sustained load, so long exposures set the coin-cell limit
+
+**Why:** the user supplied the VD56G3 datasheet (DS12968 Rev 12, now stored).
+Its Table 13 gives 97 mW typical in follower mode at 0 fps, 120 mW at 30 fps
+and 145 mW at 60 fps; Table 14 gives maxima of 11 mA, 86 mA and 25 mA on the
+1.8 V, 1.15 V and 2.8 V rails. A sensor that is ready to stream but reading
+out no frame therefore draws about two-thirds of its full streaming power.
+Exposure can be set up to one second, so the exposure itself is a sustained
+load of roughly 0.15 W at the pack on an efficient board, not a brief burst.
+On the review's source model that is 72-95% of what four standard CR2032
+sustain at 50 F and 57-76% for five.
+
+**Rejected:** treating the whole capture as a 22 ms burst that a small
+reservoir can carry; assuming sensor power falls to its standby level while
+integrating. Not established: that integration draws exactly the 0 fps
+figure. The datasheet states the follower-mode figure, and its application to
+a long exposure is the reviewing assistant's inference. The short-form
+datasheet has no register detail, so whether a lower PLL or link rate reduces
+the armed current is unknown.
+
+**Evidence:** [VD56G3 datasheet](../../datasheets/camera/VD56G3_DS12968_datasheet.pdf),
+Tables 13 and 14, Figures 23 and 24; [peak-power exploration](custom-pcb-peak-power.md)
+and its [calculation](../../tools/estimate_custom_pcb_peak_power.py).
+The pack-side figures are a model with marked assumptions, not measurements.
+The user also noted that the ST promodule is expected to be required;
+[owning note](../prototype/NOTES.md#2026-11-11--keep-the-st-promodule-as-the-camera-for-the-custom-pcb).
+No bench operation, firmware change or CAD change.

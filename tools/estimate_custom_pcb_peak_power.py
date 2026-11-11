@@ -35,9 +35,13 @@ MCU_AON = 0.00045       # Table 37, HSI
 MCU_VDD = 0.0003        # Table 31
 CSI_PHY_1V8 = 0.010     # ASSUMED receiver PHY current while capturing; not in the datasheet text
 
-# VD56G3, typical at 60 fps full resolution, as recorded in the power-tree review.
-SENSOR = {"ana_2v8": 0.0228, "io_1v8": 0.0085, "core_1v15": 0.057}
-SENSOR_IDLE = {"ana_2v8": 0.000038, "io_1v8": 0.000013, "core_1v15": 0.0021}
+# VD56G3, DS12968 Rev 12 (datasheets/camera), Tables 13 and 14.
+SENSOR = {"ana_2v8": 0.0228, "io_1v8": 0.0085, "core_1v15": 0.057}       # streaming 60 fps, typical
+SENSOR_MAX = {"ana_2v8": 0.025, "io_1v8": 0.011, "core_1v15": 0.086}     # streaming 60 fps, maximum
+# "Follower mode 0 fps": streaming state with no frame being read out. Taken here as
+# the level during a long integration; the datasheet does not state that case directly.
+SENSOR_ARMED = {"ana_2v8": 0.0135, "io_1v8": 0.0055, "core_1v15": 0.043}
+SENSOR_IDLE = {"ana_2v8": 0.000038, "io_1v8": 0.000013, "core_1v15": 0.0021}  # reset
 OSC_1V8 = 0.0025        # ASSUMED 12 MHz oscillator
 
 NOR_READ = 0.012        # ASSUMED boot-flash read current at 32 MHz single-line
@@ -102,12 +106,14 @@ def phases(tree, clock):
     # The ROM always runs its own 400 MHz profile; sensor boot current is not included.
     out["boot: ROM loading"] = tree.pack(core_current(1.0),
                                          BASE_1V8 + MCU_1V8_PLL + NOR_READ, SENSOR_IDLE)
-    out["capture"] = tree.pack(core_current(cap_scale),
-                               BASE_1V8 + MCU_1V8_PLL + CSI_PHY_1V8, SENSOR)
+    out["capture: readout"] = tree.pack(core_current(cap_scale),
+                                        BASE_1V8 + MCU_1V8_PLL + CSI_PHY_1V8, SENSOR)
+    out["capture: readout, sensor at maximum"] = tree.pack(
+        core_current(cap_scale), BASE_1V8 + MCU_1V8_PLL + CSI_PHY_1V8, SENSOR_MAX)
     pll = MCU_1V8_PLL if fast else MCU_1V8_NOPLL
-    out["long exposure, MCU asleep"] = tree.pack(
+    out["exposure, MCU asleep"] = tree.pack(
         core_current(64.0 / 400 if not fast else 1.0, cpu_running=False, peripherals=False),
-        BASE_1V8 + pll, SENSOR)
+        BASE_1V8 + pll, SENSOR_ARMED)
     out["save: page load"] = tree.pack(core_current(act_scale),
                                        BASE_1V8 + pll + NAND_LOAD, SENSOR_IDLE)
     # During the NAND's internal program time the MCU either busy-waits (today)
@@ -137,10 +143,10 @@ def main():
     names = list(phases(TREES[0], "today"))
     for clock in ("today", "matched"):
         print(f"clocking: {clock}")
-        print("  phase".ljust(34) + "".join(t.name[:1].rjust(8) for t in TREES))
+        print("  phase".ljust(40) + "".join(t.name[:1].rjust(8) for t in TREES))
         table = [phases(t, clock) for t in TREES]
         for n in names:
-            print(("  " + n).ljust(34) + "".join(f"{tb[n]:8.3f}" for tb in table))
+            print(("  " + n).ljust(40) + "".join(f"{tb[n]:8.3f}" for tb in table))
         print()
     for t in TREES:
         print(f"  {t.name}")

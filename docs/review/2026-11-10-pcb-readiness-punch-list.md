@@ -120,12 +120,13 @@ The ceiling scales with the total face area of the cells, whatever their size or
 **Further user inputs, November 11.**
 - "5xcr3032" was a typo for five CR2032.
 - If necessary the CR2032 holders can be left unfitted and their space used for a LiPo. The two sources are alternatives in the same area, not fitted together.
-- The user expects further savings on a custom board (a low-power NAND, a 1.8 V main rail, slowing the MCU to its data streams) and asked for them to be explored. The [first exploration](../power/custom-pcb-peak-power.md) puts capture near 0.27 W and a NAND save at or under 0.09 W, inside the four-cell ceilings above; an SD save does not fit, and a long exposure is unresolved.
+- The user expects further savings on a custom board (a low-power NAND, a 1.8 V main rail, slowing the MCU to its data streams) and asked for them to be explored. The [first exploration](../power/custom-pcb-peak-power.md), updated with the VD56G3 datasheet the user supplied, puts readout near 0.27 W, a NAND save at or under 0.09 W and a long exposure at a sustained 0.15 W. On four cells at 50 °F the first two fit; the long exposure is at the edge (72–95% of the sustained ceiling) and fits on five. An SD save does not fit.
 
 **Still open.**
 - Four positions or five. Decide in the placement study.
 - Whether holders should also accept the thinner CR2025 (2.5 mm), which is as widely sold and frees 0.7 mm of the thickness budget. Its pulse resistance against the CR2032 is unverified.
-- Sensor current during a long exposure, which needs the VD56G3 datasheet (PL-05).
+- Whether the sensor's armed current (97 mW typical with no frame being read out) can be lowered by its settings. That needs ST's register and integration manual (PL-05).
+- Whether one-second exposures must work on coin cells, or the longest exposures may be limited there.
 
 ### PL-02 · What this board spin is for, and what is on it
 
@@ -157,7 +158,8 @@ The ceiling scales with the total face area of the cells, whatever their size or
 
 The new schematic of PL-04 would be derived from two of these documents (the Nucleo and camera-adapter schematics), and the camera pinout, rail limits and mechanics come from the others.
 
-- Not in the repo: VD56G3 datasheet, CAM-6G3-073CLR schematic and STEP, STEVAL-CAM-M0I1 schematic, MB1940 schematic, UM3417.
+- Stored November 11: the [VD56G3 datasheet](../../datasheets/camera/VD56G3_DS12968_datasheet.pdf), DS12968 Rev 12, supplied by the user.
+- Still not in the repo: the VD56G3 register and integration manual, CAM-6G3-073CLR schematic and STEP, STEVAL-CAM-M0I1 schematic, MB1940 schematic, UM3417.
 - This cloud session cannot reach st.com, ti.com, analog.com, hirose.com, the distributors or JLCPCB.
 - KiCad is not installed here. The repo's files are KiCad 9 format; the package available here is KiCad 7, which cannot open them. Without it I can generate files but cannot run ERC or DRC.
 
@@ -217,7 +219,7 @@ Problems to solve in the PCB circuit:
 **Situation.** The module does not plug into the Nucleo directly. The STEVAL-CAM-M0I1 adapter supplies three LDO rails, a 12 MHz oscillator, level translation and an XSHUTDOWN pull-up. That pull-up lets the sensor boot while the MCU is still in ROM, and the 23–25 ms time-to-exposure depends on it. Releasing reset from firmware instead would add about 6.5 ms.
 
 **The PCB must provide.**
-- 2.8 V, 1.8 V and 1.15 V rails that rise with main power, not under firmware control.
+- 2.8 V, 1.8 V and 1.15 V rails that rise with main power, not under firmware control. Size them for the datasheet maxima: 25 mA, 11 mA and 86 mA, with local decoupling for a 106 mA, 3.5 µC start-up transient on the 2.8 V rail.
 - A 12 MHz clock running before XSHUTDOWN rises (firmware PLL constants assume 12 MHz).
 - A hardware XSHUTDOWN release that waits for rails and clock.
 - Both CSI data lanes. The recovered design routes one; one lane cannot carry this mode.
