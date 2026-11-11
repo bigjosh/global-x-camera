@@ -59,22 +59,45 @@
 | Board awake, no camera, no SD | about 0.185 W | — |
 | Whole cycle | 168–263 mJ | 446–648 ms |
 
-**What four CR2032 can deliver (my estimate).** Published pulse ratings for standard cells are 10 mA for 1 s (Duracell) and 15 mA (EEMB). Murata rates its high-drain CR2032R at 50 mA for 3 s to 2.0 V, at half capacity and 23 °C, and describes that as double its standard cell. At a sagged 8–10 V that is roughly **0.1–0.25 W for standard cells and about 0.4 W for high-drain cells** at the pack terminals, less when cold or deeply discharged.
+**Source model (added November 11).** Two anchors, both more direct than the vendor pulse ratings my first pass used:
+- The October 28 trace ([screenshot readings](../power/power-cost-comparison.md#october-28-battery-side-trace-and-remaining-overhead)): 12.56 V open-circuit, then 70 mA at 8.3 V, 110 mA at 6.5 V and 130 mA at 5.2 V. That is a pack resistance of 55–61 Ω, about 14 Ω per cell, for fresh cells loaded for tens of milliseconds. It includes holders, wiring and the meter.
+- The stored [Energizer sheet](../../datasheets/reference/CR2032_Energizer_reference.pdf), typical 2-second pulse resistance at 21 °C, read from its graph: about 30 Ω per cell fresh, about 40 Ω after 100–125 mAh, about 60 Ω after 150 mAh, then rising steeply.
 
-**Gap.** The present peak is 3–6 times too high for standard cells. The Nucleo's idle floor alone exceeds the standard-cell budget. A rough model of a custom board with efficient converters (sensor 145 mW typical at its rails, plus MCU) lands near 0.25–0.3 W during capture: still above standard cells, inside the high-drain rating when the cells are fresh. During the save, an SD card adds about 0.17 W typical and up to 0.4 W by datasheet; SPI NAND programming is about 0.04–0.05 W.
+A regulated converter is a constant-power load. A source of open-circuit voltage V and resistance R can deliver at most V²/4R; ask for more and the pack voltage collapses. At 12 V that ceiling is 0.60 W for 60 Ω, 0.30 W for 120 Ω, 0.23 W for 160 Ω and 0.18 W for 200 Ω.
+
+**Reading of the October 28 collapse.** The Nucleo system needs about 0.62 W at 5 V, so roughly 0.7 W at the pack after the converter. That pack's ceiling was about 0.69 W. The load sat on the knee and the pack collapsed. Fresh cells at room temperature almost ran today's hardware; the shortfall is margin for used, aged and cold cells rather than an order of magnitude. The vendor pulse ratings (10 mA Duracell, 15 mA EEMB, 50 mA for Murata's high-drain CR2032R) describe conditions that preserve rated capacity and are more conservative than this.
+
+**Figure of merit.** Collapse resistance, V²/4P at 12 V: the largest source resistance a configuration survives. Rows marked "model" are my estimates from datasheet typicals with assumed 85–90% conversion, not measurements.
+
+| Configuration | Peak at the pack | Collapse resistance |
+|---|---:|---:|
+| Nucleo prototype today | about 0.69 W | about 52 Ω |
+| Custom board, capture burst, no reservoir (model) | 0.27–0.34 W | 105–135 Ω |
+| Custom board, SD save, typical card current (model) | 0.27–0.34 W | 105–135 Ω |
+| Custom board, SD save, card at its datasheet maximum (model) | 0.53–0.60 W | 60–68 Ω |
+| Custom board, SPI NAND save (model) | 0.15–0.21 W | 170–240 Ω |
+
+For comparison the pack itself is about 57 Ω fresh for short loads, about 120 Ω fresh for 2-second loads, about 160 Ω half used, and higher when cold (no temperature data is in the repo).
 
 **Consequences for the PCB.**
 - The 100 nA OFF target stays. Capacitor leakage alone makes a large always-connected reservoir on the battery side impractical within it.
-- A small reservoir on the switched side (order 100–220 µF at pack voltage, 3–7 mJ) could carry the 22 ms camera burst and recharge well inside one second. It costs a few milliseconds of ramp against the 50 ms budget.
-- Storage choice (PL-03) matters as much as the regulators.
+- A reservoir on the switched side of order 100 µF at pack voltage could carry the 22 ms capture burst and recharge well inside one second. It costs about 3 ms of ramp against the 50 ms budget.
+- Storage choice (PL-03) matters as much as the regulators: the save lasts hundreds of milliseconds, where the higher 2-second resistance applies, and only the NAND row clears it with margin.
+- Depth of discharge is not the limiter. Four cells hold about 9,500 J; 20,000 shots at 0.1 J use about a fifth of that. Temperature, cell brand and shelf age are the derating factors that matter.
+
+**Proposed target, for discussion.** Define "CR2032-viable" as a bench test rather than a current figure: the camera completes a set number of cold capture-and-save cycles from a 12.0 V supply through a series resistor R. I propose R = 120 Ω to pass and 160 Ω as the stretch. In power terms that is a sustained pack draw of about 0.2 W or less, with any short burst above it carried by the reservoir. The same test runs on the Nucleo today and on the PCB later, and the largest R that still passes is a single number to track.
 
 **Recommendation.**
-1. Agree a target, for example "1 ms mean pack current ≤ X mA with the pack ≥ 8 V", and name the cell (standard or high-drain).
-2. Before layout, measure per-rail currents on the Nucleo using the CN12 shunts. They have never been measured and would replace my model.
-3. Design the input stage for roughly 3–15 V so the same board runs from the LiPo now and from 4×CR2032 when the budget closes.
-4. Consider one alternative cell: thin Li-MnO2 pouch cells (for example CP224147, 3 V, about 750–800 mAh, about 2.2 mm thick) are rated for 200–400 mA pulses with primary-cell shelf life. Two in series would remove the peak-current problem and are thinner than a CR2032. Figures are from distributor listings and need checking against a maker's datasheet.
+1. Agree the test and the value of R.
+2. Before layout, take four measurements:
+   - SD card current during a save (meter in the card's supply lead). It has never been measured and decides PL-03.
+   - Pulse resistance of the actual cells at about 20 ms and 500 ms, at room temperature and cold.
+   - The collapse resistance of today's prototype, as the baseline.
+   - Per-rail currents: core at CN12 (R40), main 3.3 V at R102, auxiliary 3.3 V at R115.
+3. Design the input stage for roughly 3–15 V so the same board runs from the LiPo now and from 4×CR2032 when the test passes. The LTC3621 already studied covers 2.7–17 V with 0.1 µA typical (1 µA maximum) shutdown current, a 0.8 ms soft start and full dropout operation.
+4. Keep one alternative cell as a fallback: thin Li-MnO2 pouch cells (for example CP224147, 3 V, about 750–800 mAh, about 2.2 mm thick) are listed at 200–400 mA pulses with primary-cell shelf life. Figures are from distributor listings and need checking against a maker's datasheet.
 
-**Need from you.** The target, the cell type, and whether this spin must run from CR2032 or only prove the budget on LiPo. Also confirm no on-board charger is wanted.
+**Need from you.** The value of R, which really means the worst cell condition that must still fire (minimum temperature, how used); how many shots in a row at one per second; any standard CR2032 or a named high-drain part; whether this spin must run from CR2032 or only pass the bench test on the way; and confirmation that no on-board charger is wanted.
 
 ### PL-02 · What this board spin is for, and what is on it
 
@@ -149,7 +172,7 @@ The new schematic of PL-04 would be derived from two of these documents (the Nuc
 ### PL-08 · Latch and source selection as built are not transferable
 
 Problems to solve in the PCB circuit:
-1. **Reverse blocking.** A single P-FET conducts backwards through its body diode. With USB at 5 V and a LiPo at 3.7 V that charges the cell uncontrolled. With primary cells, any charging path is a safety issue.
+1. **Reverse blocking.** A single P-FET conducts backwards through its body diode. With USB at 5 V and a LiPo at 3.7 V that charges the cell uncontrolled. With primary cells, any charging path is a safety issue; the stored Energizer sheet allows at most 1 µA of reverse current.
 2. **Priority.** A 4×CR2032 pack sits above VBUS, so diode-OR logic picks the battery. "USB present" must force the battery path off in hardware.
 3. **Gate voltage range.** One circuit spanning 3–13.2 V needs a FET that is fully on at −2.5 V and survives −13.2 V at the gate. The kit AO3401 is rated ±12 V (existing finding PWR-002).
 4. **OFF leakage.** The kit FETs are specified at up to 1 µA each, ten times the whole 100 nA budget. Latch leakage has never been measured; the Joulescope position used cannot see the R1/Q2 branch.
