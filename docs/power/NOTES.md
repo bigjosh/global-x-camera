@@ -924,3 +924,27 @@ rating recorded there are the reviewing assistant's model and inference,
 not user decisions or measurements. Cell count, a LiPo connection alongside
 the holders and CR2025 compatibility remain open. No bench operation,
 firmware change or CAD change accompanied this entry.
+
+## 2026-11-11  Five cells means CR2032; a LiPo may take the holder space; explore custom-board savings
+
+**Why:** the user confirmed that "5xcr3032" in the earlier reply was a typo
+for five CR2032. If the cells prove unusable, the CR2032 holders can be left
+unfitted and that board area used for a LiPo instead. The user also states an
+expectation that a custom board offers further power savings, naming a
+specific low-power NAND, running everything except the sensor's 2.8 V rail
+from a 1.8 V buck output, and slowing the MCU to match its input data
+streams, and asked for ways to reduce peak current to be explored.
+
+**Rejected:** reading the earlier reply as a request for 30 mm CR3032 cells;
+fitting LiPo and coin cells side by side as a requirement. Not rejected or
+selected: any particular power tree, NAND part or clocking scheme. The
+exploration is an estimate to discuss, not a design decision.
+
+**Evidence:** direct user reply, November 11;
+[first peak-power exploration](custom-pcb-peak-power.md) and its
+[calculation](../../tools/estimate_custom_pcb_peak_power.py). The
+exploration's figures are the reviewing assistant's model from datasheet
+typical values with marked assumptions; it found the 1.8 V main rail worth
+little on power alone, and the sensor-core LDO, NAND in place of SD and MCU
+sleep during page programming worth more. No bench operation, firmware
+change or CAD change.

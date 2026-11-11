@@ -113,14 +113,19 @@ The ceiling scales with the total face area of the cells, whatever their size or
 **Consequences for this spin.**
 - Rate the input for five fresh cells, 16.5 V. The LTC3621 studied earlier is limited to 17 V and is too close; a part rated 20 V or more is needed. Four cells alone would fit it.
 - Lay out four cell positions, plus a fifth with a bypass link if placement allows. In board cutouts at about 22 mm pitch, four cells take about 42% of the card and five about 59% (PL-12).
-- Keep a LiPo connection as the working source, selected by a link so the two are never joined.
+- Keep a LiPo as the working source. Per the user it may occupy the holder area with the holders unfitted.
 - Include the reservoir footprint.
 - When the board exists, "CR2032-viable" is tested with real cells at 50 °F, or from a bench supply through a series resistor. On the model above that resistor is about 170 Ω for four fresh cells and 225 Ω half used.
 
+**Further user inputs, November 11.**
+- "5xcr3032" was a typo for five CR2032.
+- If necessary the CR2032 holders can be left unfitted and their space used for a LiPo. The two sources are alternatives in the same area, not fitted together.
+- The user expects further savings on a custom board (a low-power NAND, a 1.8 V main rail, slowing the MCU to its data streams) and asked for them to be explored. The [first exploration](../power/custom-pcb-peak-power.md) puts capture near 0.27 W and a NAND save at or under 0.09 W, inside the four-cell ceilings above; an SD save does not fit, and a long exposure is unresolved.
+
 **Still open.**
 - Four positions or five. Decide in the placement study.
-- Whether "5xcr3032" in the user's reply meant CR2032 or the 30 mm CR3032. Five CR3032 cover 76% of the card before any board between them and cannot fit; two can.
 - Whether holders should also accept the thinner CR2025 (2.5 mm), which is as widely sold and frees 0.7 mm of the thickness budget. Its pulse resistance against the CR2032 is unverified.
+- Sensor current during a long exposure, which needs the VD56G3 datasheet (PL-05).
 
 ### PL-02 · What this board spin is for, and what is on it
 
