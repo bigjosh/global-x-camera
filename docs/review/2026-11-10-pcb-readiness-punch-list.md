@@ -260,7 +260,7 @@ Some present assignments also sit on boot-ROM serial pins: PA2 (HOLD) is USART2_
 
 ### PL-12 · Mechanical envelope
 
-**Situation.** The camera module is 4.68 mm tall. On a 1.6 mm board that is 6.3 mm, so the 5 mm target needs the module in a board cutout. A CR2032 is 3.2 mm before contacts. The USB-C part in the old design is about 3.2 mm above the board. No STEP of the module is in the repo, and the connector orientation was never validated. No placement drawing exists for lens, shutter, knobs, USB, card slot or cells.
+**Situation.** The user expects the promodule to be required (November 11), so its dimensions are fixed inputs. The camera module is 4.68 mm tall. On a 1.6 mm board that is 6.3 mm, so the 5 mm target needs the module in a board cutout. A CR2032 is 3.2 mm before contacts. The USB-C part in the old design is about 3.2 mm above the board. No STEP of the module is in the repo, and the connector orientation was never validated. No placement drawing exists for lens, shutter, knobs, USB, card slot or cells.
 
 **Need from you.** A sketch of where each user-facing item goes on the card, whether this spin must hit 5 mm, and a physical module to check orientation against.
 

@@ -282,3 +282,22 @@ for settling/sampling, then LOW; never feed header-level3.3V directly into
 an unconditioned ADC pin. [Current interface](../hardware-firmware-interface.md)
 records both knobs. No firmware, instrument or hardware-test operation
 accompanied this documentation update.
+
+## 2026-11-11  Keep the ST promodule as the camera for the custom PCB
+
+**Why:** during the PCB readiness review the user noted "I think we have to
+use the promodule". The custom PCB is therefore planned around the complete
+CAM-6G3-073CLR module rather than a bare VD56G3 with separately sourced
+optics. This fixes the module's 4.68 mm height, its 30-pin flex connector and
+the need for the host board to supply all three sensor rails and the clock.
+
+**Rejected:** planning this board spin around a bare sensor and custom lens to
+recover thickness or power. The earlier VD5943/custom-optics direction stays a
+future direction and is not reopened here. The user's wording is a working
+constraint ("I think"), not a statement that no alternative can ever exist.
+
+**Evidence:** direct user note, November 11, in the PCB readiness review;
+[punch-list items PL-09 and PL-12](../review/2026-11-10-pcb-readiness-punch-list.md).
+That the module carries no regulators is the repository's second-hand record
+of ST's module documents, which are still not stored locally. No hardware,
+firmware or CAD change.
