@@ -8,6 +8,15 @@ Initially collected 2026-09-05 from the supplied BOM, EDIF netlist, and specific
 
 Start with the part coverage table below. Each document has an adjacent `.pdf.source.json` record containing its source and resolved URLs, retrieval time, page count, SHA-256 hash, and any variant or source caveat. [manifest.json](manifest.json) indexes the full library. [parts-inventory.json](parts-inventory.json) preserves the BOM fields and EDIF identifiers/connectivity.
 
+## Nucleo prototype reference bundle
+
+The [NUCLEO-N657X0-Q / MB1940 C02 collection](boards/nucleo-n657x0-q/README.md)
+contains the full schematic, UM3417 Rev 4 manual, C02 BOM and revision C
+manufacturing sources, with checksums and source records. It also links the
+newly archived [DC1863A external buck-board manual](power/ADI_DC1863A_demo_manual.pdf)
+and the existing MCU/LTC3621 references. Its own manifest supplements the
+historical library counts and manifest below.
+
 ## Coverage and remaining inputs
 
 - Datasheets and directly relevant hardware, package, layout, programming, and errata documents are included where available.

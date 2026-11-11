@@ -282,3 +282,24 @@ for settling/sampling, then LOW; never feed header-level3.3V directly into
 an unconditioned ADC pin. [Current interface](../hardware-firmware-interface.md)
 records both knobs. No firmware, instrument or hardware-test operation
 accompanied this documentation update.
+
+## 2026-11-10  Preserve revision-matched Nucleo source documents in Git
+
+**Why:** the user asked to include the Nucleo schematic and relevant supporting
+references in the pushed repository. The complete C02 schematic, BOM and
+revision C manufacturing sources underpin connector, power-tree and component
+location findings, but their originals were only in ignored temporary storage.
+Archive those exact source bytes alongside UM3417 Rev 4, with source URLs and
+SHA-256 records, so a fresh checkout can reproduce the reference review. The
+external DC1863A manual accompanies the already tracked LTC3621 datasheet.
+
+**Rejected:** leaving essential source documents only under `tmp/` or behind
+external links; silently replacing the evidence-matched C02 source with a
+newer board variant; treating generic manufacturing population as the fitted
+C02 BOM; or describing the original schematic as our modified as-built board.
+
+**Evidence:** [reference bundle and manifest](../../datasheets/boards/nucleo-n657x0-q/README.md);
+[October 18 source hashes](nucleo-assembly/locations.json). The archived full
+schematic and manufacturing ZIP match those historical hashes; all copied
+vendor files have provenance records and verified content/archive integrity.
+No firmware, hardware or instrument operation accompanies this publication.

@@ -1,5 +1,7 @@
 # Nucleo C02 rework location diagrams
 
+Full original [schematic, user manual, BOM and manufacturing sources](../../../datasheets/boards/nucleo-n657x0-q/README.md) are now tracked in the repository. The assembly-only PDF below remains the input to these existing locator tools.
+
 These figures locate the parts and connector pins used by the consolidated Nucleo modification guide. They are derived from ST's actual MB1940 revision C, N657X0Q C02 assembly drawings, not a generated board photograph. The top is viewed from the component side with CN10 / ST-LINK USB at the top; the bottom is viewed directly from underneath after flipping the board left-to-right, keeping the ST-LINK end at the top.
 
 - `rework-overview.png` / `.svg`: top and bottom locations for D2, R23, R88, R89, SB24, and U24.
