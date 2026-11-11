@@ -2,6 +2,24 @@
 
 **Reviewed November 10, 2026**, before starting custom-PCB design. Hardware only; firmware items appear only where they change copper. Ordered by severity, most important first. Nothing here is decided: each item is for discussion, and the outcome of each discussion gets a dated entry in the owning `NOTES.md` when it is resolved.
 
+## Where the review stands (November 11)
+
+A session picking this up should read this block first, then the items it names.
+
+**Settled with the user.**
+- PL-01: standard CR2032 cells, work down to 50 °F, at most one shot per second, holders on this spin, a fifth cell if it fits, no charger, no further Nucleo power experiments. A LiPo may take the holder space if the cells prove unusable.
+- PL-02: this spin exists to execute every power-saving strategy. There is no fallback and extensive firmware change is accepted.
+- PL-03: parallel raw NAND with host BCH from the MCU, no SD card. Part and capacity await a live stock check.
+- PL-04: a new schematic, not bound to the Nucleo's pin assignments.
+- PL-19: the RTC is the RV-3032. An orientation sensor is included but is the first thing cut; four-way sensing is enough.
+- The camera is the ST promodule. The longest exposure may be cut to 0.5 s on coin cells, possibly by temperature.
+
+**Open.**
+- PL-05: the user prefers DipTrace to KiCad. Feasibility is untested; it needs the DipTrace version, the XML specifications and a sample export.
+- PL-06 and PL-07: sequencing and the power tree. Next to be discussed, as one proposal, for the lowest-power tree in the [peak-power exploration](../power/custom-pcb-peak-power.md).
+- PL-08 onward: not yet discussed with the user.
+- Still needed from the user: quantity, whether this spin must meet 5 mm, a placement sketch, and yes or no on both knobs, three LEDs and USB-C.
+
 ## What was reviewed, and its limits
 
 - The working system: NUCLEO-N657X0-Q + STEVAL-CAM-M0I1 adapter + CAM-6G3-073CLR, SD card on SDMMC2, LiPo latch, two pots, native USB PTP, as recorded through the November 10 wiring update.
