@@ -21,7 +21,7 @@
 |---|---|---|---|
 | PL-01 | S1 | C | Energy source and the CR2032 budget. Inputs settled November 11; cell count still open |
 | PL-02 | S1 | C | What this board spin is for, and what is on it. Purpose settled November 11 |
-| PL-03 | S1 | C | Storage: raw NAND only, no SD fallback (settled November 11). Parallel with host error correction now recommended; part still open |
+| PL-03 | S1 | C | Storage: parallel raw NAND with host BCH, no SD fallback (settled November 11). Part and capacity still open |
 | PL-04 | S1 | P | The recovered KiCad design is not the system that works |
 | PL-05 | S1 | P | Missing primary documents and tooling. The user prefers DipTrace; feasibility to be tested |
 | PL-06 | S2 | P | STM32N6 main/AUX sequencing, shutdown order and rail limits |
@@ -207,7 +207,9 @@ Parts in this footprint differ in page size (2 KiB or 4 KiB) and in the correcti
 
 In September JLCPCB's library held the Micron serial part and the old 3.3 V parallel part, but no 1.8 V parallel part was confirmed there. Like the MCU, it would be sourced through a distributor.
 
-**Still needed.** Agreement on parallel NAND with host BCH, and a live stock check before a part is named.
+**Settled November 11.** The user agreed: parallel NAND with host BCH ([owning note](../decisions/NOTES.md#2026-11-11--parallel-raw-nand-with-host-bch-on-the-custom-pcb)).
+
+**Still needed.** A live stock check before a part and capacity are named.
 
 ### PL-04 · The recovered KiCad design is not the system that works
 

@@ -16,7 +16,8 @@ charger**. No further Nucleo power experiments precede layout. The purpose of
 the next board spin is to **execute all available power-saving strategies**,
 including power-efficient storage, probably raw NAND. The longest exposure
 may be reduced to **0.5 s** on coin cells if necessary, possibly depending on
-temperature. Storage is **raw NAND only, with no SD card and no fallback**;
+temperature. Storage is **parallel raw NAND with host BCH error correction,
+with no SD card and no fallback**;
 extensive firmware change is accepted. The RTC is the **RV-3032**. Cell count,
 the power tree, the NAND type and the measured power budget remain open.
 [Owning note](docs/power/NOTES.md#2026-11-11--design-the-pcb-for-standard-cr2032-cells-at-50-f-without-further-nucleo-power-experiments),
