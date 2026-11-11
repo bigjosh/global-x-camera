@@ -894,3 +894,105 @@ test predates this selector change; no new source-transfer or capture
 qualification is claimed. USB tap remains the documented protected SB12.1
 takeoff unless subsequently changed. Exact final PCB source-control circuit
 and part qualification remain implementation work.
+
+## 2026-11-11  Design the PCB for standard CR2032 cells at 50 F without further Nucleo power experiments
+
+**Why:** in the PL-01 punch-list discussion the user set the battery inputs for
+the custom PCB. The camera should work down to 50 F (10 C), with colder
+operation a welcome bonus. The maximum rate is one shot per second. Cells are
+standard, for example Energizer CR2032; the user chose CR2032 as the most
+widely available primary cell that fits the 5 mm thickness, and remains open
+to other suggestions, including a mechanical generator drive. CR2032 holders
+go on this board spin, accepting that they may prove unusable. Moving to five
+cells is acceptable if they physically fit. No charger. The user's reply
+wrote "5xcr3032"; whether that meant CR2032 or the 30 mm CR3032 is not yet
+confirmed.
+
+**Rejected:** running further power experiments on the present Nucleo before
+layout. The user judges the hacked Nucleo with an SD card too different in
+power use from a custom board for more data to be worth taking. This
+withdraws the four measurements proposed in the punch list on November 11
+(SD card current, cell pulse resistance, baseline collapse resistance and
+per-rail currents); it is not a finding that those quantities are known.
+Also rejected: an on-board charger.
+
+**Evidence:** direct user reply, November 11, in the PCB readiness review;
+[punch-list item PL-01](../review/2026-11-10-pcb-readiness-punch-list.md).
+The four- versus five-cell power ceilings, the 1.4x resistance factor
+assumed for 50 F, the custom-board power figures and the 16.5 V input
+rating recorded there are the reviewing assistant's model and inference,
+not user decisions or measurements. Cell count, a LiPo connection alongside
+the holders and CR2025 compatibility remain open. No bench operation,
+firmware change or CAD change accompanied this entry.
+
+## 2026-11-11  Five cells means CR2032; a LiPo may take the holder space; explore custom-board savings
+
+**Why:** the user confirmed that "5xcr3032" in the earlier reply was a typo
+for five CR2032. If the cells prove unusable, the CR2032 holders can be left
+unfitted and that board area used for a LiPo instead. The user also states an
+expectation that a custom board offers further power savings, naming a
+specific low-power NAND, running everything except the sensor's 2.8 V rail
+from a 1.8 V buck output, and slowing the MCU to match its input data
+streams, and asked for ways to reduce peak current to be explored.
+
+**Rejected:** reading the earlier reply as a request for 30 mm CR3032 cells;
+fitting LiPo and coin cells side by side as a requirement. Not rejected or
+selected: any particular power tree, NAND part or clocking scheme. The
+exploration is an estimate to discuss, not a design decision.
+
+**Evidence:** direct user reply, November 11;
+[first peak-power exploration](custom-pcb-peak-power.md) and its
+[calculation](../../tools/estimate_custom_pcb_peak_power.py). The
+exploration's figures are the reviewing assistant's model from datasheet
+typical values with marked assumptions; it found the 1.8 V main rail worth
+little on power alone, and the sensor-core LDO, NAND in place of SD and MCU
+sleep during page programming worth more. No bench operation, firmware
+change or CAD change.
+
+## 2026-11-11  The armed sensor is a sustained load, so long exposures set the coin-cell limit
+
+**Why:** the user supplied the VD56G3 datasheet (DS12968 Rev 12, now stored).
+Its Table 13 gives 97 mW typical in follower mode at 0 fps, 120 mW at 30 fps
+and 145 mW at 60 fps; Table 14 gives maxima of 11 mA, 86 mA and 25 mA on the
+1.8 V, 1.15 V and 2.8 V rails. A sensor that is ready to stream but reading
+out no frame therefore draws about two-thirds of its full streaming power.
+Exposure can be set up to one second, so the exposure itself is a sustained
+load of roughly 0.15 W at the pack on an efficient board, not a brief burst.
+On the review's source model that is 72-95% of what four standard CR2032
+sustain at 50 F and 57-76% for five.
+
+**Rejected:** treating the whole capture as a 22 ms burst that a small
+reservoir can carry; assuming sensor power falls to its standby level while
+integrating. Not established: that integration draws exactly the 0 fps
+figure. The datasheet states the follower-mode figure, and its application to
+a long exposure is the reviewing assistant's inference. The short-form
+datasheet has no register detail, so whether a lower PLL or link rate reduces
+the armed current is unknown.
+
+**Evidence:** [VD56G3 datasheet](../../datasheets/camera/VD56G3_DS12968_datasheet.pdf),
+Tables 13 and 14, Figures 23 and 24; [peak-power exploration](custom-pcb-peak-power.md)
+and its [calculation](../../tools/estimate_custom_pcb_peak_power.py).
+The pack-side figures are a model with marked assumptions, not measurements.
+The user also noted that the ST promodule is expected to be required;
+[owning note](../prototype/NOTES.md#2026-11-11--keep-the-st-promodule-as-the-camera-for-the-custom-pcb).
+No bench operation, firmware change or CAD change.
+
+## 2026-11-11  The longest exposure may be cut to 0.5 s, possibly by temperature
+
+**Why:** the stored sensor datasheet shows that an armed sensor is a sustained
+load, which makes long exposures the limiting case on coin cells. The user
+answered that the maximum exposure time can be reduced to 0.5 s if necessary,
+and that the restriction could depend on temperature, since temperature is
+known from the RTC. The user's reply names an RV3032; the recovered design
+carries an RV-3028-C8, so the RTC part is to be confirmed.
+
+**Rejected:** treating one-second exposure on coin cells at 50 F as a fixed
+requirement that the power source must meet regardless. D-39's exponential
+curve to 1 s is not withdrawn; it may be shortened on coin cells when needed.
+Not decided: the threshold, or whether the limit is sensed by temperature, by
+loaded pack voltage, or both. A shorter exposure does not lower the sustained
+power; it shortens how long the cells must hold it.
+
+**Evidence:** direct user reply, November 11; [peak-power exploration](custom-pcb-peak-power.md);
+[punch-list items PL-01 and PL-16](../review/2026-11-10-pcb-readiness-punch-list.md).
+No hardware, firmware or CAD change.

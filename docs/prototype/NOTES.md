@@ -303,3 +303,56 @@ C02 BOM; or describing the original schematic as our modified as-built board.
 schematic and manufacturing ZIP match those historical hashes; all copied
 vendor files have provenance records and verified content/archive integrity.
 No firmware, hardware or instrument operation accompanies this publication.
+
+## 2026-11-11  Keep the ST promodule as the camera for the custom PCB
+
+**Why:** during the PCB readiness review the user noted "I think we have to
+use the promodule". The custom PCB is therefore planned around the complete
+CAM-6G3-073CLR module rather than a bare VD56G3 with separately sourced
+optics. This fixes the module's 4.68 mm height, its 30-pin flex connector and
+the need for the host board to supply all three sensor rails and the clock.
+
+**Rejected:** planning this board spin around a bare sensor and custom lens to
+recover thickness or power. The earlier VD5943/custom-optics direction stays a
+future direction and is not reopened here. The user's wording is a working
+constraint ("I think"), not a statement that no alternative can ever exist.
+
+**Evidence:** direct user note, November 11, in the PCB readiness review;
+[punch-list items PL-09 and PL-12](../review/2026-11-10-pcb-readiness-punch-list.md).
+That the module carries no regulators is the repository's second-hand record
+of ST's module documents, which are still not stored locally. No hardware,
+firmware or CAD change.
+
+## 2026-11-11  The RTC for the custom PCB is the RV-3032
+
+**Why:** the user named the RV3032 as the source of temperature for a possible
+exposure limit, and confirmed on request that the RV-3032 is the intended RTC.
+The recovered design carries an RV-3028-C8, which that choice replaces for the
+custom PCB.
+
+**Rejected:** carrying the RV-3028-C8 forward by default from the recovered
+schematic. Not decided: the backup supply arrangement, pins, or whether the
+accelerometer is on this board spin.
+
+**Evidence:** direct user replies, November 11, in the PCB readiness review;
+[punch-list item PL-19](../review/2026-11-10-pcb-readiness-punch-list.md).
+No RV-3032 datasheet is stored yet, so its backup current, temperature
+accuracy and footprint are unverified here. No hardware, firmware or CAD
+change.
+
+## 2026-11-11  Include an orientation sensor, sized for four-way sensing, and cut it first
+
+**Why:** the user decided to add the accelerometer to the custom PCB but to be
+ready to cut it if other constraints require. The user noted that camera
+orientation is only needed to within 90 degrees in the plane of the sensor,
+which leaves many options beyond a three-axis accelerometer.
+
+**Rejected:** leaving orientation off this spin by default; treating a full
+accelerometer as a hard requirement. Not decided: the sensing part. The
+recovered design's LIS2DW12 with its own load switch and I2C bus is one
+candidate, not a selection.
+
+**Evidence:** direct user note, November 11, in the PCB readiness review;
+[punch-list item PL-19](../review/2026-11-10-pcb-readiness-punch-list.md);
+earlier finding ACC-001 on the accelerometer's start-up time. No hardware,
+firmware or CAD change.

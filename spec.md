@@ -7,6 +7,22 @@
 
 Current decisions and their remaining implementation boundaries are indexed in the [project decision register](docs/decisions/2026-10-13-project-baseline.md). This specification defines the current requirements; explicitly historical circuit descriptions preserve the unchanged CAD evidence.
 
+**November 11 custom-PCB power-source inputs:** the PCB is designed for
+standard CR2032 cells (for example Energizer), operating down to **50 °F
+(10 °C)** with colder operation a bonus, at **at most one shot per second**.
+CR2032 holders are included on the next board spin, accepting that they may
+prove unusable; a fifth cell is acceptable if it fits; there is **no
+charger**. No further Nucleo power experiments precede layout. The purpose of
+the next board spin is to **execute all available power-saving strategies**,
+including power-efficient storage, probably raw NAND. The longest exposure
+may be reduced to **0.5 s** on coin cells if necessary, possibly depending on
+temperature. Storage is **parallel raw NAND with host BCH error correction,
+with no SD card and no fallback**;
+extensive firmware change is accepted. The RTC is the **RV-3032**. Cell count,
+the power tree, the NAND type and the measured power budget remain open.
+[Owning note](docs/power/NOTES.md#2026-11-11--design-the-pcb-for-standard-cr2032-cells-at-50-f-without-further-nucleo-power-experiments),
+[review item PL-01](docs/review/2026-11-10-pcb-readiness-punch-list.md).
+
 **November10 USB HOLD requirement:** once VBUS selects USB mode, HOLD
 must be LOW before USB loading and remain off through service, faults,
 shutdown refusal and unexpected WFI return. Ambiguous/failed VBUS samples
