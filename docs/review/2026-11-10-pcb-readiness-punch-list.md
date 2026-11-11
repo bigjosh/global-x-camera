@@ -19,7 +19,7 @@
 
 | ID | Sev | Type | Item |
 |---|---|---|---|
-| PL-01 | S1 | C | Energy source: no numeric target defines "CR2032-viable", and the PCB input stage depends on it |
+| PL-01 | S1 | C | Energy source and the CR2032 budget. Inputs settled November 11; cell count still open |
 | PL-02 | S1 | C | What this board spin is for, and what is on it |
 | PL-03 | S1 | C | Storage medium on the PCB (SD, SPI NAND or both) |
 | PL-04 | S1 | P | The recovered KiCad design is not the system that works |
@@ -85,19 +85,42 @@ For comparison the pack itself is about 57 Ω fresh for short loads, about 120 �
 - Storage choice (PL-03) matters as much as the regulators: the save lasts hundreds of milliseconds, where the higher 2-second resistance applies, and only the NAND row clears it with margin.
 - Depth of discharge is not the limiter. Four cells hold about 9,500 J; 20,000 shots at 0.1 J use about a fifth of that. Temperature, cell brand and shelf age are the derating factors that matter.
 
-**Proposed target, for discussion.** Define "CR2032-viable" as a bench test rather than a current figure: the camera completes a set number of cold capture-and-save cycles from a 12.0 V supply through a series resistor R. I propose R = 120 Ω to pass and 160 Ω as the stretch. In power terms that is a sustained pack draw of about 0.2 W or less, with any short burst above it carried by the reservoir. The same test runs on the Nucleo today and on the PCB later, and the largest R that still passes is a single number to track.
+**Settled by the user, November 11** ([owning note](../power/NOTES.md#2026-11-11--design-the-pcb-for-standard-cr2032-cells-at-50-f-without-further-nucleo-power-experiments)):
+- Work down to 50 °F (10 °C); colder is a bonus.
+- At most one shot per second.
+- Standard cells, for example Energizer CR2032. The CR2032 was chosen as the most widely available primary cell that fits the 5 mm thickness. Other suggestions, including a mechanical generator, remain welcome.
+- CR2032 holders go on this spin, accepting that they may prove unusable.
+- A fifth cell is acceptable if it physically fits.
+- No charger.
+- No further power experiments on the Nucleo before layout: it differs too much from a custom board for more data to be worth taking. The four measurements proposed here on November 11 are withdrawn; the PCB itself is the experiment.
 
-**Recommendation.**
-1. Agree the test and the value of R.
-2. Before layout, take four measurements:
-   - SD card current during a save (meter in the card's supply lead). It has never been measured and decides PL-03.
-   - Pulse resistance of the actual cells at about 20 ms and 500 ms, at room temperature and cold.
-   - The collapse resistance of today's prototype, as the baseline.
-   - Per-rail currents: core at CN12 (R40), main 3.3 V at R102, auxiliary 3.3 V at R115.
-3. Design the input stage for roughly 3–15 V so the same board runs from the LiPo now and from 4×CR2032 when the test passes. The LTC3621 already studied covers 2.7–17 V with 0.1 µA typical (1 µA maximum) shutdown current, a 0.8 ms soft start and full dropout operation.
-4. Keep one alternative cell as a fallback: thin Li-MnO2 pouch cells (for example CP224147, 3 V, about 750–800 mAh, about 2.2 mm thick) are listed at 200–400 mA pulses with primary-cell shelf life. Figures are from distributor listings and need checking against a maker's datasheet.
+**Design case at 50 °F (my model).** Per-cell resistance: 14 Ω for short loads (the October 28 trace) and 30–40 Ω for 2-second loads (Energizer typical, fresh to half used), both multiplied by 1.4 for 50 °F. The 1.4 is my assumption; the repo holds no temperature data and the vendor sites could not be reached from this session. "Usable" is 70% of the ceiling.
 
-**Need from you.** The value of R, which really means the worst cell condition that must still fire (minimum temperature, how used); how many shots in a row at one per second; any standard CR2032 or a named high-drain part; whether this spin must run from CR2032 or only pass the bench test on the way; and confirmation that no on-board charger is wanted.
+| Pack | Capture burst: ceiling / usable | Save: ceiling / usable |
+|---|---:|---:|
+| 4 cells, fresh | 0.46 / 0.32 W | 0.21 / 0.15 W |
+| 4 cells, half used | 0.34 / 0.24 W | 0.16 / 0.11 W |
+| 5 cells, fresh | 0.57 / 0.40 W | 0.27 / 0.19 W |
+| 5 cells, half used | 0.43 / 0.30 W | 0.20 / 0.14 W |
+
+Against the custom-board model above (capture 0.27–0.34 W; SD save 0.27–0.34 W typical; NAND save 0.15–0.21 W):
+- **Capture** is inside the ceiling on four cells with little margin. A switched-side reservoir of order 100 µF, or a fifth cell, gives the margin.
+- **An SD save** exceeds the ceiling on four cells and is marginal at best on five.
+- **A NAND save** sits at the ceiling on four cells and inside it on five, provided the MCU's awake power lands at the low end of the model. That number is the largest unknown.
+
+The ceiling scales with the total face area of the cells, whatever their size or connection. Five CR2032 give 25% more than four.
+
+**Consequences for this spin.**
+- Rate the input for five fresh cells, 16.5 V. The LTC3621 studied earlier is limited to 17 V and is too close; a part rated 20 V or more is needed. Four cells alone would fit it.
+- Lay out four cell positions, plus a fifth with a bypass link if placement allows. In board cutouts at about 22 mm pitch, four cells take about 42% of the card and five about 59% (PL-12).
+- Keep a LiPo connection as the working source, selected by a link so the two are never joined.
+- Include the reservoir footprint.
+- When the board exists, "CR2032-viable" is tested with real cells at 50 °F, or from a bench supply through a series resistor. On the model above that resistor is about 170 Ω for four fresh cells and 225 Ω half used.
+
+**Still open.**
+- Four positions or five. Decide in the placement study.
+- Whether "5xcr3032" in the user's reply meant CR2032 or the 30 mm CR3032. Five CR3032 cover 76% of the card before any board between them and cannot fit; two can.
+- Whether holders should also accept the thinner CR2025 (2.5 mm), which is as widely sold and frees 0.7 mm of the thickness budget. Its pulse resistance against the CR2032 is unverified.
 
 ### PL-02 · What this board spin is for, and what is on it
 

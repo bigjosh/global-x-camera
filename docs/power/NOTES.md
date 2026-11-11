@@ -894,3 +894,33 @@ test predates this selector change; no new source-transfer or capture
 qualification is claimed. USB tap remains the documented protected SB12.1
 takeoff unless subsequently changed. Exact final PCB source-control circuit
 and part qualification remain implementation work.
+
+## 2026-11-11  Design the PCB for standard CR2032 cells at 50 F without further Nucleo power experiments
+
+**Why:** in the PL-01 punch-list discussion the user set the battery inputs for
+the custom PCB. The camera should work down to 50 F (10 C), with colder
+operation a welcome bonus. The maximum rate is one shot per second. Cells are
+standard, for example Energizer CR2032; the user chose CR2032 as the most
+widely available primary cell that fits the 5 mm thickness, and remains open
+to other suggestions, including a mechanical generator drive. CR2032 holders
+go on this board spin, accepting that they may prove unusable. Moving to five
+cells is acceptable if they physically fit. No charger. The user's reply
+wrote "5xcr3032"; whether that meant CR2032 or the 30 mm CR3032 is not yet
+confirmed.
+
+**Rejected:** running further power experiments on the present Nucleo before
+layout. The user judges the hacked Nucleo with an SD card too different in
+power use from a custom board for more data to be worth taking. This
+withdraws the four measurements proposed in the punch list on November 11
+(SD card current, cell pulse resistance, baseline collapse resistance and
+per-rail currents); it is not a finding that those quantities are known.
+Also rejected: an on-board charger.
+
+**Evidence:** direct user reply, November 11, in the PCB readiness review;
+[punch-list item PL-01](../review/2026-11-10-pcb-readiness-punch-list.md).
+The four- versus five-cell power ceilings, the 1.4x resistance factor
+assumed for 50 F, the custom-board power figures and the 16.5 V input
+rating recorded there are the reviewing assistant's model and inference,
+not user decisions or measurements. Cell count, a LiPo connection alongside
+the holders and CR2025 compatibility remain open. No bench operation,
+firmware change or CAD change accompanied this entry.

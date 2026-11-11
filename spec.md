@@ -7,6 +7,16 @@
 
 Current decisions and their remaining implementation boundaries are indexed in the [project decision register](docs/decisions/2026-10-13-project-baseline.md). This specification defines the current requirements; explicitly historical circuit descriptions preserve the unchanged CAD evidence.
 
+**November 11 custom-PCB power-source inputs:** the PCB is designed for
+standard CR2032 cells (for example Energizer), operating down to **50 °F
+(10 °C)** with colder operation a bonus, at **at most one shot per second**.
+CR2032 holders are included on the next board spin, accepting that they may
+prove unusable; a fifth cell is acceptable if it fits; there is **no
+charger**. No further Nucleo power experiments precede layout. Cell count,
+the alternative working source and the measured power budget remain open.
+[Owning note](docs/power/NOTES.md#2026-11-11--design-the-pcb-for-standard-cr2032-cells-at-50-f-without-further-nucleo-power-experiments),
+[review item PL-01](docs/review/2026-11-10-pcb-readiness-punch-list.md).
+
 **November 10 prototype hardware update:** a 500 mAh LiPo feeds Q1 and the
 2.2 Ω R0. A separate SPDT source selector connects either R0 output or USB
 power to CN5.5/5V, common ground CN5.6; it replaces the prototype's Q3
