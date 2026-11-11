@@ -139,3 +139,45 @@ and unexpected WFI return retain/reassert HOLD; PA2's WKUP2 source is disabled.
 `test_shutdown.py` and [the offline candidate](evidence/2026-11-09-a3-hold/README.md).
 The user confirmed the board is disconnected for assembly; no instrument,
 NOR, SD, live recovery allowlist or installed-firmware state was changed.
+
+
+## 2026-11-10  Keep HOLD off after USB mode selection
+
+**Why:** the user requires HOLD to remain deasserted in USB mode so removing
+USB cannot leave the camera latched onto the battery. After the real VBUS
+sample, the selector drives A3/PA2 LOW before loading USB code whenever VBUS
+is present or the result is ambiguous/failed. The USB application also drives
+it LOW on entry, including standalone RAM entry, and never reasserts it in
+normal service, faults, refused shutdown or an unexpected WFI return. The
+battery capture path keeps its existing early HOLD and final release behavior.
+
+**Rejected:** waiting for USB disconnect polling to release HOLD, asserting
+HOLD for USB initialization or error recovery, or retaining the capture
+shutdown rule that reasserts on WFI return inside the USB application. This
+supersedes the November9 USB-HOLD policy. Release must occur after
+`usb_vbus_sample()` returns because that routine restores its entry GPIOA
+MODER/PUPDR; releasing before it would restore the old HIGH output state.
+Canonical PA2 packages reject `--force-capture` rather than allowing a
+USB-present run into capture code that may reassert HOLD. The legacy
+diagnostic override remains historical-only and cannot hide a failed or
+ambiguous VBUS sample.
+
+**Evidence:** the November10 user correction; `selector.c`, `main.c`,
+`shutdown.c`, package-contract checks and the offline boot/shutdown tests.
+The [offline candidate and qualification](evidence/2026-11-10-usb-hold-off/README.md)
+preserve the unchanged capture payload and early UART bytes separately from
+the corrected USB policy.
+The early boot hook, UART recovery park and E001 selector-load failure occur
+before USB classification and still retain provisional HIGH. This is not a
+claim of zero HOLD pulse whenever a USB cable is physically attached; literal
+no-pulse behavior would need earlier validated source detection. The
+post-memory ADC path is retained rather than changing the checked early UART
+guard or battery takeover timing. Corrected firmware is offline and not
+installed; the November9 installed package still holds HIGH through USB.
+
+SW2 USB selection bypasses the latch. With HOLD off, removing that source may
+cut power immediately during a transfer or explicit deletion; software
+cleanup runs only while power remains. No battery hold-up, seamless handover
+or power-loss-atomic deletion is established. The prior manual latch test
+does not qualify the new USB behavior. No instrument, NOR, SD or live
+recovery allowlist operation accompanies this correction.

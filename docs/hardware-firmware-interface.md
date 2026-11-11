@@ -22,7 +22,24 @@ JS output-OFF checkpoint is historical; the user retains bench control.
 
 **November 10 power contract:** the current prototype retains the [LiPo SPDT capacitor latch](power/2026-10-14-power-tree-review.md#november-7-lipo-button-and-pd7-hold-wiring), replacing the older LTC/divider implementation below. The user removed the USB-controlled battery-cutoff MOSFET Q3 and installed a separate **manual source selector SW2**: one throw receives USB power, the other receives **LiPo → Q1 → R0 / 2.2 Ω**, and COM feeds **CN5.5 / 5V** (through JS when measuring). Q1 source and R1 high end now connect directly to LiPo+. USB and battery branches are selected rather than joined; R0 remains battery-only. Use a break-before-make selector so the sources are not briefly tied together; the installed switch's contact timing is not reported. Retention/removal of the former USB-branch diode was not specified. **The PCB version will use automatic MOSFET source control instead of this manual switch.**
 
-**PA2 / Arduino A3 / CN4.4** must remain HIGH from the earliest custom boot code through capture/save, USB service, error blinks and UART recovery, then become input/no-pull immediately before final Standby. R2=100 kΩ pulls Q2 off; C1/C2/D1/R4 are omitted by choice; PA2 connects directly to Q2 gate. SW1 remains the separate momentary trigger with C3=2.2 µF and R5=1 kΩ reset, so a held trigger eventually permits power-off after HOLD releases; it is not a firmware-hang timeout. Historical runs support a 30 ms takeover allowance, not a new A3/latch measurement. The [historical timing evidence](../firmware/capture-raw/evidence/2026-11-08-spdt-hold/README.md) remains separate from the installed November9 A3 build. Both NOR regions matched readback, and GPIO/ADC/UART smoke tests passed on direct5V. The subsequent manual missing-sensor cycle confirms functional latch cutoff; exact takeover, release and rail timing still need measurement. AUX-before-main timing is not established by this circuit.
+**PA2 / Arduino A3 / CN4.4 — November10 HOLD policy:** provisional HIGH
+begins at the earliest custom boot code and remains through the unchanged
+pre-selection UART guard. A measured cable-absent branch keeps HIGH through
+battery capture/save/error display, then selects input/no-pull before Standby.
+Once VBUS is present or its sample is ambiguous/failed, the selector drives
+PA2 LOW before USB loading or diagnostic parking. USB code keeps it off in
+service, faults, refused shutdown and unexpected WFI return. E001 before the
+selector can sample VBUS remains a pre-selection HIGH park. This does not
+claim zero boot-time assertion whenever a USB cable is attached. The new USB
+policy is **offline, not installed**; the November9 image still holds HIGH
+through USB. [Owning decision](../firmware/usb-ptp/NOTES.md#2026-11-10--keep-hold-off-after-usb-mode-selection).
+
+R2=100 kΩ pulls Q2 off; C1/C2/D1/R4 remain omitted and PA2 connects directly
+to Q2 gate. SW1 retains C3=2.2 µF/R5=1 kΩ. The prior manual missing-sensor
+test confirms the battery latch function, not new USB behavior or rail
+ordering. SW2 USB power bypasses the latch; with HOLD off, unplug can remove
+power during a host operation without waiting for cleanup. No seamless
+handover or power-loss-atomic deletion is implied.
 
 **Updated: October 14, 2026.** Current behavior follows the [project decision register](decisions/2026-10-13-project-baseline.md), [specification](../spec.md) and [power implementation study](../power.md). Accepted behavior is not implemented or measured firmware. The existing firmware design still needs integration; its absence does not block justified hardware corrections.
 

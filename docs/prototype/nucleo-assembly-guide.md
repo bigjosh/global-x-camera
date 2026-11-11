@@ -1,5 +1,10 @@
 # Nucleo prototype: consolidated modification and wiring guide
 
+**November10 USB HOLD correction:** USB mode must keep A3 LOW after VBUS
+detection; the battery capture and early recovery paths retain HOLD.
+The [corrected package is built/tested offline, not installed](../../firmware/usb-ptp/evidence/2026-11-10-usb-hold-off/README.md).
+The November9 installed firmware still asserts HOLD in USB mode.
+
 **November 10 canonical assembly:** the [complete LiPo/USB/SPDT diagram](../power/lipo-latch-wiring.svg) and [exact connections](../power/2026-10-14-power-tree-review.md#november-7-lipo-button-and-pd7-hold-wiring) supersede the historical LTC/RUN path below. The user removed USB-controlled battery-cutoff Q3 and installed **manual source selector SW2**: one throw receives USB power, the other the output of **LiPo → Q1 → 2.2 ohm R0**, and COM feeds **CN5.5 / 5V** (through JS when measuring). Q1 source and R1 high end connect directly to LiPo+; the two supply branches are not merged. Automatic MOSFET source selection is retained for the PCB version instead of SW2. SW1 remains the separate momentary capacitor trigger. Use C3=2.2uF, R5=1kohm, R1/R2=100kohm, and no C1/C2/D1/R4. Q3/R6 are no longer part of the prototype plan; the former USB diode's retention/removal was not reported. Common ground remains CN5.6. **HOLD is A3/CN4.4/PA2 directly to Q2 gate.**
 
 Exposure uses adjacent **A0/CN4.1/PF5 LOW, A1/CN4.2 buffered PA9/ADC1 channel10 wiper, A2/CN4.3/PF6 HIGH**; leave A1 companion PC10 input/no-pull. The added **ASA / analog-gain knob** has high end **A4/CN4.5/PC12**, low end **GND**, and wiper **A5/CN4.6 → buffered PG15/ADC1 channel7**. Future firmware will excite A4 during sampling and keep PH2/A5 input/no-pull; ASA sampling and gain integration are not implemented yet. Keep SB6 and default SB5/SB3 fitted, SB4/SB2 open; no GPIO-bank conversion is part of this current SD/control assembly. See the [full control table](../hardware-firmware-interface.md#current-behavior-and-firmware-contract).

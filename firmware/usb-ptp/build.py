@@ -26,9 +26,9 @@ def main():
  def sym(n):return int(re.search(r'^([0-9a-f]+) [A-Za-z] '+n+'$',symbols,re.M)[1],16)
  code=(out/'usb.bin').read_bytes()
  frozen=out/'source'
- for source in src+[HERE/'usb.ld',HERE/'build.py',HERE/'ptp.h',HERE/'shutdown.h',HERE/'storage/photo_store.h',HERE/'transport/usb_ptp_transport.h',HERE/'transport/usbd_conf.h',HERE/'thumbnail/thumbnail_bmp.h',ROOT/'firmware/sd-storage/sd_card.h']:
+ for source in src+[HERE/'usb.ld',HERE/'build.py',HERE/'ptp.h',HERE/'shutdown.h',HERE/'usb_hold.h',HERE/'storage/photo_store.h',HERE/'transport/usb_ptp_transport.h',HERE/'transport/usbd_conf.h',HERE/'thumbnail/thumbnail_bmp.h',ROOT/'firmware/sd-storage/sd_card.h']:
   target=frozen/source.relative_to(ROOT);target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(source.read_bytes())
- m=dict(schema=1,kind='usb-ptp-ram',load=0x34300000,entry=sym('usb_entry')|1,park=sym('usb_park'),proof=0x343F8000,proof_words=64,request=0x343F7F00,stack=0x343F0000,bss_start=sym('__bss_start__'),bss_end=sym('__bss_end__'),bytes=len(code),sha256=hashlib.sha256(code).hexdigest(),flags=flags,sources={str(f.relative_to(ROOT)):hashlib.sha256(f.read_bytes()).hexdigest() for f in src+[HERE/'usb.ld']})
- m['gpio_hold']=dict(schema=1,port='GPIOA',pin=2,header='Arduino A3 / CN4.4',shutdown_proof_schema=2,release='input-no-pull-immediately-before-wfi',uart_recovery='PE6-unchanged')
+ m=dict(schema=1,kind='usb-ptp-ram',load=0x34300000,entry=sym('usb_entry')|1,park=sym('usb_park'),proof=0x343F8000,proof_words=64,request=0x343F7F00,stack=0x343F0000,bss_start=sym('__bss_start__'),bss_end=sym('__bss_end__'),bytes=len(code),sha256=hashlib.sha256(code).hexdigest(),flags=flags,sources={str(f.relative_to(ROOT)):hashlib.sha256(f.read_bytes()).hexdigest() for f in src+[HERE/'usb.ld',HERE/'usb_hold.h']})
+ m['gpio_hold']=dict(schema=2,port='GPIOA',pin=2,header='Arduino A3 / CN4.4',mode='usb-off',shutdown_proof_schema=3,release='low-from-usb-selection-input-no-pull-at-wfi',uart_recovery='PE6-unchanged')
  (out/'manifest.json').write_text(json.dumps(m,indent=2)+'\n',encoding='utf-8');print(json.dumps(m,indent=2))
 if __name__=='__main__':main()

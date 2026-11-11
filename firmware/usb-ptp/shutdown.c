@@ -1,6 +1,7 @@
 /* USB-only terminal teardown. Standby guards are adapted from
  * capture-sd/low_power/completion.c and capture-raw/error_signal.c; the final
- * HOLD/WFI/reassert bytes match capture-raw/gpio_hold_transform.py exactly.
+ * HOLD stays LOW in USB service/refusal and floats at the terminal WFI.
+ * An unexpected return keeps it OFF; only battery capture may assert HOLD.
  * The capture success record is deliberately NOT reused or forged here.
  * No live USB/SD operation may call this code, including from an IRQ.
  */
@@ -15,9 +16,8 @@ _Static_assert(offsetof(GPIO_TypeDef,MODER)==0U,"HOLD MODER offset");
 _Static_assert(offsetof(GPIO_TypeDef,PUPDR)==12U,"HOLD PUPDR offset");
 _Static_assert(offsetof(GPIO_TypeDef,BSRR)==24U,"HOLD BSRR offset");
 #endif
+#include "usb_hold.h"
 
-#define HOLD (1UL<<2)
-#define HOLD_MODE (3UL<<4)
 #define LEDS ((1UL<<10)|(1UL<<8)|1UL)
 #define LED_MODES ((3UL<<20)|(3UL<<16)|3UL)
 #define SD_MODES ((3UL<<0)|(3UL<<4)|(3UL<<6)|(3UL<<8)|(3UL<<10))
@@ -44,25 +44,20 @@ static void publish(uint32_t state)
     S.checksum=hash; __DMB(); S.seal=USB_SHUTDOWN_SEAL; __DSB();
 }
 
-static int assert_hold(void)
+static int release_hold(void)
 {
+    int off=usb_hold_off();
     if(!(RCC->AHB4ENR&RCC_AHB4ENR_GPIOAEN) ||
        (RCC->AHB4RSTR&RCC_AHB4RSTR_GPIOARST)) return 0;
-    GPIOA->BSRR=HOLD; /* preload HIGH before changing mode */
-    GPIOA->OTYPER&=~HOLD; GPIOA->PUPDR&=~HOLD_MODE;
-    GPIOA->MODER=(GPIOA->MODER&~HOLD_MODE)|(1UL<<4); __DSB();
     S.hold_moder=GPIOA->MODER; S.hold_pupdr=GPIOA->PUPDR;
     S.hold_odr=GPIOA->ODR; S.hold_idr=GPIOA->IDR;
-    return (S.hold_moder&HOLD_MODE)==(1UL<<4) &&
-           !(S.hold_pupdr&HOLD_MODE) && !(GPIOA->OTYPER&HOLD) &&
-           (S.hold_odr&HOLD) && (S.hold_idr&HOLD);
+    return off;
 }
 
 __attribute__((noreturn,noinline)) static void refuse(uint32_t error,uint32_t state)
 {
-    /* Retain/reassert HOLD when its register bank is accessible; never release
-     * it on a failed guard. A failed physical HIGH readback remains a failure. */
-    S.error=error; S.hold_verified=(uint32_t)assert_hold();
+    /* A failed USB shutdown must not fall back to battery power. */
+    S.error=error; S.hold_verified=(uint32_t)release_hold();
     SCB->SCR&=~(SCB_SCR_SLEEPDEEP_Msk|SCB_SCR_SLEEPONEXIT_Msk|SCB_SCR_SEVONPEND_Msk);
     publish(state);
 #ifdef USB_SHUTDOWN_HOST_TEST
@@ -187,24 +182,21 @@ __attribute__((noreturn,noinline)) void usb_shutdown_enter(uint32_t prerequisite
     REQUIRE((S.apb4enr2&RCC_APB4ENR2_BSECEN) &&
             (S.ahb4enr&(GPIO_CLOCKS|RCC_AHB4ENR_PWREN))==(GPIO_CLOCKS|RCC_AHB4ENR_PWREN) &&
             !(S.ahb4rstr&(GPIO_RESETS|RCC_AHB4RSTR_PWRRST)),USB_SHUTDOWN_BAD_CLOCKS);
-    S.hold_verified=(uint32_t)assert_hold();
+    S.hold_verified=(uint32_t)release_hold();
     REQUIRE(S.hold_verified,USB_SHUTDOWN_HOLD_UNAVAILABLE);
     peripherals_off(); publish(USB_SHUTDOWN_PERIPHERALS_OFF);
     prepare_standby(); publish(USB_SHUTDOWN_ARMED);
 #ifdef USB_SHUTDOWN_HOST_TEST
     usb_shutdown_test_hold_wfi();
 #else
-    /* Keep this contiguous, reviewed Thumb-2 group byte-identical to the
-     * capture HOLD sequence. No logging/call can occur after PA2 floats. */
+    /* HOLD is already LOW. Float only PA2 immediately before WFI; there is
+     * deliberately no battery-HOLD assertion if WFI unexpectedly returns. */
     __asm volatile(
         ".global usb_shutdown_hold_release\nusb_shutdown_hold_release:\n"
         "movw r0, #0x0000\nmovt r0, #0x5602\n"
         "ldr.w r1, [r0, #12]\nbic.w r1, r1, #0x30\nstr.w r1, [r0, #12]\n"
         "ldr.w r1, [r0]\nbic.w r1, r1, #0x30\nstr.w r1, [r0]\n"
         "dsb sy\nisb sy\n.global usb_shutdown_wfi\nusb_shutdown_wfi:\nwfi\n"
-        ".global usb_shutdown_hold_reassert\nusb_shutdown_hold_reassert:\n"
-        "mov.w r1, #0x04\nstr.w r1, [r0, #24]\n"
-        "ldr.w r1, [r0]\nbic.w r1, r1, #0x30\norr.w r1, r1, #0x10\nstr.w r1, [r0]\ndsb sy\n"
         ".global usb_shutdown_hold_end\nusb_shutdown_hold_end:\n"
         ::: "r0", "r1", "memory");
 #endif

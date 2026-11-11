@@ -4,6 +4,21 @@ Read [NOTES.md](NOTES.md) at the root and in the relevant owning folder before c
 
 # Instrument access
 
+**November 10 USB HOLD correction — offline only, not installed:** the user
+requires HOLD OFF throughout USB mode to avoid battery takeover after cable
+removal. New selector code drives A3/PA2 LOW after VBUS sampling, before USB
+loading, and also on ambiguous VBUS. USB entry/fault/refused-shutdown and
+unexpected-WFI-return paths never assert it; terminal WFI floats it.
+All62 USB tests passed, including linked package/capture/UART preservation
+and native GPIO/fault models. [Candidate and evidence](firmware/usb-ptp/evidence/2026-11-10-usb-hold-off/README.md).
+Early boot/UART recovery and selector-load failure before VBUS classification
+still retain provisional HOLD; this is not a no-HIGH-pulse guarantee whenever
+a USB cable is physically present. Installed firmware remains the November9
+prefix `852bc7724a9fc0267fb37e3f93ba52f22137c65c55f2cece47d17dd352093084`,
+which still holds through USB. No instruments, NOR, SD or recovery allowlist
+were touched. **User still owns the bench.** Re-establish actual source,
+connections and ownership before installing/testing the new candidate.
+
 **Latest user hardware update — November 10, manual source selector and ASA knob:**
 the user removed the USB-controlled battery-cutoff MOSFET Q3 and installed a
 separate SPDT power selector (SW2): one throw receives USB power, the other

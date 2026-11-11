@@ -1,5 +1,14 @@
 # Global X Camera power design
 
+**November10 USB HOLD correction:** after VBUS detection, keep A3/PA2
+LOW before and throughout USB service, including faults and shutdown refusal
+or return. Ambiguous samples also release HOLD. The code is offline and not
+installed; the November9 package still holds HIGH in USB. Early boot/UART
+recovery and E001 before classification retain provisional HIGH for battery
+takeover. This is not a no-pulse-on-USB-attachment guarantee. USB removal can
+immediately remove power; no battery hold-up for cleanup is promised.
+[Owning decision](firmware/usb-ptp/NOTES.md#2026-11-10--keep-hold-off-after-usb-mode-selection).
+
 **November 10, 2026 superseding prototype plan:** 500 mAh LiPo → Q1 →
 2.2-ohm R0 → battery throw of a manual SPDT source selector SW2; USB power →
 other throw; COM → CN5.5/5V (optionally through JS for measurement), with

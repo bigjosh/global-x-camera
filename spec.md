@@ -7,14 +7,25 @@
 
 Current decisions and their remaining implementation boundaries are indexed in the [project decision register](docs/decisions/2026-10-13-project-baseline.md). This specification defines the current requirements; explicitly historical circuit descriptions preserve the unchanged CAD evidence.
 
+**November10 USB HOLD requirement:** once VBUS selects USB mode, HOLD
+must be LOW before USB loading and remain off through service, faults,
+shutdown refusal and unexpected WFI return. Ambiguous/failed VBUS samples
+also release before parking. Early boot/UART recovery and E001 before VBUS
+classification still retain provisional HIGH; the battery capture path is
+unchanged. This does not promise no startup pulse whenever a cable is
+attached. The corrected implementation is **offline, not installed**; the
+November9 image still holds HIGH through USB. With SW2 on USB, removing the
+cable may cut power during transfer/deletion; no battery-backed cleanup or
+atomic deletion is implied. [Owning policy](firmware/usb-ptp/NOTES.md#2026-11-10--keep-hold-off-after-usb-mode-selection).
+
 **November 10 prototype hardware update:** a 500 mAh LiPo feeds Q1 and the
 2.2 Ω R0. A separate SPDT source selector connects either R0 output or USB
 power to CN5.5/5V, common ground CN5.6; it replaces the prototype's Q3
 USB-controlled battery cutoff and wired source merge. The PCB version will
 implement **automatic MOSFET source control, not a physical selector**.
 Q1/Q2 and the momentary SPDT trigger remain: C3=2.2 µF, R5=1 kΩ, R1/R2=100 kΩ;
-C1/C2/D1/R4 omitted. A3/CN4.4/PA2 drives Q2 directly, asserts early and floats
-immediately before Standby. The November9 combined capture/USB firmware is
+C1/C2/D1/R4 omitted. A3/CN4.4/PA2 drives Q2 directly; battery capture asserts early and floats
+immediately before Standby, while USB follows the HOLD-off requirement above. The November9 combined capture/USB firmware is
 installed and readback-verified; the user confirmed missing-sensor error
 indication followed by latch cutoff with zero indicated current. Exact rail
 timing, LiPo margins and the new selector transitions remain unqualified.

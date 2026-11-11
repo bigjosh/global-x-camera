@@ -6,6 +6,12 @@ An STM32N6-based, credit-card-size monochrome global-shutter camera project. Thi
 
 ## Start here
 
+**November 10 USB HOLD correction — not yet installed:** USB mode now
+requires A3 HOLD LOW after VBUS detection, before loading the USB app, and
+through service/error/shutdown paths. Early pre-selection boot/UART recovery
+still uses provisional HIGH; battery capture is unchanged. The installed
+November9 image still holds through USB. [Policy and implementation status](firmware/usb-ptp/README.md).
+
 **Latest installed firmware (November 9):** the combined capture/USB package now
 uses A3/CN4.4/PA2 HOLD before the original UART guard and through operation.
 Both programmed NOR regions matched full readback. UART recovery passed after

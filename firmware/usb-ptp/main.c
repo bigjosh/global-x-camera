@@ -1,6 +1,7 @@
 #include "stm32n6xx_hal.h"
 #include "ptp.h"
 #include "shutdown.h"
+#include "usb_hold.h"
 #include "transport/usb_ptp_transport.h"
 #include "../sd-storage/sd_card.h"
 #include <string.h>
@@ -43,15 +44,14 @@ static int recover_card(void *unused){
  memset(&card,0,sizeof card);return sd_init(&card,25000000U)==SD_OK;
 }
 static void snapshot(void){P[8]=card.error;P[9]=card.error_stage;P[10]=card.error_command;P[11]=card.error_sta;P[12]=card.cleanup_error;P[13]=card.initialized;P[14]=card.media_idle;P[15]=card.clock_hz;P[16]=(uint32_t)card.sector_count;P[17]=photos.scanned_slots;P[18]=photos.known_objects;P[19]=usb_ptp_debug.init_error;P[20]=usb_ptp_debug.init_stage;P[21]=SCB->CFSR;P[22]=SCB->HFSR;P[23]=HAL_GetTick();}
-void usb_fault(void){P[2]=0xF000U|__get_IPSR();P[21]=SCB->CFSR;P[22]=SCB->HFSR;P[24]=SCB->BFAR;P[25]=SCB->MMFAR;__DSB();usb_park();}
+void usb_fault(void){(void)usb_hold_off();P[2]=0xF000U|__get_IPSR();P[21]=SCB->CFSR;P[22]=SCB->HFSR;P[24]=SCB->BFAR;P[25]=SCB->MMFAR;__DSB();usb_park();}
 void usb_main(void){
- /* A3/CN4.4/PA2 HOLD was asserted before the early UART guard. Reassert
-  * without a LOW glitch for RAM launches too; PA12's ADC branch stays Hi-Z. */
- RCC->AHB4ENSR=RCC_AHB4ENR_GPIOAEN;__DSB();GPIOA->BSRR=1U<<2;
- GPIOA->OTYPER&=~(1U<<2);GPIOA->OSPEEDR&=~(3U<<4);GPIOA->PUPDR&=~(3U<<4);
- GPIOA->MODER=(GPIOA->MODER&~(3U<<4))|(1U<<4);__DSB();
+ /* USB never holds the battery latch. Repeat the selector's release here
+  * before any app checks/SD work, including standalone RAM launches. */
+ int hold_off=usb_hold_off();
  for(unsigned i=0;i<64;i++)P[i]=0;
  P[0]=0x31505450;P[1]=1;P[2]=1;P[3]=Q[1];
+ if(!hold_off){P[2]=0xE007;usb_park();}
  CoreDebug->DEMCR|=CoreDebug_DEMCR_TRCENA_Msk;DWT->CTRL|=DWT_CTRL_CYCCNTENA_Msk;last_cycles=DWT->CYCCNT;
  P[4]=(uint32_t)ptp_stats;P[5]=(uint32_t)&usb_ptp_debug;P[6]=(uint32_t)ptp_log;P[7]=(uint32_t)&card;
  if(SCB->CCR&0x30000U||__get_CONTROL()||__get_IPSR()){P[2]=0xE001;usb_park();}

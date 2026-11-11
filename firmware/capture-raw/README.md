@@ -1,5 +1,11 @@
 # Packed RAW capture to fixed SD slots
 
+**November10 USB policy correction:** the HOLD behavior below belongs to
+battery capture and pre-selection recovery. The new combined USB candidate
+drives A3 LOW after VBUS detection and never reasserts it in USB mode.
+That correction is [built/tested offline, not installed](../usb-ptp/evidence/2026-11-10-usb-hold-off/README.md);
+the battery capture payload and early UART guard are unchanged.
+
 **November 9 canonical A3 HOLD implementation:** `--gpio-hold` asserts **PA2 /
 Arduino A3 / CN4.4** before the original startup/UART guard, retains HIGH
 through capture, saving, error display and recovery, and floats only this

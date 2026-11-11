@@ -66,6 +66,19 @@ class BoundsTests(unittest.TestCase):
   result=subprocess.run([sys.executable,'-O','-c','import sys;'+code,str(HERE/'package.py')],capture_output=True,text=True)
   self.assertNotEqual(result.returncode,0);self.assertIn('intentional guard',result.stderr)
 
+class USBHoldPolicyTests(unittest.TestCase):
+ def setUp(self):self.m={'gpio_hold':dict(schema=2,port='GPIOA',pin=2,mode='usb-off',shutdown_proof_schema=3)}
+ def test_usb_off_policy_admits_normal_pa2_and_explicit_legacy(self):
+  p.validate_usb_hold_policy(self.m,'pa2-hold')
+  p.validate_usb_hold_policy(self.m,'legacy-october28',True)
+ def test_old_reasserting_or_missing_policy_is_rejected(self):
+  for change in ({'schema':1},{'pin':7},{'port':'GPIOD'},{'mode':'usb-hold'},{'shutdown_proof_schema':2}):
+   with self.subTest(change=change),self.assertRaises(ValueError):
+    p.validate_usb_hold_policy({'gpio_hold':{**self.m['gpio_hold'],**change}},'pa2-hold')
+  with self.assertRaises(ValueError):p.validate_usb_hold_policy({},'pa2-hold')
+ def test_latched_capture_cannot_override_usb_selection(self):
+  with self.assertRaises(ValueError):p.validate_usb_hold_policy(self.m,'pa2-hold',True)
+
 
 class ReferenceAndCompositionTests(unittest.TestCase):
  @classmethod
@@ -265,7 +278,9 @@ class LinkedPackageTests(unittest.TestCase):
   self.assertEqual(self.m['gpio_hold'],manifest['raw_slots']['gpio_hold_contract'])
   usb=json.loads((Path(self.m['usb_build'])/'manifest.json').read_text(encoding='utf-8'))
   self.assertEqual((usb['gpio_hold']['port'],usb['gpio_hold']['pin']),('GPIOA',2))
-  self.assertEqual(usb['gpio_hold']['shutdown_proof_schema'],2)
+  p.validate_usb_hold_policy(usb,'pa2-hold',self.m['force_capture'])
+  self.assertEqual(usb['gpio_hold']['shutdown_proof_schema'],3)
+  self.assertEqual(self.m['usb_hold_policy'],usb['gpio_hold'])
   # A self-consistent manifest cannot admit corrupted code or old PD7 claims.
   bad=bytearray(original);bad[0x19F0]^=1
   with self.assertRaises(ValueError):p.validate_reference(bad,sector,{**manifest,'stage1_raw_sha256':p.sha(bad)})

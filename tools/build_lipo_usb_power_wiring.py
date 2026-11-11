@@ -6,7 +6,7 @@ OUT = ROOT / 'docs/power'
 helper = ROOT / 'tools/build_lipo_latch_wiring.py'
 ns = {'__file__': str(helper)}
 exec(helper.read_text(encoding='utf-8').split('c=Drawing()')[0], ns)
-ns['W'], ns['H'] = 2400, 2000
+ns['W'], ns['H'] = 2400, 2070
 c = ns['Drawing']()
 P, B, G, M, I = '#b13b35', '#136b9b', '#526474', '#5d7080', '#1c3044'
 c.svg[1] = '<title>Prototype wiring: manual USB/battery selector, SPDT trigger, A3 HOLD, exposure A0-A2 and ASA A4-A5</title>'
@@ -21,7 +21,7 @@ def cap_v(x, y1, y2):
 c.text(45,28,'Prototype power and controls',40,bold=True)
 c.text(45,86,'Canonical wiring — November 10, 2026  |  SW2 manually selects USB or battery; Q3 removed',26,B,True)
 c.text(45,132,'The PCB version will use automatic MOSFET source selection instead of SW2.',24,P,True)
-c.text(45,174,'A3 HOLD installed; manual missing-sensor shutdown passed. Exposure and ASA capture integration remain pending.',21,M)
+c.text(45,174,'Installed Nov9 holds through USB. Nov10 USB HOLD-off correction is offline / not loaded; knob integration remains pending.',21,M)
 
 # USB branch: tap unchanged; diode status was not restated by the user.
 c.rect(45,235,455,125,'#fff5f3',P)
@@ -166,8 +166,10 @@ c.line([(45,1780),(2350,1780)],G,2)
 c.text(45,1800,'COMMON GROUND',25,G,True)
 c.text(335,1800,'LiPo −, latch / ASA GND and CN5 pin 6; JS return if fitted. USB ground is common through the board.',22,G)
 c.text(45,1846,'Keep all CN9 jumpers OUT and SB12 fitted; board D2 / R23 remain removed. No parallel target supply.',23,P,True)
-c.text(45,1891,'A3 stays HIGH through capture/save/USB/recovery and floats before Standby. SW2 USB power bypasses the latch.',23)
-c.text(45,1935,'A3 is exclusively HOLD. Do not run the old A3–A5 knob diagnostic. No firmware change or bench operation in this update.',22,M)
+c.text(45,1891,'New policy: A3 HIGH for battery capture; LOW after USB detection and throughout USB service / faults / shutdown.',23)
+c.text(45,1933,'Before VBUS classification, early boot / UART recovery / E001 retain provisional HIGH. Not a zero-startup-pulse claim.',22,M)
+c.text(45,1975,'SW2 USB bypasses the latch; unplug can cut power immediately. No guaranteed cleanup hold-up. No bench operation.',22,M)
+c.text(45,2017,'A3 is exclusively HOLD. Do not run the old A3–A5 knob diagnostic; it would drive the latch and ASA wiper.',22,M)
 
 OUT.mkdir(parents=True, exist_ok=True)
 svg = '\n'.join(c.svg + ['</svg>'])

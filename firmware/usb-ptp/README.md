@@ -4,7 +4,21 @@ Bare-metal PTP over the Nucleo's **CN8 MCU USB connector**. Windows uses its
 native Portable Devices camera driver; no custom driver, drive emulation or
 SD filesystem is required. The SD still holds the existing fixed RAW slots.
 
-**November 9:** the canonical HOLD connection is now **A3 / CN4.4 / PA2**.
+**November 10 HOLD correction — offline, not installed:** USB mode must
+not latch battery power. After the real VBUS sample indicates USB present,
+the selector drives **A3/CN4.4/PA2 LOW before loading USB code**; ambiguous or
+failed samples also release HOLD before parking. USB entry, service, faults,
+shutdown refusal and unexpected WFI return keep it off. Battery capture
+retains its original HOLD behavior. [Owning decision and boundaries](NOTES.md#2026-11-10--keep-hold-off-after-usb-mode-selection).
+[Offline build and qualification](evidence/2026-11-10-usb-hold-off/README.md).
+
+Early startup and UART recovery precede VBUS classification and still use
+provisional HIGH, as does E001 if the selector itself cannot load. Thus this
+does not eliminate the short pre-selection assertion with a USB cable
+attached. The installed November9 image described below still asserts HOLD
+through USB; the correction has not been programmed or hardware-qualified.
+
+**Installed November 9 behavior (superseded by the offline policy above):** the HOLD connection is **A3 / CN4.4 / PA2**.
 The installed combined capture/USB firmware asserts it before the unchanged early UART
 guard, retains it throughout recovery, capture/save and USB service, and floats
 it immediately before final Standby. Both NOR regions now match the reviewed
@@ -16,9 +30,11 @@ and [original offline candidate](evidence/2026-11-09-a3-hold/README.md).
 
 ## Using the installed prototype
 
-1. Connect **CN8** to the computer before starting the target. Keep its existing
-   external power connection through the Joulescope; with CN9 shunts removed,
-   the USB cable is not the target's complete power supply.
+1. Set the new **SW2 source selector to USB**, and connect **CN8** to the
+   computer before starting the target. Its protected USB takeoff feeds the
+   selector and CN5.5; all CN9 shunts remain removed. A Joulescope may be in
+   series with SW2 COM when measuring. The older external-supply-only bench
+   hookup is historical.
 2. Start or reset the target and allow the full-card catalogue scan to finish.
    In Windows File Explorer, open **This PC → Global X RAW Camera → RAW photo
    slots**. This is a camera, so it has no drive letter. The underlying native
@@ -74,7 +90,11 @@ it does not implement the A3 capture latch. A small branch after SRAM preparatio
 loads a checked selector from a separate NOR region. It samples **CN8 VBUS
 through R80/R81 → PA11/ADC2 channel 12**. Present USB power selects the PTP
 app; absent power resumes capture. A powered charger also selects USB mode.
-An ambiguous voltage or failed loader check parks for debugger diagnosis.
+With the corrected code, HOLD goes LOW after the sample and before any USB
+load; ambiguous/failed VBUS results also park with HOLD off. The earlier
+E001 selector-load fault has no VBUS result and retains pre-selection HOLD.
+Canonical PA2 packages reject `--force-capture`; the option remains only for
+explicit legacy capture diagnostics, and cannot override a negative sample.
 
 Initial boot code remains small. The USB app is loaded only in USB mode.
 Packages bind the original capture sector, USB image, selector and recovery
@@ -100,11 +120,15 @@ No OTP settings or standard external-loader initialization are changed.
   hidden and are not erased automatically.
 - USB mode does not take a photo or sample the exposure controls. Normal
   capture, DMA-sleep and physical HOLD-latch qualification remain separate.
-- USB disconnect handling waits until protocol/storage work is quiescent,
-  samples absent VBUS twice, deinitializes SD/USB, and attempts guarded
-  Standby with PA2 floated at the final boundary. Shutdown proof schema 2
-  identifies PA2; frozen schema 1 records still describe PD7. The code and isolated
-  shutdown checks pass; physical cable-removal/shutdown is not yet tested.
+- The corrected USB code keeps PA2 LOW throughout service and cleanup,
+  including refusal and WFI return. If power remains, disconnect handling
+  waits for protocol/storage quiescence, samples absent VBUS twice, then
+  deinitializes SD/USB and attempts guarded Standby. With SW2 on USB, cable
+  removal may instead cut power immediately, including during an explicit
+  deletion; no graceful hold-up or atomic deletion guarantee is made.
+  Shutdown proof schema 3 records USB HOLD-off; frozen schema 2 still
+  describes PA2 HOLD-through-service and schema 1 describes PD7. The new
+  policy is offline-only; physical unplug/shutdown is not yet tested.
 - A failed header read during initial catalogue scanning currently prevents
   USB service from starting. Unknown/torn header markers stay occupied and
   hidden. Best-effort recovery applies to recognized objects during download;

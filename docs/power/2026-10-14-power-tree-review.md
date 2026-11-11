@@ -1,5 +1,13 @@
 # Power-tree review: Nucleo prototype and compact camera
 
+**November10 USB HOLD correction — offline, not installed:** drive A3 LOW
+after the VBUS sample selects USB, before loading the application, and keep
+it off through all USB service/error/shutdown paths. Ambiguous/failed VBUS
+samples also release before parking. Battery capture and the pre-selection
+boot/UART guard retain HIGH; E001 before selector loading has no VBUS result
+and remains in that provisional state. The installed November9 firmware still
+holds HIGH in USB mode. [Owning decision and exact boundaries](../../firmware/usb-ptp/NOTES.md#2026-11-10--keep-hold-off-after-usb-mode-selection).
+
 **November 9 canonical controls:** HOLD is now **A3/CN4.4/PA2**;
 the exposure knob is **A0/CN4.1/PF5 LOW**, **A1/CN4.2 wiper** and
 **A2/CN4.3/PF6 HIGH**, as confirmed by the user. A1's conditioned analog
@@ -55,9 +63,10 @@ Tests used direct5V through JS with MCU USB and sensor disconnected, not
 the physical trigger latch. At the end of that automated test JS output was
 OFF with measured current zero and COM8 closed. The user has since operated
 and modified the circuit; that is not a current bench-state report. The firmware
-contract retains early assertion before the original UART guard and HOLD
-through capture/save/USB/recovery/error display, with input/no-pull release
-immediately before Standby.
+installed contract retained early assertion before the original UART guard
+and HOLD through capture/save/USB/recovery/error display, with input/no-pull
+release before Standby. The offline November10 correction supersedes only
+the USB HOLD behavior; it has not changed that installed image.
 The [earlier PD7 timing estimate](../../firmware/capture-raw/evidence/2026-11-08-spdt-hold/README.md)
 is historical evidence, not a measurement of the new build.
 
@@ -319,10 +328,14 @@ the card is idle. USB inrush bypasses R0. Automatic MOSFET selection is the
 custom-PCB plan, with the exact circuit and qualification still pending.
 
 SW2 disconnects the battery's **load branch**, not its Q1/R1/Q2 control
-network. While USB-powered firmware asserts HOLD, Q2 still pulls R1 low;
-the nominal battery bias is `VBAT / 100kohm` (about37 µA at3.7 V), plus
-leakage. This is a circuit estimate, not a measurement or a zero-battery-drain
-claim for USB mode.
+network. The installed November9 firmware still asserts HOLD in USB, so it
+can draw nominal battery bias `VBAT / 100kohm` (about37 µA at3.7 V), plus
+leakage. The November10 offline correction holds PA2 LOW after USB detection,
+turning Q2 off rather than maintaining that bias. Neither case is a measured
+whole-circuit zero-leakage result. With USB selected and HOLD off, unplug may
+cut power immediately during transfer/deletion; software polling cannot
+provide battery hold-up. This is deliberate battery-latch behavior, with
+power-loss deletion still unqualified.
 
 **Operation:** released SW1 connects C3 to ground through R5. Pressing it connects the discharged C3 to Q1 gate, initially pulling that gate low and turning on the supply. Firmware drives PA2 HIGH directly into Q2 gate, turning Q2 on to maintain power after button release. **The press must last until GPIO takeover:** releasing SW1 disconnects C3 from Q1, so this circuit does not stretch a too-short tap. Contact bounce can interrupt or retrigger the pulse.
 
@@ -334,18 +347,19 @@ When PA2 floats before Standby, R2 pulls Q2 gate low. If SW1 is released, R1 pul
 
 **Press-duration estimate from earlier runs:** expect the early HOLD hook at roughly25ms after input power arrives. The older approximately23ms first-GPIO measurements used a much smaller image; allowing for the current prefix's additional ROM loading gives about 25 ms. Approximately26ms is a rounded allowance based on later observed events in the current camera startup, not a guaranteed bound for this untested latch. Allow about30ms for assembly planning and use roughly100ms presses for the first manual tests, so firmware can establish HOLD before release. These estimates do not replace a new PA2/power trace. The November9 direct5V GPIO/ADC/UART smoke test does not establish real-latch takeover time. [Historical timing basis and current firmware boundary](../../firmware/capture-raw/evidence/2026-11-08-spdt-hold/README.md).
 
-**Firmware contract:** preload PA2 HIGH before selecting low-speed push-pull
-output/no pulls, at the earliest custom bootstrap point and before UART
-recovery parking. Keep HIGH through capture, final card acknowledgement/deinit,
-USB service, error display and recovery. Float it immediately before the final
-Standby instruction; no long software delay follows release. Refused Standby
-or an unexpected WFI return retains/reasserts HOLD. The November9 package is
-installed and its direct5V GPIO/ADC/UART smoke tests passed. The no-sensor
-error path reached a low-current state with retained SBF=1, but physical A3
-release timing was not measured. The subsequent user-operated trigger test
-confirmed the two-flash missing-sensor error followed by cutoff and zero
-indicated current; that result predates the SW2 hardware update. A held SPDT is not a permanent
-programming-power bypass.
+**Firmware contract, November10:** preload PA2 HIGH before selecting
+low-speed push-pull/no-pull output at the earliest custom bootstrap point,
+before the unchanged UART guard. This provisional boot/recovery state exists
+before VBUS classification. If VBUS is absent, keep HIGH through capture,
+final card acknowledgement/deinit and capture-error display; float before
+final Standby, retaining/reasserting only on the capture refusal/return paths.
+If VBUS is present or ambiguous/failed, drive PA2 LOW after sampling and
+before USB load/parking. USB mode never reasserts it, even on errors, refused
+shutdown or WFI return. E001 before selector loading remains pre-selection
+HIGH. New PA2 packages disallow forced capture with USB. The correction is
+offline, not installed; November9's image still holds throughout USB.
+The existing user manual trigger test verifies battery error cutoff, not
+the new USB policy. [Owning decision](../../firmware/usb-ptp/NOTES.md#2026-11-10--keep-hold-off-after-usb-mode-selection).
 
 **Limits for first test:** repeated shots require actual power removal/reset and sufficient released time to reset C3. Removing C2 gives up its battery-attachment transient suppression even if the battery is normally soldered in. Minimum press, actual held-button cutoff, low-state current, main/AUX rail falls, UART recovery continuity and direct-LiPo headroom remain to measure. The previous5V+2.2ohm image tests do not establish LiPo margins. [Canonical circuit selection](NOTES.md#2026-11-08--make-the-capacitor-spdt-latch-the-canonical-prototype-wiring).
 
