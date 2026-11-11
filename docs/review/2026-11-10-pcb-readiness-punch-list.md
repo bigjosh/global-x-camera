@@ -126,7 +126,7 @@ The ceiling scales with the total face area of the cells, whatever their size or
 - Four positions or five. Decide in the placement study.
 - Whether holders should also accept the thinner CR2025 (2.5 mm), which is as widely sold and frees 0.7 mm of the thickness budget. Its pulse resistance against the CR2032 is unverified.
 - Whether the sensor's armed current (97 mW typical with no frame being read out) can be lowered by its settings. That needs ST's register and integration manual (PL-05).
-- Whether one-second exposures must work on coin cells, or the longest exposures may be limited there.
+- Settled November 11: the maximum exposure may be reduced to 0.5 s if necessary, and the limit may depend on temperature. See PL-16 for how the limit is sensed.
 
 ### PL-02 · What this board spin is for, and what is on it
 
@@ -134,7 +134,9 @@ The ceiling scales with the total face area of the cells, whatever their size or
 
 **Recommendation.** Make this spin a functional board in the credit-card outline, with full debug and measurement access, and treat thickness as best-effort (see PL-12). It will carry a 264-ball BGA, a 0.35 mm-pitch camera connector and a new power tree, none of which has been built before; a second spin for the final envelope is likely either way.
 
-**Need from you.** The goal of this spin, the quantity, and a yes/no on each block: microSD, SPI NAND, RTC, accelerometer, both knobs, three LEDs, USB-C, charger.
+**Settled by the user, November 11.** The purpose of this spin is to execute all of the possible power-saving strategies, including power-efficient storage, probably raw NAND ([owning note](../../NOTES.md#2026-11-11--the-custom-pcb-spin-exists-to-execute-every-power-saving-strategy)). That takes priority over staying close to the Nucleo's electrical arrangement, and it changes the recommendations in PL-03 and PL-07. No charger (PL-01).
+
+**Still needed.** The quantity, whether this spin must meet 5 mm, and a yes/no on each remaining block: a microSD footprint alongside the NAND, RTC (the user's reply names an RV3032, where the recovered design has an RV-3028-C8), accelerometer, both knobs, three LEDs, USB-C.
 
 ### PL-03 · Storage medium on the PCB
 
@@ -144,7 +146,9 @@ The ceiling scales with the total face area of the cells, whatever their size or
 
 **Recommendation.** Fit both: a microSD socket on the SDMMC2 pins the firmware already uses, and a 1.8 V SPI NAND footprint on its own pins. The board then works on day one and can test the CR2032 path without a respin.
 
-**Need from you.** SD only, NAND only, or both.
+**Direction from the user, November 11.** Power-efficient storage, probably raw NAND. The [peak-power exploration](../power/custom-pcb-peak-power.md) agrees: an SD save does not fit the coin-cell budget and a NAND save does.
+
+**Still needed.** Serial (SPI) or parallel raw NAND, the part, and whether a microSD footprint stays on the board as a bring-up fallback. No NAND firmware exists yet, so a board with NAND only cannot save a photo on the day it arrives.
 
 ### PL-04 · The recovered KiCad design is not the system that works
 
@@ -158,8 +162,8 @@ The ceiling scales with the total face area of the cells, whatever their size or
 
 The new schematic of PL-04 would be derived from two of these documents (the Nucleo and camera-adapter schematics), and the camera pinout, rail limits and mechanics come from the others.
 
-- Stored November 11: the [VD56G3 datasheet](../../datasheets/camera/VD56G3_DS12968_datasheet.pdf), DS12968 Rev 12, supplied by the user.
-- Still not in the repo: the VD56G3 register and integration manual, CAM-6G3-073CLR schematic and STEP, STEVAL-CAM-M0I1 schematic, MB1940 schematic, UM3417.
+- Stored November 11, all supplied by the user: the [VD56G3 datasheet](../../datasheets/camera/VD56G3_DS12968_datasheet.pdf) (DS12968 Rev 12), the [CAM-56G3 module data brief](../../datasheets/camera/CAM-56G3_DB5264_module_brief.pdf) (DB5264 Rev 3) and the [camera-adapter schematic](../../datasheets/camera/STEVAL-CAM-M0I_PCB4280D_schematic.pdf) (PCB4280D, version 1.1).
+- Still not in the repo: the Nucleo schematic (MB1940) and manual (UM3417), a mechanical drawing or STEP of the module showing the flex and connector face, and the VD56G3 register and integration manual.
 - This cloud session cannot reach st.com, ti.com, analog.com, hirose.com, the distributors or JLCPCB.
 - KiCad is not installed here. The repo's files are KiCad 9 format; the package available here is KiCad 7, which cannot open them. Without it I can generate files but cannot run ERC or DRC.
 
@@ -197,7 +201,7 @@ The new schematic of PL-04 would be derived from two of these documents (the Nuc
 - How the three camera rails, the card rail and the USB PHY rail are derived and switched.
 - A 1.8 V ADC reference. Firmware uses an external VREF+ and never enables the internal buffer.
 
-**Recommendation.** For this spin keep the Nucleo's electrical arrangement as seen by the MCU (3.3 V main, external core buck enabled by PWR_ON), generated by efficient converters from a wide-range input. With a 3.3 V main and one LiPo cell, the usable battery window ends near 3.4–3.5 V and needs a lockout (PL-16).
+**Recommendation, revised November 11.** My first recommendation was to keep the Nucleo's electrical arrangement as seen by the MCU, to limit firmware change. The user's purpose for this spin (PL-02) overrides that. The tree to design is the lowest-power one in the [exploration](../power/custom-pcb-peak-power.md): a 1.8 V main rail from one wide-input buck, separate bucks for the MCU core and the sensor core, and an efficient path to the sensor's 2.8 V. The cost is firmware: bank set-up for a 1.8 V VDD, and no Nucleo-equivalent configuration to fall back on.
 
 ### PL-08 · Latch and source selection as built are not transferable
 
@@ -220,10 +224,10 @@ Problems to solve in the PCB circuit:
 
 **The PCB must provide.**
 - 2.8 V, 1.8 V and 1.15 V rails that rise with main power, not under firmware control. Size them for the datasheet maxima: 25 mA, 11 mA and 86 mA, with local decoupling for a 106 mA, 3.5 µC start-up transient on the 2.8 V rail.
-- A 12 MHz clock running before XSHUTDOWN rises (firmware PLL constants assume 12 MHz).
+- A 12 MHz clock running before XSHUTDOWN rises (firmware PLL constants assume 12 MHz). The adapter uses an ECS-2520MVLC-120-CN oscillator powered from the 1.8 V I/O rail and always enabled.
 - A hardware XSHUTDOWN release that waits for rails and clock.
 - Both CSI data lanes. The recovered design routes one; one lane cannot carry this mode.
-- A deliberate P/N polarity choice. Firmware currently inverts all three pairs to match the adapter chain.
+- A deliberate P/N polarity choice. Firmware currently inverts all three pairs. The adapter schematic explains why: its note says that with a Raspberry Pi-style host connector the lane P/N must be swapped in software. Wired directly, the PCB can use true polarity and the firmware drops the swap.
 - I2C, strobe and reset at 1.8 V, either on a 1.8 V bank or through translators, with pull-ups sized for 1 MHz.
 - A rebuilt J3 land pattern. The connector part is right for this module; the footprint has the known geometry fault (CAM-001).
 
@@ -231,7 +235,8 @@ Problems to solve in the PCB circuit:
 - The firmware expects a cold sensor at every boot and never pulses reset; a warm MCU reset fails. In Standby the reset pin floats, so a bare pull-up releases the sensor again unless its rails are off.
 - The strobe level translator on the adapter takes its direction from a sensor GPIO. A translator-free 1.8 V input removes that dependency.
 - The start-up lane error is handled by a firmware workaround qualified on one board; it must be re-qualified on new copper.
-- Pins 15/17/19/21 of the module are not established.
+- The module pinout is now confirmed from the data brief: pins 13, 15 and 17 are GPIO3, GPIO4 and GPIO5, and pins 19 and 21 are not connected.
+- The adapter's arrangement, from its schematic: three LD39050 regulators from 3.3 V, chained so that the core rail enables the analog rail and the analog rail enables the I/O rail; 4.7 µF plus 100 nF on each rail at the connector; XSHUTDOWN pulled to the I/O rail through 100 kΩ with a Schottky diode to the host reset line; I2C through BSS138 shifters with 1.8 kΩ pull-ups on the sensor side; the strobe (sensor GPIO0) through a 74LVC1T45 whose direction pin is sensor GPIO1. The diode's drawn direction looks opposite to the low-clamp behaviour the repo recorded on the bench; unresolved, and not copied to the PCB.
 - Only sensor revision 0x31xx meets the timing.
 
 **Need from you.** The primary documents (PL-05), and a physical check of which face the module's plug is on and which way the flex leaves.
@@ -263,6 +268,8 @@ Some present assignments also sit on boot-ROM serial pins: PA2 (HOLD) is USART2_
 ### PL-12 · Mechanical envelope
 
 **Situation.** The user expects the promodule to be required (November 11), so its dimensions are fixed inputs. The camera module is 4.68 mm tall. On a 1.6 mm board that is 6.3 mm, so the 5 mm target needs the module in a board cutout. A CR2032 is 3.2 mm before contacts. The USB-C part in the old design is about 3.2 mm above the board. No STEP of the module is in the repo, and the connector orientation was never validated. No placement drawing exists for lens, shutter, knobs, USB, card slot or cells.
+
+**From the module data brief.** The 73° module's head is 6.5 × 6.5 × 4.68 mm, 12.4 × 8.0 mm overall, with 7.45 mm from connector to optical centre. The 84° module (CAM-6G3-084CLR) is 3.98 mm tall with the same footprint, connector and pinout, so the same PCB takes either. Its field of view is 84° diagonal against 73°, and its depth of field is 30 cm to 6 m against 43 cm to infinity. The brief has no drawing of the flex or of which face carries the plug.
 
 **Need from you.** A sketch of where each user-facing item goes on the card, whether this spin must hit 5 mm, and a physical module to check orientation against.
 
@@ -298,6 +305,8 @@ Some present assignments also sit on boot-ROM serial pins: PA2 (HOLD) is USART2_
 ### PL-16 · Battery monitoring and brown-out protection
 
 No battery-voltage sensing exists; fault code 1 is reserved. The board needs a switched divider into the 1.8 V ADC (switched so it does not count against OFF current), a threshold checked under load before exposure, and a lockout so a save is never started on a collapsing supply. For a series primary pack, an undervoltage cutoff also guards against driving the weakest cell into reversal (existing finding PWR-007).
+
+The user suggests limiting the longest exposure by temperature, read from the RTC (November 11). The same monitor can serve that purpose more directly: pack voltage read under load reflects temperature, age and use together. The sensor and the MCU also each have a temperature sensor.
 
 ### PL-17 · User controls
 

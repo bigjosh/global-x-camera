@@ -12,8 +12,12 @@ standard CR2032 cells (for example Energizer), operating down to **50 °F
 (10 °C)** with colder operation a bonus, at **at most one shot per second**.
 CR2032 holders are included on the next board spin, accepting that they may
 prove unusable; a fifth cell is acceptable if it fits; there is **no
-charger**. No further Nucleo power experiments precede layout. Cell count,
-the alternative working source and the measured power budget remain open.
+charger**. No further Nucleo power experiments precede layout. The purpose of
+the next board spin is to **execute all available power-saving strategies**,
+including power-efficient storage, probably raw NAND. The longest exposure
+may be reduced to **0.5 s** on coin cells if necessary, possibly depending on
+temperature. Cell count, the power tree, the NAND type and the measured power
+budget remain open.
 [Owning note](docs/power/NOTES.md#2026-11-11--design-the-pcb-for-standard-cr2032-cells-at-50-f-without-further-nucleo-power-experiments),
 [review item PL-01](docs/review/2026-11-10-pcb-readiness-punch-list.md).
 

@@ -57,6 +57,8 @@ What the pack can deliver at 50 °F before its voltage collapses (PL-01 model; t
 - **Long exposures on five cells: inside,** at 57–76% of the sustained ceiling.
 - **An SD save does not fit on four cells at any setting.**
 
+**Exposure limit.** The user will accept a maximum exposure of 0.5 s on coin cells if necessary, possibly depending on temperature. That does not lower the 0.15 W; it halves how long the cells must hold it. Cell resistance grows with the length of the load, from about 14 Ω per cell over tens of milliseconds to about 30 Ω over two seconds, so a shorter exposure sees a lower resistance and a higher ceiling. The repo has no figure for 0.5 s.
+
 ## What each lever is worth
 
 | Lever | Effect on the peak | Cost |

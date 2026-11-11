@@ -976,3 +976,23 @@ The pack-side figures are a model with marked assumptions, not measurements.
 The user also noted that the ST promodule is expected to be required;
 [owning note](../prototype/NOTES.md#2026-11-11--keep-the-st-promodule-as-the-camera-for-the-custom-pcb).
 No bench operation, firmware change or CAD change.
+
+## 2026-11-11  The longest exposure may be cut to 0.5 s, possibly by temperature
+
+**Why:** the stored sensor datasheet shows that an armed sensor is a sustained
+load, which makes long exposures the limiting case on coin cells. The user
+answered that the maximum exposure time can be reduced to 0.5 s if necessary,
+and that the restriction could depend on temperature, since temperature is
+known from the RTC. The user's reply names an RV3032; the recovered design
+carries an RV-3028-C8, so the RTC part is to be confirmed.
+
+**Rejected:** treating one-second exposure on coin cells at 50 F as a fixed
+requirement that the power source must meet regardless. D-39's exponential
+curve to 1 s is not withdrawn; it may be shortened on coin cells when needed.
+Not decided: the threshold, or whether the limit is sensed by temperature, by
+loaded pack voltage, or both. A shorter exposure does not lower the sustained
+power; it shortens how long the cells must hold it.
+
+**Evidence:** direct user reply, November 11; [peak-power exploration](custom-pcb-peak-power.md);
+[punch-list items PL-01 and PL-16](../review/2026-11-10-pcb-readiness-punch-list.md).
+No hardware, firmware or CAD change.
