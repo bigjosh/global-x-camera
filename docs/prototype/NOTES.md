@@ -339,3 +339,20 @@ accelerometer is on this board spin.
 No RV-3032 datasheet is stored yet, so its backup current, temperature
 accuracy and footprint are unverified here. No hardware, firmware or CAD
 change.
+
+## 2026-11-11  Include an orientation sensor, sized for four-way sensing, and cut it first
+
+**Why:** the user decided to add the accelerometer to the custom PCB but to be
+ready to cut it if other constraints require. The user noted that camera
+orientation is only needed to within 90 degrees in the plane of the sensor,
+which leaves many options beyond a three-axis accelerometer.
+
+**Rejected:** leaving orientation off this spin by default; treating a full
+accelerometer as a hard requirement. Not decided: the sensing part. The
+recovered design's LIS2DW12 with its own load switch and I2C bus is one
+candidate, not a selection.
+
+**Evidence:** direct user note, November 11, in the PCB readiness review;
+[punch-list item PL-19](../review/2026-11-10-pcb-readiness-punch-list.md);
+earlier finding ACC-001 on the accelerometer's start-up time. No hardware,
+firmware or CAD change.

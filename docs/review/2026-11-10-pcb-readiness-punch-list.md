@@ -21,9 +21,9 @@
 |---|---|---|---|
 | PL-01 | S1 | C | Energy source and the CR2032 budget. Inputs settled November 11; cell count still open |
 | PL-02 | S1 | C | What this board spin is for, and what is on it. Purpose settled November 11 |
-| PL-03 | S1 | C | Storage: raw NAND only, no SD fallback (settled November 11). Serial or parallel, and the part, still open |
+| PL-03 | S1 | C | Storage: raw NAND only, no SD fallback (settled November 11). Parallel with host error correction now recommended; part still open |
 | PL-04 | S1 | P | The recovered KiCad design is not the system that works |
-| PL-05 | S1 | P | Missing primary documents and tooling for doing the design here |
+| PL-05 | S1 | P | Missing primary documents and tooling. The user prefers DipTrace; feasibility to be tested |
 | PL-06 | S2 | P | STM32N6 main/AUX sequencing, shutdown order and rail limits |
 | PL-07 | S2 | P | No power tree exists for either battery; rail currents were never measured |
 | PL-08 | S2 | P | Latch and source selection as built are not transferable to the PCB |
@@ -37,7 +37,7 @@
 | PL-16 | S3 | P | Battery monitoring and brown-out protection do not exist |
 | PL-17 | S3 | C | User controls: real parts for the thumbwheels and the SPDT shutter |
 | PL-18 | S3 | C | Indicators: three colours required, one LED in the old design |
-| PL-19 | S3 | C | RTC is the RV-3032 (settled November 11); accelerometer on this board or not |
+| PL-19 | S3 | C | RTC is the RV-3032; orientation sensor included but may be cut (both settled November 11) |
 | PL-20 | S3 | C | Board technology, fabricator and assembler |
 | PL-21 | S4 | I | Bring-up and measurement provisions |
 | PL-22 | S4 | I | Improvements worth deciding on now |
@@ -171,11 +171,43 @@ The ceiling scales with the total face area of the cells, whatever their size or
 - A 4 Gbit part gives 256 two-megabyte slots before bad blocks, against the 200-photo requirement.
 - The parallel part's ready/busy pin could wake a sleeping MCU directly. A serial part needs a timed wake and a status poll, which costs little.
 
-**Recommendation.** Serial NAND with on-chip error correction in the WSON-8 package: the Micron part first, since it is the fastest and draws the least, with the Winbond part as a second source on the same footprint. Three vendors share that footprint, which protects the board against supply trouble. The September sourcing check found the Micron part's factory supply uncertain, so availability needs rechecking before it is committed.
+**First recommendation, superseded below.** Serial NAND with on-chip error correction in the WSON-8 package, Micron first and Winbond second.
 
-**Option for the pin map (PL-10).** The NAND can share the boot flash's bus on that port's second chip select, saving five MCU pins.
+**User inputs on the choice, November 11** ([owning note](../decisions/NOTES.md#2026-11-11--prefer-host-error-correction-larger-capacity-and-easily-sourced-nand)).
+- Error correction should be handled in firmware rather than by the chip, for determinism and efficiency.
+- Larger capacity is welcome if the only cost is price.
+- A standard, easily sourced part matters a great deal: DigiKey, or the parts library of an assembler that also holds the other parts.
 
-**Still needed.** Agreement on serial NAND and the part.
+**Error correction: who does it.**
+- The MCU's parallel memory controller has hardware BCH for NAND: 4-bit or 8-bit correction per 512-byte sector, 7 or 13 parity bytes, computed as the data is clocked, with error bit positions returned on read. It also has a command sequencer for page transfers (RM0486 §27.9.6–27.9.7). The serial (XSPI) interface has no such hardware.
+- Host error correction is therefore efficient only with parallel NAND. On a serial part it means software BCH, which I estimate at 15–30 CPU cycles per byte: 70–140 ms at 400 MHz and roughly 7–15 mJ per photo. On-chip correction costs about 40 µs per page, roughly 1.5 mJ per photo.
+- On determinism: on-chip correction adds a fixed encode time to each page program. The variable part of NAND timing is the cell programming itself (200–320 µs typical, 600–700 µs maximum), which is the same whoever computes the parity. Variable correction time falls on reads, which happen on USB power.
+- Host correction also gives exact error counts and positions for the slot-retirement policy, and lets the USED/DONE markers sit in sectors with their own parity.
+
+**Revised recommendation.** Parallel raw NAND at 1.8 V in the standard 63-ball, 9 × 11 mm package, with 8-bit BCH from the MCU's controller. This reverses my first recommendation and follows from the user's preference. Its costs:
+- about 15 MCU pins on the main I/O bank, which must then run at 1.8 V (already the plan in PL-07);
+- twice the board area of the serial package;
+- about 0.1 ms more per page to load, roughly 2 mJ per photo.
+
+Its ready/busy pin can wake a sleeping MCU directly.
+
+**Capacity.** A 4 Gbit part gives 256 two-megabyte slots before bad blocks, 8 Gbit gives 512 and 16 Gbit gives 1,024. At 1.8 V the 8 Gbit parts are generally two 4 Gbit dies in the same package, so the electrical cost is nil and the catch is availability. A 16 Gbit SLC part at 1.8 V in this package is not confirmed.
+
+Parts in this footprint differ in page size (2 KiB or 4 KiB) and in the correction they require (4-bit or 8-bit). Firmware that reads the geometry from the part and always uses 8-bit BCH makes capacity and vendor a purchasing choice rather than a board choice. Page size matters to the save: 2 KiB pages at 300 µs take about 0.28 s per photo, 4 KiB pages at 320 µs about 0.15 s.
+
+**Sourcing snapshot.** Not live: DigiKey, Mouser, LCSC and JLCPCB cannot be reached from this session. September figures are from [the repo's supply comparison](../power/nand-supply-options.md); November figures are search-engine summaries of DigiKey pages.
+
+| Part | Capacity, package | Snapshot |
+|---|---|---|
+| Micron MT29F4G08ABBFAH4-AIT:F | 4 Gbit, BGA-63 | DigiKey 1,883 at $30.53 (September) |
+| Alliance AS9F14G08SA-45BIN | 4 Gbit, BGA-63, 2 KiB pages | Mouser 837, DigiKey 165, $8.40 (September) |
+| Kioxia TH58NYG2S3HBAI4 | 4 Gbit, BGA-63 | DigiKey 33 at $6.20 (November) |
+| Macronix MX30UF4G28AD | 4 Gbit, 4 KiB pages; TSOP-48 or BGA-63 | DigiKey 889 at $23.59 for the TSOP (September) |
+| Alliance AS9F18G08SA-45BIN | 8 Gbit, BGA-63 | DigiKey 0, $11.51, 20-week lead (November) |
+
+In September JLCPCB's library held the Micron serial part and the old 3.3 V parallel part, but no 1.8 V parallel part was confirmed there. Like the MCU, it would be sourced through a distributor.
+
+**Still needed.** Agreement on parallel NAND with host BCH, and a live stock check before a part is named.
 
 ### PL-04 · The recovered KiCad design is not the system that works
 
@@ -195,7 +227,12 @@ The new schematic of PL-04 would be derived from two of these documents (the Nuc
 - This cloud session cannot reach st.com, ti.com, analog.com, hirose.com, the distributors or JLCPCB.
 - KiCad is not installed here. The repo's files are KiCad 9 format; the package available here is KiCad 7, which cannot open them. Without it I can generate files but cannot run ERC or DRC.
 
-**Need from you.** Either add the documents to `datasheets/` and run ERC/DRC on your machine, or widen this environment's network access and let me install a matching KiCad.
+**Tool preference, November 11.** The user would like to do this board in DipTrace, which is installed on their machine, rather than KiCad ([owning note](../../NOTES.md#2026-11-11--try-diptrace-for-the-custom-pcb)).
+- DipTrace cannot run in this session, and I found no command-line or batch mode for its checks, so ERC and DRC would be run by the user.
+- DipTrace's help describes "DipTrace XML" as a text import/export format in all its modules, and DipTrace publishes a specification for the PCB flavour. That would let me write libraries, schematic and board as files the user imports, and read back what the user exports. I could not read the specification from here because diptrace.com is not reachable.
+- Feasibility is untested. A round trip on a trivial design, exported from the user's installed version, would settle it before any real work depends on it.
+
+**Need from you.** The DipTrace version, the XML specifications added to the repo (or diptrace.com allowed for this environment), and a small sample project exported as DipTrace XML.
 
 ---
 
@@ -349,7 +386,7 @@ Both are still required by the specification (D-06, D-20) and neither exists on 
 
 **Settled November 11.** The RTC is the RV-3032, which also supplies the temperature reading the user proposes for the exposure limit (PL-16). Its datasheet is not yet in the repo.
 
-**Need from you.** Accelerometer in or out for this spin.
+**Settled November 11.** The accelerometer goes on this spin, on the understanding that it is the first thing cut if other constraints require. Orientation is only needed to within 90° in the plane of the sensor, so simpler four-way sensing is acceptable. The old design's part needs about 20 ms to start (finding ACC-001) and an I2C bus; a tilt sensor read as plain inputs would avoid both. Options to be compared when this item is taken.
 
 ### PL-20 · Board technology, fabricator and assembler
 
