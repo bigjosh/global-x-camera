@@ -1,10 +1,21 @@
 # Power-tree review: Nucleo prototype and compact camera
 
-**November 9 canonical controls:** HOLD is now **A3/CN4.4/PA2**;
+**November 13 canonical HOLD:** **D8 / CN14 pin1 / PD12**, wired directly
+to **Q2 gate pin1** and the top of R2=100kohm. **CN15 pin21** is the same
+net and is an alternate test point. The user confirms the installed D8
+version works; no new precision takeover/release timing or leakage claim is
+made. A3/PA2 is suspect after the physical pin checks, and the interim D3/PE9
+assignment is superseded. The former PD12 phase pulses are disabled so they
+cannot interrupt HOLD; RAM timing counters and the PD0 exposure marker remain.
+USB-selected service keeps HOLD LOW. The early boot/recovery path still
+asserts provisional HOLD before USB selection, so this is not a zero-pulse
+USB cold-boot guarantee. [Installed firmware](../../firmware/usb-ptp/evidence/2026-11-13-d8-hold/README.md).
+
+**Historical November 9 controls and validation:** HOLD was **A3/CN4.4/PA2**;
 the exposure knob is **A0/CN4.1/PF5 LOW**, **A1/CN4.2 wiper** and
 **A2/CN4.3/PF6 HIGH**, as confirmed by the user. A1's conditioned analog
 path is PA9/ADC1 channel 10; leave PC10 input/no-pull. New A3 capture/USB
-firmware is **installed and readback-verified**. A3 HIGH, the A0/A1/A2 ADC
+firmware was installed and readback-verified. A3 HIGH, the A0/A1/A2 ADC
 sweep and UART recovery passed on direct5V through JS. In the subsequent
 manual trigger test, the user confirmed the missing-sensor two-flash code,
 completion, camera power-off and **zero indicated current**. This provides
@@ -41,11 +52,10 @@ R0 still limits only battery-path inrush; USB bypasses R0.
 **A4/CN4.5**, low end on **GND**, and wiper on **A5/CN4.6**. It will control
 sensor **analog gain**, retaining the selected 1×–8× range and fixed 1×
 digital gain. ASA calibration and knob-to-sensor integration remain pending.
-Exposure remains A0 LOW/A1 wiper/A2 HIGH; A3 remains HOLD. This hardware
-documentation update does not change the installed firmware.
+Exposure remains A0 LOW/A1 wiper/A2 HIGH; HOLD is now D8 as described above.
 
-**Firmware status, November 9, 23:01 EST:** the PA2/A3 combined capture/USB
-package is installed; both NOR regions matched full readback. UART recovery
+**Historical firmware status, November 9, 23:01 EST:** the PA2/A3 combined
+capture/USB package was installed; both NOR regions matched full readback. UART recovery
 passed after flashing, after the ADC diagnostic and after an actual JS power
 cycle. GPIO readback verified A3 HIGH, and stopping the control diagnostic
 retained it while turning A2 LOW. With the sensor absent, error17 reached a
@@ -55,7 +65,7 @@ Tests used direct5V through JS with MCU USB and sensor disconnected, not
 the physical trigger latch. At the end of that automated test JS output was
 OFF with measured current zero and COM8 closed. The user has since operated
 and modified the circuit; that is not a current bench-state report. The firmware
-contract retains early assertion before the original UART guard and HOLD
+contract then retained early assertion before the original UART guard and HOLD
 through capture/save/USB/recovery/error display, with input/no-pull release
 immediately before Standby.
 The [earlier PD7 timing estimate](../../firmware/capture-raw/evidence/2026-11-08-spdt-hold/README.md)
@@ -64,13 +74,13 @@ is historical evidence, not a measurement of the new build.
 **Current prototype assembly:** a 500 mAh single-cell LiPo feeds the Q1/Q2
 latch and manual source selector, with the tested 2.2-ohm R0 retained in
 the battery branch. All selected latch board contacts are on Arduino headers:
-HOLD A3/CN4.4, target input CN5.5, common ground CN5.6. TP19/PWR_ON remains
+HOLD D8/CN14.1, target input CN5.5, common ground CN5.6. TP19/PWR_ON remains
 onboard supply control, not the external HOLD connection.
 
 **Exposure control:** A0 LOW / A1 wiper / A2 HIGH replaces the November 7
 A3–A5 diagnostic hookup. Configure PF5 LOW before enabling PF6; after settling
-and sampling the buffered PA9 input, drive PF6 LOW. PA2 is exclusively HOLD
-and must not be driven LOW by the obsolete diagnostic. One 50 kohm track draws
+and sampling the buffered PA9 input, drive PF6 LOW. D8/PD12 is exclusively
+HOLD; do not drive suspect PA2 with the obsolete diagnostic. One 50 kohm track draws
 about 66 µA at 3.3 V plus board-divider loads. Gain's old proposed A1 assignment
 is superseded by A4 HIGH / GND / A5 wiper, reported November10. The remapped
 RAM diagnostic does
@@ -144,7 +154,7 @@ Expected savings depend on load distribution: the core and existing auxiliary 3.
 | Boot NOR | **Board-specific; Nucleo flash uses 1.8 V** | Must be available for boot. Historical custom CAD uses 3.3 V NOR; a 1.8 V custom replacement was researched but not selected. Sleeping NOR later depends on execution/memory placement. |
 | Accelerometer | **1.8 V candidate** | LIS2DW12 supports this supply/IO level. Required around orientation sampling; verify startup/sample latency and unpowered-bus behavior. |
 | RTC main / backup | **3.3 V switched main / approximately one cell on backup** | Retained RV-3028-C8 architecture. Backup survives full main OFF and is budgeted separately. Reconcile the C7 evaluation-board recommendation with actual purchased hardware. |
-| Exposure potentiometer | **Switched 3.3 V at the header; nominal 1.8 V ADC domain after onboard conditioning** | A0/PF5 LOW, A1/PA9 ADC1 channel 10 wiper, A2/PF6 HIGH; 50 kohm track. Settle/sample/latch, then PF6 LOW. PC10 stays input/no-pull; PA8/PA10/PA12 stay analog/Hi-Z. A3/PA2 is separate HOLD. ASA uses separate A4 HIGH/GND/A5 wiper; both camera-control integrations remain deferred. |
+| Exposure potentiometer | **Switched 3.3 V at the header; nominal 1.8 V ADC domain after onboard conditioning** | A0/PF5 LOW, A1/PA9 ADC1 channel 10 wiper, A2/PF6 HIGH; 50 kohm track. Settle/sample/latch, then PF6 LOW. PC10 stays input/no-pull; PA8/PA10 stay analog/Hi-Z. D8/PD12 is separate HOLD; PA2/PA12 are untouched. ASA uses separate A4 HIGH/GND/A5 wiper; both camera-control integrations remain deferred. |
 | USB PHY | **3.3 V and 1.8 V** | Required for target-USB operation. Nucleo provides these; final gating/isolation is architecture-dependent. |
 | Status/error LED | **Drive-dependent; no new rail selected** | Use the board LED for initial bring-up if suitable. Exact external LED/drive is open. Photographic flash remains deferred. |
 
@@ -244,7 +254,7 @@ The selected LiPo feed uses a master high-side switch upstream of **all** batter
 
 Firmware releases HOLD immediately before Standby. With the trigger released, there is no deliberately added main-supply off-delay; with it held, the trigger capacitor charges and eventually allows cutoff. This prototype choice does not resolve the separate AN5967 AUX-before-main shutdown-order question. [Selected tradeoff](NOTES.md#2026-11-08--accept-no-separate-q2-shutdown-delay-for-the-spdt-prototype).
 
-PWR_ON was considered as an automatic master-HOLD source because it asserts before firmware and falls on Standby. **The user instead selected GPIO HOLD to keep the power assembly on Arduino headers.** Do not add a TP19 connection to this plan. PWR_ON continues its onboard role controlling core/auxiliary regulators; the external latch uses PA2/A3.
+PWR_ON was considered as an automatic master-HOLD source because it asserts before firmware and falls on Standby. **The user instead selected GPIO HOLD to keep the power assembly on Arduino headers.** Do not add a TP19 connection to this plan. PWR_ON continues its onboard role controlling core/auxiliary regulators; the external latch uses PD12/D8.
 
 TPS22919 is a candidate master switch (1.6–5.5 V, 1.5 A, 90 milliohm typical at 3.6 V, 2 nA typical shutdown current), not a selected part or a demonstrated 100 nA whole-system OFF result. Its approximately 1.75 ms typical turn-on time at 3.6 V belongs in the startup budget. Package, actual startup current, output-discharge connection, off-delay behavior, USB isolation and all battery-side leakage paths still require circuit qualification. Switching only the new auxiliary LDO would leave main/AON and other input branches connected to the battery. [TPS22919 datasheet](https://www.ti.com/lit/ds/symlink/tps22919.pdf).
 
@@ -252,9 +262,9 @@ Sources: [MB1940 C02 schematic, sheet 9](https://www.st.com/resource/en/schemati
 
 <a id="november-7-lipo-button-and-pd7-hold-wiring"></a>
 
-## Canonical LiPo, USB and A3 HOLD wiring — November 10
+## Canonical LiPo, USB and D8 HOLD wiring — November 13
 
-**Canonical November 10 revision:** the prototype uses the manual source
+**Canonical November 13 revision:** HOLD moves to D8; the prototype retains the manual source
 selector SW2 after the battery-path R0, in place of Q3 and the wired USB
 merge. SW2 COM feeds CN5.5, optionally through JS110 for measurement.
 The separate momentary trigger SW1 retains C3=2.2uF: COM to C3 top,
@@ -262,24 +272,25 @@ NC/released through R5=1kohm to ground, NO/pressed to Q1 gate/Q2 drain.
 **C1, C2, D1 and R4 remain omitted.** Component numbers below refer to the
 external circuit, not identically named Nucleo PCB components.
 
-![Prototype wiring with manual USB or battery selector, SPDT trigger, A3 HOLD and both control knobs](lipo-latch-wiring.png)
+![Prototype wiring with manual USB or battery selector, SPDT trigger, D8 HOLD and both control knobs](lipo-latch-wiring.png)
 
 [Vector version](lipo-latch-wiring.svg). Regenerate both drawings with `tools/build_lipo_usb_power_wiring.py` (the older `tools/build_lipo_latch_wiring.py` entry point also regenerates this complete circuit). The picture uses pin-labelled functional blocks, with physical SOT-23 orientation in the inset.
 
-**Canonical HOLD contact:** **Arduino A3 / CN4 pin4 (PA2)**, through fitted
-SB6. Target input remains **CN5 pin5** and common ground **CN5 pin6**.
-PA2 belongs to main VDD (3.3V on this board), not selectable VDDIO4; no PCB
-rework is needed. CN3.34 is the same MCU-side signal but is not the selected
-assembly endpoint. A3's existing 470 kohm / 560 kohm conditioning branch adds
-about 3.2 µA load at 3.3 V and feeds PA12; keep that buffered analog companion
-analog/Hi-Z. PE6 UART recovery is unchanged. A0/PF5 LOW, conditioned A1/PA9
+**Canonical HOLD contact:** **Arduino D8 / CN14 pin1 (PD12)** directly to
+Q2 gate pin1. Target input remains **CN5 pin5** and common ground **CN5 pin6**.
+PD12 belongs to main VDD (3.3V on this board), not a selectable auxiliary
+IO bank; no PCB rework is needed. **CN15 pin21** is the same signal but is
+an alternate test point, not the selected assembly endpoint. A3/PA2 remains
+suspect and unused; D3/PE9 is superseded. Do not run firmware that pulses
+PD12 as a phase marker: this build disables those pulses to keep HOLD steady.
+PE6 UART recovery is unchanged. A0/PF5 LOW, conditioned A1/PA9
 wiper and A2/PF6 HIGH are reserved for the exposure knob; the old gain-on-A1
 proposal and old A3–A5 diagnostic must not be reused. [Current control table](../hardware-firmware-interface.md#current-behavior-and-firmware-contract).
 
 | External component | Value | Exact connection |
 |---|---|---|
 | Q1, main switch | AO3401 P-channel, kit A19T | Pin2 source directly to LiPo+ and R1 high end; pin3 drain to R0; pin1 gate to Q2 drain, R1 and SW1 NO. |
-| Q2, control | AO3400 N-channel, kit A09T | Pin3 drain to Q1 gate; pin2 source to GND; pin1 gate directly to PA2 and the top of R2. |
+| Q2, control | AO3400 N-channel, kit A09T | Pin3 drain to Q1 gate; pin2 source to GND; pin1 gate directly to D8/PD12 and the top of R2. |
 | SW2, source selector | SPDT; use non-shorting/break-before-make contacts | COM to CN5.5/5V, or JS IN+ then JS OUT+ to CN5.5 when measuring. Battery throw to R0 output; USB throw to protected USB feed. Physical lug numbers/contact timing not supplied. |
 | Q3 / R6 | Q3 removed; R6 no longer required | Automatic MOSFET source selection is for the PCB version, not the prototype. R6 physical removal was not reported. |
 | D_USB, previous USB feed diode | Presence after SW2 installation not reported | If retained: anode A to SB12 pad1; cathode K/band to SW2 USB throw only. No connection to the battery throw. This diode is not the source selector. Board D2 remains removed. |
@@ -288,8 +299,8 @@ proposal and old A3–A5 diagnostic must not be reused. [Current control table](
 | SW1 | Momentary SPDT, break-before-make | **COM** to C3 top; **NC/released** to R5; **NO/pressed** to Q1 pin1 gate / Q2 pin3 drain. Identify the actual switch contacts by continuity; their physical order is not specified here. |
 | C3, trigger | 2.2uF X7R ceramic, 10–16V | Top to SW1 COM; bottom to GND. This capacitor has no polarity. |
 | R5, trigger reset | 1kohm | SW1 NC/released contact to GND; limits C3 discharge current. It is not in the pressed/NO path. |
-| R4 | Omitted; direct wire | PA2 / Arduino A3 / CN4 pin4 directly to Q2 pin1 gate. No diode or series resistor. |
-| R2 | 100kohm | Q2 pin1 gate to GND; defaults Q2 OFF when PA2 floats. |
+| R4 | Omitted; direct wire | PD12 / Arduino D8 / CN14 pin1 directly to Q2 pin1 gate. No diode or series resistor. |
+| R2 | 100kohm | Q2 pin1 gate to GND; defaults Q2 OFF when PD12 floats. |
 | C1, C2, D1, R3 | Omitted | No separate Q2-gate off-delay, Q1 gate-source capacitor, diode or old button-feed resistor. |
 
 Both fitted MOSFETs use the standard SOT-23 assignment1=gate,2=source,3=drain. Viewed from the marking side with the single lead at the top: top=3/drain, bottom-left=1/gate, bottom-right=2/source. Verify actual kit parts before attachment. The exact SPDT part is unspecified, so use verified COM/NC/NO contacts rather than invented physical lug numbers.
@@ -319,37 +330,47 @@ the card is idle. USB inrush bypasses R0. Automatic MOSFET selection is the
 custom-PCB plan, with the exact circuit and qualification still pending.
 
 SW2 disconnects the battery's **load branch**, not its Q1/R1/Q2 control
-network. While USB-powered firmware asserts HOLD, Q2 still pulls R1 low;
-the nominal battery bias is `VBAT / 100kohm` (about37 µA at3.7 V), plus
-leakage. This is a circuit estimate, not a measurement or a zero-battery-drain
-claim for USB mode.
+network. Once USB mode is selected, firmware drives HOLD LOW so Q2 does not
+hold the battery branch on. The earlier policy that kept HOLD HIGH throughout
+USB service is superseded. Provisional early boot and UART recovery still
+assert HIGH before USB selection; during that interval the nominal R1 bias
+is `VBAT / 100kohm` (about37 µA at3.7 V), plus leakage. These are circuit
+estimates, not measured zero battery drain or a guaranteed pulse-free startup.
 
-**Operation:** released SW1 connects C3 to ground through R5. Pressing it connects the discharged C3 to Q1 gate, initially pulling that gate low and turning on the supply. Firmware drives PA2 HIGH directly into Q2 gate, turning Q2 on to maintain power after button release. **The press must last until GPIO takeover:** releasing SW1 disconnects C3 from Q1, so this circuit does not stretch a too-short tap. Contact bounce can interrupt or retrigger the pulse.
+**Operation:** released SW1 connects C3 to ground through R5. Pressing it connects the discharged C3 to Q1 gate, initially pulling that gate low and turning on the supply. Battery-capture firmware drives PD12 HIGH directly into Q2 gate, turning Q2 on to maintain power after button release. **The press must last until GPIO takeover:** releasing SW1 disconnects C3 from Q1, so this circuit does not stretch a too-short tap. Contact bounce can interrupt or retrigger the pulse.
 
 **November 8 simplification:** omit R4 by user choice; retain R2=100kohm and R5=1kohm. Direct GPIO drive is the prototype baseline. If gate ringing, overshoot or GPIO-drive trouble is observed, restore a series resistor starting with the previous1kohm value and recheck the waveform. Transient amplitude at the GPIO transition matters; settling before the button is released is not proof of harmless transients. No gate waveform or hardware change was measured here. R4 does not set the R1/C3 trigger window, and its omission needs no firmware change. [Decision and revisit condition](NOTES.md#2026-11-08--omit-r4-and-retain-gate-damping-as-a-measured-follow-up).
 
-When PA2 floats before Standby, R2 pulls Q2 gate low. If SW1 is released, R1 pulls Q1 gate toward LiPo+ without a deliberate external delay. If SW1 is held, C3 charges through R1 until Q1 turns off; the held-trigger path then draws only leakage. Q2 keeps C3 discharged while HOLD is HIGH, so this timeout begins after HOLD releases and does not stop firmware stuck asserting HOLD. This cuts power in SW2 battery mode; SW2 USB mode maintains target power independently of Q1. No independent AUX/main shutdown interval is claimed. The user explicitly accepts this prototype tradeoff; [the shutdown-order question remains open](NOTES.md#2026-11-08--accept-no-separate-q2-shutdown-delay-for-the-spdt-prototype).
+When PD12 floats before Standby, R2 pulls Q2 gate low. If SW1 is released, R1 pulls Q1 gate toward LiPo+ without a deliberate external delay. If SW1 is held, C3 charges through R1 until Q1 turns off; the held-trigger path then draws only leakage. Q2 keeps C3 discharged while HOLD is HIGH, so this timeout begins after HOLD releases and does not stop firmware stuck asserting HOLD. This cuts power in SW2 battery mode; SW2 USB mode maintains target power independently of Q1. No independent AUX/main shutdown interval is claimed. The user explicitly accepts this prototype tradeoff; [the shutdown-order question remains open](NOTES.md#2026-11-08--accept-no-separate-q2-shutdown-delay-for-the-spdt-prototype).
 
 **Initial timing estimates:** R1/C3 gives a nominal220ms time constant. With ideal constant VBAT, the gate-drive magnitude is `VBAT × exp(-t / 220ms)` before Q2 takeover. It remains at least2.5V for approximately40/86/114ms at3.0/3.7/4.2V, respectively. This uses the AO3401's specified on-resistance gate voltage, not its low-current threshold, and does not predict the actual cutoff instant or prove board operation at those battery voltages. Effective capacitance under bias, tolerance, battery droop and actual kit devices need measurement. R5/C3 resets to within1% in about11ms nominal; a partial reset can weaken the next startup pulse.
 
-**Press-duration estimate from earlier runs:** expect the early HOLD hook at roughly25ms after input power arrives. The older approximately23ms first-GPIO measurements used a much smaller image; allowing for the current prefix's additional ROM loading gives about 25 ms. Approximately26ms is a rounded allowance based on later observed events in the current camera startup, not a guaranteed bound for this untested latch. Allow about30ms for assembly planning and use roughly100ms presses for the first manual tests, so firmware can establish HOLD before release. These estimates do not replace a new PA2/power trace. The November9 direct5V GPIO/ADC/UART smoke test does not establish real-latch takeover time. [Historical timing basis and current firmware boundary](../../firmware/capture-raw/evidence/2026-11-08-spdt-hold/README.md).
+**Historical press-duration estimate:** earlier runs suggested roughly25ms to the early HOLD hook after input power arrives. The older approximately23ms first-GPIO measurements used a much smaller image; allowing for extra ROM loading produced that estimate. Approximately26ms was a rounded allowance based on later observed camera events, not a guaranteed D8 takeover bound. The earlier assembly guidance allowed about30ms and roughly100ms manual presses. These estimates do not replace a new PD12/power trace. Neither the November9 direct5V GPIO/ADC/UART smoke test nor the November13 user report that D8 works establishes precise latch takeover time. [Historical timing basis](../../firmware/capture-raw/evidence/2026-11-08-spdt-hold/README.md).
 
-**Firmware contract:** preload PA2 HIGH before selecting low-speed push-pull
+**Firmware contract:** preload PD12 HIGH before selecting low-speed push-pull
 output/no pulls, at the earliest custom bootstrap point and before UART
 recovery parking. Keep HIGH through capture, final card acknowledgement/deinit,
-USB service, error display and recovery. Float it immediately before the final
-Standby instruction; no long software delay follows release. Refused Standby
-or an unexpected WFI return retains/reasserts HOLD. The November9 package is
-installed and its direct5V GPIO/ADC/UART smoke tests passed. The no-sensor
-error path reached a low-current state with retained SBF=1, but physical A3
-release timing was not measured. The subsequent user-operated trigger test
-confirmed the two-flash missing-sensor error followed by cutoff and zero
-indicated current; that result predates the SW2 hardware update. A held SPDT is not a permanent
-programming-power bypass.
+error display and early recovery. Float it immediately before the final
+battery-mode Standby instruction; no long software delay follows release.
+Refused battery-mode Standby or an unexpected WFI return retains/reasserts
+HOLD. Once USB mode is selected, HOLD is driven LOW and remains off on USB
+shutdown refusal/return; it floats at the final USB Standby instruction.
+The provisional early boot HIGH is retained before VBUS selection, including
+the early recovery park. The PD12 phase-marker output is disabled; the PD0
+exposure marker and RAM counters remain available.
+
+**D8 functional confirmation, November13:** the D8 firmware was installed
+with complete readback matching both NOR regions, followed by a normal reset.
+The user subsequently confirms it works. No additional automated test campaign
+was requested; this confirmation does not measure minimum press, precise HOLD
+edges, leakage or rail order. [Firmware and programming record](../../firmware/usb-ptp/evidence/2026-11-13-d8-hold/README.md).
+The November9 A3 smoke, missing-sensor blink/cutoff and zero-indicated-current
+reports above remain historical evidence and predate SW2. A held SPDT is not
+a permanent programming-power bypass.
 
 **Limits for first test:** repeated shots require actual power removal/reset and sufficient released time to reset C3. Removing C2 gives up its battery-attachment transient suppression even if the battery is normally soldered in. Minimum press, actual held-button cutoff, low-state current, main/AUX rail falls, UART recovery continuity and direct-LiPo headroom remain to measure. The previous5V+2.2ohm image tests do not establish LiPo margins. [Canonical circuit selection](NOTES.md#2026-11-08--make-the-capacitor-spdt-latch-the-canonical-prototype-wiring).
 
-Sources: [UM3417 Rev4 Table17](https://www.st.com/resource/en/user_manual/um3417-stm32n6-nucleo144-board-mb1940-stmicroelectronics.pdf#page=31), [DS14791 PA2 and supply note2](https://www.st.com/resource/en/datasheet/stm32n657x0.pdf#page=90), MB1940 C02 sheet10/SB6/R159/R158/U8B and ODB PA2 net213, [AO3401](https://www.aosmd.com/sites/default/files/res/datasheets/AO3401.pdf), [AO3400](https://www.aosmd.com/sites/default/files/res/datasheets/AO3400.pdf), [AN5967 section3.5.2 power-off ordering](https://www.st.com/resource/en/application_note/an5967-getting-started-with-hardware-development-for-stm32n6-mcus-stmicroelectronics.pdf#page=9). This diagram preserves the selected circuit; the November9 firmware installation and direct5V smoke evidence are linked above. Precise latch timing, held-button behavior and source switching remain unqualified.
+Sources: [MB1940 C02 schematic](../../datasheets/boards/nucleo-n657x0-q/MB1940-N657X0Q-C02-schematic.pdf), sheet10 maps D8 to PD12/CN14.1; the manufacturing ODB confirms CN15.21 on the same net. [DS14791](https://www.st.com/resource/en/datasheet/stm32n657x0.pdf) Rev10 Table18 PD12 row and footnote1 identify mainVDD. [AO3401](https://www.aosmd.com/sites/default/files/res/datasheets/AO3401.pdf), [AO3400](https://www.aosmd.com/sites/default/files/res/datasheets/AO3400.pdf), [AN5967 section3.5.2 power-off ordering](https://www.st.com/resource/en/application_note/an5967-getting-started-with-hardware-development-for-stm32n6-mcus-stmicroelectronics.pdf#page=9). This diagram preserves the selected circuit values and manual selector while making the confirmed D8 connection canonical. Precise latch timing, held-button behavior and source switching remain unqualified.
 
 ### Q1 current versus gate voltage
 

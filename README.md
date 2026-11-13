@@ -1,18 +1,24 @@
 # Global X Camera
 
-An STM32N6-based, credit-card-size monochrome global-shutter camera project. This repository is the durable project record; chat and Page copies are working views. Latest hardware wiring update: November 10, 2026. Installed firmware and control smoke test: November 9, 2026.
+An STM32N6-based, credit-card-size monochrome global-shutter camera project. This repository is the durable project record; chat and Page copies are working views. Latest wiring and firmware update: November 13, 2026; D8 HOLD installed and confirmed working by the user.
 
 **Public repository:** [bigjosh/global-x-camera](https://github.com/bigjosh/global-x-camera), created at the user's explicit request on October 13, 2026. The default branch is `main`.
 
 ## Start here
 
-**Latest installed firmware (November 9):** the combined capture/USB package now
-uses A3/CN4.4/PA2 HOLD before the original UART guard and through operation.
-Both programmed NOR regions matched full readback. UART recovery passed after
-installation, the ADC diagnostic and an actual JS power cycle. The knob
-sweep read A1 from0 to3840 with A0 LOW/A2 HIGH; stopping the diagnostic
-drove A2 LOW while retaining A3 HIGH. Normal capture exposure remains fixed.
-[Installation and smoke evidence](firmware/control-smoke/evidence/2026-11-09-a3-live/README.md).
+**Latest installed firmware (November 13):** the combined capture/USB package
+uses **D8 / CN14.1 / PD12 HOLD**, directly connected to Q2 gate pin1;
+CN15.21 is an alternate tap. Both programmed NOR regions matched full
+readback, and the user confirms D8 works. The reload did not include another
+test campaign. A3 is suspect and unassigned; D3 was superseded, not proven
+faulty. Capture and early UART recovery keep HOLD HIGH, then capture shutdown
+floats it immediately before Standby. Selected USB mode drives it LOW;
+provisional HIGH before USB detection remains. The old PD12 phase pulses are
+disabled; RAM timing records and the independent PD0 exposure mirror remain.
+[Installation record](firmware/usb-ptp/evidence/2026-11-13-d8-hold/README.md).
+Normal capture exposure remains fixed; exposure and ASA control integration
+are deferred. The [November9 A3/ADC smoke results](firmware/control-smoke/evidence/2026-11-09-a3-live/README.md)
+remain historical evidence.
 
 **USB baseline (November 8):** native PTP photo access remains in the package. CN8 VBUS present at
 boot selects **Global X RAW Camera** in Windows; the native camera driver can
@@ -52,19 +58,19 @@ See AGENTS.md before bench work.
 
 **Canonical prototype power connection (October 27):** regulated source -> JS110 IN+ -> JS110 OUT+ -> **Arduino CN5.5/5V**; common return -> **CN5.6/GND**, with all CN9 shunts absent. [Source options, wiring and measurement limits](docs/power/nucleo-debug-isolation.md#canonical-target-power-connection--october-27).
 
-**November 10 canonical hardware:** a manual SPDT power selector replaces
+**Canonical hardware, updated November13:** a manual SPDT power selector replaces
 the USB-controlled cutoff MOSFET Q3. It selects USB power or the output of
 battery-path R0=2.2 ohm into CN5.5/5V, with common ground at CN5.6. Q1/Q2,
 the separate momentary SPDT trigger, C3=2.2uF and R5=1kohm remain. The PCB
 will use **automatic MOSFET source control** rather than the manual selector.
-HOLD remains **A3/CN4.4/PA2**; exposure is **A0 LOW / A1 wiper / A2 HIGH**.
+HOLD is **D8/CN14.1/PD12** directly to **Q2 gate pin1**; exposure is **A0 LOW / A1 wiper / A2 HIGH**.
 The new ASA pot is **A4 high end / GND low end / A5 wiper** and will set
-**analog gain**. ASA sampling and both knobs' camera integration are pending;
-the installed firmware is unchanged. The user confirmed trigger/HOLD/error
-cutoff with zero indicated current before this hardware update.
+**analog gain**. ASA sampling and both knobs' camera integration are pending.
+The user has confirmed the new D8 HOLD arrangement works; exact takeover,
+rail ordering and OFF-current floor remain unqualified.
 [Canonical wiring and diagram](docs/power/2026-10-14-power-tree-review.md#november-7-lipo-button-and-pd7-hold-wiring),
 [control pin table](docs/hardware-firmware-interface.md).
-Do not run old A3–A5 diagnostics against the new latch.
+Keep A3 unassigned; do not run old all-A-pin or A3–A5 diagnostics with these controls attached.
 
 Read [NOTES.md](NOTES.md) for the reasons behind decisions, rejected approaches and hard-won constraints. Its map leads to the owning folder; the [bootstrap coverage record](docs/notes-bootstrap-2026-10-24.md) explains which sources were reviewed.
 

@@ -1,4 +1,4 @@
-"""Opt-in PA2/A3 HOLD release at the last possible Standby instruction boundary.
+"""Opt-in PD12/D8 HOLD release at the last possible Standby instruction boundary.
 
 No hardware access. The earlier prefix establishes HOLD; ordinary work and
 UART park do not release it. Every new instruction in the copied error engine
@@ -21,28 +21,46 @@ LEGACY_STANDBY_OPCODES = bytes.fromhex(
 
 
 # PA2 keeps the same 70-byte release group and fixed WFI offset as legacy PD7.
-STANDBY_OPCODES = bytes.fromhex(
+PA2_STANDBY_OPCODES = bytes.fromhex(
     '40f20000c5f20260d0f80c1021f03001c0f80c10d0f8001021f03001c0f80010'
     'bff34f8fbff36f8f30bf4ff00401c0f81810d0f8001021f0300141f01001'
     'c0f80010bff34f8f')
 
+# PE9 uses the same 70-byte release/WFI/reassert geometry.
+PE9_STANDBY_OPCODES = bytes.fromhex(
+    '41f20000c5f20260d0f80c1021f44021c0f80c10d0f8001021f44021c0f80010'
+    'bff34f8fbff36f8f30bf4ff40071c0f81810d0f8001021f4402141f48021'
+    'c0f80010bff34f8f')
+
+
+STANDBY_OPCODES = bytes.fromhex('40f60040c5f20260d0f80c1021f04071c0f80c10d0f8001021f04071c0f80010bff34f8fbff36f8f30bf4ff48051c0f81810d0f8001021f0407141f08071c0f80010bff34f8f')
+
 
 def pin_source(text, pin):
-    """Preserve exact historical PD7 source; only PA2 is emitted by new builds."""
+    """Preserve historical PD7/PA2 source; only PD12 is emitted by new builds."""
     if pin == 'PD7':
         return text
-    if pin != 'PA2':
+    if pin not in ('PA2', 'PE9', 'PD12'):
         raise ValueError('Unknown GPIO HOLD pin profile')
-    for old, new in (('GPIOD', 'GPIOA'), ('PD7', 'PA2'), ('0x56020C00', '0x56020000'),
-                     ('0x0c00', '0x0000'), ('0xc000', '0x0030'),
-                     ('0x4000', '0x0010'), ('0x80', '0x04')):
+    if pin == 'PD12':
+        for old, new in (('PD7', 'PD12'), ('0xc000', '0x3000000'),
+                         ('0x4000', '0x1000000'), ('0x80', '0x1000')):
+            text = text.replace(old, new)
+        return text
+    changes = (('GPIOD', 'GPIOA'), ('PD7', 'PA2'), ('0x56020C00', '0x56020000'),
+               ('0x0c00', '0x0000'), ('0xc000', '0x0030'),
+               ('0x4000', '0x0010'), ('0x80', '0x04')) if pin == 'PA2' else (
+               ('GPIOD', 'GPIOE'), ('PD7', 'PE9'), ('0x56020C00', '0x56021000'),
+               ('0x0c00', '0x1000'), ('0xc000', '0xc0000'),
+               ('0x4000', '0x40000'), ('0x80', '0x200'))
+    for old, new in changes:
         text = text.replace(old, new)
     return text
 
 
 def contract_pin(value, standby):
     validate_contract(value, standby)
-    return 'PA2' if value['schema'] == 3 else 'PD7'
+    return {1: 'PD7', 2: 'PD7', 3: 'PA2', 4: 'PE9', 5: 'PD12'}[value['schema']]
 
 
 def once(text, old, new):
@@ -51,18 +69,20 @@ def once(text, old, new):
     return text.replace(old, new)
 
 
-def contract(standby, *, schema=3):
+def contract(standby, *, schema=5):
     """Describe policy separately from the unchanged release instructions.
 
     Schemas 1 and 2 retain the exact historical PD7 packages.
     Schema 3 moves the pin to PA2/A3; no other release policy changes.
+    Schema 4 moves the pin to PE9/D3; schema 5 moves it to PD12/D8.
+    Schemas 1--4 remain exact historical profiles.
     Schema 1 was used by the frozen November 7 packages.
     Schema 2 records the user's subsequent no-extra-off-delay prototype choice;
     accepting that choice does not qualify AUX-before-main rail sequencing.
     """
     if type(standby) is not bool:
         raise ValueError('GPIO HOLD standby selector must be boolean')
-    if type(schema) is not int or schema not in (1, 2, 3):
+    if type(schema) is not int or schema not in (1, 2, 3, 4, 5):
         raise ValueError('Unknown GPIO HOLD contract schema')
     result = dict(schema=schema, port='GPIOD', pin=7, header='Arduino D9 / CN14.2',
                 active='push_pull_high',
@@ -76,13 +96,17 @@ def contract(standby, *, schema=3):
                       aux_before_main_shutdown_qualified=False)
     if schema == 3:
         result.update(port='GPIOA', pin=2, header='Arduino A3 / CN4.4')
+    if schema == 4:
+        result.update(port='GPIOE', pin=9, header='Arduino D3 / CN13.4')
+    if schema == 5:
+        result.update(port='GPIOD', pin=12, header='Arduino D8 / CN14.1')
     return result
 
 
 def validate_contract(value, standby):
     """Accept an exact known policy, never infer physical latch qualification."""
     if (type(value) is not dict or type(value.get('schema')) is not int or
-            value.get('schema') not in (1, 2, 3)):
+            value.get('schema') not in (1, 2, 3, 4, 5)):
         raise ValueError('GPIO HOLD contract differs from the selected completion profile')
     expected = contract(standby, schema=value.get('schema'))
     if (value != expected or any(type(value[k]) is not type(v) for k, v in expected.items())):
@@ -94,7 +118,7 @@ def validate_contract(value, standby):
 # Only this pin's two-bit fields change. ODR remains HIGH through release.
 # IRQs are disabled by both established callers; an unexpected WFI return
 # immediately reasserts HIGH before the caller records/reports its failure.
-def standby_asm(kind, *, pin="PA2"):
+def standby_asm(kind, *, pin="PD12"):
     if kind not in ('success', 'error'):
         raise ValueError('Unknown GPIO HOLD site')
     wfi_label = 'status_led_sleep_idle' if kind == 'success' else 'gpio_hold_error_wfi'
@@ -131,7 +155,7 @@ SUCCESS_ANCHOR = '''    __asm volatile(".global status_led_sleep_idle\\n"
                    "wfi\\n" ::: "memory");'''
 
 
-def completion_source(text, *, pin="PA2"):
+def completion_source(text, *, pin="PD12"):
     """Call after the existing completion/error/phase source transforms."""
     text = once(text, '#include "phase_gpio.h"', '#include "phase_gpio.h"\n' + pin_source(ASSERTIONS, pin))
     text = once(text, '    RCC->AHB4ENSR=RCC_AHB4ENSR_PWRENS;',
@@ -147,7 +171,7 @@ def completion_source(text, *, pin="PA2"):
     return text
 
 
-def error_source(text, *, pin="PA2"):
+def error_source(text, *, pin="PD12"):
     """Call on generated staged/error_signal.c after prefix_sources()."""
     text = once(text, '#include "stm32n657xx.h"', '#include "stm32n657xx.h"\n' + pin_source(ASSERTIONS, pin))
     text = once(text, '    RCC->AHB4ENSR=RCC_AHB4ENSR_PWRENS;',
@@ -169,11 +193,13 @@ def canonical_completion():
                 '    (void)phase_gpio_emit(10U);\n    LP[LPC_ARM_CYCLES]=DWT->CYCCNT;')
 
 
-def audit_sources(folder, standby, *, pin="PA2"):
+def audit_sources(folder, standby, *, pin="PD12"):
     """Bind complete generated shutdown sources, not merely marker strings."""
     contract(standby)
     folder = Path(folder)
     expected = {'staged/error_signal.c': error_source((HERE/'error_signal.c').read_text(), pin=pin)}
+    if pin == 'PD12':
+        expected['phase_gpio.c'] = (HERE/'phase_gpio_hold.inc').read_text()
     if standby:
         expected['completion.c'] = completion_source(canonical_completion(), pin=pin)
     result = {}
@@ -188,9 +214,10 @@ def audit_sources(folder, standby, *, pin="PA2"):
                 release_sites=['error', 'success'] if standby else ['error'])
 
 
-def _sequence(listing, binary, base, kind, *, pin="PA2"):
+def _sequence(listing, binary, base, kind, *, pin="PD12"):
     """Check the actual linked bytes against explicit instruction semantics."""
-    opcodes = LEGACY_STANDBY_OPCODES if pin == "PD7" else STANDBY_OPCODES
+    opcodes = {'PD7': LEGACY_STANDBY_OPCODES, 'PA2': PA2_STANDBY_OPCODES,
+               'PE9': PE9_STANDBY_OPCODES, 'PD12': STANDBY_OPCODES}.get(pin)
     pin_source("", pin)
     entries = list(re.finditer(r'^([0-9a-f]+) <([^>]+)>:', listing, re.M))
     labels = {m[2]: int(m[1], 16) for m in entries}
@@ -230,6 +257,10 @@ def _sequence(listing, binary, base, kind, *, pin="PA2"):
     ]
     if pin == 'PA2':
         expected = [op.replace('#3072', '#0').replace('#49152', '#48').replace('#128', '#4').replace('#16384', '#16') for op in expected]
+    if pin == 'PE9':
+        expected = [op.replace('#3072', '#4096').replace('#49152', '#786432').replace('#128', '#512').replace('#16384', '#262144') for op in expected]
+    if pin == 'PD12':
+        expected = [op.replace('#49152', '#50331648').replace('#128', '#4096').replace('#16384', '#16777216') for op in expected]
     # objdump can spell zero-offset loads/stores with an explicit #0.
     instructions = [s.replace('[r0,#0]','[r0]') for s in instructions]
     if instructions != expected or next_address != end or reassert != labels[wfi] + 2:
@@ -238,7 +269,7 @@ def _sequence(listing, binary, base, kind, *, pin="PA2"):
                 bytes=end-begin, sha256=hashlib.sha256(binary[begin-base:end-base]).hexdigest())
 
 
-def audit_binary(folder, standby, *, pin="PA2"):
+def audit_binary(folder, standby, *, pin="PD12"):
     folder = Path(folder)
     result = {'error': _sequence((folder/'staged/stage1.lst').read_text(),
                                 (folder/'staged/stage1.bin').read_bytes(), 0x34180400, 'error', pin=pin)}

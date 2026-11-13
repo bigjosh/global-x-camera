@@ -1,24 +1,33 @@
 # Global X Camera power design
 
-**November 10, 2026 superseding prototype plan:** 500 mAh LiPo → Q1 →
+**November 13, 2026 current prototype plan:** 500 mAh LiPo → Q1 →
 2.2-ohm R0 → battery throw of a manual SPDT source selector SW2; USB power →
 other throw; COM → CN5.5/5V (optionally through JS for measurement), with
 common ground CN5.6. Q3 has been removed to simplify wiring. The PCB will
 restore **automatic MOSFET source control**, not the physical selector.
-Q1 source and R1 high end now connect directly to LiPo+. SW1 remains the
-separate momentary trigger: COM to C3=2.2uF to ground, NC/released through
-R5=1kohm to ground, NO/pressed to Q1 gate/Q2 drain. C1/C2/D1/R4 remain omitted;
-A3/CN4.4/PA2 drives Q2 gate directly with R2=100kohm to ground. R1=100kohm
-pulls Q1 gate to source. The USB tap remains protected SB12.1/CN9.3; whether
-the former USB diode remains in that branch was not reported. Do not retain
-the old direct source merge. [Canonical diagram and connections](docs/power/2026-10-14-power-tree-review.md#november-7-lipo-button-and-pd7-hold-wiring).
-Exposure is A0 LOW/A1 wiper/A2 HIGH. The new ASA pot is A4 high/GND low/A5
-wiper, for analog gain; its firmware integration is pending. The installed
-November9 A3 capture/USB package is unchanged. The user confirmed a manual
-trigger/error/cutoff cycle with zero indicated current before this selector
-update; precise timing, off-current floor and LiPo rail margins remain
-unmeasured. No bench operation occurred for this documentation update.
-The LTC/coin-cell study below is historical.
+Q1 source and R1 high end connect directly to LiPo+. SW1 remains the separate
+momentary trigger: COM to C3=2.2uF to ground, NC/released through R5=1kohm to
+ground, NO/pressed to Q1 gate/Q2 drain. C1/C2/D1/R4 remain omitted.
+**D8 / CN14.1 / PD12** (alternate **CN15.21**) drives Q2 gate directly, with
+R2=100kohm to ground; R1=100kohm pulls Q1 gate to source. A3 and D3 are retired
+HOLD assignments. PD12's former phase-marker output is disabled so it cannot
+toggle the latch; the separate PD0 exposure marker and RAM timing records remain.
+The USB tap remains protected SB12.1/CN9.3; whether the former USB diode remains
+in that branch was not reported. Do not retain the old direct source merge.
+[Canonical diagram and connections](docs/power/2026-10-14-power-tree-review.md#november-7-lipo-button-and-pd7-hold-wiring).
+
+Battery capture asserts HOLD early and retains it through capture/save/error
+handling, then floats it immediately before Standby. **Once VBUS selects USB,
+HOLD stays LOW**, including USB faults and shutdown refusal/return. Provisional
+early HOLD before VBUS selection, and early UART recovery HIGH, remain; this is
+not a claim of a pulse-free USB boot. The user reports that the D8 substitution
+works; exact takeover/release timing, off-current floor, LiPo rail margins and
+AUX-before-main ordering have not received a new qualification campaign.
+See the [D8 firmware record](firmware/usb-ptp/evidence/2026-11-13-d8-hold/README.md).
+
+Exposure remains A0 LOW/A1 wiper/A2 HIGH. ASA remains A4 high/GND low/A5 wiper,
+for analog gain; its firmware integration is pending. The LTC/coin-cell study
+below is historical, including its old RUN/HOLD circuit and start-pulse options.
 
 **Updated:** October 14, 2026, America/New_York. **Status:** the user has locked **four CR2032 cells in series through LTC3621** for the prototype and clarified the Standby handoff below. The detailed pushbutton-start circuit remains an unimplemented, untested engineering study originating September 7.
 

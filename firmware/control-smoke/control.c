@@ -1,4 +1,4 @@
-/* RAM-only A0/A1/A2 knob diagnostic with A3 HOLD. No storage/camera/NOR/sleep. */
+/* RAM-only A0/A1/A2 knob diagnostic with D8 HOLD. No storage/camera/NOR/sleep. */
 #include "stm32n6xx_hal.h"
 #include "stm32n6xx_ll_rcc.h"
 
@@ -44,12 +44,12 @@ static void snapshot(void)
  P[PWR_SVMCR1_SNAPSHOT]=PWR->SVMCR1;
  P[PF5_IDR]=(GPIOF->IDR>>5)&1U;P[PF6_IDR]=(GPIOF->IDR>>6)&1U;
  P[PA_MODER]=GPIOA->MODER;P[PC_MODER]=GPIOC->MODER;
- P[PF_MODER]=GPIOF->MODER;P[HOLD_IDR]=(GPIOA->IDR>>2)&1U;
- P[HOLD_MODER]=GPIOA->MODER;P[HOLD_ODR]=GPIOA->ODR;
+ P[PF_MODER]=GPIOF->MODER;P[HOLD_IDR]=(GPIOD->IDR>>12)&1U;
+ P[HOLD_MODER]=GPIOD->MODER;P[HOLD_ODR]=GPIOD->ODR;
 }
 static void excitation_off(void)
 {
- /* A2/PF6 only: A3/PA2 is the latch, never the former pot low endpoint. */
+ /* A2/PF6 only: D8/PD12 retains the latch; suspect A3/PA2 is untouched. */
  if(RCC->AHB4ENR&RCC_AHB4ENR_GPIOFEN)GPIOF->BSRR=1U<<22;
 }
 static void finish(uint32_t error)
@@ -74,11 +74,11 @@ static void configure_control_pins(void)
 {
  /* A1's raw digital companion must not fight the wiper. */
  GPIOC->MODER&=~(3U<<20);GPIOC->PUPDR&=~(3U<<20);
- /* A0/A1/A2 conditioned inputs and A3's buffered companion are Hi-Z.
-  * Preserve PA2 HOLD and every unrelated pin's mode/pulls. */
- const uint32_t analog=(3U<<16)|(3U<<18)|(3U<<20)|(3U<<24);
+ /* Only A0/A1/A2 conditioned inputs are Hi-Z. Preserve suspect PA2,
+  * its PA12 buffered companion and every unrelated pin's mode/pulls. */
+ const uint32_t analog=(3U<<16)|(3U<<18)|(3U<<20);
  GPIOA->MODER|=analog;GPIOA->PUPDR&=~analog;
- /* PF5/PF6 and PA2 are main-VDD pins; VDDIO4 is not involved. */
+ /* PF5/PF6 and PD12 are main-VDD pins; VDDIO4 is not involved. */
  output(GPIOF,5,0);output(GPIOF,6,0);
 }
 static uint32_t sample_channel(uint32_t channel)
@@ -105,14 +105,15 @@ static uint32_t sample_channel(uint32_t channel)
 void control_main(void)
 {
  /* First peripheral action retains the new latch if fitted. */
- RCC->AHB4ENSR=RCC_AHB4ENR_GPIOAEN;__DSB();
- output(GPIOA,2,1);
+ RCC->AHB4ENSR=RCC_AHB4ENR_GPIODEN;__DSB();
+ (void)RCC->AHB4ENR;
+ output(GPIOD,12,1);
  for(unsigned i=0;i<64;i++)P[i]=0;
 #if defined(CONTROL_INTERNAL_VREF)
  for(unsigned i=0;i<16;i++)V[i]=0;
  V[0]=0x46455256U;V[3]=4095U;
 #endif
- P[MAGIC]=0x31434441U;P[VERSION]=3;P[NONCE]=Q[1];P[STATE]=1;
+ P[MAGIC]=0x31434441U;P[VERSION]=5;P[NONCE]=Q[1];P[STATE]=1;
  P[PERIOD_MS]=Q[3];P[MAX_SAMPLES]=Q[2];P[MIN_RAW]=4095;
  P[ADC_CHANNEL]=10;P[ADC_BITS]=12;P[DIGITAL_FULL_SCALE]=4095;
  P[A0_MIN]=4095;P[A2_MIN]=4095;

@@ -9,25 +9,25 @@ import unittest
 import gpio_hold_transform as hold
 
 
-# Independent GNU Arm disassembly fixture of the canonical PA2 release group.
+# Independent GNU Arm disassembly fixture of the canonical PD12 release group.
 # Addresses are deliberately relocatable, as the error engine is copied to RAM.
 OPS = [
-    ('f240 0000', 'movw r0, #0'),
+    ('f640 4000', 'movw r0, #3072'),
     ('f2c5 6002', 'movt r0, #22018'),
     ('f8d0 100c', 'ldr.w r1, [r0, #12]'),
-    ('f021 0130', 'bic.w r1, r1, #48'),
+    ('f021 7140', 'bic.w r1, r1, #50331648'),
     ('f8c0 100c', 'str.w r1, [r0, #12]'),
     ('f8d0 1000', 'ldr.w r1, [r0]'),
-    ('f021 0130', 'bic.w r1, r1, #48'),
+    ('f021 7140', 'bic.w r1, r1, #50331648'),
     ('f8c0 1000', 'str.w r1, [r0]'),
     ('f3bf 8f4f', 'dsb sy'),
     ('f3bf 8f6f', 'isb sy'),
     ('bf30', 'wfi'),
-    ('f04f 0104', 'mov.w r1, #4'),
+    ('f44f 5180', 'mov.w r1, #4096'),
     ('f8c0 1018', 'str.w r1, [r0, #24]'),
     ('f8d0 1000', 'ldr.w r1, [r0]'),
-    ('f021 0130', 'bic.w r1, r1, #48'),
-    ('f041 0110', 'orr.w r1, r1, #16'),
+    ('f021 7140', 'bic.w r1, r1, #50331648'),
+    ('f041 7180', 'orr.w r1, r1, #16777216'),
     ('f8c0 1000', 'str.w r1, [r0]'),
     ('f3bf 8f4f', 'dsb sy'),
 ]
@@ -78,14 +78,19 @@ class HoldSourceTests(unittest.TestCase):
             current = hold.contract(standby)
             hold.validate_contract(current, standby)
             self.assertEqual(current['external_off_delay'], 'omitted_user_accepted_prototype')
-            self.assertEqual((current['port'], current['pin'], current['header']), ('GPIOA', 2, 'Arduino A3 / CN4.4'))
+            self.assertEqual((current['port'], current['pin'], current['header']), ('GPIOD', 12, 'Arduino D8 / CN14.1'))
             self.assertEqual(hold.contract_pin(original, standby), 'PD7')
-            self.assertEqual(hold.contract_pin(current, standby), 'PA2')
+            self.assertEqual(hold.contract_pin(current, standby), 'PD12')
             hold.validate_contract(hold.contract(standby, schema=2), standby)
+            a3 = hold.contract(standby, schema=3)
+            self.assertEqual((a3['port'], a3['pin'], a3['header']),
+                             ('GPIOA', 2, 'Arduino A3 / CN4.4'))
+            self.assertEqual(hold.contract_pin(a3, standby), 'PA2')
             # Either old/new policy must be complete: changing only the old
             # delay bit or relabelling a schema is not compatible metadata.
             for bad in (dict(original, external_off_delay_required=False),
                         dict(original, schema=2), dict(current, schema=1),
+                        dict(a3, schema=4), dict(current, schema=3),
                         dict(current, aux_before_main_shutdown_qualified=True),
                         dict(current, error_release=1), dict(current, schema=True)):
                 with self.subTest(standby=standby, bad=bad), self.assertRaises(ValueError):
@@ -98,8 +103,8 @@ class HoldSourceTests(unittest.TestCase):
         self.assertLess(changed.index('phase_gpio_emit(10U)'), release)
         self.assertLess(changed.index('publish(LPC_STATE_ARMED)'), release)
         self.assertLess(reassert, changed.index('publish(LPC_STATE_RETURNED)'))
-        self.assertIn('RCC_AHB4ENSR_PWRENS | RCC_AHB4ENSR_GPIOAENS', changed)
-        self.assertIn('RCC->AHB4RSTR & RCC_AHB4RSTR_GPIOARST', changed)
+        self.assertIn('RCC_AHB4ENSR_PWRENS | RCC_AHB4ENSR_GPIODENS', changed)
+        self.assertIn('RCC->AHB4RSTR & RCC_AHB4RSTR_GPIODRST', changed)
         self.assertIn('#if LOW_POWER_MODE != 3', changed)
         self.assertNotIn(hold.SUCCESS_ANCHOR, changed)
 
@@ -112,7 +117,7 @@ class HoldSourceTests(unittest.TestCase):
         self.assertLess(changed.index('SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;'), release)
         self.assertLess(release, reassert)
         self.assertLess(reassert, shallow)
-        self.assertIn('RCC->AHB4RSTR & RCC_AHB4RSTR_GPIOARST', changed)
+        self.assertIn('RCC->AHB4RSTR & RCC_AHB4RSTR_GPIODRST', changed)
         # Retain the exact fallback loop: it does not deliberately cut power
         # when the established AUX/Standby checks refuse the transition.
         self.assertIn('for (;;) { __DSB(); __WFI(); }', changed[shallow:])
@@ -136,6 +141,7 @@ class HoldSourceTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             folder = Path(directory)
             (folder/'staged').mkdir()
+            (folder/'phase_gpio.c').write_text((hold.HERE/'phase_gpio_hold.inc').read_text())
             error = folder/'staged/error_signal.c'
             error.write_text(hold.error_source(self.error))
             self.assertEqual(hold.audit_sources(folder, False)['release_sites'], ['error'])
@@ -155,7 +161,7 @@ class HoldSourceTests(unittest.TestCase):
         self.assertEqual(binary[16:], hold.STANDBY_OPCODES)
         for kind in ('error', 'success'):
             assembly = hold.standby_asm(kind)
-            self.assertIn('"movw r0, #0x0000', assembly)
+            self.assertIn('"movw r0, #0x0c00', assembly)
             self.assertIn('"movt r0, #0x5602', assembly)
             self.assertNotIn('bl ', assembly)
             self.assertNotIn('=0x', assembly)
@@ -169,11 +175,11 @@ class HoldSourceTests(unittest.TestCase):
         assembly = hold.standby_asm('success')
         instructions = re.findall(r'^\s*"([^"\\]+)\\n"', assembly, re.M)
         randomizer = random.Random(0xD7)
-        mask = 3 << 4
+        mask = 3 << 24
         for _ in range(64):
-            original_mode = (randomizer.getrandbits(32) & ~mask) | (1 << 4)
+            original_mode = (randomizer.getrandbits(32) & ~mask) | (1 << 24)
             original_pull = randomizer.getrandbits(32)
-            original_odr = randomizer.getrandbits(16) | 0x04
+            original_odr = randomizer.getrandbits(16) | 0x1000
             memory = {0: original_mode, 12: original_pull, 20: original_odr}
             registers = {'r0': 0, 'r1': 0}
             states = []
@@ -193,7 +199,7 @@ class HoldSourceTests(unittest.TestCase):
                     continue
                 access = re.fullmatch(r'(ldr.w|str.w) r1, \[r0(?:, #(\d+))?\]', instruction)
                 if access:
-                    self.assertEqual(registers['r0'], 0x56020000)
+                    self.assertEqual(registers['r0'], 0x56020c00)
                     offset = int(access[2] or 0)
                     if access[1] == 'ldr.w':
                         registers['r1'] = memory[offset]

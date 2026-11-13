@@ -140,3 +140,72 @@ no HAL/CPU faults and HOLD IDR1; subsequent direct pin reads confirmed A2 LOW
 and A3 HIGH after clean STATE8 stop. Exact UART recovery passed after the
 diagnostic and after the separate no-sensor error/shutdown cycle. The root's
 final checkpoint leaves JS output OFF; no live ownership is retained here.
+
+## 2026-11-13  Isolate header faults with a standalone all-output blinker
+
+**Why:** the user explicitly removed external header wiring and requested
+A0–A5 at2Hz to resolve conflicting external A3 voltage and internal PA2
+readings. The temporary FLASH test bypasses camera, USB, storage and shutdown,
+while preserving exact UART recovery and a backed-up restoration image.
+It deliberately toggles A3; the normal diagnostic's HOLD-preservation rule
+still applies whenever the latch is attached. A1/PC10, as well as A4/PC12 and
+A5/PH2, requires VDDIO4 supply-valid with stock3.3V voltage selection.
+
+**Rejected:** reusing the exposure diagnostic while treating all contacts as
+unloaded, interpreting MCU IDR as an independently measured external voltage,
+or leaving a modified image without a verified recovery route. The earlier
+ADC13 cross-check is deferred in favor of the user's simpler physical test.
+
+**Evidence:** [test behavior and mapping](gpio-blink.md),
+[programming, live reads and recovery](evidence/2026-11-13-a0-a5-blink/README.md).
+The user confirmed all header wiring removed and direct5V/ST-LINK ready.
+All six input/output bits alternated, and exact UART recovery passed9valid/
+0bad pulses. External waveform verification remains with the user.
+
+## 2026-11-13  Move the control helper to D3 and bind host checks to the exact HOLD hook
+
+**Why:** after A3 and its direct PA2 tap failed the user's physical blinker
+check, the user moved the latch to Arduino D3/CN13.4/PE9. Schema4 retains
+A0 LOW/A1 wiper/A2 excitation and the mandatory ADC12 security fix while
+asserting only PE9 as HOLD. PA2 and PA12 are untouched. Stop/error paths
+remove A2 excitation and retain D3 HIGH for debugger access. Both the old
+PA2 hook and new PE9 hook enter at0x34181DF1, so a reset-vector check cannot
+identify which GPIO to verify before replacing firmware in SRAM.
+
+**Rejected:** driving the suspect PA2 pad, changing exposure/ASA integration,
+using a common hook address as a pin identity, silently relabelling historical
+schema3 telemetry, or admitting new hardware recovery identities from this
+diagnostic. New launches/replacements require schema4 and an installed D3
+package; schema1–3 remain monitorable. Package inspection recognizes schema3
+PA2 and schema4 PE9 only when their explicit metadata and exact76-byte hook
+hash agree. GPIO clocks are checked before the before/after-bridge reads.
+
+**Evidence:** `control.c`, `build.py`, `console.py`, `test_control_pins.py`
+and `test_package_launch.py`; ten offline tests pass, including4096 GPIO
+preservation cases,4096 ADC security cases and five security refusals.
+Offline build `tmp/bringup/d3-hold-20261113/control-pe9` is5808bytes with
+SHA256`263bba342c602d5e17d99c1d66f8a5f809be5b804f2276220a975ad3d8d8f875`.
+Official MB1940C02 sheet10 and manufacturing ODB identify D3 as PE9 with
+alternate tap CN15.31; DS14791Rev10 Table18 pp100/112 places it on mainVDD.
+This diagnostic migration performed no instrument operation or NOR/SD write;
+live installation and qualification remain the root bench campaign's record.
+
+## 2026-11-13  Follow the user's D8 HOLD substitution without repeating tests
+
+**Why:** the user subsequently selected D8/CN14.1/PD12 instead of D3 and
+requested a simple substitution/reload without further testing. Schema5
+changes only the diagnostic HOLD pin and its host identity/telemetry while
+retaining A0–A2, ADC security and terminal HOLD-HIGH behavior. Historical
+PA2/schema3 and PE9/schema4 packages remain inspectable; new launches require
+the exact PD12/schema5 package. PA2 and PA12 remain untouched.
+
+**Rejected:** retaining D3 as current, silently relabelling old diagnostics,
+or sharing PD12 with the former phase-marker output. The capture build owns
+that marker's removal; this helper never emits it. Further diagnostic builds,
+regression execution and live ADC testing are deferred as the user requested.
+
+**Evidence:** current `control.c`, `build.py`, `console.py` and README;
+existing test expectations are remapped but not executed. Official MB1940C02
+sheet10/ODB identify D8=PD12 with alternate tap CN15.21; DS14791Rev10
+Table18 identifies mainVDD through footnote1. No diagnostic hardware operation
+or new ADC qualification is implied by this source update.

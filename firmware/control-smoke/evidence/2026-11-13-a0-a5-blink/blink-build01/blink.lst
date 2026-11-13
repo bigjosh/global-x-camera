@@ -1,0 +1,245 @@
+
+D:\Github\global-x-camera\tmp\bringup\hold-recheck-20261113\blink-build01\blink.elf:     file format elf32-littlearm
+
+
+Disassembly of section .text:
+
+34181840 <blink_main>:
+34181840:	b580      	push	{r7, lr}
+34181842:	b672      	cpsid	i
+34181844:	f04f 0e20 	mov.w	lr, #32
+34181848:	4b67      	ldr	r3, [pc, #412]	@ (341819e8 <blink_main+0x1a8>)
+3418184a:	2200      	movs	r2, #0
+3418184c:	461c      	mov	r4, r3
+3418184e:	f04e e001 	dls	lr, lr
+34181852:	f843 2b04 	str.w	r2, [r3], #4
+34181856:	f00f c005 	le	lr, 34181852 <blink_main+0x12>
+3418185a:	2201      	movs	r2, #1
+3418185c:	4b63      	ldr	r3, [pc, #396]	@ (341819ec <blink_main+0x1ac>)
+3418185e:	4964      	ldr	r1, [pc, #400]	@ (341819f0 <blink_main+0x1b0>)
+34181860:	6023      	str	r3, [r4, #0]
+34181862:	4b64      	ldr	r3, [pc, #400]	@ (341819f4 <blink_main+0x1b4>)
+34181864:	6062      	str	r2, [r4, #4]
+34181866:	6463      	str	r3, [r4, #68]	@ 0x44
+34181868:	4b63      	ldr	r3, [pc, #396]	@ (341819f8 <blink_main+0x1b8>)
+3418186a:	f8c3 1a5c 	str.w	r1, [r3, #2652]	@ 0xa5c
+3418186e:	f3bf 8f4f 	dsb	sy
+34181872:	f8d3 325c 	ldr.w	r3, [r3, #604]	@ 0x25c
+34181876:	6323      	str	r3, [r4, #48]	@ 0x30
+34181878:	4b60      	ldr	r3, [pc, #384]	@ (341819fc <blink_main+0x1bc>)
+3418187a:	6b5d      	ldr	r5, [r3, #52]	@ 0x34
+3418187c:	f015 7580 	ands.w	r5, r5, #16777216	@ 0x1000000
+34181880:	d002      	beq.n	34181888 <blink_main+0x48>
+34181882:	64e2      	str	r2, [r4, #76]	@ 0x4c
+34181884:	bf00      	nop
+34181886:	e7fd      	b.n	34181884 <blink_main+0x44>
+34181888:	6b5a      	ldr	r2, [r3, #52]	@ 0x34
+3418188a:	f442 7280 	orr.w	r2, r2, #256	@ 0x100
+3418188e:	635a      	str	r2, [r3, #52]	@ 0x34
+34181890:	f3bf 8f4f 	dsb	sy
+34181894:	6b5b      	ldr	r3, [r3, #52]	@ 0x34
+34181896:	4f5a      	ldr	r7, [pc, #360]	@ (34181a00 <blink_main+0x1c0>)
+34181898:	62e3      	str	r3, [r4, #44]	@ 0x2c
+3418189a:	683b      	ldr	r3, [r7, #0]
+3418189c:	4e59      	ldr	r6, [pc, #356]	@ (34181a04 <blink_main+0x1c4>)
+3418189e:	f043 734f 	orr.w	r3, r3, #54263808	@ 0x33c0000
+341818a2:	f443 3340 	orr.w	r3, r3, #196608	@ 0x30000
+341818a6:	603b      	str	r3, [r7, #0]
+341818a8:	68fb      	ldr	r3, [r7, #12]
+341818aa:	f8df 815c 	ldr.w	r8, [pc, #348]	@ 34181a08 <blink_main+0x1c8>
+341818ae:	f023 734f 	bic.w	r3, r3, #54263808	@ 0x33c0000
+341818b2:	f423 3340 	bic.w	r3, r3, #196608	@ 0x30000
+341818b6:	60fb      	str	r3, [r7, #12]
+341818b8:	6833      	ldr	r3, [r6, #0]
+341818ba:	4638      	mov	r0, r7
+341818bc:	f043 03c0 	orr.w	r3, r3, #192	@ 0xc0
+341818c0:	6033      	str	r3, [r6, #0]
+341818c2:	68f3      	ldr	r3, [r6, #12]
+341818c4:	2104      	movs	r1, #4
+341818c6:	f023 03c0 	bic.w	r3, r3, #192	@ 0xc0
+341818ca:	60f3      	str	r3, [r6, #12]
+341818cc:	4b4f      	ldr	r3, [pc, #316]	@ (34181a0c <blink_main+0x1cc>)
+341818ce:	681a      	ldr	r2, [r3, #0]
+341818d0:	f042 4240 	orr.w	r2, r2, #3221225472	@ 0xc0000000
+341818d4:	601a      	str	r2, [r3, #0]
+341818d6:	68da      	ldr	r2, [r3, #12]
+341818d8:	f022 4240 	bic.w	r2, r2, #3221225472	@ 0xc0000000
+341818dc:	60da      	str	r2, [r3, #12]
+341818de:	2210      	movs	r2, #16
+341818e0:	f000 f8a2 	bl	34181a28 <outputs>
+341818e4:	4640      	mov	r0, r8
+341818e6:	f04f 7288 	mov.w	r2, #17825792	@ 0x1100000
+341818ea:	f44f 51a0 	mov.w	r1, #5120	@ 0x1400
+341818ee:	f000 f89b 	bl	34181a28 <outputs>
+341818f2:	4630      	mov	r0, r6
+341818f4:	f44f 52a0 	mov.w	r2, #5120	@ 0x1400
+341818f8:	2160      	movs	r1, #96	@ 0x60
+341818fa:	f000 f895 	bl	34181a28 <outputs>
+341818fe:	2210      	movs	r2, #16
+34181900:	2104      	movs	r1, #4
+34181902:	f506 6000 	add.w	r0, r6, #2048	@ 0x800
+34181906:	f000 f88f 	bl	34181a28 <outputs>
+3418190a:	f3bf 8f4f 	dsb	sy
+3418190e:	683b      	ldr	r3, [r7, #0]
+34181910:	4a3f      	ldr	r2, [pc, #252]	@ (34181a10 <blink_main+0x1d0>)
+34181912:	6523      	str	r3, [r4, #80]	@ 0x50
+34181914:	f8d8 3000 	ldr.w	r3, [r8]
+34181918:	f108 485e 	add.w	r8, r8, #3724541952	@ 0xde000000
+3418191c:	6563      	str	r3, [r4, #84]	@ 0x54
+3418191e:	6833      	ldr	r3, [r6, #0]
+34181920:	f508 18b1 	add.w	r8, r8, #1449984	@ 0x162000
+34181924:	65a3      	str	r3, [r4, #88]	@ 0x58
+34181926:	6803      	ldr	r3, [r0, #0]
+34181928:	f8df 90e8 	ldr.w	r9, [pc, #232]	@ 34181a14 <blink_main+0x1d4>
+3418192c:	65e3      	str	r3, [r4, #92]	@ 0x5c
+3418192e:	f8d2 30fc 	ldr.w	r3, [r2, #252]	@ 0xfc
+34181932:	f8df a0e4 	ldr.w	sl, [pc, #228]	@ 34181a18 <blink_main+0x1d8>
+34181936:	f043 7380 	orr.w	r3, r3, #16777216	@ 0x1000000
+3418193a:	f8c2 30fc 	str.w	r3, [r2, #252]	@ 0xfc
+3418193e:	4b37      	ldr	r3, [pc, #220]	@ (34181a1c <blink_main+0x1dc>)
+34181940:	f608 0838 	addw	r8, r8, #2104	@ 0x838
+34181944:	681a      	ldr	r2, [r3, #0]
+34181946:	f042 0201 	orr.w	r2, r2, #1
+3418194a:	601a      	str	r2, [r3, #0]
+3418194c:	685e      	ldr	r6, [r3, #4]
+3418194e:	64a6      	str	r6, [r4, #72]	@ 0x48
+34181950:	4f32      	ldr	r7, [pc, #200]	@ (34181a1c <blink_main+0x1dc>)
+34181952:	687b      	ldr	r3, [r7, #4]
+34181954:	1b9b      	subs	r3, r3, r6
+34181956:	f5b3 6f7a 	cmp.w	r3, #4000	@ 0xfa0
+3418195a:	d340      	bcc.n	341819de <blink_main+0x19e>
+3418195c:	68a3      	ldr	r3, [r4, #8]
+3418195e:	2001      	movs	r0, #1
+34181960:	3301      	adds	r3, #1
+34181962:	60a3      	str	r3, [r4, #8]
+34181964:	68e3      	ldr	r3, [r4, #12]
+34181966:	3301      	adds	r3, #1
+34181968:	60e3      	str	r3, [r4, #12]
+3418196a:	6125      	str	r5, [r4, #16]
+3418196c:	6166      	str	r6, [r4, #20]
+3418196e:	f000 f871 	bl	34181a54 <packed>
+34181972:	61e0      	str	r0, [r4, #28]
+34181974:	2000      	movs	r0, #0
+34181976:	f000 f86d 	bl	34181a54 <packed>
+3418197a:	2d00      	cmp	r5, #0
+3418197c:	bf14      	ite	ne
+3418197e:	4643      	movne	r3, r8
+34181980:	464b      	moveq	r3, r9
+34181982:	6220      	str	r0, [r4, #32]
+34181984:	69e2      	ldr	r2, [r4, #28]
+34181986:	601a      	str	r2, [r3, #0]
+34181988:	4b25      	ldr	r3, [pc, #148]	@ (34181a20 <blink_main+0x1e0>)
+3418198a:	bf08      	it	eq
+3418198c:	4653      	moveq	r3, sl
+3418198e:	681a      	ldr	r2, [r3, #0]
+34181990:	3201      	adds	r2, #1
+34181992:	601a      	str	r2, [r3, #0]
+34181994:	f3bf 8f4f 	dsb	sy
+34181998:	68a3      	ldr	r3, [r4, #8]
+3418199a:	4a22      	ldr	r2, [pc, #136]	@ (34181a24 <blink_main+0x1e4>)
+3418199c:	3301      	adds	r3, #1
+3418199e:	60a3      	str	r3, [r4, #8]
+341819a0:	687b      	ldr	r3, [r7, #4]
+341819a2:	1b9b      	subs	r3, r3, r6
+341819a4:	4293      	cmp	r3, r2
+341819a6:	d91c      	bls.n	341819e2 <blink_main+0x1a2>
+341819a8:	2304      	movs	r3, #4
+341819aa:	4a15      	ldr	r2, [pc, #84]	@ (34181a00 <blink_main+0x1c0>)
+341819ac:	f085 0101 	eor.w	r1, r5, #1
+341819b0:	012d      	lsls	r5, r5, #4
+341819b2:	40ab      	lsls	r3, r5
+341819b4:	6193      	str	r3, [r2, #24]
+341819b6:	f44f 52a0 	mov.w	r2, #5120	@ 0x1400
+341819ba:	4813      	ldr	r0, [pc, #76]	@ (34181a08 <blink_main+0x1c8>)
+341819bc:	40aa      	lsls	r2, r5
+341819be:	6182      	str	r2, [r0, #24]
+341819c0:	2260      	movs	r2, #96	@ 0x60
+341819c2:	fa02 f505 	lsl.w	r5, r2, r5
+341819c6:	4a0f      	ldr	r2, [pc, #60]	@ (34181a04 <blink_main+0x1c4>)
+341819c8:	6195      	str	r5, [r2, #24]
+341819ca:	f8c2 3818 	str.w	r3, [r2, #2072]	@ 0x818
+341819ce:	f3bf 8f4f 	dsb	sy
+341819d2:	687b      	ldr	r3, [r7, #4]
+341819d4:	460d      	mov	r5, r1
+341819d6:	1b9e      	subs	r6, r3, r6
+341819d8:	61a6      	str	r6, [r4, #24]
+341819da:	461e      	mov	r6, r3
+341819dc:	e7b8      	b.n	34181950 <blink_main+0x110>
+341819de:	bf00      	nop
+341819e0:	e7b6      	b.n	34181950 <blink_main+0x110>
+341819e2:	bf00      	nop
+341819e4:	e7dc      	b.n	341819a0 <blink_main+0x160>
+341819e6:	bf00      	nop
+341819e8:	34183000 	.word	0x34183000
+341819ec:	4b4e4c42 	.word	0x4b4e4c42
+341819f0:	000400e5 	.word	0x000400e5
+341819f4:	05f5e100 	.word	0x05f5e100
+341819f8:	56028000 	.word	0x56028000
+341819fc:	56024800 	.word	0x56024800
+34181a00:	56020000 	.word	0x56020000
+34181a04:	56021400 	.word	0x56021400
+34181a08:	56020800 	.word	0x56020800
+34181a0c:	56021800 	.word	0x56021800
+34181a10:	e000ed00 	.word	0xe000ed00
+34181a14:	34183034 	.word	0x34183034
+34181a18:	3418303c 	.word	0x3418303c
+34181a1c:	e0001000 	.word	0xe0001000
+34181a20:	34183040 	.word	0x34183040
+34181a24:	05f5e0ff 	.word	0x05f5e0ff
+
+34181a28 <outputs>:
+34181a28:	040b      	lsls	r3, r1, #16
+34181a2a:	6183      	str	r3, [r0, #24]
+34181a2c:	6843      	ldr	r3, [r0, #4]
+34181a2e:	ea23 0301 	bic.w	r3, r3, r1
+34181a32:	6043      	str	r3, [r0, #4]
+34181a34:	68c3      	ldr	r3, [r0, #12]
+34181a36:	eb02 0142 	add.w	r1, r2, r2, lsl #1
+34181a3a:	ea23 0301 	bic.w	r3, r3, r1
+34181a3e:	60c3      	str	r3, [r0, #12]
+34181a40:	6883      	ldr	r3, [r0, #8]
+34181a42:	ea23 0301 	bic.w	r3, r3, r1
+34181a46:	6083      	str	r3, [r0, #8]
+34181a48:	6803      	ldr	r3, [r0, #0]
+34181a4a:	ea23 0301 	bic.w	r3, r3, r1
+34181a4e:	431a      	orrs	r2, r3
+34181a50:	6002      	str	r2, [r0, #0]
+34181a52:	4770      	bx	lr
+
+34181a54 <packed>:
+34181a54:	b530      	push	{r4, r5, lr}
+34181a56:	4912      	ldr	r1, [pc, #72]	@ (34181aa0 <packed+0x4c>)
+34181a58:	4a12      	ldr	r2, [pc, #72]	@ (34181aa4 <packed+0x50>)
+34181a5a:	4c13      	ldr	r4, [pc, #76]	@ (34181aa8 <packed+0x54>)
+34181a5c:	4b13      	ldr	r3, [pc, #76]	@ (34181aac <packed+0x58>)
+34181a5e:	b1d0      	cbz	r0, 34181a96 <packed+0x42>
+34181a60:	6909      	ldr	r1, [r1, #16]
+34181a62:	6912      	ldr	r2, [r2, #16]
+34181a64:	6924      	ldr	r4, [r4, #16]
+34181a66:	6918      	ldr	r0, [r3, #16]
+34181a68:	0a53      	lsrs	r3, r2, #9
+34181a6a:	0925      	lsrs	r5, r4, #4
+34181a6c:	f005 0504 	and.w	r5, r5, #4
+34181a70:	f003 0302 	and.w	r3, r3, #2
+34181a74:	432b      	orrs	r3, r5
+34181a76:	f3c4 1440 	ubfx	r4, r4, #5, #1
+34181a7a:	0049      	lsls	r1, r1, #1
+34181a7c:	4323      	orrs	r3, r4
+34181a7e:	f001 0108 	and.w	r1, r1, #8
+34181a82:	0a12      	lsrs	r2, r2, #8
+34181a84:	430b      	orrs	r3, r1
+34181a86:	f002 0210 	and.w	r2, r2, #16
+34181a8a:	00c0      	lsls	r0, r0, #3
+34181a8c:	4313      	orrs	r3, r2
+34181a8e:	f000 0020 	and.w	r0, r0, #32
+34181a92:	4318      	orrs	r0, r3
+34181a94:	bd30      	pop	{r4, r5, pc}
+34181a96:	6949      	ldr	r1, [r1, #20]
+34181a98:	6952      	ldr	r2, [r2, #20]
+34181a9a:	6964      	ldr	r4, [r4, #20]
+34181a9c:	6958      	ldr	r0, [r3, #20]
+34181a9e:	e7e3      	b.n	34181a68 <packed+0x14>
+34181aa0:	56020000 	.word	0x56020000
+34181aa4:	56020800 	.word	0x56020800
+34181aa8:	56021400 	.word	0x56021400
+34181aac:	56021c00 	.word	0x56021c00

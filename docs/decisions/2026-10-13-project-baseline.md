@@ -1,18 +1,26 @@
 # Project decisions and discoveries through October 24, 2026
 
-**November 10 current prototype summary:** the installed capture/USB package
-uses **A3/CN4.4/PA2 HOLD**. Exposure is **A0 LOW / A1 wiper / A2 HIGH**;
-the added ASA pot is **A4 high / GND low / A5 wiper**, for analog gain.
-The exposure diagnostic passed its full-travel smoke test; both knobs'
-integration into capture remains pending. Power is LiPo → Q1 → 2.2-ohm R0,
-with a separate manual SPDT selecting R0 output or USB into CN5.5. Q3 is
-removed; automatic MOSFET source selection is the custom-PCB plan. The
-momentary SPDT capacitor trigger and Q2 remain. A user-operated missing-sensor
-cycle confirmed error indication followed by latch cutoff and zero indicated
-current before the selector change. [Current power plan](../power/2026-10-14-power-tree-review.md),
-[control pins](../hardware-firmware-interface.md), [installed-firmware evidence](../../firmware/control-smoke/evidence/2026-11-09-a3-live/README.md).
-The dated November7/8 paragraphs below preserve superseded wiring and
-implementation status; do not use those pin assignments for this prototype.
+**November 13 current prototype summary:** the installed capture/USB package
+uses **D8 / CN14.1 / PD12 HOLD**, with **CN15.21** as an alternate tap. A3/PA2 is
+suspect and unassigned; D3/PE9 is superseded. The user reports the D8 arrangement
+works. PD12 phase pulses are disabled so they cannot interrupt HOLD; RAM timing
+records and PD0 exposure mirroring remain. Battery capture/recovery retains
+HOLD HIGH until final capture Standby. Selected USB mode keeps it LOW, including
+fault/refusal/return paths; provisional early assertion before VBUS selection
+and early UART recovery HIGH remain.
+
+Exposure is **A0 LOW / A1 wiper / A2 HIGH**; ASA is **A4 high / GND low / A5
+wiper**, for analog gain. The exposure diagnostic passed its earlier sweep;
+both knobs' integration into capture remains pending. Power is LiPo → Q1 →
+2.2-ohm R0, with manual SPDT SW2 selecting R0 output or USB into CN5.5. Q3 is
+removed; automatic MOSFET selection remains the custom-PCB plan. SW1 is the
+separate momentary capacitor trigger. The D8 reload was readback-verified,
+without a new timing/power qualification campaign.
+[Current power plan](../power/2026-10-14-power-tree-review.md),
+[control pins](../hardware-firmware-interface.md),
+[installed D8 record](../../firmware/usb-ptp/evidence/2026-11-13-d8-hold/README.md).
+Dated historical paragraphs below retain their earlier wiring/results and do
+not override this pin assignment or current implementation status.
 
 **Historical November 8 prototype power decision (superseded above):** use the 500 mAh LiPo, retained 2.2 Ω series resistor and [SPDT capacitor trigger with PD7 HOLD](../power/2026-10-14-power-tree-review.md#november-7-lipo-button-and-pd7-hold-wiring). C3=2.2 µF, R5=1 kΩ reset, C1/C2/D1/R4 omitted; PD7 drives Q2 gate directly; all latch connections to the Nucleo stay on Arduino CN5.5/CN5.6 and D9/CN14.2. This selects the previously deferred held-button protection for the current prototype and supersedes its CR2032/LTC assembly path; historical product targets and older evidence are retained below. [Owning circuit decision](../power/NOTES.md#2026-11-08--make-the-capacitor-spdt-latch-the-canonical-prototype-wiring). HOLD code is implemented and packaged offline, not installed. [Previous-run timing estimate and current build](../../firmware/capture-raw/evidence/2026-11-08-spdt-hold/README.md) distinguish the approximately 25 ms expectation from actual latch qualification, which remains pending.
 
@@ -81,7 +89,7 @@ The [prior-session synthesis](../../research_notes/Global%20X%20Camera%20decisio
 | D-33 | **Provisional circular allocation: search for the next FREE and GOOD slot after the last durably allocated slot, wrapping at the end.** | Accepted “for now” on October 14. Advance from durable allocation, including interrupted saves; deletion does not reset it. Recover the cursor through allocation records and ordinary checkpoints, with no separate per-capture pointer write. Page/block layout, exact storage/recovery protocol and off-NAND allocation-table alternatives explicitly remain open; this is not a frozen storage architecture. [Working direction](slot-state-storage-review.md#circular-allocation--provisional-october-14-2026). |
 | D-34 | **Use ambient light for the prototype; defer photographic flash and retain it as a future direction.** | Explicit October 14 approval. Flash illumination is outside prototype scope; the existing status/error LED requirements still apply. Reevaluate illumination under FD-06 after representative image testing. The four-CR2032/LTC3621 prototype power choice remains in force. |
 | D-35 | **The user will assemble the first prototype around the NUCLEO-N657X0-Q; defer custom-PCB manufacturer/assembler selection.** | Explicit October 14 clarification: “decide later. I will assemble the prototype myself first using the necleo board as the base.” The prior JLCPCB Standard/PCBWay recommendation remains background, not an adopted manufacturing direction. Camera, storage, power, USB and capture requirements still govern bring-up; exact wiring and purchased-parts reconciliation remain open. |
-| D-36 | **Set prototype exposure time with a potentiometer connected to an MCU ADC input, sampled before image acquisition.** | Explicit October14 selection; D-50 adds 1×–8× analog gain with digital gain1×, D-39 retains the exposure curve. Current exposure wiring is A0 LOW/A1 buffered ADC wiper/A2 HIGH; ASA is A4 high/GND low/A5 buffered ADC wiper. A3 is HOLD. Exposure diagnostic smoke tests passed; ASA sampling, sensor integration, calibration/filtering and timing remain pending. [Current control contract](../hardware-firmware-interface.md#current-behavior-and-firmware-contract); owning reasons are in [prototype notes](../prototype/NOTES.md). The directional light-sensor study remains unselected. |
+| D-36 | **Set prototype exposure time with a potentiometer connected to an MCU ADC input, sampled before image acquisition.** | Explicit October14 selection; D-50 adds 1×–8× analog gain with digital gain1×, D-39 retains the exposure curve. Current exposure wiring is A0 LOW/A1 buffered ADC wiper/A2 HIGH; ASA is A4 high/GND low/A5 buffered ADC wiper. D8/PD12 is HOLD; A3 is unassigned. Exposure diagnostic smoke tests passed; ASA sampling, sensor integration, calibration/filtering and timing remain pending. [Current control contract](../hardware-firmware-interface.md#current-behavior-and-firmware-contract); owning reasons are in [prototype notes](../prototype/NOTES.md). The directional light-sensor study remains unselected. |
 | D-37 | **Start prototype firmware in C with STM32CubeN6/HAL, retaining a path to streamlined bare-metal and LL/direct-register implementations for power/time optimization.** | Explicit October 14 acceptance of the starting point with readiness to change it. Keep hardware access replaceable and compare full startup latency and capture energy with equivalent workloads; removing HAL alone does not establish savings. HAL does not require an RTOS. No RTOS, USB middleware or wholesale rewrite is selected. Accepted capture/storage/shutdown behavior remains required. |
 | D-38 | **Historical initial policy: fixed 1× analog and 1× digital gain. D-50 supersedes the analog-gain portion on October 24.** | Explicit October 15 acceptance: “agreed - fixed 1x 1x.” No automatic gain or automatic exposure is selected; the potentiometer sets exposure time. Retain firmware configurability for bring-up experiments; changes to the normal operating policy require a later decision. |
 | D-39 | **Exposure potentiometer spans the fastest supported exposure to 1 second, with an exponential curve giving finer absolute adjustment at short exposures.** | Explicit October 15 instruction; tune the curve with the real camera. The numeric minimum depends on sensor mode/timing. Verify one-second integration and quantization; the ≤50 ms requirement concerns exposure start. D-51 identifies the 50 kΩ controls; initial raw A4 sampling works, while full-travel calibration, physical pin verification and camera integration remain open. |

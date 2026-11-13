@@ -43,7 +43,7 @@ def checked(build, expected):
                  request_words=8, stack=0x343B0000, stack_floor=0x343AF000,
                  sd_commands=False, nor_commands=False, camera_commands=False,
                  reset=False, power_switch=False, resolution_bits=12)
-    if m['schema'] not in (1, 2, 3) or any(m.get(k) != v for k, v in exact.items()):
+    if m['schema'] not in (1, 2, 3, 4, 5) or any(m.get(k) != v for k, v in exact.items()):
         raise ValueError('Unexpected diagnostic layout or capabilities')
     if not (m['bytes'] == len(code) < 65536 and
             m['load'] <= m['entry'] - 1 < m['load'] + len(code) and
@@ -59,13 +59,39 @@ def checked(build, expected):
 
 
 def require_current_wiring(m):
-    """Historical builds can be inspected, but must not drive the new A3 latch LOW."""
+    """Historical builds remain inspectable; only D8 HOLD may be launched now."""
     wiring = dict(low='A0/CN4.1/PF5', wiper='A1/CN4.2/PA9',
-                  high='A2/CN4.3/PF6', hold='A3/CN4.4/PA2')
-    if (m['schema'] != 3 or m.get('wiring') != wiring or
+                  high='A2/CN4.3/PF6', hold='D8/CN14.1/PD12')
+    if (m['schema'] != 5 or m.get('wiring') != wiring or
             m.get('adc') != 'ADC1_INP10/PA9' or
             m.get('endpoint_channels') != {'A0': 'ADC1_INP5/PA8', 'A2': 'ADC1_INP11/PA10'}):
-        raise ValueError('Launch requires canonical A0/A1/A2 control and PA2/A3 HOLD build')
+        raise ValueError('Launch requires A0/A1/A2 control and PD12/D8 HOLD build')
+
+
+def package_hold(m, prefix):
+    """Interpret only named historical/current contracts, bound to exact code."""
+    profiles = {
+        3: ('GPIOA', 2, 'Arduino A3 / CN4.4', 0x56020000, 1, 76,
+            '1c2487687bdd4e11737492c68f50f2409722b319cc4a67c6dd4efe4867489f1e'),
+        4: ('GPIOE', 9, 'Arduino D3 / CN13.4', 0x56021000, 16, 76,
+            'b8b06e4a891d56c1be4cb8f3d7862b6c3040848c9c0f17340fc57d5b935bd6c1'),
+        5: ('GPIOD', 12, 'Arduino D8 / CN14.1', 0x56020C00, 8, 76,
+            '05deb43fa5906aec826805c1ef8cb9e73991552b1986cfa79e0e0017deb23732'),
+    }
+    hold = m.get('gpio_hold')
+    if not isinstance(hold, dict) or type(hold.get('schema')) is not int:
+        raise ValueError('Package lacks a supported explicit HOLD contract')
+    cfg = profiles.get(hold['schema'])
+    if cfg is None:
+        raise ValueError('Unsupported package HOLD schema')
+    port, pin, header, base, clock, size, digest = cfg
+    if (hold.get('port') != port or hold.get('pin') != pin or
+            hold.get('header') != header or hold.get('active') != 'push_pull_high' or
+            struct.unpack_from('<I', prefix, 4)[0] != 0x34181DF1 or
+            hashlib.sha256(prefix[0x19F0:0x19F0+size]).hexdigest() != digest):
+        raise ValueError('Package HOLD contract differs from its exact early hook')
+    return dict(schema=hold['schema'], port=port, pin=pin, header=header,
+                base=base, clock_mask=clock)
 
 
 def checked_package(path, approved):
@@ -92,7 +118,7 @@ def checked_package(path, approved):
             rm.get('program_sha256') != pin['sector'] or rm.get('program_bytes') != len(sector)):
         raise ValueError('USB recovery artifact differs from its admitted package')
     return dict(prefix_sha256=digest, prefix_bytes=len(prefix), sector_sha256=pin['sector'],
-                package=str(path), pa2_hold=struct.unpack_from('<I', prefix, 4)[0] == 0x34181DF1)
+                package=str(path), gpio_hold=package_hold(m, prefix))
 
 
 def checked_idle_clocks(raw):
@@ -107,15 +133,22 @@ def checked_idle_clocks(raw):
     return result
 
 
-def checked_pa2_hold(raw):
+def checked_hold(raw, hold):
     if len(raw) != 24:
-        raise ValueError('Incomplete PA2 HOLD snapshot')
+        raise ValueError('Incomplete HOLD snapshot')
     p = dict(zip(('moder', 'otyper', 'ospeedr', 'pupdr', 'idr', 'odr'),
                  struct.unpack('<6I', raw)))
-    if (p['moder'] & 0x30 != 0x10 or p['otyper'] & 4 or
-            p['pupdr'] & 0x30 or not p['idr'] & 4 or not p['odr'] & 4):
-        raise ValueError('PA2 HOLD is not actively HIGH at the verified early park')
+    bit, mode = 1 << hold['pin'], 3 << (2 * hold['pin'])
+    if (p['moder'] & mode != mode // 3 or p['otyper'] & bit or
+            p['pupdr'] & mode or not p['idr'] & bit or not p['odr'] & bit):
+        raise ValueError(hold['header'] + ' HOLD is not actively HIGH at the verified early park')
     return p
+
+
+def read_hold(b, hold, name):
+    if not struct.unpack('<I', b.upload(0x5602825C, 4, name+'-clock.bin'))[0] & hold['clock_mask']:
+        raise ValueError(hold['port'] + ' clock absent; do not read HOLD registers')
+    return checked_hold(b.upload(hold['base'], 24, name+'.bin'), hold)
 
 
 def early_guard(args, bridge):
@@ -127,6 +160,8 @@ def early_guard(args, bridge):
         # explicit executable selected for this diagnostic invocation.
         nor_bench.CLI = cli
         identity = checked_package(args.package, guard.APPROVED)
+        if identity['gpio_hold']['schema'] != 5:
+            raise ValueError('D8 diagnostic requires an installed D8 HOLD package')
         command = ['usb_recovery', '--package', str(args.package)]
     else:
         guard = load_module('control_guard', ROOT / 'firmware/capture-timing/recovery_gpio/check_park.py')
@@ -155,6 +190,7 @@ def replace(args):
     old, old_code = checked(Path(session['build']), session['sha256'])
     m, code = checked(args.build, args.sha256)
     require_current_wiring(m)
+    require_current_wiring(old)
     args.out.mkdir(parents=True, exist_ok=False)
     b = nor_bench.Bench(args.out / 'replace')
     if b.upload(old['load'], len(old_code), 'old-code.bin') != old_code:
@@ -198,6 +234,8 @@ def replace(args):
 def prepare(args):
     m, code = checked(args.build, args.sha256)
     require_current_wiring(m)
+    if not args.package:
+        raise ValueError('D8 diagnostic requires the exact installed D8 USB package')
     args.out.mkdir(parents=True, exist_ok=False)
     bridge = load_module('control_bridge', ROOT / 'firmware/capture-sd/low_power/readback_recovery/run.py')
     identity = early_guard(args, bridge)
@@ -206,11 +244,8 @@ def prepare(args):
     b = nor_bench.Bench(args.out / 'launch')
     save(args.out / 'idle-clocks.json', checked_idle_clocks(
         b.upload(0x56028250, 48, 'idle-clocks.bin')))
-    if identity.get('pa2_hold'):
-        if not struct.unpack('<I', b.upload(0x5602825C, 4, 'gpio-clock.bin'))[0] & 1:
-            raise ValueError('GPIOA clock absent; do not read HOLD registers')
-        save(args.out / 'hold-before-bridge.json', checked_pa2_hold(
-            b.upload(0x56020000, 24, 'hold-before-bridge.bin')))
+    save(args.out / 'hold-before-bridge.json', read_hold(
+        b, identity['gpio_hold'], 'hold-before-bridge'))
     nonce = secrets.randbelow(0xFFFFFFFF) + 1
     request = struct.pack('<4I', 0x52425231, nonce, 0, 0)
     (b.output / 'bridge-request.bin').write_bytes(request)
@@ -232,9 +267,8 @@ def prepare(args):
     save(args.out / 'bridge-proof.json', proof)
     save(args.out / 'idle-clocks-after-bridge.json', checked_idle_clocks(
         b.upload(0x56028250, 48, 'idle-clocks-after-bridge.bin')))
-    if identity.get('pa2_hold'):
-        save(args.out / 'hold-after-bridge.json', checked_pa2_hold(
-            b.upload(0x56020000, 24, 'hold-after-bridge.bin')))
+    save(args.out / 'hold-after-bridge.json', read_hold(
+        b, identity['gpio_hold'], 'hold-after-bridge'))
     b.call('-halt', '-w', args.build / 'control.bin', hex(m['load']), '-v',
            success='Download verified successfully')
     if b.upload(m['load'], len(code), 'control-readback.bin') != code:
@@ -269,7 +303,7 @@ def read_status(b, m, nonce, name):
 def monitor(args):
     session = json.loads(args.session.read_text())
     m, code = checked(Path(session['build']), session['sha256'])
-    current = m['schema'] == 3
+    current = m['schema'] >= 3
     low, wiper, high = ('A0', 'A1', 'A2') if current else ('A3', 'A4', 'A5')
     low_field, high_field = ('PF5_IDR', 'PF6_IDR') if current else ('PA2_IDR', 'PH2_IDR')
     if sys.platform == 'win32':
@@ -301,7 +335,7 @@ def monitor(args):
         if m['schema'] >= 2:
             print(f"          endpoint ADC: {low}={p[low+'_RAW']:4d}  {high}={p[high+'_RAW']:4d}  {wiper} digital={p[wiper+'_DIGITAL']}", flush=True)
         if current:
-            print(f"          A3 HOLD={p['HOLD_IDR']}", flush=True)
+            print(f"          {m['wiring']['hold']} HOLD={p['HOLD_IDR']}", flush=True)
         if p['ERROR_CODE'] or p['STATE'] == 15:
             raise RuntimeError('ADC diagnostic failed; see latest.json. Target left powered.')
         if p['STATE'] == 8:

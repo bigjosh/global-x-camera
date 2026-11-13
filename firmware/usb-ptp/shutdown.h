@@ -17,7 +17,7 @@
 #define USB_SHUTDOWN_REQUIRED         15U
 #define USB_SHUTDOWN_MAGIC            0x31534455U /* UDS1 */
 #define USB_SHUTDOWN_SEAL             0x44455355U /* USED: snapshot published */
-#define USB_SHUTDOWN_SCHEMA           2U /* schema 1: PD7; schema 2: PA2/A3 */
+#define USB_SHUTDOWN_SCHEMA           5U /* 1: PD7 HIGH; 2: PA2 HIGH; 3: USB PA2 OFF; 4: USB PE9 OFF; 5: USB PD12 OFF */
 
 enum usb_shutdown_state {
     USB_SHUTDOWN_BEGIN=1, USB_SHUTDOWN_PERIPHERALS_OFF=2,
@@ -38,7 +38,7 @@ enum usb_shutdown_error {
 typedef struct {
     uint32_t magic, schema, words, state, error, prerequisites;
     uint32_t trial_entry_proven; /* Always zero: pre-WFI data is NOT entry proof. */
-    uint32_t hold_verified, ccr, control, ipsr, faultmask, fpccr;
+    uint32_t hold_verified, ccr, control, ipsr, faultmask, fpccr; /* schema5: PD12 verified LOW */
     uint32_t ahb4enr, ahb4rstr, ahb5enr_before, ahb5enr_after;
     uint32_t apb4enr2, dbg_cr_before, dbg_cr_after;
     uint32_t otp_shadowed, otp_valid, otp_value;
@@ -50,7 +50,7 @@ typedef struct {
 } usb_shutdown_proof_t;
 extern volatile usb_shutdown_proof_t usb_shutdown_proof;
 
-/* Never returns: guarded Standby, or an awake diagnostic park with HOLD high
+/* Never returns: guarded Standby, or an awake diagnostic park with HOLD LOW
  * on refusal/unexpected WFI return. Normal UART recovery requires NRST/cold
  * restart; neither UART wake nor USB reattach wake is configured. No reset,
  * NOR deep-power-down, OTP operation, or RTC/backup-domain write is issued.

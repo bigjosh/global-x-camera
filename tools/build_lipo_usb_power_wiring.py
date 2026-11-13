@@ -9,7 +9,7 @@ exec(helper.read_text(encoding='utf-8').split('c=Drawing()')[0], ns)
 ns['W'], ns['H'] = 2400, 2000
 c = ns['Drawing']()
 P, B, G, M, I = '#b13b35', '#136b9b', '#526474', '#5d7080', '#1c3044'
-c.svg[1] = '<title>Prototype wiring: manual USB/battery selector, SPDT trigger, A3 HOLD, exposure A0-A2 and ASA A4-A5</title>'
+c.svg[1] = '<title>Prototype wiring: manual USB/battery selector, SPDT trigger, D8 HOLD, exposure A0-A2 and ASA A4-A5</title>'
 
 def cap_v(x, y1, y2):
     mid = (y1+y2)/2
@@ -19,9 +19,9 @@ def cap_v(x, y1, y2):
     c.line([(x,mid+7),(x,y2)],G)
 
 c.text(45,28,'Prototype power and controls',40,bold=True)
-c.text(45,86,'Canonical wiring — November 10, 2026  |  SW2 manually selects USB or battery; Q3 removed',26,B,True)
+c.text(45,86,'Canonical wiring — November 13, 2026  |  SW2 manually selects USB or battery; Q3 removed',26,B,True)
 c.text(45,132,'The PCB version will use automatic MOSFET source selection instead of SW2.',24,P,True)
-c.text(45,174,'A3 HOLD installed; manual missing-sensor shutdown passed. Exposure and ASA capture integration remain pending.',21,M)
+c.text(45,174,'D8 HOLD installed; user confirms it works. Precise latch timing and exposure / ASA integration remain pending.',21,M)
 
 # USB branch: tap unchanged; diode status was not restated by the user.
 c.rect(45,235,455,125,'#fff5f3',P)
@@ -120,7 +120,8 @@ c.text(495,1173,'X7R, 10–16 V',20,M)
 c.text(495,1208,'Non-polarized',20,M)
 
 # GPIO and external gate OFF bias.
-c.text(45,1314,'HOLD: A3 / CN4 pin 4 / PA2 → Q2 gate pin 1',27,B,True)
+c.text(45,1314,'HOLD: D8 / CN14 pin 1 / PD12 → Q2 gate pin 1',27,B,True)
+c.text(45,1350,'Same net: CN15 pin 21. A3 suspect; D3 superseded. PD12 phase pulses disabled.',18,M)
 c.line([(45,1374),(1120,1374),(1120,1138),(990,1138)],B)
 c.dot(1120,1215,B)
 c.line([(1120,1215),(1030,1215)],B)
@@ -142,7 +143,7 @@ c.text(1555,995,'3 = Drain (single leg)',24,bold=True)
 c.text(1555,1041,'1 = Gate (lower left)',24,bold=True)
 c.text(1555,1087,'2 = Source (lower right)',24,bold=True)
 c.text(1245,1200,'Q1: S2 → LiPo+ / R1; D3 → R0 → SW2 BAT throw.',23,P,True)
-c.text(1245,1244,'Q2: S2 → GND; G1 → A3; D3 → Q1 G1 / SW1 NO.',23,B,True)
+c.text(1245,1244,'Q2: S2 → GND; G1 → D8; D3 → Q1 G1 / SW1 NO.',23,B,True)
 c.text(1245,1290,'Q3 / R6 omitted. No C1, C2, old D1, R3 or R4.',23,B,True)
 c.text(1245,1335,'Switch lug numbering is part-specific: identify COM/throws by continuity.',21,M)
 
@@ -152,7 +153,7 @@ c.text(70,1467,'EXPOSURE — A0 / A1 / A2',28,B,True)
 c.text(70,1520,'LOW end: A0 / CN4.1 / PF5 (GPIO LOW)',24,B,True)
 c.text(70,1570,'Wiper: A1 / CN4.2 → buffered PA9 / ADC1 channel 10',23,B,True)
 c.text(70,1620,'HIGH end: A2 / CN4.3 / PF6 (GPIO supply)',24,B,True)
-c.text(70,1670,'Diagnostic verified. Normal capture still uses fixed exposure.',22,M)
+c.text(70,1670,'Historical A0–A2 diagnostic verified; capture exposure still fixed.',22,M)
 c.text(70,1708,'Keep A1 digital companion PC10 input / no pull.',20,M)
 c.rect(1220,1445,1130,295,'#f7fafc',G)
 c.text(1245,1467,'ASA → ANALOG GAIN — new knob',28,B,True)
@@ -166,8 +167,9 @@ c.line([(45,1780),(2350,1780)],G,2)
 c.text(45,1800,'COMMON GROUND',25,G,True)
 c.text(335,1800,'LiPo −, latch / ASA GND and CN5 pin 6; JS return if fitted. USB ground is common through the board.',22,G)
 c.text(45,1846,'Keep all CN9 jumpers OUT and SB12 fitted; board D2 / R23 remain removed. No parallel target supply.',23,P,True)
-c.text(45,1891,'A3 stays HIGH through capture/save/USB/recovery and floats before Standby. SW2 USB power bypasses the latch.',23)
-c.text(45,1935,'A3 is exclusively HOLD. Do not run the old A3–A5 knob diagnostic. No firmware change or bench operation in this update.',22,M)
+c.text(45,1889,'D8 HIGH: battery capture/save/error display and early UART recovery. Float immediately before battery Standby.',22)
+c.text(45,1927,'USB-selected service: D8 LOW. Provisional early boot HOLD can pulse HIGH before USB selection.',21)
+c.text(45,1962,'SW2 USB power bypasses the latch. D8 is exclusively HOLD; do not run the old A3–A5 diagnostic.',19,M)
 
 OUT.mkdir(parents=True, exist_ok=True)
 svg = '\n'.join(c.svg + ['</svg>'])

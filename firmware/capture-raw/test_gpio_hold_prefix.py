@@ -91,11 +91,11 @@ class GpioHoldPrefixTests(unittest.TestCase):
     def test_modified_hook_source_rejected_even_with_unchanged_binary(self):
         blob=self.fixture()
         path=self.folder/'gpio_hold_boot.S'
-        path.write_text(path.read_text().replace('movs r1, #4','movs r1, #64'))
+        path.write_text(path.read_text().replace('mov.w r1, #4096','mov.w r1, #8192'))
         with self.assertRaisesRegex(ValueError,'assembly source changed'):self.checked(blob)
 
 
-@unittest.skipUnless(os.environ.get('GPIO_HOLD_BUILD'), 'Linked PA2 candidate supplied by GPIO_HOLD_BUILD')
+@unittest.skipUnless(os.environ.get('GPIO_HOLD_BUILD'), 'Linked PD12 candidate supplied by GPIO_HOLD_BUILD')
 class EmbeddedHookIsolationTests(unittest.TestCase):
     def setUp(self):
         import error_build
@@ -142,7 +142,7 @@ class EmbeddedHookIsolationTests(unittest.TestCase):
             self.audit(self.folder)
         path.write_text(original)
         binary=self.folder/'stage1.bin'; original=binary.read_bytes()
-        for offset in (0x19D0, 0x19F0, 0x1A20):
+        for offset in (0x19D0, 0x19F0, 0x1A20, 0x1A3F):
             changed=bytearray(original);changed[offset]^=1;binary.write_bytes(changed)
             with self.subTest(offset=offset), self.assertRaisesRegex(ValueError, 'padding'):
                 self.audit(self.folder)

@@ -610,3 +610,52 @@ effect on the cold-start budget remain part of that later integration.
 [control diagnostic](../control-smoke/README.md) and
 [offline combined candidate](../usb-ptp/evidence/2026-11-09-a3-hold/README.md).
 This confirmation changes no firmware binary or hardware state.
+
+## 2026-11-13  Move HOLD to PE9/D3 after the external A3 toggle failure
+
+**Why:** the user moved the latch wire to Arduino D3 and requested camera
+firmware plus a hardware smoke test before changing schematic/assembly
+instructions. The official MB1940 C02 schematic identifies D3/CN13.4 as PE9,
+on the MCU's main VDD supply. Contract schema 4 binds this exact pin, while
+schemas 1/2 (PD7) and 3 (PA2) retain their original meanings. Existing masked
+GPIOE users (recovery PE1/PE6, marker PE0, SD PE4) preserve PE9.
+
+**Rejected:** continuing to rely on a pin whose output was not observed
+physically, diagnosing the cause of A3 damage from internal IDR/ODR alone,
+changing an entire GPIO port, moving the UART guard, or silently reinterpreting
+old contract schemas. The early PE9 preload requires a wider instruction but
+uses former alignment padding: the complete hook remains 76 bytes at
+0x34181DF0 and leaves four zero bytes before the USB selector. Boot-only
+padding is still unreachable from the copied error engine. Only PE9 floats
+at the final Standby boundary; active, error-display, recovery and refused
+paths keep HOLD HIGH, and unexpected WFI return reasserts it.
+
+**Evidence:** [D3 offline build and qualification](evidence/2026-11-13-d3-hold/README.md)
+freezes the exact sources and binaries, full package audit, 324 passing tests
+without skips, six historical HOLD package checks, and unchanged no-HOLD
+October28 receiver/prefix/sector comparisons. The control-smoke folder owns
+the physical A3 observations; the combined USB campaign owns installation,
+external D3 levels and UART recovery. This capture-only work performed no
+hardware access and makes no new latch/rail timing claim. Schematic and
+assembly edits are intentionally deferred until the requested smoke test.
+
+## 2026-11-13  Move HOLD to PD12/D8 and retire its physical phase-marker output
+
+**Why:** after the D3 migration, the user explicitly requested a simple move
+to D8 and reload, with no further testing. The existing phase header maps
+D8/CN14.1 (also CN15.21) to PD12. Schema5 binds that pin while preserving
+schemas1–4 for historical packages. Startup assertion and final Standby
+release retain the same policy and fixed boot/recovery layout.
+
+**Rejected:** leaving the PD12 phase generator active on a power-HOLD pin,
+where its LOW initialization and pulses would interrupt the latch. The
+HOLD profile substitutes no-GPIO phase functions; the callers' RAM counters
+and independent PD0 exposure mirror remain unchanged. No new test campaign
+or additional behavioral changes are included in this user-requested reload.
+
+**Evidence:** `gpio_hold_prefix.py`, `gpio_hold_transform.py`,
+`phase_gpio_hold.inc` and the explicit disabled phase-marker build metadata.
+Build/package checks are required before reload. The root campaign at
+`tmp/bringup/d8-hold-20261113/` owns the final combined package, programming
+readback and installed-state record; this offline work does not claim a new
+capture, latch timing or power measurement. Schematics remain deferred.

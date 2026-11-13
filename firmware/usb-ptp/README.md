@@ -4,15 +4,23 @@ Bare-metal PTP over the Nucleo's **CN8 MCU USB connector**. Windows uses its
 native Portable Devices camera driver; no custom driver, drive emulation or
 SD filesystem is required. The SD still holds the existing fixed RAW slots.
 
-**November 9:** the canonical HOLD connection is now **A3 / CN4.4 / PA2**.
-The installed combined capture/USB firmware asserts it before the unchanged early UART
-guard, retains it throughout recovery, capture/save and USB service, and floats
-it immediately before final Standby. Both NOR regions now match the reviewed
-PA2 package; A3, the remapped knob diagnostic and UART recovery passed smoke
-tests. Camera and CN8 were absent, so capture and USB mode were not requalified.
-Target power was left OFF through the JS. See the
-[live installation record](../control-smoke/evidence/2026-11-09-a3-live/README.md)
-and [original offline candidate](evidence/2026-11-09-a3-hold/README.md).
+**November 13 D8 firmware installed:** HOLD is now **Arduino D8 / CN14.1 / PD12**.
+This supersedes the earlier D3 assignment at the user's request. The combined
+image preserves early battery HOLD and the UART guard, keeps HOLD through
+capture/save/error display, and floats it immediately before battery Standby.
+USB-selected HOLD remains LOW. The capture build disables the former PD12
+phase-marker output so it cannot toggle the latch. Both flash-sector readbacks match;
+[the D8 record](evidence/2026-11-13-d8-hold/README.md) records the reload.
+No new functional test campaign was run, as requested.
+
+Once VBUS selects USB mode, HOLD is driven LOW before the USB application is
+loaded and stays LOW through service, faults, shutdown refusal and an unexpected
+WFI return. It floats at the final USB Standby boundary. This incorporates the
+previously committed November 10 USB-off correction. A provisional HIGH still
+exists before VBUS selection, and early UART recovery parks before that decision;
+there is no claim that a USB-powered cold boot has no initial HOLD pulse.
+The original [November 9 PA2 installation](../control-smoke/evidence/2026-11-09-a3-live/README.md)
+and [candidate](evidence/2026-11-09-a3-hold/README.md) remain historical evidence.
 
 ## Using the installed prototype
 
@@ -61,16 +69,16 @@ same native driver used by Explorer.
 
 ```powershell
 python firmware/usb-ptp/build.py --out tmp/my-usb-build
-python firmware/usb-ptp/package.py --usb tmp/my-usb-build --capture tmp/my-reviewed-pa2-capture/staged --out tmp/my-usb-package
+python firmware/usb-ptp/package.py --usb tmp/my-usb-build --capture tmp/my-reviewed-pd12-capture/staged --out tmp/my-usb-package
 ```
 
-The canonical dual-mode package includes the reviewed PA2 HOLD capture build
+The canonical dual-mode package includes the reviewed PD12 HOLD capture build
 and preserves its capture payload and the original early UART recovery guard.
 The standalone capture build uses `--gpio-hold`; see the [capture build](../capture-raw/README.md).
 The package builder requires an explicit capture directory and admits only
 independently reviewed exact prefix/sector hashes, not a self-consistent manifest.
 The legacy October 28 input is retained for explicit historical reproductions;
-it does not implement the A3 capture latch. A small branch after SRAM preparation
+it does not implement the D8 capture latch. A small branch after SRAM preparation
 loads a checked selector from a separate NOR region. It samples **CN8 VBUS
 through R80/R81 → PA11/ADC2 channel 12**. Present USB power selects the PTP
 app; absent power resumes capture. A powered charger also selects USB mode.
@@ -102,9 +110,10 @@ No OTP settings or standard external-loader initialization are changed.
   capture, DMA-sleep and physical HOLD-latch qualification remain separate.
 - USB disconnect handling waits until protocol/storage work is quiescent,
   samples absent VBUS twice, deinitializes SD/USB, and attempts guarded
-  Standby with PA2 floated at the final boundary. Shutdown proof schema 2
-  identifies PA2; frozen schema 1 records still describe PD7. The code and isolated
-  shutdown checks pass; physical cable-removal/shutdown is not yet tested.
+  Standby with PD12 floated at the final boundary. Shutdown proof schema 5
+  identifies USB PD12 OFF; frozen schemas 1/2/3/4 describe PD7 HIGH, PA2 HIGH,
+  PA2 OFF and PE9 OFF respectively. No refusal or WFI-return path asserts the battery latch.
+  Physical cable-removal/shutdown remains unqualified for this candidate.
 - A failed header read during initial catalogue scanning currently prevents
   USB service from starting. Unknown/torn header markers stay occupied and
   hidden. Best-effort recovery applies to recognized objects during download;

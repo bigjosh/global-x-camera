@@ -996,3 +996,64 @@ power; it shortens how long the cells must hold it.
 **Evidence:** direct user reply, November 11; [peak-power exploration](custom-pcb-peak-power.md);
 [punch-list items PL-01 and PL-16](../review/2026-11-10-pcb-readiness-punch-list.md).
 No hardware, firmware or CAD change.
+
+## 2026-11-12  A HIGH HOLD pad does not prove the external latch has taken over
+
+**Why:** a trigger-powered, sensor-disconnected boot reached the sensor READY
+poll with PA2/A3 configured as output HIGH and its pad reading HIGH. Current
+nevertheless collapsed before the documented 500 ms absent-sensor timeout,
+preventing the expected error display. The external A3/Q2/Q1 path is the
+leading suspect; the physical failure is still unlocated.
+
+**Rejected:** changing the blink firmware based only on the observed brief
+red LED; treating the MCU's output latch or pad reading as proof that Q2's
+gate receives the voltage and clamps Q1's gate. A second UART-requested pulse
+also ended early, but no recovery snapshot was obtained, so it is not proof
+of a verified parked MCU dropping power.
+
+**Evidence:** [November 12 trigger traces and RAM records](evidence/2026-11-12-trigger-dropout/README.md).
+No firmware/NOR/SD writes, reset, halt or JS power switching. Physical HOLD
+continuity and downstream gate/rail measurements remain pending.
+
+## 2026-11-13  Direct 5 V operation supports investigating the external latch first
+
+**Why:** the user bypassed the trigger circuit by feeding the board's 5 V pin
+directly and reports that it now seems to work. Together with the earlier
+HIGH HOLD pad and early current collapse, this supports investigating the
+external trigger/HOLD connections before changing firmware.
+
+**Rejected:** treating the brief red indication as sufficient evidence of a
+blink-handler bug; claiming the exact failing wire or component is now
+identified. The user did not report exact blink counts or measured waveforms
+for this direct-power check.
+
+**Evidence:** direct user report on November 13; [preceding instrumented
+diagnostic](evidence/2026-11-12-trigger-dropout/README.md). The user is checking
+the power-circuit connections and retains bench ownership. No instrument
+access or firmware change was made for this update.
+
+## 2026-11-13  Make D8 the canonical prototype HOLD connection after the user's check
+
+**Why:** after the A3 output investigation and the intermediate D3 migration,
+the user requested D8 instead, then reported that the loaded firmware works.
+The assembly plan now connects **Arduino D8 / CN14 pin 1 / PD12** directly to
+Q2 gate pin 1. CN15 pin 21 is the same net. The SPDT trigger, 2.2 uF starting
+capacitor, R1/R2=100 kOhm, R5=1 kOhm, R0=2.2 Ohm and manual USB/battery
+selector are unchanged. Exposure remains A0-A2 and ASA remains A4/A5/GND.
+
+**Rejected:** keeping A3 or D3 in current wiring instructions, diagnosing why
+A3 stopped driving from internal GPIO readings, or treating the user's D8
+confirmation as evidence that D3 failed. PD12 cannot also emit phase pulses;
+the firmware disables that physical marker while retaining RAM timing and the
+independent PD0 exposure marker. USB-selected mode keeps HOLD LOW; the existing
+provisional early assertion and early UART-recovery HIGH are not a guarantee
+of a zero-pulse USB start. Automatic power selection remains a PCB direction.
+
+**Evidence:** direct November 13 user instruction, "works! lets update the
+schematic and assembly instructions to make D8 the canonical HOLD pin, then
+commit and push"; [complete wiring](lipo-latch-wiring.svg),
+[assembly guide](../prototype/nucleo-assembly-guide.md), and
+[installed D8 package, complete programming readbacks and user confirmation](../../firmware/usb-ptp/evidence/2026-11-13-d8-hold/README.md).
+The reload had build/layout and programming checks but no additional functional
+test campaign, at the user's request. No new bench operation accompanies this
+documentation update; exact latch timing and rail ordering are not newly measured.

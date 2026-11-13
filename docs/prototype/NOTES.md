@@ -356,3 +356,21 @@ candidate, not a selection.
 [punch-list item PL-19](../review/2026-11-10-pcb-readiness-punch-list.md);
 earlier finding ACC-001 on the accelerometer's start-up time. No hardware,
 firmware or CAD change.
+
+## 2026-11-13  Check both sides of SB6 when MCU HOLD and Arduino A3 disagree
+
+**Why:** the user reports no external A3 HIGH despite continuity from A3 to
+Q2's gate. Live rechecking found the complete boot/HOLD prefix unchanged and
+PA2 output/pad HIGH in verified UART recovery. ST's schematic routes PA2
+directly to CN3.34 but through SB6 to CN4.4/A3. Header-to-gate continuity does
+not test that MCU-to-header connection. The official C02 BOM confirms SB6 is
+factory fitted; its present physical condition remains unverified.
+
+**Rejected:** concluding that firmware changed from the external trace alone;
+calling an open SB6 proven; using PA12, the buffered ADC companion, as the
+HOLD GPIO; or treating software pad readback as an external voltage measurement.
+The requested direct-PA2 and A3 voltage readings remain pending.
+
+**Evidence:** [November13 live prefix, recovery and GPIO comparison](../../firmware/control-smoke/evidence/2026-11-13-hold-recheck/README.md),
+including official schematic/BOM/manual references. No firmware or board
+wiring change; target left in recovery with HIGH HOLD for the user's meter.

@@ -26,10 +26,11 @@ class GPIOHoldAdmission(unittest.TestCase):
         self.assertNotIn('gpio_hold',json.loads(NORMAL.read_text()))
 
     def test_exact_historical_hold_packages_remain_inspectable(self):
-        for name in ('hold-standby','hold-awake'):
-            archived=HERE/'evidence/2026-11-07-gpio-hold'/name/'manifest.json'
-            with self.subTest(name=name):
-                self.assertTrue(bench.gpio_hold_layout(json.loads(archived.read_text())))
+        for campaign in ('2026-11-07-gpio-hold', '2026-11-08-spdt-hold', '2026-11-09-a3-hold'):
+            for name in ('hold-standby','hold-awake'):
+                archived=HERE/'evidence'/campaign/name/'manifest.json'
+                with self.subTest(campaign=campaign, name=name):
+                    self.assertTrue(bench.gpio_hold_layout(json.loads(archived.read_text())))
 
     def test_awake_and_standby_only_admit_explicit_bound_flash_selection(self):
         for standby in (False,True):

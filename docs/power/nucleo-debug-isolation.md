@@ -1,10 +1,21 @@
 # Nucleo debugger isolation and power measurement
 
-The latest [October 28 isolated-Nucleo report](evidence/2026-10-28-isolated-nucleo/README.md)
+**November 13 current signal allocation:** D8 / CN14.1 / **PD12** is power
+HOLD, and **CN15.21** is the same net. Its old phase-pulse output is disabled
+in the installed HOLD profile; do not decode this pin as cycle-phase events
+or drive it from an instrument. RAM timestamp records and the separate PD0
+exposure mirror remain available. The user reports the D8 arrangement works;
+no new synchronized power/timing campaign accompanied the reload.
+[Installed firmware](../../firmware/usb-ptp/evidence/2026-11-13-d8-hold/README.md).
+The October 28 wiring/results below are historical, not a current instrument
+channel assignment or bench-state proof. Re-establish actual connections and
+ownership from the latest AGENTS checkpoint before operating the bench.
+
+The historical [October 28 isolated-Nucleo report](evidence/2026-10-28-isolated-nucleo/README.md)
 records CPU/sleep/cache/SRAM controls with camera and SD physically disconnected,
 and a measured 182.85 mW Ethernet power-down saving. Final shutdown current was
 8.0766 mA at 4.9937 V; warm UART recovery and retained Standby flags passed.
-Normal NOR is unchanged. At 19:15:18 UTC the JS output was intentionally disabled;
+That campaign left its then-installed NOR unchanged. At 19:15:18 UTC the JS output was intentionally disabled;
 other instrument settings were restored. See the latest AGENTS checkpoint before
 operating the bench. The earlier [aligned ablations](evidence/2026-10-28-aligned-ablation/README.md)
 retain the complete-camera phase measurements and their separate limitations.
@@ -13,7 +24,7 @@ retain the complete-camera phase measurements and their separate limitations.
 
 After the battery-side collapse test, the user confirms connecting the regulated bench supply directly through JS110 to the target, following the canonical CN5.5/5V and CN5.6/GND plan below. Supply capability is 2 A. This is a user hookup confirmation, not a measured voltage, successful boot or idle-state proof. Keep the proposed CN9-open/CN8-disconnected/LTC-output-disconnected configuration and independently powered CN10 with D2 removed; verify actual state before recording. Compare unchanged card, scene, exposure/gain and firmware over three complete capture/save cycles before component changes. A later stable-12-V-through-LTC comparison measures a different boundary and must be labeled separately.
 
-For simultaneous power and phase observation, the proposed wiring now uses only CN15, as requested by the user:
+For that October 28 power/phase baseline, the proposed wiring used only CN15:
 
 | Nucleo signal | JS110 rear GPIO connector | Purpose |
 |---|---|---|
@@ -27,7 +38,7 @@ The user confirmed these CN15 marker connections on October28. All three cold cy
 
 JS110 needs no external Vref wire; configure its internal IO reference to 3.3 V and leave its rear +5 V and OUT pins unconnected. Its GPIO reference is USB ground, which this wiring intentionally joins to DUT ground, unlike the isolated analog measurement terminals. The documented native GPI rate is 2 MSPS; enabled GPI channels consume one ADC LSB, reducing corresponding analog samples from 14 to 13 bits. Preserve and report these settings, and save full digital samples rather than just analog averages. [JS110 GPIO guide](https://docs.joulescope.com/en/products/js110/guide/gpio.html), [datasheet](https://docs.joulescope.com/en/products/js110/datasheet.html).
 
-The last installed normal RAW build's outer manifest declares phase protocol v2: event IDs are spaced by 2 us on PD12. The source and manifest are available under `tmp/bringup/error-relocate-20261026/flash-normal-v2`; [protocol and semantic precedence](../../firmware/capture-raw/phase_protocol.py) distinguish overlapping camera/storage activity. At a 0.5 us sample grid, do not apply Saleae's 0.4 us width tolerance unchanged or infer a missing event solely from expected order. Qualify observed pulses and record instrument-specific decoding uncertainty. The October28 test recorded the existing markers without changing their firmware.
+The October 28 RAW build's outer manifest declares historical phase protocol v2: event IDs are spaced by 2 us on PD12. The source and manifest are available under `tmp/bringup/error-relocate-20261026/flash-normal-v2`; [protocol and semantic precedence](../../firmware/capture-raw/phase_protocol.py) distinguish overlapping camera/storage activity. At a 0.5 us sample grid, do not apply Saleae's 0.4 us width tolerance unchanged or infer a missing event solely from expected order. Qualify observed pulses and record instrument-specific decoding uncertainty. The October28 test recorded the existing markers without changing their firmware.
 
 ## Canonical target power connection — October 27
 

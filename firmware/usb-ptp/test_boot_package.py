@@ -32,6 +32,34 @@ def fixture():
  return manifest,bytes(image)
 
 
+def guarded_selector_handoffs(image,base,entry):
+ """Decode bounded Thumb paths after DSB/ISB, including literal-pool bypass.
+
+ Only an unconditional B, PC-relative 16-bit LDR, and BLX of that loaded
+ register are accepted. No store, other call, condition or fallthrough data
+ may separate the barriers from the exact reviewed USB entry.
+ """
+ barriers=bytes.fromhex('bff34f8fbff36f8f');paths=[]
+ for start in range(0,len(image)-8,2):
+  if image[start:start+8]!=barriers:continue
+  pc=base+start+8;loaded={};visited=[]
+  for _ in range(5):
+   off=pc-base
+   if off<0 or off+2>len(image) or pc in visited:break
+   visited.append(pc);ins=struct.unpack_from('<H',image,off)[0]
+   if ins&0xF800==0xE000: # 16-bit unconditional B; signed11 displacement
+    imm=ins&0x7FF;imm=imm-0x800 if imm&0x400 else imm
+    pc+=4+2*imm;continue
+   if ins&0xF800==0x4800: # LDR Rt,[PC,#imm] from the exact linked bytes
+    reg=(ins>>8)&7;literal=((pc+4)&~3)+(ins&255)*4-base
+    if literal<0 or literal+4>len(image):break
+    loaded[reg]=struct.unpack_from('<I',image,literal)[0];pc+=2;continue
+   if ins&0xFF87==0x4780 and loaded.get((ins>>3)&15)==entry:
+    paths.append(dict(barrier=base+start,path=visited,entry=entry))
+   break
+ return paths
+
+
 class BoundsTests(unittest.TestCase):
  def setUp(self):self.m,self.image=fixture()
  def reject(self,**changes):
@@ -65,6 +93,21 @@ class BoundsTests(unittest.TestCase):
   code="import runpy; p=runpy.run_path(sys.argv[1]); p['require'](False,'intentional guard')"
   result=subprocess.run([sys.executable,'-O','-c','import sys;'+code,str(HERE/'package.py')],capture_output=True,text=True)
   self.assertNotEqual(result.returncode,0);self.assertIn('intentional guard',result.stderr)
+
+class USBHoldPolicyTests(unittest.TestCase):
+ def setUp(self):self.m={'gpio_hold':dict(schema=4,port='GPIOD',pin=12,mode='usb-off',shutdown_proof_schema=5)}
+ def test_usb_off_policy_admits_normal_pd12_and_explicit_legacy(self):
+  p.validate_usb_hold_policy(self.m,'pd12-hold')
+  p.validate_usb_hold_policy(self.m,'legacy-october28',True)
+ def test_old_reasserting_or_missing_policy_is_rejected(self):
+  for change in ({'schema':2},{'pin':2},{'port':'GPIOA'},{'mode':'usb-hold'},{'shutdown_proof_schema':3}):
+   with self.subTest(change=change),self.assertRaises(ValueError):
+    p.validate_usb_hold_policy({'gpio_hold':{**self.m['gpio_hold'],**change}},'pd12-hold')
+  with self.assertRaises(ValueError):p.validate_usb_hold_policy({},'pd12-hold')
+ def test_old_capture_hold_cannot_be_paired_with_new_usb_pin(self):
+  with self.assertRaises(ValueError):p.validate_usb_hold_policy(self.m,'pa2-hold')
+ def test_latched_capture_cannot_override_usb_selection(self):
+  with self.assertRaises(ValueError):p.validate_usb_hold_policy(self.m,'pd12-hold',True)
 
 
 class ReferenceAndCompositionTests(unittest.TestCase):
@@ -253,23 +296,25 @@ class LinkedPackageTests(unittest.TestCase):
  def test_early_uart_guard_is_identical_to_original(self):
   prefix=(self.out/'stage1.bin').read_bytes();legacy=(p.REFERENCE/'stage1.bin').read_bytes()
   # Reset startup through the complete PE6/UART park/recovery block remains
-  # fixed. PA2 may change only the reset vector before this range.
+  # fixed. PD12 may change only the reset vector before this range.
   self.assertEqual(prefix[0x40:p.PATCH_OFFSET],legacy[0x40:p.PATCH_OFFSET])
   self.assertEqual(prefix[0x38C:0x38E],bytes.fromhex('fee7'))
- def test_pa2_capture_reference_and_usb_contract(self):
-  if self.m.get('capture_profile')!='pa2-hold':self.skipTest('Legacy package has no early HOLD')
+ def test_pd12_capture_reference_and_usb_contract(self):
+  if self.m.get('capture_profile')!='pd12-hold':self.skipTest('Legacy package has no early HOLD')
   capture=Path(self.m['capture_build']);original=(capture/'stage1.bin').read_bytes()
   sector=(capture/'capture_sector_0.bin').read_bytes();manifest=json.loads((capture/'manifest.json').read_text(encoding='utf-8'))
-  self.assertEqual(p.validate_reference(original,sector,manifest),'pa2-hold')
+  self.assertEqual(p.validate_reference(original,sector,manifest),'pd12-hold')
   self.assertEqual(struct.unpack_from('<I',original,4)[0],0x34181DF1)
   self.assertEqual(self.m['gpio_hold'],manifest['raw_slots']['gpio_hold_contract'])
   usb=json.loads((Path(self.m['usb_build'])/'manifest.json').read_text(encoding='utf-8'))
-  self.assertEqual((usb['gpio_hold']['port'],usb['gpio_hold']['pin']),('GPIOA',2))
-  self.assertEqual(usb['gpio_hold']['shutdown_proof_schema'],2)
+  self.assertEqual((usb['gpio_hold']['port'],usb['gpio_hold']['pin']),('GPIOD',12))
+  p.validate_usb_hold_policy(usb,'pd12-hold',self.m['force_capture'])
+  self.assertEqual(usb['gpio_hold']['shutdown_proof_schema'],5)
+  self.assertEqual(self.m['usb_hold_policy'],usb['gpio_hold'])
   # A self-consistent manifest cannot admit corrupted code or old PD7 claims.
   bad=bytearray(original);bad[0x19F0]^=1
   with self.assertRaises(ValueError):p.validate_reference(bad,sector,{**manifest,'stage1_raw_sha256':p.sha(bad)})
-  for change in ({'port':'GPIOD'},{'pin':7},{'schema':2}):
+  for change in ({'port':'GPIOE'},{'pin':7},{'schema':2}):
    with self.subTest(change=change),self.assertRaises(ValueError):
     p.validate_reference(original,sector,{**manifest,'raw_slots':{**manifest['raw_slots'],'gpio_hold_contract':{**manifest['raw_slots']['gpio_hold_contract'],**change}}})
  def test_linked_loaders_guard_caches_and_sync_before_executable_branch(self):
@@ -280,7 +325,19 @@ class LinkedPackageTests(unittest.TestCase):
   self.assertRegex(self.hl,r'dsb\s+sy\s*\n[^\n]+isb\s+sy(?:(?!\bblx\b)[\s\S])*?blx\s+r3')
   if not self.m['force_capture']:
    self.assertRegex(self.sl,r'#196608')
-   self.assertTrue(re.search(r'dsb\s+sy\s*\n[^\n]+isb\s+sy(?:\s*\n[^\n]+){1,3}?blx\s+',self.sl),'USB handoff lacks adjacent DSB/ISB before branch')
+   usb=json.loads((Path(self.m['usb_build'])/'manifest.json').read_text(encoding='utf-8'))
+   selector=(self.out/'selector.bin').read_bytes()
+   paths=guarded_selector_handoffs(selector,p.SELECTOR_LOAD,usb['entry'])
+   self.assertEqual(len(paths),1,'USB handoff must execute DSB/ISB then only bounded B/LDR before exact-entry BLX')
+ def test_selector_handoff_rejects_changed_barriers_target_and_call(self):
+  usb=json.loads((Path(self.m['usb_build'])/'manifest.json').read_text(encoding='utf-8'))
+  selector=(self.out/'selector.bin').read_bytes()
+  paths=guarded_selector_handoffs(selector,p.SELECTOR_LOAD,usb['entry'])
+  self.assertEqual(len(paths),1)
+  for address in (paths[0]['barrier'],paths[0]['path'][-1]):
+   bad=bytearray(selector);offset=address-p.SELECTOR_LOAD;bad[offset:offset+2]=b'\0\xbf'
+   self.assertFalse(guarded_selector_handoffs(bad,p.SELECTOR_LOAD,usb['entry']))
+  self.assertFalse(guarded_selector_handoffs(selector,p.SELECTOR_LOAD,usb['entry']+2))
  def test_linked_ic_disable_invalidate_and_conditional_restore(self):
   disable=re.search(r'bic\.w\s+[^\n]+#131072',self.hl)
   restore=re.search(r'orr\.w\s+[^\n]+#131072',self.hl)

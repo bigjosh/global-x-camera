@@ -1,4 +1,4 @@
-"""Build a RAM-only A0/A1/A2 ADC diagnostic with A3 HOLD. No instruments."""
+"""Build a RAM-only A0/A1/A2 ADC diagnostic with D8 HOLD. No instruments."""
 from pathlib import Path
 import argparse, hashlib, json, re, shutil, subprocess, sys
 HERE=Path(__file__).resolve().parent
@@ -44,7 +44,7 @@ def main():
     assert len(code)<0x10000 and code[sym('control_park')-0x34300000:sym('control_park')-0x34300000+2]==b'\xfe\xe7'
     fields=[x.strip() for x in re.search(r'enum \{(.*?)\};',(out/'control.c').read_text(),re.S)[1].split(',')][:-1]
     assert len(fields)==63
-    m=dict(schema=3,kind='exposure-knob-adc-ram',load=0x34300000,entry=sym('control_entry')|1,
+    m=dict(schema=5,kind='exposure-knob-adc-ram',load=0x34300000,entry=sym('control_entry')|1,
         park=sym('control_park'),proof=0x343C2000,proof_words=64,proof_sequence_end_word=63,request=0x343C1F00,request_words=8,
         request_magic=0x31544F50,stop_magic=0x504F5453,stack=0x343B0000,stack_floor=0x343AF000,
         bss_start=sym('__bss_start__'),bss_end=sym('__bss_end__'),fields=fields,
@@ -56,10 +56,10 @@ def main():
         vrefbuf_clock=a.vrefbuf_clock,vrefbuf_mode='external ENVR=0,HIZ=1' if a.vrefbuf_clock else 'untouched',
         reserved53='VREFBUF CSR before low16 / after high16' if a.vrefbuf_clock else 'reserved',
         endpoint_channels={'A0':'ADC1_INP5/PA8','A2':'ADC1_INP11/PA10'},
-        wiring={'low':'A0/CN4.1/PF5','wiper':'A1/CN4.2/PA9','high':'A2/CN4.3/PF6','hold':'A3/CN4.4/PA2'},
-        digital_wiper='PC10 input/no-pull',hold_analog_companion='PA12 analog/no-pull',
+        wiring={'low':'A0/CN4.1/PF5','wiper':'A1/CN4.2/PA9','high':'A2/CN4.3/PF6','hold':'D8/CN14.1/PD12'},
+        digital_wiper='PC10 input/no-pull',retired_hold='PA2 and PA12 untouched',
         sd_commands=False,nor_commands=False,camera_commands=False,reset=False,power_switch=False,
-        terminal_policy='A2 LOW; PA2/A3 HOLD remains HIGH; debug awake park',
+        terminal_policy='A2 LOW; PD12/D8 HOLD remains HIGH; debug awake park',
         sources={n:hashlib.sha256((out/n).read_bytes()).hexdigest() for n in sources})
     (out/'manifest.json').write_text(json.dumps(m,indent=2)+'\n');print(json.dumps(m,indent=2))
 if __name__=='__main__':main()

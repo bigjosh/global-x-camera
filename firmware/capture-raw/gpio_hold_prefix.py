@@ -1,4 +1,4 @@
-"""Opt-in PA2/A3 boot hook, leaving the historical UART guard at exact addresses.
+"""Opt-in PD12/D8 boot hook, leaving the historical UART guard at exact addresses.
 
 The reset vector alone redirects ROM entry to a stackless fixed-location hook.
 It asserts HOLD then enters the original reset handler; original startup,
@@ -23,7 +23,7 @@ ERROR_BEGIN, ERROR_END = 0x1440, 0x1A40
 # Unknown output is refused rather than making structure an identity waiver.
 LEGACY_HOOK_SHA256 = 'c3b7aeb3f1919b556441d6369fd8bb5bdabbe7ad85ec3b3927b3eda2259e34db'
 LEGACY_ERROR_SHA256 = '7082e54d435a68288d44979abd40aa18668dc436395dfa9e00e43cf517b72d94'
-HOOK_BYTES = 76
+LEGACY_HOOK_BYTES = 76
 LEGACY_HOOK_HEX = ('72b60f48082101600e4801680e4880218161416821f080014160'
             '816821f440418160c16821f44041c160016821f4404141f48041'
             '0160bff34f8ffef7e1ba00005c8a02565c820256000c0256')
@@ -74,29 +74,51 @@ LEGACY_LINK_SECTION = '''    .gpio_hold_boot 0x34181E40 : {
 '''
 
 
-# Canonical PA2 hook occupies otherwise-unused error-copy padding, leaving the
+# Canonical hook occupies otherwise-unused error-copy padding, leaving the
 # entire 0x34181E40..0x34182000 tail available for the native USB selector.
 # It is never reachable from the copied error engine. Legacy PD7 stays at its
 # original address for strict inspection of frozen November 7/8 packages.
 ENTRY = 0x34181DF0
-HOOK_HEX = '72b60f48012101600e4801680e4804218161416821f004014160816821f030018160c16821f03001c160016821f0300141f010010160bff34f8ffef709bb00005c8a02565c82025600000256'
-HOOK_SHA256 = '1c2487687bdd4e11737492c68f50f2409722b319cc4a67c6dd4efe4867489f1e'
-ERROR_SHA256 = '722ea4e53321bbc579ec45bccb601bc1912d0dc920a2eff2d746c68e447c1f0a'
-ASSEMBLY = LEGACY_ASSEMBLY.replace('GPIOD', 'GPIOA').replace('PD7', 'PA2')
+PA2_HOOK_HEX = '72b60f48012101600e4801680e4804218161416821f004014160816821f030018160c16821f03001c160016821f0300141f010010160bff34f8ffef709bb00005c8a02565c82025600000256'
+PA2_HOOK_SHA256 = '1c2487687bdd4e11737492c68f50f2409722b319cc4a67c6dd4efe4867489f1e'
+PA2_ERROR_SHA256 = '722ea4e53321bbc579ec45bccb601bc1912d0dc920a2eff2d746c68e447c1f0a'
+PA2_ASSEMBLY = LEGACY_ASSEMBLY.replace('GPIOD', 'GPIOA').replace('PD7', 'PA2')
 for _old, _new in (('movs r1, #8\n', 'movs r1, #1\n'), ('0x56020C00', '0x56020000'),
                    ('#128', '#4'), ('#0xC000', '#0x30'), ('#0x4000', '#0x10')):
+    PA2_ASSEMBLY = PA2_ASSEMBLY.replace(_old, _new)
+HOOK_BYTES = 76
+PE9_HOOK_HEX = '72b60f48102101600e4801680e484ff400718161416821f400714160816821f440218160c16821f44021c160016821f4402141f480210160bff34f8ffef708bb5c8a02565c82025600100256'
+PE9_HOOK_SHA256 = 'b8b06e4a891d56c1be4cb8f3d7862b6c3040848c9c0f17340fc57d5b935bd6c1'
+PE9_ERROR_SHA256 = '45b676daf1b9974faf6a24ac69cfa48e0ce5b815c3f05d1ce424b2108a9332be'
+PE9_ASSEMBLY = LEGACY_ASSEMBLY.replace('GPIOD', 'GPIOE').replace('PD7', 'PE9')
+for _old, _new in (('movs r1, #8\n', 'movs r1, #16\n'), ('0x56020C00', '0x56021000'),
+                   ('movs r1, #128', 'mov.w r1, #512'), ('#128', '#512'),
+                   ('#0xC000', '#0xC0000'), ('#0x4000', '#0x40000')):
+    PE9_ASSEMBLY = PE9_ASSEMBLY.replace(_old, _new)
+HOOK_HEX = '72b60f48082101600e4801680e484ff480518161416821f480514160816821f040718160c16821f04071c160016821f0407141f080710160bff34f8ffef708bb5c8a02565c820256000c0256'
+HOOK_SHA256 = '05deb43fa5906aec826805c1ef8cb9e73991552b1986cfa79e0e0017deb23732'
+ERROR_SHA256 = 'c32c1c40a8650a0e452aa5bc1a1e697595a61bbfae38198d4046a1f474ccb7c3'
+ASSEMBLY = LEGACY_ASSEMBLY.replace('PD7', 'PD12')
+for _old, _new in (('movs r1, #128', 'mov.w r1, #4096'), ('#128', '#4096'),
+                   ('#0xC000', '#0x3000000'), ('#0x4000', '#0x1000000')):
     ASSEMBLY = ASSEMBLY.replace(_old, _new)
 LINK_SECTION = '        ASSERT(_error_engine_end <= 0x34181DF0, "Error engine overlaps early HOLD hook");\n        . = _error_engine_start + 0x5B0;\n        KEEP(*(.gpio_hold_boot))\n        ASSERT(. <= _error_engine_start + 1536, "Early HOLD hook exceeds error padding");\n'
 
 
 def profile(pin):
     if pin == 'PD7':
-        return dict(entry=LEGACY_ENTRY, size=LEGACY_ENTRY-BASE+HOOK_BYTES,
+        return dict(entry=LEGACY_ENTRY, size=LEGACY_ENTRY-BASE+LEGACY_HOOK_BYTES, boot_bytes=LEGACY_HOOK_BYTES,
                     assembly=LEGACY_ASSEMBLY, hook=LEGACY_HOOK_SHA256,
                     engine=LEGACY_ERROR_SHA256, header='Arduino D9 / CN14.2')
     if pin == 'PA2':
-        return dict(entry=ENTRY, size=ERROR_END, assembly=ASSEMBLY,
-                    hook=HOOK_SHA256, engine=ERROR_SHA256, header='Arduino A3 / CN4.4')
+        return dict(entry=ENTRY, size=ERROR_END, boot_bytes=LEGACY_HOOK_BYTES, assembly=PA2_ASSEMBLY,
+                    hook=PA2_HOOK_SHA256, engine=PA2_ERROR_SHA256, header='Arduino A3 / CN4.4')
+    if pin == 'PE9':
+        return dict(entry=ENTRY, size=ERROR_END, boot_bytes=HOOK_BYTES, assembly=PE9_ASSEMBLY,
+                    hook=PE9_HOOK_SHA256, engine=PE9_ERROR_SHA256, header='Arduino D3 / CN13.4')
+    if pin == 'PD12':
+        return dict(entry=ENTRY, size=ERROR_END, boot_bytes=HOOK_BYTES, assembly=ASSEMBLY,
+                    hook=HOOK_SHA256, engine=ERROR_SHA256, header='Arduino D8 / CN14.1')
     raise ValueError('Unknown GPIO HOLD pin profile')
 
 
@@ -123,7 +145,7 @@ def prepare(folder):
     return [path]
 
 
-def check(folder, prefix, *, pin="PA2"):
+def check(folder, prefix, *, pin="PD12"):
     """Authenticate the exact hook/engine and every preserved prefix byte.
 
     Both unrelocated and relocated CRC words are admitted only if the two
@@ -135,13 +157,13 @@ def check(folder, prefix, *, pin="PA2"):
     reference = REFERENCE.read_bytes()
     if hashlib.sha256(reference).hexdigest() != REFERENCE_SHA:
         raise ValueError('GPIO HOLD prefix reference changed')
-    if len(prefix) != cfg["size"] or not HOOK_BYTES:
+    if len(prefix) != cfg["size"] or not cfg['boot_bytes']:
         raise ValueError('Unreviewed GPIO HOLD prefix geometry')
     if (folder / 'gpio_hold_boot.S').read_text() != cfg['assembly']:
         raise ValueError('GPIO HOLD assembly source changed')
     if struct.unpack_from('<I', prefix, 4)[0] != entry | 1:
         raise ValueError('GPIO HOLD is not the first ROM entry')
-    if hashlib.sha256(prefix[entry-BASE:entry-BASE+HOOK_BYTES]).hexdigest() != cfg["hook"]:
+    if hashlib.sha256(prefix[entry-BASE:entry-BASE+cfg['boot_bytes']]).hexdigest() != cfg["hook"]:
         raise ValueError('Unreviewed GPIO HOLD boot instructions')
     if hashlib.sha256(prefix[ERROR_BEGIN:ERROR_END]).hexdigest() != cfg["engine"]:
         raise ValueError('Unreviewed GPIO HOLD error-shutdown engine')
@@ -169,7 +191,7 @@ def check(folder, prefix, *, pin="PA2"):
     if len(literals) != 20:
         raise ValueError('GPIO HOLD recovery literal set changed')
     return dict(schema=1, reference_sha256=REFERENCE_SHA, reset_vector_offset=4,
-        entry=entry, resume_entry=OLD_ENTRY, boot_bytes=HOOK_BYTES,
+        entry=entry, resume_entry=OLD_ENTRY, boot_bytes=cfg['boot_bytes'],
         boot_sha256=cfg["hook"], error_engine_sha256=cfg["engine"],
         startup_recovery_loader_bridge_equal=True,
         recovery_literal_offsets=sorted(literals),

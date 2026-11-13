@@ -12,6 +12,17 @@ sys.path.insert(0,str(ROOT/'firmware/boot-timing'))
 import nor_bench
 nor_bench.CLI=ROOT/'tmp/bringup/control-smoke-20261107/tools/programmer-2.23.0/bin/STM32_Programmer_CLI.exe'
 APPROVED={
+ # November13 D8/PD12 substitution: compiled hook/masks, disabled conflicting
+ # phase output, exact UART bytes and package layout reviewed for reload.
+ # No new functional testing requested or implied by this exact admission.
+ 'b1b032c7ae48e68a8942922b9a6a2d8e57983030a331b1d5b590c01ee3571c52':
+  dict(bytes=7164,sector='1a9278ab1733134a86e382af61b3a78627fe40d82e9e137dd33f2bfcf8de1197'),
+ # November13 D3/PE9 + USB-off: root independently reviewed exact early
+ # GPIO hook, port masks, UART bytes and full capture/package composition;
+ # 324 capture and 64 linked USB tests passed. This admits the exact candidate,
+ # not a claim of external HOLD voltage or completed hardware qualification.
+ 'bcd7fc5b439fc0b2df48ff668f62fe271d973df83121a96d9859a7d1757fd111':
+  dict(bytes=7160,sector='1d5d4fd8aa04a9ed25e6a9608079601999d803f2b33b7cfff472c9bde7a9e6d9'),
  # November9 PA2/A3 HOLD: independent prefix/layout/CRC review, 26 linked
  # package tests, 324 capture tests; original early UART block is byte-exact.
  # Exact candidate admission for installation/verification, not hardware proof.

@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "scope": "Offline only; no bench access or recovery admission",
+  "prefix_sha256": "bcd7fc5b439fc0b2df48ff668f62fe271d973df83121a96d9859a7d1757fd111",
+  "sector0_sha256": "1d5d4fd8aa04a9ed25e6a9608079601999d803f2b33b7cfff472c9bde7a9e6d9",
+  "sector1_sha256": "43f81739be9328adbe750e08e3846270f70b65956464d88519e5a262eca36bac",
+  "usb_sha256": "fcbb2b014edb42c444faab9728585237bd22d109ea4edc00a1856441e84aa026",
+  "capture_profile": "pe9-hold",
+  "capture_contract": {
+    "schema": 4,
+    "port": "GPIOE",
+    "pin": 9,
+    "header": "Arduino D3 / CN13.4",
+    "active": "push_pull_high",
+    "release": "input_no_pull_immediately_before_standby_wfi",
+    "success_release": true,
+    "error_release": true,
+    "awake_completion": "hold_high",
+    "shallow_fallback": "hold_high",
+    "unexpected_wfi_return": "reassert_high",
+    "external_off_delay_required": false,
+    "external_off_delay": "omitted_user_accepted_prototype",
+    "aux_before_main_shutdown_qualified": false
+  },
+  "usb_hold_policy": {
+    "schema": 3,
+    "port": "GPIOE",
+    "pin": 9,
+    "header": "Arduino D3 / CN13.4",
+    "mode": "usb-off",
+    "shutdown_proof_schema": 4,
+    "release": "low-from-usb-selection-input-no-pull-at-wfi",
+    "uart_recovery": "PE6-unchanged"
+  },
+  "all_sources_match_current": true,
+  "capture_tail_identical": true,
+  "original_uart_guard_identical": true,
+  "early_pe9_hook_preserved": true,
+  "selector_handoff": {
+    "barrier": 874513104,
+    "path": [
+      874513112,
+      874513192,
+      874513194
+    ],
+    "entry": 875561857
+  },
+  "hook_bytes": 440,
+  "selector_bytes": 4468,
+  "usb_bytes": 34582,
+  "tests": 64,
+  "skips": 0,
+  "recovery_allowlist_admission": false,
+  "hardware_access": false
+}

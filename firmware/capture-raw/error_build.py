@@ -174,7 +174,7 @@ def audit_engine(folder):
     """
     listing=(folder/'stage1.lst').read_text()
     engine=listing.split('34181840 <error_signal_shutdown>:',1)[1]
-    # The canonical PA2 boot hook lives in reserved copy padding. Exclude it
+    # The PA2/PE9/PD12 boot hooks live in reserved copy padding. Exclude them
     # from engine decoding, but prohibit every engine branch/literal from
     # reaching it. Its bytes and reset-only entry are separately authenticated
     # by gpio_hold_prefix.check(). Legacy engines retain their exact audit.
@@ -189,8 +189,10 @@ def audit_engine(folder):
             raise ValueError('Error engine boundary differs from reviewed embedded HOLD layout')
         image=(folder/'stage1.bin').read_bytes()
         hook=image[0x19F0:0x1A3C]
-        if (any(image[engine_end-0x34180400:0x19F0]) or
-            hashlib.sha256(hook).hexdigest()!='1c2487687bdd4e11737492c68f50f2409722b319cc4a67c6dd4efe4867489f1e'):
+        # Only these exact reviewed boot-only byte sequences may occupy it.
+        from gpio_hold_prefix import PA2_HOOK_SHA256, PE9_HOOK_SHA256, HOOK_SHA256
+        if (any(image[engine_end-0x34180400:0x19F0]) or any(image[0x1A3C:0x1A40]) or
+            hashlib.sha256(hook).hexdigest() not in (PA2_HOOK_SHA256, PE9_HOOK_SHA256, HOOK_SHA256)):
             raise ValueError('Unreviewed executable in reserved error-copy padding')
 
     instructions=0; literals=0; branches=0; pc_loads=0

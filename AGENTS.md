@@ -4,6 +4,138 @@ Read [NOTES.md](NOTES.md) at the root and in the relevant owning folder before c
 
 # Instrument access
 
+**November 13 D8 HOLD confirmed by the user; canonical documentation updated:**
+the user reports that the loaded D8 firmware works and requests the schematic,
+assembly instructions, commit and push. Current HOLD is **PD12 / Arduino D8 /
+CN14 pin 1**, also available at CN15 pin 21. The former PD12 phase output is
+disabled in this HOLD profile. The installed D8 package and complete NOR
+readback evidence below remain unchanged. This is a user functional report,
+not an additional automated capture, USB, recovery or timing qualification.
+No hardware operation accompanies the documentation update; the user retains
+bench ownership and the actual terminal power/runtime state is not reread.
+[Current wiring](docs/power/lipo-latch-wiring.svg) and
+[installation plus user confirmation](firmware/usb-ptp/evidence/2026-11-13-d8-hold/README.md).
+
+**November13 D8 HOLD installed; no functional tests requested:** user replaced
+D3 with D8/PD12/CN14.1. Combined normal camera/PTP firmware programmed;
+both full64KiB programmer readbacks match. Prefix7164bytes SHA b1b032c7...71c52;
+sector0 1a9278ab...e1197;sector1 ed6d4169...fbc38. PD12 phase pulses disabled,
+RAM timing and PD0 exposure mirror retained. USB-selected HOLD staysLOW.
+D3 programming recovery passed; new UART bytes/layout preserved but no
+post-load recovery/capture/shutdown/power test run. Normal poweredreset
+released after completedNORwrites; terminalstate notmeasured. Direct5V and
+ST-LINK setup retained, noJSoperations,COM8closed/BREAKreleased,nohelper.
+User owns bench again. D3 meter request superseded. Schematic/assembly
+edits remain deferred. [Programming record](firmware/usb-ptp/evidence/2026-11-13-d8-hold/hardware/final-state.json).
+
+**November13 D8 HOLD reload active:** user supersedes D3 meter check and
+requests D8 replacement/reload with no testing. D8=PD12/CN14.1, mainVDD;
+PD12 phase output must be disabled for HOLD ownership. Root owns flash
+maintenance; no hardware testcycles orJS operations planned. Previous direct5V/
+ST-LINK setup retained; exact installedD3 recovery will be checked solely for
+programming. Agents offline. Campaign tmp/bringup/d8-hold-20261113.
+
+**November13 D3 firmware installed; physical meter check pending:** normal
+D3/PE9 camera/PTP package replaced all-Ablinker; both64KiBsectors match and
+following4KiB preserved. Prefixbcd7fc5b...fd111; sector0 1d5d4fd8...e6d9;
+sector1 43f81739...6bac. ExactUARTpark9/0 passed before and after a normal
+poweredreset. First read1s after normalreset returnedAPinvalid; cycle/error/
+physicalrelease notobserved. RetainedCPUCR0x10201 isnotfreshentryproof.
+Currenttarget direct5V powered and parked0x3418078C;PE9MODER1/ODR1/IDR1,
+pushpull/nopull. Userasked to measureD3/CN13.4 toGND; leaveboardunchanged
+until response. ST-LINK connected; sensor/controls notfreshlyconfirmed.
+Rootownsbench; noJSoperations, COM8closed/BREAKreleased/noactivehelper.
+Assembly/SVG deferred. Campaign tmp/bringup/d3-hold-20261113 and
+[hardware evidence](firmware/usb-ptp/evidence/2026-11-13-d3-hold/README.md).
+
+**November13 continuity result / input-pull test pending:** user confirms
+A3/CN4.4↔CN3.34effectively0ohm, allAcontacts~1MohmtoGND. OpenSB6/hardshort
+unlikely. Awaiting userreconnectiondirect5V+ST-LINK(allheaderwiresremoved)
+beforePA2input/pull-up test. No livechange; blinkerFLASHstillinstalled.
+
+**November13 unpowered A-pin check:** user reports allAcontacts approximately
+1Mohm toGND afterrequestedpowerremoval; noA3-specifichardshortindicated.
+Now awaitingA3/CN4.4↔CN3.34continuity (expectednear0ohm throughSB6).
+User owns unpoweredbench; noinstrumentaction, nofirmwarechange. Do not
+restorepower duringmeasurement; standaloneblinkerremainsinstalled.
+
+**November13 A3 physical-fault localization — resistance check pending:**
+user reports A0/1/2/4/5 physicallyblink, A3~0V, and freshCN3.34no waveform.
+Read-only18:54:59UTCchecks found blinkcounteradvancing, PA2IDR/ODR0/1,
+outputpushpull/nopull. Noreset/halt/write/powercommand. User nowownsbench
+to unplugdirect5V andCN10/ST-LINK and compare A3-toGND/A2-toGND resistance.
+Do notoperate/reset/restorepower while this check ispending. Blinker remains
+installed; nofirmware change. OpenSB6alone insufficient toexplainbothlow;
+physicalshort/open/damagedpinunproven. [Evidence](firmware/control-smoke/evidence/2026-11-13-a0-a5-blink/physical-a3-followup/README.md).
+
+**November13 A0-A5 blinker installed, 17:17:49 UTC — user owns bench:**
+temporary standaloneFLASH test left running continuously after final normal
+poweredreset. A0/PF5,A1/PC10,A2/PF6,A3/PA2,A4/PC12,A5/PH2 toggle LOW/HIGH
+every250ms; all externalheaderwiring user-confirmed removed, direct5V and
+ST-LINK attached. NoJSoperations inthiscampaign. No camera/SD/USB/Standby
+workload. Prefix6d4deeee...a0869, sector0 28257715...3d23a; full64KiB
+independentreadback matched, following64KiB+4KiB unchanged. UARTrecovery9/0
+exactpark passed; final RAMreads show all6IDR/ODR bits0/63 and advancing
+counters. Externalpinvoltage/waveforms not independentlymeasured. COM8closed,
+BREAKreleased,nohelpers. OriginalNov9 firmware backedup; do not reconnect
+pots/latch while this all-output diagnostic is installed. Recovery uses
+firmware/control-smoke/blink_recovery.py with exact archivedbuild, not the
+normalUSBpackage verifier. [Evidence](firmware/control-smoke/evidence/2026-11-13-a0-a5-blink/README.md).
+
+**November13 standalone A0-A5 blink diagnostic active:** user confirms all
+external header wiring removed, direct5V supplied and ST-LINK attached.
+Root owns programming/recovery; subagents are offline only. Prepare/install
+2Hz all-six digital outputs with no camera/SD/USB/Standby workload, retaining
+UART recovery. Original November9 package remains the restoration reference.
+The previous pending meter check/park boundary is superseded by this explicit
+request and ready confirmation. Do not assume JS remains in the supply path
+or any external timing probes remain connected. New final checkpoint follows.
+
+**November 13 HOLD follow-up — parked state no longer verified, 17:04 UTC:**
+user reports A3/CN4.4 and CN3.34 both approximately0V. Read-only16:57 check
+still found exact November9 prefix/PC0x3418078C/PA2 IDR1 and ODR1. At17:03,
+HOTPLUG failed before any register read; no reset/retry/mutation followed.
+Stats-only JS at17:04 found4.9951V/3.1976mA, consistent with historical
+Standby current but no fresh PC/flag proof. Reason for state change unknown;
+do not reuse the earlier park as live admission. JS range128/settings unchanged,
+deviceclosed; COM8closed/BREAKreleased, nohelper. Known3.3V meter-reference
+question pending; leave measurement state unchanged until answered. ADC13
+cross-check is prepared offline only, not run. No GPIO/firmware/NOR/SD writes.
+[Follow-up evidence](firmware/control-smoke/evidence/2026-11-13-hold-recheck/external-voltage-followup/README.md).
+
+**November 13 HOLD recheck — target deliberately powered in recovery:** user
+confirms JS OUT directly to5V input. Established COM8 UART/BREAK reset and
+exact recovery verifier passed, PC0x3418078C,9good/0bad pulses. All7160 live
+boot-prefix bytes match November9 SHA852bc772...93084. PA2 reads push-pull
+output HIGH, pad HIGH, no pull in two snapshots. No firmware/target-memory
+write, NOR/SD command or JS power toggle; verifier did halt for context.
+COM8closed/BREAKreleased, JSsettingsrestored/range128/deviceclosed. User owns
+bench and is measuring CN3.34 (directPA2) vs CN4.4/A3 across fittedSB6;
+external voltages pending. Do not reset/change power while those measurements
+are underway. No normal cycle or full-NOR reread is claimed. [Evidence](firmware/control-smoke/evidence/2026-11-13-hold-recheck/README.md).
+
+**November 13 user hardware update — direct 5 V appears to work:** the user
+has bypassed the trigger circuit by applying power directly to the board's
+5 V pin and reports that operation now seems normal. They are checking the
+power-circuit connections and retain bench ownership. Exact blink counts,
+JS placement and current rail/USB state were not remeasured. This supports
+the latch-path diagnosis but does not identify the faulty connection.
+No instrument access or firmware change accompanied this update.
+
+**November 12 trigger-dropout diagnostic — no firmware change:** user confirms
+5 V PSU -> JS110 -> trigger circuit, ST-LINK attached, sensor absent. A normal
+trigger snapshot found stage1 running in the sensor READY poll, USB absent,
+PA2/A3 output/pad HIGH, and zero CFSR/HFSR. Current fell below 50 mA at427 ms
+and 1 mA at503 ms, before the500 ms sensor wait plus boot could lead to the
+11.4 s error display. External latch takeover is the leading suspect, not
+yet physically localized. A UART-requested second press ended at140 ms;
+debugger reads timed out, so recovery entry is unproven. No reset/BREAK, halt,
+flash/SD write or JS power switch. JS settings restored/range128/deviceclosed;
+COM8closed/BREAKreleased; final trace current effectivelyzero. User now owns
+the bench for an A3-to-Q2-gate/common-ground continuity check with supplyoff.
+Full installed prefix not freshly verified; November9 identity remains the
+last qualified installation. [Evidence and limits](docs/power/evidence/2026-11-12-trigger-dropout/README.md).
+
 **Latest user hardware update — November 10, manual source selector and ASA knob:**
 the user removed the USB-controlled battery-cutoff MOSFET Q3 and installed a
 separate SPDT power selector (SW2): one throw receives USB power, the other

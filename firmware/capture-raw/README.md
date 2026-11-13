@@ -1,27 +1,39 @@
 # Packed RAW capture to fixed SD slots
 
-**November 9 canonical A3 HOLD implementation:** `--gpio-hold` asserts **PA2 /
-Arduino A3 / CN4.4** before the original startup/UART guard, retains HIGH
+**November 13 current HOLD pin: Arduino D8 / CN14.1 / PD12.** The user
+requested this substitution and reload without another test campaign.
+`--gpio-hold` now emits schema5 for PD12; schemas1–4 retain their historical
+meanings. PD12's former phase-marker output is disabled in this profile so
+it cannot interrupt HOLD. RAM timing/status records and the separate PD0
+exposure mirror remain. Boot assertion and final Standby release policy are
+unchanged. Compiler/layout/package checks and complete NOR programming
+readbacks passed. The user subsequently confirms D8 works; no new automated
+capture or power test campaign was run. See the
+[installed combined package and user confirmation](../usb-ptp/evidence/2026-11-13-d8-hold/README.md).
+The D3 record below is historical.
+
+**Historical November 13 D3 HOLD implementation:** that build asserted **PE9 /
+Arduino D3 / CN13.4** before the original startup/UART guard, retains HIGH
 through capture, saving, error display and recovery, and floats only this
 pin immediately before Standby. An unexpected WFI return reasserts it.
-The exposure potentiometer has moved to A0–A2, freeing A3; this capture
-change does not itself integrate exposure ADC sampling. D9/PD7 is historical.
+The user moved HOLD after A3 failed to toggle externally in the standalone
+pin test. This change does not drive A3 or integrate exposure/ASA ADC sampling.
+PE9 uses the main VDD supply; it does not need an auxiliary supply-valid bit.
 
-Contract schema 3 binds PA2; exact schemas 1/2 still describe frozen PD7
+Contract schema 4 binds PE9; exact schema 3/PA2 and schemas 1/2/PD7 retain frozen
 packages. The stackless 76-byte hook uses reserved padding at 0x34181DF0,
 leaving the USB selector's tail at 0x34181E40 free. Original UART instructions,
-addresses and all twenty literals remain exact. The combined capture/USB
-package was subsequently installed with both NOR regions readback-verified;
-A3 HIGH, exposure-knob diagnostic and UART recovery smoke tests passed.
-The user then confirmed manual trigger, missing-sensor error and latch cutoff
-with zero indicated current. The capture-only package remains an offline
-artifact; the optional DMA-sleep candidate is not hardware-qualified.
-Normal exposure remains fixed and the November10 ASA wiring is not yet
-integrated. See [installed-package and live evidence](../control-smoke/evidence/2026-11-09-a3-live/README.md)
-and AGENTS.md for the latest user-owned bench state.
-See [A3 implementation and offline evidence](evidence/2026-11-09-a3-hold/README.md),
-[canonical power wiring](../../docs/power/lipo-latch-wiring.svg), and
-[USB integration](../usb-ptp/README.md).
+addresses and all twenty literals remain exact. All 324 capture regression
+tests pass, including linked PE9 shutdown checks; disabled-HOLD binaries still
+match October 28. The capture-only candidate is an offline artifact: use
+[D3 build and checks](evidence/2026-11-13-d3-hold/README.md),
+[USB integration](../usb-ptp/README.md) and AGENTS.md for the separately
+qualified combined package and latest bench state. The old A3 installation
+remains [historical evidence](../control-smoke/evidence/2026-11-09-a3-live/README.md).
+Normal exposure remains fixed, ASA is not integrated, and DMA sleep remains
+unqualified. Schematic/assembly edits were deferred during D3 bring-up;
+the [current assembly guide](../../docs/prototype/nucleo-assembly-guide.md)
+now uses the subsequently selected and user-confirmed D8 connection.
 
 **Single-frame normal firmware installed October 28:** the sensor automatically
 stops after one exposure. The normal capture path retains unused Ethernet PHY

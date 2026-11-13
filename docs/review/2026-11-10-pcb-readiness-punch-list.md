@@ -334,9 +334,9 @@ Problems to solve in the PCB circuit:
 - VBUS is sensed by an ADC (PA11) through a ÷15 divider, against fixed code thresholds.
 - On the Nucleo, VDDIO2, VDDIO4 and VDDIO5 all run at 3.3 V and only VDDIO3 (boot flash) is 1.8 V. The sensor's I/O is 1.8 V, so the camera control pins (I2C2 on PB10/PB11, reset on PO5, strobe on PA0) cannot connect directly where they are.
 - The recovery inputs (PE6, PE1) rely on internal pull-ups enabled by the first-stage code.
-- The installed image always drives three diagnostic outputs (PD0, PE0, PD12) and bit-bangs the Ethernet PHY on PF4/PG11.
+- The November 13 installed image uses **PD12 / D8 / CN14.1 for HOLD** and disables its former phase pulses. PD0/PE0 capture diagnostics and Ethernet PHY control on PF4/PG11 remain. This supersedes the pin allocation at the original review; [current wiring and firmware](../hardware-firmware-interface.md).
 
-Some present assignments also sit on boot-ROM serial pins: PA2 (HOLD) is USART2_TX, PF6 is USART2_RX, PA0 (strobe) is UART4_TX, PE5/PE6 are USART1, and PG10 is the ROM's boot-failure output. UM3234 reads as though the ROM drives a TX pin only after it sees activity on RX, so this is a caution to check rather than a known fault.
+Some prototype pins also sit on boot-ROM serial pins: PA2 (former A3 HOLD, now suspect and unassigned) is USART2_TX, PF6 is USART2_RX, PA0 (strobe) is UART4_TX, PE5/PE6 are USART1, and PG10 is the ROM's boot-failure output. UM3234 reads as though the ROM drives a TX pin only after it sees activity on RX, so this is a caution to check rather than a known fault. Current D8/PD12 HOLD is a separate assignment; custom-PCB pins remain a design decision.
 
 **Recommendation.** Produce one pin table for the new board (signal, ball, function, bank, voltage, reset state, firmware change needed) and agree it before placement. Keep SDMMC2, XSPI boot, USB and CSI where the firmware has them; move only what the voltage domains force.
 

@@ -264,7 +264,7 @@ def main():
     p.add_argument('--sensor-single-frame',action='store_true',
                    help='Single-frame capture: minimal pre-START context write, strict one-frame autonomous standby')
     p.add_argument('--gpio-hold',action='store_true',
-                   help='Candidate: assert PA2/A3 before UART recovery; float immediately before Standby')
+                   help='Candidate: assert PD12/D8 before UART recovery; float immediately before Standby')
     a=p.parse_args()
     if a.gpio_hold and (not a.flash or not a.sensor_single_frame or not a.error_blinks or
             a.dma_sleep or a.dma_sleep_probe or a.cycle_trace or a.sd_init_gap_ms):
@@ -424,6 +424,8 @@ def main():
             if a.power_probe or a.sd_init_gap_ms or autostop_enabled:
                 phase=replace(phase,'event > 10U','event > 12U')
                 phase=phase.replace('event 1..10','event 1..12')
+            if a.gpio_hold:
+                phase=(HERE/'phase_gpio_hold.inc').read_text()
             dst.write_text(phase,newline='\n')
         else: dst.write_bytes(data)
         if dst.suffix.lower() in ('.c','.s'): compiled.append(dst)
@@ -693,6 +695,9 @@ def main():
             clock_hz=400000000,headers=['cycle_trace_events.h','cycle_trace_sd.h'],
             completion='awake terminal; no Standby entry timing')
     if a.gpio_hold:
+        manifest['phase_markers']=copy.deepcopy(manifest['phase_markers'])
+        manifest['phase_markers'].update(enabled=False, disabled_reason='PD12 is D8 HOLD',
+            idle_level=None, pulse_high_cycles_per_id=None, nominal_high_us_per_id=None)
         manifest['gpio_hold']=True
         manifest['gpio_hold_contract']=gpio_hold_transform.contract(a.standby)
     (out/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')

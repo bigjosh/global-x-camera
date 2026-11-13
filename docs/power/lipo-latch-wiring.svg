@@ -1,10 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="2400" height="2000" viewBox="0 0 2400 2000">
-<title>Prototype wiring: manual USB/battery selector, SPDT trigger, A3 HOLD, exposure A0-A2 and ASA A4-A5</title>
+<title>Prototype wiring: manual USB/battery selector, SPDT trigger, D8 HOLD, exposure A0-A2 and ASA A4-A5</title>
 <rect width="100%" height="100%" fill="white"/>
 <text x="45" y="61.6" font-family="Segoe UI,Arial,sans-serif" font-size="40" font-weight="700" fill="#1c3044">Prototype power and controls</text>
-<text x="45" y="107.84" font-family="Segoe UI,Arial,sans-serif" font-size="26" font-weight="700" fill="#136b9b">Canonical wiring — November 10, 2026  |  SW2 manually selects USB or battery; Q3 removed</text>
+<text x="45" y="107.84" font-family="Segoe UI,Arial,sans-serif" font-size="26" font-weight="700" fill="#136b9b">Canonical wiring — November 13, 2026  |  SW2 manually selects USB or battery; Q3 removed</text>
 <text x="45" y="152.16" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="700" fill="#b13b35">The PCB version will use automatic MOSFET source selection instead of SW2.</text>
-<text x="45" y="191.64" font-family="Segoe UI,Arial,sans-serif" font-size="21" font-weight="400" fill="#5d7080">A3 HOLD installed; manual missing-sensor shutdown passed. Exposure and ASA capture integration remain pending.</text>
+<text x="45" y="191.64" font-family="Segoe UI,Arial,sans-serif" font-size="21" font-weight="400" fill="#5d7080">D8 HOLD installed; user confirms it works. Precise latch timing and exposure / ASA integration remain pending.</text>
 <rect x="45" y="235" width="455" height="125" fill="#fff5f3" stroke="#b13b35" stroke-width="2"/>
 <text x="65" y="273.84" font-family="Segoe UI,Arial,sans-serif" font-size="26" font-weight="700" fill="#b13b35">CN8 USB → board protection</text>
 <text x="65" y="317.0" font-family="Segoe UI,Arial,sans-serif" font-size="25" font-weight="700" fill="#b13b35">TAP: SB12 pad 1</text>
@@ -110,7 +110,8 @@
 <text x="495" y="1149.32" font-family="Segoe UI,Arial,sans-serif" font-size="23" font-weight="700" fill="#136b9b">C3  2.2 µF</text>
 <text x="495" y="1189.8" font-family="Segoe UI,Arial,sans-serif" font-size="20" font-weight="400" fill="#5d7080">X7R, 10–16 V</text>
 <text x="495" y="1224.8" font-family="Segoe UI,Arial,sans-serif" font-size="20" font-weight="400" fill="#5d7080">Non-polarized</text>
-<text x="45" y="1336.68" font-family="Segoe UI,Arial,sans-serif" font-size="27" font-weight="700" fill="#136b9b">HOLD: A3 / CN4 pin 4 / PA2 → Q2 gate pin 1</text>
+<text x="45" y="1336.68" font-family="Segoe UI,Arial,sans-serif" font-size="27" font-weight="700" fill="#136b9b">HOLD: D8 / CN14 pin 1 / PD12 → Q2 gate pin 1</text>
+<text x="45" y="1365.12" font-family="Segoe UI,Arial,sans-serif" font-size="18" font-weight="400" fill="#5d7080">Same net: CN15 pin 21. A3 suspect; D3 superseded. PD12 phase pulses disabled.</text>
 <polyline points="45,1374 1120,1374 1120,1138 990,1138" fill="none" stroke="#136b9b" stroke-width="3"/>
 <circle cx="1120" cy="1215" r="5" fill="#136b9b"/>
 <polyline points="1120,1215 1030,1215" fill="none" stroke="#136b9b" stroke-width="3"/>
@@ -135,7 +136,7 @@
 <text x="1555" y="1061.16" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="700" fill="#1c3044">1 = Gate (lower left)</text>
 <text x="1555" y="1107.16" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="700" fill="#1c3044">2 = Source (lower right)</text>
 <text x="1245" y="1219.32" font-family="Segoe UI,Arial,sans-serif" font-size="23" font-weight="700" fill="#b13b35">Q1: S2 → LiPo+ / R1; D3 → R0 → SW2 BAT throw.</text>
-<text x="1245" y="1263.32" font-family="Segoe UI,Arial,sans-serif" font-size="23" font-weight="700" fill="#136b9b">Q2: S2 → GND; G1 → A3; D3 → Q1 G1 / SW1 NO.</text>
+<text x="1245" y="1263.32" font-family="Segoe UI,Arial,sans-serif" font-size="23" font-weight="700" fill="#136b9b">Q2: S2 → GND; G1 → D8; D3 → Q1 G1 / SW1 NO.</text>
 <text x="1245" y="1309.32" font-family="Segoe UI,Arial,sans-serif" font-size="23" font-weight="700" fill="#136b9b">Q3 / R6 omitted. No C1, C2, old D1, R3 or R4.</text>
 <text x="1245" y="1352.64" font-family="Segoe UI,Arial,sans-serif" font-size="21" font-weight="400" fill="#5d7080">Switch lug numbering is part-specific: identify COM/throws by continuity.</text>
 <rect x="45" y="1445" width="1130" height="295" fill="#f7fafc" stroke="#526474" stroke-width="2"/>
@@ -143,7 +144,7 @@
 <text x="70" y="1540.16" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="700" fill="#136b9b">LOW end: A0 / CN4.1 / PF5 (GPIO LOW)</text>
 <text x="70" y="1589.32" font-family="Segoe UI,Arial,sans-serif" font-size="23" font-weight="700" fill="#136b9b">Wiper: A1 / CN4.2 → buffered PA9 / ADC1 channel 10</text>
 <text x="70" y="1640.16" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="700" fill="#136b9b">HIGH end: A2 / CN4.3 / PF6 (GPIO supply)</text>
-<text x="70" y="1688.48" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#5d7080">Diagnostic verified. Normal capture still uses fixed exposure.</text>
+<text x="70" y="1688.48" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#5d7080">Historical A0–A2 diagnostic verified; capture exposure still fixed.</text>
 <text x="70" y="1724.8" font-family="Segoe UI,Arial,sans-serif" font-size="20" font-weight="400" fill="#5d7080">Keep A1 digital companion PC10 input / no pull.</text>
 <rect x="1220" y="1445" width="1130" height="295" fill="#f7fafc" stroke="#526474" stroke-width="2"/>
 <text x="1245" y="1490.52" font-family="Segoe UI,Arial,sans-serif" font-size="28" font-weight="700" fill="#136b9b">ASA → ANALOG GAIN — new knob</text>
@@ -156,6 +157,7 @@
 <text x="45" y="1821.0" font-family="Segoe UI,Arial,sans-serif" font-size="25" font-weight="700" fill="#526474">COMMON GROUND</text>
 <text x="335" y="1818.48" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#526474">LiPo −, latch / ASA GND and CN5 pin 6; JS return if fitted. USB ground is common through the board.</text>
 <text x="45" y="1865.32" font-family="Segoe UI,Arial,sans-serif" font-size="23" font-weight="700" fill="#b13b35">Keep all CN9 jumpers OUT and SB12 fitted; board D2 / R23 remain removed. No parallel target supply.</text>
-<text x="45" y="1910.32" font-family="Segoe UI,Arial,sans-serif" font-size="23" font-weight="400" fill="#1c3044">A3 stays HIGH through capture/save/USB/recovery and floats before Standby. SW2 USB power bypasses the latch.</text>
-<text x="45" y="1953.48" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#5d7080">A3 is exclusively HOLD. Do not run the old A3–A5 knob diagnostic. No firmware change or bench operation in this update.</text>
+<text x="45" y="1907.48" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="400" fill="#1c3044">D8 HIGH: battery capture/save/error display and early UART recovery. Float immediately before battery Standby.</text>
+<text x="45" y="1944.64" font-family="Segoe UI,Arial,sans-serif" font-size="21" font-weight="400" fill="#1c3044">USB-selected service: D8 LOW. Provisional early boot HOLD can pulse HIGH before USB selection.</text>
+<text x="45" y="1977.96" font-family="Segoe UI,Arial,sans-serif" font-size="19" font-weight="400" fill="#5d7080">SW2 USB power bypasses the latch. D8 is exclusively HOLD; do not run the old A3–A5 diagnostic.</text>
 </svg>

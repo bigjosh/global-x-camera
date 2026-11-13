@@ -139,3 +139,54 @@ and unexpected WFI return retain/reassert HOLD; PA2's WKUP2 source is disabled.
 `test_shutdown.py` and [the offline candidate](evidence/2026-11-09-a3-hold/README.md).
 The user confirmed the board is disconnected for assembly; no instrument,
 NOR, SD, live recovery allowlist or installed-firmware state was changed.
+
+## 2026-11-13  Move HOLD to D3 and retain USB-selected battery release
+
+**Why:** the user moved the latch wire from A3 to Arduino D3 after PA2 failed
+external output tests. D3 is PE9/CN13.4 on main VDD, with secure GPIO base
+0x56021000. The combined image must bind its early capture assertion, error and
+success shutdown, USB selector and USB teardown to the same physical pin.
+The earlier user requirement that USB not keep the battery latch alive still
+applies. This branch lacked the already committed `34a49be8` USB-off correction;
+its selected-mode behavior is restored and moved to PE9. Capture and early UART
+recovery retain HOLD; a USB-present or ambiguous VBUS result releases it before
+loading USB. USB service/fault/refusal/WFI-return paths never set it HIGH.
+
+**Rejected:** pairing PE9 USB code with a PA2 capture image; reasserting battery
+HOLD on USB shutdown failure; changing the early recovery guard or adding an
+unqualified early VBUS sampler. The provisional early HIGH before VBUS selection
+is retained, so this is not a guarantee of a zero-pulse USB cold boot. Retired
+PA2 and PE6 UART fields are preserved; D3's main-VDD assignment does not grant
+powered-off input tolerance or prove the original A3 failure mechanism. Assembly
+schematic updates are deferred until the requested firmware smoke test.
+
+**Evidence:** `usb_hold.h`, `selector.c`, `shutdown.c`, exact-pin package guards,
+the selector model and 34-case shutdown model (including 4,096 randomized GPIO
+states), linked PE9 float/WFI instruction audit, and
+[the offline D3 package](evidence/2026-11-13-d3-hold/README.md). USB shutdown schema
+4 distinguishes PE9 OFF from older pin/policy records. No instrument operation
+or installed-state claim accompanies this offline preparation.
+
+**Provenance:** user D3 wiring request and prior USB HOLD-off instruction;
+implementation policy recovered from commit `34a49be8`, whose November 10
+candidate was not installed. The November 9 note above describes historical
+PA2 behavior and is superseded by this pin and USB-selected release policy.
+
+## 2026-11-13  Substitute D8 HOLD and preserve the existing USB release policy
+
+**Why:** the user superseded D3 with Arduino D8/CN14.1/PD12 and explicitly
+requested a simple substitution and reload without further tests. The capture
+and USB images must agree on this pin, so USB selected-mode release, refusal
+and final float now target only PD12 at secure GPIOD base 0x56020C00. USB
+shutdown schema 5 and USB policy schema 4 distinguish this image from PE9.
+The capture owner also disables PD12's former phase output to avoid pulsing HOLD.
+
+**Rejected:** keeping different latch pins in capture and USB; retaining the
+PD12 phase-marker output; starting another qualification campaign when the user
+asked only for substitution/reload. Prior D3 test evidence remains historical;
+D8 build/source/artifact checks are not a new hardware or regression qualification.
+
+**Evidence:** `usb_hold.h`, `selector.c`, `shutdown.c`, the exact D8 capture pair
+admitted by `package.py`, and [the D8 build record](evidence/2026-11-13-d8-hold/README.md).
+Early UART recovery and the provisional pre-VBUS assertion policy are unchanged.
+No instrument operation accompanies this offline work.
