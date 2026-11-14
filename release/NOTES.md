@@ -41,3 +41,25 @@ write while the original operation's completion remains unknown.
 `firmware/boot-timing/nor_bench.py` completion checks and timeout behavior;
 `firmware/usb-ptp/nor.py` read-helper loading path. This documents the existing
 hardware safety requirement and adds no new approval requirement.
+
+
+## 2026-11-14  Publish calibrated controls as a new r2 prerelease
+
+**Why:** after consolidation the user explicitly asked for the release to
+contain our firmware and for a review of its notes. The previous release still
+identifies different bytes, so `knobs-2026-11-14-r2` carries the canonical image
+under a new immutable tag. It includes both flash sectors, a complete package
+with exact recovery records, an installation guide and checksums that match
+the actual downloadable files. The outer manifest relocates build provenance
+to committed evidence; executable and recovery bytes are unchanged.
+
+**Rejected:** replacing binaries under the old tag, reusing a whole-build hash
+list that cannot verify loose downloads, labeling publication as installation,
+or calling this bench-specific procedure a portable installer. The notes
+separate offline checks from the remaining physical controls, images, USB,
+latch/recovery, timing and energy qualification.
+
+**Evidence:** `knobs-2026-11-14-r2/RELEASE_NOTES.md`, `INSTALL.md`, package
+manifest and inner/outer SHA256SUMS; `request.json` explicitly enables this
+user-requested publication. No instrument or target-memory operation is part
+of preparing or publishing this release.

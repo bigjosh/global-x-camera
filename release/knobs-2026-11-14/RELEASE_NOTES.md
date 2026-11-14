@@ -4,6 +4,8 @@
 
 The review found that this historical binary turns exposure in the opposite direction to the calibrated knob, uses a different exposure range/ASA scale, and requests 8× analog gain without raising the sensor's default 4× gain limit. It also silently falls back to fixed settings on a knob-read failure and does not check the applied exposure/gain against the request. See the [reconciliation record](https://github.com/bigjosh/global-x-camera/blob/ccr-2fc483d6-bkdh6g/docs/review/2026-11-14-knob-firmware-reconciliation.md). **Keep the existing knob wiring; do not rewire it to accommodate this superseded image.**
 
+The replacement images and reviewed installation notes are in [the canonical r2 prerelease](https://github.com/bigjosh/global-x-camera/releases/tag/knobs-2026-11-14-r2).
+
 The tag, firmware assets and their hashes remain unchanged so prior downloads can be identified. The descriptions and installation steps below document the historical package, not the current installation recommendation. Timeout guidance has been corrected: `nor.py read` halts the target and must never be used while a previous write may still be active.
 
 Original qualification was offline only: compiled, compared with the archived previously installed firmware, and exercised with host-side tests (50 of the 50 that could run on Linux passed). No physical camera test or fresh installed-identity check supported the release.

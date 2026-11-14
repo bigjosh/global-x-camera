@@ -4,6 +4,20 @@ Read [NOTES.md](NOTES.md) at the root and in the relevant owning folder before c
 
 # Instrument access
 
+**November 14 canonical r2 release preparation:** the user explicitly requested
+publishing our consolidated image and reviewing release notes. New immutable
+prerelease tag `knobs-2026-11-14-r2` packages the same b866589c…e242 prefix,
+6ddf4499…b499 sector0 and 206da4c0…73d8 sector1; both executable regions and
+recovery records are unchanged. Release request is enabled only for r2.
+The ZIP includes firmware/recovery data and docs, not the local bench tools.
+[Release notes](release/knobs-2026-11-14-r2/RELEASE_NOTES.md) and
+[installation guide](release/knobs-2026-11-14-r2/INSTALL.md) distinguish offline
+qualification from the outstanding hardware checks. GitHub's release record
+is authoritative for publication status. The older tag/assets stay immutable.
+**No hardware access or firmware installation occurred.** Last physical state
+and installed D8 image are historical, not freshly checked; no active bench
+client/ownership hold exists. Re-establish state before any later installation.
+
 **November 14 controls consolidation complete offline:** the user selected the
 review recommendation and requested commit/push. Default `package.py` now builds
 calibrated source-based CKN1 controls; `--legacy-knobs` alone reproduces the old

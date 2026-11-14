@@ -16,6 +16,8 @@ floats it immediately before Standby. Selected USB mode drives it LOW;
 provisional HIGH before USB detection remains. The old PD12 phase pulses are
 disabled; RAM timing records and the independent PD0 exposure mirror remain.
 [Installation record](firmware/usb-ptp/evidence/2026-11-13-d8-hold/README.md).
+[Download the canonical controls r2 prerelease](https://github.com/bigjosh/global-x-camera/releases/tag/knobs-2026-11-14-r2) (offline-qualified; not installed).
+
 Installed capture exposure remains fixed. A build that reads both knobs exists
 but is not installed or hardware-tested. The canonical build now uses the calibrated controls implementation; see [the November14 reconciliation and consolidation](docs/review/2026-11-14-knob-firmware-reconciliation.md). The [November9 A3/ADC smoke results](firmware/control-smoke/evidence/2026-11-09-a3-live/README.md)
 remain historical evidence.
