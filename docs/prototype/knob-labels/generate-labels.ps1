@@ -109,7 +109,25 @@ function DrawLabel([string]$name, [string]$centerText, $markings, $values,
         $dividerPath.Dispose()
         }
     }
-    $caption = OutlinedText $centerText ([double]$design.caption_height_mm) $cx $cy 0 0 $false
+    if ($name -eq 'Exposure' -and $design.exposure_caption.style -eq 'stacked_fraction') {
+        $fraction = $design.exposure_caption
+        $textHeight = [double]$design.caption_height_mm
+        $ruleWidth = [double]$fraction.rule_width_mm
+        $ruleHeight = [double]$fraction.rule_height_mm
+        $offset = $textHeight/2 + [double]$fraction.gap_mm + $ruleHeight/2
+        $caption = [System.Drawing.Drawing2D.GraphicsPath]::new()
+        $numerator = OutlinedText $fraction.numerator $textHeight $cx ($cy-$offset) 0 0 $false
+        $denominator = OutlinedText $fraction.denominator $textHeight $cx ($cy+$offset) 0 0 $false
+        $caption.AddPath($numerator,$false)
+        # Filled rectangle belongs to the engraving path, never the cut layer.
+        $caption.AddRectangle([System.Drawing.RectangleF]::new(
+            [single]($cx-$ruleWidth/2),[single]($cy-$ruleHeight/2),
+            [single]$ruleWidth,[single]$ruleHeight))
+        $caption.AddPath($denominator,$false)
+        $numerator.Dispose();$denominator.Dispose()
+    } else {
+        $caption = OutlinedText $centerText ([double]$design.caption_height_mm) $cx $cy 0 0 $false
+    }
     $paths.Add('<path data-role="caption" d="'+(SvgPath $caption)+'"/>')
     $graphics.FillPath([System.Drawing.Brushes]::Black,$caption);$caption.Dispose()
     $graphics.DrawEllipse($cutPen,[single]($cx-$radius),[single]($cy-$radius),[single](2*$radius),[single](2*$radius))
@@ -147,7 +165,7 @@ try {
             'ASA markings: ' + ($design.asa_markings -join ', ') + ', corresponding provisionally to ' +
             ($design.asa_analog_gain_multipliers -join 'x, ') + 'x analog gain, not calibrated sensitivity. ' +
             'Both rotating labels select increasing values when turned ' + $design.physical_increase_direction +
-            ' against a stationary body index. SEC and ASA captions are centered. No ticks; only ASA has sector dividers. ' +
+            ' against a stationary body index. The exposure caption is a centered stacked fraction: 1 above a horizontal rule, SEC below. ASA is centered. No ticks; only ASA has sector dividers. ' +
             'Black filled outlines engrave first; red circles cut last. Import at 100% scale; overall canvas is 43 by 21.5 mm. ' +
             'No laser power, speed or machine commands are supplied.')
         $preview = [System.Drawing.Bitmap]::new(1720,860)
