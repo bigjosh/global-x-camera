@@ -165,7 +165,9 @@ try {
             'ASA markings: ' + ($design.asa_markings -join ', ') + ', corresponding provisionally to ' +
             ($design.asa_analog_gain_multipliers -join 'x, ') + 'x analog gain, not calibrated sensitivity. ' +
             'Both rotating labels select increasing values when turned ' + $design.physical_increase_direction +
-            ' against a stationary body index. The exposure caption is a centered stacked fraction: 1 above a horizontal rule, SEC below. ASA is centered. No ticks; only ASA has sector dividers. ' +
+            ' against a stationary body index. The exposure caption is a centered stacked fraction: ' +
+            $design.exposure_caption.numerator + ' above a horizontal rule, ' + $design.exposure_caption.denominator +
+            ' below. X denotes the selected scale number: exposure time is one second divided by X. ASA is centered. No ticks; only ASA has sector dividers. ' +
             'Black filled outlines engrave first; red circles cut last. Import at 100% scale; overall canvas is 43 by 21.5 mm. ' +
             'No laser power, speed or machine commands are supplied.')
         $preview = [System.Drawing.Bitmap]::new(1720,860)
