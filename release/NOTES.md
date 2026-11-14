@@ -81,3 +81,26 @@ alone proves the public downloads contain the intended firmware.
 
 **Evidence:** `knobs-2026-11-14-r2/PUBLICATION.json`; source/release tag remains
 `a2e30d251c39c08378f84ffccc002ea3737b2c5e`. No hardware operation occurred.
+
+## 2026-11-14  Add current knob artwork without replacing release firmware
+
+**Why:** the user explicitly requested the current two-knob SVG in the
+repository and attached to the most recent release. The additive
+`knob-labels-15p5mm.svg` asset on `knobs-2026-11-14-r2` contains two solid
+15.5 mm labels, exposure 1/1000–1/2 second and provisional ASA 100–800,
+with centered captions and ASA-only sector dividers. The source generator
+and design inputs are retained with the SVG. This artwork is published
+after the original firmware release; its asset record carries its own hash.
+
+**Rejected:** moving the firmware tag, repackaging or replacing the eight
+existing assets, rewriting their original checksum lists to imply the art
+was present at firmware publication, or changing the automatic publisher's
+immutable-firmware policy. This is the user's specific authorization for
+an additional artwork attachment, not a change to firmware publication rules.
+
+**Evidence:** [SVG](../docs/prototype/knob-labels/knob-labels-15p5mm.svg),
+[generator](../docs/prototype/knob-labels/generate-labels.ps1), and
+[download verification](knobs-2026-11-14-r2/KNOB_LABELS_ASSET.json).
+The downloaded SVG and GitHub's asset digest match the local SHA-256;
+the eight previous asset IDs, sizes and digests are unchanged. No hardware
+or laser operation occurred.
