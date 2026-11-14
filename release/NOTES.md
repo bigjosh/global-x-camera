@@ -63,3 +63,21 @@ latch/recovery, timing and energy qualification.
 manifest and inner/outer SHA256SUMS; `request.json` explicitly enables this
 user-requested publication. No instrument or target-memory operation is part
 of preparing or publishing this release.
+
+
+## 2026-11-14  Confirm an existing draft before resuming after lookup uncertainty
+
+**Why:** r2 creation returned successfully, but the immediate tag/list lookup
+failed to rediscover the new draft. Subsequent read-only checks found one
+matching empty draft, and the normal publisher safely resumed missing uploads.
+The cause of the transient lookup result was not determined. After publication,
+all eight public downloads and both checksum lists were verified, and the
+completed request was disabled again. A future publisher improvement can use
+the returned draft ID or bounded read-only rediscovery before reporting failure.
+
+**Rejected:** treating a lookup miss after creation as permission to create
+another release, overwriting assets during retry, or assuming upload success
+alone proves the public downloads contain the intended firmware.
+
+**Evidence:** `knobs-2026-11-14-r2/PUBLICATION.json`; source/release tag remains
+`a2e30d251c39c08378f84ffccc002ea3737b2c5e`. No hardware operation occurred.

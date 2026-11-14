@@ -4,6 +4,19 @@ Read [NOTES.md](NOTES.md) at the root and in the relevant owning folder before c
 
 # Instrument access
 
+**November 14 canonical r2 prerelease published and downloaded back:**
+`knobs-2026-11-14-r2` points to release commit a2e30d251c39c08378f84ffccc002ea3737b2c5e.
+All eight public assets were downloaded and matched local bytes; seven outer
+and 37 inner checksums passed. It contains our b866589c…e242 prefix and
+6ddf4499…b499 / 206da4c0…73d8 sectors, exact recovery data and reviewed notes.
+The old release now links to r2; its tag/binaries are unchanged. The completed
+request is disabled again to prevent accidental publication from later commits.
+[Publication receipt](release/knobs-2026-11-14-r2/PUBLICATION.json).
+**Publication did not install firmware or operate the board.** The integrated
+controls remain physically unqualified, and the earlier D8 installation is
+still the last recorded installed image. No live power/runtime identity was
+read; no hardware client or ownership hold exists.
+
 **November 14 canonical r2 release preparation:** the user explicitly requested
 publishing our consolidated image and reviewing release notes. New immutable
 prerelease tag `knobs-2026-11-14-r2` packages the same b866589c…e242 prefix,
