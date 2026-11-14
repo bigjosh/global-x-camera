@@ -1,0 +1,258 @@
+
+D:\Github\global-x-camera\tmp\bringup\rom-nor-maintenance-readonly-20261017\read.elf:     file format elf32-littlearm
+
+
+Disassembly of section .text:
+
+341b0000 <ROM_NOR_Read>:
+341b0000:	b672      	cpsid	i
+341b0002:	f3ef 8008 	mrs	r0, MSP
+341b0006:	f3ef 810a 	mrs	r1, MSPLIM
+341b000a:	2200      	movs	r2, #0
+341b000c:	f382 880a 	msr	MSPLIM, r2
+341b0010:	4a02      	ldr	r2, [pc, #8]	@ (341b001c <ROM_NOR_Read+0x1c>)
+341b0012:	f382 8808 	msr	MSP, r2
+341b0016:	f000 b803 	b.w	341b0020 <rom_nor_read>
+341b001a:	0000      	.short	0x0000
+341b001c:	341b8000 	.word	0x341b8000
+
+341b0020 <rom_nor_read>:
+341b0020:	b580      	push	{r7, lr}
+341b0022:	f04f 0e1a 	mov.w	lr, #26
+341b0026:	2200      	movs	r2, #0
+341b0028:	f04e e001 	dls	lr, lr
+341b002c:	4c9e      	ldr	r4, [pc, #632]	@ (341b02a8 <rom_nor_read_ready+0x56>)
+341b002e:	4b9f      	ldr	r3, [pc, #636]	@ (341b02ac <rom_nor_read_ready+0x5a>)
+341b0030:	68e5      	ldr	r5, [r4, #12]
+341b0032:	6926      	ldr	r6, [r4, #16]
+341b0034:	f843 2b04 	str.w	r2, [r3], #4
+341b0038:	f00f c005 	le	lr, 341b0034 <rom_nor_read+0x14>
+341b003c:	4b9c      	ldr	r3, [pc, #624]	@ (341b02b0 <rom_nor_read_ready+0x5e>)
+341b003e:	f8c4 3100 	str.w	r3, [r4, #256]	@ 0x100
+341b0042:	f04f 33ff 	mov.w	r3, #4294967295
+341b0046:	f8c4 3104 	str.w	r3, [r4, #260]	@ 0x104
+341b004a:	f8c4 5108 	str.w	r5, [r4, #264]	@ 0x108
+341b004e:	6863      	ldr	r3, [r4, #4]
+341b0050:	f8c4 315c 	str.w	r3, [r4, #348]	@ 0x15c
+341b0054:	68a3      	ldr	r3, [r4, #8]
+341b0056:	f8c4 3160 	str.w	r3, [r4, #352]	@ 0x160
+341b005a:	4b96      	ldr	r3, [pc, #600]	@ (341b02b4 <rom_nor_read_ready+0x62>)
+341b005c:	f8c4 6164 	str.w	r6, [r4, #356]	@ 0x164
+341b0060:	f8c4 0124 	str.w	r0, [r4, #292]	@ 0x124
+341b0064:	f8c4 1128 	str.w	r1, [r4, #296]	@ 0x128
+341b0068:	695b      	ldr	r3, [r3, #20]
+341b006a:	f8c4 3120 	str.w	r3, [r4, #288]	@ 0x120
+341b006e:	f8d4 3120 	ldr.w	r3, [r4, #288]	@ 0x120
+341b0072:	f413 3380 	ands.w	r3, r3, #65536	@ 0x10000
+341b0076:	f040 80ef 	bne.w	341b0258 <rom_nor_read_ready+0x6>
+341b007a:	6821      	ldr	r1, [r4, #0]
+341b007c:	4a8e      	ldr	r2, [pc, #568]	@ (341b02b8 <rom_nor_read_ready+0x66>)
+341b007e:	4291      	cmp	r1, r2
+341b0080:	f040 80ef 	bne.w	341b0262 <rom_nor_read_ready+0x10>
+341b0084:	f8d4 2160 	ldr.w	r2, [r4, #352]	@ 0x160
+341b0088:	2a01      	cmp	r2, #1
+341b008a:	f040 80ea 	bne.w	341b0262 <rom_nor_read_ready+0x10>
+341b008e:	1e6f      	subs	r7, r5, #1
+341b0090:	f5b7 3f80 	cmp.w	r7, #65536	@ 0x10000
+341b0094:	f080 80e5 	bcs.w	341b0262 <rom_nor_read_ready+0x10>
+341b0098:	f1b6 7f80 	cmp.w	r6, #16777216	@ 0x1000000
+341b009c:	f080 80e1 	bcs.w	341b0262 <rom_nor_read_ready+0x10>
+341b00a0:	f1c6 7280 	rsb	r2, r6, #16777216	@ 0x1000000
+341b00a4:	42aa      	cmp	r2, r5
+341b00a6:	f0c0 80dc 	bcc.w	341b0262 <rom_nor_read_ready+0x10>
+341b00aa:	f3ef 8214 	mrs	r2, CONTROL
+341b00ae:	f8c4 2118 	str.w	r2, [r4, #280]	@ 0x118
+341b00b2:	f3ef 8205 	mrs	r2, IPSR
+341b00b6:	f8c4 211c 	str.w	r2, [r4, #284]	@ 0x11c
+341b00ba:	f8d4 2118 	ldr.w	r2, [r4, #280]	@ 0x118
+341b00be:	2a00      	cmp	r2, #0
+341b00c0:	f040 80d3 	bne.w	341b026a <rom_nor_read_ready+0x18>
+341b00c4:	f8d4 111c 	ldr.w	r1, [r4, #284]	@ 0x11c
+341b00c8:	2900      	cmp	r1, #0
+341b00ca:	f040 80d2 	bne.w	341b0272 <rom_nor_read_ready+0x20>
+341b00ce:	f242 0020 	movw	r0, #8224	@ 0x2020
+341b00d2:	4b7a      	ldr	r3, [pc, #488]	@ (341b02bc <rom_nor_read_ready+0x6a>)
+341b00d4:	f8d3 2260 	ldr.w	r2, [r3, #608]	@ 0x260
+341b00d8:	f8c4 212c 	str.w	r2, [r4, #300]	@ 0x12c
+341b00dc:	f8d3 3220 	ldr.w	r3, [r3, #544]	@ 0x220
+341b00e0:	f8c4 3130 	str.w	r3, [r4, #304]	@ 0x130
+341b00e4:	f8d4 312c 	ldr.w	r3, [r4, #300]	@ 0x12c
+341b00e8:	ea30 0303 	bics.w	r3, r0, r3
+341b00ec:	f040 80c3 	bne.w	341b0276 <rom_nor_read_ready+0x24>
+341b00f0:	4a6d      	ldr	r2, [pc, #436]	@ (341b02a8 <rom_nor_read_ready+0x56>)
+341b00f2:	f8d2 3130 	ldr.w	r3, [r2, #304]	@ 0x130
+341b00f6:	4003      	ands	r3, r0
+341b00f8:	f040 80c1 	bne.w	341b027e <rom_nor_read_ready+0x2c>
+341b00fc:	4970      	ldr	r1, [pc, #448]	@ (341b02c0 <rom_nor_read_ready+0x6e>)
+341b00fe:	f8d1 1400 	ldr.w	r1, [r1, #1024]	@ 0x400
+341b0102:	f8c2 1134 	str.w	r1, [r2, #308]	@ 0x134
+341b0106:	f8d2 1134 	ldr.w	r1, [r2, #308]	@ 0x134
+341b010a:	2902      	cmp	r1, #2
+341b010c:	f040 80bb 	bne.w	341b0286 <rom_nor_read_ready+0x34>
+341b0110:	496c      	ldr	r1, [pc, #432]	@ (341b02c4 <rom_nor_read_ready+0x72>)
+341b0112:	6808      	ldr	r0, [r1, #0]
+341b0114:	f8c2 0138 	str.w	r0, [r2, #312]	@ 0x138
+341b0118:	6888      	ldr	r0, [r1, #8]
+341b011a:	f8c2 013c 	str.w	r0, [r2, #316]	@ 0x13c
+341b011e:	68c8      	ldr	r0, [r1, #12]
+341b0120:	f8c2 0140 	str.w	r0, [r2, #320]	@ 0x140
+341b0124:	6a08      	ldr	r0, [r1, #32]
+341b0126:	f8c2 0144 	str.w	r0, [r2, #324]	@ 0x144
+341b012a:	f8d1 0100 	ldr.w	r0, [r1, #256]	@ 0x100
+341b012e:	f8c2 0148 	str.w	r0, [r2, #328]	@ 0x148
+341b0132:	f8d1 0108 	ldr.w	r0, [r1, #264]	@ 0x108
+341b0136:	f8c2 014c 	str.w	r0, [r2, #332]	@ 0x14c
+341b013a:	f8d1 0110 	ldr.w	r0, [r1, #272]	@ 0x110
+341b013e:	f8c2 0150 	str.w	r0, [r2, #336]	@ 0x150
+341b0142:	6c08      	ldr	r0, [r1, #64]	@ 0x40
+341b0144:	f8c2 0154 	str.w	r0, [r2, #340]	@ 0x154
+341b0148:	6c89      	ldr	r1, [r1, #72]	@ 0x48
+341b014a:	f8c2 1158 	str.w	r1, [r2, #344]	@ 0x158
+341b014e:	f8d2 0138 	ldr.w	r0, [r2, #312]	@ 0x138
+341b0152:	495d      	ldr	r1, [pc, #372]	@ (341b02c8 <rom_nor_read_ready+0x76>)
+341b0154:	4288      	cmp	r0, r1
+341b0156:	f040 809a 	bne.w	341b028e <rom_nor_read_ready+0x3c>
+341b015a:	f8d2 113c 	ldr.w	r1, [r2, #316]	@ 0x13c
+341b015e:	f5b1 1ff8 	cmp.w	r1, #2031616	@ 0x1f0000
+341b0162:	f040 8094 	bne.w	341b028e <rom_nor_read_ready+0x3c>
+341b0166:	f8d2 1140 	ldr.w	r1, [r2, #320]	@ 0x140
+341b016a:	2901      	cmp	r1, #1
+341b016c:	f040 808f 	bne.w	341b028e <rom_nor_read_ready+0x3c>
+341b0170:	f8d2 0148 	ldr.w	r0, [r2, #328]	@ 0x148
+341b0174:	f101 7180 	add.w	r1, r1, #16777216	@ 0x1000000
+341b0178:	f501 5104 	add.w	r1, r1, #8448	@ 0x2100
+341b017c:	4288      	cmp	r0, r1
+341b017e:	f040 8086 	bne.w	341b028e <rom_nor_read_ready+0x3c>
+341b0182:	f8d2 014c 	ldr.w	r0, [r2, #332]	@ 0x14c
+341b0186:	2808      	cmp	r0, #8
+341b0188:	f040 8081 	bne.w	341b028e <rom_nor_read_ready+0x3c>
+341b018c:	f8d2 1150 	ldr.w	r1, [r2, #336]	@ 0x150
+341b0190:	290b      	cmp	r1, #11
+341b0192:	d17c      	bne.n	341b028e <rom_nor_read_ready+0x3c>
+341b0194:	f8d2 1144 	ldr.w	r1, [r2, #324]	@ 0x144
+341b0198:	f647 7220 	movw	r2, #32544	@ 0x7f20
+341b019c:	4011      	ands	r1, r2
+341b019e:	d17a      	bne.n	341b0296 <rom_nor_read_ready+0x44>
+341b01a0:	460b      	mov	r3, r1
+341b01a2:	460c      	mov	r4, r1
+341b01a4:	f045 e001 	dls	lr, r5
+341b01a8:	f103 5250 	add.w	r2, r3, #872415232	@ 0x34000000
+341b01ac:	f502 12e8 	add.w	r2, r2, #1900544	@ 0x1d0000
+341b01b0:	7014      	strb	r4, [r2, #0]
+341b01b2:	3301      	adds	r3, #1
+341b01b4:	f00f c009 	le	lr, 341b01a8 <rom_nor_read+0x188>
+341b01b8:	2303      	movs	r3, #3
+341b01ba:	4c42      	ldr	r4, [pc, #264]	@ (341b02c4 <rom_nor_read_ready+0x72>)
+341b01bc:	6263      	str	r3, [r4, #36]	@ 0x24
+341b01be:	6427      	str	r7, [r4, #64]	@ 0x40
+341b01c0:	64a6      	str	r6, [r4, #72]	@ 0x48
+341b01c2:	f3bf 8f4f 	dsb	sy
+341b01c6:	2300      	movs	r3, #0
+341b01c8:	4e40      	ldr	r6, [pc, #256]	@ (341b02cc <rom_nor_read_ready+0x7a>)
+341b01ca:	6a22      	ldr	r2, [r4, #32]
+341b01cc:	3101      	adds	r1, #1
+341b01ce:	07d7      	lsls	r7, r2, #31
+341b01d0:	d42d      	bmi.n	341b022e <rom_nor_read+0x20e>
+341b01d2:	f412 4ffe 	tst.w	r2, #32512	@ 0x7f00
+341b01d6:	d010      	beq.n	341b01fa <rom_nor_read+0x1da>
+341b01d8:	f894 c050 	ldrb.w	ip, [r4, #80]	@ 0x50
+341b01dc:	f103 5750 	add.w	r7, r3, #872415232	@ 0x34000000
+341b01e0:	f507 17e8 	add.w	r7, r7, #1900544	@ 0x1d0000
+341b01e4:	fa5f fc8c 	uxtb.w	ip, ip
+341b01e8:	f887 c000 	strb.w	ip, [r7]
+341b01ec:	3301      	adds	r3, #1
+341b01ee:	42ab      	cmp	r3, r5
+341b01f0:	d209      	bcs.n	341b0206 <rom_nor_read+0x1e6>
+341b01f2:	3e01      	subs	r6, #1
+341b01f4:	d1e9      	bne.n	341b01ca <rom_nor_read+0x1aa>
+341b01f6:	200a      	movs	r0, #10
+341b01f8:	e019      	b.n	341b022e <rom_nor_read+0x20e>
+341b01fa:	f002 0722 	and.w	r7, r2, #34	@ 0x22
+341b01fe:	2f02      	cmp	r7, #2
+341b0200:	d1f5      	bne.n	341b01ee <rom_nor_read+0x1ce>
+341b0202:	2009      	movs	r0, #9
+341b0204:	e013      	b.n	341b022e <rom_nor_read+0x20e>
+341b0206:	d1f6      	bne.n	341b01f6 <rom_nor_read+0x1d6>
+341b0208:	4b31      	ldr	r3, [pc, #196]	@ (341b02d0 <rom_nor_read_ready+0x7e>)
+341b020a:	4c2e      	ldr	r4, [pc, #184]	@ (341b02c4 <rom_nor_read_ready+0x72>)
+341b020c:	1a5b      	subs	r3, r3, r1
+341b020e:	3b01      	subs	r3, #1
+341b0210:	d101      	bne.n	341b0216 <rom_nor_read+0x1f6>
+341b0212:	462b      	mov	r3, r5
+341b0214:	e7ef      	b.n	341b01f6 <rom_nor_read+0x1d6>
+341b0216:	6a22      	ldr	r2, [r4, #32]
+341b0218:	3101      	adds	r1, #1
+341b021a:	07d6      	lsls	r6, r2, #31
+341b021c:	d43f      	bmi.n	341b029e <rom_nor_read_ready+0x4c>
+341b021e:	f002 0622 	and.w	r6, r2, #34	@ 0x22
+341b0222:	2e02      	cmp	r6, #2
+341b0224:	d1f3      	bne.n	341b020e <rom_nor_read+0x1ee>
+341b0226:	f412 40fe 	ands.w	r0, r2, #32512	@ 0x7f00
+341b022a:	462b      	mov	r3, r5
+341b022c:	d139      	bne.n	341b02a2 <rom_nor_read_ready+0x50>
+341b022e:	4c1e      	ldr	r4, [pc, #120]	@ (341b02a8 <rom_nor_read_ready+0x56>)
+341b0230:	f8c4 310c 	str.w	r3, [r4, #268]	@ 0x10c
+341b0234:	f8c4 1110 	str.w	r1, [r4, #272]	@ 0x110
+341b0238:	f8c4 2114 	str.w	r2, [r4, #276]	@ 0x114
+341b023c:	f8c4 0104 	str.w	r0, [r4, #260]	@ 0x104
+341b0240:	f3bf 8f4f 	dsb	sy
+341b0244:	4b23      	ldr	r3, [pc, #140]	@ (341b02d4 <rom_nor_read_ready+0x82>)
+341b0246:	f8c4 3100 	str.w	r3, [r4, #256]	@ 0x100
+341b024a:	f3bf 8f4f 	dsb	sy
+341b024e:	f3bf 8f6f 	isb	sy
+
+341b0252 <rom_nor_read_ready>:
+341b0252:	bf00      	nop
+341b0254:	f7ff bffd 	b.w	341b0252 <rom_nor_read_ready>
+341b0258:	2200      	movs	r2, #0
+341b025a:	2001      	movs	r0, #1
+341b025c:	4611      	mov	r1, r2
+341b025e:	4613      	mov	r3, r2
+341b0260:	e7e5      	b.n	341b022e <rom_nor_read+0x20e>
+341b0262:	461a      	mov	r2, r3
+341b0264:	4619      	mov	r1, r3
+341b0266:	200c      	movs	r0, #12
+341b0268:	e7e1      	b.n	341b022e <rom_nor_read+0x20e>
+341b026a:	461a      	mov	r2, r3
+341b026c:	4619      	mov	r1, r3
+341b026e:	2002      	movs	r0, #2
+341b0270:	e7dd      	b.n	341b022e <rom_nor_read+0x20e>
+341b0272:	4611      	mov	r1, r2
+341b0274:	e7fb      	b.n	341b026e <rom_nor_read_ready+0x1c>
+341b0276:	2200      	movs	r2, #0
+341b0278:	2003      	movs	r0, #3
+341b027a:	4613      	mov	r3, r2
+341b027c:	e7d7      	b.n	341b022e <rom_nor_read+0x20e>
+341b027e:	2200      	movs	r2, #0
+341b0280:	2004      	movs	r0, #4
+341b0282:	4613      	mov	r3, r2
+341b0284:	e7d3      	b.n	341b022e <rom_nor_read+0x20e>
+341b0286:	461a      	mov	r2, r3
+341b0288:	4619      	mov	r1, r3
+341b028a:	2005      	movs	r0, #5
+341b028c:	e7cf      	b.n	341b022e <rom_nor_read+0x20e>
+341b028e:	461a      	mov	r2, r3
+341b0290:	4619      	mov	r1, r3
+341b0292:	2006      	movs	r0, #6
+341b0294:	e7cb      	b.n	341b022e <rom_nor_read+0x20e>
+341b0296:	461a      	mov	r2, r3
+341b0298:	4619      	mov	r1, r3
+341b029a:	2007      	movs	r0, #7
+341b029c:	e7c7      	b.n	341b022e <rom_nor_read+0x20e>
+341b029e:	462b      	mov	r3, r5
+341b02a0:	e7c5      	b.n	341b022e <rom_nor_read+0x20e>
+341b02a2:	200b      	movs	r0, #11
+341b02a4:	e7c3      	b.n	341b022e <rom_nor_read+0x20e>
+341b02a6:	bf00      	nop
+341b02a8:	341b4000 	.word	0x341b4000
+341b02ac:	341b4100 	.word	0x341b4100
+341b02b0:	52554e4e 	.word	0x52554e4e
+341b02b4:	e000ed00 	.word	0xe000ed00
+341b02b8:	4e4f5244 	.word	0x4e4f5244
+341b02bc:	56028000 	.word	0x56028000
+341b02c0:	5802b000 	.word	0x5802b000
+341b02c4:	58025000 	.word	0x58025000
+341b02c8:	10000001 	.word	0x10000001
+341b02cc:	007a1200 	.word	0x007a1200
+341b02d0:	007a1201 	.word	0x007a1201
+341b02d4:	444f4e45 	.word	0x444f4e45
