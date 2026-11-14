@@ -1,0 +1,165 @@
+
+/home/user/global-x-camera/firmware/usb-ptp/evidence/2026-11-14-knobs/package/hook.elf:     file format elf32-littlearm
+
+
+Disassembly of section .text:
+
+34181e40 <usb_boot_hook>:
+34181e40:	f3bf 8f4f 	dsb	sy
+34181e44:	e92d 5fff 	stmdb	sp!, {r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, sl, fp, ip, lr}
+34181e48:	f3ef 8000 	mrs	r0, CPSR
+34181e4c:	b403      	push	{r0, r1}
+34181e4e:	f000 f809 	bl	34181e64 <usb_selector_load>
+34181e52:	bc03      	pop	{r0, r1}
+34181e54:	f380 8c00 	msr	CPSR_fs, r0
+34181e58:	e8bd 5fff 	ldmia.w	sp!, {r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, sl, fp, ip, lr}
+34181e5c:	f3bf 8f4f 	dsb	sy
+34181e60:	f7fe bfe3 	b.w	34180e2a <*ABS*0x34180e2a>
+
+34181e64 <usb_selector_load>:
+34181e64:	e92d 43f8 	stmdb	sp!, {r3, r4, r5, r6, r7, r8, r9, lr}
+34181e68:	4a5a      	ldr	r2, [pc, #360]	@ (34181fd4 <usb_selector_load+0x170>)
+34181e6a:	4b5b      	ldr	r3, [pc, #364]	@ (34181fd8 <usb_selector_load+0x174>)
+34181e6c:	601a      	str	r2, [r3, #0]
+34181e6e:	2201      	movs	r2, #1
+34181e70:	605a      	str	r2, [r3, #4]
+34181e72:	4a5a      	ldr	r2, [pc, #360]	@ (34181fdc <usb_selector_load+0x178>)
+34181e74:	6852      	ldr	r2, [r2, #4]
+34181e76:	609a      	str	r2, [r3, #8]
+34181e78:	4b59      	ldr	r3, [pc, #356]	@ (34181fe0 <usb_selector_load+0x17c>)
+34181e7a:	695c      	ldr	r4, [r3, #20]
+34181e7c:	f414 3400 	ands.w	r4, r4, #131072	@ 0x20000
+34181e80:	d00e      	beq.n	34181ea0 <usb_selector_load+0x3c>
+34181e82:	f3bf 8f4f 	dsb	sy
+34181e86:	f3bf 8f6f 	isb	sy
+34181e8a:	695a      	ldr	r2, [r3, #20]
+34181e8c:	f422 3200 	bic.w	r2, r2, #131072	@ 0x20000
+34181e90:	615a      	str	r2, [r3, #20]
+34181e92:	2200      	movs	r2, #0
+34181e94:	f8c3 2250 	str.w	r2, [r3, #592]	@ 0x250
+34181e98:	f3bf 8f4f 	dsb	sy
+34181e9c:	f3bf 8f6f 	isb	sy
+34181ea0:	4e4e      	ldr	r6, [pc, #312]	@ (34181fdc <usb_selector_load+0x178>)
+34181ea2:	4b4f      	ldr	r3, [pc, #316]	@ (34181fe0 <usb_selector_load+0x17c>)
+34181ea4:	6875      	ldr	r5, [r6, #4]
+34181ea6:	695b      	ldr	r3, [r3, #20]
+34181ea8:	f413 3f40 	tst.w	r3, #196608	@ 0x30000
+34181eac:	d173      	bne.n	34181f96 <usb_selector_load+0x132>
+34181eae:	4a4d      	ldr	r2, [pc, #308]	@ (34181fe4 <usb_selector_load+0x180>)
+34181eb0:	4b4d      	ldr	r3, [pc, #308]	@ (34181fe8 <usb_selector_load+0x184>)
+34181eb2:	6811      	ldr	r1, [r2, #0]
+34181eb4:	4299      	cmp	r1, r3
+34181eb6:	d16e      	bne.n	34181f96 <usb_selector_load+0x132>
+34181eb8:	f8d2 1100 	ldr.w	r1, [r2, #256]	@ 0x100
+34181ebc:	f103 4371 	add.w	r3, r3, #4043309056	@ 0xf1000000
+34181ec0:	f503 5304 	add.w	r3, r3, #8448	@ 0x2100
+34181ec4:	4299      	cmp	r1, r3
+34181ec6:	d166      	bne.n	34181f96 <usb_selector_load+0x132>
+34181ec8:	f8d2 3110 	ldr.w	r3, [r2, #272]	@ 0x110
+34181ecc:	2b0b      	cmp	r3, #11
+34181ece:	d162      	bne.n	34181f96 <usb_selector_load+0x132>
+34181ed0:	f647 7120 	movw	r1, #32544	@ 0x7f20
+34181ed4:	6a13      	ldr	r3, [r2, #32]
+34181ed6:	400b      	ands	r3, r1
+34181ed8:	d15d      	bne.n	34181f96 <usb_selector_load+0x132>
+34181eda:	2103      	movs	r1, #3
+34181edc:	6251      	str	r1, [r2, #36]	@ 0x24
+34181ede:	f641 31e7 	movw	r1, #7143	@ 0x1be7
+34181ee2:	6411      	str	r1, [r2, #64]	@ 0x40
+34181ee4:	f44f 3180 	mov.w	r1, #65536	@ 0x10000
+34181ee8:	f641 37e8 	movw	r7, #7144	@ 0x1be8
+34181eec:	6491      	str	r1, [r2, #72]	@ 0x48
+34181eee:	f04f 31ff 	mov.w	r1, #4294967295	@ 0xffffffff
+34181ef2:	f8df c0f8 	ldr.w	ip, [pc, #248]	@ 34181fec <usb_selector_load+0x188>
+34181ef6:	f8df 80f8 	ldr.w	r8, [pc, #248]	@ 34181ff0 <usb_selector_load+0x18c>
+34181efa:	6a10      	ldr	r0, [r2, #32]
+34181efc:	f010 0f01 	tst.w	r0, #1
+34181f00:	d149      	bne.n	34181f96 <usb_selector_load+0x132>
+34181f02:	f410 4ffe 	tst.w	r0, #32512	@ 0x7f00
+34181f06:	d016      	beq.n	34181f36 <usb_selector_load+0xd2>
+34181f08:	f892 0050 	ldrb.w	r0, [r2, #80]	@ 0x50
+34181f0c:	f103 0901 	add.w	r9, r3, #1
+34181f10:	f103 5350 	add.w	r3, r3, #872415232	@ 0x34000000
+34181f14:	b2c0      	uxtb	r0, r0
+34181f16:	f503 1300 	add.w	r3, r3, #2097152	@ 0x200000
+34181f1a:	7018      	strb	r0, [r3, #0]
+34181f1c:	2308      	movs	r3, #8
+34181f1e:	f043 e001 	dls	lr, r3
+34181f22:	4041      	eors	r1, r0
+34181f24:	f341 0300 	sbfx	r3, r1, #0, #1
+34181f28:	ea03 030c 	and.w	r3, r3, ip
+34181f2c:	ea83 0151 	eor.w	r1, r3, r1, lsr #1
+34181f30:	f00f c009 	le	lr, 34181f24 <usb_selector_load+0xc0>
+34181f34:	464b      	mov	r3, r9
+34181f36:	6870      	ldr	r0, [r6, #4]
+34181f38:	1b40      	subs	r0, r0, r5
+34181f3a:	4540      	cmp	r0, r8
+34181f3c:	d82b      	bhi.n	34181f96 <usb_selector_load+0x132>
+34181f3e:	42bb      	cmp	r3, r7
+34181f40:	d1db      	bne.n	34181efa <usb_selector_load+0x96>
+34181f42:	4b28      	ldr	r3, [pc, #160]	@ (34181fe4 <usb_selector_load+0x180>)
+34181f44:	4825      	ldr	r0, [pc, #148]	@ (34181fdc <usb_selector_load+0x178>)
+34181f46:	4e2a      	ldr	r6, [pc, #168]	@ (34181ff0 <usb_selector_load+0x18c>)
+34181f48:	6a1a      	ldr	r2, [r3, #32]
+34181f4a:	0797      	lsls	r7, r2, #30
+34181f4c:	d51f      	bpl.n	34181f8e <usb_selector_load+0x12a>
+34181f4e:	6a1a      	ldr	r2, [r3, #32]
+34181f50:	0692      	lsls	r2, r2, #26
+34181f52:	d41c      	bmi.n	34181f8e <usb_selector_load+0x12a>
+34181f54:	6a1a      	ldr	r2, [r3, #32]
+34181f56:	f647 7301 	movw	r3, #32513	@ 0x7f01
+34181f5a:	421a      	tst	r2, r3
+34181f5c:	d11b      	bne.n	34181f96 <usb_selector_load+0x132>
+34181f5e:	4b25      	ldr	r3, [pc, #148]	@ (34181ff4 <usb_selector_load+0x190>)
+34181f60:	4299      	cmp	r1, r3
+34181f62:	d118      	bne.n	34181f96 <usb_selector_load+0x132>
+34181f64:	f3bf 8f4f 	dsb	sy
+34181f68:	f3bf 8f6f 	isb	sy
+34181f6c:	2202      	movs	r2, #2
+34181f6e:	4b1a      	ldr	r3, [pc, #104]	@ (34181fd8 <usb_selector_load+0x174>)
+34181f70:	605a      	str	r2, [r3, #4]
+34181f72:	f5a3 13fc 	sub.w	r3, r3, #2064384	@ 0x1f8000
+34181f76:	f6a3 73ff 	subw	r3, r3, #4095	@ 0xfff
+34181f7a:	4798      	blx	r3
+34181f7c:	b98c      	cbnz	r4, 34181fa2 <usb_selector_load+0x13e>
+34181f7e:	2203      	movs	r2, #3
+34181f80:	4b15      	ldr	r3, [pc, #84]	@ (34181fd8 <usb_selector_load+0x174>)
+34181f82:	605a      	str	r2, [r3, #4]
+34181f84:	4a15      	ldr	r2, [pc, #84]	@ (34181fdc <usb_selector_load+0x178>)
+34181f86:	6852      	ldr	r2, [r2, #4]
+34181f88:	60da      	str	r2, [r3, #12]
+34181f8a:	e8bd 83f8 	ldmia.w	sp!, {r3, r4, r5, r6, r7, r8, r9, pc}
+34181f8e:	6842      	ldr	r2, [r0, #4]
+34181f90:	1b52      	subs	r2, r2, r5
+34181f92:	42b2      	cmp	r2, r6
+34181f94:	d9d8      	bls.n	34181f48 <usb_selector_load+0xe4>
+34181f96:	f24e 0201 	movw	r2, #57345	@ 0xe001
+34181f9a:	4b0f      	ldr	r3, [pc, #60]	@ (34181fd8 <usb_selector_load+0x174>)
+34181f9c:	605a      	str	r2, [r3, #4]
+34181f9e:	bf00      	nop
+34181fa0:	e7fd      	b.n	34181f9e <usb_selector_load+0x13a>
+34181fa2:	4b0f      	ldr	r3, [pc, #60]	@ (34181fe0 <usb_selector_load+0x17c>)
+34181fa4:	695a      	ldr	r2, [r3, #20]
+34181fa6:	f412 3200 	ands.w	r2, r2, #131072	@ 0x20000
+34181faa:	d1e8      	bne.n	34181f7e <usb_selector_load+0x11a>
+34181fac:	f3bf 8f4f 	dsb	sy
+34181fb0:	f3bf 8f6f 	isb	sy
+34181fb4:	f8c3 2250 	str.w	r2, [r3, #592]	@ 0x250
+34181fb8:	f3bf 8f4f 	dsb	sy
+34181fbc:	f3bf 8f6f 	isb	sy
+34181fc0:	695a      	ldr	r2, [r3, #20]
+34181fc2:	f442 3200 	orr.w	r2, r2, #131072	@ 0x20000
+34181fc6:	615a      	str	r2, [r3, #20]
+34181fc8:	f3bf 8f4f 	dsb	sy
+34181fcc:	f3bf 8f6f 	isb	sy
+34181fd0:	e7d5      	b.n	34181f7e <usb_selector_load+0x11a>
+34181fd2:	bf00      	nop
+34181fd4:	31534255 	.word	0x31534255
+34181fd8:	343f9000 	.word	0x343f9000
+34181fdc:	e0001000 	.word	0xe0001000
+34181fe0:	e000ed00 	.word	0xe000ed00
+34181fe4:	58025000 	.word	0x58025000
+34181fe8:	10000001 	.word	0x10000001
+34181fec:	edb88320 	.word	0xedb88320
+34181ff0:	02625a00 	.word	0x02625a00
+34181ff4:	ff24f6e0 	.word	0xff24f6e0

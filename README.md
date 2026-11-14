@@ -16,8 +16,8 @@ floats it immediately before Standby. Selected USB mode drives it LOW;
 provisional HIGH before USB detection remains. The old PD12 phase pulses are
 disabled; RAM timing records and the independent PD0 exposure mirror remain.
 [Installation record](firmware/usb-ptp/evidence/2026-11-13-d8-hold/README.md).
-Normal capture exposure remains fixed; exposure and ASA control integration
-are deferred. The [November9 A3/ADC smoke results](firmware/control-smoke/evidence/2026-11-09-a3-live/README.md)
+Installed capture exposure remains fixed. A build that reads both knobs exists
+but is not installed or hardware-tested; see [the knob firmware](firmware/usb-ptp/README.md#exposure-and-gain-knobs). The [November9 A3/ADC smoke results](firmware/control-smoke/evidence/2026-11-09-a3-live/README.md)
 remain historical evidence.
 
 **USB baseline (November 8):** native PTP photo access remains in the package. CN8 VBUS present at
@@ -65,7 +65,8 @@ the separate momentary SPDT trigger, C3=2.2uF and R5=1kohm remain. The PCB
 will use **automatic MOSFET source control** rather than the manual selector.
 HOLD is **D8/CN14.1/PD12** directly to **Q2 gate pin1**; exposure is **A0 LOW / A1 wiper / A2 HIGH**.
 The new ASA pot is **A4 high end / GND low end / A5 wiper** and will set
-**analog gain**. ASA sampling and both knobs' camera integration are pending.
+**analog gain**. The installed firmware reads neither knob; the uninstalled
+[November 14 knob build](firmware/usb-ptp/evidence/2026-11-14-knobs/README.md) reads both.
 The user has confirmed the new D8 HOLD arrangement works; exact takeover,
 rail ordering and OFF-current floor remain unqualified.
 [Canonical wiring and diagram](docs/power/2026-10-14-power-tree-review.md#november-7-lipo-button-and-pd7-hold-wiring),

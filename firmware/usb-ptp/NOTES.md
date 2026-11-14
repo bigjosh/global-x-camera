@@ -190,3 +190,94 @@ D8 build/source/artifact checks are not a new hardware or regression qualificati
 admitted by `package.py`, and [the D8 build record](evidence/2026-11-13-d8-hold/README.md).
 Early UART recovery and the provisional pre-VBUS assertion policy are unchanged.
 No instrument operation accompanies this offline work.
+
+## 2026-11-14  Read both knobs in the boot selector and edit the loaded capture prefix
+
+**Why:** the user asked for a firmware release in which the two knobs control
+the photo. Exposure, gain and frame length are written to the sensor by the
+capture prefix, which cannot be rebuilt outside the original ST compiler: it
+has four spare bytes, its layout is pinned by hash, and neither stock GCC
+12.3.1 nor 13.2.1 can link the capture stage's fixed layout from the same
+sources. The selector is
+the one piece of code that already runs on every boot before sensor setup,
+already brings up the converter, and builds identically in logic with GCC
+13.2.1. So `knob.c` reads both knobs there and writes the three values into the
+RAM copy of the prefix: bytes 1 to 3 of the manual-exposure block and the
+`MOVW` holding the frame length. It runs only when VBUS sampling returned a
+certain "absent", checks the exact default bytes before writing, and leaves the
+fixed 1428 lines at 1x on any failure, so a knob fault can cost control but not
+the photo.
+
+**Rejected:** rebuilding the capture stage to read a mailbox, which is the
+cleaner end state but needs the ST compiler and a new capture qualification;
+adding converter code to the prefix, which is full; converting the knobs inside
+`vbus.c`'s ADC2 session, which would alter the hardware-proven VBUS sampler and
+use inputs only proven on ADC1; exciting the knobs before the VBUS decision,
+which would drive A4 and A2 in USB mode for no purpose; restoring registers
+field by field, which cost 240 bytes of selector for no benefit in
+single-threaded code; storing the applied values with the photo, which needs a
+capture rebuild and a metadata schema that does not exist; treating the
+host-side register model as hardware evidence.
+
+**Evidence:** `knob.c`, `knob_map.h`, `knob_tables.py`, `selector.c`,
+`package.py` `knob_sites()`, `test_knob.py`, and
+[the build record](evidence/2026-11-14-knobs/README.md). Offline only: no
+instrument or camera was used, and the package is not installed.
+
+## 2026-11-14  Open the receiver's fixed-exposure assertion with a five-byte, checksum-neutral edit
+
+**Why:** the reviewed receiver reads back the sensor's applied exposure and
+fails the photo with code 0x90 unless it is 1428 lines, so an exposure knob
+cannot work against unchanged capture bytes. The assertion is in the
+late-loaded range, which the receiver loads and CRC-checks itself after
+arming, and the receiver cannot be rebuilt here. `exposure_gate.py` turns its
+`beq.n` into `b.n` to the same continuation, which leaves the two failure
+instructions after it unreachable, and sets those four bytes so the late
+range's CRC-32 is unchanged. Nothing else moves: the checksum constant, the
+early receiver, its CRC literals in the prefix and every other capture byte are
+as reviewed. The continuation reloads the registers the comparison used, and
+no branch or stored address reaches the four bytes. The receiver's only other
+exposure-dependent check, the frame-margin test, is not compiled into this
+build; the knob mapping keeps the frame 2000 lines longer than the exposure.
+
+**Rejected:** recomputing the late checksum instead, because its constant sits
+in the early receiver, whose own checksum is held twice in the prefix: thirteen
+bytes in four places rather than five in one; patching the receiver in RAM from
+a trampoline, because the late range is loaded after the last point the
+selector controls; leaving the assertion and offering gain only; calling the
+edit reviewed capture code. It is a new, untested variant of it.
+
+**Evidence:** `exposure_gate.py`; `test_knob.py` `ExposureGateTests`;
+`test_boot_package.py` proves that undoing the recorded edit restores the
+reviewed capture bytes; flash offsets 0x6B87 to 0x6B8B in
+[the build record](evidence/2026-11-14-knobs/README.md); archived receiver
+source `capture-raw/evidence/2026-11-13-d3-hold/hold-standby/capture.c` line 762.
+
+## 2026-11-14  Knob ranges: 0.2 ms to 484 ms, 1x to 8x, frame at least exposure plus 2000 lines
+
+**Why:** D-39 asks for an exponential exposure curve and D-50 for 1x to 8x
+analog gain in equal stops; both are implemented as 33-point tables with
+integer interpolation. The top of the exposure range is set by the sensor mode,
+not by choice: exposure and frame length are 16-bit line counts at 7.69 µs per
+line, and the receiver requires that line length, so about half a second is
+the ceiling. The user had already accepted a 0.5 s limit on November 11. The
+frame rule `max(4336, lines + 2000)` is the one the October 24 long-exposure
+bench test used at 30000 lines, the only long exposure ever run here, which
+caps exposure at 63000 lines. The floor of 26 lines is above the sensor
+driver's minimum of 21. Readings below 120 and above 3720 are treated as end
+of travel because the calibrated converter tops out near 3839 and the divider
+puts the top few percent of travel beyond that.
+
+**Rejected:** one second, which needs a longer line time that ST discourages
+and the receiver rejects; a linear exposure scale, which crowds the useful
+short exposures into the first few degrees; digital gain beyond 8x; the
+sensor's own minimum frame margin of 75 lines, which has never been run;
+deriving the top of the range from each boot's calibration factor, which adds
+a failure mode for no visible gain; checking the knob's end pins as a wiring
+test, which cannot detect a missing wiper.
+
+**Evidence:** `knob_tables.py` and `test_knob.py` (every code 0 to 4095 mapped
+and compared with an independent model); `capture-raw/magic_transform.py`
+`sensor_exposure()` for the frame rule; `capture-timing/exposure-measurement.md`
+for line time and the 650-line and 1301-line runs. Exposures outside 5 ms to
+231 ms and gains above 1x are untested on hardware.

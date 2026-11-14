@@ -1,0 +1,80 @@
+{
+  "schema": 1,
+  "hardware_status": "offline-only-not-installed",
+  "tag": "knobs-2026-11-14",
+  "prefix_sha256": "71f935962afd935c56ccf5e707eb62574b3e39f59b7e6bb0893f3159bc7af503",
+  "prefix_bytes": 7160,
+  "sector0_sha256": "2d4141d327edde3fe4618e442c205521845656985d7a12b2fdd1c9779d1a43fd",
+  "sector1_sha256": "53b8dacb8378e3018d5a2c44bab53c14b515e246c8b8d5864a368d537d5bf55d",
+  "usb_sha256": "d2bbb76f789e01bb94f09892f291d602b5d7276b96124eb613d70f1bd7b87461",
+  "selector_bytes": 7144,
+  "hook_bytes": 440,
+  "compiler": "arm-none-eabi-gcc (15:13.2.rel1-2) 13.2.1 20231009",
+  "against_installed_d8": {
+    "sector0_changed_bytes": 190,
+    "sector0_changed_4k_blocks": [
+      0,
+      1,
+      6
+    ],
+    "sector0_changed_outside_hook": [
+      "0x64",
+      "0x65",
+      "0x6b87",
+      "0x6b88",
+      "0x6b89",
+      "0x6b8a",
+      "0x6b8b"
+    ],
+    "sector1_changed_4k_blocks": [
+      0,
+      1
+    ],
+    "usb_app_identical": true,
+    "prefix_before_hook_identical": true
+  },
+  "exposure_gate": {
+    "schema": 1,
+    "address": "0x34304b80",
+    "flash_offset": 27520,
+    "resumes_at": "0x34304be8",
+    "original": "40f294539e422fd0902384e7",
+    "patched": "40f294539e422fe03c135dc1",
+    "changed_flash_offsets": [
+      27527,
+      27528,
+      27529,
+      27530,
+      27531
+    ],
+    "late_crc32": 2914057167,
+    "meaning": "beq.n to b.n: the receiver no longer requires 1428 exposure lines; the four unreachable bytes after it keep the late-range CRC-32 unchanged"
+  },
+  "knob": {
+    "schema": 1,
+    "manual_address": 873994140,
+    "frame_address": 873993000,
+    "proof_pointer_word": 9,
+    "result_word": 10,
+    "default_lines": 1428,
+    "default_frame": 4336,
+    "min_lines": 26,
+    "max_lines": 63000,
+    "frame_margin": 2000,
+    "line_ns": 7686,
+    "gain_code_max": 28,
+    "code_low": 120,
+    "code_high": 3720
+  },
+  "tests": {
+    "command": "USB_BOOT_TEST_PACKAGE=<this package> python3 -m unittest discover -s firmware/usb-ptp -p \"test_*.py\"",
+    "host": "Linux, Python 3.13, clang/gcc native models",
+    "ran": 50,
+    "passed": 48,
+    "skipped": 1,
+    "errors": 1,
+    "error": "test_ptp cannot link its native PTP library on Linux (gcc -shared without -fPIC); it is unrelated to this change and did not run"
+  },
+  "reproducible": "two builds into different folders gave identical sector0.bin, sector1.bin, selector.bin and hook.bin",
+  "hardware_tests_run": false
+}

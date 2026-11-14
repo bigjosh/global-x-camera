@@ -4,6 +4,18 @@ Read [NOTES.md](NOTES.md) at the root and in the relevant owning folder before c
 
 # Instrument access
 
+**November 14 knob package built offline; NOT installed; no hardware operated:**
+a cloud session with no bench access built
+[firmware/usb-ptp/evidence/2026-11-14-knobs](firmware/usb-ptp/evidence/2026-11-14-knobs/README.md),
+which reads the exposure and gain knobs on each battery photo. Prefix 7160 bytes;
+hashes are in that record and in `recovery.py` `APPROVED`, whose new entry is an
+offline admission of the exact candidate, not a hardware result. The camera
+still holds the November 13 D8 package below. Bench ownership and state are
+unchanged from the entries below. The install sequence, reconstructed from the
+November 13 records, is in the GitHub release notes for tag `knobs-2026-11-14` and in
+`release/knobs-2026-11-14/RELEASE_NOTES.md`; installing it is the first hardware test, and
+everything in the "not checked" list there is open.
+
 **November 13 D8 HOLD confirmed by the user; canonical documentation updated:**
 the user reports that the loaded D8 firmware works and requests the schematic,
 assembly instructions, commit and push. Current HOLD is **PD12 / Arduino D8 /

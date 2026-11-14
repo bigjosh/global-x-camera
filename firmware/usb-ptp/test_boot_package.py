@@ -286,13 +286,20 @@ class LinkedPackageTests(unittest.TestCase):
   self.assertEqual(p.branch_target(self.hook[32:36],p.HOOK_BASE+32),p.RESUME_ADDRESS)
   self.assertEqual((14+2)*4%8,0)  # The hook preserves ABI stack alignment.
  def test_linked_patch_and_original_capture_exact(self):
-  capture=Path(self.m.get('capture_build',p.REFERENCE))
+  capture=Path(p.located(self.m.get('capture_build',p.REFERENCE)))
   original=(capture/'stage1.bin').read_bytes();prefix=(self.out/'stage1.bin').read_bytes()
   self.assertEqual(p.branch_target(prefix[p.PATCH_OFFSET:p.PATCH_OFFSET+4],p.PATCH_ADDRESS),p.HOOK_BASE)
   self.assertEqual(prefix[:p.PATCH_OFFSET],original[:p.PATCH_OFFSET])
   self.assertEqual(prefix[p.PATCH_OFFSET+4:len(original)],original[p.PATCH_OFFSET+4:])
-  sector=(self.out/'sector0.bin').read_bytes();self.assertEqual(sector[p.CAPTURE_OFFSET:],(capture/'capture_sector_0.bin').read_bytes()[p.CAPTURE_OFFSET:])
+  sector=(self.out/'sector0.bin').read_bytes()
   self.assertEqual(p.sha(prefix),self.m['prefix_sha256']);self.assertEqual(p.sha(sector),self.m['sector0_sha256'])
+  # Knob packages change the receiver's fixed-exposure assertion and nothing
+  # else; undoing the recorded edit must give back the reviewed capture bytes.
+  gate=self.m.get('exposure_gate')
+  if gate:
+   self.assertEqual(len(gate['changed_flash_offsets']),5)
+   sector=p.exposure_gate.close_gate(sector,gate)
+  self.assertEqual(sector[p.CAPTURE_OFFSET:],(capture/'capture_sector_0.bin').read_bytes()[p.CAPTURE_OFFSET:])
  def test_early_uart_guard_is_identical_to_original(self):
   prefix=(self.out/'stage1.bin').read_bytes();legacy=(p.REFERENCE/'stage1.bin').read_bytes()
   # Reset startup through the complete PE6/UART park/recovery block remains
@@ -301,12 +308,12 @@ class LinkedPackageTests(unittest.TestCase):
   self.assertEqual(prefix[0x38C:0x38E],bytes.fromhex('fee7'))
  def test_pd12_capture_reference_and_usb_contract(self):
   if self.m.get('capture_profile')!='pd12-hold':self.skipTest('Legacy package has no early HOLD')
-  capture=Path(self.m['capture_build']);original=(capture/'stage1.bin').read_bytes()
+  capture=Path(p.located(self.m['capture_build']));original=(capture/'stage1.bin').read_bytes()
   sector=(capture/'capture_sector_0.bin').read_bytes();manifest=json.loads((capture/'manifest.json').read_text(encoding='utf-8'))
   self.assertEqual(p.validate_reference(original,sector,manifest),'pd12-hold')
   self.assertEqual(struct.unpack_from('<I',original,4)[0],0x34181DF1)
   self.assertEqual(self.m['gpio_hold'],manifest['raw_slots']['gpio_hold_contract'])
-  usb=json.loads((Path(self.m['usb_build'])/'manifest.json').read_text(encoding='utf-8'))
+  usb=json.loads((Path(p.located(self.m['usb_build']))/'manifest.json').read_text(encoding='utf-8'))
   self.assertEqual((usb['gpio_hold']['port'],usb['gpio_hold']['pin']),('GPIOD',12))
   p.validate_usb_hold_policy(usb,'pd12-hold',self.m['force_capture'])
   self.assertEqual(usb['gpio_hold']['shutdown_proof_schema'],5)
@@ -325,12 +332,12 @@ class LinkedPackageTests(unittest.TestCase):
   self.assertRegex(self.hl,r'dsb\s+sy\s*\n[^\n]+isb\s+sy(?:(?!\bblx\b)[\s\S])*?blx\s+r3')
   if not self.m['force_capture']:
    self.assertRegex(self.sl,r'#196608')
-   usb=json.loads((Path(self.m['usb_build'])/'manifest.json').read_text(encoding='utf-8'))
+   usb=json.loads((Path(p.located(self.m['usb_build']))/'manifest.json').read_text(encoding='utf-8'))
    selector=(self.out/'selector.bin').read_bytes()
    paths=guarded_selector_handoffs(selector,p.SELECTOR_LOAD,usb['entry'])
    self.assertEqual(len(paths),1,'USB handoff must execute DSB/ISB then only bounded B/LDR before exact-entry BLX')
  def test_selector_handoff_rejects_changed_barriers_target_and_call(self):
-  usb=json.loads((Path(self.m['usb_build'])/'manifest.json').read_text(encoding='utf-8'))
+  usb=json.loads((Path(p.located(self.m['usb_build']))/'manifest.json').read_text(encoding='utf-8'))
   selector=(self.out/'selector.bin').read_bytes()
   paths=guarded_selector_handoffs(selector,p.SELECTOR_LOAD,usb['entry'])
   self.assertEqual(len(paths),1)
@@ -363,7 +370,7 @@ class LinkedPackageTests(unittest.TestCase):
   sector1=(self.out/'sector1.bin').read_bytes();self.assertEqual(len(sector1),p.SECTOR_BYTES)
   self.assertEqual(sector1[:self.m['selector_bytes']],(self.out/'selector.bin').read_bytes())
   self.assertEqual(sector1[self.m['selector_bytes']:0x2000],b'\xff'*(0x2000-self.m['selector_bytes']))
-  usb=Path(self.m['usb_build']);image=(usb/'usb.bin').read_bytes();manifest=json.loads((usb/'manifest.json').read_text(encoding='utf-8'))
+  usb=Path(p.located(self.m['usb_build']));image=(usb/'usb.bin').read_bytes();manifest=json.loads((usb/'manifest.json').read_text(encoding='utf-8'))
   p.validate_usb_image(manifest,image);self.assertEqual(sector1[0x2000:0x2000+len(image)],image)
   self.assertEqual(sector1[0x2000+len(image):],b'\xff'*(p.SECTOR_BYTES-0x2000-len(image)))
 

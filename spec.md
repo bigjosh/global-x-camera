@@ -41,8 +41,9 @@ provisional HIGH before USB selection remains. PD12 phase pulses are disabled
 in this HOLD profile; RAM counters and PD0 exposure mirroring remain.
 Exact rail timing, LiPo margins and selector transitions remain unqualified.
 Exposure wiring remains **A0 LOW / A1 wiper / A2 HIGH**. ASA uses **A4 high end /
-A5 wiper / GND low end**, for analog gain. ASA sampling and both knobs' normal
-capture integration remain deferred. [Canonical wiring](docs/power/2026-10-14-power-tree-review.md#november-7-lipo-button-and-pd7-hold-wiring)
+A5 wiper / GND low end**, for analog gain. The installed firmware reads neither knob. A
+build that reads both for every battery photo exists but has not been installed
+or run on hardware: [knob firmware](firmware/usb-ptp/README.md#exposure-and-gain-knobs). [Canonical wiring](docs/power/2026-10-14-power-tree-review.md#november-7-lipo-button-and-pd7-hold-wiring)
 and [installed D8 package](firmware/usb-ptp/evidence/2026-11-13-d8-hold/README.md).
 This supersedes earlier prototype HOLD assignments, CR2032/LTC power and
 automatic prototype-selector plans.

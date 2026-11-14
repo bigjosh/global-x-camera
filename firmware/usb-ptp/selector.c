@@ -4,6 +4,9 @@
 #include "usb_hold.h"
 extern int usb_vbus_sample(void);
 extern volatile uint32_t vbus_proof[16];
+/* knob.c: exposure and gain knobs, battery capture path only. */
+extern uint32_t knob_apply(void);
+extern volatile uint32_t knob_proof[32];
 uint32_t SystemCoreClock=400000000U;
 static uint32_t last,frac,ms;
 uint32_t HAL_GetTick(void){uint32_t now=DWT->CYCCNT,delta=now-last;last=now;uint64_t t=(uint64_t)frac+delta;ms+=(uint32_t)(t/400000U);frac=(uint32_t)(t%400000U);return ms;}
@@ -38,5 +41,9 @@ __attribute__((section(".text.entry"))) void usb_selector(void)
  last=DWT->CYCCNT;volatile uint32_t *proof=(volatile uint32_t *)0x343F9000U;
  proof[4]=(uint32_t)vbus_proof;
  int present=usb_vbus_sample();proof[5]=(uint32_t)present;
+ /* A certain "no cable" is the only case that returns to capture. Read the
+  * knobs then, after the VBUS sampler has released the converter. A knob
+  * failure leaves the fixed exposure and never changes the mode decision. */
+ if(present==0){proof[9]=(uint32_t)knob_proof;proof[10]=knob_apply();}
  usb_select_mode(present,proof);
 }

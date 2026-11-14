@@ -12,6 +12,14 @@ sys.path.insert(0,str(ROOT/'firmware/boot-timing'))
 import nor_bench
 nor_bench.CLI=ROOT/'tmp/bringup/control-smoke-20261107/tools/programmer-2.23.0/bin/STM32_Programmer_CLI.exe'
 APPROVED={
+ # November14 knob selector: against the D8 entry below, the prefix differs
+ # only in its rebuilt 440-byte hook (same instructions; new selector length,
+ # CRC and entry) and sector0 also carries the five-byte exposure gate. The
+ # early UART guard bytes are identical. Offline build, tests and review only:
+ # this admits the exact candidate for installation and park verification and
+ # is not a hardware result.
+ '71f935962afd935c56ccf5e707eb62574b3e39f59b7e6bb0893f3159bc7af503':
+  dict(bytes=7160,sector='2d4141d327edde3fe4618e442c205521845656985d7a12b2fdd1c9779d1a43fd'),
  # November13 D8/PD12 substitution: compiled hook/masks, disabled conflicting
  # phase output, exact UART bytes and package layout reviewed for reload.
  # No new functional testing requested or implied by this exact admission.

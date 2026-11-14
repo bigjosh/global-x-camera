@@ -1,0 +1,2 @@
+ENTRY(usb_boot_hook)
+SECTIONS { . = 0x34181e40; .text : { KEEP(*(.text.entry)) KEEP(*(.text.hook)) *(.text*) *(.rodata*) } .data : { *(.data*) } . = ALIGN(4); __bss_start__ = .; .bss (NOLOAD) : { *(.bss*) *(COMMON) } . = ALIGN(4); __bss_end__ = .; /DISCARD/ : { *(.ARM.exidx*) *(.ARM.extab*) *(.comment*) *(.note*) } ASSERT(. < 0x34182000,"overflow") }

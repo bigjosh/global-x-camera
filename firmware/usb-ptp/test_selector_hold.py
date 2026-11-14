@@ -51,7 +51,8 @@ void sync_regs(void);void park_now(void);void usb_app(void);
 #include <string.h>
 MockRCC rcc; MockGPIO ga; MockDWT dwt;
 uint32_t request[8],__bss_start__,__bss_end__;
-volatile uint32_t vbus_proof[16];
+volatile uint32_t vbus_proof[16],knob_proof[32];
+uint32_t knob_apply(void){return 0;}
 static jmp_buf terminal;
 static unsigned loads,success,set_high;
 int usb_vbus_sample(void){return 1;}

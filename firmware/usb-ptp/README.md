@@ -4,6 +4,12 @@ Bare-metal PTP over the Nucleo's **CN8 MCU USB connector**. Windows uses its
 native Portable Devices camera driver; no custom driver, drive emulation or
 SD filesystem is required. The SD still holds the existing fixed RAW slots.
 
+**November 14 knob build, not installed:** a package that reads the exposure
+and gain knobs for every battery photo is built and checked offline. It has
+never run on the camera; the installed firmware is still the November 13
+package described next. See [Exposure and gain knobs](#exposure-and-gain-knobs)
+and [the knob build record](evidence/2026-11-14-knobs/README.md).
+
 **November 13 D8 firmware installed:** HOLD is now **Arduino D8 / CN14.1 / PD12**.
 This supersedes the earlier D3 assignment at the user's request. The combined
 image preserves early battery HOLD and the UART guard, keeps HOLD through
@@ -59,6 +65,49 @@ PNG uses stored DEFLATE for now. Each exported file is 3,064,188 bytes; the
 card retains its smaller packed RAW representation. Thumbnails are generated
 from a fresh snapshot too. Neither conversion runs during battery capture.
 
+## Exposure and gain knobs
+
+Built November 14; offline checks only, not installed and not run on hardware.
+
+On the battery path (no cable in CN8) the boot selector reads both knobs once,
+after the VBUS check and before the capture code configures the sensor:
+
+| Knob | Pins | Result |
+|---|---|---|
+| Exposure | A0/PF5 driven LOW, A2/PF6 driven HIGH, wiper A1 → PA9, ADC1 input 10 | 26 to 63000 sensor lines, **0.2 ms to 484 ms**, exponential in knob position; mid-travel 1280 lines, 9.8 ms |
+| Gain | A4/PC12 driven HIGH, low end GND, wiper A5 → PG15, ADC1 input 7 | analog gain code 0 to 28, **1x to 8x**, equal stops; digital gain stays 1x |
+
+A higher reading gives a longer exposure or more gain. Readings below code 120
+or above 3720 count as the ends of travel, so both extremes are reachable; an
+unconnected wiper reads as the low end. The pins are driven only for the
+reading, about 2 ms, and every register is put back before capture continues.
+
+The selector then edits the copy of the capture prefix already in RAM: bytes 1
+to 3 of the manual-exposure register block (gain code, exposure lines) and the
+`MOVW` that holds the frame length. The frame length is the larger of the
+usual 4336 lines and exposure + 2000 lines. `package.py` finds both places in
+the reviewed prefix and refuses to build if either is not unique; at run time
+`knob.c` checks the exact default bytes before writing. Flash is never written
+at run time. If the converter cannot be set up, a conversion fails or the bytes
+are not as expected, nothing is edited and the photo uses the fixed 1428 lines
+at 1x, as before.
+
+The reviewed capture receiver fails a photo unless the sensor reports exactly
+1428 exposure lines. `exposure_gate.py` changes that one conditional branch in
+the built image to an unconditional one and sets the four bytes it leaves
+unreachable so the late-range CRC-32 is unchanged. Five bytes of sector 0
+change; the loader's checksum constant, the early receiver and the boot prefix
+do not.
+
+Limits: the applied exposure and gain are not stored with the photo. The knobs
+are not read in USB mode. One second is not reachable in the current sensor
+mode (16-bit line registers at 7.69 µs per line). The selector grew from 4464
+to 7144 bytes, and with the reading itself that adds an estimated 5 ms before
+exposure. `test_knob.py` models the logic on the host; settling time, gains
+above 1x and exposures outside 5 ms to 231 ms have never been run on hardware.
+The selector record at `0x343F9000` gains word 9, the address of `knob_proof`,
+and word 10, the result code listed at the top of `knob.c`.
+
 ## Architecture and build
 
 `main.c` owns the SD transport; USB callbacks only publish protocol work.
@@ -71,6 +120,25 @@ same native driver used by Explorer.
 python firmware/usb-ptp/build.py --out tmp/my-usb-build
 python firmware/usb-ptp/package.py --usb tmp/my-usb-build --capture tmp/my-reviewed-pd12-capture/staged --out tmp/my-usb-package
 ```
+
+`package.py` uses the ST compiler recorded in `capture-timing/build_raw10.py`
+when it is present, otherwise `arm-none-eabi-gcc` on `PATH`; set
+`GLOBAL_X_TOOLCHAIN` to a tools directory to choose another. `--hal` and
+`--cmsis` point it at ST driver sources other than the SDK copy under `tmp/`.
+The knob package was built on Linux from committed inputs only, plus ST's
+HAL driver v1.3.0 from GitHub:
+
+```sh
+python3 firmware/usb-ptp/package.py \
+  --usb firmware/usb-ptp/evidence/2026-11-13-d8-hold/usb \
+  --capture firmware/usb-ptp/evidence/2026-11-13-d8-hold/capture-input \
+  --hal <stm32n6xx-hal-driver v1.3.0> \
+  --cmsis firmware/capture-sd/evidence/2026-10-20-hardware/dependencies/st/STM32Cube_FW_N6/Drivers/CMSIS \
+  --out <new folder>
+```
+
+Run `python firmware/usb-ptp/knob_tables.py` after changing a mapping constant;
+it regenerates `knob_tables.h`.
 
 The canonical dual-mode package includes the reviewed PD12 HOLD capture build
 and preserves its capture payload and the original early UART recovery guard.
