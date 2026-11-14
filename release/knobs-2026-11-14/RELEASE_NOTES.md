@@ -1,6 +1,6 @@
 # Knob control firmware: exposure and gain (2026-11-14)
 
-**Pre-release. This firmware has never run on a camera.** It was built and checked offline only: compiled, compared byte for byte against the installed firmware, and exercised with host-side tests (48 of the 48 that can run on Linux passing). Installing it is the first hardware test. The firmware it replaces is kept in the repository so you can go back (see [Going back](#going-back)).
+**Pre-release. This firmware has never run on a camera.** It was built and checked offline only: compiled, compared byte for byte against the installed firmware, and exercised with host-side tests (50 of the 50 that can run on Linux passing). Installing it is the first hardware test. The firmware it replaces is kept in the repository so you can go back (see [Going back](#going-back)).
 
 This page is written so that someone, or another Claude session, who has not seen the work can install it. Read it to the end before touching the board.
 
@@ -8,7 +8,7 @@ This page is written so that someone, or another Claude session, who has not see
 
 | Knob | Wiring (unchanged) | Effect |
 |---|---|---|
-| Exposure | A0 low end, A1 wiper, A2 high end | Exposure time from **0.2 ms to 484 ms**. Equal turns give equal ratios (about 11 stops end to end); mid-travel is about 10 ms, close to the old fixed 11 ms. |
+| Exposure | A0 low end, A1 wiper, A2 high end | Exposure time from **0.5 ms to 484 ms**. Equal turns give equal ratios (about 10 stops end to end); mid-travel is about 16 ms, near the old fixed 11 ms. |
 | Gain ("ASA") | A4 high end, GND low end, A5 wiper | Sensor analog gain from **1x to 8x** in equal stops. Digital gain stays 1x. |
 
 - Both knobs are read once, at the start of each photo. Turning a knob during a photo affects the next photo.
@@ -63,13 +63,13 @@ CN10 does not power the camera on this modified board (the CN9 jumpers and D2 ar
 
 | File | What it is | SHA-256 |
 |---|---|---|
-| `sector0.bin` | 64 KiB image for NOR flash offset `0x00000` (boot prefix and capture code) | `2d4141d327edde3fe4618e442c205521845656985d7a12b2fdd1c9779d1a43fd` |
-| `sector1.bin` | 64 KiB image for NOR flash offset `0x10000` (boot selector with the knob reader, and the USB download app) | `53b8dacb8378e3018d5a2c44bab53c14b515e246c8b8d5864a368d537d5bf55d` |
+| `sector0.bin` | 64 KiB image for NOR flash offset `0x00000` (boot prefix and capture code) | `06196d10e8ddeb50948ef3666729dbe390d575b58a0c1d2ee7f5796758ece6ad` |
+| `sector1.bin` | 64 KiB image for NOR flash offset `0x10000` (boot selector with the knob reader, and the USB download app) | `ac1854200e78dfb04f0554b3555ccb794de1e0e2f6ddc587ee3358b3031e9736` |
 | `manifest.json` | Build record: hashes, addresses, compiler, the exact bytes changed | |
 | `SHA256SUMS` | Hashes of every file in the build folder | |
 | `nucleo-usb-ports.png` | The drawing above | |
 
-The same files, plus the recovery metadata the install scripts need, are in the repository at this tag under `firmware/usb-ptp/evidence/2026-11-14-knobs/package/`. **Use that folder for the install**; the loose release files are for checking hashes. Boot prefix: 7160 bytes, SHA-256 `71f935962afd935c56ccf5e707eb62574b3e39f59b7e6bb0893f3159bc7af503`.
+The same files, plus the recovery metadata the install scripts need, are in the repository at this tag under `firmware/usb-ptp/evidence/2026-11-14-knobs/package/`. **Use that folder for the install**; the loose release files are for checking hashes. Boot prefix: 7160 bytes, SHA-256 `0f87fbbe521230349db3d19b9449db38f2bff8000a4683461db080ad5525acc9`.
 
 The firmware now on the camera (installed November 13) is in `firmware/usb-ptp/evidence/2026-11-13-d8-hold/package/`: sector 0 `1a9278ab1733134a86e382af61b3a78627fe40d82e9e137dd33f2bfcf8de1197`, sector 1 `ed6d416974bf0801f1b1daa6e29520db06fa3294bb33060a9dfbc48b761fbc38`.
 
@@ -157,7 +157,7 @@ python firmware/usb-ptp/nor.py write --offset 65536 --build tmp/bringup/usb-ptp-
 python firmware/usb-ptp/nor.py write --offset 0 --build tmp/bringup/rom-nor-programmer-v2-20261024 --out $out/write0 --current $out/backup0/readback.bin --desired $new/sector0.bin
 ```
 
-Success for 4 and 5: the script exits without an error after comparing the whole 64 KiB region. The writer checks the current contents before erasing anything, erases only the 4 KiB blocks that differ (two in sector 1, three in sector 0) and never resets the camera.
+Success for 4 and 5: the script exits without an error after comparing the whole 64 KiB region. The writer checks the current contents before erasing anything, erases only the 4 KiB blocks that differ (two in sector 1, two in sector 0) and never resets the camera.
 
 **6. Read both regions back independently.**
 
@@ -195,7 +195,7 @@ A normal photo shows red (start), blue (capturing), green (saving), then all LED
 1. **One photo, both knobs near the middle.** Expect the normal LED sequence. This alone shows the knob reader, the prefix edit and the capture change work together.
 2. **Exposure knob.** Same scene, gain at minimum, photos at the low end, the middle and the high end. Download them (connect CN8, restart the camera, open **This PC → Global X RAW Camera**). Brightness should rise with the knob: the image should go from nearly black to washed out across the full travel in ordinary room light.
 3. **Gain knob.** Same scene, exposure fixed mid-travel, gain at both ends. The high end should be about 8 times brighter (3 stops) and noisier.
-4. **Exact exposure, if a logic probe is available.** PD0 (CN15 pin 33) mirrors the sensor's exposure strobe, so its pulse width is the exposure. Expect about 0.2 ms at one end of the exposure knob and about 484 ms at the other.
+4. **Exact exposure, if a logic probe is available.** PD0 (CN15 pin 33) mirrors the sensor's exposure strobe, so its pulse width is the exposure. Expect about 0.5 ms at one end of the exposure knob and about 484 ms at the other.
 
 What a failure looks like, and what it means:
 
@@ -207,7 +207,7 @@ What a failure looks like, and what it means:
 | Photos never change with the knobs, but are normal | Knob reading failed and the firmware fell back to the fixed settings. | Check the knob wiring. A debugger can read the reason (below). |
 | Photos are black at every exposure setting | Exposure wiper open: an unconnected wiper reads as the shortest exposure. | Check the A1 wire. |
 
-For a debugger: after the selector has run, the word at `0x343F9028` is the knob result (0 applied; 1 converter busy; 2 pin bank set for 1.8 V; 3 analog supply not ready; 4 or 5 converter setup; 6 conversion; 7 capture prefix not the expected bytes; 8 write did not read back) and the word at `0x343F9024` points to a 32-word record laid out by the `K_…` names at the top of `firmware/usb-ptp/knob.c` (both raw readings of each knob, the chosen lines, frame length and gain code). These are only readable while the camera is awake.
+For a debugger: after the selector has run, the word at `0x343F9028` is the knob result (0 applied; 1 converter busy; 2 pin bank set for 1.8 V; 3 analog supply not ready; 4 or 5 converter setup; 6 conversion; 7 capture prefix not the expected bytes; 8 write did not read back; 9 memory protection on; all ones: knobs not read on this boot) and the word at `0x343F9024` points to a 32-word record laid out by the `K_…` names at the top of `firmware/usb-ptp/knob.c` (both raw readings of each knob, the chosen lines, frame length and gain code). These are only readable while the camera is awake.
 
 ## If something goes wrong
 
@@ -226,16 +226,17 @@ To restore the November 13 firmware, repeat steps 1 to 7 with the roles swapped:
 Checked offline:
 
 - The build is reproducible: two independent builds give identical flash images.
-- Against the installed firmware, sector 0 differs only in the 440-byte boot hook, the boot header checksum and five bytes of capture code; the hook is instruction-for-instruction the same logic. Everything before the hook, including the recovery guard, is byte-identical.
+- Against the installed firmware, sector 0 differs only in the 440-byte boot hook and five bytes of capture code; the hook is instruction-for-instruction the same logic. Everything before the hook, including the recovery guard, is byte-identical.
 - In sector 1 the USB download app is byte-identical; only the selector in front of it changed.
 - The knob reader, compiled for a PC against a model of the chip's registers: correct pins driven while reading, every register put back afterwards, correct bytes written for a table of readings, and every failure path leaving the fixed settings in place.
+- The knob reader running with ST's real ADC driver code against a model of the converter's control register: four conversions, the right bytes written, no rule of the converter broken.
 - The mapping for all 4096 possible readings: within the sensor's limits, never reversing, frame length always long enough.
-- An independent review of the source and of the compiled result. That review was still running when this was written; the release is not published until it is complete.
+- An independent review of the source and of the compiled result. It found that the first build could never read a knob on the real chip, because of a rule of ST's converter driver that the first tests did not enforce. That is fixed here and the tests now enforce the rule. It found the five-byte capture edit, the unchanged boot and recovery code and the mapping correct. The corrected reader was then run against the driver code itself; it has not had a second independent review.
 
 Not checked, because it needs the camera:
 
 - Whether the pots settle within the 1 ms the firmware allows before reading. Each knob is read twice; the record above shows both readings.
-- Exposures shorter than 5 ms or longer than 231 ms. Those two values are the only non-default exposures ever run on this camera, and that was on an older build.
+- Exposures shorter than 5 ms or longer than 231 ms. Those two values are the only non-default exposures ever run on this camera, and that was on an older build. At the 0.5 ms end the picture starts arriving only about 1 ms after the capture code is ready for it, against 11.5 ms today; that is the setting most likely to fail.
 - Analog gain above 1x. The sensor documentation allows up to 8x; this camera has only ever run at 1x.
 - Driving the gain knob's supply pin (PC12) in the capture path.
 - Time from button to exposure. The knob reader adds an estimated 5 ms (a larger selector to load, and the reading itself).
@@ -243,7 +244,7 @@ Not checked, because it needs the camera:
 
 ## How it works, briefly
 
-1. On every boot a small selector program already ran before the camera code to check for a USB cable. It now also drives the two pots for about 2 ms, reads both with the ADC, and converts the readings to an exposure in sensor lines (7.69 microseconds each), a frame length and a gain code (`firmware/usb-ptp/knob.c`, `knob_map.h`, `knob_tables.py`).
+1. On every boot a small selector program already ran before the camera code to check for a USB cable. It now also drives the two pots for about 2 ms, reads both with the ADC, and converts the readings to an exposure in sensor lines (7.69 microseconds each), a frame length and a gain code (`firmware/usb-ptp/knob.c`, `knob_map.h`, `knob_tables.py`). The exposure range is one pair of constants in `knob_tables.py`.
 2. The capture code's sensor setup is not rebuilt. The selector writes the three values into the copy of that code already loaded in RAM: three bytes of the register block at `0x3418179C` and the frame-length instruction at `0x34181328`. Flash is not written at run time.
 3. The capture code used to reject any photo whose exposure was not exactly 1428 lines. One branch instruction in flash is changed so that it accepts the sensor's reported exposure, and the four unreachable bytes after it are set so the code's checksum is unchanged (`firmware/usb-ptp/exposure_gate.py`; flash offsets `0x6B87` to `0x6B8B`).
 

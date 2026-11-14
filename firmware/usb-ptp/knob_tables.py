@@ -22,7 +22,11 @@ DEFAULT_FRAME = 4336                      # frame length the prefix programs
 FRAME_MARGIN = 2000
 FRAME_MAX = 65535                         # 16-bit sensor register
 
-MIN_LINES = 26                            # 0.2 ms; the sensor driver's floor is 21 lines
+# The receiver is armed about 0.24 ms before the exposure starts (5.04 to
+# 5.07 ms after sensor START in 37 recorded runs; the strobe rises at 5.29 ms),
+# and readout begins 0.24 ms after the exposure ends. The floor therefore sets
+# how long after arming the picture starts to arrive: about 1 ms here.
+MIN_LINES = 65                            # 0.5 ms; the sensor driver's own floor is 21 lines
 MAX_LINES = 63000                         # 484 ms; frame length 65000
 
 STEPS = 32                                # table intervals across the knob travel

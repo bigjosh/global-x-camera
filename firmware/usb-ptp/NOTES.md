@@ -281,3 +281,50 @@ and compared with an independent model); `capture-raw/magic_transform.py`
 `sensor_exposure()` for the frame rule; `capture-timing/exposure-measurement.md`
 for line time and the 650-line and 1301-line runs. Exposures outside 5 ms to
 231 ms and gains above 1x are untested on hardware.
+
+## 2026-11-14  Stop the converter before every channel change, and raise the exposure floor to 0.5 ms
+
+**Why:** an independent review of the first knob build, before it was
+released or installed, found that it could never read a knob. ST's
+`HAL_ADC_ConfigChannel` returns an error while the converter is enabled, and
+both calibration and a finished conversion leave it enabled; only
+`HAL_ADC_Stop` disables it. `vbus.c` never met this because it converts one
+channel. The reader selected its first channel straight after calibration, so
+on the chip it would have returned result 6 on every boot and every photo
+would have kept the fixed settings. `convert()` now stops the converter first,
+as `control-smoke/control.c` always did. The host test missed it because its
+stand-in for the driver asserted the rule instead of enforcing it; the
+stand-in now returns the driver's error, and `hal_model/` runs the real driver
+sources against a model of the bus so the next such rule is not left to a
+stand-in.
+
+The same review measured how little time separates arming the receiver from
+the picture arriving. Across 37 recorded captures the receiver is armed 5.04
+to 5.07 ms after sensor START; the exposure strobe rises at 5.29 ms and readout
+starts 0.24 ms after it falls. A 0.2 ms exposure would start readout 0.7 ms
+after arming, where the fixed exposure leaves 11.5 ms; if arming ever came
+later than readout the single frame would be lost and the photo would fail
+after a 3 s wait. The floor is now 65 lines, 0.5 ms, which leaves about 1 ms.
+That margin is a judgement, not a measurement.
+
+Three smaller changes came from the same review: the reader refuses to write
+if memory protection is enabled, so an unexpected read-only prefix costs knob
+control and not a fault; the selector marks the knob record "not read" on USB
+boots, where it used to leave the previous photo's result; and the gate's
+branch scan now decodes the low-overhead-loop branches the receiver contains.
+
+**Rejected:** releasing the first build on the strength of its own tests;
+keeping the 0.2 ms floor, the sensor's 21-line minimum or any other value
+whose margin after arming is under 1 ms until the arm time has been measured
+on the installed build; treating the recovery allowlist entry for the first
+build as still valid, since the hashes changed with the fix.
+
+**Evidence:** `knob.c` `convert()`; ST HAL v1.3.0 `stm32n6xx_hal_adc.c`
+`HAL_ADC_ConfigChannel` and `stm32n6xx_hal_adc_ex.c`
+`HAL_ADCEx_Calibration_Start`; `control-smoke/evidence/2026-11-09-a3-live/hardware/knob-sweep01/latest.json`,
+where the enable bit reads 1 after a conversion and 0 only after a stop;
+`hal_model/model.c` and `test_knob.py` (the committed first reader gives result
+6 under both models, the corrected one gives 0 with four conversions);
+`capture-raw/evidence/2026-10-26-sd25-twenty` and the other `verified.json`
+records for the arm time; `capture-timing/exposure-measurement.md` for the
+strobe and readout delays. Still offline only.

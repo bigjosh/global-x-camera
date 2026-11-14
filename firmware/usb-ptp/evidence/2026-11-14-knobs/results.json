@@ -2,24 +2,21 @@
   "schema": 1,
   "hardware_status": "offline-only-not-installed",
   "tag": "knobs-2026-11-14",
-  "prefix_sha256": "71f935962afd935c56ccf5e707eb62574b3e39f59b7e6bb0893f3159bc7af503",
+  "prefix_sha256": "0f87fbbe521230349db3d19b9449db38f2bff8000a4683461db080ad5525acc9",
   "prefix_bytes": 7160,
-  "sector0_sha256": "2d4141d327edde3fe4618e442c205521845656985d7a12b2fdd1c9779d1a43fd",
-  "sector1_sha256": "53b8dacb8378e3018d5a2c44bab53c14b515e246c8b8d5864a368d537d5bf55d",
+  "sector0_sha256": "06196d10e8ddeb50948ef3666729dbe390d575b58a0c1d2ee7f5796758ece6ad",
+  "sector1_sha256": "ac1854200e78dfb04f0554b3555ccb794de1e0e2f6ddc587ee3358b3031e9736",
   "usb_sha256": "d2bbb76f789e01bb94f09892f291d602b5d7276b96124eb613d70f1bd7b87461",
-  "selector_bytes": 7144,
+  "selector_bytes": 7228,
   "hook_bytes": 440,
   "compiler": "arm-none-eabi-gcc (15:13.2.rel1-2) 13.2.1 20231009",
   "against_installed_d8": {
-    "sector0_changed_bytes": 190,
+    "sector0_changed_bytes": 188,
     "sector0_changed_4k_blocks": [
-      0,
       1,
       6
     ],
     "sector0_changed_outside_hook": [
-      "0x64",
-      "0x65",
       "0x6b87",
       "0x6b88",
       "0x6b89",
@@ -58,7 +55,7 @@
     "result_word": 10,
     "default_lines": 1428,
     "default_frame": 4336,
-    "min_lines": 26,
+    "min_lines": 65,
     "max_lines": 63000,
     "frame_margin": 2000,
     "line_ns": 7686,
@@ -67,14 +64,21 @@
     "code_high": 3720
   },
   "tests": {
-    "command": "USB_BOOT_TEST_PACKAGE=<this package> python3 -m unittest discover -s firmware/usb-ptp -p \"test_*.py\"",
-    "host": "Linux, Python 3.13, clang/gcc native models",
-    "ran": 50,
-    "passed": 48,
+    "command": "USB_BOOT_TEST_PACKAGE=<this package> GLOBAL_X_HAL=<stm32n6xx-hal-driver v1.3.0> python3 -m unittest discover -s firmware/usb-ptp -p \"test_*.py\"",
+    "host": "Linux, Python 3.13, clang/gcc native models, ST HAL v1.3.0 for the driver model",
+    "ran": 52,
+    "passed": 50,
     "skipped": 1,
     "errors": 1,
     "error": "test_ptp cannot link its native PTP library on Linux (gcc -shared without -fPIC); it is unrelated to this change and did not run"
   },
   "reproducible": "two builds into different folders gave identical sector0.bin, sector1.bin, selector.bin and hook.bin",
+  "superseded_first_build": {
+    "commit": "50f2af5b",
+    "prefix_sha256": "71f935962afd935c56ccf5e707eb62574b3e39f59b7e6bb0893f3159bc7af503",
+    "defect": "knob reader changed the ADC channel while the converter was enabled; the driver refuses, so no knob was ever read",
+    "released": false,
+    "installed": false
+  },
   "hardware_tests_run": false
 }

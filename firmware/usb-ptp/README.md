@@ -74,7 +74,7 @@ after the VBUS check and before the capture code configures the sensor:
 
 | Knob | Pins | Result |
 |---|---|---|
-| Exposure | A0/PF5 driven LOW, A2/PF6 driven HIGH, wiper A1 → PA9, ADC1 input 10 | 26 to 63000 sensor lines, **0.2 ms to 484 ms**, exponential in knob position; mid-travel 1280 lines, 9.8 ms |
+| Exposure | A0/PF5 driven LOW, A2/PF6 driven HIGH, wiper A1 → PA9, ADC1 input 10 | 65 to 63000 sensor lines, **0.5 ms to 484 ms**, exponential in knob position; mid-travel 2024 lines, 15.6 ms |
 | Gain | A4/PC12 driven HIGH, low end GND, wiper A5 → PG15, ADC1 input 7 | analog gain code 0 to 28, **1x to 8x**, equal stops; digital gain stays 1x |
 
 A higher reading gives a longer exposure or more gain. Readings below code 120
@@ -88,9 +88,9 @@ to 3 of the manual-exposure register block (gain code, exposure lines) and the
 usual 4336 lines and exposure + 2000 lines. `package.py` finds both places in
 the reviewed prefix and refuses to build if either is not unique; at run time
 `knob.c` checks the exact default bytes before writing. Flash is never written
-at run time. If the converter cannot be set up, a conversion fails or the bytes
-are not as expected, nothing is edited and the photo uses the fixed 1428 lines
-at 1x, as before.
+at run time. If the converter cannot be set up, a conversion fails, memory
+protection is on or the bytes are not as expected, nothing is edited and the
+photo uses the fixed 1428 lines at 1x, as before.
 
 The reviewed capture receiver fails a photo unless the sensor reports exactly
 1428 exposure lines. `exposure_gate.py` changes that one conditional branch in
@@ -102,11 +102,15 @@ do not.
 Limits: the applied exposure and gain are not stored with the photo. The knobs
 are not read in USB mode. One second is not reachable in the current sensor
 mode (16-bit line registers at 7.69 µs per line). The selector grew from 4464
-to 7144 bytes, and with the reading itself that adds an estimated 5 ms before
-exposure. `test_knob.py` models the logic on the host; settling time, gains
-above 1x and exposures outside 5 ms to 231 ms have never been run on hardware.
-The selector record at `0x343F9000` gains word 9, the address of `knob_proof`,
-and word 10, the result code listed at the top of `knob.c`.
+to 7228 bytes, and with the reading itself that adds an estimated 5 ms before
+exposure. The 0.5 ms floor keeps the start of readout about 1 ms after the
+receiver is armed; see the notes before lowering it. `test_knob.py` models the
+logic on the host, and with `GLOBAL_X_HAL` set to ST's HAL driver v1.3.0 it
+also runs `knob.c` with the real ADC driver against the bus model in
+`hal_model/`. Settling time, gains above 1x and exposures outside 5 ms to
+231 ms have never been run on hardware. The selector record at `0x343F9000`
+gains word 9, the address of `knob_proof`, and word 10, the result code listed
+at the top of `knob.c`, or all ones when the knobs were not read on that boot.
 
 ## Architecture and build
 

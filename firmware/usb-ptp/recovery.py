@@ -18,8 +18,8 @@ APPROVED={
  # early UART guard bytes are identical. Offline build, tests and review only:
  # this admits the exact candidate for installation and park verification and
  # is not a hardware result.
- '71f935962afd935c56ccf5e707eb62574b3e39f59b7e6bb0893f3159bc7af503':
-  dict(bytes=7160,sector='2d4141d327edde3fe4618e442c205521845656985d7a12b2fdd1c9779d1a43fd'),
+ '0f87fbbe521230349db3d19b9449db38f2bff8000a4683461db080ad5525acc9':
+  dict(bytes=7160,sector='06196d10e8ddeb50948ef3666729dbe390d575b58a0c1d2ee7f5796758ece6ad'),
  # November13 D8/PD12 substitution: compiled hook/masks, disabled conflicting
  # phase output, exact UART bytes and package layout reviewed for reload.
  # No new functional testing requested or implied by this exact admission.

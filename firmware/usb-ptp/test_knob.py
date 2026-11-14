@@ -6,10 +6,12 @@ self-consistent. They do not show that a camera takes correct pictures.
 """
 import importlib.util
 import json
+import os
 from pathlib import Path
 import shutil
 import struct
 import subprocess
+import sys
 import tempfile
 import unittest
 import zlib
@@ -71,9 +73,14 @@ class TableTests(unittest.TestCase):
         manual, frame = package.knob_sites(prefix)
         self.assertEqual((manual, frame), (0x3418179C, 0x34181328))
         self.assertEqual(tables.movw_r1(4336), bytes.fromhex('41f2f001'))
-        # The same sites are present, unmoved, in the package prefix that adds the hook.
-        self.assertEqual(prefix[frame - package.PREFIX_BASE:][:4], tables.movw_r1(tables.DEFAULT_FRAME))
-        self.assertEqual(prefix[manual - package.PREFIX_BASE:][:12], tables.manual_block())
+        # The same sites are present, unmoved, in the built package prefix, which
+        # is what the camera actually loads (capture prefix plus the boot hook).
+        for image in (prefix, (HERE / 'evidence/2026-11-14-knobs/package/stage1.bin').read_bytes()):
+            self.assertEqual(image[frame - package.PREFIX_BASE:][:4], tables.movw_r1(tables.DEFAULT_FRAME))
+            self.assertEqual(image[manual - package.PREFIX_BASE:][:12], tables.manual_block())
+        config = (HERE / 'evidence/2026-11-14-knobs/package/knob_config.h').read_text(encoding='utf-8')
+        self.assertIn('KNOB_MANUAL_ADDRESS 0x3418179cU', config)
+        self.assertIn('KNOB_FRAME_ADDRESS 0x34181328U', config)
         # A second copy of either pattern would make the edit ambiguous.
         second_manual = prefix[:6000] + tables.manual_block() + prefix[6012:]
         second_frame = prefix[:6000] + tables.movw_r1(4336) + bytes.fromhex('02224ff48b60') + prefix[6010:]
@@ -146,6 +153,10 @@ typedef struct {uint32_t SVMCR1,SVMCR3;} MockPWR;
 typedef struct {uint32_t RISC_SECCFGRx[4];} MockRIFSC;
 typedef struct {uint32_t ISR,CALFACT;} MockADC;
 typedef struct {uint32_t CYCCNT;} MockDWT;
+typedef struct {uint32_t CTRL;} MockMPU;
+extern MockMPU mpu;
+#define MPU (&mpu)
+#define MPU_CTRL_ENABLE_Msk 1U
 extern MockRCC rcc; extern GPIO_TypeDef ga,gc,gf,gg,gh; extern MockPWR pwr; extern MockRIFSC rifsc;
 extern MockADC adc1; extern MockDWT dwt;
 #define RCC (&rcc)
@@ -208,9 +219,10 @@ MOCK_MAIN = r'''
 #include "knob.c"
 #include <assert.h>
 #include <stdio.h>
-MockRCC rcc; GPIO_TypeDef ga,gc,gf,gg,gh; MockPWR pwr; MockRIFSC rifsc; MockADC adc1; MockDWT dwt;
+MockRCC rcc; GPIO_TypeDef ga,gc,gf,gg,gh; MockPWR pwr; MockRIFSC rifsc; MockADC adc1; MockDWT dwt; MockMPU mpu;
 uint8_t manual_ram[12],frame_ram[4];
-static unsigned fail_step,supply_ready,active,enabled,configured,converted,ms,resets;
+static unsigned fail_step,supply_ready,active,enabled,configured,converted,ms,resets,drove,stuck;
+static const uint8_t default_manual[12]={2,0,0x94,5,0,1,0,1,0,1,0,1},default_frame[4]={0x41,0xf2,0xf0,0x01};
 static uint32_t codes[2];
 static void port(GPIO_TypeDef *g){g->ODR=(g->ODR|(g->BSRR&65535U))&~(g->BSRR>>16);g->BSRR=0;}
 void sync_regs(void){
@@ -220,6 +232,9 @@ void sync_regs(void){
  if(rcc.AHB1RSTSR&RCC_AHB1RSTR_ADC12RST)resets++;
  rcc.AHB1RSTSR=rcc.AHB1RSTCR=0;                           /* write-only set and clear registers */
  port(&ga);port(&gc);port(&gf);port(&gg);port(&gh);
+ if((gf.MODER>>10&3U)==1U||(gf.MODER>>12&3U)==1U||(gc.MODER>>24&3U)==1U)drove=1;
+ /* Memory that does not keep what was written, to reach the read-back path. */
+ if(stuck){memcpy(manual_ram,default_manual,12);memcpy(frame_ram,default_frame,4);}
  /* Ready is a status bit: it follows the monitor enable, never a write. */
  if(supply_ready&&(pwr.SVMCR3&PWR_SVMCR3_AVMEN))pwr.SVMCR3|=PWR_SVMCR3_ARDY;else pwr.SVMCR3&=~PWR_SVMCR3_ARDY;
 }
@@ -244,10 +259,12 @@ static void excited(void){
 }
 HAL_StatusTypeDef HAL_ADC_Init(ADC_HandleTypeDef *h){assert(h->Instance==ADC1);excited();assert(resets==1);active=1;return fail_step==4?HAL_ERROR:HAL_OK;}
 HAL_StatusTypeDef HAL_ADC_DeInit(ADC_HandleTypeDef *h){(void)h;assert(!enabled);active=0;return HAL_OK;}
+/* As in the real driver: the channel cannot change while the converter is
+ * enabled, calibration and conversions leave it enabled, only Stop disables. */
 HAL_StatusTypeDef HAL_ADC_ConfigChannel(ADC_HandleTypeDef *h,ADC_ChannelConfTypeDef *c){
- (void)h;assert(active&&!enabled);assert(c->Channel==7U||c->Channel==10U);
+ (void)h;assert(active);if(enabled)return HAL_ERROR;assert(c->Channel==7U||c->Channel==10U);
  assert(c->SamplingTime==ADC_SAMPLETIME_1499CYCLES_5&&c->Rank==1U);configured=c->Channel;return HAL_OK;}
-HAL_StatusTypeDef HAL_ADCEx_Calibration_Start(ADC_HandleTypeDef *h,uint32_t m){(void)h;(void)m;assert(!enabled);adc1.CALFACT=0x800000FFU;return fail_step==5?HAL_ERROR:HAL_OK;}
+HAL_StatusTypeDef HAL_ADCEx_Calibration_Start(ADC_HandleTypeDef *h,uint32_t m){(void)h;(void)m;assert(!enabled);enabled=1;adc1.CALFACT=0x800000FFU;return fail_step==5?HAL_ERROR:HAL_OK;}
 HAL_StatusTypeDef HAL_ADC_Start(ADC_HandleTypeDef *h){(void)h;excited();assert(dwt.CYCCNT>=400000U);enabled=1;return HAL_OK;}
 HAL_StatusTypeDef HAL_ADC_Stop(ADC_HandleTypeDef *h){(void)h;enabled=0;return HAL_OK;}
 HAL_StatusTypeDef HAL_ADC_PollForConversion(ADC_HandleTypeDef *h,uint32_t t){(void)h;(void)t;assert(enabled);return fail_step==6&&converted>=2?HAL_ERROR:HAL_OK;}
@@ -256,7 +273,6 @@ uint32_t HAL_ADC_GetValue(ADC_HandleTypeDef *h){(void)h;converted++;
  return (configured==10U?codes[0]:codes[1])+(converted<=2?300U:0U);}
 void LL_RCC_SetADCPrescaler(uint32_t n){rcc.CCIPR1=(rcc.CCIPR1&~RCC_CCIPR1_ADCPRE)|(n<<8);}
 void LL_RCC_SetADCClockSource(uint32_t s){rcc.CCIPR1=(rcc.CCIPR1&~RCC_CCIPR1_ADC12SEL)|s;}
-static const uint8_t default_manual[12]={2,0,0x94,5,0,1,0,1,0,1,0,1},default_frame[4]={0x41,0xf2,0xf0,0x01};
 typedef struct {MockRCC r;GPIO_TypeDef a,c,f,g,h;MockPWR p;MockRIFSC s;} State;
 static State snapshot(void){sync_regs();State x={rcc,ga,gc,gf,gg,gh,pwr,rifsc};return x;}
 static uint32_t run(uint32_t exposure,uint32_t gain,unsigned failure,State *before,State *after){
@@ -269,13 +285,14 @@ static uint32_t run(uint32_t exposure,uint32_t gain,unsigned failure,State *befo
  gg=(GPIO_TypeDef){0xFFFFFF5AU,0x00000005U,0x0001U,0x00000003U,0x0004U,0,0xFFFFU};
  gh=(GPIO_TypeDef){0xFFFFFFCFU,0x00000040U,0x0000U,0x00000000U,0x0000U,0,0xFFFFU};
  rcc.AHB4ENR=RCC_AHB4ENR_GPIOAEN|0x8U;rcc.CCIPR1=0x12340003U;pwr.SVMCR1=0x2U;pwr.SVMCR3=0x1U;rifsc.RISC_SECCFGRx[2]=0x40U;
+ mpu.CTRL=failure==10;stuck=failure==8;
  if(failure==1)rcc.AHB1ENR=RCC_AHB1ENR_ADC12EN;
  if(failure==2)pwr.SVMCR1|=PWR_SVMCR1_VDDIO4VRSEL;
  memcpy(manual_ram,default_manual,12);memcpy(frame_ram,default_frame,4);
  if(failure==7)frame_ram[2]^=1U;
  if(failure==9)manual_ram[5]^=1U;
  codes[0]=exposure;codes[1]=gain;fail_step=failure;supply_ready=failure!=3;
- active=enabled=configured=converted=ms=resets=0;dwt.CYCCNT=0;
+ active=enabled=configured=converted=ms=resets=drove=0;dwt.CYCCNT=0;
  *before=snapshot();uint32_t result=knob_apply();*after=snapshot();
  assert(!active&&!enabled);
  return result;
@@ -288,7 +305,7 @@ int main(int argc,char **argv){
   uint32_t result=run(pairs[i][0],pairs[i][1],0,&before,&after);
   assert(result==0&&knob_proof[K_RESULT]==0&&knob_proof[K_STATE]==5&&knob_proof[K_MAGIC]==0x31424E4BU);
   assert(!memcmp(&before,&after,sizeof before));             /* every register handed back */
-  assert(converted==4&&knob_proof[K_EXPOSURE_CODE]==pairs[i][0]&&knob_proof[K_GAIN_CODE]==pairs[i][1]);
+  assert(converted==4&&drove&&knob_proof[K_EXPOSURE_CODE]==pairs[i][0]&&knob_proof[K_GAIN_CODE]==pairs[i][1]);
   assert(knob_proof[K_EXPOSURE_FIRST]==pairs[i][0]+300U);    /* the settled pair is the one used */
   printf("%u %u",(unsigned)pairs[i][0],(unsigned)pairs[i][1]);
   for(unsigned k=0;k<12;k++)printf(" %02x",manual_ram[k]);
@@ -296,7 +313,7 @@ int main(int argc,char **argv){
   printf(" %u %u %u\n",(unsigned)knob_proof[K_LINES],(unsigned)knob_proof[K_FRAME],(unsigned)knob_proof[K_GAIN]);
  }
  /* Every failure leaves the fixed exposure in place and restores the pins. */
- static const unsigned failures[]={1,2,3,4,5,6,7,9},expected[]={1,2,3,4,5,6,7,7};
+ static const unsigned failures[]={1,2,3,4,5,6,7,9,8,10},expected[]={1,2,3,4,5,6,7,7,8,9};
  for(unsigned i=0;i<sizeof failures/sizeof failures[0];i++){
   uint8_t manual_before[12],frame_before[4];
   uint32_t result=run(2000,3000,failures[i],&before,&after);
@@ -307,7 +324,8 @@ int main(int argc,char **argv){
   assert(!memcmp(manual_ram,manual_before,12)&&!memcmp(frame_ram,frame_before,4));
   assert(!memcmp(&before,&after,sizeof before));
   assert(knob_proof[K_LINES]==1428U&&knob_proof[K_FRAME]==4336U&&knob_proof[K_GAIN]==0U);
-  if(failures[i]<=2)assert(converted==0&&ms<=1);              /* refused before touching a pin */
+  if(failures[i]<=2||failures[i]==10)assert(converted==0&&!drove);   /* refused before driving a pin */
+  if(failures[i]==8)assert(converted==4);                            /* reached the write, which did not hold */
  }
  puts("done");
  return 0;
@@ -347,12 +365,107 @@ class KnobReaderTests(unittest.TestCase):
             self.assertEqual(written[12:], tables.movw_r1(frame), row)
             self.assertEqual(tuple(map(int, fields[18:])), (lines, frame, gain))
 
+    @unittest.skipUnless(os.environ.get('GLOBAL_X_HAL') and sys.platform.startswith('linux'),
+                         'Set GLOBAL_X_HAL to ST\'s stm32n6xx-hal-driver v1.3.0 (Linux only)')
+    def test_reader_with_the_real_st_driver(self):
+        """knob.c and the real HAL ADC sources against a model of the bus."""
+        hal = Path(os.environ['GLOBAL_X_HAL'])
+        cmsis = package.ROOT / 'firmware/capture-sd/evidence/2026-10-20-hardware/dependencies/st/STM32Cube_FW_N6/Drivers/CMSIS'
+        built = HERE / 'evidence/2026-11-14-knobs/package'
+        with tempfile.TemporaryDirectory(prefix='knob-hal-') as tmp:
+            exe = Path(tmp) / 'model.exe'
+            includes = [HERE / 'hal_model/fake', built, HERE, hal / 'Inc',
+                        cmsis / 'Device/ST/STM32N6xx/Include', cmsis / 'Include']
+            compiled = subprocess.run(
+                ['gcc', '-O1', '-w', '-ffunction-sections', '-Wl,--gc-sections', '-D__ARM_FEATURE_CMSE=3',
+                 '-DSTM32N657xx', '-DUSE_HAL_DRIVER', *('-I' + str(i) for i in includes),
+                 str(HERE / 'hal_model/model.c'), str(HERE / 'knob.c'), str(hal / 'Src/stm32n6xx_hal_adc.c'),
+                 str(hal / 'Src/stm32n6xx_hal_adc_ex.c'), '-o', str(exe)], capture_output=True, text=True)
+            self.assertEqual(compiled.returncode, 0, compiled.stderr)
+            for exposure_code, gain_code in ((0, 0), (120, 3720), (1920, 1920), (2000, 3000), (3840, 5), (4095, 2047)):
+                out = subprocess.run([str(exe), str(built / 'stage1.bin'), str(exposure_code), str(gain_code)],
+                                     capture_output=True, text=True)
+                self.assertEqual(out.returncode, 0, out.stdout + out.stderr)
+                lines, frame, gain = python_map(exposure_code, gain_code)
+                text = out.stdout
+                self.assertIn('-> result 0 state 5 resets 1 conversions 4 model_violations 0', text)
+                self.assertIn('manual ' + tables.manual_block(lines, gain).hex(' '), text)
+                self.assertIn('frame ' + tables.movw_r1(frame).hex(' '), text)
+                self.assertIn('registers restored: yes', text)
+
     def test_selector_reads_knobs_only_when_the_cable_is_certainly_absent(self):
+        """Runs the real usb_selector() with each VBUS outcome."""
         source = (HERE / 'selector.c').read_text(encoding='utf-8')
-        self.assertEqual(source.count('knob_apply()'), 1)
-        self.assertIn('if(present==0){proof[9]=(uint32_t)knob_proof;proof[10]=knob_apply();}', source)
-        self.assertLess(source.index('usb_vbus_sample();'), source.index('knob_apply()'))
-        self.assertLess(source.index('knob_apply()'), source.index('usb_select_mode(present,proof);\n}'))
+        self.assertEqual((source.count('0x343F7F00U'), source.count('0x343F9000U')), (1, 1))
+        with tempfile.TemporaryDirectory(prefix='knob-selector-') as tmp:
+            root = Path(tmp)
+            (root / 'selector.c').write_text(source.replace('0x343F7F00U', '(uintptr_t)request')
+                                             .replace('0x343F9000U', '(uintptr_t)proof_words'))
+            shutil.copyfile(HERE / 'usb_hold.h', root / 'usb_hold.h')
+            (root / 'stm32n6xx_hal.h').write_text(r'''
+#include <stdint.h>
+typedef struct {uint32_t AHB4ENSR,AHB4ENR,AHB4RSTR;} MockRCC;
+typedef struct {uint32_t BSRR,OTYPER,OSPEEDR,PUPDR,MODER,ODR,IDR;} MockGPIO;
+typedef struct {uint32_t CYCCNT;} MockDWT;
+extern MockRCC rcc; extern MockGPIO gd; extern MockDWT dwt;
+extern uint32_t request[8],proof_words[16];
+#define RCC (&rcc)
+#define GPIOD (&gd)
+#define DWT (&dwt)
+#define RCC_AHB4ENR_GPIODEN 1U
+#define RCC_AHB4RSTR_GPIODRST 1U
+void sync_regs(void);void park_now(void);void usb_app(void);
+#define __DSB() sync_regs()
+#define __ISB() ((void)0)
+#define __NOP() park_now()
+''')
+            (root / 'boot_read.h').write_text('int boot_read(uint32_t,uint8_t *,uint32_t,uint32_t);\n')
+            (root / 'boot_config.h').write_text('#define USB_FLASH_OFFSET 0x12000U\n#define USB_BYTES 8U\n'
+                                                '#define USB_CRC 123U\n#define USB_ENTRY ((uintptr_t)usb_app)\n')
+            (root / 'main.c').write_text(r'''
+#include "selector.c"
+#include <assert.h>
+#include <setjmp.h>
+#include <string.h>
+MockRCC rcc; MockGPIO gd; MockDWT dwt;
+uint32_t request[8],proof_words[16],__bss_start__;
+volatile uint32_t vbus_proof[16],knob_proof[32];
+static jmp_buf terminal;static int vbus;static unsigned knob_calls,order;
+int usb_vbus_sample(void){assert(knob_calls==0);order=1;return vbus;}
+uint32_t knob_apply(void){assert(order==1);knob_calls++;return 6U;}
+void sync_regs(void){
+ rcc.AHB4ENR|=rcc.AHB4ENSR;rcc.AHB4ENSR=0;
+ gd.ODR=(gd.ODR|(gd.BSRR&65535U))&~(gd.BSRR>>16);gd.BSRR=0;
+ if((gd.MODER&50331648U)==16777216U)gd.IDR=(gd.IDR&~4096U)|(gd.ODR&4096U);
+}
+void park_now(void){longjmp(terminal,1);}
+void usb_app(void){longjmp(terminal,2);}
+int boot_read(uint32_t a,uint8_t *p,uint32_t n,uint32_t c){(void)a;(void)p;(void)n;(void)c;return 1;}
+static int run(int present){
+ memset(&rcc,0,sizeof rcc);memset(&gd,0,sizeof gd);memset(proof_words,0xAA,sizeof proof_words);
+ vbus=present;knob_calls=order=0;
+ int ended=setjmp(terminal);
+ if(!ended)usb_selector();
+ return ended;
+}
+int main(void){
+ /* No cable: knobs read once, after VBUS; result published; returns to capture. */
+ assert(run(0)==0&&knob_calls==1&&proof_words[5]==0U&&proof_words[10]==6U);
+ assert(proof_words[9]==(uint32_t)(uintptr_t)knob_proof&&gd.MODER==0U);
+ /* Cable present: straight to the USB app, knobs never touched. */
+ assert(run(1)==2&&knob_calls==0&&proof_words[10]==0xFFFFFFFFU&&proof_words[1]==4U);
+ /* Ambiguous VBUS: parks, knobs never touched. */
+ assert(run(-1)==1&&knob_calls==0&&proof_words[10]==0xFFFFFFFFU&&proof_words[1]==0xE002U);
+ return 0;
+}
+''')
+            exe = root / 'selector.exe'
+            compiled = subprocess.run([COMPILER, '-std=c11', '-Wall', '-Wextra', '-Werror', '-Wno-pointer-to-int-cast',
+                                       '-D__bss_end__=__bss_start__', '-I' + str(root), str(root / 'main.c'),
+                                       '-o', str(exe)], capture_output=True, text=True)
+            self.assertEqual(compiled.returncode, 0, compiled.stderr)
+            ran = subprocess.run([str(exe)], capture_output=True, text=True)
+            self.assertEqual(ran.returncode, 0, ran.stdout + ran.stderr)
         knob = (HERE / 'knob.c').read_text(encoding='utf-8')
         for forbidden in ('GPIOD', 'PA2', 'VREFBUF', 'usb_hold'):         # HOLD, A3 and the reference stay untouched
             self.assertNotIn(forbidden, knob.split('*/', 1)[1])
@@ -399,6 +512,35 @@ class ExposureGateTests(unittest.TestCase):
         relaxed = {**self.manifest, 'late_load': {**late, 'late_crc32': zlib.crc32(bytes(jump[late['late_flash_offset']:late['late_flash_offset'] + late['late_bytes']]))}}
         with self.assertRaises(ValueError):
             gate.open_gate(bytes(jump), relaxed)
+
+    def test_branch_decoder_agrees_with_the_disassembler_over_the_whole_receiver(self):
+        objdump = shutil.which('arm-none-eabi-objdump')
+        if not objdump:
+            self.skipTest('Arm disassembler unavailable')
+        import re
+        stage2 = int(self.manifest['stage2_flash_offset'], 16)
+        base = int(self.manifest['stage2_load_address'], 16)
+        image = self.sector[stage2:stage2 + self.manifest['stage2_full_bytes']]
+        with tempfile.TemporaryDirectory(prefix='knob-gate-') as tmp:
+            binary = Path(tmp) / 'stage2.bin'
+            binary.write_bytes(image)
+            listing = subprocess.check_output([objdump, '-D', '-b', 'binary', '-marm', '-Mforce-thumb',
+                                               f'--adjust-vma={base:#x}', str(binary)], text=True)
+        conditions = 'eq ne cs cc hs lo mi pl vs vc hi ls ge lt gt le'.split()
+        branches = {'b', 'bl', 'cbz', 'cbnz', 'le', 'letp', 'wls', 'wlstp'} | {'b' + c for c in conditions}
+        mine, checked, kinds = dict(gate.branch_targets(image, base)), 0, set()
+        for line in listing.splitlines():
+            match = re.match(r'\s*([0-9a-f]+):\s+(?:[0-9a-f]{4} ?)+\s+(\S+)\s+(.*)', line)
+            if not match or match[2].split('.')[0] not in branches:
+                continue
+            target = re.search(r'0x([0-9a-f]+)\s*$', match[3].split('@')[0].strip())
+            if not target:
+                continue                                              # register form, not a direct branch
+            self.assertEqual(mine.get(int(match[1], 16)), int(target[1], 16), line)
+            checked += 1
+            kinds.add(match[2].split('.')[0])
+        self.assertGreater(checked, 1500)
+        self.assertTrue({'b', 'bl', 'beq', 'cbz', 'cbnz', 'le'} <= kinds, kinds)
 
     def test_crc_compensation_and_branch_decoder(self):
         data = bytearray(range(256)) * 3

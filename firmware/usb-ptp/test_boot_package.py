@@ -298,6 +298,13 @@ class LinkedPackageTests(unittest.TestCase):
   gate=self.m.get('exposure_gate')
   if gate:
    self.assertEqual(len(gate['changed_flash_offsets']),5)
+   # The packaged bytes are exactly the gate applied to the reviewed capture,
+   # and the loader's checksum of the late range still holds on them.
+   reference=(capture/'capture_sector_0.bin').read_bytes();manifest=json.loads((capture/'manifest.json').read_text(encoding='utf-8'))
+   self.assertEqual(sector[p.CAPTURE_OFFSET:],p.exposure_gate.open_gate(reference,manifest)[0][p.CAPTURE_OFFSET:])
+   late=manifest['late_load'];import zlib
+   self.assertEqual(zlib.crc32(sector[late['late_flash_offset']:late['late_flash_offset']+late['late_bytes']]),late['late_crc32'])
+   self.assertEqual(zlib.crc32(sector[p.CAPTURE_OFFSET:p.CAPTURE_OFFSET+manifest['stage2_bytes']]),int(manifest['stage2_crc32'],16))
    sector=p.exposure_gate.close_gate(sector,gate)
   self.assertEqual(sector[p.CAPTURE_OFFSET:],(capture/'capture_sector_0.bin').read_bytes()[p.CAPTURE_OFFSET:])
  def test_early_uart_guard_is_identical_to_original(self):

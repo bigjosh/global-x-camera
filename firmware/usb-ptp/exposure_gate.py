@@ -74,7 +74,10 @@ def branch_targets(image, base):
         elif first & 0xF800 == 0xF000 and offset + 4 <= len(image):
             second = struct.unpack_from('<H', image, offset + 2)[0]
             sign, j1, j2 = (first >> 10) & 1, (second >> 13) & 1, (second >> 11) & 1
-            if second & 0xD000 == 0x8000 and (first >> 6) & 15 < 14:     # B<cond>.W
+            if first & 0xFF80 == 0xF000 and second & 0xF001 == 0xC001:   # LE (back) / WLS (forward)
+                distance = (second >> 1 & 0x3FF) << 2 | (second >> 11 & 1) << 1
+                yield address, address + 4 + (-distance if first & 15 == 15 else distance)
+            elif second & 0xD000 == 0x8000 and (first >> 6) & 15 < 14:   # B<cond>.W
                 value = sign << 20 | j2 << 19 | j1 << 18 | (first & 0x3F) << 12 | (second & 0x7FF) << 1
                 yield address, address + 4 + signed(value, 21)
             elif second & 0xD000 in (0x9000, 0xD000):                    # B.W / BL

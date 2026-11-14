@@ -7,7 +7,7 @@
 #define KNOB_DEFAULT_FRAME 4336U
 #define KNOB_FRAME_MARGIN 2000U
 #define KNOB_FRAME_MAX 65535U
-#define KNOB_MIN_LINES 26U
+#define KNOB_MIN_LINES 65U
 #define KNOB_MAX_LINES 63000U
 #define KNOB_STEPS 32U
 #define KNOB_GAIN_CODE_MAX 28U
@@ -16,10 +16,10 @@
 
 /* Exposure in sensor lines at each 1/32 of the knob travel. */
 static const uint16_t knob_exposure_lines[KNOB_STEPS + 1U] = {
-    26, 33, 42, 54, 69, 88, 112, 143,
-    182, 233, 297, 379, 483, 616, 786, 1003,
-    1280, 1633, 2083, 2657, 3390, 4325, 5517, 7039,
-    8979, 11455, 14614, 18644, 23785, 30343, 38710, 49383,
+    65, 81, 100, 124, 154, 190, 236, 293,
+    363, 450, 557, 691, 857, 1062, 1317, 1632,
+    2024, 2509, 3110, 3856, 4780, 5926, 7347, 9108,
+    11291, 13998, 17353, 21514, 26671, 33065, 40991, 50818,
     63000
 };
 

@@ -36,7 +36,8 @@ volatile uint32_t knob_proof[K_WORDS];
 
 /* Result codes; zero means the knob settings were applied. */
 enum { KNOB_APPLIED=0, KNOB_ADC_IN_USE=1, KNOB_BANK_1V8=2, KNOB_SUPPLY=3, KNOB_ADC_INIT=4,
-       KNOB_ADC_SETUP=5, KNOB_CONVERSION=6, KNOB_PREFIX_DIFFERS=7, KNOB_READBACK=8 };
+       KNOB_ADC_SETUP=5, KNOB_CONVERSION=6, KNOB_PREFIX_DIFFERS=7, KNOB_READBACK=8,
+       KNOB_MEMORY_PROTECTED=9 };
 
 /* Excitation must be stable at the buffered ADC inputs before sampling.
  * The divider has no capacitor and the buffer settles in tens of
@@ -66,14 +67,16 @@ static void drive(GPIO_TypeDef *port,unsigned pin,unsigned high)
 
 static int convert(ADC_HandleTypeDef *adc,uint32_t channel,volatile uint32_t *to)
 {
- /* The channel may change only while the converter is stopped. */
+ /* The HAL refuses a channel change while the converter is enabled, and
+  * both calibration and a finished conversion leave it enabled. Stop first,
+  * every time, as the control diagnostic does. */
  ADC_ChannelConfTypeDef ch={0};
  ch.Channel=channel;ch.Rank=ADC_REGULAR_RANK_1;ch.SamplingTime=ADC_SAMPLETIME_1499CYCLES_5;
  ch.SingleDiff=ADC_SINGLE_ENDED;ch.OffsetNumber=ADC_OFFSET_NONE;
- if(HAL_ADC_ConfigChannel(adc,&ch)!=HAL_OK||HAL_ADC_Start(adc)!=HAL_OK||
-    HAL_ADC_PollForConversion(adc,20U)!=HAL_OK)return 0;
+ if(HAL_ADC_Stop(adc)!=HAL_OK||HAL_ADC_ConfigChannel(adc,&ch)!=HAL_OK||
+    HAL_ADC_Start(adc)!=HAL_OK||HAL_ADC_PollForConversion(adc,20U)!=HAL_OK)return 0;
  *to=HAL_ADC_GetValue(adc);
- return HAL_ADC_Stop(adc)==HAL_OK;
+ return 1;
 }
 
 /* Write the setting into the capture prefix. Returns a result code. */
@@ -122,6 +125,11 @@ uint32_t knob_apply(void)
  /* PC12 would drive 3.3 V logic levels into a bank configured for 1.8 V. */
  result=KNOB_BANK_1V8;
  if(bank&PWR_SVMCR1_VDDIO4VRSEL)goto cleanup;
+ /* The boot ROM leaves memory protection off, so the loaded prefix is plain
+  * writable RAM. If that ever changes, keep the fixed settings rather than
+  * risk a fault on the write. */
+ result=KNOB_MEMORY_PROTECTED;
+ if(MPU->CTRL&MPU_CTRL_ENABLE_Msk)goto cleanup;
 
  /* Conditioned inputs and the raw pins that share the two wipers. */
  GPIOA->MODER|=A_ANALOG;GPIOA->PUPDR&=~A_ANALOG;
