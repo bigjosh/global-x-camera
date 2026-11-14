@@ -1,5 +1,68 @@
 # Packed RAW capture to fixed SD slots
 
+**November13 controls candidate:** opt-in `--knob-controls` integrates the
+latched exposure/ASA record supplied by the combined USB selector. Exposure
+is continuous and logarithmic from **1ms to0.5s**; ASA100/200/400/800 selects
+analog gain1×/2×/4×/8×, with digital gain fixed1×. Both physical knobs increase
+their setting counterclockwise; exposure ADC polarity is inverted while ASA
+polarity is positive. The ASA numbers are a provisional control scale, not a
+calibrated photographic sensitivity claim. Current wiring remains A0 LOW,
+A1 exposure wiper, A2 excitation; ASA uses A4 excitation, A5 wiper and GND.
+
+This receiver **requires the combined selector package**. A standalone staged
+capture image lacks its ADC sampler and sensor helper. The builder deliberately
+keeps the existing prefix exact; the combined packager audits two sensor-only
+relocations: FRAME_LENGTH call0x34181332 to helper0x34200101, and manual table
+pointer0x341816A4 to record0x343F9440. All UART recovery, HOLD, error engine and
+other prefix bytes remain unchanged. Without the option, receiver/prefix/sector
+reproduce the prior D8 build byte-for-byte.
+
+The candidate uses a constant **1280-pixel line** at nominal160.8MHz, keeping
+the requested0.5s endpoint inside16-bit coarse/frame limits: coarse62813,
+frame64813, nominal500003.98µs after upward quantization. Frame length is at
+least4336 and at least coarse+2000. The existing READ_OFFSET18 remains consistent
+with ceil(18×1236/1280). Post-FRAME checks compare actual line/coarse/frame,
+margin, applied analog code and applied digital gain with the latched record.
+The3s first-sector/final-frame waits remain; autonomous-stop's1s deadline starts
+after FRAME. These are bounded firmware deadlines, not measured new timing.
+
+The existing152-byte front reservation now stores a **128-byte CKN1** record
+and24zero bytes. It carries raw knobs, electrical positions, requested timing,
+line/frame/manual settings, provisional ASA, validation flags and CRC32. The
+first publication freezes it once: state3 means configured, state4 means the
+post-FRAME applied checks had already passed. Later checks may update the RAM
+record but never rewrite an already-offered first block. Slot magic, image
+offset156, RAW10 payload size and trailing GXRE remain unchanged. Timestamp
+and orientation are still unavailable. The host decoder reports the stored
+validation state without upgrading configured metadata to applied evidence.
+
+Offline candidate `tmp/bringup/knobs-capture-20261113/capture-v3` passed exact
+HOLD/prefix/error audits,327 tests (four optional linked checks then covered
+by25 passing linked HOLD tests), and baseline reproduction. Receiver SHA256
+`8cd86fa71e1cd2422897558567b9c66035c66ca103cea537e50ad3ebd4d5caaa`.
+Installation and live image qualification belong to the combined-package
+campaign; this paragraph makes no new hardware or photographic-accuracy claim.
+The user requested loading this candidate and testing it personally, without
+another automated functional campaign. The half-second/8× endpoint and new
+saved-image controls metadata therefore remain hardware-unqualified here.
+
+Reproduce the frozen capture-v3 input to the combined packager with:
+
+```powershell
+python firmware/capture-raw/build.py `
+  --out tmp/bringup/knobs-capture-20261113/capture-v3 `
+  --flash --standby --error-blinks --magic-format --line-stream --async-stop `
+  --sd-bus-width 4 --sd-clock-hz 25000000 --sd-clock-negedge `
+  --sd-clock-negedge-init --sd-review-profile --sd-startup-opt `
+  --ethernet-powerdown --sensor-single-frame --gpio-hold --knob-controls
+```
+
+The resulting standalone prefix SHA256 is
+`8eabee637bec3d54c42dbf725a588c67b65f6d55c52f346d8bbcb73cd0a7bbc7`;
+standalone sector SHA256 is
+`d836c5ea1f432ebf63b2fd3759433eb6b240006276ffc54164511e47fbcd533c`.
+These identify packager inputs, not the final combined image to program.
+
 **November 13 current HOLD pin: Arduino D8 / CN14.1 / PD12.** The user
 requested this substitution and reload without another test campaign.
 `--gpio-hold` now emits schema5 for PD12; schemas1–4 retain their historical
@@ -938,7 +1001,8 @@ row count is current; unused rows deliberately retain prior contents.
 Exposure telemetry uses the read-back coarse exposure and line length with the
 fixed sensor's nominal 160.8 MHz pixel clock, rounded only after multiplication.
 This avoids the shipped driver's integer-microsecond line-time truncation.
-Magic slots do not store this telemetry or other image metadata. The legacy
+The historical fixed-exposure magic profile does not store this telemetry;
+the opt-in controls profile stores the CKN1 snapshot described above. The legacy
 header format retains its metadata validity flags; timestamp and orientation
 remain explicitly unavailable.
 

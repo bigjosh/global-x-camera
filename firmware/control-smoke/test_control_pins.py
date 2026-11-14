@@ -31,30 +31,33 @@ class ControlPinRegression(unittest.TestCase):
         # The first peripheral operation asserts PD12; none of the endpoint
         # setup, sampling or terminal paths may lower or float it.
         main = source[source.index('void control_main(void)'):]
-        self.assertLess(main.index('output(GPIOD,12,1);'), main.index('for(unsigned i=0;i<64;i++)'))
+        self.assertLess(main.index('output(GPIOD,12,1);'), main.index('for(unsigned i=0;i<PROOF_WORDS;i++)'))
         self.assertNotIn('output(GPIOD,12,0)', source)
         self.assertNotIn('output(GPIOA,2,', source)
-        self.assertIn('P[VERSION]=5;', source)
-        self.assertNotIn('GPIOH->', source)
+        self.assertIn('P[VERSION]=6;', source)
         self.assertNotIn('GPIOE->', source)
-        self.assertNotIn('PWR_SVMCR1_VDDIO4', source)
+        self.assertIn('PWR_SVMCR1_VDDIO4SV', source)
+        self.assertNotIn('PWR_SVMCR1_VDDIO4RDY', source)
         self.assertIn('excitation_off();', function(source, 'finish'))
         harness = r'''
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 typedef struct {uint32_t MODER,OTYPER,PUPDR,OSPEEDR,BSRR,ODR;} GPIO_TypeDef;
-static GPIO_TypeDef ga,gc,gf,ge;
+static GPIO_TypeDef ga,gc,gf,ge,gg,gh;
 struct {uint32_t AHB4ENR;} rcc;
 #define GPIOA (&ga)
 #define GPIOC (&gc)
 #define GPIOF (&gf)
 #define GPIOD (&ge)
+#define GPIOG (&gg)
+#define GPIOH (&gh)
 #define RCC (&rcc)
 #define RCC_AHB4ENR_GPIOFEN 0x20U
+#define RCC_AHB4ENR_GPIOCEN 4U
 static void barrier(void) {
- GPIO_TypeDef *ports[]={&ga,&gc,&gf,&ge};
- for(unsigned i=0;i<4;i++) {
+ GPIO_TypeDef *ports[]={&ga,&gc,&gf,&ge,&gg,&gh};
+ for(unsigned i=0;i<6;i++) {
   GPIO_TypeDef *p=ports[i];
   p->ODR=(p->ODR|(p->BSRR&0xffffU))&~(p->BSRR>>16);p->BSRR=0;
  }
@@ -71,7 +74,7 @@ int main(void) {
  const uint32_t analog=(3U<<16)|(3U<<18)|(3U<<20);
  const uint32_t ends=(3U<<10)|(3U<<12),end_bits=(1U<<5)|(1U<<6);
  for(unsigned i=0;i<4096;i++) {
-  randomize(&ga);randomize(&gc);randomize(&gf);randomize(&ge);
+  randomize(&ga);randomize(&gc);randomize(&gf);randomize(&ge);randomize(&gg);randomize(&gh);
   GPIO_TypeDef original_e=ge;
   output(GPIOD,12,1);
   CHECK(ge.MODER==((original_e.MODER&~(3U<<24))|(1U<<24)));
@@ -79,22 +82,24 @@ int main(void) {
   CHECK(ge.PUPDR==(original_e.PUPDR&~(3U<<24)));
   CHECK(ge.OSPEEDR==(original_e.OSPEEDR&~(3U<<24)));
   CHECK(ge.OTYPER==(original_e.OTYPER&~(1U<<12)));
-  GPIO_TypeDef olda=ga,oldc=gc,oldf=gf,olde=ge;
+  GPIO_TypeDef olda=ga,oldc=gc,oldf=gf,olde=ge,oldg=gg,oldh=gh;
   configure_control_pins();
   CHECK(ga.MODER==(olda.MODER|analog));CHECK(ga.PUPDR==(olda.PUPDR&~analog));
   CHECK(ga.OTYPER==olda.OTYPER&&ga.OSPEEDR==olda.OSPEEDR&&ga.ODR==olda.ODR);
   CHECK(memcmp(&ge,&olde,sizeof ge)==0);
   CHECK((ga.MODER&(3U<<4))==(olda.MODER&(3U<<4)));
   CHECK((ga.MODER&(3U<<24))==(olda.MODER&(3U<<24)));
-  CHECK(gc.MODER==(oldc.MODER&~(3U<<20)));CHECK(gc.PUPDR==(oldc.PUPDR&~(3U<<20)));
-  CHECK(gc.ODR==oldc.ODR&&gc.OTYPER==oldc.OTYPER&&gc.OSPEEDR==oldc.OSPEEDR);
-  CHECK(gf.MODER==((oldf.MODER&~ends)|(1U<<10)|(1U<<12)));
-  CHECK(gf.PUPDR==(oldf.PUPDR&~ends));CHECK(gf.OSPEEDR==(oldf.OSPEEDR&~ends));
+  CHECK(gc.MODER==((oldc.MODER&~((3U<<20)|(3U<<24)))|(1U<<24)));CHECK(gc.PUPDR==(oldc.PUPDR&~((3U<<20)|(3U<<24))));
+  CHECK(gc.ODR==(oldc.ODR&~(1U<<12))&&gc.OTYPER==(oldc.OTYPER&~(1U<<12))&&gc.OSPEEDR==(oldc.OSPEEDR&~(3U<<24)));
+  CHECK(gg.MODER==(oldg.MODER|(3U<<30))&&gg.PUPDR==(oldg.PUPDR&~(3U<<30)));
+  CHECK(gh.MODER==(oldh.MODER&~(3U<<4))&&gh.PUPDR==(oldh.PUPDR&~(3U<<4)));
+  CHECK(gf.MODER==((oldf.MODER&~ends)|(1U<<10)|(1U<<12)|(3U<<6)));
+  CHECK(gf.PUPDR==(oldf.PUPDR&~(ends|(3U<<6))));CHECK(gf.OSPEEDR==(oldf.OSPEEDR&~ends));
   CHECK(gf.OTYPER==(oldf.OTYPER&~end_bits));CHECK(gf.ODR==(oldf.ODR&~end_bits));
-  output(GPIOF,6,1);CHECK((gf.ODR&end_bits)==(1U<<6));
-  olda=ga;oldc=gc;oldf=gf;olde=ge;rcc.AHB4ENR=RCC_AHB4ENR_GPIOFEN;
+  output(GPIOF,6,1);output(GPIOC,12,1);CHECK((gf.ODR&end_bits)==(1U<<6));
+  olda=ga;oldc=gc;oldf=gf;olde=ge;rcc.AHB4ENR=RCC_AHB4ENR_GPIOFEN|RCC_AHB4ENR_GPIOCEN;
   excitation_off();barrier();
-  CHECK(memcmp(&ga,&olda,sizeof ga)==0);CHECK(memcmp(&gc,&oldc,sizeof gc)==0);
+  CHECK(memcmp(&ga,&olda,sizeof ga)==0);oldc.ODR&=~(1U<<12);CHECK(memcmp(&gc,&oldc,sizeof gc)==0);
   oldf.ODR&=~(1U<<6);CHECK(memcmp(&gf,&oldf,sizeof gf)==0);
   CHECK(memcmp(&ge,&olde,sizeof ge)==0);CHECK(ge.ODR&(1U<<12));
   rcc.AHB4ENR=0;gf.BSRR=0;excitation_off();CHECK(gf.BSRR==0);
@@ -121,12 +126,14 @@ int main(void) {
         namespace = {}
         exec(compile(ast.Module(body=[target], type_ignores=[]), 'contract', 'exec'), namespace)
         check = namespace['require_current_wiring']
-        good = dict(schema=5, adc='ADC1_INP10/PA9',
+        good = dict(schema=6, adc='ADC1_INP10/PA9',
                     wiring=dict(low='A0/CN4.1/PF5', wiper='A1/CN4.2/PA9',
                                 high='A2/CN4.3/PF6', hold='D8/CN14.1/PD12'),
-                    endpoint_channels={'A0': 'ADC1_INP5/PA8', 'A2': 'ADC1_INP11/PA10'})
+                    endpoint_channels={'A0': 'ADC1_INP5/PA8', 'A2': 'ADC1_INP11/PA10', 'A4': 'ADC1_INP16/PF3'},
+                    asa_wiring=dict(low='GND', wiper='A5/CN4.6/PG15', high='A4/CN4.5/PC12'),
+                    asa_adc='ADC1_INP7/PG15', digital_wiper='PC10 input/no-pull', asa_digital_wiper='PH2 input/no-pull')
         check(good)
-        for key, value in (('schema', 1), ('schema', 2), ('schema', 3), ('schema', 4), ('adc', 'ADC1_INP16/PF3')):
+        for key, value in (('schema', 1), ('schema', 2), ('schema', 3), ('schema', 4), ('schema', 5), ('adc', 'ADC1_INP16/PF3')):
             bad = copy.deepcopy(good);bad[key] = value
             with self.assertRaises(ValueError):
                 check(bad)

@@ -1,0 +1,54 @@
+{
+  "schema": 1,
+  "recorded_utc": "2026-11-14T17:45:04.002970+00:00",
+  "scope": "offline source consolidation approved by user; no instruments or firmware installation",
+  "canonical": "source-built calibrated CKN1 controls; default package profile",
+  "retained": "ST real-HAL model, compiler/SDK portability, USB diagram and immutable historical artifacts",
+  "historical_profile": "explicit --legacy-knobs only",
+  "tests": {
+    "capture": 328,
+    "control_smoke": 13,
+    "photo_storage": 19,
+    "raw_slots": 17,
+    "package_canonical": 37,
+    "package_historical": 37,
+    "selector_profile_suite": 1,
+    "real_hal_test_methods": 3,
+    "real_hal_scenarios": 17,
+    "release_tests": 18,
+    "failures": 0,
+    "historical_knob": {
+      "passed": 10,
+      "skipped": 3,
+      "skip_reason": "Optional assembler/disassembler absent from PATH and Linux-only historical HAL model; canonical real-HAL runs separately"
+    }
+  },
+  "fresh_builds_match_reviewed_package": true,
+  "binary_identity_sha256": {
+    "stage1.bin": "b866589cf472cac9820d961f3243cb8280759614826083757fae374ccee7e242",
+    "sector0.bin": "6ddf4499865264aec845150597aa6b8d44cb89e7d5e621dd324a0e1a9170b499",
+    "sector1.bin": "206da4c0a8bdcda6205d7ccdb3d9ac02548e9db6852b1fa47afa6327b76473d8",
+    "selector.bin": "c1718d099dca128772a2b77a4503ab03c066d39bd78cb8698853a2ed3b049c45",
+    "hook.bin": "9969a1d2b0805c74777c864643cf5ad1a57f267b8bd729d6ee721e8c61a79d29"
+  },
+  "evidence_hash_checks": [
+    {
+      "directory": "firmware/control-smoke/evidence/2026-11-13-dual-knobs",
+      "verified_hash_entries": 927
+    },
+    {
+      "directory": "firmware/usb-ptp/evidence/2026-11-13-knob-controls",
+      "verified_hash_entries": 167
+    },
+    {
+      "directory": "firmware/usb-ptp/evidence/2026-11-14-knobs",
+      "verified_hash_entries": 36
+    }
+  ],
+  "release_policy": "manual dispatch, explicit enabled committed request, immutable tag/assets, complete verified draft before publication; old request disabled",
+  "published_release_correction": "superseded notice and corrected timeout instructions prepared; apply notes-only correction after push, preserving tag/assets",
+  "hardware_qualification": "not performed; prior D8 installation remains last recorded firmware",
+  "preserved_unrelated_work": "power-tree/NAND research, PCB readiness and label artwork remain outside this consolidation commit",
+  "staged_evidence_hash_entries_verified": 1130,
+  "staged_scope_verified": true
+}

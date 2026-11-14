@@ -24,9 +24,10 @@ means byte `0x00`, value 1 means byte `0xff`. The byte is never inferred from a 
 that happens to look empty. The old `raw_slots_format()` only writes headers and
 does **not** establish this new format's erased-card precondition. Erase is a
 separate operator-authorized operation, never automatic on boot or a mount error.
-There is no on-card generation, superblock or allocation table. The new metadata
-region is reserved and currently initialized to zero; a schema for timestamps,
-orientation and other fields is deferred. Zero is not a valid-date indication.
+There is no on-card generation, superblock or allocation table. Older captures
+initialize the metadata reservation to zero. The opt-in knob capture profile
+stores the CKN1 controls record described below; timestamps and orientation
+remain undefined. Zero is not a valid-date indication.
 An interrupted commissioning erase is not a completed format and must be repeated
 successfully before use. Ordinary SD erase is not a secure data-sanitization claim.
 
@@ -37,7 +38,7 @@ at the end of the card is unused. Each image writes every sector of its slot onc
 | Offset within slot | Bytes | Contents |
 | --- | ---: | --- |
 | 0 | 4 | Leading magic: ASCII `GXR2` (`0x32525847` little endian) |
-| 4 | 152 | Opaque photo-metadata reservation; zero until a schema is implemented |
+| 4 | 152 | Photo-metadata reservation: legacy opaque bytes, or 128-byte CKN1 record plus 24 zeros |
 | 156 | 1,909,600 | Packed MIPI RAW10, 1120 × 1364 samples, 1400 bytes per row |
 | 1,909,756 | 4 | Completion magic: ASCII `GXRE` (`0x45525847` little endian), the final four bytes of the slot |
 
@@ -110,8 +111,9 @@ python firmware/raw-slots/magic_slots.py card.img --erased-byte 0x00 extract 0 p
 ```
 
 Default `list` uses `read_header()`/`parse_header()` and reads exactly one sector
-per slot. It reports FREE or OCCUPIED, the detected layout and the new format's
-opaque `metadata_hex`; `metadata_schema` remains null. It explicitly reports
+per slot. It reports FREE or OCCUPIED, the detected layout and all original
+`metadata_hex` bytes. `metadata_schema` is `CKN1/v1` only for a valid known
+controls record and remains null otherwise. It explicitly reports
 `completion_checked=false` and `completion_marker_valid=null`. Directory listing
 cannot establish a complete image without reading the final sector.
 
@@ -128,6 +130,34 @@ tail padding. PNG output reconstructs
 16-bit grayscale samples as `sample << 6`, with `sBIT=10`; its text comment contains
 derived inspection results and the raw metadata reservation when present; it does
 not invent capture times from the reserved zeros.
+
+### Controls metadata (CKN1, schema 1)
+
+The knob-enabled capture stores the little-endian 128-byte
+[`capture_controls_t`](../usb-ptp/capture_controls.h) at slot offset 4, followed
+by 24 zero bytes. Its CRC-32/ISO-HDLC at record offset 124 covers the preceding
+124 bytes only. The host checks identity, CRC, reserved bytes, state/flags,
+ADC bounds and normalization, exposure/frame bounds, gain and any claimed
+applied register readback before exposing `controls` in the listing/PNG comment.
+Invalid known records add `metadata_warning`; unknown schemas and older zero or
+arbitrary metadata remain opaque. Neither case makes the slot free, suppresses
+image recovery, changes the image offset or constitutes a pixel checksum.
+
+The record is frozen before the first sector is offered to storage. State 3
+(`configured`) records the parameters programmed before streaming; it does not
+claim applied sensor readback. State 4 (`applied`) additionally records matching
+post-frame coarse exposure, analog-gain and digital-gain registers. A record
+already published as state 3 is never rewritten when the separate RAM record
+later reaches state 4. This preserves the one-write-per-sector arrangement.
+
+The current profile requests 1–500 ms exposure, uses line length 1280 and a
+160.8 MHz timing clock, and reports the line-quantized nominal exposure
+separately from the requested value. The half-second setting is nominally
+500003.98 µs. ASA labels 100/200/400/800 mean analog gain 1×/2×/4×/8× with unity
+digital gain; `asa_provisional=true` explicitly distinguishes these labels from
+calibrated photographic ISO. The record contains no capture date or orientation.
+Source/host support alone does not establish installed firmware or hardware
+qualification; consult the capture campaign's current checkpoint.
 
 Run both format generations' host tests with the command at the end of this file.
 The new C-core tests exercise both erased polarities, damaged first words, full

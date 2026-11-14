@@ -12,7 +12,9 @@ import argparse
 import importlib.util
 import json
 from pathlib import Path
+import struct
 import sys
+import zlib
 
 _spec = importlib.util.spec_from_file_location("_magic_slots_raw_codec", Path(__file__).with_name("raw_slots.py"))
 _codec = importlib.util.module_from_spec(_spec)
@@ -40,6 +42,77 @@ LEGACY_IMAGE_OFFSET = 4
 LEGACY_TRAILER_OFFSET = LEGACY_IMAGE_OFFSET + IMAGE_BYTES
 LEGACY_OBJECT_BYTES = LEGACY_TRAILER_OFFSET + 4
 LEGACY_PADDING_BYTES = PADDED_BYTES - LEGACY_OBJECT_BYTES
+
+
+def decode_controls_record(metadata):
+    """Validate known CKN1/v1 controls; its CRC never covers image pixels.
+
+    State 3 is a pre-stream configuration snapshot, not applied sensor readback.
+    The caller leaves unknown schemas opaque and catches invalid known records
+    without changing slot occupancy, completion or image-recovery eligibility.
+    """
+    if len(metadata) != METADATA_BYTES:
+        raise FormatError("Controls metadata reservation has the wrong size")
+    data = bytes(metadata[:128])
+    words = struct.unpack("<32I", data)
+    if words[:3] != (0x314E4B43, 1, 128):
+        raise FormatError("Controls metadata identity or size differs")
+    if zlib.crc32(data[:124]) != words[31]:
+        raise FormatError("Controls metadata CRC mismatch; controls are unknown")
+    state, error, flags = words[3:6]
+    if (state not in (3, 4) or error or flags != (23 if state == 3 else 31)
+            or any(words[29:31]) or any(metadata[128:])):
+        raise FormatError("Controls metadata state, flags or reserved bytes differ")
+    low, exposure_high, asa_high, exposure_raw, asa_raw = words[6:11]
+    exposure_q16, asa_q16, requested_us, line, frame = words[11:16]
+    if (low > 128 or not low + 3000 <= exposure_high <= 4095
+            or not low + 3000 <= asa_high <= 4095
+            or exposure_raw > 4095 or asa_raw > 4095):
+        raise FormatError("Controls ADC samples or endpoint bounds differ")
+
+    def normalize(raw, high):
+        if raw <= low:
+            return 0
+        if raw >= high:
+            return 65535
+        return ((raw - low) * 65535 + (high - low) // 2) // (high - low)
+
+    if (exposure_q16 != 65535 - normalize(exposure_raw, exposure_high)
+            or asa_q16 != normalize(asa_raw, asa_high)):
+        raise FormatError("Controls normalized positions differ from ADC samples")
+    manual = data[64:76]
+    coarse = int.from_bytes(manual[2:4], "little")
+    asa, vt_hz, applied_coarse, applied_gain, applied_digital, margin = words[19:25]
+    gain = {100: 0, 200: 16, 400: 24, 800: 28}.get(asa)
+    expected_coarse = (requested_us * 160800000 + 1280000000 - 1) // 1280000000
+    asa_sector = sum(asa_q16 * 6 >= threshold for threshold in (65535, 196605, 327675))
+    if (not 1000 <= requested_us <= 500000 or line != 1280 or vt_hz != 160800000
+            or coarse != expected_coarse or coarse < 21
+            or frame != max(4336, coarse + 2000) or frame > 65535 or margin > 1993
+            or coarse > frame - margin - 7 or manual[0] != 2 or manual[1] != gain
+            or asa != 100 << asa_sector or manual[4:] != b"\x00\x01" * 4):
+        raise FormatError("Controls exposure, frame or gain bounds differ")
+    if state == 4 and (applied_coarse, applied_gain, applied_digital) != (coarse, gain, 256):
+        raise FormatError("Controls applied readback differs from configuration")
+    result = {
+        "schema": "CKN1/v1", "state": state,
+        "validation": "applied" if state == 4 else "configured",
+        "sensor_readback_verified": state == 4,
+        "record_crc32_valid": True, "record_crc32": f"{words[31]:08x}",
+        "requested_exposure_us": requested_us,
+        "nominal_exposure_us": coarse * line * 1000000 / vt_hz,
+        "line_length": line, "coarse_lines": coarse, "frame_length": frame,
+        "frame_margin": margin, "vt_hz": vt_hz,
+        "analog_gain": 32 // (32 - gain), "analog_code": gain, "digital_gain": 1,
+        "asa": asa, "asa_provisional": True,
+        "adc": {"low": low, "exposure_high": exposure_high, "asa_high": asa_high,
+                "exposure_raw": exposure_raw, "asa_raw": asa_raw},
+        "exposure_fraction_q16": exposure_q16, "asa_fraction_q16": asa_q16,
+    }
+    if state == 4:
+        result["applied_registers"] = {"coarse": applied_coarse, "analog": applied_gain,
+                                       "digital": applied_digital}
+    return result
 
 
 def _format(first_word):
@@ -72,10 +145,10 @@ def layout(sector_count, erased_byte):
 
 
 def parse_header(first_sector, *, index, erased_byte):
-    """One-sector directory record: occupancy and opaque metadata, not completion.
+    """One-sector directory record: occupancy and metadata, not completion.
 
-    No timestamp schema is assigned yet. metadata_hex preserves all reserved
-    bytes; zero bytes do not imply a valid capture date or other field.
+    Known controls records are validated; metadata_hex preserves every byte.
+    No timestamp schema exists; zero bytes never imply a valid capture date.
     """
     if erased_byte not in (0, 255) or index < 0:
         raise FormatError("invalid erased byte or slot index")
@@ -95,8 +168,18 @@ def parse_header(first_sector, *, index, erased_byte):
         record.update(detected)
         record["start_magic_valid"] = True
         if detected["metadata_bytes"]:
-            record["metadata_hex"] = bytes(first_sector[METADATA_OFFSET:IMAGE_OFFSET]).hex()
+            metadata = bytes(first_sector[METADATA_OFFSET:IMAGE_OFFSET])
+            record["metadata_hex"] = metadata.hex()
             record["metadata_schema"] = None
+            if metadata[:4] == b"CKN1":
+                if struct.unpack_from("<I", metadata, 4)[0] != 1:
+                    record["metadata_warning"] = "Unsupported controls metadata schema; left opaque."
+                else:
+                    try:
+                        record["controls"] = decode_controls_record(metadata)
+                        record["metadata_schema"] = "CKN1/v1"
+                    except FormatError as exc:
+                        record["metadata_warning"] = str(exc)
     else:
         record.update(format=None, warning="Unknown or damaged leading magic; occupied, not free.")
     return record

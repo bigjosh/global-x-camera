@@ -20,6 +20,12 @@ APPROVED={
  # is not a hardware result.
  '0f87fbbe521230349db3d19b9449db38f2bff8000a4683461db080ad5525acc9':
   dict(bytes=7160,sector='06196d10e8ddeb50948ef3666729dbe390d575b58a0c1d2ee7f5796758ece6ad'),
+
+ # November13 controls: independent exact prefix/layout/source audit; original
+ # UART block/literals and early D8 hook preserved. User requested load only;
+ # this admission is not a claim of live capture or post-load recovery testing.
+ 'b866589cf472cac9820d961f3243cb8280759614826083757fae374ccee7e242':
+  dict(bytes=7160,sector='6ddf4499865264aec845150597aa6b8d44cb89e7d5e621dd324a0e1a9170b499'),
  # November13 D8/PD12 substitution: compiled hook/masks, disabled conflicting
  # phase output, exact UART bytes and package layout reviewed for reload.
  # No new functional testing requested or implied by this exact admission.

@@ -14,5 +14,11 @@
 #define HAL_DMA_MODULE_ENABLED
 #include "stm32n6xx_hal_dma.h"
 #include "stm32n6xx_hal_adc.h"
+#ifdef ADC_MODEL_STRICT
+/* HAL's direct ISR assignment means write-one-to-clear on hardware, not RAM.
+ * Override that access macro only; compile the actual ST driver unchanged. */
+#undef __HAL_ADC_CLEAR_FLAG
+#define __HAL_ADC_CLEAR_FLAG(HANDLE, FLAG) sim_write(&(HANDLE)->Instance->ISR, (FLAG))
+#endif
 #define assert_param(expr) ((void)0U)
 #endif

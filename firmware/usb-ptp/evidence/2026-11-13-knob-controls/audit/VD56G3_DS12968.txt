@@ -1,0 +1,1427 @@
+
+=== PDF PAGE 1 ===
+Features
+• Resolution: 1.53 MP (1124 x 1364)
+• Chroma: Monochrome
+• Optical format: 1/4’’ (4.61 mm)
+• State-of-the-art pixel technology:
+– Pixel pitch: 2.61 µm
+– Shutter type: Global shutter
+– Technologies: GS (global shutter), BSI (backside illumination), CDTI 
+(continuous digital time integration), and 3D stacking (three-dimensional 
+stacking).
+• Embedded features:
+– Image quality optimization: Autoexposure, defective pixel correction, 
+binning, and more.
+– Data and frame rate optimization: Cropping, subsampling, and more.
+– Others: Context management, temperature sensor, and more.
+• Interfaces:
+– Output: MIPI CSI-2 (1 or 2 lanes) with RAW8 and RAW10 output formats
+– Control: I²C
+• Comprehensive evaluation hardware:
+– VD56G3 promodules (CAM-56G3)
+– VD56G3 S-Board (STEVAL-56G3MAI)
+– EVK Main (STEVAL-EVK-U0I)
+• Compatible software tools:
+– PC Evaluation software: STSW-IMG501
+– PC Software Development Kit (SDK): STSW-IMG507_56G3
+– Embedded platform drivers: STSW-IMG502
+Description
+The VD56G3 and VB56G3 are 1.5-megapixel monochrome CMOS image sensors 
+that deliver exceptional imaging performance in a compact form factor. Built on 
+STMicroelectronics' proprietary technologies, including BSI and full CDTI, they 
+achieve superior QE (quantum efficiency), MTF (modulation transfer function), and 
+angular response for sharp, crystal-clear image capture, even in challenging 
+conditions. With outstanding performance in both visible and near infrared light (850 
+nm, 940 nm), these sensors are ideal for precision-driven and versatile applications.
+Their ultracompact footprint minimizes system size, featuring a small optical format of 
+4.6 mm (1/4'') at full resolution, enabling the design of compact and ergonomic vision 
+systems. With low-power consumption, they are ideal for battery-powered devices, 
+while their robust design ensures reliable and consistent image quality across a wide 
+range of temperatures.
+Smart in-sensor features such as autoexposure, cropping, binning, and 
+programmable sequences simplify development and optimize data throughput. Their 
+MIPI CSI-2 interface (1 or 2 lanes) and I²C control ensures seamless connection to 
+embedded processing platforms.
+Order code Description
+VD56G3CCA/RW Bare die as 
+reconstructed wafer
+VB56G3CAGK/1 OBGA sensor in 
+tape and reel
+Compact and high-sensitivity 1.5 MP monochrome  global shutter image sensors
+VB56G3, VD56G3
+Datasheet
+DS12968 - Rev 12 - October 2025
+For further information, contact your local STMicroelectronics sales office.
+www.st.com
+
+=== PDF PAGE 2 ===
+The sensors offer unmatched flexibility. The VD56G3 is available as a sensor die for ultracompact camera 
+modules, while the VB56G3 comes in an OBGA package for direct PCB integration. They are also part of a 
+sensor family that includes color (RGB) versions VD66GY and VB66GY, and RGB-NIR versions VD16GZ and 
+VB16GZ for even greater flexibility.
+Supported by turnkey sensor boards, evaluation modules, and free drivers, the VD56G3 and VB56G3 accelerate 
+development and empower engineers to build innovative, high-performance imaging solutions with ease and 
+confidence.
+Application
+• Industrial, logistics, and smart retail
+• Security, surveillance, and smart building
+• Robotics and drones
+• Home appliances
+• AR/VR/XR
+• Biometrics and authentication
+• Medical
+VB56G3, VD56G3
+DS12968 - Rev 12 page 2/43
+
+=== PDF PAGE 3 ===
+1 Acronyms and abbreviations
+Table 1. Acronyms and abbreviations
+Acronym/abbreviation Definition
+ADC analog to digital converter
+AE autoexposure
+AGV automated guided vehicle
+AR augmented reality
+BSI backside illumination
+CCI camera control interface
+CP charge pump
+CRA chief ray angle
+CSI camera serial interface
+DTI deep trench isolation
+EMC electromagnetic compatibility
+EMI electromagnetic interference
+FoV field of view
+fps frames per second
+GPIO general-purpose input/output
+I2C inter-integrated circuit (bus)
+ISL intelligent status line
+ISP image signal processor
+LDO low dropout regulator
+LED light-emitting diode
+MCU microcontroller unit
+MIPI mobile industry processor interface
+MTF modulation transfer function
+NIR near infrared
+OIF output interface
+OTP one-time programmable
+PLL phase-locked loop
+PWM pulse-width modulation
+QE quantum efficiency
+RI relative illumination
+SW software
+UAV unmanned aerial vehicle
+UI user interface for host to sensor communication
+VR virtual reality
+VB56G3, VD56G3
+Acronyms and abbreviations
+DS12968 - Rev 12 page 3/43
+
+=== PDF PAGE 4 ===
+2 Product overview
+2.1 Functional description summary
+The VD56G3, VB56G3 are 1.5-megapixel global shutter image sensors featuring a matrix of 1124 x 1364 pixels. 
+With their global shutter operation, all pixels are synchronized to capture light at the same time. This removes the 
+motion blur that can affect rolling shutter image sensors, when capturing changing or moving scenes.
+Once the exposure is finished, each pixel information is transferred in a storage node, before being read and 
+digitized one pixel row after the other. The image data are digitized using internal 10-bit ADCs. Additional gains 
+can be applied before ADC stage (for example, analog gain) or after ADC stage (for example, digital gain). 
+Following the digital conversion, various image preprocessing and correction algorithms can be applied into the 
+sensors before data output, such as autoexposure or binning.
+The image data are output as frames of RAW8 or RAW10 data through a MIPI CSI-2 interface. The sensors can 
+be configured to operate with either 1 or 2 MIPI CSI-2 lanes to best fit with host processing requirements.
+The VD56G3, VB56G3 are synchronized to the rest of the system by means of an external clock, triggers, and 
+general-purpose input/output (GPIO) signals that can be used to enable synchronization of several sensor 
+readouts or to control strobe light sources during exposure time.
+The devices are fully configurable through the I²C serial interface and provides flexible frame-to-frame parameter 
+configuration changes via the use of programmable contexts. It also embeds a one-time programmable (OTP) 
+nonvolatile memory to be written by 32-bit words.
+Figure 1. Functional block diagram
+VB56G3, VD56G3
+Product overview
+DS12968 - Rev 12 page 4/43
+
+=== PDF PAGE 5 ===
+2.2 Technical specifications summary
+Table 2. Technical specifications
+Category Parameter Specifications
+Resolution
+Resolution 1.53 MP
+Pixel array [H x V] 1124 x 1364
+Aspect ratio 5:6
+Pixel
+Shutter type Global shutter
+Illumination type BSI
+Pixel size 2.61 µm
+Color Color option Monochrome
+Frame rates (maximum)
+Full resolution 88 fps
+1 MP resolution 121 fps
+VGA resolution 237 fps
+Optical characteristics
+Pixel array size [H x V] 2.93 mm x 3.56 mm
+Optical format 1/4’’ (4.61 mm)
+CRA 26° linear
+QE at 940 nm 22%
+Mechanical characteristics
+Die footprint [H x V] 3.65 mm x 4.34 mm
+Die centering (optical vs. mechanical) Yes
+Die pinout 115 pins
+Operating temperature range -30 to +85°C
+Electronic characteristics
+Sensor data interface MIPI CSI-2 | 1 or 2 lanes
+Sensor control interface I²C, up to 1 Mbits/s
+Output format RAW8, RAW10
+Supply voltages 2.8 V – 1.8 V – 1.15 V
+External clock frequency 6 to 27 MHz
+Power consumption 120 mW (typical) | 4 mW (standby)
+Embedded features
+Image quality optimization
+• Autoexposure
+• Automatic dark calibration
+• Defective pixel correction
+• Analog and digital gains
+• Binning
+Data and frame rate optimization
+• Cropping
+• Subsampling
+• Context management with up to 4 contexts
+Others
+• Mirror/Flip
+• Test pattern generation
+• Temperature sensor
+VB56G3, VD56G3
+Product overview
+DS12968 - Rev 12 page 5/43
+
+=== PDF PAGE 6 ===
+3 Functional description
+3.1 Interfaces
+3.1.1 Inter-integrated circuit (I²C)
+The VD56G3, VB56G3 are configured and controlled via an I²C interface operating in either fast mode (up to 400 
+kHz) or fast mode plus (up to 1 MHz) at 1.8 V. After the MCU boot sequence, the default I²C configuration is fast 
+mode plus with a sink capability set to 20 mA. Drive capability can be decreased to 4 mA (fast mode) by writing a 
+dedicated register once the system has booted. Device addressing uses a CCI protocol with 2 byte 
+subaddresses. The default address of the sensors is 0x20 (including R/W bit), and can be overridden:
+• Permanently by storing a non-null value in a dedicated OTP register.
+• Dynamically with a firmware command when the MCU state is SW_STANDBY.
+3.1.2 Camera serial interface (CSI)
+The sensors are ready to connect via a dual lane mobile industry processor interface (MIPI) CSI-2 serial interface.
+The dual lane MIPI CSI-2 serial interface supports up to 1.5 Gbps per lane. It is the industry standard for low 
+electromagnetic interference (EMI) and excellent electromagnetic compatibility (EMC) high-speed interfacing. The 
+CSI lane number can be lowered to a single lane. Resolution is scalable between RAW8 and RAW10.
+3.2 Power supplies
+The power supplies required by the sensors are:
+• 2.8 V for the analog blocks
+• 1.8 V for the digital I/Os
+• 1.15 V for the core digital logic and MIPI CSI-2 output drivers
+The pixel array requires different positive and negative voltages, all internally generated by charge pumps and 
+regulators. Four voltage references, internally generated, need external decoupling capacitors. The internal MCU 
+handles the entire power management of the sensors to guarantee the lowest power consumption at any given 
+time.
+3.3 Clock and PLL
+An input clock is required from an external digital clock source in the range of 6 to 27 MHz. Firmware is 
+preconfigured for a 12 MHz external source clock. Two built-in PLL (phase-locked loop) blocks generate all 
+necessary internal clocks for the pixel array, processing pipe, and output interface.
+VB56G3, VD56G3
+Functional description
+DS12968 - Rev 12 page 6/43
+
+=== PDF PAGE 7 ===
+3.4 Video pipe
+The video pipe performs several features designed to ensure a high quality image. These features include:
+• Analog subsampling
+• Pattern generation
+• Dynamic defective pixel correction
+• Dark calibration
+• Autoexposure
+• Digital binning
+• Embedded status lines
+• Output interface
+• Context management
+• Cropping
+The diagram below presents the features implementation in the video pipe
+Figure 2. Image signal processor schematic
+VB56G3, VD56G3
+Functional description
+DS12968 - Rev 12 page 7/43
+
+=== PDF PAGE 8 ===
+3.4.1 Pattern generation
+The pattern generation allows the generation of digital patterns in the output frame for test and debug. It is also 
+possible to insert a cross bar in the image with configurable position, size, and brightness. The available patterns 
+are:
+• Solid color
+• Color bars
+• Vertical gray scale
+• Horizontal gray scale
+• Diagonal gray scale
+• Pseudorandom data
+Figure 3. Available patterns
+3.4.2 Defective pixel correction
+Active pixels are automatically corrected by a dynamic algorithm embedded in the sensor’s ISP. This enables 
+defect-free images directly from the sensors without the need for additional algorithm development or processing 
+resources.
+The advanced correction algorithm can correct singlet and couplet of defects and take into account local spatial 
+gradients.
+The host can program the strength of the correction to find the perfect balance between systematic defect 
+correction and preserving existing textures/patterns in the image. The correction strength evolves automatically 
+with exposure time. This mechanism can be deactivated for debugging purposes and for specific use cases such 
+as structured light.
+3.4.3 Dark calibration
+The pixel matrix has dedicated lines with shielded pixels that dynamically retrieve the dark level and subtract it 
+from the active image. Temperature, exposure time, or gain changes are compensated. Temporal smoothing and 
+fractional bit dithering are applied to avoid a sudden one-code step. This block also embeds a programmable 
+digital gain control feature with a granularity of 1/256 followed by a configurable pedestal to offset the dark level 
+along the ISP pipe.
+VB56G3, VD56G3
+Functional description
+DS12968 - Rev 12 page 8/43
+
+=== PDF PAGE 9 ===
+3.4.4 Analog and digital gains
+The VD56G3, VB56G3 enable adjustment of the analog and digital gains on the image to optimize image quality 
+depending on the lighting conditions. Gains are adjusted automatically when autoexposure is enabled, or by 
+manual control when autoexposure is disabled.
+Analog gain ranges from x1 (+ 0 dB) up to x8 (+18 dB) with 29 steps following a 1/X behavior enabling to benefit 
+from fine gain granularity at low gain and wider granularity at high gains to better adjust image quality. It follows 
+the following formula:
+Analog gain x = 32
+32 − x
+Where x is an integer from 0 to 28.
+Figure 4. Analog gain progression versus control code
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+16
+AGAIN progression15
+0 5 10
+Axis Title
+15 20 25 30
+0
+1
+2
+3
+4
+5
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+0 4 8 12 16 20 24 28
+AGAIN value
+AGAIN control code
+decibel (dB)
+linear
+Four digital gains (one per color channel) can be applied, each of them ranging from 1.0 up to 8.0 minus one-step 
+control with a step control of 1/256th so approximately 0.0039.
+VB56G3, VD56G3
+Functional description
+DS12968 - Rev 12 page 9/43
+
+=== PDF PAGE 10 ===
+3.4.5 Autoexposure
+The autoexposure (AE) feature computes and automatically applies the ideal exposure time and gain factors to 
+get the optimum average luminance in the image. The autoexposure algorithm is performed directly in the 
+sensors, to benefit from automatic exposure without the need to develop any dedicated algorithm or to allocate 
+processor resources to the computation.
+The sensors can also operate in manual mode where exposure parameters are provided by the host.
+The host can configure autoexposure module parameters that control brightness target, convergence speed, and 
+stability. The region of interest (ROI) used for autoexposure can be set independently from the image capture 
+region.
+A specific antiflickering mode can be selected to mitigate artifacts introduced by ambient light frequency and 
+frame rate differences.
+A dedicated I2C status register provides the image average brightness information when the sensors are set to 
+autoexposure or manual exposure mode. This information is also available in the status lines (ISL) embedded at 
+the beginning of each frame. Refer to Section 3.4.8: Embedded status lines for ISL description.
+3.4.6 Analog subsampling
+The devices support x2 and x4 subsampling which reduces overall image size and keeps the same field of view 
+(FoV). Subsampling is applied vertically and horizontally during the ADC readout, where every two or every four 
+pixels are read. When subsampling is used, the frame rate can be increased by decreasing the frame length.
+3.4.7 Digital binning
+The digital binning process reduces the image resolution by a factor of 2 or 4 in each direction. Central and 
+neighboring pixels are weighted to produce the digital binned image, avoiding special phase shift and artifacts 
+which may occur on the output image. Digital binning and subsampling are mutually exclusive.
+3.4.8 Embedded status lines
+The output interface (OIF) embeds the intelligent status line generator, which allows metadata to be sent through 
+the MIPI image data interface. The ISL follows the SMIA CSI-2, simplified, 2-byte, tagged data format for RAW8 
+data packing. There are two ISL lines transmitted at the beginning of each frame. Each data packet is 256 bytes 
+long. The length of the ISL can be stretched to equal the active line packet size.
+The MCU has access to a bank of status registers, refreshed at each frame, and providing detailed information on 
+the current state of the sensors. Most of the content of this bank is also available in ISLs. The ISL contains all 
+information related to the current transmitted frame such as:
+• Clock settings
+• Cropping and orientation parameters
+• Analog and digital gains
+• Integration time
+• Frame counter index
+• Thermal sensor values
+• Dark calibration parameters
+Transmission of ISL data packets can be disabled by configuring a static register during SW_STANDBY state 
+before streaming. ISL data packets have their own programmable "data types" and "virtual channels".
+VB56G3, VD56G3
+Functional description
+DS12968 - Rev 12 page 10/43
+
+=== PDF PAGE 11 ===
+3.4.9 Output interface
+The output interface (OIF) embeds two data lanes of the MIPI D-PHY interface. It supports up to 1.5 Gbps of data 
+per lane. The OIF outputs active pixel data in RAW10 or RAW8.
+The OIF can output a combination of the following:
+• Intelligent status lines
+• Active pixel data
+The OIF supports multiple virtual channels and different data types for active pixels and ISL data.
+3.4.10 Context management
+The sensors allow the configuration of up to four different rolling contexts (or frame setups). Parameters that can 
+be specifically defined in a context are listed in the figure below.
+Figure 5. Context parameters
+VB56G3, VD56G3
+Functional description
+DS12968 - Rev 12 page 11/43
+
+=== PDF PAGE 12 ===
+Contexts can be chained one to another in an ending or non-ending sequence.
+Figure 6. Example of ending and non-ending multicontext sequence
+For the VD56G3CCA/RW, GPIO configurations are applied at the end of the current frame. If there is a context 
+change including a different GPIO configuration, the new GPIO settings are applied at the second frame of this 
+new context.
+3.4.11 Cropping
+The host can accurately choose which area of the whole pixel array it receives. This reduces traffic on the CSI 
+interface and saves processing time.
+3.4.12 Orientation
+The sensor's image can be horizontally (mirror) and/or vertically flipped, as illustrated in the following figure.
+Figure 7. Image orientation
+VB56G3, VD56G3
+Functional description
+DS12968 - Rev 12 page 12/43
+
+=== PDF PAGE 13 ===
+3.5 Synchronization modes
+The sensors have multiple synchronization modes:
+1. Leader mode
+– Image streaming starts right after the execution of a streaming initialization command sent over the I2C 
+bus
+– After the initialization sequence, wait for a rising edge event on GPIO0 to start streaming images (only 
+available for the VD56G3CCA/RW order code)
+2. Follower mode
+– Using GPIO pulses
+– Using I²C triggering commands
+3.6 General purpose input/outputs (GPIOs)
+The sensors provide eight GPIOs:
+• GPIO0 is used as a frame start synchronization signal or as a generic GPIO if not used for this function
+• GPIO[1-7] are used as PWM outputs, pulse (strobe) outputs, VSYNC, or as a generic GPIO, as per the 
+configuration
+Figure 8. GPIO modes
+All GPIO settings are fully configurable for the four context setups. Each output signal can be mapped to one or 
+several of the GPIOs. All GPIOs have configurable polarity.
+Figure 9. PWM and pulse overview
+For the VD56G3CCA/RW, in SW_STANDBY state, the GPIOs can be set either as outputs (driven low or high) or 
+as inputs.
+VB56G3, VD56G3
+Functional description
+DS12968 - Rev 12 page 13/43
+
+=== PDF PAGE 14 ===
+3.7 Sensor firmware
+The sensors present to the host a user interface (bank of registers), accessible via the I²C bus.
+The host writes high-level parameters in the user interface and an MCU inside the sensors applies the proper 
+sensor configuration based on UI settings provided by the host.
+The firmware managing this MCU is located in a ROM but may have to be updated before streaming (code 
+patching). This consists of a sequence of data transmission over the I²C bus.
+The VD56G3CCA/RW does not require such a sequence. It requires a sequence of nearly 26 Kbytes to load. The 
+patch sequence is provided by STMicroelectronics.
+3.8 Use case examples
+Table 3. Example of functional use cases 
+Resolution Maximum fps Typical data rate
+1124 x 1364 88 2 lanes, 800 Mbps per lane
+1124 x 1364 88 1 lane, 1500 Mbps
+720 x 1280 90 2 lanes, 800 Mbps per lane
+640 x 480 210 1 lane at 1500 Mbps
+320 x 240 360 1 lane at 1500 Mbps
+VB56G3, VD56G3
+Functional description
+DS12968 - Rev 12 page 14/43
+
+=== PDF PAGE 15 ===
+4 Die specification
+In the table below, the die dimensions are after sawing.
+Table 4. Die dimensions
+Description North, (+y) µm East, (+x) µm South, (-y) µm West, (-x) µm
+Chip center 0.0 0.0 0.0 0.0
+Optical center — -0.2 -17.80 —
+First active pixel 1767.44 1471.84 -1803.04 -1472.24
+First µlens — — — —
+Inner edge of pad 2025.9 1665.9 -2025.9 -1665.9
+Center of pad 2065.9 1705.9 -2065.9 -1705.9
+Edge of chip 2184 ±10 1824 ±10 -2184 ±10 -1824 ±10
+1/2 scribe width 50.0 50.0 50.0 50.0
+Figure 10. Die mechanical dimensions (µm)
+VB56G3, VD56G3
+Die specification
+DS12968 - Rev 12 page 15/43
+
+=== PDF PAGE 16 ===
+5 Package information
+To meet environmental requirements, ST offers these devices in different grades of ECOPACK packages, 
+depending on their level of environmental compliance. ECOPACK specifications, grade definitions, and product 
+status are available at: www.st.com. ECOPACK is an ST trademark.
+5.1 OBGA package information
+The bond line thickness (substrate to silicon interface) is 20 μm.
+The silicon die thickness is 200 μm.
+The focusing plan is designed to be on the top surface of the silicon with an height tolerance of ±30 μm.
+Focusing plan tilt is maximum 25 μm.
+Figure 11. Top view
+Array Zone 
+(visible pixel)
+Array & Pck center
+First Pixel
+Read Out
+VB56G3, VD56G3
+Package information
+DS12968 - Rev 12 page 16/43
+
+=== PDF PAGE 17 ===
+Figure 12. Side view
+0.45±0.05
+Figure 13. Bottom view
+VB56G3, VD56G3
+Package information
+DS12968 - Rev 12 page 17/43
+
+=== PDF PAGE 18 ===
+5.2 Glass reflectance and transmittance
+Table 5. Glass reflectance and transmittance
+Items Requirements
+Glass optical specification
+Band nm 0° (1) 30° (1) 5° (1)
+Transmittance (T) 900-1000 Tminimum > 97.5％ Tminimum > 97％
+Reflectivity (R) 900-1000 —
+Raverage < 1.5％
+Rmaximum < 2％
+ 
+1. Incidence angle
+ 
+5.3 Soldering information
+The OBGA packages are compliant with the RoHS and “green” standards and are qualified for soldering heat 
+resistance according to JEDEC J-STD-020.
+Figure 14. Soldering temperature vs time
+Table 6. Soldering details
+Profil Ramp to strike
+Temperature gradient in preheat (T = 70-180°C) 0.9 ± 0.1°C/s
+Temperature gradient (T = 200-225°C) 1.1 - 3.0°C/s
+Peak temperature in reflow 237°C - 245°C
+Time above 220°C 50 ± 10 s
+Temperature gradient in cooling -1 to -4°C/s (-6°C /s max.)
+Temperature from 50°C to 220°C 160 to 220 s
+VB56G3, VD56G3
+Package information
+DS12968 - Rev 12 page 18/43
+
+=== PDF PAGE 19 ===
+6 Pin description and assignment
+Table 7. Pin description
+Pin name Type Description Reset 
+state Reference supply
+Power supply
+VCORE
+PWR
+1.15 V power supply for the digital core 1.15 V
+VDDIO 1.8 V power supply for I/Os 1.8 V
+VANA 2.8 V analog power supply 2.8 V
+DGND Digital ground VDDIO
+AGND Analog ground VANA
+Reference
+LDO2V4
+REF
+Internal reference (must be connected together)
+VANA
+VCPNEG_IN Must be connected to VCPNEG_OUT
+VCPNEG_OUT Must be connected to VCPNEG_IN
+VCPPOS_IN Must be connected to VCPPOS_OUT
+VCPPOS_OUT Must be connected to VCPPOS_IN
+VDDAMP All VDDAMP (internal reference) must be connected 
+together VDDIO
+CSI-2 interface
+DATA1P, DATA1N
+MIPI DPHY
+CSI-2 data lane 1, positive and negative
+Low VCOREDATA2P, DATA2N CSI-2 data lane 2, positive and negative
+CLKP, CLKN CSI-2 clock, positive and negative
+Host interface
+XSHUTDOWN I Reset active low
+VDDIO
+SDA I/O I2C data
+SCL I I2C clock
+GPIO0
+I/O General-purpose I/O and strobe light control Low
+GPIO1
+GPIO2
+GPIO3
+GPIO4
+GPIO5
+GPIO6
+GPIO7
+CLKIN I Input clock
+Other pins
+PORTEST I Must be connected to digital ground VDDIO
+NC Not connected
+RCALIB Not connected
+VB56G3, VD56G3
+Pin description and assignment
+DS12968 - Rev 12 page 19/43
+
+=== PDF PAGE 20 ===
+Table 8. Pin coordinates
+The pin coordinates (0, 0) are the die center
+Pin number Bonding point X coordinate Bonding point Y coordinate Net name
+1 -1611.62 2065.9 VCPPOS_OUT
+2 -1461.56 2065.9 VANA
+3 -1357.52 2065.9 AGND
+4 -1253.97 2065.9 DGND
+5 -1150.42 2065.9 VCORE
+6 -1046.87 2065.9 AGND
+7 -943.32 2065.9 DGND
+8 -839.77 2065.9 VCORE
+9 -736.22 2065.9 VANA
+10 -632.67 2065.9 VANA
+11 -529.12 2065.9 AGND
+12 -425.57 2065.9 VCORE
+13 -322.02 2065.9 NC
+14 -218.47 2065.9 VANA
+15 -114.92 2065.9 NC
+16 -11.37 2065.9 AGND
+17 92.18 2065.9 VANA
+18 195.73 2065.9 DGND
+19 299.28 2065.9 VCORE
+20 402.83 2065.9 DGND
+21 506.38 2065.9 VANA
+22 609.93 2065.9 AGND
+23 713.48 2065.9 VANA
+24 817.03 2065.9 AGND
+25 920.62 2065.9 DGND
+26 1024.17 2065.9 DGND
+27 1127.77 2065.9 SDA
+28 1231.32 2065.9 SCL
+29 1334.87 2065.9 VCORE
+30 1438.42 2065.9 XSHUTDOWN
+31 1600.34 2065.9 VDDIO
+32 1705.9 1969.53 NC
+33 1705.9 1798.29 GPIO0
+34 1705.9 1694.72 PORTST
+35 1705.9 1591.15 DGND
+36 1705.9 1487.58 GPIO1
+37 1705.9 1316.29 GPIO2
+38 1705.9 1212.71 DGND
+39 1705.9 1109.14 VCORE
+40 1705.9 1005.58 DGND
+VB56G3, VD56G3
+Pin description and assignment
+DS12968 - Rev 12 page 20/43
+
+=== PDF PAGE 21 ===
+Pin number Bonding point X coordinate Bonding point Y coordinate Net name
+41 1705.9 902 VCORE
+42 1705.9 798.44 DGND
+43 1705.9 694.87 LDO2V4
+44 1705.9 591.29 VCORE
+45 1705.9 487.73 DGND
+46 1705.9 384.16 VDDIO
+47 1705.9 280.58 GPIO3
+48 1705.9 177.02 VCORE
+49 1705.9 73.44 DGND
+50 1705.9 -30.13 GPIO4
+51 1705.9 -133.69 NC
+52 1705.9 -237.26 VCORE
+53 1705.9 -340.83 DGND
+54 1705.9 -444.41 DGND
+55 1705.9 -547.98 DGND
+56 1705.9 -651.54 VCORE
+57 1705.9 -755.12 AGND
+58 1705.9 -858.69 GPIO5
+59 1705.9 -962.25 GPIO6
+60 1705.9 -1065.83 GPIO7
+61 1705.9 -1169.39 VDDIO
+62 1705.9 -1272.96 VANA
+63 1705.9 -1376.54 LDO2V4
+64 1705.9 -1480.11 DGND
+65 1705.9 -1583.67 VCORE
+66 1705.9 -1687.25 DGND
+67 1705.9 -1790.82 CLKIN
+68 1705.9 -1959.03 VDDIO
+69 1611.63 -2065.9 DGND
+70 1461.52 -2065.9 DGND
+71 1357.95 -2065.9 VDDAMP
+72 1254.38 -2065.9 VCORE
+73 1150.81 -2065.9 DGND
+74 1047.24 -2065.9 DGND
+75 943.67 -2065.9 DATA2N
+76 840.1 -2065.9 DATA2P
+77 736.53 -2065.9 VDDAMP
+78 632.96 -2065.9 CLKN
+79 529.39 -2065.9 DGND
+80 425.82 -2065.9 CLKP
+81 322.25 -2065.9 VCORE
+VB56G3, VD56G3
+Pin description and assignment
+DS12968 - Rev 12 page 21/43
+
+=== PDF PAGE 22 ===
+Pin number Bonding point X coordinate Bonding point Y coordinate Net name
+82 218.68 -2065.9 VDDAMP
+83 115.11 -2065.9 DATA1N
+84 11.54 -2065.9 DATA1P
+85 -92.03 -2065.9 DGND
+86 -195.6 -2065.9 LDO2V4
+87 -299.17 -2065.9 VDDAMP
+88 -402.74 -2065.9 RCALIB
+89 -506.31 -2065.9 DGND
+90 -609.88 -2065.9 VCORE
+91 -713.45 -2065.9 AGND
+92 -817.02 -2065.9 AGND
+93 -920.59 -2065.9 NC
+94 -1081.63 -2065.9 NC
+95 -1185.2 -2065.9 DGND
+96 -1288.77 -2065.9 AGND
+97 -1451.06 -2065.9 VCORE
+98 -1601.12 -2065.9 VANA
+99 -1705.9 -1969.53 AGND
+100 -1705.9 -1808.5 VCPNEG_IN
+101 -1705.9 -321.68 VCPNEG_OUT
+102 -1705.9 -218.11 AGND
+103 -1705.9 -114.54 DGND
+104 -1705.9 -10.97 VANA
+105 -1705.9 92.6 VANA
+106 -1705.9 196.17 NC
+107 -1705.9 299.74 NC
+108 -1705.9 403.31 NC
+109 -1705.9 506.88 VCORE
+110 -1705.9 610.45 AGND
+111 -1705.9 1498.25 VCPPOS_IN
+112 -1705.9 1601.82 VCORE
+113 -1705.9 1705.38 VANA
+114 -1705.9 1808.95 AGND
+115 -1705.9 1959.04 VANA
+VB56G3, VD56G3
+Pin description and assignment
+DS12968 - Rev 12 page 22/43
+
+=== PDF PAGE 23 ===
+Figure 15. Ball positions (see-through view)
+DGNDXSHUTDOWNVCORESCLSDADGND
+GPIO1GPIO0VCOREVCOREDGNDVCPPOS_OUT
+GPIO2GPIO3PORTESTNCAGNDVCPPOS_IN
+VDDIOVDDIODGNDNCAGNDAGND
+GPIO4GPIO5GPIO6VANAVANAVANA
+CLKINGPIO7LDO2V4NCDGNDVCPNEG_OUT
+VDDAMPNCDGNDDATA1NDATA1PVCPNEG_IN
+DGNDDATA2NDATA2PCLKPCLKNDGND
+VB56G3, VD56G3
+Pin description and assignment
+DS12968 - Rev 12 page 23/43
+
+=== PDF PAGE 24 ===
+7 Application schematic
+7.1 Additional components
+Dedicated additional capacitors are required to complete the circuit. These are listed in Table 9. Capacitor needs 
+below. The capacitors should be selected to maintain their capacitance value within the indicated tolerance over 
+the full range of maximum voltages, operating temperatures, and aging.
+Capacitor values are based on capacitor positions (embedded in the camera module or external to the camera 
+module).
+External capacitors are required to properly filter out supply noise. Optimal reference in terms of value and size is 
+subject to application board architecture and topology. The external capacitor values provided in the table below 
+may be increased to compensate real supply noise.
+Table 9. Capacitor needs
+Associated 
+pin name
+Capacitor 
+position
+Typical 
+voltage
+Minimum 
+capacitance
+Typical 
+capacitance
+Maximum 
+capacitance
+Operating 
+frequencies
+Capacitor 
+ground Purpose
+CPPOS_IN, 
+CPPOS_OUT Embedded 3.55 V 330 nF 470 nF 560 nF 160 MHz AGND CP tank 
+capacitor
+CPNEG_IN, 
+CPNEG_OUT Embedded -2.0 V 650 nF 0.88 µF 1.04 μF 160 MHz AGND CP tank 
+capacitor
+VDDIO
+Embedded
+1.8 V 1 MHz DGND Supply 
+decouplingExternal 1 μF
+VCORE
+Embedded
+1.15 V
+470 nF 800 MHz
+1 GHz - 
+1.5 GHz
+160 MHz - 
+200 MHz
+DGND Supply 
+decoupling
+External 10 μF DGND Supply 
+decoupling
+VANA
+Embedded
+2.8 V
+100 nF
+160 MHz AGND Supply 
+decouplingExternal 10 μF
+LDO2V4 Embedded 2.4 V 100 nF 1 µF DC AGND LDO 
+capacitor
+VDDAMP Embedded 1.15 V 100 nF 1 µF 1.5 GHz DGND Supply 
+decoupling
+VB56G3, VD56G3
+Application schematic
+DS12968 - Rev 12 page 24/43
+
+=== PDF PAGE 25 ===
+Figure 16. Application schematic for bare die
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+697071727374757677787980818283848586878889909192939495969798
+99
+100
+115
+114
+111
+112
+113
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+V ANA_2V8
+AGND
+AGND
+DGND
+DGND
+DGND
+DGND
+V CO RE_1V1
+AGND
+V ANA_2V8
+V ANA_2V8
+V ANA_2V8
+VDDIO_1V8
+VDDIO_1V8
+VDDIO_1V8
+AGND
+V CO RE_1V1
+V CO RE_1V1
+V CO RE_1V1
+DGNDPOR TST
+V ANA_2V8
+CPN EG
+DGND
+DA TA2N
+DA TA2P
+CLKN
+CLKP
+DA TA1N
+DA TA1P
+CSI2
+CSI2
+G PIO0
+GPIO1
+GPIO2
+GPIO3
+GPIO4
+GPIO5
+GPIO6
+GPIO7
+X SHU TDOWN
+CLKIN
+SDA
+SCL
+Ho st I nt erf ace
+Ho st I nt erf ace
+CLKIN
+G PIO7
+GPIO6
+GPIO5
+GPIO4
+GPIO3
+GPIO2
+GPIO1
+GPIO0
+SDA
+SCL
+X SHU TDOWN
+VDDIO _1V8
+C_LDO 2V4
+AGND
+V CO RE_1V1
+V ANA_2V8
+AGND
+C_CPN EG
+LDO 2V4
+VDDIO _1V8
+DGND
+C_VDDIO
+DGND
+C_V CO RE
+V CO RE_1V1V ANA_2V8
+AGND
+C_V ANA
+Pow er supply deco upli ng
+C_CPPOS
+AGND
+CPPOS
+VDDA MP
+DGND
+C_VDDA MP
+Figure 17. Application schematic for OBGA
+VB56G3, VD56G3
+Application schematic
+DS12968 - Rev 12 page 25/43
+
+=== PDF PAGE 26 ===
+7.2 Layout guidelines
+For good PCB design practice, observe the following image sensor layout:
+• Use power and ground planes to supply power to the sensors.
+• Join grounds i.e. join AGND and DGND into one single, solid GND plane underneath the sensors.
+• Connect this GND plane to the sensor's pins with one via per GND pin.
+• To minimize risk of emissions, shield all vias and tracks attached to supplies by their respective GND nets.
+• Maximize copper fill on the power planes near the sensors and use vias to improve heat transfer from the 
+sensors. Consider including additional heatsinks close to the sensors if they are to be used at high 
+temperatures.
+• Route the high-speed signal pairs of the MIPI CSI-2 interface with balanced and controlled impedance 
+differential traces (50 Ω single-ended impedance, 100 Ω differential impedance). This is a requirement for 
+high-speed signaling. Route each pair together and match them in length to target a maximum 10 ps skew.
+VCPNEG_IN and VCPNEG_OUT must be connected together with a short track. The required decoupling 
+capacitor shall be placed on this path and not on an isolated track.
+VCPPOS_IN and VCPPOS_OUT must be connected together with a short track. The required decoupling 
+capacitor shall be placed on this path and not on an isolated track.
+7.3 Device power up sequence
+To power on the devices:
+• Provide all the external supplies (VCORE, VDDIO, VANA) according to the device characteristics described 
+in Section 9: Electrical characteristics. As long as XSHUTDOWN is low, the devices are in HW_STANDBY 
+state.
+• You can switch on the external supplies and CLKIN in any order.
+• Set XSHUTDOWN to high.
+Figure 18. Power up sequence
+The devices have power-on-reset (POR) detection cells with hysteresis on VCORE and VDDIO power supplies. 
+POR is released after a typical delay of 20 μs on the rising edge.
+Bursts with a duration of less than 2 μs (typical) are ignored.
+Table 10. POR typical threshold
+Supply POR typical threshold rising edge (V) POR typical threshold falling edge (V)
+VCORE 0.65 0.55
+VDDIO 1.1 0.95
+VB56G3, VD56G3
+Application schematic
+DS12968 - Rev 12 page 26/43
+
+=== PDF PAGE 27 ===
+7.4 Device power down sequence
+The power down sequence must be done as follows:
+1. If the sensors are in STREAMING state, then set them to SW_STANDBY state and wait for the command to 
+complete.
+2. Set XSHUTDOWN to low.
+3. External supplies can be switched off in any order, as well as CLKIN.
+VB56G3, VD56G3
+Application schematic
+DS12968 - Rev 12 page 27/43
+
+=== PDF PAGE 28 ===
+8 Pixel performance
+The information listed in this section is for typical parts at ambient temperature (Tj = 40°C).
+8.1 Quantum efficiency
+Quantum efficiency (QE) is the percentage of incident photons converted into electrons, representing the 
+sensitivity of the pixels.
+Figure 19. VD56G3, VB56G3 quantum efficiency, gain 1
+VB56G3, VD56G3
+Pixel performance
+DS12968 - Rev 12 page 28/43
+
+=== PDF PAGE 29 ===
+8.2 MTF
+The modulation transfer function (MTF) measures the ability of the devices to differentiate spatial frequencies. 
+The MTF value represents the contrast restitution for the corresponding spatial frequency. In other words, it 
+describes the contrast attenuation. It is a sharpness indicator that quantifies the extent to which image sensors 
+can capture and discriminate fine detailed contrast of objects within the field of view.
+The figure below presents the on-axis MTF, measured in a 100x28 pixel ROI using the slanted-edge method. 
+Note that in the following figure, Ny is the spatial Nyquist frequency.
+Figure 20. On-axis vertical and horizontal pixel MTF @ 940 nm
+8.3 Microlenses and CRA matching
+Each pixel of the matrix has its own microlens covering it.
+The purpose of the microlens is to concentrate and optimize photon capture by passing through the module lens 
+down to the photo diode to increase sensor light sensitivity and to maximize the amount of light received by each 
+pixel.
+The light beam has an incidence angle change when passing through the module lens, increasing from center to 
+periphery. This is the chief ray angle (CRA).
+To compensate for the change of CRA over the matrix, the microlens position over the pixels progressively shifts 
+from matrix center to matrix borders.
+The design of the sensor's microlens shift is optimized for matching a lens with CRA of 26° at corners and follows 
+a linear shift shape.
+It is recommended to match the CRA of the lens with the CRA of the image sensors to maximize image quality. 
+Featuring advanced BSI pixel technology, the VD56G3, VB56G3 provide high relative illumination (RI) uniformity 
+up to the image corners, which enables users to select lenses with different CRA with limited impact.
+The following figure presents the CRA tolerance range in lens selection for maintaining a RI uniformity over 90% 
+across the image.
+VB56G3, VD56G3
+Pixel performance
+DS12968 - Rev 12 page 29/43
+
+=== PDF PAGE 30 ===
+Figure 21. Guideline for lens CRA matching
+Figure 22. Co-centric pixel microlens CRA shift
+VB56G3, VD56G3
+Pixel performance
+DS12968 - Rev 12 page 30/43
+
+=== PDF PAGE 31 ===
+9 Electrical characteristics
+The electrical characteristics have been measured under the following typical conditions:
+• Full resolution (1124 x 1364)
+• 60 fps
+• Nominal power supply levels
+• External clock at 12 MHz
+• Junction temperature at 60°C
+• Nominal voltage
+9.1 Absolute maximum ratings
+Caution: Stresses above those listed under "Absolute maximum ratings" may cause permanent damage to the devices. 
+This is a stress rating only and functional operation of the devices at these or any other conditions above those 
+indicated in the operational sections of the specification is not implied. Exposure to absolute maximum rating 
+conditions for extended periods may affect device reliability.
+Table 11. Absolute maximum ratings
+Symbol Parameter Max Unit
+VDDIO Digital I/O power supply 2.5 V
+VANA Analog power supply 3.5 V
+VCORE Digital core power supply 1.4 V
+VIO I/O referenced to VDDIO 2.5 V
+VESD, electrostatic discharge 
+model
+Human body model (HBM) ±2 kV
+Charge device model (CDM) ±500 V
+9.2 Operating conditions
+Table 12. Operating conditions
+Symbol Parameter Min. Typ. Max. Unit
+VDDIO Digital I/O power 
+supply 1.7 1.8 1.9
+V
+VANA Analog power 
+supply 2.65 2.8 2.95
+VCORE Digital core power 
+supply 1.08 1.15 1.26
+VIO I/O referenced to 
+VDDIO -0.3 — VDDIO + 0.3
+Temperature
+T JF
+Junction 
+temperature 
+(functional 
+operation)
+-30 — 85 °C
+VB56G3, VD56G3
+Electrical characteristics
+DS12968 - Rev 12 page 31/43
+
+=== PDF PAGE 32 ===
+9.3 Power consumption
+Table 13. Typical power consumption
+Values below are measured for the conditions listed in Section 9: Electrical characteristics, but they also include process 
+variability.
+State
+VDDIO (nominal) VCORE (nominal) VANA (nominal)
+Unit
+Total power
+Min. Typ. Max. Min. Typ. Max. Min. Typ. Max. Typ. Max. Unit
+Reset 0.0075 0.013 0.017 0.2 2.1 6.5 0.028 0.038 0.05
+mA
+2.5 —
+mW
+SW_STANDBY 0.0075 0.013 0.017 1 3.3 7.5 0.028 0.043 0.05 4 —
+Streaming image 60 fps 7.5 8.5 11.0 50 57 65 18 22.8 25 145 —
+Leader mode 30 fps — 6.8 — — 49.5 — — 17.4 — 120 —
+Follower mode 0 fps — 5.5 — — 43 — — 13.5 — 97 —
+Table 14. Maximum supply consumption
+Values below are measured for the worst conditions of process, voltage, and temperature.
+State VDDIO (mA) VCORE (mA) VANA (mA)
+SW_STANDBY 0.02 23 0.1
+Streaming image 60 fps 11 86 25
+9.3.1 Current profile
+Figure 23. Start streaming and the first frame of typical current profile (mA) over time (ms)
+Note: Figure 23. Start streaming and the first frame of typical current profile (mA) over time (ms) is captured at 
+maximum temperature and voltage.
+VB56G3, VD56G3
+Electrical characteristics
+DS12968 - Rev 12 page 32/43
+
+=== PDF PAGE 33 ===
+Figure 24. Detail of VANA first transient pulse energy
+9.4 CLKIN input
+Table 15. Typical CLKIN input
+The CLKIN input is for all voltage and temperature conditions.
+Symbol Parameter Min. Max. Unit
+VCLKINL DC-coupled square wave low-level input -0.3 0.3 x VDDIO
+V
+VCLKINH DC-coupled square wave high-level input 0.7 x VDDIO VDDIO + 0.3
+fCLKIN Clock input frequency 6 27 MHz
+CtoCjitter Clock maximum cycle-to-cycle jitter — 200 ps
+Duty cycle Clock duty cycle 40 60 %
+ICLKIN Input leakage current — 10 µA
+9.5 Digital inputs
+Table 16. Digital inputs over process variations at 60°C
+Symbol Parameter Min. Max. Unit
+VIL Low-level input voltage -0.3 0.3 x VDDIO
+V
+VIH High-level input voltage 0.7 x VDDIO VDDIO + 0.3
+ILeak Input leakage current (1) — 10 μA
+ 
+1. For 0 ≤ VI ≤ VDDIO
+ 
+VB56G3, VD56G3
+Electrical characteristics
+DS12968 - Rev 12 page 33/43
+
+=== PDF PAGE 34 ===
+9.6 Digital outputs
+Table 17. Digital outputs
+The digital outputs are over process variations at 60°C.
+Symbol Parameter Conditions Min. Max. Unit
+VOL Low-level output voltage IOL = -4 mA — 0.4
+V
+VOH High-level output voltage IOH = 4 mA VDDIO - 0.4V —
+Imax Maximum current — — 4 mA
+9.7 I²C interface - SDA, SCL
+Table 18. I²C timing
+The values below are for all process, voltage, and temperature conditions.
+Parameter Symbol
+Fast mode Fast mode plus
+Unit
+Min. Max. Min. Max.
+SCL clock frequency tSCL 0 400 0 1000 kHz
+Hold time (repeated) START condition. After this period, 
+the first clock pulse is generated tHD.STA 0.6 — 0.26 —
+µs
+LOW period of the SCL clock tLOW 1.3 — 0.5 —
+HIGH period of the SCL clock tHIGH 0.6 — 0.26 —
+Setup time for a repeated START condition tSU.STA 0.6 — 0.26 —
+Data hold time tHD.DAT 0 — 0 —
+Data set-up time tSU.DAT 100 — 50 —
+nsRise time of both SDA and SCL tR 20 300 — 120
+Fall time of both SDA and SCL tF 20 x (VDD/5.5 V) 300 15 x (VDD/5.5 V) 120
+Set-up time for STOP condition tSU.STO 0.6 — 0.26 —
+µs
+Bus free time between a STOP and START condition tBUF 1.3 — 0.5 —
+Capacity load for each bus line CO — 400 — 550 pF
+Data valid time tVD.DAT — 0.9 — 0.45
+µs
+Data valid acknowledge time tVD.ACK — 0.9 — 0.45
+Noise margin at LOW level for each connected device 
+(including hysteresis) VnL
+0.054 x VDD
+—
+0.054 x VDD
+—
+V
+Noise margin at HIGH level for each connected device 
+(including hysteresis) VnH — —
+VB56G3, VD56G3
+Electrical characteristics
+DS12968 - Rev 12 page 34/43
+
+=== PDF PAGE 35 ===
+Figure 25. I²C timing
+9.8 CSI-2 interface
+9.8.1 DC specification
+The DC specifications are evaluated by characterization for all process, voltage, and temperature conditions. 
+They are not tested in production.
+Table 19. CSI-2 interface - high-speed mode - DC specifications
+Symbol Parameter Min Typical Max Unit
+VCMTX HS transmits static common-mode voltage 150 200 250
+mVVOD HS transmits differential voltage (1) 140 200 270
+VOHHS HS outputs high voltage (1) — — 360
+ZOS (2) Single-ended output impedance 40 50 62.5 Ω
+ 
+1. Value when driving into load impedance anywhere in the ZID range (80-125 Ω)
+2. Characterization data only
+ 
+Table 20. CSI-2 interface - low-power mode - DC specifications
+Symbol Parameter Min Typical Max Unit
+VOH Output high-level 1.1 1.2 1.3 V
+VOL Output low-level -50 — 50 mV
+ZOLP
+Output impedance 
+of LP transmitter 110 — — Ω
+VB56G3, VD56G3
+Electrical characteristics
+DS12968 - Rev 12 page 35/43
+
+=== PDF PAGE 36 ===
+9.8.2 AC specification
+Table 21. CSI-2 interface - high-speed mode - AC specifications
+Symbol Parameter Min. Typ. Max. Unit
+— Data rate 250 804 1500 Mbit/s
+tclkp Average data period — 1.25 — ns
+tr and tf tf 20% - 80% rise time and fall time 100 — 0.3UI
+ps
+tskew Data-to-clock skew -0.15UI — 0.15UI
+VB56G3, VD56G3
+Electrical characteristics
+DS12968 - Rev 12 page 36/43
+
+=== PDF PAGE 37 ===
+10 Packing information
+10.1 Package delivery mode
+Tested dice are delivered as sawn dice which are reconstructed into a wafer format on UV-tape, and delivered on 
+a metallic ring (see figure below). The frames are packed in plastic containers, each including a maximum of 13 
+double-spaced reconstructed wafer rings. A mapping information file is also provided for localizing dice that may 
+have been damaged during wafer reconstruction on sticking foil.
+Figure 26. Reconstructed wafer information
+VB56G3, VD56G3
+Packing information
+DS12968 - Rev 12 page 37/43
+
+=== PDF PAGE 38 ===
+10.2 Product marking
+Figure 27. Product marking example
+Product code: VB56G3
+Additional information: G
+Other marking information:
+• HQ: Assembly plant code
+• LLL: Assembly lot
+• SS: Split characters
+• Y: Assembly year (last digit of current year)
+• WW: Assembly week (2 digits week number of this build)
+• UUUU: Serial number (4 digit serial number of units in this build)
+VB56G3, VD56G3
+Packing information
+DS12968 - Rev 12 page 38/43
+
+=== PDF PAGE 39 ===
+10.3 Tape and reel information
+Figure 28. Reel description
+1.50-+0.10.0
+24.00-+0.30.1
+0.01.50+ 0.1 
+ Bo 
+ 3.6 
+ R 0.50 TYP. 
+ 1.75±0.10 
+ 12.00 
+ 2.00±0.10  
+ 4.00  B
+11.50±0.10
+B
+AA
+ Ko 
+ 0.30±0.05 
+ R 0.20 MAX 
+SECTION B-B
+ 10.8 
+ Ao 
+SECTION A-A
+ R 0.50  0.25 
+ 0.25 
+DETAIL DSCALE 4 : 1 DIM ±
+Ao 6.75 0.10
+Bo 7.45 0.10
+Ko 2.35 0.10
+10.4 Storage information
+Store all packing material in an appropriate indoor area. This is to prevent any dust and/or damage from the sun, 
+external light, and physical shocks.
+Keep the temperature between 15ºC and 35ºC.
+Keep the relative humidity range between 10% and 70% maximum.
+Store the reconstructed wafers under vacuum, in their original supplied sealed packing until they are used.
+After the packing seal is broken, store the reconstructed wafers under nitrogen (N2) within dedicated closed 
+shelves until they are processed.
+Use the trace code to count the storage time. It is written on the package label.
+The maximum storage time of the reconstructed wafer is:
+• Six months from the trace code date. This is when the wafer is kept in the original sealed packing.
+• One week from the trace code date. This is when the original packing seal is open.
+The maximum storage time defines the maximum time that can be waited for reconstructed wafer processing. 
+Processing may be for picking and placing, and module integration. If the maximm storage time is not respected, 
+safe processing is not guaranteed.
+Note: For further information on reconstructed wafer specifications for visual inspection and packing, refer to the 
+technical note TN1497.
+VB56G3, VD56G3
+Packing information
+DS12968 - Rev 12 page 39/43
+
+=== PDF PAGE 40 ===
+Revision history
+Table 22. Document revision history
+Date Version Changes
+18-Apr-2024 11 First public release
+28-Oct-2025 12
+Added the VB56G3 product.
+Updated the document title.
+Updated the cover image.
+Updated the Device summary table.
+Updated the Features.
+Updated the Description.
+Updated the Applications.
+Table 2. Technical specifications: added QE parameter details.
+Added Section 5.1: OBGA package information, Section 5.2: Glass 
+reflectance and transmittance, and Section 5.3: Soldering information.
+Added Figure 15. Ball positions (see-through view).
+Updated Figure 16. Application schematic for bare die.
+Added Figure 17. Application schematic for OBGA.
+Updated layout of Section 10: Packing information and added 
+Section 10.2: Product marking and Section 10.3: Tape and reel information.
+VB56G3, VD56G3
+Packing information
+DS12968 - Rev 12 page 40/43
+
+=== PDF PAGE 41 ===
+Contents
+1 Acronyms and abbreviations ...................................................... 3
+2 Product overview .................................................................. 4
+2.1 Functional description summary .................................................. 4
+2.2 Technical specifications summary................................................. 5
+3 Functional description ............................................................. 6
+3.1 Interfaces ..................................................................... 6
+3.1.1 Inter-integrated circuit (I²C) ................................................. 6
+3.1.2 Camera serial interface (CSI) ............................................... 6
+3.2 Power supplies ................................................................ 6
+3.3 Clock and PLL ................................................................. 6
+3.4 Video pipe .................................................................... 7
+3.4.1 Pattern generation ....................................................... 8
+3.4.2 Defective pixel correction .................................................. 8
+3.4.3 Dark calibration .......................................................... 8
+3.4.4 Analog and digital gains ................................................... 9
+3.4.5 Autoexposure .......................................................... 10
+3.4.6 Analog subsampling ..................................................... 10
+3.4.7 Digital binning .......................................................... 10
+3.4.8 Embedded status lines ................................................... 10
+3.4.9 Output interface ........................................................ 11
+3.4.10 Context management .................................................... 11
+3.4.11 Cropping .............................................................. 12
+3.4.12 Orientation ............................................................ 12
+3.5 Synchronization modes ........................................................ 13
+3.6 General purpose input/outputs (GPIOs)........................................... 13
+3.7 Sensor firmware .............................................................. 14
+3.8 Use case examples............................................................ 14
+4 Die specification.................................................................. 15
+5 Package information.............................................................. 16
+5.1 OBGA package information ..................................................... 16
+5.2 Glass reflectance and transmittance.............................................. 18
+5.3 Soldering information .......................................................... 18
+6 Pin description and assignment................................................... 19
+7 Application schematic ............................................................ 24
+7.1 Additional components ......................................................... 24
+VB56G3, VD56G3
+Contents
+DS12968 - Rev 12 page 41/43
+
+=== PDF PAGE 42 ===
+7.2 Layout guidelines ............................................................. 26
+7.3 Device power up sequence ..................................................... 26
+7.4 Device power down sequence................................................... 27
+8 Pixel performance ................................................................ 28
+8.1 Quantum efficiency ............................................................ 28
+8.2 MTF......................................................................... 29
+8.3 Microlenses and CRA matching ................................................. 29
+9 Electrical characteristics.......................................................... 31
+9.1 Absolute maximum ratings...................................................... 31
+9.2 Operating conditions........................................................... 31
+9.3 Power consumption ........................................................... 32
+9.3.1 Current profile .......................................................... 32
+9.4 CLKIN input .................................................................. 33
+9.5 Digital inputs ................................................................. 33
+9.6 Digital outputs ................................................................ 34
+9.7 I²C interface - SDA, SCL ....................................................... 34
+9.8 CSI-2 interface................................................................ 35
+9.8.1 DC specification ........................................................ 35
+9.8.2 AC specification ........................................................ 36
+10 Packing information .............................................................. 37
+10.1 Package delivery mode ........................................................ 37
+10.2 Product marking .............................................................. 38
+10.3 Tape and reel information....................................................... 39
+10.4 Storage information............................................................ 39
+Revision history ....................................................................... 40
+VB56G3, VD56G3
+Contents
+DS12968 - Rev 12 page 42/43
+
+=== PDF PAGE 43 ===
+IMPORTANT NOTICE – READ CAREFULLY
+STMicroelectronics NV and its subsidiaries (“ST”) reserve the right to make changes, corrections, enhancements, modifications, and improvements to ST 
+products and/or to this document at any time without notice.
+In the event of any conflict between the provisions of this document and the provisions of any contractual arrangement in force between the purchasers and 
+ST, the provisions of such contractual arrangement shall prevail.
+The purchasers should obtain the latest relevant information on ST products before placing orders. ST products are sold pursuant to ST’s terms and 
+conditions of sale in place at the time of order acknowledgment.
+The purchasers are solely responsible for the choice, selection, and use of ST products and ST assumes no liability for application assistance or the design of 
+the purchasers’ products.
+No license, express or implied, to any intellectual property right is granted by ST herein.
+Resale of ST products with provisions different from the information set forth herein shall void any warranty granted by ST for such product.
+If the purchasers identify an ST product that meets their functional and performance requirements but that is not designated for the purchasers' market 
+segment, the purchasers shall contact ST for more information.
+ST and the ST logo are trademarks of ST. For additional information about ST trademarks, refer to www.st.com/trademarks. All other product or service names 
+are the property of their respective owners.
+Information in this document supersedes and replaces information previously supplied in any prior versions of this document.
+© 2025 STMicroelectronics – All rights reserved
+VB56G3, VD56G3
+DS12968 - Rev 12 page 43/43

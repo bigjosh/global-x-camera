@@ -1,21 +1,25 @@
 # Knob control firmware: exposure and gain (2026-11-14)
 
-**Pre-release. This firmware has never run on a camera.** It was built and checked offline only: compiled, compared byte for byte against the installed firmware, and exercised with host-side tests (50 of the 50 that can run on Linux passing). Installing it is the first hardware test. The firmware it replaces is kept in the repository so you can go back (see [Going back](#going-back)).
+**SUPERSEDED — historical prerelease, not recommended for installation.** This package was published without hardware testing. The project has selected the separately rebuilt controls implementation described in the [current firmware README](https://github.com/bigjosh/global-x-camera/blob/ccr-2fc483d6-bkdh6g/firmware/usb-ptp/README.md). That replacement still needs its own hardware qualification; this notice does not claim it is installed or tested.
 
-This page is written so that someone, or another Claude session, who has not seen the work can install it. Read it to the end before touching the board.
+The review found that this historical binary turns exposure in the opposite direction to the calibrated knob, uses a different exposure range/ASA scale, and requests 8× analog gain without raising the sensor's default 4× gain limit. It also silently falls back to fixed settings on a knob-read failure and does not check the applied exposure/gain against the request. See the [reconciliation record](https://github.com/bigjosh/global-x-camera/blob/ccr-2fc483d6-bkdh6g/docs/review/2026-11-14-knob-firmware-reconciliation.md). **Keep the existing knob wiring; do not rewire it to accommodate this superseded image.**
+
+The tag, firmware assets and their hashes remain unchanged so prior downloads can be identified. The descriptions and installation steps below document the historical package, not the current installation recommendation. Timeout guidance has been corrected: `nor.py read` halts the target and must never be used while a previous write may still be active.
+
+Original qualification was offline only: compiled, compared with the archived previously installed firmware, and exercised with host-side tests (50 of the 50 that could run on Linux passed). No physical camera test or fresh installed-identity check supported the release.
 
 ## What changes for the person using the camera
 
 | Knob | Wiring (unchanged) | Effect |
 |---|---|---|
 | Exposure | A0 low end, A1 wiper, A2 high end | Exposure time from **0.5 ms to 484 ms**. Equal turns give equal ratios (about 10 stops end to end); mid-travel is about 16 ms, near the old fixed 11 ms. |
-| Gain ("ASA") | A4 high end, GND low end, A5 wiper | Sensor analog gain from **1x to 8x** in equal stops. Digital gain stays 1x. |
+| Gain ("ASA") | A4 high end, GND low end, A5 wiper | Requests **1x to 8x** analog gain, but leaves the default **4x maximum** unchanged; requests above 4x can be capped unless that limit is separately configured. Digital gain stays 1x. |
 
 - Both knobs are read once, at the start of each photo. Turning a knob during a photo affects the next photo.
 - The knobs are read only on the normal photo path (no cable in the camera's "USB" port). Photo download over USB is unchanged.
-- Higher ADC reading means longer exposure or more gain. If a knob feels backwards, swap its two end wires; nothing in firmware needs to change.
+- In this historical binary, higher ADC reading means longer exposure or more gain. That reverses exposure on the calibrated hardware. Do not swap the current wiring; use the replacement implementation.
 - If the knob reading fails for any reason, the camera takes the photo with the old fixed settings (11 ms, 1x) instead of failing.
-- The chosen exposure and gain are **not** stored with the photo. The photo format has no field for them yet.
+- This historical implementation does **not** store the chosen exposure and gain. The replacement uses the existing first-sector metadata space for a CKN1 controls record.
 
 ## Which USB-C port
 
@@ -71,7 +75,7 @@ CN10 does not power the camera on this modified board (the CN9 jumpers and D2 ar
 
 The same files, plus the recovery metadata the install scripts need, are in the repository at this tag under `firmware/usb-ptp/evidence/2026-11-14-knobs/package/`. **Use that folder for the install**; the loose release files are for checking hashes. Boot prefix: 7160 bytes, SHA-256 `0f87fbbe521230349db3d19b9449db38f2bff8000a4683461db080ad5525acc9`.
 
-The firmware now on the camera (installed November 13) is in `firmware/usb-ptp/evidence/2026-11-13-d8-hold/package/`: sector 0 `1a9278ab1733134a86e382af61b3a78627fe40d82e9e137dd33f2bfcf8de1197`, sector 1 `ed6d416974bf0801f1b1daa6e29520db06fa3294bb33060a9dfbc48b761fbc38`.
+The last installed firmware recorded when this historical release was prepared (November 13, not a fresh present-state check) is in `firmware/usb-ptp/evidence/2026-11-13-d8-hold/package/`: sector 0 `1a9278ab1733134a86e382af61b3a78627fe40d82e9e137dd33f2bfcf8de1197`, sector 1 `ed6d416974bf0801f1b1daa6e29520db06fa3294bb33060a9dfbc48b761fbc38`.
 
 ## What the install needs
 
@@ -109,7 +113,7 @@ Three rules that must not be broken:
 2. **If a step fails, stop.** Do not improvise a different way of writing flash. See [If something goes wrong](#if-something-goes-wrong).
 3. **Each output folder must be new.** The scripts refuse to overwrite.
 
-## Install
+## Historical installation procedure — superseded
 
 PowerShell, from the repository root. Each step says what success looks like; do not go on without it.
 
@@ -192,9 +196,9 @@ Afterwards, record what you did in the repository the way earlier installs did (
 
 A normal photo shows red (start), blue (capturing), green (saving), then all LEDs off. That sequence is unchanged.
 
-1. **One photo, both knobs near the middle.** Expect the normal LED sequence. This alone shows the knob reader, the prefix edit and the capture change work together.
+1. **One photo, both knobs near the middle.** The normal LED sequence proves only that capture/save completed. It does not prove knob sampling or the selected settings: the silent fixed-setting fallback produces the same LEDs. To distinguish those cases, read the current-boot knob result/record while awake and compare commanded versus applied sensor settings; endpoint photos and exposure-strobe timing provide additional checks.
 2. **Exposure knob.** Same scene, gain at minimum, photos at the low end, the middle and the high end. Download them (connect CN8, restart the camera, open **This PC → Global X RAW Camera**). Brightness should rise with the knob: the image should go from nearly black to washed out across the full travel in ordinary room light.
-3. **Gain knob.** Same scene, exposure fixed mid-travel, gain at both ends. The high end should be about 8 times brighter (3 stops) and noisier.
+3. **Gain knob.** Same scene, exposure fixed mid-travel, gain at both ends. This package requests up to 8× but does not raise the sensor's default 4× limit; 8× operation is therefore not established. Read back the applied gain instead of assuming a successful photo used the requested value.
 4. **Exact exposure, if a logic probe is available.** PD0 (CN15 pin 33) mirrors the sensor's exposure strobe, so its pulse width is the exposure. Expect about 0.5 ms at one end of the exposure knob and about 484 ms at the other.
 
 What a failure looks like, and what it means:
@@ -213,7 +217,7 @@ For a debugger: after the selector has run, the word at `0x343F9028` is the knob
 
 - **Step 1 or 2 fails (recovery missed).** Nothing has been written. Run step 1 and 2 again with new output folders; a few attempts can be needed. If the programmer reports `DEV_USB_COMM_ERR`, run `python firmware/boot-timing/stlink_recover.py --execute` once, then retry.
 - **Step 3 fails its `--expect`.** The flash does not hold the November 13 firmware. Nothing has been written. Stop and ask the owner what is installed.
-- **Step 4 or 5 fails or times out.** Leave the camera powered and do not reset it. Read the region again with `nor.py read` (no `--expect`) into a new folder, then run the same write again with `--current` pointing at that fresh `readback.bin`. The writer only proceeds if `--current` matches what is really in flash.
+- **Step 4 or 5 fails or times out.** Keep stable power and leave the target running. Do not reset, halt, reload a helper, run `nor.py read`, or retry the write while completion is uncertain: the read wrapper itself halts the MCU and replaces the running helper. First inspect the current helper's RAM status using a non-halting read. Require a fresh `DONE` record for this operation, matching its command, sequence and expected input/current CRCs, with `result == 0`, `(flags & 7) == 7`, and `(flags & 16) == 0`, as required by `firmware/boot-timing/nor_bench.py`. A stale saved record or `DONE` alone is insufficient. Only after those completion and controller/flash-safety checks pass may the normal independent readback helper be loaded. Compare the full readback before deciding whether any further write is necessary; a retry must use that fresh readback as `--current`. If safe completion cannot be established, preserve power/state and diagnose the running helper; no automatic reset/read/retry is permitted.
 - **Sector 1 is written, sector 0 is not, and you must stop.** The camera will not take photos in this state: the old boot code parks at the selector checksum with the power latch held on, which would drain a battery. Recovery still works because it runs earlier in boot. Either finish step 5 or [go back](#going-back).
 - **The camera no longer enters the recovery park at all.** Last resort, used once on October 20: move JP2 to pins 2-3 (development boot), power-cycle the camera, and write sector 0 with the standard external loader as recorded in `firmware/capture-timing/evidence/2026-10-20-vcp-sd-smoke/programming/write-request.json`. Ask the owner first.
 
@@ -244,7 +248,7 @@ Not checked, because it needs the camera:
 
 ## How it works, briefly
 
-1. On every boot a small selector program already ran before the camera code to check for a USB cable. It now also drives the two pots for about 2 ms, reads both with the ADC, and converts the readings to an exposure in sensor lines (7.69 microseconds each), a frame length and a gain code (`firmware/usb-ptp/knob.c`, `knob_map.h`, `knob_tables.py`). The exposure range is one pair of constants in `knob_tables.py`.
+1. In this historical build, on every boot a small selector program already ran before the camera code to check for a USB cable. It now also drives the two pots for about 2 ms, reads both with the ADC, and converts the readings to an exposure in sensor lines (7.69 microseconds each), a frame length and a gain code (`firmware/usb-ptp/knob.c`, `knob_map.h`, `knob_tables.py`). The exposure range is one pair of constants in `knob_tables.py`.
 2. The capture code's sensor setup is not rebuilt. The selector writes the three values into the copy of that code already loaded in RAM: three bytes of the register block at `0x3418179C` and the frame-length instruction at `0x34181328`. Flash is not written at run time.
 3. The capture code used to reject any photo whose exposure was not exactly 1428 lines. One branch instruction in flash is changed so that it accepts the sensor's reported exposure, and the four unreachable bytes after it are set so the code's checksum is unchanged (`firmware/usb-ptp/exposure_gate.py`; flash offsets `0x6B87` to `0x6B8B`).
 

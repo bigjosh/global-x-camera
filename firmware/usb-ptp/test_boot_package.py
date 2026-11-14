@@ -4,7 +4,9 @@ Set USB_BOOT_TEST_PACKAGE to a package directory for linked-artifact checks.
 Without it, pure input/mutation checks and a native cache-guard harness run.
 """
 import copy
+import contextlib
 import importlib.util
+import io
 import json
 import os
 from pathlib import Path
@@ -110,6 +112,73 @@ class USBHoldPolicyTests(unittest.TestCase):
   with self.assertRaises(ValueError):p.validate_usb_hold_policy(self.m,'pd12-hold',True)
 
 
+class ControlsProfileTests(unittest.TestCase):
+ controls=HERE/'evidence/2026-11-13-knob-controls'
+ old=HERE/'evidence/2026-11-13-d8-hold'
+
+ def test_default_and_explicit_profiles_are_unambiguous(self):
+  args=['--usb','usb','--out','out','--capture','capture']
+  self.assertTrue(p.argument_parser().parse_args(args).capture_controls)
+  self.assertTrue(p.argument_parser().parse_args(args+['--capture-controls']).capture_controls)
+  self.assertFalse(p.argument_parser().parse_args(args+['--legacy-knobs']).capture_controls)
+  with contextlib.redirect_stderr(io.StringIO()):
+   with self.assertRaises(SystemExit):p.argument_parser().parse_args(args+['--capture-controls','--legacy-knobs'])
+   with self.assertRaises(SystemExit):p.argument_parser().parse_args(['--usb','usb','--out','out'])
+
+ def test_capture_profile_cannot_silently_switch_algorithms(self):
+  p.validate_controls_profile('pd12-knob-controls')
+  p.validate_controls_profile('pd12-hold',False)
+  p.validate_controls_profile('legacy-october28',False)
+  for profile in ('pd12-hold','legacy-october28','pa2-hold','pe9-hold','unknown'):
+   with self.subTest(profile=profile),self.assertRaises(ValueError):p.validate_controls_profile(profile)
+  for profile in ('pd12-knob-controls','pa2-hold','pe9-hold','unknown'):
+   with self.subTest(profile=profile),self.assertRaises(ValueError):p.validate_controls_profile(profile,False)
+
+ def test_usb_exporter_must_bind_current_ckn1_schema_and_reader(self):
+  m=json.loads((self.controls/'usb/manifest.json').read_text(encoding='utf-8'))
+  p.validate_usb_controls_sources(m)
+  normalized={**m,'sources':{name.replace('\\','/'):value for name,value in m['sources'].items()}}
+  p.validate_usb_controls_sources(normalized)
+  for ending in (b'\n',b'\r\n'):
+   portable=copy.deepcopy(normalized)
+   for name in ('capture_controls.h','storage/photo_store.c'):
+    source=(HERE/name).read_bytes().replace(b'\r\n',b'\n').replace(b'\n',ending)
+    portable['sources']['firmware/usb-ptp/'+name]=p.sha(source)
+   p.validate_usb_controls_sources(portable)
+  for name in ('capture_controls.h','storage/photo_store.c'):
+   key='firmware/usb-ptp/'+name
+   for replacement in (None,'0'*64):
+    changed=copy.deepcopy(normalized)
+    if replacement is None:del changed['sources'][key]
+    else:changed['sources'][key]=replacement
+    with self.subTest(name=name,replacement=replacement),self.assertRaisesRegex(ValueError,'CKN1 metadata-capable USB'):
+     p.validate_usb_controls_sources(changed)
+  old=json.loads((self.old/'usb/manifest.json').read_text(encoding='utf-8'))
+  with self.assertRaisesRegex(ValueError,'CKN1 metadata-capable USB'):p.validate_usb_controls_sources(old)
+
+ def test_wrong_inputs_fail_before_output_or_compiler(self):
+  cases=[(self.controls/'usb',self.old/'capture-input',[],'Canonical controls require'),
+         (self.old/'usb',self.controls/'capture/staged',[],'CKN1 metadata-capable USB'),
+         (self.controls/'usb',self.controls/'capture/staged',['--legacy-knobs'],'Legacy knob patches require')]
+  with tempfile.TemporaryDirectory(prefix='usb-profile-reject-') as tmp:
+   for i,(usb,capture,flags,reason) in enumerate(cases):
+    with self.subTest(case=i):
+     out=Path(tmp)/str(i)
+     result=subprocess.run([sys.executable,str(HERE/'package.py'),'--usb',str(usb),'--capture',str(capture),'--out',str(out),*flags],capture_output=True,text=True)
+     self.assertNotEqual(result.returncode,0);self.assertIn(reason,result.stderr)
+     self.assertFalse(out.exists(),'A mismatched package must fail before any build files are created')
+
+ def test_compose_defaults_to_pinned_controls_and_preserves_receiver(self):
+  capture=self.controls/'capture/staged'
+  original=(capture/'stage1.bin').read_bytes();sector=(capture/'capture_sector_0.bin').read_bytes()
+  prefix,_,s0,_=p.compose(original,sector,bytes.fromhex('01f00bb8'),p.DSB+b'\0'*16,b'selector',b'USBIMAGE')
+  self.assertEqual(s0[p.CAPTURE_OFFSET:],sector[p.CAPTURE_OFFSET:])
+  self.assertEqual(prefix[0x40:p.PATCH_OFFSET],original[0x40:p.PATCH_OFFSET])
+  old=self.old/'capture-input'
+  with self.assertRaisesRegex(ValueError,'Canonical controls require'):
+   p.compose((old/'stage1.bin').read_bytes(),(old/'capture_sector_0.bin').read_bytes(),bytes.fromhex('01f00bb8'),p.DSB+b'\0'*16,b'selector',b'USBIMAGE')
+
+
 class ReferenceAndCompositionTests(unittest.TestCase):
  @classmethod
  def setUpClass(cls):
@@ -130,9 +199,9 @@ class ReferenceAndCompositionTests(unittest.TestCase):
  def test_reject_linking_wrong_target_and_short_branch(self):
   for patch in (bytes.fromhex('01f00bf8'),bytes.fromhex('01f00ab8'),b'\0\xe0'):
    with self.subTest(patch=patch.hex()),self.assertRaises(ValueError):
-    p.compose(self.original,self.sector,patch,self.hook,b'1234',b'12345678')
+    p.compose(self.original,self.sector,patch,self.hook,b'1234',b'12345678',capture_controls=False)
  def test_prefix_and_capture_preservation(self):
-  prefix,boot,s0,s1=p.compose(self.original,self.sector,self.patch,self.hook,b'selector',b'USBIMAGE')
+  prefix,boot,s0,s1=p.compose(self.original,self.sector,self.patch,self.hook,b'selector',b'USBIMAGE',capture_controls=False)
   self.assertEqual(prefix[:p.PATCH_OFFSET],self.original[:p.PATCH_OFFSET])
   self.assertEqual(prefix[p.PATCH_OFFSET+4:len(self.original)],self.original[p.PATCH_OFFSET+4:])
   self.assertEqual(prefix[len(self.original):],self.hook)
@@ -144,10 +213,10 @@ class ReferenceAndCompositionTests(unittest.TestCase):
  def test_reserved_regions_and_displaced_barrier(self):
   for changes in ({'hook':b'\0'*16},{'hook':p.DSB+b'\0'*445},
                   {'selector':b'x'*8193},{'selector':b''},{'usb':b'x'*(p.USB_MAX_BYTES+1)}):
-   params=dict(original=self.original,sector=self.sector,patch=self.patch,hook=self.hook,selector=b'1234',usb=b'12345678');params.update(changes)
+   params=dict(original=self.original,sector=self.sector,patch=self.patch,hook=self.hook,selector=b'1234',usb=b'12345678',capture_controls=False);params.update(changes)
    with self.subTest(changes=tuple(changes)),self.assertRaises(ValueError):p.compose(**params)
  def test_recovery_metadata_preserves_contract_without_allowlisting(self):
-  prefix,boot,s0,_=p.compose(self.original,self.sector,self.patch,self.hook,b'1234',b'12345678')
+  prefix,boot,s0,_=p.compose(self.original,self.sector,self.patch,self.hook,b'1234',b'12345678',capture_controls=False)
   m=p.recovery_manifest(self.reference,prefix,boot,s0)
   for key in ('recovery_gpio','recovery_vcp','error_signal'):
    if key in self.reference:self.assertEqual(m[key],self.reference[key])
@@ -289,8 +358,14 @@ class LinkedPackageTests(unittest.TestCase):
   capture=Path(p.located(self.m.get('capture_build',p.REFERENCE)))
   original=(capture/'stage1.bin').read_bytes();prefix=(self.out/'stage1.bin').read_bytes()
   self.assertEqual(p.branch_target(prefix[p.PATCH_OFFSET:p.PATCH_OFFSET+4],p.PATCH_ADDRESS),p.HOOK_BASE)
-  self.assertEqual(prefix[:p.PATCH_OFFSET],original[:p.PATCH_OFFSET])
-  self.assertEqual(prefix[p.PATCH_OFFSET+4:len(original)],original[p.PATCH_OFFSET+4:])
+  expected=original
+  if 'capture_controls' in self.m:
+   sys.path.insert(0,str(p.ROOT/'firmware/capture-raw'))
+   import knob_transform
+   expected,patch=knob_transform.patch_prefix(original)
+   self.assertEqual(patch,self.m['capture_controls']['patch'])
+  self.assertEqual(prefix[:p.PATCH_OFFSET],expected[:p.PATCH_OFFSET])
+  self.assertEqual(prefix[p.PATCH_OFFSET+4:len(original)],expected[p.PATCH_OFFSET+4:])
   sector=(self.out/'sector0.bin').read_bytes()
   self.assertEqual(p.sha(prefix),self.m['prefix_sha256']);self.assertEqual(p.sha(sector),self.m['sector0_sha256'])
   # Knob packages change the receiver's fixed-exposure assertion and nothing
@@ -307,6 +382,20 @@ class LinkedPackageTests(unittest.TestCase):
    self.assertEqual(zlib.crc32(sector[p.CAPTURE_OFFSET:p.CAPTURE_OFFSET+manifest['stage2_bytes']]),int(manifest['stage2_crc32'],16))
    sector=p.exposure_gate.close_gate(sector,gate)
   self.assertEqual(sector[p.CAPTURE_OFFSET:],(capture/'capture_sector_0.bin').read_bytes()[p.CAPTURE_OFFSET:])
+ def test_control_implementations_are_mutually_exclusive(self):
+  sources=self.m['sources']
+  if 'capture_controls' in self.m:
+   self.assertEqual(self.m['capture_profile'],'pd12-knob-controls')
+   self.assertNotIn('knob',self.m);self.assertNotIn('exposure_gate',self.m)
+   self.assertNotIn('knob.c',sources);self.assertNotIn('exposure_gate.py',sources)
+   self.assertIn('capture_controls_adc.c',sources)
+   self.assertEqual(self.m['unchanged_capture_from_offset'],p.CAPTURE_OFFSET)
+   usb=json.loads((Path(p.located(self.m['usb_build']))/'manifest.json').read_text(encoding='utf-8'))
+   p.validate_usb_controls_sources(usb)
+  elif 'knob' in self.m:
+   self.assertIn('exposure_gate',self.m);self.assertIn('knob.c',sources)
+   self.assertNotIn('capture_controls_adc.c',sources)
+   self.assertNotIn('capture_controls_sample',self.sl)
  def test_early_uart_guard_is_identical_to_original(self):
   prefix=(self.out/'stage1.bin').read_bytes();legacy=(p.REFERENCE/'stage1.bin').read_bytes()
   # Reset startup through the complete PE6/UART park/recovery block remains
@@ -314,15 +403,16 @@ class LinkedPackageTests(unittest.TestCase):
   self.assertEqual(prefix[0x40:p.PATCH_OFFSET],legacy[0x40:p.PATCH_OFFSET])
   self.assertEqual(prefix[0x38C:0x38E],bytes.fromhex('fee7'))
  def test_pd12_capture_reference_and_usb_contract(self):
-  if self.m.get('capture_profile')!='pd12-hold':self.skipTest('Legacy package has no early HOLD')
+  profile=self.m.get('capture_profile')
+  if profile not in ('pd12-hold','pd12-knob-controls'):self.skipTest('Legacy package has no early HOLD')
   capture=Path(p.located(self.m['capture_build']));original=(capture/'stage1.bin').read_bytes()
   sector=(capture/'capture_sector_0.bin').read_bytes();manifest=json.loads((capture/'manifest.json').read_text(encoding='utf-8'))
-  self.assertEqual(p.validate_reference(original,sector,manifest),'pd12-hold')
+  self.assertEqual(p.validate_reference(original,sector,manifest),profile)
   self.assertEqual(struct.unpack_from('<I',original,4)[0],0x34181DF1)
   self.assertEqual(self.m['gpio_hold'],manifest['raw_slots']['gpio_hold_contract'])
   usb=json.loads((Path(p.located(self.m['usb_build']))/'manifest.json').read_text(encoding='utf-8'))
   self.assertEqual((usb['gpio_hold']['port'],usb['gpio_hold']['pin']),('GPIOD',12))
-  p.validate_usb_hold_policy(usb,'pd12-hold',self.m['force_capture'])
+  p.validate_usb_hold_policy(usb,profile,self.m['force_capture'])
   self.assertEqual(usb['gpio_hold']['shutdown_proof_schema'],5)
   self.assertEqual(self.m['usb_hold_policy'],usb['gpio_hold'])
   # A self-consistent manifest cannot admit corrupted code or old PD7 claims.

@@ -1,5 +1,6 @@
 import importlib.util
 import io
+import json
 from pathlib import Path
 import shutil
 import struct
@@ -12,6 +13,109 @@ ROOT = Path(__file__).resolve().parent
 spec = importlib.util.spec_from_file_location("magic_slots", ROOT / "magic_slots.py")
 magic = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(magic)
+
+
+class ControlsMetadataTest(unittest.TestCase):
+    """Independent serialized fixtures, without importing the firmware decoder."""
+
+    def fixture(self, state=3, requested=1000, asa=100):
+        coarse = (requested * 160800000 + 1279999999) // 1280000000
+        gain = {100: 0, 200: 16, 400: 24, 800: 28}[asa]
+        asa_raw = {100: 0, 200: 1280, 400: 2560, 800: 3840}[asa]
+        exposure_raw = 3840 if requested == 1000 else 0
+        words = [0] * 32
+        words[:16] = [0x314E4B43, 1, 128, state, 0, 23 if state == 3 else 31,
+                      0, 3840, 3840, exposure_raw, asa_raw,
+                      0 if exposure_raw else 65535, (asa_raw * 65535 + 1920) // 3840,
+                      requested, 1280, max(4336, coarse + 2000)]
+        words[19:25] = [asa, 160800000, coarse if state == 4 else 0,
+                        gain if state == 4 else 0, 256 if state == 4 else 0, 34]
+        data = bytearray(struct.pack("<32I", *words) + bytes(24))
+        data[64:76] = bytes((2, gain)) + struct.pack("<H", coarse) + b"\0\1" * 4
+        return self.crc(data)
+
+    @staticmethod
+    def crc(data):
+        struct.pack_into("<I", data, 124, zlib.crc32(data[:124]))
+        return data
+
+    def header(self, metadata):
+        return magic.START_MAGIC + metadata + bytes(512 - magic.IMAGE_OFFSET)
+
+    def test_configured_and_applied_are_distinct(self):
+        for state in (3, 4):
+            for asa in (100, 200, 400, 800):
+                with self.subTest(state=state, asa=asa):
+                    record = magic.parse_header(self.header(self.fixture(state, asa=asa)), index=0, erased_byte=0)
+                    controls = record["controls"]
+                    self.assertEqual(record["state"], "OCCUPIED")
+                    self.assertIsNone(record["completion_marker_valid"])
+                    self.assertFalse(record["checksummed"])
+                    self.assertEqual(controls["asa"], asa)
+                    self.assertTrue(controls["asa_provisional"])
+                    self.assertEqual(controls["analog_gain"], asa // 100)
+                    self.assertEqual(controls["sensor_readback_verified"], state == 4)
+                    self.assertEqual("applied_registers" in controls, state == 4)
+
+    def test_half_second_register_rounding_is_visible(self):
+        record = magic.decode_controls_record(self.fixture(4, 500000, 800))
+        self.assertEqual(record["coarse_lines"], 62813)
+        self.assertEqual(record["frame_length"], 64813)
+        self.assertAlmostEqual(record["nominal_exposure_us"], 500003.9800995025)
+
+    def test_bad_crc_does_not_change_occupancy_or_completion(self):
+        metadata = self.fixture()
+        metadata[40] ^= 1
+        last = bytes(508) + magic.END_MAGIC
+        record = magic.parse_probe(self.header(metadata), last, index=0, erased_byte=0)
+        self.assertEqual(record["state"], "COMPLETE")
+        self.assertNotIn("controls", record)
+        self.assertIsNone(record["metadata_schema"])
+        self.assertIn("CRC", record["metadata_warning"])
+        self.assertEqual(record["metadata_hex"], metadata.hex())
+        partial = magic.parse_probe(self.header(metadata), bytes(512), index=0, erased_byte=0)
+        self.assertIn("metadata_warning", partial)
+        self.assertIn("warning", partial)
+
+    def test_crc_correct_but_invalid_semantics_are_rejected(self):
+        # State, flags, ADC range/normalization, time, line, frame, digital gain,
+        # ASA, clock, applied readback, reserve and unchecksummed tail.
+        for offset, value in ((12, 2), (20, 23), (24, 129), (44, 1), (52, 500001),
+                              (56, 1236), (60, 65536), (68, 0), (76, 1600),
+                              (80, 160000000), (84, 0), (116, 1), (128, 1)):
+            with self.subTest(offset=offset):
+                data = self.fixture(4)
+                struct.pack_into("<I", data, offset, value)
+                self.crc(data)
+                with self.assertRaises(magic.FormatError):
+                    magic.decode_controls_record(data)
+
+    def test_old_and_unknown_metadata_stays_opaque(self):
+        unknown = self.fixture()
+        struct.pack_into("<I", unknown, 4, 2)
+        for metadata in (bytes(152), bytes(range(152)), unknown):
+            record = magic.parse_header(self.header(metadata), index=0, erased_byte=0)
+            self.assertIsNone(record["metadata_schema"])
+            self.assertNotIn("controls", record)
+            self.assertEqual(record["metadata_hex"], metadata.hex())
+
+    def test_png_comment_includes_validated_controls_and_bad_record_warning(self):
+        for damaged in (False, True):
+            metadata = self.fixture(4, 500000, 800)
+            if damaged:
+                metadata[124] ^= 1
+            record = magic.parse_header(self.header(metadata), index=0, erased_byte=0)
+            png = magic.png16(bytes(magic.IMAGE_BYTES), record)
+            offset, found = 8, None
+            while offset < len(png):
+                length = struct.unpack_from(">I", png, offset)[0]
+                if png[offset + 4:offset + 8] == b"tEXt":
+                    body = png[offset + 8:offset + 8 + length]
+                    found = json.loads(body.split(b"\0", 1)[1])
+                offset += 12 + length
+            self.assertEqual(found, record)
+            self.assertEqual("controls" in found, not damaged)
+            self.assertEqual("metadata_warning" in found, damaged)
 
 
 class MagicSlotsTest(unittest.TestCase):

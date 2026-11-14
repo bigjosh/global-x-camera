@@ -20,6 +20,7 @@ import single_frame_prefix
 import error_build
 import gpio_hold_prefix
 import gpio_hold_transform
+import knob_transform
 
 HERE=Path(__file__).resolve().parent
 ROOT=HERE.parents[1]
@@ -265,7 +266,12 @@ def main():
                    help='Single-frame capture: minimal pre-START context write, strict one-frame autonomous standby')
     p.add_argument('--gpio-hold',action='store_true',
                    help='Candidate: assert PD12/D8 before UART recovery; float immediately before Standby')
+    p.add_argument('--knob-controls',action='store_true',
+                   help='Combined-selector-only: latched exposure/ASA controls and immutable slot metadata')
     a=p.parse_args()
+    if a.knob_controls and (not a.gpio_hold or not a.magic_format or not a.sensor_single_frame or
+            a.dma_sleep or a.cycle_trace or a.exposure_coarse!=1428):
+        p.error('Knob controls require the normal D8 single-frame magic FLASH profile and combined selector')
     if a.gpio_hold and (not a.flash or not a.sensor_single_frame or not a.error_blinks or
             a.dma_sleep or a.dma_sleep_probe or a.cycle_trace or a.sd_init_gap_ms):
         p.error('GPIO HOLD requires normal single-frame FLASH with error shutdown, without DMA sleep or diagnostics')
@@ -414,6 +420,7 @@ def main():
             capture=transform_capture(data.decode().replace('\r\n','\n'))
             capture=transform_magic(capture) if a.magic_format else capture
             if autostop_enabled: capture=sensor_autostop_transform.capture(capture,a.sensor_single_frame)
+            if a.knob_controls: capture=knob_transform.capture(capture)
             if a.cycle_trace: capture=transform_cycle_trace(capture)
             dst.write_text(capture,newline='\n')
         elif src.name=='phase_gpio.c':
@@ -453,8 +460,13 @@ def main():
                              ('capture-raw',('magic_runtime.inc',))]:
             for name in names:
                 dst=out/name
-                dst.write_text((ROOT/'firmware'/folder/name).read_text().replace('../sd-storage/sd_card.h','sd_card.h'),newline='\n')
+                data=(ROOT/'firmware'/folder/name).read_text().replace('../sd-storage/sd_card.h','sd_card.h')
+                if a.knob_controls and name=='magic_runtime.inc': data=knob_transform.magic_runtime(data)
+                dst.write_text(data,newline='\n')
                 if dst.suffix=='.c': compiled.append(dst)
+    if a.knob_controls:
+        (out/'capture_controls.h').write_bytes((ROOT/'firmware/usb-ptp/capture_controls.h').read_bytes())
+        (out/'knob_capture.inc').write_bytes((HERE/'knob_capture.inc').read_bytes())
     if a.cycle_trace:
         for name in ('cycle_trace.h','cycle_trace_events.h','cycle_trace_sd.h'):
             (out/name).write_bytes((HERE/name).read_bytes())
@@ -510,6 +522,7 @@ def main():
     if autostop_enabled: flags.append('-DRAW_SENSOR_AUTOSTOP=1')
     if a.sensor_single_frame: flags.append('-DRAW_SENSOR_SINGLE_FRAME=1')
     if a.gpio_hold: flags.append('-DRAW_GPIO_HOLD=1')
+    if a.knob_controls: flags.append('-DRAW_KNOB_CONTROLS=1')
     flags += [f'-DRAW_PATTERN={int(a.pattern=="diagonal")}',f'-DRAW_FLASH={int(a.flash)}',
               f'-DSD_BUS_WIDTH={a.sd_bus_width}',
               f'-DRAW_SD_CLOCK_HZ={a.sd_clock_hz}U',
@@ -700,6 +713,9 @@ def main():
             idle_level=None, pulse_high_cycles_per_id=None, nominal_high_us_per_id=None)
         manifest['gpio_hold']=True
         manifest['gpio_hold_contract']=gpio_hold_transform.contract(a.standby)
+    if a.knob_controls:
+        manifest['knob_controls']=knob_transform.contract(sha((out/'capture_controls.h').read_bytes()))
+        manifest['exposure_control']='Latched knob; exposure_coarse=1428 is legacy builder default only'
     (out/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
     if a.flash:
         pd=out/'staged'; pd.mkdir(); sources=[]

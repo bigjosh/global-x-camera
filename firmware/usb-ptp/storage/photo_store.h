@@ -65,7 +65,8 @@ int photo_store_open(photo_store_t *, const photo_io_t *, uint64_t sector_count,
  * has a stable handle slot_index+1; callback zero cancels the scan. */
 int photo_store_scan(photo_store_t *, photo_visit_fn, void *);
 /* Fresh first/last sector checks. Completion markers are NOT a pixel checksum.
- * Metadata remains opaque; no date or orientation is inferred. */
+ * Validated CKN1 settings are exported in the PNG comment; unknown metadata
+ * remains opaque, and no date/orientation or calibrated ISO is inferred. */
 int photo_store_info(photo_store_t *, uint32_t handle, photo_info_t *);
 /* Fresh whole-slot read into caller's >=PHOTO_STORE_BUFFER_BYTES word-aligned
  * RAM. Failed bursts are retried sector-by-sector after recover. Unreadable

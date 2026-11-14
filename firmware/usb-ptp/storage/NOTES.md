@@ -64,3 +64,24 @@ final-sync failure, final-readback failure and cancellation after tail clearing.
 Neighbors remain unchanged in the mock; a subsequent successful header read
 distinguishes the absent object from the occupied partial one. These tests do
 not claim corresponding physical-card failure behavior was observed.
+
+## 2026-11-13  Export validated capture settings without changing PNG geometry or inventing ISO
+
+**Why:** the new capture path snapshots a CRC-protected CKN1 settings record into
+existing first-sector padding. Its snapshot can precede applied-register checks,
+so exports must distinguish configured from applied-verified settings. The
+existing fixed EXIF UserComment now includes actual line-quantized exposure,
+analog gain and provisional ASA only after schema, CRC, flags, timing arithmetic,
+gain and digital-unity checks. Unknown/invalid legacy metadata reports settings
+unavailable. Fixed EXIF and PNG sizes remain unchanged, including damaged-image
+warnings and the absent pixel-checksum limitation.
+
+**Rejected:** labeling configured settings as verified applied values, inferring
+calibrated ISO from provisional ASA labels, synthesizing dates/orientation,
+discarding legacy photos, rewriting the saved header after its first publication,
+or allowing settings text to truncate corruption warnings.
+
+**Evidence:** `photo_store.c` and 19 passing native storage tests, including valid
+configured/applied records, CRC/semantic corruption, legacy data, and maximum-size
+warning/comment bounds. Live USB export of the new settings remains unqualified
+in the user's requested load-and-manual-test workflow.

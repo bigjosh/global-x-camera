@@ -209,3 +209,47 @@ existing test expectations are remapped but not executed. Official MB1940C02
 sheet10/ODB identify D8=PD12 with alternate tap CN15.21; DS14791Rev10
 Table18 identifies mainVDD through footnote1. No diagnostic hardware operation
 or new ADC qualification is implied by this source update.
+
+## 2026-11-13  Read both controls coherently before integrating sensor parameters
+
+**Why:** the user requested a quick live CW/center/CCW comparison of the two
+installed knobs. Schema6 preserves the working A0–A2 exposure wiring and D8
+HOLD, adds PC12/A4 excitation and the buffered PG15/ADC1 channel7 ASA wiper,
+and publishes both readings/endpoints/timing under one sequence fence.
+A4's conditioned endpoint is PF3/channel16. Both supplies go LOW on stop or
+error while HOLD stays HIGH for debugger access. The ADC12 security fix now
+checks PF3 and PG15 too, without changing any GPIO security attributes.
+
+**Rejected:** driving suspect PA2, sampling the PH2 digital companion as the
+ADC input, assuming PA13 is the A4 buffer, waiting for VDDIO4 PVM-ready despite
+ES0620 section2.2.29, relabelling historical telemetry, or equating electrical
+position fractions with calibrated ASA/exposure settings. Normal sensor
+integration and full potentiometer curve calibration remain deferred.
+
+**Evidence:** official MB1940C02 sheet10/DS14791 pin audit, `control.c`,
+`build.py`, `console.py`, and13 focused offline tests (4096 GPIO preservation
+cases,4096 security cases and7 refusals plus host contracts/telemetry).
+Offline build `tmp/bringup/knobs-both-20261113/diagnostic` is6200bytes,
+SHA256 `f611404188a6f762b60f91e19e11ce595a2f4fd8420d3220eb4e1623b7366ddb`.
+Proof moves to0x343C2400/96words/end95 to keep both knobs coherent without
+colliding with optional clock/reference/security records. Schemas1–5 remain
+monitorable; new launches require diagnostic schema6 and exact package HOLD
+schema5. This implementation accessed no instruments; live readings and final
+bench ownership belong to the root campaign's subsequent evidence.
+
+## 2026-11-13  Use measured endpoint references and opposite ADC polarities
+
+**Why:** live CW/center/CCW medians were exposure3840/2177/1.5 and
+ASA0/1780.5/3840. Both physical controls should increase counterclockwise,
+so exposure is inverted and ASA is not. Excitation references measured3840
+rather than the ADC's4095 full scale. Read endpoint references with each
+sample batch instead of assuming a perfect supply/reference ratio.
+
+**Rejected:** using the same direction for both knobs, assuming4095 is the
+pot endpoint, forcing a hand-positioned midpoint to50%, or claiming three
+points prove precise linearity or calibrated ASA sensitivity.
+
+**Evidence:** [live diagnostic results and raw records](evidence/2026-11-13-dual-knobs/README.md).
+Both supplies read LOW after cooperative stop, D8 remained HIGH, and the exact
+D8 UART park passed9good/0bad afterward. That diagnostic changed no FLASH/SD
+data and made no JS power operation; capture integration is separate.

@@ -368,6 +368,7 @@ def gpio_hold_layout(m,operation=None):
     receiver by inspect_flash. This selector check alone is not binary or pin
     state evidence, and performs no instrument reads.
     """
+    knob_layout(m)
     enabled=m.get('gpio_hold',False)
     selected=[f for f in m.get('flags',[]) if f=='-DRAW_GPIO_HOLD' or f.startswith('-DRAW_GPIO_HOLD=')]
     if type(enabled) is not bool:
@@ -417,6 +418,25 @@ def gpio_hold_layout(m,operation=None):
     spec=importlib.util.spec_from_file_location('raw_hold_contract',HERE/'gpio_hold_transform.py')
     transform=importlib.util.module_from_spec(spec);spec.loader.exec_module(transform)
     transform.validate_contract(contract,standby)
+    return True
+
+
+def knob_module():
+    spec=importlib.util.spec_from_file_location('raw_knob_contract',HERE/'knob_transform.py')
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+    return module
+
+
+def knob_layout(m):
+    selected=[f for f in m.get('flags',[]) if f=='-DRAW_KNOB_CONTROLS' or f.startswith('-DRAW_KNOB_CONTROLS=')]
+    controls=m.get('knob_controls')
+    if controls is None:
+        if selected: raise ValueError('Controls compiler flag lacks its contract')
+        return False
+    digest=m.get('source_hashes',{}).get('capture_controls.h')
+    if (selected!=['-DRAW_KNOB_CONTROLS=1'] or not m.get('gpio_hold') or not m.get('flash') or
+            not isinstance(digest,str) or controls!=knob_module().contract(digest)):
+        raise ValueError('Controls profile or frozen ABI contract differs')
     return True
 
 
@@ -1577,6 +1597,9 @@ def frame_guards(b,m,p):
         if g['version']==1:result['padding_zero']=True
         else:result.update(layout_version=2,metadata_bytes=152,metadata_hex=metadata.hex(),
                            metadata_schema=None,end_guard_word_bias=1)
+        if m.get('knob_controls'):
+            knob_layout(m)
+            result.update(metadata_schema='CKN1',controls=knob_module().decode_record(metadata))
         return result
     if not m.get('whole_image_preerase'): return None
     whole_layout(m)
@@ -1703,16 +1726,25 @@ def magic_snapshot(b,m,p,label,card):
         sensor_raw=b.upload(0x343F4000,128,label+'-sensor-status.bin')
         if len(sensor_raw)!=128: raise ValueError('Incomplete sensor exposure status')
         sensor_words=struct.unpack('<32I',sensor_raw)
-        coarse=m.get('exposure_coarse',1428)
+        controls=None
+        if m.get('knob_controls'):
+            knob_layout(m)
+            controls=knob_module().decode_record(b.upload(0x343F9400,128,label+'-controls.bin'))
+            if controls['state']!=4:raise ValueError('Controls capture lacks applied verification')
+            result.update(metadata_schema='CKN1',controls=controls)
+        coarse=controls['coarse_lines'] if controls else m.get('exposure_coarse',1428)
         sensor=dict(applied_coarse=sensor_words[20],exposure_us=sensor_words[21],
             frame_length=sensor_words[18],margin=sensor_words[19],
             nondefault_frame_bound_checked=coarse!=1428)
         if (not 1<=coarse<=63000 or sensor['applied_coarse']!=coarse or not sensor['exposure_us'] or
                 (coarse!=1428 and (sensor['frame_length']<sensor['margin']+7 or
                     coarse>sensor['frame_length']-sensor['margin']-7)) or
-                (coarse==30000 and sensor['exposure_us']!=230597)):
+                (not controls and coarse==30000 and sensor['exposure_us']!=230597)):
             raise ValueError('Applied sensor exposure differs from capture manifest/bounds')
         result['sensor']=sensor
+        if controls and (sensor['exposure_us']!=controls['nominal_exposure_us'] or
+                sensor['frame_length']!=controls['frame_length'] or sensor['margin']!=controls['margin']):
+            raise ValueError('Controls runtime and sensor readbacks disagree')
         raw=b.upload(m['sd_stream'],44,label+'-stream.bin')
         if len(raw)!=44: raise ValueError('Incomplete SD stream object')
         names='publish context mode initial_available_bytes published_bytes queued_bytes publication_calls starved_polls producer_error producer_wait_cycles max_wait_cycles'.split()

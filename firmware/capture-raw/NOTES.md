@@ -659,3 +659,70 @@ Build/package checks are required before reload. The root campaign at
 `tmp/bringup/d8-hold-20261113/` owns the final combined package, programming
 readback and installed-state record; this offline work does not claim a new
 capture, latch timing or power measurement. Schematics remain deferred.
+
+## 2026-11-13  Integrate calibrated knob polarity without changing the early recovery layout
+
+**Why:** after the live dual-knob endpoint/center comparison, the user asked
+for exposure and analog gain control. The exposure pot increases electrically
+clockwise while ASA increases counterclockwise; invert only exposure so both
+physical controls increase their setting counterclockwise. The user then
+accepted a0.5s maximum instead of1s. Constant1280-pixel lines permit the full
+requested half-second with coarse62813/frame64813 and a2000-line reserve;
+1236-pixel lines with that reserve reach only about488.366ms. The selector
+already occupies a checked RAM image, so it owns ADC sampling and a fixed
+sensor timing helper; the capture prefix needs only two audited relocations
+at composition. All UART, D8 HOLD and copied error-engine bytes remain exact.
+
+**Rejected:** overflowing16-bit coarse/frame fields at1s, silently clipping
+the new0.5s label to488ms, driving suspect PA2, moving the fixed recovery code,
+claiming ASA calibration from an analog-gain setting, or turning the default
+capture build into a package that silently depends on an absent selector.
+The explicit controls option requires the combined package; disabled builds
+reproduce the previous D8 receiver/prefix/sector exactly.
+
+**Evidence:** `knob_transform.py`, `knob_capture.inc`, the shared selector ABI
+in `../usb-ptp/capture_controls.h`, and root campaign
+`tmp/bringup/knobs-capture-20261113/`. Final capture-v3 receiver35032bytes has
+SHA256 `8cd86fa71e1cd2422897558567b9c66035c66ca103cea537e50ad3ebd4d5caaa`;
+mandatory HOLD/error/UART audits pass.327 offline tests passed with4 optional
+linked checks skipped; all25 tests in the two linked HOLD suites then passed
+against that exact candidate, covering the skips. Default reproduction is
+recorded in `baseline-repro.json`. No hardware or Git access occurred here.
+
+## 2026-11-13  Freeze configured or applied controls metadata before its first publication
+
+**Why:** the152-byte front reservation fits the128-byte CKN1 record plus24zero
+bytes without changing image offset156 or the3730-sector slot. Streaming can
+publish image data before FRAME validation, especially at long exposure. A
+single snapshot immediately before the first nonzero publication can honestly
+be state3/configured or state4/applied; post-FRAME checks later update only the
+RAM control record. Actual coarse/line/frame/margin and applied analog0068/
+digital006A readbacks must match before the capture receives full validation.
+
+**Rejected:** changing an already-offered first sector, blocking all streaming
+until FRAME merely to upgrade metadata, presenting configured values as applied
+readback, or rewriting historical all-zero metadata as though it had controls.
+Existing3s producer/final waits and post-FRAME1s automatic-stop budget remain;
+nominal timing uses the frozen160.8MHz clock and is not a calibrated measurement.
+
+**Evidence:** actual-source native tests exercise bounds, read errors, gain
+mismatch, CRC rejection, record state and snapshot immutability. Host reporting
+uses the known CKN1 schema and preserves configured/applied distinction. Exact
+sensor offsets are corroborated by ST's driver and UM2602; the helper records
+actual EXP_COARSE_INTG_MARGIN and checks frame >= coarse + margin +7 rather
+than inventing a register write to resolve conflicting documented defaults.
+
+## 2026-11-13  Leave controls hardware qualification to the user's requested test
+
+**Why:** once the half-second controls candidate and offline checks were ready,
+the user explicitly requested loading it without another verification campaign
+and said they would test it. The capture-v3 executable remains frozen; the
+combined-package owner records installation separately.
+
+**Rejected:** extending this handoff into automated maximum-exposure/gain,
+saved-image, timing or energy experiments, or presenting offline checks and
+programming readback as qualification of those behaviors on the camera.
+
+**Evidence:** the user's "no verify - just load and i will test" instruction;
+the frozen capture-v3 identities and reproduction command in README.md. No
+additional functional test or executable change accompanied this note.

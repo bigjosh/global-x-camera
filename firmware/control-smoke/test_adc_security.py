@@ -36,15 +36,17 @@ class ADCSecurityRegression(unittest.TestCase):
 #include <stdlib.h>
 struct rcc_t { uint32_t AHB3ENR, AHB3ENSR; } rcc;
 struct rif_t { uint32_t RISC_SECCFGRx[6], RISC_PRIVCFGRx[6]; } rif;
-struct gpio_t { uint32_t SECCFGR; } ga,gf,gc;
+struct gpio_t { uint32_t SECCFGR; } ga,gf,gc,gg,gh;
 #define RCC (&rcc)
 #define RIFSC (&rif)
 #define GPIOA (&ga)
 #define GPIOF (&gf)
 #define GPIOC (&gc)
+#define GPIOG (&gg)
+#define GPIOH (&gh)
 #define RCC_AHB3ENR_RIFSCEN 0x200U
 #define RCC_AHB3ENSR_RIFSCENS 0x200U
-static uint32_t Q[8], proof[12], old_sec, error;
+static uint32_t Q[8], proof[14], old_sec, error;
 static int deny_clock,deny_security;
 static jmp_buf failure;
 static void barrier(void) {
@@ -62,31 +64,32 @@ static uint32_t random_word(void) {state^=state<<13;state^=state>>17;state^=stat
 int main(void) {
  for(unsigned trial=0;trial<4096;trial++) {
   for(unsigned i=0;i<6;i++){rif.RISC_SECCFGRx[i]=random_word();rif.RISC_PRIVCFGRx[i]=random_word();}
-  ga.SECCFGR=random_word()|0x700U;gf.SECCFGR=random_word();gc.SECCFGR=random_word();
+  ga.SECCFGR=random_word()|0x700U;gf.SECCFGR=random_word()|8U;gc.SECCFGR=random_word();gg.SECCFGR=random_word()|0x8000U;gh.SECCFGR=random_word();
   rcc.AHB3ENR=random_word();rcc.AHB3ENSR=0;
   Q[1]=random_word();old_sec=rif.RISC_SECCFGRx[2];
-  struct rif_t old_rif=rif;struct gpio_t old_ga=ga,old_gf=gf,old_gc=gc;
+  struct rif_t old_rif=rif;struct gpio_t old_ga=ga,old_gf=gf,old_gc=gc,old_gg=gg,old_gh=gh;
   uint32_t old_clock=rcc.AHB3ENR;deny_clock=deny_security=0;
   run();CHECK(error==0);CHECK(proof[10]==1);CHECK(proof[11]==Q[1]);
   CHECK(rif.RISC_SECCFGRx[2]==(old_sec|1U));
   old_rif.RISC_SECCFGRx[2]|=1U;CHECK(memcmp(&rif,&old_rif,sizeof rif)==0);
-  CHECK(ga.SECCFGR==old_ga.SECCFGR&&gf.SECCFGR==old_gf.SECCFGR&&gc.SECCFGR==old_gc.SECCFGR);
+  CHECK(ga.SECCFGR==old_ga.SECCFGR&&gf.SECCFGR==old_gf.SECCFGR&&gc.SECCFGR==old_gc.SECCFGR&&gg.SECCFGR==old_gg.SECCFGR&&gh.SECCFGR==old_gh.SECCFGR);
   CHECK(rcc.AHB3ENR==(old_clock|0x200U));CHECK(rcc.AHB3ENSR==0x200U);
   CHECK(proof[1]==old_sec&&proof[2]==(old_sec|1U));
   CHECK(proof[3]==proof[4]&&proof[3]==old_rif.RISC_PRIVCFGRx[2]);
  }
- for(unsigned missing=0;missing<3;missing++) {
-  ga.SECCFGR=gf.SECCFGR=gc.SECCFGR=0xffffU;
-  ga.SECCFGR&=~(1U<<(8+missing));
+ for(unsigned missing=0;missing<5;missing++) {
+  ga.SECCFGR=gf.SECCFGR=gc.SECCFGR=gg.SECCFGR=gh.SECCFGR=0xffffU;
+  if(missing<3)ga.SECCFGR&=~(1U<<(8+missing));
+  else if(missing==3)gf.SECCFGR&=~8U;else gg.SECCFGR&=~0x8000U;
   old_sec=rif.RISC_SECCFGRx[2]=0xabc00000U;run();
   CHECK(error==21&&rif.RISC_SECCFGRx[2]==old_sec&&proof[10]==0);
  }
- ga.SECCFGR=gf.SECCFGR=gc.SECCFGR=0xffffU;
+ ga.SECCFGR=gf.SECCFGR=gc.SECCFGR=gg.SECCFGR=gh.SECCFGR=0xffffU;
  old_sec=rif.RISC_SECCFGRx[2]=0x55aa0000U;deny_security=1;run();
  CHECK(error==22&&rif.RISC_SECCFGRx[2]==old_sec&&proof[10]==0);
  deny_security=0;deny_clock=1;rcc.AHB3ENR=0;rcc.AHB3ENSR=0;run();
  CHECK(error==20&&rif.RISC_SECCFGRx[2]==old_sec&&proof[10]==0);
- puts("4096 preserved-state cases and 5 refusal cases passed");return 0;
+ puts("4096 preserved-state cases and 7 refusal cases passed");return 0;
 }
 '''.replace('BLOCK', block)
         compiler = shutil.which('clang') or shutil.which('gcc')
@@ -98,7 +101,7 @@ int main(void) {
             c.write_text(harness)
             subprocess.run([compiler, '-std=c11', '-O2', '-Wall', '-Wextra', '-Werror', str(c), '-o', str(exe)], check=True)
             result = subprocess.run([str(exe)], check=True, capture_output=True, text=True)
-            self.assertIn('4096 preserved-state cases and 5 refusal cases passed', result.stdout)
+            self.assertIn('4096 preserved-state cases and 7 refusal cases passed', result.stdout)
 
 
 if __name__ == '__main__':

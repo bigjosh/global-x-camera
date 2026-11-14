@@ -39,11 +39,14 @@ def checked(build, expected):
     if hashlib.sha256(code).hexdigest() != expected or m['sha256'] != expected:
         raise ValueError('Diagnostic binary identity differs')
     exact = dict(kind='exposure-knob-adc-ram', load=0x34300000,
-                 proof=0x343C2000, proof_words=64, request=0x343C1F00,
+                 request=0x343C1F00,
                  request_words=8, stack=0x343B0000, stack_floor=0x343AF000,
                  sd_commands=False, nor_commands=False, camera_commands=False,
                  reset=False, power_switch=False, resolution_bits=12)
-    if m['schema'] not in (1, 2, 3, 4, 5) or any(m.get(k) != v for k, v in exact.items()):
+    layout = (0x343C2400, 96, 95) if m['schema'] == 6 else (0x343C2000, 64, 63)
+    if (m['schema'] not in (1, 2, 3, 4, 5, 6) or
+            (m.get('proof'), m.get('proof_words'), m.get('proof_sequence_end_word')) != layout or
+            any(m.get(k) != v for k, v in exact.items())):
         raise ValueError('Unexpected diagnostic layout or capabilities')
     if not (m['bytes'] == len(code) < 65536 and
             m['load'] <= m['entry'] - 1 < m['load'] + len(code) and
@@ -62,10 +65,14 @@ def require_current_wiring(m):
     """Historical builds remain inspectable; only D8 HOLD may be launched now."""
     wiring = dict(low='A0/CN4.1/PF5', wiper='A1/CN4.2/PA9',
                   high='A2/CN4.3/PF6', hold='D8/CN14.1/PD12')
-    if (m['schema'] != 5 or m.get('wiring') != wiring or
+    if (m['schema'] != 6 or m.get('wiring') != wiring or
             m.get('adc') != 'ADC1_INP10/PA9' or
-            m.get('endpoint_channels') != {'A0': 'ADC1_INP5/PA8', 'A2': 'ADC1_INP11/PA10'}):
-        raise ValueError('Launch requires A0/A1/A2 control and PD12/D8 HOLD build')
+            m.get('endpoint_channels') != {'A0': 'ADC1_INP5/PA8', 'A2': 'ADC1_INP11/PA10', 'A4': 'ADC1_INP16/PF3'} or
+            m.get('asa_wiring') != dict(low='GND', wiper='A5/CN4.6/PG15', high='A4/CN4.5/PC12') or
+            m.get('asa_adc') != 'ADC1_INP7/PG15' or
+            m.get('digital_wiper') != 'PC10 input/no-pull' or
+            m.get('asa_digital_wiper') != 'PH2 input/no-pull'):
+        raise ValueError('Launch requires both knob inputs with PD12/D8 HOLD')
 
 
 def package_hold(m, prefix):
@@ -219,7 +226,7 @@ def replace(args):
     nonce = secrets.randbelow(0xFFFFFFFF)+1
     request = struct.pack('<8I', m['request_magic'], nonce, args.samples, 100, 0, 0, 0, 0)
     (b.output/'request.bin').write_bytes(request)
-    (b.output/'clear.bin').write_bytes(bytes(256))
+    (b.output/'clear.bin').write_bytes(bytes(m['proof_words']*4))
     b.call('-halt', '-w', b.output/'request.bin', hex(m['request']), '-v',
            '-w', b.output/'clear.bin', hex(m['proof']), '-v', success='Download verified successfully')
     if b.upload(m['request'], 32, 'request-readback.bin') != request:
@@ -276,7 +283,7 @@ def prepare(args):
     nonce = secrets.randbelow(0xFFFFFFFF) + 1
     request = struct.pack('<8I', m['request_magic'], nonce, args.samples, 100, 0, 0, 0, 0)
     (b.output / 'control-request.bin').write_bytes(request)
-    (b.output / 'control-clear.bin').write_bytes(bytes(256))
+    (b.output / 'control-clear.bin').write_bytes(bytes(m['proof_words']*4))
     b.call('-halt', '-w', b.output / 'control-request.bin', hex(m['request']), '-v',
            '-w', b.output / 'control-clear.bin', hex(m['proof']), '-v',
            success='Download verified successfully')
@@ -292,12 +299,20 @@ def prepare(args):
 
 
 def read_status(b, m, nonce, name):
-    raw = b.upload(m['proof'], 256, name)
-    p = dict(zip(m['fields'], struct.unpack('<64I', raw)))
+    raw = b.upload(m['proof'], m['proof_words']*4, name)
+    p = dict(zip(m['fields'], struct.unpack('<'+str(m['proof_words'])+'I', raw)))
     p['SEQUENCE_END'] = struct.unpack_from('<I', raw, 4*m['proof_sequence_end_word'])[0]
     if p['MAGIC'] != 0x31434441 or p['VERSION'] != m['schema'] or p['NONCE'] != nonce:
         raise ValueError('Telemetry identity differs; target left untouched')
     return p
+
+
+def positions(p):
+    """Electrical fractions, not calibrated exposure or ASA values."""
+    def fraction(value, low, high):
+        return None if high <= low else (value-low)/(high-low)
+    return dict(exposure_position=fraction(p['RAW'], p['A0_RAW'], p['A2_RAW']),
+                asa_position=fraction(p['ASA_RAW'], p['A0_RAW'], p['A4_RAW']))
 
 
 def monitor(args):
@@ -308,11 +323,13 @@ def monitor(args):
     low_field, high_field = ('PF5_IDR', 'PF6_IDR') if current else ('PA2_IDR', 'PH2_IDR')
     if sys.platform == 'win32':
         import ctypes
-        ctypes.windll.kernel32.SetConsoleTitleW(f'Exposure knob {wiper} - live ADC')
+        ctypes.windll.kernel32.SetConsoleTitleW('Exposure + ASA - live ADC' if m['schema'] == 6 else f'Exposure knob {wiper} - live ADC')
     b = nor_bench.Bench(args.out)
     if b.upload(m['load'], len(code), 'live-code.bin') != code:
         raise ValueError('Running code differs from this test')
     print(f'Exposure knob: {low} = LOW, {wiper} = wiper, {high} = HIGH', flush=True)
+    if m['schema'] == 6:
+        print('ASA knob: GND = LOW, A5 = wiper, A4 = HIGH. Positions are electrical fractions, not calibrated ASA.', flush=True)
     print('HOLD: ' + m['wiring']['hold'] + ' remains HIGH, including on completion/error.', flush=True)
     print('12-bit raw ADC; 4095 is digital full scale, not a calibrated knob endpoint.', flush=True)
     print('Turn the knob to see readings. Ctrl+C closes this console; test has a finite sample limit.', flush=True)
@@ -326,6 +343,8 @@ def monitor(args):
         if seq != p['SEQUENCE'] or seq & 1:
             continue
         p['host_utc'] = datetime.now(timezone.utc).isoformat()
+        if m['schema'] == 6:
+            p.update(positions(p))
         with (args.out / 'readings.jsonl').open('a', encoding='utf-8') as f:
             f.write(json.dumps(p) + '\n')
         save(args.out / 'latest.json', p)
@@ -336,10 +355,17 @@ def monitor(args):
             print(f"          endpoint ADC: {low}={p[low+'_RAW']:4d}  {high}={p[high+'_RAW']:4d}  {wiper} digital={p[wiper+'_DIGITAL']}", flush=True)
         if current:
             print(f"          {m['wiring']['hold']} HOLD={p['HOLD_IDR']}", flush=True)
+        if m['schema'] == 6:
+            def percent(value):
+                return 'invalid' if value is None else f'{value*100:.1f}%'
+            print(f"          exposure={percent(p['exposure_position'])}  ASA raw={p['ASA_RAW']:4d}  "
+                  f"min={p['ASA_MIN_RAW']:4d} max={p['ASA_MAX_RAW']:4d} position={percent(p['asa_position'])}  "
+                  f"A4 ADC={p['A4_RAW']} digital={p['A4_DIGITAL']} A5 digital={p['A5_DIGITAL']}  "
+                  f"pair={p['PAIR_CYCLES']/m['core_hz']*1e6:.1f}us", flush=True)
         if p['ERROR_CODE'] or p['STATE'] == 15:
             raise RuntimeError('ADC diagnostic failed; see latest.json. Target left powered.')
         if p['STATE'] == 8:
-            print('Test complete; pot supply LOW, HOLD HIGH, debugger awake.', flush=True)
+            print('Test complete; pot supplies LOW, HOLD HIGH, debugger awake.', flush=True)
             return
         if last_count == p['SAMPLE_COUNT']:
             print('Warning: no new ADC sample since last observation.', flush=True)

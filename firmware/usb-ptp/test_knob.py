@@ -394,7 +394,7 @@ class KnobReaderTests(unittest.TestCase):
                 self.assertIn('registers restored: yes', text)
 
     def test_selector_reads_knobs_only_when_the_cable_is_certainly_absent(self):
-        """Runs the real usb_selector() with each VBUS outcome."""
+        """Runs the explicitly selected historical selector with each VBUS outcome."""
         source = (HERE / 'selector.c').read_text(encoding='utf-8')
         self.assertEqual((source.count('0x343F7F00U'), source.count('0x343F9000U')), (1, 1))
         with tempfile.TemporaryDirectory(prefix='knob-selector-') as tmp:
@@ -461,7 +461,7 @@ int main(void){
 ''')
             exe = root / 'selector.exe'
             compiled = subprocess.run([COMPILER, '-std=c11', '-Wall', '-Wextra', '-Werror', '-Wno-pointer-to-int-cast',
-                                       '-D__bss_end__=__bss_start__', '-I' + str(root), str(root / 'main.c'),
+                                       '-DLEGACY_KNOBS_ENABLED=1', '-D__bss_end__=__bss_start__', '-I' + str(root), str(root / 'main.c'),
                                        '-o', str(exe)], capture_output=True, text=True)
             self.assertEqual(compiled.returncode, 0, compiled.stderr)
             ran = subprocess.run([str(exe)], capture_output=True, text=True)

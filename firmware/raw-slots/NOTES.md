@@ -35,3 +35,9 @@
 **Rejected:** silently choosing a metadata schema or interpreting zero as a valid date; presenting completion markers as end-to-end checksums. Product retention/ECC/retrieval policy remains separate from this prototype's implementation limits.
 **Evidence:** commit `18299c29`; [metadata scope](../../docs/decisions/raw-sd-slots-2026-10-24.md#october-24-follow-up-reserve-metadata-in-the-first-sector); [product decisions](../../docs/decisions/NOTES.md).
 **Provenance:** migrated 2026-10-24 from the expressly recorded deferral; no missing field rationale invented.
+
+## 2026-11-13  Decode controls snapshots without upgrading them to image-integrity proof
+
+**Why:** knob-enabled captures now use 128 of the 152 front metadata bytes for a versioned CRC-checked exposure/analog-gain record. Publication can occur before post-frame register readback, so the host must distinguish a configured snapshot from an applied/readback-verified snapshot. Old photos retain their original zero or opaque metadata. A damaged controls record must not hide otherwise recoverable pixels or change allocation/completion semantics.
+**Rejected:** treating configured values as measured applied settings, interpreting the provisional ASA labels as calibrated ISO, changing old image offsets, rewriting the first sector after publication, or presenting the controls CRC as a checksum of the image. Timestamp and orientation schemas remain deferred.
+**Evidence:** `magic_slots.py::decode_controls_record`, `test_magic_slots.py::ControlsMetadataTest`, the shared [CKN1 ABI](../usb-ptp/capture_controls.h), and [capture publication](../capture-raw/knob_capture.inc). This is offline host support; firmware installation and physical qualification belong to the capture campaign.

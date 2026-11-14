@@ -29,6 +29,7 @@ at this bootstrap.
 | On-media object format and host interpretation | [RAW slots](firmware/raw-slots/NOTES.md) |
 | Native SD transport, DMA and card completion | [SD storage](firmware/sd-storage/NOTES.md) |
 | USB mode selection, native PTP and transfer ownership | [USB photo access](firmware/usb-ptp/NOTES.md) |
+| Release publication, immutable assets and install guidance | [Releases](release/NOTES.md) |
 | Earlier PNG/FAT32 integration and low-power qualification | [Capture to SD](firmware/capture-sd/NOTES.md) |
 | Encoder choices and rejected compression candidates | [PNG encoder](firmware/png-encoder/NOTES.md) |
 | Native SD logic decoding and raw DAT0 busy timing | [Saleae SD analyzer](tools/saleae-sd-native/NOTES.md) |
@@ -93,3 +94,18 @@ reasons, not another full transcript or a replacement for immutable evidence.
 **Why:** asked how the design would be checked, the user answered that if at all possible they would love to do this board in DipTrace rather than KiCad, and that DipTrace is installed on their local machine. The recovered design and its tools are KiCad, and the review environment can run neither program, so the checking tool is whichever the user runs.
 **Rejected:** nothing yet. KiCad is not ruled out; DipTrace is the preference if a workable exchange exists. DipTrace's documentation describes a "DipTrace XML" text format for import and export in all modules and publishes a PCB specification, but the review could not read it and no file has been exchanged, so feasibility is untested.
 **Evidence:** direct user note, November 11, in the PCB readiness review; [punch-list item PL-05](docs/review/2026-11-10-pcb-readiness-punch-list.md). The format facts come from search summaries of DipTrace's site, not from the specification itself. No hardware, firmware or CAD change.
+
+
+## 2026-11-14  Exempt immutable calibration/build evidence from whitespace lint
+
+**Why:** the newly committed November 13 calibration and controls archives bind
+hashes to exact CRLF source/log bytes, including vendor code. Normal Git
+whitespace checking treats those preserved line endings as errors. Scoped
+`-whitespace` attributes leave evidence bytes unchanged while current source
+and documentation continue to receive normal checks.
+
+**Rejected:** normalizing frozen archives or rewriting their hashes to satisfy
+style checks; disabling whitespace checks for current source or the whole repo.
+
+**Evidence:** `.gitattributes` scopes exactly the two new archives. The staged
+blob audit validates every SHA256SUMS entry, independently of working files.

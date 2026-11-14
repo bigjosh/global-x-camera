@@ -17,7 +17,7 @@ provisional HIGH before USB detection remains. The old PD12 phase pulses are
 disabled; RAM timing records and the independent PD0 exposure mirror remain.
 [Installation record](firmware/usb-ptp/evidence/2026-11-13-d8-hold/README.md).
 Installed capture exposure remains fixed. A build that reads both knobs exists
-but is not installed or hardware-tested; see [the knob firmware](firmware/usb-ptp/README.md#exposure-and-gain-knobs). The [November9 A3/ADC smoke results](firmware/control-smoke/evidence/2026-11-09-a3-live/README.md)
+but is not installed or hardware-tested. The canonical build now uses the calibrated controls implementation; see [the November14 reconciliation and consolidation](docs/review/2026-11-14-knob-firmware-reconciliation.md). The [November9 A3/ADC smoke results](firmware/control-smoke/evidence/2026-11-09-a3-live/README.md)
 remain historical evidence.
 
 **USB baseline (November 8):** native PTP photo access remains in the package. CN8 VBUS present at

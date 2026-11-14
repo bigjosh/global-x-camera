@@ -16,9 +16,10 @@ single-owner and cannot be reentered from those callbacks.
    Preserve the recognized layout if later header-error recovery is needed.
    Unknown occupied markers are counted and hidden, never declared free.
    A failed header read aborts the scan; a partially built list is not complete.
-3. `photo_store_info` freshly checks the first and last sectors. Current opaque
-   metadata contains no approved date/orientation schema; callers must leave
-   those PTP/EXIF values absent. `GX_0000001.png` names slot handle 1, not a date.
+3. `photo_store_info` freshly checks the first and last sectors. Valid CKN1
+   schema-1 metadata is interpreted only as capture settings; date/orientation
+   remain unknown. Legacy and invalid metadata remain opaque.
+   `GX_0000001.png` names slot handle 1, not a date.
 4. For each requested photo, call `photo_store_load` into a full slot RAM buffer.
    It discards all previous RAM contents. A failed burst is cleared before
    single-sector retries; `recover` must first establish a safely usable idle
@@ -64,7 +65,13 @@ checksums** and cannot establish the original pixels were intact.
 The fixed-size `eXIf` TIFF holds `ExifIFD/UserComment`, including completion
 marker status, failed-read attempts, zero-filled sector count, first failed
 read LBA and the absent stored-checksum limitation. Dates and orientation are
-omitted. Any encountered read error or missing completion marker marks the
+omitted. A valid 128-byte CKN1 schema-1 record adds exposure in microseconds,
+analog gain and provisional ASA, explicitly distinguishing configured settings
+from applied settings verified after FRAME. CRC, state, flags, ranges, frame
+arithmetic and digital-unity fields must all agree. Invalid or older metadata
+reports capture settings unavailable. The comment does not claim calibrated ISO
+or convert settings validity into a pixel-integrity guarantee; PNG size stays
+unchanged. Any encountered read error or missing completion marker marks the
 in-memory info recovered, and `photo_store_filename` then returns a
 `_RECOVERED.png` suffix. PTP must refresh/publish that name itself; this backend
 cannot rename a download already opened by the host. Do not advertise random

@@ -1,0 +1,125 @@
+{
+  "receiver": "8cd86fa71e1cd2422897558567b9c66035c66ca103cea537e50ad3ebd4d5caaa",
+  "receiver_bytes": 35032,
+  "prefix": "8eabee637bec3d54c42dbf725a588c67b65f6d55c52f346d8bbcb73cd0a7bbc7",
+  "sector": "d836c5ea1f432ebf63b2fd3759433eb6b240006276ffc54164511e47fbcd533c",
+  "hold_audit": {
+    "runtime": {
+      "schema": 1,
+      "source_sha256": {
+        "staged/error_signal.c": "f5d7e902198e95bd0ddc853b6410fabf51fba3134b72a86619a4d7f4ca698cd6",
+        "phase_gpio.c": "ad0faf309cfb44531d1787cfb5eab83431ec5adc23f711b408341278ae3a1fee",
+        "completion.c": "895dc2c3ce9efb0e258402bc18cd6def0d92519f3c4f00d575ee010775c0ba79"
+      },
+      "release_sites": [
+        "error",
+        "success"
+      ]
+    },
+    "binary": {
+      "schema": 1,
+      "sites": {
+        "error": {
+          "release": 873995436,
+          "wfi": 873995476,
+          "reassert": 873995478,
+          "end": 873995506,
+          "bytes": 70,
+          "sha256": "630a4fe67a56c1d00c0956de4344435664894dce6996982f25c3ca7d05ab53f5"
+        },
+        "success": {
+          "release": 875593156,
+          "wfi": 875593196,
+          "reassert": 875593198,
+          "end": 875593226,
+          "bytes": 70,
+          "sha256": "630a4fe67a56c1d00c0956de4344435664894dce6996982f25c3ca7d05ab53f5"
+        }
+      }
+    },
+    "prefix": {
+      "schema": 1,
+      "reference_sha256": "6378483a91b560ffc6b31d74a9dd1205996a14c8030447ffddf7deddc9d23874",
+      "reset_vector_offset": 4,
+      "entry": 873995760,
+      "resume_entry": 873989184,
+      "boot_bytes": 76,
+      "boot_sha256": "05deb43fa5906aec826805c1ef8cb9e73991552b1986cfa79e0e0017deb23732",
+      "error_engine_sha256": "c32c1c40a8650a0e452aa5bc1a1e697595a61bbfae38198d4046a1f474ccb7c3",
+      "startup_recovery_loader_bridge_equal": true,
+      "recovery_literal_offsets": [
+        1660,
+        1664,
+        1668,
+        1672,
+        1676,
+        1680,
+        1684,
+        1688,
+        1692,
+        1696,
+        1700,
+        1704,
+        1708,
+        1712,
+        1716,
+        1720,
+        1724,
+        1728,
+        1732,
+        1736
+      ],
+      "crc_literal_offsets": [
+        3228,
+        4952
+      ],
+      "early_load_bytes": 15804,
+      "assertion_before_stack_and_uart": true,
+      "pin": "PD12",
+      "header": "Arduino D8 / CN14.1",
+      "mode": "push-pull output",
+      "speed": "low",
+      "pulls": "none"
+    },
+    "scope": "Offline package only; no live GPIO, shutdown, storage-idle, or recovery qualification"
+  },
+  "knob_controls": {
+    "schema": 1,
+    "record_address": 876581888,
+    "record_bytes": 128,
+    "record_magic": "CKN1",
+    "header_sha256": "0f518bc3f6581b71bc7f16db9faab3bc17c0d3ba91375c5aefb2238ee6a52562",
+    "helper_address": 874512641,
+    "requires_combined_selector": true,
+    "exposure_us": [
+      1000,
+      500000
+    ],
+    "asa": [
+      100,
+      200,
+      400,
+      800
+    ],
+    "analog_gain": [
+      1,
+      2,
+      4,
+      8
+    ],
+    "digital_gain": 1,
+    "line_lengths": [
+      1280
+    ],
+    "maximum_frame_lines": 65535,
+    "metadata_offset": 4,
+    "metadata_bytes": 128,
+    "metadata_reservation": 152,
+    "metadata_policy": "Snapshot configured/applied state before first nonzero publication; never rewrite",
+    "post_frame_validation": "Latched line/coarse/frame/margin and applied analog/digital gain",
+    "first_sector_timeout_ms": 3000,
+    "final_capture_timeout_ms": 3000,
+    "autostop_timeout_ms": 1000,
+    "autostop_timeout_origin": "after FRAME"
+  }
+}

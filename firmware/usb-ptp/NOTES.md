@@ -191,6 +191,46 @@ admitted by `package.py`, and [the D8 build record](evidence/2026-11-13-d8-hold/
 Early UART recovery and the provisional pre-VBUS assertion policy are unchanged.
 No instrument operation accompanies this offline work.
 
+## 2026-11-13  Sample both knobs only on confirmed battery capture and keep a fixed helper ABI
+
+**Why:** normal capture must use the physical exposure/ASA controls without
+disturbing D8 HOLD, early UART recovery or USB-selected battery release. The
+post-memory selector has room for a bounded ADC1 batch and sensor helper, while
+the boot prefix does not have room for their complete implementation. Its
+reviewed frame-write call and manual-data pointer therefore refer to a fixed,
+CRC-loaded helper at 0x34200100 and a 128-byte CKN1 record at 0x343F9400.
+Only confirmed absent VBUS samples controls; present/ambiguous VBUS keeps the
+existing USB HOLD-off behavior. Excitation is off before capture resumes, and
+ADC/security/rail/cleanup failures propagate through the camera initialization
+error display and shutdown instead of silently using stale settings.
+
+The user's calibration has exposure decreasing electrically toward CCW and ASA
+increasing: normalize to measured endpoints/references and invert exposure only.
+The manually estimated middle position is not a calibration anchor. The revised
+range is logarithmic 1 ms to 500 ms, with ASA sectors 100/200/400/800 mapped to
+analog gain codes 0/16/24/28 (1/2/4/8x), always unity digital gain. Constant line
+length 1280 allows the true half-second endpoint plus 2000 lines of frame margin
+inside 16 bits. It leaves READ_OFFSET18 valid; the actual coarse margin is read
+and checked. MAX_AG_CODED defaults to 24 in the manual, so the helper explicitly
+sets and verifies 28 before applying the requested 8x manual gain.
+
+**Rejected:** runtime opcode mutation; expanding the tiny boot prefix; knob reads
+in USB mode; an assumed 50% mechanical center; advertising 500 ms while clipping
+at 488 ms; the superseded 1-second/dynamic-line-length design; inferring a hard
+minimum coarse margin from conflicting vendor defaults; silently falling back
+after ADC faults. Initial 10 ms settling is conservative and may later be tuned.
+The requested load-only workflow defers new hardware and timing qualification;
+provisional ASA labels are not calibrated ISO.
+
+**Evidence:** `capture_controls*.c/.h`, `controls_entry.S`, selector/package
+composition, capture owner's `knob_transform.py`, and final
+`tmp/bringup/knobs-capture-20261113/package-v1`. Selector7716B fits the existing
+8192B reservation; helper and manual-pointer patches are the only additional
+prefix changes. Targeted ADC/map/callback/selector tests passed before the user
+requested no further verification; the build's mandatory boundaries passed.
+Package prefix SHA256 `b866589cf472cac9820d961f3243cb8280759614826083757fae374ccee7e242`.
+This note records offline implementation, not installation or hardware success.
+
 ## 2026-11-14  Read both knobs in the boot selector and edit the loaded capture prefix
 
 **Why:** the user asked for a firmware release in which the two knobs control
@@ -328,3 +368,49 @@ where the enable bit reads 1 after a conversion and 0 only after a stop;
 `capture-raw/evidence/2026-10-26-sd25-twenty` and the other `verified.json`
 records for the arm time; `capture-timing/exposure-measurement.md` for the
 strobe and readout delays. Still offline only.
+
+## 2026-11-14  Reconcile the two knob paths as mutually exclusive profiles
+
+**Why:** upstream9f159586 added an independent runtime-prefix knob patch while
+our uncommitted source-built controls path already existed. Applying both would
+change the frame argument before the local helper validates its fixed call,
+causing initialization failure; applying the upstream exposure gate to the new
+receiver would also be invalid. Retain both historical implementations as
+separate profiles, preserving the upstream toolchain/SDK portability and real
+HAL test model, and preserve both frozen package identities. The selected
+physical mapping remains the measured CCW-increasing1–500ms/four-ASA-sector
+plan recorded in prototype notes. The reconciliation report recommends the
+source-built controls path for a later consolidated release; it does not
+qualify or install either candidate.
+
+**Rejected:** automatic concatenation of both samplers; applying the old
+checksum-neutral assertion-removal patch to the rebuilt receiver; treating
+successful publication as hardware qualification; silently changing previously
+frozen binaries or deleting the other implementation's history.
+
+**Evidence:** [review, findings and intended consolidation](../../docs/review/2026-11-14-knob-firmware-reconciliation.md).
+The pull preserved prior work in stashd0609865 and a separate working-file
+backup. The published prerelease points at9f159586 and has matching sector
+asset hashes. Both archived firmware manifests/hash lists remain unchanged.
+No instrument operation, firmware load, publication or Git push occurred.
+
+## 2026-11-14  Make calibrated source-built controls the default package
+
+**Why:** after the upstream review, the user selected our implementation and
+requested consolidation, retention of useful upstream improvements, release
+fixes, commit and push. The canonical path preserves measured exposure polarity,
+1–500 ms logarithmic exposure, four ASA sectors, the explicit 8× gain limit,
+applied-setting checks and CKN1 metadata. Package toolchain/SDK portability and
+real-ST-HAL regression coverage are retained. Historical runtime instruction
+patching is available only through explicit `--legacy-knobs`; the default
+rejects a fixed-settings capture reference instead of silently using that path.
+
+**Rejected:** leaving the superseded profile as the default, sampling twice,
+silent fixed-setting fallback, dropping metadata or applied-value checks to
+match the old release, changing historical binaries, or treating offline
+success as hardware qualification. Firmware installation remains separate.
+
+**Evidence:** `package.py`, `selector.c`, profile regression tests and
+[review/consolidation record](../../docs/review/2026-11-14-knob-firmware-reconciliation.md).
+The user authorized committing and pushing this consolidation on November 14.
+No instrument access is part of it.

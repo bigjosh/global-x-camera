@@ -2,11 +2,26 @@
 #include "boot_read.h"
 #include "boot_config.h"
 #include "usb_hold.h"
+/* The current controls path is the default even outside package.py. The old
+ * RAM-patching implementation is available only to explicit historical builds. */
+#if defined(LEGACY_KNOBS_ENABLED) && defined(CAPTURE_CONTROLS_ENABLED)
+#error "Choose either CKN1 controls or historical knob patches, never both"
+#endif
+#ifndef LEGACY_KNOBS_ENABLED
+#ifndef CAPTURE_CONTROLS_ENABLED
+#define CAPTURE_CONTROLS_ENABLED 1
+#endif
+#endif
+#ifdef CAPTURE_CONTROLS_ENABLED
+#include "capture_controls.h"
+#endif
 extern int usb_vbus_sample(void);
 extern volatile uint32_t vbus_proof[16];
-/* knob.c: exposure and gain knobs, battery capture path only. */
+#ifndef CAPTURE_CONTROLS_ENABLED
+/* Historical knob profile: never linked with the sampled-controls helper. */
 extern uint32_t knob_apply(void);
 extern volatile uint32_t knob_proof[32];
+#endif
 uint32_t SystemCoreClock=400000000U;
 static uint32_t last,frac,ms;
 uint32_t HAL_GetTick(void){uint32_t now=DWT->CYCCNT,delta=now-last;last=now;uint64_t t=(uint64_t)frac+delta;ms+=(uint32_t)(t/400000U);frac=(uint32_t)(t%400000U);return ms;}
@@ -19,7 +34,12 @@ static void usb_select_mode(int present,volatile uint32_t *proof)
 #ifdef USB_BOOT_FORCE_CAPTURE
  if(present>=0)return;
 #endif
- if(!present)return;
+ if(!present){
+#ifdef CAPTURE_CONTROLS_ENABLED
+  capture_controls_sample();
+#endif
+  return;
+ }
  /* VBUS sampling restores its GPIOA snapshot. Release AFTER it returns,
   * before USB loading (including failure/ambiguous-voltage parks). The
   * battery path alone retains early HOLD and the original UART guard. */
@@ -35,15 +55,22 @@ static void usb_select_mode(int present,volatile uint32_t *proof)
  q[0]=0x31505450U;
  __DSB();__ISB();((void (*)(void))USB_ENTRY)();for(;;)__NOP();
 }
+#ifdef CAPTURE_CONTROLS_ENABLED
+void usb_selector_body(void)
+#else
 __attribute__((section(".text.entry"))) void usb_selector(void)
+#endif
 {
  for(uint32_t *p=&__bss_start__;p<&__bss_end__;p++)*p=0;
  last=DWT->CYCCNT;volatile uint32_t *proof=(volatile uint32_t *)0x343F9000U;
  proof[4]=(uint32_t)vbus_proof;
  int present=usb_vbus_sample();proof[5]=(uint32_t)present;
+#ifndef CAPTURE_CONTROLS_ENABLED
  /* A certain "no cable" is the only case that returns to capture. Read the
   * knobs then, after the VBUS sampler has released the converter. A knob
   * failure leaves the fixed exposure and never changes the mode decision. */
  proof[9]=(uint32_t)knob_proof;proof[10]=present==0?knob_apply():0xFFFFFFFFU; /* all ones: not read */
+#endif
  usb_select_mode(present,proof);
+
 }

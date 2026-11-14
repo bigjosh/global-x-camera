@@ -1,4 +1,5 @@
 #include "photo_store.h"
+#include "../capture_controls.h"
 #include <string.h>
 
 static uint32_t le32(const uint8_t *p) {
@@ -198,6 +199,26 @@ static int chunk(photo_write_fn wr,void *u,const char type[4],const uint8_t *p,u
     crc=crc_update(crc,p,n); be32(c,crc^UINT32_MAX);
     return emit(wr,u,h,8) && (!n || emit(wr,u,p,n)) && emit(wr,u,c,4);
 }
+static int capture_settings(const photo_info_t *i,capture_controls_t *r) {
+    if(i->start_magic!=MAGIC_SLOTS_START_MAGIC)return 0;
+    memcpy(r,i->metadata,sizeof(*r));
+    if(!capture_controls_valid(r) || (r->state!=CC_SENSOR_CONFIGURED && r->state!=CC_APPLIED_VERIFIED) ||
+       r->flags!=(CC_REQUIRED_FLAGS|CC_F_SENSOR_CONFIGURED|(r->state==CC_APPLIED_VERIFIED?CC_F_APPLIED_VALID:0)) ||
+       r->reserved0 || r->reserved1 || r->requested_us<1000 || r->requested_us>500000 ||
+       r->line_length!=1280 || r->vt_hz!=160800000 || r->manual[0]!=2 || r->margin>1993)return 0;
+    uint32_t coarse=r->manual[2]|(uint32_t)r->manual[3]<<8;
+    uint32_t expected=(uint32_t)(((uint64_t)r->requested_us*160800000U+1279999999U)/1280000000U);
+    uint32_t frame=coarse+2000U;if(frame<4336U)frame=4336U;
+    if(coarse!=expected || r->frame_length!=frame || frame>65535 || frame<coarse+r->margin+7U)return 0;
+    static const uint8_t gain[4]={0,16,24,28};unsigned sector;
+    for(sector=0;sector<4 && gain[sector]!=r->manual[1];sector++){}
+    if(sector==4 || r->asa!=(100U<<sector))return 0;
+    for(unsigned j=4;j<12;j+=2)if(r->manual[j] || r->manual[j+1]!=1)return 0;
+    if(r->state==CC_APPLIED_VERIFIED) {
+        if(r->applied_coarse!=coarse || r->applied_gain!=r->manual[1] || r->applied_digital!=256)return 0;
+    } else if(r->applied_coarse || r->applied_gain || r->applied_digital)return 0;
+    return 1;
+}
 static void exif(const photo_info_t *i,uint8_t *p) {
     char *comment=(char *)(p+44+8); size_t n=0;
     memset(p,0,PHOTO_STORE_EXIF_BYTES);
@@ -216,8 +237,17 @@ static void exif(const photo_info_t *i,uint8_t *p) {
     if (i->first_bad_lba!=UINT32_MAX) {
         n=append(comment,n,"; first_error_lba=");n=decimal(comment,n,i->first_bad_lba,1);
     }
+    capture_controls_t settings;
+    if(capture_settings(i,&settings)) {
+        uint32_t coarse=settings.manual[2]|(uint32_t)settings.manual[3]<<8;
+        uint32_t us=(uint32_t)(((uint64_t)coarse*1280U*1000000U+80400000U)/160800000U);
+        n=append(comment,n,"; settings=");n=append(comment,n,settings.state==CC_APPLIED_VERIFIED?"applied":"configured");
+        n=append(comment,n,"; exposure_us=");n=decimal(comment,n,us,1);
+        n=append(comment,n,"; analog_gain=");n=decimal(comment,n,32U/(32U-settings.manual[1]),1);
+        n=append(comment,n,"x; ASA=");n=decimal(comment,n,settings.asa,1);n=append(comment,n," (provisional)");
+    } else n=append(comment,n,"; capture settings unavailable");
     n=append(comment,n,"; packed RAW10 to gray16 (sample<<6). No stored payload checksum; markers and SD transport checks do not prove pixel integrity. Capture date/orientation unavailable.");
-    (void)n; /* bounded literals + at most four ten-digit values fit 504 bytes */
+    (void)n; /* bounded literals + seven numeric fields fit504 bytes (worst-case test) */
 }
 int photo_store_png(const photo_info_t *i,const void *buffer,size_t bytes,
                     uint8_t *row,size_t row_bytes,photo_write_fn wr,void *u) {

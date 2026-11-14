@@ -1,9 +1,11 @@
-/* RAM-only A0/A1/A2 knob diagnostic with D8 HOLD. No storage/camera/NOR/sleep. */
+/* RAM-only exposure + ASA knob diagnostic. No storage/camera/NOR/sleep. */
 #include "stm32n6xx_hal.h"
 #include "stm32n6xx_ll_rcc.h"
 
 #define Q ((volatile uint32_t *)0x343C1F00U)
-#define P ((volatile uint32_t *)0x343C2000U)
+#define P ((volatile uint32_t *)0x343C2400U)
+#define PROOF_WORDS 96U
+#define SEQUENCE_END 95U
 #define CPU_HZ 400000000U
 #define STOP_MAGIC 0x504F5453U
 enum { MAGIC,VERSION,NONCE,STATE,ERROR_CODE,SEQUENCE,SAMPLE_COUNT,RAW,MIN_RAW,
@@ -15,7 +17,10 @@ enum { MAGIC,VERSION,NONCE,STATE,ERROR_CODE,SEQUENCE,SAMPLE_COUNT,RAW,MIN_RAW,
  CONTROL,PRIMASK,FAULTMASK,CFGR1,CFGR2,IC1,PLL1_1,PLL1_2,PLL1_3,
  DWT_START,DWT_DELTA,TERMINAL,ADC_CHANNEL,ADC_BITS,FAIL_STAGE,DIGITAL_FULL_SCALE,
  PWR_SVMCR1_SNAPSHOT,RESERVED53,A0_RAW,A2_RAW,A0_MIN,A0_MAX,A2_MIN,A2_MAX,
- ENDPOINT_VALID,RESERVED61,A1_DIGITAL,WORDS };
+ ENDPOINT_VALID,RESERVED61,A1_DIGITAL,ASA_RAW,ASA_MIN_RAW,ASA_MAX_RAW,
+ A4_RAW,A4_MIN,A4_MAX,A4_DIGITAL,A5_DIGITAL,PG_MODER,PH_MODER,
+ ASA_ADC_CHANNEL,PAIR_START_MS,PAIR_CYCLES,EXPOSURE_READ_CYCLES,
+ ASA_READ_CYCLES,WORDS };
 static ADC_HandleTypeDef adc;
 static uint32_t last_cycles, fraction_cycles, elapsed_ms;
 #if defined(CONTROL_INTERNAL_VREF)
@@ -46,11 +51,15 @@ static void snapshot(void)
  P[PA_MODER]=GPIOA->MODER;P[PC_MODER]=GPIOC->MODER;
  P[PF_MODER]=GPIOF->MODER;P[HOLD_IDR]=(GPIOD->IDR>>12)&1U;
  P[HOLD_MODER]=GPIOD->MODER;P[HOLD_ODR]=GPIOD->ODR;
+ P[A4_DIGITAL]=(GPIOC->IDR>>12)&1U;P[A5_DIGITAL]=(GPIOH->IDR>>2)&1U;
+ P[PG_MODER]=GPIOG->MODER;P[PH_MODER]=GPIOH->MODER;
 }
 static void excitation_off(void)
 {
- /* A2/PF6 only: D8/PD12 retains the latch; suspect A3/PA2 is untouched. */
+ /* Both pot supplies only; D8 retains the latch, suspect PA2 is untouched. */
  if(RCC->AHB4ENR&RCC_AHB4ENR_GPIOFEN)GPIOF->BSRR=1U<<22;
+ if(RCC->AHB4ENR&RCC_AHB4ENR_GPIOCEN)GPIOC->BSRR=1U<<28;
+ __DSB();
 }
 static void finish(uint32_t error)
 {
@@ -72,14 +81,16 @@ static void output(GPIO_TypeDef *port,unsigned pin,unsigned high)
 }
 static void configure_control_pins(void)
 {
- /* A1's raw digital companion must not fight the wiper. */
+ /* Neither raw digital companion may fight its wiper. */
  GPIOC->MODER&=~(3U<<20);GPIOC->PUPDR&=~(3U<<20);
+ GPIOH->MODER&=~(3U<<4);GPIOH->PUPDR&=~(3U<<4);
  /* Only A0/A1/A2 conditioned inputs are Hi-Z. Preserve suspect PA2,
   * its PA12 buffered companion and every unrelated pin's mode/pulls. */
  const uint32_t analog=(3U<<16)|(3U<<18)|(3U<<20);
  GPIOA->MODER|=analog;GPIOA->PUPDR&=~analog;
- /* PF5/PF6 and PD12 are main-VDD pins; VDDIO4 is not involved. */
- output(GPIOF,5,0);output(GPIOF,6,0);
+ GPIOF->MODER|=3U<<6;GPIOF->PUPDR&=~(3U<<6); /* A4 conditioned PF3 */
+ GPIOG->MODER|=3U<<30;GPIOG->PUPDR&=~(3U<<30); /* A5 conditioned PG15 */
+ output(GPIOF,5,0);output(GPIOF,6,0);output(GPIOC,12,0);
 }
 static uint32_t sample_channel(uint32_t channel)
 {
@@ -108,15 +119,16 @@ void control_main(void)
  RCC->AHB4ENSR=RCC_AHB4ENR_GPIODEN;__DSB();
  (void)RCC->AHB4ENR;
  output(GPIOD,12,1);
- for(unsigned i=0;i<64;i++)P[i]=0;
+ for(unsigned i=0;i<PROOF_WORDS;i++)P[i]=0;
 #if defined(CONTROL_INTERNAL_VREF)
  for(unsigned i=0;i<16;i++)V[i]=0;
  V[0]=0x46455256U;V[3]=4095U;
 #endif
- P[MAGIC]=0x31434441U;P[VERSION]=5;P[NONCE]=Q[1];P[STATE]=1;
+ P[MAGIC]=0x31434441U;P[VERSION]=6;P[NONCE]=Q[1];P[STATE]=1;
  P[PERIOD_MS]=Q[3];P[MAX_SAMPLES]=Q[2];P[MIN_RAW]=4095;
  P[ADC_CHANNEL]=10;P[ADC_BITS]=12;P[DIGITAL_FULL_SCALE]=4095;
  P[A0_MIN]=4095;P[A2_MIN]=4095;
+ P[ASA_MIN_RAW]=4095;P[A4_MIN]=4095;P[ASA_ADC_CHANNEL]=7;
  P[CCR]=SCB->CCR;P[CONTROL]=__get_CONTROL();P[PRIMASK]=__get_PRIMASK();
  P[FAULTMASK]=__get_FAULTMASK();
  if(Q[0]!=0x31544F50U||!Q[1]||!Q[2]||Q[2]>36000U||Q[3]<20U||Q[3]>1000U||Q[4]||Q[5]||Q[6]||Q[7])finish(1);
@@ -130,9 +142,16 @@ void control_main(void)
  uint32_t before=DWT->CYCCNT;for(volatile unsigned i=0;i<1000;i++)__NOP();
  P[DWT_START]=before;P[DWT_DELTA]=DWT->CYCCNT-before;if(!P[DWT_DELTA])finish(5);
  last_cycles=DWT->CYCCNT;
- RCC->AHB4ENSR=RCC_AHB4ENR_GPIOAEN|RCC_AHB4ENR_GPIOCEN|RCC_AHB4ENR_GPIOFEN|RCC_AHB4ENR_PWREN;
+ RCC->AHB4ENSR=RCC_AHB4ENR_GPIOAEN|RCC_AHB4ENR_GPIOCEN|RCC_AHB4ENR_GPIOFEN|
+  RCC_AHB4ENR_GPIOGEN|RCC_AHB4ENR_GPIOHEN|RCC_AHB4ENR_PWREN;
  __DSB();
  configure_control_pins();
+ /* Stock3.3V VDDIO4 powers PC10/PC12/PH2. Never select its1.8V range. */
+ if(PWR->SVMCR1&PWR_SVMCR1_VDDIO4VRSEL)finish(23);
+ /* ES0620 2.2.29: VDDIO4 PVM is not operational; RDY is not a rail proof.
+  * The user-confirmed stock3.3V bank is the electrical precondition. */
+ PWR->SVMCR1|=PWR_SVMCR1_VDDIO4SV;__DSB();
+ if(!(PWR->SVMCR1&PWR_SVMCR1_VDDIO4SV))finish(25);
  /* Monitor board analog1.8V before ASV releases its ADC isolation. */
  PWR->SVMCR3|=PWR_SVMCR3_AVMEN;__DSB();uint32_t supply_start=HAL_GetTick();
  while(!(PWR->SVMCR3&PWR_SVMCR3_ARDY)) {
@@ -156,7 +175,7 @@ void control_main(void)
   * analog switch. Match the official ADC example without changing GPIO
   * security, privilege attributes, or any other peripheral's attribution. */
  volatile uint32_t *security_proof=(volatile uint32_t *)0x343C2300U;
- for(unsigned i=0;i<12;i++)security_proof[i]=0;
+ for(unsigned i=0;i<14;i++)security_proof[i]=0;
  security_proof[0]=0x43455341U;security_proof[11]=Q[1];
  security_proof[8]=RCC->AHB3ENR;
  RCC->AHB3ENSR=RCC_AHB3ENSR_RIFSCENS;__DSB();
@@ -166,7 +185,9 @@ void control_main(void)
  security_proof[3]=RIFSC->RISC_PRIVCFGRx[2];
  security_proof[5]=GPIOA->SECCFGR;security_proof[6]=GPIOF->SECCFGR;
  security_proof[7]=GPIOC->SECCFGR;
- if((security_proof[5]&0x700U)!=0x700U)finish(21);
+ security_proof[12]=GPIOG->SECCFGR;security_proof[13]=GPIOH->SECCFGR;
+ if((security_proof[5]&0x700U)!=0x700U||!(security_proof[6]&(1U<<3))||
+    !(security_proof[12]&(1U<<15)))finish(21);
  RIFSC->RISC_SECCFGRx[2]|=1U;__DSB();
  security_proof[2]=RIFSC->RISC_SECCFGRx[2];
  security_proof[4]=RIFSC->RISC_PRIVCFGRx[2];
@@ -201,20 +222,32 @@ void control_main(void)
  if(HAL_ADC_ConfigChannel(&adc,&ch)!=HAL_OK){snapshot();finish(11);}
  P[STATE]=3;
  if(HAL_ADCEx_Calibration_Start(&adc,ADC_SINGLE_ENDED)!=HAL_OK){snapshot();finish(12);}
- output(GPIOF,6,1);uint32_t start=HAL_GetTick();
+ output(GPIOF,6,1);output(GPIOC,12,1);uint32_t start=HAL_GetTick();
  while(HAL_GetTick()-start<10U)__NOP();
  P[STATE]=4;
  while(P[SAMPLE_COUNT]<P[MAX_SAMPLES]&&Q[7]!=STOP_MAGIC) {
   start=HAL_GetTick();
+  uint32_t pair_start=DWT->CYCCNT;
 #if defined(CONTROL_INTERNAL_VREF)
   uint32_t vref_raw=sample_channel(ADC_CHANNEL_VREFINT);
   uint32_t vref_sqr=ADC1->SQR1;
 #endif
   uint32_t low=sample_channel(ADC_CHANNEL_5);
   uint32_t high=sample_channel(ADC_CHANNEL_11);
+  uint32_t asa_high=sample_channel(ADC_CHANNEL_16);
   uint32_t raw=sample_channel(ADC_CHANNEL_10);
-  P[SEQUENCE]++;P[63]=P[SEQUENCE];__DSB();
+  uint32_t exposure_cycles=DWT->CYCCNT-pair_start;
+  uint32_t asa=sample_channel(ADC_CHANNEL_7);
+  uint32_t asa_cycles=DWT->CYCCNT-pair_start;
+  P[SEQUENCE]++;P[SEQUENCE_END]=P[SEQUENCE];__DSB();
   P[RAW]=raw;P[SAMPLE_COUNT]++;P[MILLISECONDS]=HAL_GetTick();
+  P[ASA_RAW]=asa;P[A4_RAW]=asa_high;P[PAIR_START_MS]=start;
+  P[EXPOSURE_READ_CYCLES]=exposure_cycles;P[ASA_READ_CYCLES]=asa_cycles;
+  P[PAIR_CYCLES]=DWT->CYCCNT-pair_start;
+  if(asa<P[ASA_MIN_RAW])P[ASA_MIN_RAW]=asa;
+  if(asa>P[ASA_MAX_RAW])P[ASA_MAX_RAW]=asa;
+  if(asa_high<P[A4_MIN])P[A4_MIN]=asa_high;
+  if(asa_high>P[A4_MAX])P[A4_MAX]=asa_high;
   P[A0_RAW]=low;P[A2_RAW]=high;
   if(low<P[A0_MIN])P[A0_MIN]=low;
   if(low>P[A0_MAX])P[A0_MAX]=low;
@@ -224,7 +257,7 @@ void control_main(void)
   P[A1_DIGITAL]=(GPIOC->IDR>>10)&1U;
   if(raw<P[MIN_RAW])P[MIN_RAW]=raw;
   if(raw>P[MAX_RAW])P[MAX_RAW]=raw;
-  snapshot();__DSB();P[63]=P[SEQUENCE]+1U;__DSB();P[SEQUENCE]++;__DSB();
+  snapshot();__DSB();P[SEQUENCE_END]=P[SEQUENCE]+1U;__DSB();P[SEQUENCE]++;__DSB();
 #if defined(CONTROL_INTERNAL_VREF)
   V[1]++;V[15]=V[1];__DSB();
   V[2]=vref_raw;if(vref_raw<V[3])V[3]=vref_raw;if(vref_raw>V[4])V[4]=vref_raw;

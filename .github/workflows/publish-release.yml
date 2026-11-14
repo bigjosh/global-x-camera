@@ -1,60 +1,31 @@
-# Publishes a GitHub release described by release/request.json.
-#
-# The request file names a tag, a title, a Markdown notes file and the asset
-# files to attach, all of which are committed in this repository. Pushing a
-# change to the request file creates the release at that commit, or updates
-# the notes and assets of a release that already exists for the tag.
+# Publication is an explicit action, never a side effect of pushing code.
+# The checked-out request must enable publication and match the typed tag.
 name: Publish firmware release
 
 on:
-  push:
-    branches:
-      - main
-      - ccr-2fc483d6-bkdh6g
-    paths:
-      - release/request.json
   workflow_dispatch:
+    inputs:
+      tag:
+        description: Exact enabled release/request.json tag to publish
+        required: true
+        type: string
 
 permissions:
   contents: write
+
+concurrency:
+  group: firmware-release-${{ github.event.inputs.tag }}
+  cancel-in-progress: false
 
 jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Create or update the release
+      - name: Validate and publish immutable firmware assets
         env:
           GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.event.inputs.tag }}
         run: |
-          set -euo pipefail
-          python3 - <<'PY' > "$RUNNER_TEMP/release.env"
-          import json, os, shlex, sys
-          request = json.load(open("release/request.json", encoding="utf-8"))
-          for key in ("tag", "title", "notes"):
-              if not isinstance(request.get(key), str) or not request[key]:
-                  sys.exit(f"release/request.json: missing {key}")
-          assets = request.get("assets", [])
-          missing = [p for p in [request["notes"], *assets] if not os.path.isfile(p)]
-          if missing:
-              sys.exit("missing files: " + ", ".join(missing))
-          print("TAG=" + shlex.quote(request["tag"]))
-          print("TITLE=" + shlex.quote(request["title"]))
-          print("NOTES=" + shlex.quote(request["notes"]))
-          print("PRERELEASE=" + ("1" if request.get("prerelease") else "0"))
-          print("ASSETS=(" + " ".join(shlex.quote(p) for p in assets) + ")")
-          PY
-          source "$RUNNER_TEMP/release.env"
-          flags=()
-          if [ "$PRERELEASE" = "1" ]; then flags+=(--prerelease); fi
-          if gh release view "$TAG" >/dev/null 2>&1; then
-            gh release edit "$TAG" --title "$TITLE" --notes-file "$NOTES" "${flags[@]}"
-            if [ "${#ASSETS[@]}" -gt 0 ]; then
-              gh release upload "$TAG" "${ASSETS[@]}" --clobber
-            fi
-          else
-            gh release create "$TAG" --target "$GITHUB_SHA" --title "$TITLE" \
-              --notes-file "$NOTES" "${flags[@]}" "${ASSETS[@]}"
-          fi
-          gh release view "$TAG"
+          python3 release/publish.py --execute --confirm-tag "$RELEASE_TAG" \
+            --commit "$GITHUB_SHA" --repository "$GITHUB_REPOSITORY"

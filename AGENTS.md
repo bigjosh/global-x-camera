@@ -4,6 +4,46 @@ Read [NOTES.md](NOTES.md) at the root and in the relevant owning folder before c
 
 # Instrument access
 
+**November 14 controls consolidation complete offline:** the user selected the
+review recommendation and requested commit/push. Default `package.py` now builds
+calibrated source-based CKN1 controls; `--legacy-knobs` alone reproduces the old
+runtime-patched profile. Default rejects fixed-settings capture or old USB
+metadata inputs. Fresh capture, USB and combined builds match the frozen
+November 13 controls binaries exactly (prefix b866589c…e242, sector0
+6ddf4499…b499, sector1 206da4c0…73d8). D8 HOLD and early UART bytes are preserved.
+Capture 328, diagnostic 13, storage 19, RAW-slot 17, each package profile 37,
+selector 1, real-HAL 17 scenarios and release 18 tests passed offline.
+
+Release publishing is manual, the historical request is disabled, tags/assets
+are immutable, and timeout guidance no longer permits halting an uncertain NOR
+write. The old prerelease is superseded; its notes-only correction preserves
+its original tag/binaries. [Consolidation and results](docs/review/2026-11-14-knob-firmware-reconciliation.md#approved-consolidation--november-14).
+**No board access, reset, power switching, firmware load or capture occurred.**
+Both knob packages remain physically unqualified; last installed D8 identity
+is historical, not newly read. No active hardware client or ownership hold.
+Re-establish the actual bench state before installation. Separate power/PCB/
+label-artwork work is outside this commit and remains in the working tree.
+
+**November 14 offline upstream reconciliation complete:** pulled three commits
+through `9f159586`, preserved previous work in retained stash `d0609865` plus
+ZIP/patch backups, and resolved all five conflicts. Both knob implementations
+are separate build profiles; `--capture-controls` reproduces our frozen
+November 13 prefix, both sectors and selector exactly. Each profile passed
+33 package/selector tests; 17 RAW-slot tests and 6 real-ST-HAL model cases per
+sampler passed. All 203 frozen evidence hashes match. Working changes remain
+unstaged; no commit, push or release publication occurred.
+
+The review found mismatched exposure direction/scales, an unraised sensor gain
+limit, silent fallback/removed applied-setting checks, and release timeout/tag
+issues. Prefer the local source-built controls path for later qualification;
+do not interpret the published prerelease as the agreed implementation.
+[Findings and recommendation](docs/review/2026-11-14-knob-firmware-reconciliation.md),
+[offline results](docs/review/evidence/2026-11-14-knob-reconciliation/results.json).
+**No instruments, reset, power switching, firmware installation or capture
+occurred.** Both knob packages remain hardware-untested. Last installed D8
+identity and the absent-ST-LINK checkpoint below are historical, not freshly
+checked. There is no active hardware client or ownership hold from this review.
+
 **November 14 knob package built offline; NOT installed; no hardware operated:**
 a cloud session with no bench access built
 [firmware/usb-ptp/evidence/2026-11-14-knobs](firmware/usb-ptp/evidence/2026-11-14-knobs/README.md),
@@ -15,6 +55,49 @@ unchanged from the entries below. The install sequence, reconstructed from the
 November 13 records, is in the GitHub release notes for tag `knobs-2026-11-14` and in
 `release/knobs-2026-11-14/RELEASE_NOTES.md`; installing it is the first hardware test, and
 everything in the "not checked" list there is open.
+
+**November13 knobs package ready; installation blocked by absent ST-LINK:**
+user requests load only and will test, confirms direct5V/ST-LINK connected,
+then reports reconnecting CN10. Windows still detects neither ST-LINK nor its
+VCP; CubeProgrammer reports no probe. No reset/UART stimulus/NOR/SD write or
+JS operation occurred in this installation attempt. Actual MCU runtime is
+unknown after user handling; prior recovery park is not a fresh live proof.
+Last installed FLASH remains the previous D8 package. Reviewed combined
+controls package prefix b866589c…e242, sector0 6ddf4499…b499 and sector1
+206da4c0…73d8 is frozen in [the load-only evidence](firmware/usb-ptp/evidence/2026-11-13-knob-controls/README.md).
+Exposure1/1000–1/2s and ASA1×/2×/4×/8×, D8 HOLD and UART retained. User
+connection check is pending; no active hardware client or ownership hold.
+After reconnection, establish exact previous D8 UART park, then use prepared
+`tmp/bringup/knobs-capture-20261113/install.py --execute-load-only` to back up,
+program secondary then primary NOR, and release normal reset. Do not run
+functional tests without new user steering. Hardware final-state.json records
+`installed:false`; update it and this checkpoint after actual programming.
+
+**November13 dual-knob calibration complete; capture integration active:**
+CW/center/CCW medians are exposure3840/2177/1.5 and ASA0/1780.5/3840.
+Both controls will increase counterclockwise; exposure normalization is inverted.
+The user selected continuous1/1000–1/2second and provisional ASA100–800
+(1×/2×/4×/8× analog gain). Three hand-positioned points are not full taper or
+absolute sensitivity calibration. Diagnostic stopped cleanly: A2/A4 LOW,
+D8/PD12 HIGH, state8/error0/CFSR0/HFSR0. Exact existing D8 UART recovery then
+passed9good/0bad at0x3418078C. [Frozen diagnostic evidence](firmware/control-smoke/evidence/2026-11-13-dual-knobs/README.md).
+Target remains powered at that recovery park; direct5V/ST-LINK connected,
+COM8 closed/BREAK released, no active helper. No NOR/SD writes or JS operation
+occurred in the diagnostic. User subsequently confirmed scene ready; root
+exclusively owns the upcoming capture qualification. Integration candidates
+are offline in `tmp/bringup/knobs-capture-20261113/`; installed FLASH remains
+the previous D8 package until a later checkpoint records programming/readback.
+
+**November 13 dual-knob calibration active:** the user requests exposure and
+ASA integration, beginning with a live CW/center/CCW knob diagnostic, and
+confirms direct 5 V target power and ST-LINK attached. Root exclusively owns
+debugger access; agents are offline. Current normal D8 package remains the
+restoration reference. Prepare a RAM-only two-knob ADC helper with D8 HIGH,
+exact UART recovery, exposure A0/A1/A2 and ASA A4/GND/A5. No SD/NOR write or
+Joulescope power operation is needed for this diagnostic. Sensor and MCU USB
+attachment were not freshly specified; establish the early recovery park and
+idle peripheral clocks before loading RAM. Campaign:
+`tmp/bringup/knobs-both-20261113/`. Later checkpoint will record the live state.
 
 **November 13 D8 HOLD confirmed by the user; canonical documentation updated:**
 the user reports that the loaded D8 firmware works and requests the schematic,

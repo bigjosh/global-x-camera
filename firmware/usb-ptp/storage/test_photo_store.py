@@ -384,6 +384,50 @@ class PhotoTests(unittest.TestCase):
             self.assertIn(b'date/orientation unavailable',comment)
             self.assertNotIn(b'RECOVERED',comment)
 
+    def controls_metadata(self, applied=False):
+        data=bytearray(128)
+        struct.pack_into('<6I',data,0,0x314E4B43,1,128,4 if applied else 3,0,31 if applied else 23)
+        struct.pack_into('<10I',data,24,2,3840,3840,0,3840,65535,65535,500000,1280,64813)
+        struct.pack_into('<BB5H',data,64,2,28,62813,256,256,256,256)
+        struct.pack_into('<6I',data,76,800,160800000,62813 if applied else 0,28 if applied else 0,256 if applied else 0,68)
+        struct.pack_into('<I',data,124,zlib.crc32(data[:124]))
+        return data
+
+    def test_capture_settings_comment_configured_applied_and_corrupt(self):
+        for applied in [False,True]:
+            self.card.put()
+            metadata=self.controls_metadata(applied)
+            self.card.data[4:132]=metadata
+            info,out=self.load()
+            result,png=self.png(info,out)
+            self.assertEqual(result,0)
+            _,comment=self.decode(png)
+            self.assertIn(b'settings=applied' if applied else b'settings=configured',comment)
+            self.assertIn(b'exposure_us=500004',comment)
+            self.assertIn(b'analog_gain=8x; ASA=800 (provisional)',comment)
+            self.assertIn(b'date/orientation unavailable',comment)
+            self.assertLessEqual(len(comment),503)
+        for offset,repair_crc in [(124,False),(65,True),(12,True),(84,True)]:
+            self.card.put();metadata=self.controls_metadata()
+            metadata[offset]^=1
+            if repair_crc:struct.pack_into('<I',metadata,124,zlib.crc32(metadata[:124]))
+            self.card.data[4:132]=metadata
+            info,out=self.load();_,png=self.png(info,out);_,comment=self.decode(png)
+            self.assertIn(b'capture settings unavailable',comment)
+            self.assertNotIn(b'ASA=',comment)
+        self.card.put(legacy=True);info,out=self.load();_,png=self.png(info,out);_,comment=self.decode(png)
+        self.assertIn(b'capture settings unavailable',comment)
+
+    def test_capture_comment_worst_case_preserves_size_and_warnings(self):
+        self.card.put();self.card.data[4:132]=self.controls_metadata(True)
+        info,out=self.load();info.flags|=8|16|64;info.flags&=~4
+        info.read_errors=info.unreadable_sectors=info.slot_index=0xFFFFFFFF
+        info.first_bad_lba=0xFFFFFFFE
+        _,png=self.png(info,out);_,comment=self.decode(png)
+        self.assertLessEqual(len(comment),503)
+        self.assertIn(b'ASA=800 (provisional)',comment)
+        self.assertTrue(comment.endswith(b'Capture date/orientation unavailable.'))
+
     def test_png_recovered_exif_and_cancellation(self):
         self.card.put(partial=True)
         info,out=self.load()

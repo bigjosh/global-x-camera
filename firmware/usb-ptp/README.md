@@ -4,11 +4,30 @@ Bare-metal PTP over the Nucleo's **CN8 MCU USB connector**. Windows uses its
 native Portable Devices camera driver; no custom driver, drive emulation or
 SD filesystem is required. The SD still holds the existing fixed RAW slots.
 
-**November 14 knob build, not installed:** a package that reads the exposure
-and gain knobs for every battery photo is built and checked offline. It has
-never run on the camera; the installed firmware is still the November 13
-package described next. See [Exposure and gain knobs](#exposure-and-gain-knobs)
-and [the knob build record](evidence/2026-11-14-knobs/README.md).
+**November 14 consolidated controls:** the default package now uses our
+source-built capture controls, with measured polarity, the selected 1–500 ms
+range, four ASA sectors, applied-setting checks and CKN1 photo metadata.
+Claude's real-ST-HAL test model and portable package tooling are retained.
+The old `knobs-2026-11-14` prerelease is superseded; it remains available only
+for explicit historical reproduction. See the
+[review and consolidation record](../../docs/review/2026-11-14-knob-firmware-reconciliation.md).
+The consolidated firmware is built and checked offline, **not installed or
+hardware-qualified**. The last recorded installation remains the earlier D8
+fixed-settings package.
+
+**Canonical controls:** the combined package
+samples exposure on A1 (A0 LOW/A2 HIGH) and ASA on A5 (A4 HIGH/GND) only after
+VBUS is confirmed absent. Both excitation outputs turn off immediately after
+the bounded ADC batch. CCW increases exposure continuously from 1 ms to 500 ms
+and selects provisional ASA 100/200/400/800, corresponding to analog gain
+1/2/4/8x. ASA labels are not a calibrated ISO sensitivity. The measured electrical
+polarities are opposite; the mapper inverts exposure and leaves ASA positive.
+
+This implementation is prepared for the user's load-and-manual-test workflow;
+the new combined controls path is **hardware untested** at this documentation
+checkpoint. It retains D8 HOLD and the original UART recovery, with USB-selected
+HOLD LOW and no knob sampling in USB or ambiguous-VBUS mode. The following D8
+installation record predates controls integration.
 
 **November 13 D8 firmware installed:** HOLD is now **Arduino D8 / CN14.1 / PD12**.
 This supersedes the earlier D3 assignment at the user's request. The combined
@@ -57,60 +76,45 @@ about 6.9 seconds for each 3.06 MB PNG, including fresh SD reading and encoding.
   UserComment describes the read errors; subsequent listings use
   `_RECOVERED`. A host that already cached the old name may retain it, so the
   embedded warning is authoritative for that download.
-- Capture dates and orientation are omitted: the existing slot padding has
-  no commissioned metadata schema. A valid completion marker is not a pixel
+- Valid new CKN1 capture metadata adds configured/applied exposure, analog gain
+  and provisional ASA to the existing EXIF comment. Old or invalid metadata
+  reports settings unavailable. Capture dates and orientation remain omitted.
+  A valid completion marker is not a pixel
   checksum; these old RAW slots have no stored payload checksum.
 
 PNG uses stored DEFLATE for now. Each exported file is 3,064,188 bytes; the
 card retains its smaller packed RAW representation. Thumbnails are generated
 from a fresh snapshot too. Neither conversion runs during battery capture.
 
+<a id="exposure-and-gain-knobs"></a>
+
 ## Exposure and gain knobs
 
-Built November 14; offline checks only, not installed and not run on hardware.
+Only a confirmed battery capture samples the controls, after VBUS detection
+and before sensor START. USB-present or uncertain-VBUS boots do not sample.
 
-On the battery path (no cable in CN8) the boot selector reads both knobs once,
-after the VBUS check and before the capture code configures the sensor:
-
-| Knob | Pins | Result |
+| Knob | Wiring | Selected behavior |
 |---|---|---|
-| Exposure | A0/PF5 driven LOW, A2/PF6 driven HIGH, wiper A1 → PA9, ADC1 input 10 | 65 to 63000 sensor lines, **0.5 ms to 484 ms**, exponential in knob position; mid-travel 2024 lines, 15.6 ms |
-| Gain | A4/PC12 driven HIGH, low end GND, wiper A5 → PG15, ADC1 input 7 | analog gain code 0 to 28, **1x to 8x**, equal stops; digital gain stays 1x |
+| Exposure | A0/PF5 LOW, A1 wiper → buffered PA9/ADC1 input 10, A2/PF6 HIGH | Continuous logarithmic 1/1000–1/2 second; longer counterclockwise |
+| ASA | A4/PC12 HIGH, A5 wiper → buffered PG15/ADC1 input 7, low end GND | Four sectors: provisional ASA 100/200/400/800 → analog gain 1×/2×/4×/8×; higher counterclockwise |
 
-A higher reading gives a longer exposure or more gain. Readings below code 120
-or above 3720 count as the ends of travel, so both extremes are reachable; an
-unconnected wiper reads as the low end. The pins are driven only for the
-reading, about 2 ms, and every register is put back before capture continues.
+The ADC reads the low and high references as well as both wipers. Exposure
+uses inverted normalized voltage; ASA uses positive normalized voltage.
+The supplies return LOW immediately after the sample batch, including failures.
+Digital gain remains 1×. A failed ADC/configuration or applied-value check uses
+the existing camera error indication and shutdown instead of silently taking
+a photo with fixed settings. D8 HOLD and early UART recovery are preserved.
 
-The selector then edits the copy of the capture prefix already in RAM: bytes 1
-to 3 of the manual-exposure register block (gain code, exposure lines) and the
-`MOVW` that holds the frame length. The frame length is the larger of the
-usual 4336 lines and exposure + 2000 lines. `package.py` finds both places in
-the reviewed prefix and refuses to build if either is not unique; at run time
-`knob.c` checks the exact default bytes before writing. Flash is never written
-at run time. If the converter cannot be set up, a conversion fails, memory
-protection is on or the bytes are not as expected, nothing is edited and the
-photo uses the fixed 1428 lines at 1x, as before.
+The 128-byte CKN1 record fits the existing first-sector metadata reservation.
+The immutable saved snapshot says whether settings were configured or already
+verified against the sensor; USB export preserves that distinction. Older
+photos remain readable with settings reported as unavailable. The metadata CRC
+does not checksum the pixel payload, and ASA labels are not calibrated ISO.
 
-The reviewed capture receiver fails a photo unless the sensor reports exactly
-1428 exposure lines. `exposure_gate.py` changes that one conditional branch in
-the built image to an unconditional one and sets the four bytes it leaves
-unreachable so the late-range CRC-32 is unchanged. Five bytes of sector 0
-change; the loader's checksum constant, the early receiver and the boot prefix
-do not.
-
-Limits: the applied exposure and gain are not stored with the photo. The knobs
-are not read in USB mode. One second is not reachable in the current sensor
-mode (16-bit line registers at 7.69 µs per line). The selector grew from 4464
-to 7228 bytes, and with the reading itself that adds an estimated 5 ms before
-exposure. The 0.5 ms floor keeps the start of readout about 1 ms after the
-receiver is armed; see the notes before lowering it. `test_knob.py` models the
-logic on the host, and with `GLOBAL_X_HAL` set to ST's HAL driver v1.3.0 it
-also runs `knob.c` with the real ADC driver against the bus model in
-`hal_model/`. Settling time, gains above 1x and exposures outside 5 ms to
-231 ms have never been run on hardware. The selector record at `0x343F9000`
-gains word 9, the address of `knob_proof`, and word 10, the result code listed
-at the top of `knob.c`, or all ones when the knobs were not read on that boot.
+Tests use both targeted failure-injection fakes and ST's actual ADC/ADCEx driver
+against the register model. They verify disabling ADC before channel selection,
+cleanup and mappings. Analog settling, complete-cycle timing, long exposures,
+high gain, image quality and the 50 ms startup target still need hardware checks.
 
 ## Architecture and build
 
@@ -121,19 +125,23 @@ USB Device core and N6 PCD. The [Windows harness](host/README.md) exercises the
 same native driver used by Explorer.
 
 ```powershell
+python firmware/capture-raw/build.py --out tmp/my-controls-capture --flash --standby --sensor-single-frame --error-blinks --ethernet-powerdown --magic-format --line-stream --async-stop --transport idma --sd-bus-width 4 --sd-clock-hz 25000000 --sd-gpio-speed 3 --sd-clock-negedge --sd-clock-negedge-init --sd-review-profile --sd-startup-opt --gpio-hold --knob-controls
 python firmware/usb-ptp/build.py --out tmp/my-usb-build
-python firmware/usb-ptp/package.py --usb tmp/my-usb-build --capture tmp/my-reviewed-pd12-capture/staged --out tmp/my-usb-package
+python firmware/usb-ptp/package.py --usb tmp/my-usb-build --capture tmp/my-controls-capture/staged --out tmp/my-usb-package
 ```
+
+### Historical upstream reproduction only
 
 `package.py` uses the ST compiler recorded in `capture-timing/build_raw10.py`
 when it is present, otherwise `arm-none-eabi-gcc` on `PATH`; set
 `GLOBAL_X_TOOLCHAIN` to a tools directory to choose another. `--hal` and
 `--cmsis` point it at ST driver sources other than the SDK copy under `tmp/`.
-The knob package was built on Linux from committed inputs only, plus ST's
-HAL driver v1.3.0 from GitHub:
+The historical knob package was built on Linux from committed inputs plus
+ST HAL v1.3.0. Reproducing it requires `--legacy-knobs`; it is not the selected
+controls implementation and retains the issues documented in the review:
 
 ```sh
-python3 firmware/usb-ptp/package.py \
+python3 firmware/usb-ptp/package.py --legacy-knobs \
   --usb firmware/usb-ptp/evidence/2026-11-13-d8-hold/usb \
   --capture firmware/usb-ptp/evidence/2026-11-13-d8-hold/capture-input \
   --hal <stm32n6xx-hal-driver v1.3.0> \
@@ -141,15 +149,39 @@ python3 firmware/usb-ptp/package.py \
   --out <new folder>
 ```
 
-Run `python firmware/usb-ptp/knob_tables.py` after changing a mapping constant;
-it regenerates `knob_tables.h`.
+The historical `knob.c`, `knob_tables.py` and `exposure_gate.py` remain for
+reproduction. They are not linked or applied by the default build. Frozen
+release artifacts and recovery identities have not been rewritten.
 
-The canonical dual-mode package includes the reviewed PD12 HOLD capture build
-and preserves its capture payload and the original early UART recovery guard.
+### Canonical controls package
+
+The package command defaults to the reviewed controls-enabled capture profile;
+`--capture-controls` remains an optional compatible alias. It rejects the older
+fixed-settings D8 reference unless `--legacy-knobs` is explicitly selected. The
+canonical USB input must include matching CKN1 metadata export; an older USB
+payload is rejected. The selector is 7,716 bytes within the existing 8 KiB NOR
+reservation; USB remains at NOR offset `0x12000`.
+
+The sampling and sensor configuration record is 128 bytes at `0x343F9400`.
+A fixed helper at `0x34200100` replaces only the reviewed frame-length call;
+the manual-settings pointer changes to the record's 12-byte payload. All other
+prefix bytes, including early UART recovery and D8 assertion, are preserved.
+No runtime code patching occurs. ADC/security/rail or cleanup faults become
+camera initialization errors through the existing red-code/shutdown path.
+
+The sensor uses constant line length 1280 at 160.8 MHz, a rounded-up exposure
+line count, and frame length `max(4336, coarse + 2000)`. The nominal 500 ms
+endpoint is 62,813 lines (500,003.98 microseconds), within the 16-bit frame
+limit. The helper reads the actual coarse margin, explicitly permits and verifies
+analog gain code 28 (8x), and retains unity digital gain. A conservative 10 ms
+pot-settling delay is included; the earlier cold-start budget is not requalified.
+
+The canonical package requires the reviewed controls capture build with matching
+HOLD policy and preserves its capture payload and original early UART guard.
 The standalone capture build uses `--gpio-hold`; see the [capture build](../capture-raw/README.md).
 The package builder requires an explicit capture directory and admits only
 independently reviewed exact prefix/sector hashes, not a self-consistent manifest.
-The legacy October 28 input is retained for explicit historical reproductions;
+The legacy October 28 input is retained for explicit historical inspection;
 it does not implement the D8 capture latch. A small branch after SRAM preparation
 loads a checked selector from a separate NOR region. It samples **CN8 VBUS
 through R80/R81 → PA11/ADC2 channel 12**. Present USB power selects the PTP

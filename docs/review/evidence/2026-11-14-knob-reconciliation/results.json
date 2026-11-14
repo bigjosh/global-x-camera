@@ -1,0 +1,83 @@
+{
+  "schema": 1,
+  "recorded_utc": "2026-11-14T17:35:01.866200+00:00",
+  "scope": "offline pull, code/release review and conflict reconciliation; no hardware operations",
+  "branch": "ccr-2fc483d6-bkdh6g",
+  "head_before": "7ca6e63412b851fa87a34550e311d9dda4421228",
+  "head_after": "9f1595865f54c26d89f5713d3c9fd9df61222259",
+  "pulled_commits": 3,
+  "preservation": {
+    "retained_stash": "d0609865185bee49eb8fded990ecdbea20f56289",
+    "backup": "tmp/review-knobs-20261114/prepull-working-files.zip",
+    "missing_preserved_files": [],
+    "unresolved_conflicts": [],
+    "working_changes": "unstaged; no commit or push"
+  },
+  "checks": {
+    "controls_profile_build": "passed",
+    "upstream_profile_build": "passed with local GCC 12.3; original upstream used GCC 13.2, so binary identity differs",
+    "controls_linked_package_and_selector_tests": {
+      "passed": 33,
+      "failed": 0,
+      "skipped": 0
+    },
+    "upstream_linked_package_and_selector_tests": {
+      "passed": 33,
+      "failed": 0,
+      "skipped": 0
+    },
+    "raw_slots_tests": {
+      "passed": 17,
+      "failed": 0,
+      "skipped": 0
+    },
+    "upstream_knob_tests": {
+      "passed": 10,
+      "failed": 0,
+      "skipped": 3,
+      "skip_reasons": "Arm tools absent from PATH in this invocation; Linux-only HAL model"
+    },
+    "real_st_hal_register_model": {
+      "local_cases_passed": 6,
+      "upstream_cases_passed": 6,
+      "model_violations": 0,
+      "adaptation": "Temporary Windows VirtualAlloc adapter; unchanged real ADC/ADCEx drivers; unused DMA symbols abort if called",
+      "limitation": "Driver/state simulation, not analog settling, startup timing or hardware capture qualification"
+    },
+    "frozen_hash_entries": {
+      "verified": 203,
+      "mismatched": 0
+    },
+    "local_rebuild_matches_frozen": [
+      "stage1.bin",
+      "sector0.bin",
+      "sector1.bin",
+      "selector.bin"
+    ],
+    "git_diff_check": "passed"
+  },
+  "local_rebuild_identity": {
+    "prefix_sha256": "b866589cf472cac9820d961f3243cb8280759614826083757fae374ccee7e242",
+    "sector0_sha256": "6ddf4499865264aec845150597aa6b8d44cb89e7d5e621dd324a0e1a9170b499",
+    "sector1_sha256": "206da4c0a8bdcda6205d7ccdb3d9ac02548e9db6852b1fa47afa6327b76473d8",
+    "selector_bytes": 7716
+  },
+  "release": {
+    "tag": "knobs-2026-11-14",
+    "url": "https://github.com/bigjosh/global-x-camera/releases/tag/knobs-2026-11-14",
+    "draft": false,
+    "prerelease": true,
+    "published_at": "2026-11-14T17:07:40Z",
+    "tag_commit": "9f1595865f54c26d89f5713d3c9fd9df61222259",
+    "uploaded_sector_hashes_match_committed_files": true,
+    "modified_by_review": false
+  },
+  "hardware": {
+    "operated": false,
+    "firmware_installed": false,
+    "latest_physical_state": "not read",
+    "last_recorded_installed_package": "November 13 D8 fixed-settings package",
+    "both_knob_candidates_hardware_qualified": false
+  },
+  "reconciliation": "Profiles are mutually exclusive. Recommend local source-built controls, retaining upstream HAL model, portability and release tooling; see report for unresolved release issues."
+}
