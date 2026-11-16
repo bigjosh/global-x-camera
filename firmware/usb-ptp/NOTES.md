@@ -414,3 +414,62 @@ success as hardware qualification. Firmware installation remains separate.
 [review/consolidation record](../../docs/review/2026-11-14-knob-firmware-reconciliation.md).
 The user authorized committing and pushing this consolidation on November 14.
 No instrument access is part of it.
+
+## 2026-11-16  First hardware shots on r2: knobs apply to 88 ms; ~0.5 s fails with code 2 after settings verify
+
+First battery captures on the installed `knobs-2026-11-14-r2` image (Mac
+install, see `release/NOTES.md`). Thirteen saved photos carry
+`settings=applied`: 1,003 to 88,366 us, at ASA 100 (1x) and ASA 800 (8x).
+Slower exposure-knob positions give two red flashes (camera initialization)
+and no photo; the exact threshold between 88 ms and 0.5 s was not bracketed.
+
+For one failing shot the CKN1 record was read over hot-plug SWD during the
+blink display: `state=4` (applied/verified), `error=0`, `flags=0x1f`,
+`requested_us=497696`, coarse 62524 (`applied_coarse` equal), line 1280,
+frame 64524, margin 68, ASA 100. So `capture_controls_sensor_apply` and the
+applied-settings verification passed; the failure is later.
+
+**Not established:** the failing location. The capture failure `where` value
+was not read. A candidate from source reading only: the START-acknowledge and
+streaming-state waits in `capture-timing/build.py` share a 500 ms
+`HAL_GetTick` deadline (`fail(0x75,-100)` / `fail(0x76,-100)`, both classified
+as code 2), and this frame lasts about 514 ms (64524 lines x 1280 / 160.8 MHz).
+
+**Evidence:** photos `GX_0000412`-`GX_0000424` on the Mac
+(`~/Pictures/Global X Camera`, eXIf user comment), and the record bytes
+`434b4e31010000008000000004000000000000001f00000001000000000f0000000f0000`
+`0400000002000000ccff00001100000020980700000500000cfc000002003cf400010001`
+`0001000164000000009d95093cf40000000000000001000044000000d4d4270078df6d00`
+`2bf27700df027a000000000000000000eded17ac`.
+
+## 2026-11-16  Cap the exposure knob at 1/8 s after hardware shots bracketed the failure
+
+Follow-up to the entry above, same day. Sixty-five r2 photos now carry
+`settings=applied`. With no debugger attached the slowest saved exposures are
+139,709, 142,790, 154,866, 175,180 and 219,256 us, at ASA 100 and 800. The
+operator saw two red flashes at slower settings; the fastest such shot whose
+value was read is 262,813 us. So the limit lies between 219 ms and 263 ms of
+exposure (about 235 to 279 ms of frame time). Its cause is still not
+established; the 500 ms START-acknowledge deadline suggested above does not
+explain a failure at 263 ms unless that tick is not 1 ms.
+
+**Caveat on the failure readings:** none of the twelve shots taken while the
+ST-LINK was attached and polled over hot-plug SWD (200 kHz, about two reads
+per second) produced a saved photo, including five the operator judged good
+(3.5 ms, 4.6 ms, 79.6 ms). The debugger polling therefore appears to prevent
+or lose the save. The failure values above 263 ms were read under that
+condition; the two-red-flash symptom itself was first reported without it.
+
+**Change (source only, uncommitted, not built or flashed):**
+`capture_controls_map.c` now spans 1,000 to 125,000 us over the same 64
+log-spaced intervals (`round(1000*125^(i/64))`), at the user's choice of 1/8 s.
+`test_capture_controls.py` passes natively; `test_controls_real_hal.py` was
+edited to match but not run here. The frozen-source hashes in `package.py`,
+the README's 1/1000-1/2 s wording, the release profile and the 15.5 mm knob
+label (`docs/prototype/knob-labels/design.json`) still describe 1/2 s and need
+the same update before a release.
+
+**Rejected:** clamping the existing table at 125 ms (leaves the last quarter
+of an unmarked knob's travel dead); capping at 1/5 s (only one saved photo is
+slower than 200 ms); building here (Arm's stock GCC does not reproduce the
+release bytes on this Mac).
