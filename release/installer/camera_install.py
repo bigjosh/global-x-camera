@@ -157,7 +157,8 @@ class Transport:
         if "-halt" in args:
             self.halt_requests += 1
         argv = [str(self.cli), "-c", "port=SWD", "mode=HOTPLUG", "ap=1",
-                "freq=1000", "sn=" + self.serial, *map(str, args)]
+                # 200 kHz: at 1000 kHz the ST-LINK USB link froze after ~30-70 KiB of RAM downloads on this Mac/board.
+                "freq=200", "sn=" + self.serial, *map(str, args)]
         self.log("cube_call", number=self.calls, argv=argv)
         kwargs = dict(stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                       timeout=self.default_timeout if timeout is None else timeout)
@@ -172,7 +173,10 @@ class Transport:
             raise RuntimeError("Programmer timed out. The MCU may still be executing; "
                                "no target reset or retry was performed.") from exc
         path.write_bytes(result.stdout)
-        text = result.stdout.decode("utf-8", errors="replace")
+        # macOS CubeProgrammer colours its output; the codes break ^-anchored and \b parsing.
+        text = re.sub(r"\x1b\[[0-9;]*m", "", result.stdout.decode("utf-8", errors="replace"))
+        # macOS libusb prints "transfer error:" warnings on commands that succeed; they are not CLI errors.
+        text = re.sub(r"(?m)^libusb: warning .*$", "", text)
         self.log("cube_result", number=self.calls, returncode=result.returncode)
         if result.returncode or re.search(r"\bError\s*:", text, re.I) or (success and success not in text):
             raise RuntimeError(f"Programmer command failed. Details: {path}")

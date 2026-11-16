@@ -165,3 +165,28 @@ blind retries after unresolved mutation, including serial reset before a SWD
 halt. Original firmware release assets stay immutable; the guided installer
 is a separately identified additive asset. `CURRENT_RELEASE_NOTES.md` supplies
 the current release body; its older attached notes remain the publication snapshot.
+
+## 2026-11-16  First Mac hardware install needed 200 kHz SWD and two output filters
+
+The guided installer first completed on a Mac (Apple Silicon, STM32CubeProgrammer
+2.23.0, ST-LINK V3J15M6 serial 002100203335511035383531) only after three local
+changes to `installer/camera_install.py`, all still uncommitted:
+
+- strip ANSI colour codes from CLI output (they hid the `-coreReg` lines from
+  the `^`-anchored parser, giving a false "not the reviewed recovery context");
+- drop `libusb: warning` lines before the `Error:` check;
+- `freq=200` instead of `freq=1000`.
+
+**Rejected:** keeping 1000 kHz. With the camera parked in recovery, hot-plug
+reads and `-halt -coreReg` were reliable, but RAM downloads froze the ST-LINK
+USB interface (`device not responding`, then `DEV_USB_COMM_ERR` until replug)
+after roughly 30-70 KiB sent, on two different Mac ports. Splitting the 64 KiB
+download into 4 KiB pieces did not help (failed on the ninth). At 200 kHz about
+1.5 MB of RAM downloads and the full install passed with no libusb warning.
+Cause not established; a hub and a newer ST-LINK firmware were not tried.
+
+**Evidence:** `~/global-x-camera-installs/20261116-125222-144111` on that Mac
+(`complete.json`, verified sector hashes 6ddf4499... / 206da4c0..., backup of the
+D8 image 1a9278ab... / ed6d4169...). Knob behaviour, D8 latch and capture on
+the r2 image were not checked in this session. `test_camera_transport` has two
+path tests that fail on macOS (`/var` vs `/private/var`).
