@@ -138,7 +138,10 @@ transfer or previous flash operation is active. Without `--restart`, the utility
 arms the serial signal and waits for the operator to switch to USB. `--serial`
 selects one probe when multiple are attached; `--port` still must match that
 probe. `--cubeprogrammer` accepts the installed CLI or `.app` path. `--output`
-must name a new log directory. Run `--help` for the options. Do not invoke ST's
+must name a new log directory. `--target eighth-second-2026-11-16` installs the
+r2 controls image with the exposure knob rescaled to 1/1000–1/8 s instead of
+the default r2; either image can be installed over the other. Run `--help` for
+the options. Do not invoke ST's
 stock external loader from our normal-boot recovery park.
 
 Offline developer checks use `python3 -m unittest discover -s . -p 'test_*.py'`.

@@ -473,3 +473,17 @@ the same update before a release.
 of an unmarked knob's travel dead); capping at 1/5 s (only one saved photo is
 slower than 200 ms); building here (Arm's stock GCC does not reproduce the
 release bytes on this Mac).
+
+## 2026-11-16  1/8 s table built on the Mac, installed, and shot across its range
+
+Supersedes "building here" in the rejected list above: ST's macOS build of the
+same compiler reproduces r2 byte-for-byte, so the 1/8 s table was packaged and
+installed from the Mac (build identity and byte diff in `release/NOTES.md`).
+
+Six battery shots on that image, no debugger attached, all saved with
+`settings=applied` at ASA 800: 1,003, 1,003, 2,683, 23,172, 105,672 and
+124,553 µs. The operator reported no two-flash failures across the knob's
+travel. The slowest reading is the top of the new table (125,000 µs nominal).
+
+Still open: why exposures above ~220 ms fail on r2; ASA 100-400 and the
+intermediate knob positions were not re-shot on this image.

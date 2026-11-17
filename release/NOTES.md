@@ -190,3 +190,42 @@ Cause not established; a hub and a newer ST-LINK firmware were not tried.
 D8 image 1a9278ab... / ed6d4169...). Knob behaviour, D8 latch and capture on
 the r2 image were not checked in this session. `test_camera_transport` has two
 path tests that fail on macOS (`/var` vs `/private/var`).
+
+## 2026-11-16  Mac reproduces r2 byte-for-byte; installer gains a second pinned image
+
+ST's macOS build of the same compiler (GNU Tools for STM32
+12.3.rel1.20240612-1315, plugin `...gnu-tools-for-stm32.12.3.rel1.macos64_1.0.200.202406191456`
+from ST's public STM32CubeIDE 1.16.0 update site, SHA-256 `c11d71cc...1bbb`
+as published in that site's index) rebuilds r2 exactly: `package.py` on
+unmodified source with the committed `2026-11-13-knob-controls` USB and capture
+inputs, HAL v1.3.0 and the committed CMSIS gives sector0 `6ddf4499...` and
+sector1 `206da4c0...`. Arm's stock 12.3.Rel1 does not (selector ~300 bytes
+larger, hook one word over its slot). Only `package.py` is needed for a
+controls-table change; the Windows-only `build.py` scripts are not.
+
+The same build with the 1/8 s exposure table gives sector0 `dadacbe3...2595`,
+sector1 `f07fa113...5506`, recovery prefix `0633756f...c783`. Against r2 it
+differs in 148 bytes of sector1 (the 65-entry table and the 500000 -> 125000
+literal) and 5 bytes of sector0 (boot-header checksum byte at 0x64 and the
+4-byte word at hook offset 0x1b4). Nothing else changed; sizes are identical.
+
+Installer: `--target eighth-second-2026-11-16` selects this image from
+`assets/firmware-eighth-second`; the default stays r2. The image is added to
+`camera_recovery.APPROVED` and `profiles.json` so a camera running it is
+recognised and can be rolled back to r2. That allowlist says adding an image
+needs review: the review here is the byte diff above, done on the Mac at the
+camera owner's request, not an independent one.
+
+Rejected: retargeting the installer's single pinned image (the original
+installer would then not recognise the camera, leaving no rollback path).
+Not done: release packaging, tag, README/profile wording, knob label.
+
+## 2026-11-16  1/8 s image installed on hardware from the Mac
+
+`camera_install.py --target eighth-second-2026-11-16` over r2 at 200 kHz:
+backup matched r2 (`6ddf4499...` / `206da4c0...`), independent readbacks match
+`dadacbe3...` / `f07fa113...`, the following 4096 bytes are unchanged, and
+post-install UART recovery identified the new prefix. No libusb warnings.
+Evidence is the installer's own log folder on the Mac
+(`global-x-camera-installs/20261116-213908-892559`, not committed). Photos and
+knob behaviour on this image were not checked in this entry.

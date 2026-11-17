@@ -52,6 +52,12 @@ APPROVED = {
         'sector0_sha256': '6ddf4499865264aec845150597aa6b8d44cb89e7d5e621dd324a0e1a9170b499',
         'sector1_sha256': '206da4c0a8bdcda6205d7ccdb3d9ac02548e9db6852b1fa47afa6327b76473d8',
     },
+    # r2 with the exposure table rescaled to 1/1000-1/8 s; reviewed by byte diff against r2 (release/NOTES.md 2026-11-16).
+    '0633756fc55b59263d4ff53847dee01a1497b96299ecb5fc6d17f36aef01c783': {
+        'prefix_bytes': 7160,
+        'sector0_sha256': 'dadacbe3f00aaccdbd2b3472c0fc576763262cf0e20fd4974f374dc003072595',
+        'sector1_sha256': 'f07fa11316fbce5f2a842796f3cfe0e43cbc562113573ce95e28c4cffabf5506',
+    },
 }
 
 
