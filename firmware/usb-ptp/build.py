@@ -14,7 +14,7 @@ def main():
  (out/'stm32n6xx_hal_conf.h').write_text(conf,encoding='utf-8')
  src=[HERE/n for n in ('entry.S','main.c','vbus.c','shutdown.c','ptp.c','storage/photo_store.c','thumbnail/thumbnail_bmp.c','transport/usb_ptp_transport.c')]
  src+=[ROOT/'firmware/sd-storage/sd_card.c']
- src+=list((HERE/'transport/vendor/st-usbd/Core/Src').glob('*.c'))
+ src+=sorted((HERE/'transport/vendor/st-usbd/Core/Src').glob('*.c'))  # link order must not depend on the filesystem's listing order
  src+=[hal/'Src'/n for n in ('stm32n6xx_hal_adc.c','stm32n6xx_hal_adc_ex.c')]
  src+=[hal/'Src'/n for n in ('stm32n6xx_hal_pcd.c','stm32n6xx_hal_pcd_ex.c','stm32n6xx_ll_usb.c','stm32n6xx_hal_rcc.c','stm32n6xx_hal_rcc_ex.c','stm32n6xx_hal_pwr.c','stm32n6xx_hal_pwr_ex.c','stm32n6xx_hal_cortex.c','stm32n6xx_hal_gpio.c','stm32n6xx_hal_rif.c')]
  flags=['-mcpu=cortex-m55','-mthumb','-mcmse','-mfloat-abi=soft','-mgeneral-regs-only','-Os','-ffreestanding','-fno-builtin','-fno-stack-protector','-ffunction-sections','-fdata-sections','-Wall','-Wextra','-nostartfiles','-DSTM32N657xx','-DUSE_HAL_DRIVER','-DUSE_USB_HS','-DUSB_PTP_USE_IRQ=0','-DSD_BUS_WIDTH=4','-DSD_REVIEW_PROFILE=1','-DSD_STARTUP_OPT=1','-DSD_CLOCK_NEGEDGE=1','-DSD_CLOCK_NEGEDGE_INIT=1']

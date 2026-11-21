@@ -1,11 +1,12 @@
 """Offline reproducible capture benchmark build; never accesses hardware."""
-import argparse, hashlib, json, re, subprocess, sys
+import argparse, hashlib, json, os, re, subprocess, sys
 from pathlib import Path
 
 HERE=Path(__file__).resolve().parent
 REPO=HERE.parents[1]
 VENDOR=REPO/'tmp/bringup/x-cube-n6-camera-capture'
-TC=Path('D:/ST/STM32CubeIDE_1.15.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.200.202406191623/tools/bin')
+# GLOBAL_X_TOOLCHAIN: folder of arm-none-eabi-*.exe tools (on macOS/Linux, links with those names to ST's 12.3.rel1 build).
+TC=Path(os.environ.get('GLOBAL_X_TOOLCHAIN') or 'D:/ST/STM32CubeIDE_1.15.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.200.202406191623/tools/bin')
 sys.path.insert(0,str(REPO/'firmware/boot-timing'))
 from add_boot_header import make_image,inspect_image
 
