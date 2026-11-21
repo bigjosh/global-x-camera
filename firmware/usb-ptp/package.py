@@ -41,6 +41,11 @@ D8_REFERENCE_PREFIX_SHA='eb8a84ac842027877c6e8aa1f72b298f3381e3ddf2470d905a0232d
 D8_REFERENCE_SECTOR_SHA='f3bb072804355148349e8e719d332d8783f006abebc336da0026915e5dd91a7b'
 CONTROLS_REFERENCE_PREFIX_SHA='8eabee637bec3d54c42dbf725a588c67b65f6d55c52f346d8bbcb73cd0a7bbc7'
 CONTROLS_REFERENCE_SECTOR_SHA='d836c5ea1f432ebf63b2fd3759433eb6b240006276ffc54164511e47fbcd533c'
+# 2026-11-21 rebuild of the controls capture with the exposure floor lowered from 1000 us to 167 us (21 lines).
+# Built on macOS with ST's 12.3.rel1 compiler after the unchanged build reproduced CONTROLS_REFERENCE byte for byte.
+# NOT independently reviewed and not bench-qualified; admitted so the prototype can be tested.
+FAST_CONTROLS_PREFIX_SHA='26be1a47290f2d99d2989e5f65374c955a392677af85d1287d65293c29eabd30'
+FAST_CONTROLS_SECTOR_SHA='0a617a0d6dd76ef067c8d42e20b7ce87d6ce06497bc69079aef02559224a0881'
 PREFIX_BASE=0x34180400;PATCH_ADDRESS=0x34180E26;PATCH_OFFSET=PATCH_ADDRESS-PREFIX_BASE
 RESUME_ADDRESS=PATCH_ADDRESS+4;HOOK_BASE=0x34181E40;PREFIX_END=0x34182000
 DSB=bytes.fromhex('bff34f8f');SECTOR_BYTES=0x10000;CAPTURE_OFFSET=0x2000
@@ -128,6 +133,7 @@ def reference_identity(original,sector):
  if identity==(D3_REFERENCE_PREFIX_SHA,D3_REFERENCE_SECTOR_SHA):return 'pe9-hold'
  if identity==(D8_REFERENCE_PREFIX_SHA,D8_REFERENCE_SECTOR_SHA):return 'pd12-hold'
  if identity==(CONTROLS_REFERENCE_PREFIX_SHA,CONTROLS_REFERENCE_SECTOR_SHA):return 'pd12-knob-controls'
+ if identity==(FAST_CONTROLS_PREFIX_SHA,FAST_CONTROLS_SECTOR_SHA):return 'pd12-knob-controls'
  raise ValueError('Capture bytes differ from independently reviewed reference builds')
 
 def tool(name):

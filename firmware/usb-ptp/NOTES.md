@@ -487,3 +487,165 @@ travel. The slowest reading is the top of the new table (125,000 µs nominal).
 
 Still open: why exposures above ~220 ms fail on r2; ASA 100-400 and the
 intermediate knob positions were not re-shot on this image.
+
+## 2026-11-16  ASA fixed at 200 because the prototype's ASA knob only reads its ends
+
+Every ASA reading from this prototype is at a rail: ten raw wiper samples read
+over SWD on r2 were 0-3 or 3840-3841 (with `asa_high` 3840-3841), and all 79
+saved photos record ASA 100 or 800, never 200 or 400. Eight shots taken while
+stepping the ASA knob across its travel all recorded ASA 100. The exposure
+wiper in the same sessions read smoothly (164-3065), and a pair of photos at
+matched light (11.8 ms at ASA 800, 98.6 ms at ASA 100) has equal brightness,
+so the gain path itself works. The cause at the knob is not established
+(wiring, track or a slipping knob); a resistance check from A5 to GND was
+suggested and not done.
+
+At the operator's request `capture_controls_map()` now ignores the ASA sector
+and always selects ASA 200 (gain code 16). `asa_raw`/`asa_q16` are still
+sampled, validated and recorded, so the knob can be diagnosed from the record
+later. Host test updated and passing; `test_controls_real_hal.py` edited, not
+run.
+
+Rejected: automatic ASA (needs a metering frame in the capture firmware, whose
+build scripts are still Windows-only); ASA 100/400/800 (operator chose 200).
+Restore the sector line from git history once the knob reads its full travel.
+
+## 2026-11-20  Exposure table extended to the sensor's 21-line floor (1/6000 s) and ASA fixed at 100
+
+**Why:** on the ASA-200 image the user's daylight photos at the 1 ms end were
+50-96% clipped (GX_0000544 to GX_0000557, all `exposure_us=1003`), so the
+short end needed several stops. The table now runs 167 µs to 125000 µs
+(`round(167*(125000/167)**(i/64))`); 167 µs rounds up to 21 lines at line
+length 1280, the floor `VD6G_MIN_MANUAL_EXP_COARSE` in ST's `vd6g.c` and the
+bound `capture_controls_map` already enforced. Fixed gain drops from code 16 to
+0 (ASA 100) for one more stop. Together about 3.6 stops below the previous
+shortest setting. The user chose both, knowing the slow end gets a stop darker.
+
+This goes below the 0.5 ms floor that the 2026-11-14 review set for the other
+knob path on arm-time grounds: by those figures a 21-line exposure starts
+readout about 0.65 ms after the receiver is armed. That margin is not measured
+on this build. A late arm would show as a failed photo after the 3 s wait, so
+the test is whether fast-end shots save.
+
+Curve error against the ideal exponential is now up to 0.49% (was <0.17%),
+because the short-end entries are small integers; the source comment says so.
+
+**Rejected:** stopping at 0.5 ms or 0.25 ms (one or two stops is not enough
+for frames that are 90% clipped); keeping ASA 200.
+
+**Evidence:** `capture_controls_map.c`; `test_capture_controls.py` (passes:
+endpoints 167/125000, coarse 21 at the short end, gain code 0);
+`test_controls_real_hal.py` expectations edited but not run. Not yet installed
+or shot when this entry was written.
+
+## 2026-11-21  The 1/6000 s table could never work: the capture receiver rejects under 1000 µs. Table back to 1/1000 s, ASA stays 100
+
+**Why:** on the 2026-11-20 image the user found that only dial positions at
+or slower than about 1/1000 s saved a photo. The three that saved recorded
+2173, 1114 and 2038 µs. The cause is not arm timing. The prebuilt capture
+receiver's `knob_record_valid()` (`evidence/2026-11-13-knob-controls/capture/knob_capture.inc`)
+returns 0 when `requested_us<1000U || requested_us>500000U`, and `capture.c`
+then fails the photo with code 0x7D after the frame is captured. The helper
+and `capture_controls_map.c` accept 21 lines, which is what the 2026-11-20
+entry checked; the receiver was not read before that image was built and
+installed. That was the mistake. The 2026-11-20 arm-timing concern is
+therefore still untested, not disproved.
+
+The table is back to 1000-125000 µs (the 2026-11-16 table) and the source
+comment now names the receiver's floor. ASA stays fixed at 100, so daylight
+gets one stop less light than the ASA-200 image and nothing more. Shorter
+exposures need the receiver rebuilt with a lower bound, which is the Windows
+`build.py` path, plus a measurement of the arm margin on that build.
+
+**Rejected:** a byte edit of the receiver's bound from here (it is in the
+CRC-checked late range and is reviewed capture code); leaving the 1/6000 s
+image on the camera with a quarter of the dial dead.
+
+**Evidence:** `knob_capture.inc` and `capture.c` line 750 in the evidence
+folder above; photos GX_0000600 to GX_0000602; `test_capture_controls.py`
+passes with endpoints 1000/125000 and gain code 0.
+
+## 2026-11-21  Capture receiver and USB app now build on macOS; exposure floor lowered to 167 µs in all three places
+
+**Why:** the user asked for the receiver to be buildable here so the 1000 µs
+floor could be lowered without waiting for a Windows build. With four script
+fixes `capture-raw/build.py` and `usb-ptp/build.py` reproduce the committed
+2026-11-13 binaries byte for byte on macOS (receiver `8cd86fa7...caaa`,
+stage1, capture sector 0, USB app `06dca8da...d6bf`), using ST's macOS build
+of the same 12.3.rel1 compiler:
+
+- `GLOBAL_X_TOOLCHAIN` overrides the hard-coded `D:/ST/...` folder in
+  `capture-timing/build.py` and `build_raw10.py`. The scripts still call
+  `arm-none-eabi-*.exe`, so on macOS the folder holds links with those names.
+- `capture-raw/build.py` splits frozen-manifest source keys with
+  `PureWindowsPath` (on POSIX `Path('a\\b').name` is the whole string) and
+  remaps the manifests' recorded `-ID:\Github\global-x-camera\...` include
+  paths onto the current checkout. On the original Windows path both are
+  no-ops.
+- `usb-ptp/build.py` sorts the `st-usbd` source glob. Unsorted, APFS returned
+  a different order from NTFS, the link order changed, and 1853 bytes of
+  `usb.bin` differed. Sorted order equals the NTFS order.
+- `tmp/bringup/x-cube-n6-camera-capture` must be ST's public repository at
+  `e9441cdbb5072a6d3bcef1a5ca4e4d80f850283a` (a plain clone; git-ignored).
+
+Then the floor: `capture-raw/knob_capture.inc` (`requested_us<167U`),
+`capture-raw/knob_transform.py` (contract and record check),
+`storage/photo_store.c` (`requested_us<167`) and the table in
+`capture_controls_map.c` (167-125000 µs again, ASA 100). 167 µs is 21 lines.
+The receiver shrinks by 4 bytes, so most of it shifts; in the stage1 prefix
+only the two receiver-CRC words change. `package.py` admits the new
+(stage1, sector 0) pair as `pd12-knob-controls`, with a comment that it is not
+independently reviewed.
+
+**Rejected:** a checksum-neutral byte edit of the old receiver; keeping the
+USB metadata check at 1000 µs (short exposures would save but export without
+their settings).
+
+**Evidence:** `test_capture_controls.py` passes; `capture-raw/test_knob_controls.py`
+runs 4 tests with the same single error before and after (it needs
+`tmp/bringup/d8-hold-20261113`, which is not in the repository). The arm-time
+margin at the short end (2026-11-14 and 2026-11-20 entries) is unmeasured. No
+photo had been taken on this build when this entry was written.
+
+## 2026-11-21  First photos on the rebuilt 167 µs image: short exposures save
+
+Fourteen photos (GX_0000603 to GX_0000616) taken on battery on
+`sixthousandth-asa100-2026-11-21` all exported with `settings=applied`, ASA
+100, and exposures from 167 µs to 125007 µs; five are at 167 µs (21 lines)
+and two at 438 µs. So the receiver, the applied-value check and the USB
+metadata check all accept the new floor, and a 21-line exposure did not lose
+the frame to a late arm in these five shots. Whether any shot failed is not
+known: failed shots leave no record, and the user reported none.
+
+The scene was dim. Median level falls from 41.7% of full scale at 125 ms to
+6.3% at 167 µs, which is about the sensor's black level, so these frames show
+that short exposures complete and save, not that they are correctly exposed.
+A daylight series is still needed for that.
+
+## 2026-11-21  No failed shots in the first series on the 167 µs image
+
+The user confirmed that none of the shots in the GX_0000603 to GX_0000616
+series gave an error blink, so all fourteen attempts saved, five of them at
+21 lines. This closes the open question in the previous entry; correct
+exposure in daylight is still unchecked.
+
+## 2026-11-21  `test_usb_exporter_must_bind_current_ckn1_schema_and_reader` now errors, and is left that way
+
+`package.py` refuses a USB build whose recorded `storage/photo_store.c` hash
+is not the tree's, and this test checks the archived 2026-11-13 USB manifest
+against the tree. Lowering the metadata floor changed `photo_store.c`, so the
+archived USB build no longer matches and the test raises "Canonical controls
+require the matching CKN1 metadata-capable USB build". That refusal is the
+check working: the 2026-11-13 USB app should not be packaged with a receiver
+that accepts 167 µs. The consequence is that r2 and the three 1/8 s images
+can no longer be repackaged from this tree's default inputs; they need the
+tree at the commit before this one.
+
+Deferred to the repository owner: freeze the 2026-11-21 capture and USB builds
+as evidence and point the test at them, or decide the floor differently. The
+build outputs themselves are under the git-ignored `tmp/` and are not
+committed; the installer assets carry the resulting sectors.
+
+On macOS two other tests in this folder fail with or without these changes
+(`test_knob` and `test_selector_hold` selector cases: the host compiler rejects
+an ELF section attribute for Mach-O).

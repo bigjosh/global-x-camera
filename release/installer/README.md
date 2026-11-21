@@ -138,10 +138,17 @@ transfer or previous flash operation is active. Without `--restart`, the utility
 arms the serial signal and waits for the operator to switch to USB. `--serial`
 selects one probe when multiple are attached; `--port` still must match that
 probe. `--cubeprogrammer` accepts the installed CLI or `.app` path. `--output`
-must name a new log directory. `--target eighth-second-2026-11-16` installs the
-r2 controls image with the exposure knob rescaled to 1/1000–1/8 s instead of
-the default r2; either image can be installed over the other. Run `--help` for
-the options. Do not invoke ST's
+must name a new log directory. `--target` selects an image other than the
+default r2; any recognised image can be installed over any other:
+
+| `--target` | Exposure knob | ASA |
+|---|---|---|
+| `eighth-second-2026-11-16` | 1/1000–1/8 s | knob, as r2 |
+| `asa200-eighth-second-2026-11-16` | 1/1000–1/8 s | fixed 200 |
+| `asa100-eighth-second-2026-11-21` | 1/1000–1/8 s | fixed 100 |
+| `sixthousandth-asa100-2026-11-21` | 1/6000–1/8 s | fixed 100; rebuilt capture receiver and USB app, not independently reviewed |
+
+Run `--help` for the options. Do not invoke ST's
 stock external loader from our normal-boot recovery park.
 
 Offline developer checks use `python3 -m unittest discover -s . -p 'test_*.py'`.

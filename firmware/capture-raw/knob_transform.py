@@ -95,7 +95,7 @@ def magic_runtime(text):
 def contract(header_sha256):
     return dict(schema=1, record_address=RECORD, record_bytes=128, record_magic='CKN1',
                 header_sha256=header_sha256, helper_address=HELPER | 1,
-                requires_combined_selector=True, exposure_us=[1000, 500000],
+                requires_combined_selector=True, exposure_us=[167, 500000],
                 asa=[100, 200, 400, 800], analog_gain=[1, 2, 4, 8], digital_gain=1,
                 line_lengths=[1280], maximum_frame_lines=65535,
                 metadata_offset=4, metadata_bytes=128, metadata_reservation=152,
@@ -123,7 +123,7 @@ def decode_record(raw):
     asa, vt, applied_coarse, applied_gain, applied_digital, margin = words[19:25]
     expected_coarse = (requested*160800000 + 1280000000-1)//1280000000
     gain = {100: 0, 200: 16, 400: 24, 800: 28}.get(asa)
-    if (not 1000 <= requested <= 500000 or line != 1280 or vt != 160800000 or
+    if (not 167 <= requested <= 500000 or line != 1280 or vt != 160800000 or
             coarse != expected_coarse or coarse < 21 or
             frame != max(4336, coarse+2000) or frame > 65535 or margin > 1993 or
             coarse > frame-margin-7 or manual[0] != 2 or manual[1] != gain or

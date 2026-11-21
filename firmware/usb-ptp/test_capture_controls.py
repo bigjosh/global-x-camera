@@ -34,14 +34,14 @@ static void reset(unsigned e,unsigned a){cc_test_record=fixture(e,a);reads=write
 int main(void){
  assert(sizeof(capture_controls_t)==128&&offsetof(capture_controls_t,manual)==64);
  uint32_t last=0;
- for(uint32_t x=0;x<=65535;x++){uint32_t us=capture_controls_exposure(x);assert(us>=last&&us>=1000&&us<=125000);last=us;}
- assert(capture_controls_exposure(0)==1000&&capture_controls_exposure(65535)==125000);
- capture_controls_t r=fixture(3840,0);assert(r.requested_us==1000&&r.asa==100&&r.manual[1]==0);
- r=fixture(0,3840);assert(r.requested_us==125000&&r.asa==800&&r.manual[1]==28);
+ for(uint32_t x=0;x<=65535;x++){uint32_t us=capture_controls_exposure(x);assert(us>=last&&us>=167&&us<=125000);last=us;}
+ assert(capture_controls_exposure(0)==167&&capture_controls_exposure(65535)==125000);
+ capture_controls_t r=fixture(3840,0);assert(r.requested_us==167&&r.asa==100&&r.manual[1]==0&&r.manual[2]==21);
+ r=fixture(0,3840);assert(r.requested_us==125000&&r.asa==100&&r.manual[1]==0);
  assert(r.line_length==1280&&r.frame_length==17704&&(r.manual[2]|r.manual[3]<<8)==15704);
  r=fixture(2177,1781);assert(r.exposure_q16!=32768&&r.asa_q16!=32768);
- const unsigned inputs[4]={2,1281,2561,3840},codes[4]={0,16,24,28};
- for(unsigned i=0;i<4;i++){r=fixture(2000,inputs[i]);assert(r.manual[1]==codes[i]&&r.asa==(100U<<i));}
+ const unsigned inputs[4]={2,1281,2561,3840};
+ for(unsigned i=0;i<4;i++){r=fixture(2000,inputs[i]);assert(r.manual[1]==0&&r.asa==100);}
  for(unsigned raw=0;raw<=4095;raw++){
   r=fixture(raw,raw);unsigned coarse=r.manual[2]|r.manual[3]<<8;
   assert(r.line_length==1280&&coarse>=21&&r.frame_length>=coarse+2000&&r.frame_length<=65535);

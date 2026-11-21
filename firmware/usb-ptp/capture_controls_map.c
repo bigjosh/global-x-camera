@@ -1,8 +1,10 @@
 #include "capture_controls.h"
-/* 64 log-spaced intervals, linear interpolation; <0.17% curve error including integer rounding (exhaustive host check).
+/* 64 log-spaced intervals, linear interpolation; <0.5% curve error including integer rounding (worst at the short end, where entries are small integers).
+ * The 167 us floor (21 lines) is also enforced by the capture receiver (capture-raw/knob_capture.inc, error 0x7D) and by
+ * the USB metadata check (storage/photo_store.c); all three must change together.
  * The label itself is logarithmic in seconds, including its conventional marks. */
 static const uint32_t exposure_lut[65]={
-1000,1078,1163,1254,1352,1458,1572,1696,1829,1972,2126,2293,2473,2666,2875,3101,3344,3606,3888,4193,4522,4876,5258,5670,6114,6593,7110,7667,8268,8916,9614,10368,11180,12056,13001,14020,15119,16303,17581,18959,20444,22046,23774,25637,27646,29812,32148,34667,37384,40313,43472,46879,50552,54513,58785,63392,68359,73716,79492,85721,92439,99682,107493,115917,125000};
+167,185,205,228,253,280,311,344,382,424,470,521,578,641,710,788,874,969,1074,1191,1321,1465,1625,1801,1998,2215,2457,2724,3021,3350,3715,4120,4569,5067,5619,6231,6910,7662,8497,9423,10449,11588,12850,14250,15802,17524,19433,21550,23898,26502,29389,32590,36141,40078,44444,49286,54656,60610,67213,74536,82656,91660,101646,112720,125000};
 uint32_t capture_controls_exposure(uint32_t position) {
  if(position>=65535U)return 125000U;
  uint32_t scaled=position*64U,index=scaled/65535U,fraction=scaled%65535U;
@@ -25,7 +27,7 @@ int capture_controls_map(capture_controls_t *p) {
    (uint64_t)p->line_length*1000000U-1U)/((uint64_t)p->line_length*1000000U));
  p->frame_length=coarse+2000U;if(p->frame_length<4336U)p->frame_length=4336U;
  if(coarse<21U || p->frame_length>65535U)return -2;
- uint32_t q=p->asa_q16*6U;unsigned sector=q<65535U?0:(q<196605U?1:(q<327675U?2:3));
+ unsigned sector=0; /* ASA fixed at 100: the prototype's ASA knob only ever read its end values (NOTES 2026-11-16), and daylight needs the headroom (NOTES 2026-11-20, 2026-11-21); asa_q16 is still recorded. */
  static const uint8_t gains[4]={0,16,24,28};
  p->asa=100U<<sector;p->vt_hz=160800000U;
  p->manual[0]=2;p->manual[1]=gains[sector];p->manual[2]=(uint8_t)coarse;p->manual[3]=(uint8_t)(coarse>>8);

@@ -204,7 +204,7 @@ static int capture_settings(const photo_info_t *i,capture_controls_t *r) {
     memcpy(r,i->metadata,sizeof(*r));
     if(!capture_controls_valid(r) || (r->state!=CC_SENSOR_CONFIGURED && r->state!=CC_APPLIED_VERIFIED) ||
        r->flags!=(CC_REQUIRED_FLAGS|CC_F_SENSOR_CONFIGURED|(r->state==CC_APPLIED_VERIFIED?CC_F_APPLIED_VALID:0)) ||
-       r->reserved0 || r->reserved1 || r->requested_us<1000 || r->requested_us>500000 ||
+       r->reserved0 || r->reserved1 || r->requested_us<167 || r->requested_us>500000 ||
        r->line_length!=1280 || r->vt_hz!=160800000 || r->manual[0]!=2 || r->margin>1993)return 0;
     uint32_t coarse=r->manual[2]|(uint32_t)r->manual[3]<<8;
     uint32_t expected=(uint32_t)(((uint64_t)r->requested_us*160800000U+1279999999U)/1280000000U);

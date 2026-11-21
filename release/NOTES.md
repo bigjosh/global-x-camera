@@ -229,3 +229,89 @@ post-install UART recovery identified the new prefix. No libusb warnings.
 Evidence is the installer's own log folder on the Mac
 (`global-x-camera-installs/20261116-213908-892559`, not committed). Photos and
 knob behaviour on this image were not checked in this entry.
+
+## 2026-11-16  Third installer image: 1/8 s maximum with ASA fixed at 200
+
+`--target asa200-eighth-second-2026-11-16` (assets in `firmware-asa200`):
+sector0 `653b5b29...ed9b`, sector1 `5ac715ac...2ea5`, recovery prefix
+`571ea294...03fc`, same compiler and committed inputs as the entries above.
+Unlike the 1/8 s image this is a code change, not a table change: the selector
+is 72 bytes shorter (7644), so most of sector1 differs and the hook's selector
+length and checksum words change. Checked by host test and by disassembly of
+`capture_controls_map` (stores gain code 16 and ASA 200 unconditionally); not
+independently reviewed. Reason for the change is in `firmware/usb-ptp/NOTES.md`.
+
+## 2026-11-16  ASA-200 image installed on hardware from the Mac
+
+`camera_install.py --target asa200-eighth-second-2026-11-16` over the 1/8 s
+image at 200 kHz: backup matched `dadacbe3...` / `f07fa113...`, independent
+readbacks match `653b5b29...` / `5ac715ac...`, the following 4096 bytes are
+unchanged, and post-install UART recovery identified the new prefix. Photos on
+this image were not checked in this entry.
+
+## 2026-11-20  Fourth installer image: exposure 1/6000-1/8 s with ASA fixed at 100
+
+`--target fast-asa100-2026-11-20` (assets in `firmware-fast-asa100`): sector0
+`32a29fb2...5e7a`, sector1 `26b3e31b...baae`, recovery prefix
+`f9ded0b0...850a`, same compiler and committed inputs as the 2026-11-16
+entries. Selector is 7644 bytes, as in the ASA-200 image; the new 65-entry
+table is present in `selector.bin` and the disassembly stores ASA 100. Host
+test passes; not independently reviewed. `camera_install.py --check` passes
+for this target. The two `test_camera_transport` path failures on this Mac
+(`/private/var` versus `/var`) are the same without this change. Reason for
+the change is in `firmware/usb-ptp/NOTES.md`.
+
+## 2026-11-21  1/6000 s, ASA-100 image installed with `--restart` after three power-on waits found no recovery park
+
+`camera_install.py --target fast-asa100-2026-11-20 --restart` over the ASA-200
+image at 200 kHz: readbacks match `32a29fb2...` / `26b3e31b...`, the following
+4096 bytes are unchanged, and post-install UART recovery identified the new
+prefix (installer log `global-x-camera-installs/20261121-013225-521720` on the
+Mac, not committed). Photos on this image were not checked in this entry.
+
+Three attempts without `--restart` (logs `20261120-232448-445382`,
+`20261120-233533-945612`, `20261121-011719-711868`) each stopped after 600 s
+with "Not a requested early recovery park" and wrote nothing. In the third the
+user moved the selector to BATTERY and back to USB while the stream was armed
+(Image Capture logged the camera removed 01:17:10 and added 01:17:31 local;
+stream armed 01:17:20), yet every status read from 01:17:22 on succeeded and
+returned the same record, state 2 / reason 0. On 2026-11-16 the same wait
+showed `cube_timeout` until the switch reached USB. So on this day the MCU
+stayed powered and readable with the selector on BATTERY and the ST-LINK
+attached, and the selector did not produce a power-on reset. Why is not
+established; the ST-LINK had been replugged into a different Mac port. The
+first attempt's failure was put down to an early flip at the time; that
+explanation is not supported by the third attempt.
+
+## 2026-11-21  1/6000 s image withdrawn as a target; fifth image (1/8 s maximum, ASA 100) built and installed
+
+`fast-asa100-2026-11-20` is removed from `TARGETS` and its sector files are
+deleted; its entry stays in `APPROVED` and `profiles.json` (marked
+superseded) so a camera carrying it is recognised and can be replaced. Reason
+in `firmware/usb-ptp/NOTES.md` of this date.
+
+`--target asa100-eighth-second-2026-11-21` (assets in `firmware-asa100`):
+sector0 `95c65f79...99c3`, sector1 `17b5381b...0062`, recovery prefix
+`55f69301...6785`. Host test passes, `--check` passes, not independently
+reviewed. Installed with `--restart` over the 1/6000 s image at 200 kHz:
+backup matched `32a29fb2...` / `26b3e31b...`, readbacks match, the following
+4096 bytes are unchanged, post-install UART recovery identified the new prefix
+(log `global-x-camera-installs/20261121-014418-738162`, not committed). Photos
+on this image were not checked in this entry.
+
+## 2026-11-21  Sixth installer image: 1/6000-1/8 s, ASA 100, with rebuilt capture receiver and USB app
+
+`--target sixthousandth-asa100-2026-11-21` (assets in
+`firmware-sixthousandth-asa100`): sector0 `98e1eb4e...c60d`, sector1
+`27205e4e...fadf`, recovery prefix `509fd796...d2e5`. Unlike every earlier
+image from this Mac it is not the 2026-11-13 capture and USB binaries with a
+new selector: both were rebuilt from source with the exposure floor at 167 µs
+(`firmware/usb-ptp/NOTES.md`, same date). Against the installed ASA-100 image
+the 7160-byte prefix differs in 12 bytes: two receiver-CRC words and the
+selector checksum word. Not independently reviewed. `--check` passes.
+
+Installed with `--restart` over `asa100-eighth-second-2026-11-21` at 200 kHz:
+backup matched `95c65f79...` / `17b5381b...`, readbacks match, the following
+4096 bytes are unchanged, post-install UART recovery identified the new prefix
+(log `global-x-camera-installs/20261121-021233-105583`, not committed). Photos
+on this image were not checked in this entry.

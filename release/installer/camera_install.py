@@ -30,6 +30,18 @@ TARGETS = {  # tag: (assets folder, sector hashes, prefix hash recovery reports 
         "dadacbe3f00aaccdbd2b3472c0fc576763262cf0e20fd4974f374dc003072595",
         "f07fa11316fbce5f2a842796f3cfe0e43cbc562113573ce95e28c4cffabf5506",
     ), "0633756fc55b59263d4ff53847dee01a1497b96299ecb5fc6d17f36aef01c783"),
+    "asa200-eighth-second-2026-11-16": ("firmware-asa200", (
+        "653b5b290c085c85f5b990e721a15fa0c4c0909ca0519d336458c8f7bdd7ed9b",
+        "5ac715acfe633cbef6cdc6dc396b077b041e377b5978315ef064e5ed70f72ea5",
+    ), "571ea294ccee7e1ceed509a742cf1bdeef09eae87eeecbdfd109975d3d9803fc"),
+    "asa100-eighth-second-2026-11-21": ("firmware-asa100", (
+        "95c65f793f041ff182c7b68245e1a78fc1495e4f84f873d05bd4f368f47999c3",
+        "17b5381b46f17d92b0b8411260395aa752cf44870689737d563b7c550eb80062",
+    ), "55f693018dcc5fec816cd6d03b4fe42e9634ad20f6acbc13847f0af132866785"),
+    "sixthousandth-asa100-2026-11-21": ("firmware-sixthousandth-asa100", (
+        "98e1eb4ec591e2ea8994e46c3b916294f59638bfb39d146847c68d518f27c60d",
+        "27205e4ee5b22eac6ce9a2f8b7014af87244d2e4f4acd6ed7e51fad8e008fadf",
+    ), "509fd7969951d893fd2bc7c30162b7b0dbf857f63c16dd747af0bb8c356fd2e5"),
 }
 TAG = "knobs-2026-11-14-r2"
 FIRMWARE, TARGET_HASHES, TARGET_PREFIX = TARGETS[TAG]
