@@ -52,6 +52,38 @@ APPROVED = {
         'sector0_sha256': '6ddf4499865264aec845150597aa6b8d44cb89e7d5e621dd324a0e1a9170b499',
         'sector1_sha256': '206da4c0a8bdcda6205d7ccdb3d9ac02548e9db6852b1fa47afa6327b76473d8',
     },
+    # r2 with the exposure table rescaled to 1/1000-1/8 s; reviewed by byte diff against r2 (release/NOTES.md 2026-11-16).
+    '0633756fc55b59263d4ff53847dee01a1497b96299ecb5fc6d17f36aef01c783': {
+        'prefix_bytes': 7160,
+        'sector0_sha256': 'dadacbe3f00aaccdbd2b3472c0fc576763262cf0e20fd4974f374dc003072595',
+        'sector1_sha256': 'f07fa11316fbce5f2a842796f3cfe0e43cbc562113573ce95e28c4cffabf5506',
+    },
+    # The 1/8 s image with ASA fixed at 200; built with the release compiler, host-tested, not independently reviewed.
+    '571ea294ccee7e1ceed509a742cf1bdeef09eae87eeecbdfd109975d3d9803fc': {
+        'prefix_bytes': 7160,
+        'sector0_sha256': '653b5b290c085c85f5b990e721a15fa0c4c0909ca0519d336458c8f7bdd7ed9b',
+        'sector1_sha256': '5ac715acfe633cbef6cdc6dc396b077b041e377b5978315ef064e5ed70f72ea5',
+    },
+    # Exposure 1/6000-1/8 s with ASA fixed at 100. Recognised only so it can be replaced: the capture receiver rejects
+    # every exposure under 1000 us (error 0x7D), so the fastest quarter of its dial cannot save a photo.
+    'f9ded0b08a04d27d3e3f683010d767a410657c8e3bb817c9a16ca3af4c6b850a': {
+        'prefix_bytes': 7160,
+        'sector0_sha256': '32a29fb271bc1c71fb3bf239142cdfb2dc45c3912a276be846504266c7555e7a',
+        'sector1_sha256': '26b3e31b3c4d4823001a6c4cf0b3390c7eca5b47d6c728166c92d22269d8baae',
+    },
+    # The 1/8 s image with ASA fixed at 100; built with the release compiler, host-tested, not independently reviewed.
+    '55f693018dcc5fec816cd6d03b4fe42e9634ad20f6acbc13847f0af132866785': {
+        'prefix_bytes': 7160,
+        'sector0_sha256': '95c65f793f041ff182c7b68245e1a78fc1495e4f84f873d05bd4f368f47999c3',
+        'sector1_sha256': '17b5381b46f17d92b0b8411260395aa752cf44870689737d563b7c550eb80062',
+    },
+    # Exposure 1/6000-1/8 s, ASA 100, with the capture receiver and USB app rebuilt on macOS for the 167 us floor.
+    # Not independently reviewed; arm-time margin at the short end is unmeasured.
+    '509fd7969951d893fd2bc7c30162b7b0dbf857f63c16dd747af0bb8c356fd2e5': {
+        'prefix_bytes': 7160,
+        'sector0_sha256': '98e1eb4ec591e2ea8994e46c3b916294f59638bfb39d146847c68d518f27c60d',
+        'sector1_sha256': '27205e4ee5b22eac6ce9a2f8b7014af87244d2e4f4acd6ed7e51fad8e008fadf',
+    },
 }
 
 

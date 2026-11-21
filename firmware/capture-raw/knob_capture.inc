@@ -9,7 +9,7 @@ KNOB_LATE static int knob_record_valid(void)
      (p->state!=CC_SENSOR_CONFIGURED && p->state!=CC_APPLIED_VERIFIED) ||
      p->flags!=(CC_REQUIRED_FLAGS|CC_F_SENSOR_CONFIGURED|
        (p->state==CC_APPLIED_VERIFIED?CC_F_APPLIED_VALID:0U)) || p->vt_hz!=160800000U ||
-     p->requested_us<1000U || p->requested_us>500000U ||
+     p->requested_us<167U ||  /* 167 us is 21 lines at line length 1280, the sensor driver floor */ p->requested_us>500000U ||
      p->line_length!=1280U ||
      p->manual[0]!=2U || p->margin>1993U || p->reserved0 || p->reserved1)
     return 0;

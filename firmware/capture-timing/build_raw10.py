@@ -7,6 +7,7 @@ import argparse
 import copy
 import hashlib
 import json
+import os
 from pathlib import Path
 import re
 import struct
@@ -17,7 +18,7 @@ import zlib
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 VENDOR = ROOT / 'tmp/bringup/x-cube-n6-camera-capture'
-TC = Path('D:/ST/STM32CubeIDE_1.15.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.200.202406191623/tools/bin')
+TC = Path(os.environ.get('GLOBAL_X_TOOLCHAIN') or 'D:/ST/STM32CubeIDE_1.15.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.200.202406191623/tools/bin')
 sys.path.insert(0, str(ROOT / 'firmware/boot-timing'))
 from add_boot_header import make_image, inspect_image
 

@@ -130,6 +130,20 @@ python firmware/usb-ptp/build.py --out tmp/my-usb-build
 python firmware/usb-ptp/package.py --usb tmp/my-usb-build --capture tmp/my-controls-capture/staged --out tmp/my-usb-package
 ```
 
+### Building off Windows
+
+`capture-raw/build.py` and `usb-ptp/build.py` also run on macOS and Linux and
+reproduce the 2026-11-13 receiver and USB binaries byte for byte. Set
+`GLOBAL_X_TOOLCHAIN` to a folder holding ST's 12.3.rel1 tools under the
+`arm-none-eabi-*.exe` names the scripts call (links to the native tools are
+enough), and clone ST's `x-cube-n6-camera-capture` at commit
+`e9441cdbb5072a6d3bcef1a5ca4e4d80f850283a` into `tmp/bringup/`.
+
+The exposure range is enforced in three places that must agree: the table in
+`capture_controls_map.c`, `knob_record_valid()` in `capture-raw/knob_capture.inc`
+and the metadata check in `storage/photo_store.c`. The floor is 167 µs, 21
+sensor lines.
+
 ### Historical upstream reproduction only
 
 `package.py` uses the ST compiler recorded in `capture-timing/build_raw10.py`

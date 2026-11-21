@@ -21,11 +21,30 @@ import time
 
 HERE = Path(__file__).resolve().parent
 ASSETS = HERE / "assets"
+TARGETS = {  # tag: (assets folder, sector hashes, prefix hash recovery reports once installed)
+    "knobs-2026-11-14-r2": ("firmware", (
+        "6ddf4499865264aec845150597aa6b8d44cb89e7d5e621dd324a0e1a9170b499",
+        "206da4c0a8bdcda6205d7ccdb3d9ac02548e9db6852b1fa47afa6327b76473d8",
+    ), "b866589cf472cac9820d961f3243cb8280759614826083757fae374ccee7e242"),
+    "eighth-second-2026-11-16": ("firmware-eighth-second", (
+        "dadacbe3f00aaccdbd2b3472c0fc576763262cf0e20fd4974f374dc003072595",
+        "f07fa11316fbce5f2a842796f3cfe0e43cbc562113573ce95e28c4cffabf5506",
+    ), "0633756fc55b59263d4ff53847dee01a1497b96299ecb5fc6d17f36aef01c783"),
+    "asa200-eighth-second-2026-11-16": ("firmware-asa200", (
+        "653b5b290c085c85f5b990e721a15fa0c4c0909ca0519d336458c8f7bdd7ed9b",
+        "5ac715acfe633cbef6cdc6dc396b077b041e377b5978315ef064e5ed70f72ea5",
+    ), "571ea294ccee7e1ceed509a742cf1bdeef09eae87eeecbdfd109975d3d9803fc"),
+    "asa100-eighth-second-2026-11-21": ("firmware-asa100", (
+        "95c65f793f041ff182c7b68245e1a78fc1495e4f84f873d05bd4f368f47999c3",
+        "17b5381b46f17d92b0b8411260395aa752cf44870689737d563b7c550eb80062",
+    ), "55f693018dcc5fec816cd6d03b4fe42e9634ad20f6acbc13847f0af132866785"),
+    "sixthousandth-asa100-2026-11-21": ("firmware-sixthousandth-asa100", (
+        "98e1eb4ec591e2ea8994e46c3b916294f59638bfb39d146847c68d518f27c60d",
+        "27205e4ee5b22eac6ce9a2f8b7014af87244d2e4f4acd6ed7e51fad8e008fadf",
+    ), "509fd7969951d893fd2bc7c30162b7b0dbf857f63c16dd747af0bb8c356fd2e5"),
+}
 TAG = "knobs-2026-11-14-r2"
-TARGET_HASHES = (
-    "6ddf4499865264aec845150597aa6b8d44cb89e7d5e621dd324a0e1a9170b499",
-    "206da4c0a8bdcda6205d7ccdb3d9ac02548e9db6852b1fa47afa6327b76473d8",
-)
+FIRMWARE, TARGET_HASHES, TARGET_PREFIX = TARGETS[TAG]
 HELPER_HASHES = {
     "reader/read.bin": "d6b63e6e993a9cb872cfe482c0fd4f8954f8edc398a7dfb1db25982b9e255b5d",
     "writer0/programmer.bin": "e69f0d0c3c49c2bad1ad5e7e8ff5907fcf3b251cb5b968629c18a9c57247f307",
@@ -56,9 +75,9 @@ def validate_assets(assets=ASSETS):
     """Pin executable bytes independently of user-editable build manifests."""
     images = []
     for index, digest in enumerate(TARGET_HASHES):
-        data = (assets / "firmware" / f"sector{index}.bin").read_bytes()
+        data = (assets / FIRMWARE / f"sector{index}.bin").read_bytes()
         if len(data) != 65536 or sha(data) != digest:
-            raise ValueError(f"Firmware sector {index} is missing or differs from r2.")
+            raise ValueError(f"Firmware sector {index} is missing or differs from {TAG}.")
         images.append(data)
     for name, digest in HELPER_HASHES.items():
         if sha((assets / "helpers" / name).read_bytes()) != digest:
@@ -157,7 +176,8 @@ class Transport:
         if "-halt" in args:
             self.halt_requests += 1
         argv = [str(self.cli), "-c", "port=SWD", "mode=HOTPLUG", "ap=1",
-                "freq=1000", "sn=" + self.serial, *map(str, args)]
+                # 200 kHz: at 1000 kHz the ST-LINK USB link froze after ~30-70 KiB of RAM downloads on this Mac/board.
+                "freq=200", "sn=" + self.serial, *map(str, args)]
         self.log("cube_call", number=self.calls, argv=argv)
         kwargs = dict(stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                       timeout=self.default_timeout if timeout is None else timeout)
@@ -172,7 +192,10 @@ class Transport:
             raise RuntimeError("Programmer timed out. The MCU may still be executing; "
                                "no target reset or retry was performed.") from exc
         path.write_bytes(result.stdout)
-        text = result.stdout.decode("utf-8", errors="replace")
+        # macOS CubeProgrammer colours its output; the codes break ^-anchored and \b parsing.
+        text = re.sub(r"\x1b\[[0-9;]*m", "", result.stdout.decode("utf-8", errors="replace"))
+        # macOS libusb prints "transfer error:" warnings on commands that succeed; they are not CLI errors.
+        text = re.sub(r"(?m)^libusb: warning .*$", "", text)
         self.log("cube_result", number=self.calls, returncode=result.returncode)
         if result.returncode or re.search(r"\bError\s*:", text, re.I) or (success and success not in text):
             raise RuntimeError(f"Programmer command failed. Details: {path}")
@@ -324,11 +347,15 @@ def parser():
     p.add_argument("--port", help="serial port override; must belong to the selected ST-LINK")
     p.add_argument("--wait-seconds", type=int, default=120, help="maximum wait for the user's USB switch (10–600 seconds)")
     p.add_argument("--output", type=Path, help="new log/backup folder (must not already exist)")
+    p.add_argument("--target", choices=TARGETS, default=TAG, help="pinned firmware image to install")
     return p
 
 
 def main(argv=None):
+    global TAG, FIRMWARE, TARGET_HASHES, TARGET_PREFIX
     args = parser().parse_args(argv)
+    TAG = args.target
+    FIRMWARE, TARGET_HASHES, TARGET_PREFIX = TARGETS[TAG]
     console = Console()
     lock = None
     transport = None
@@ -405,8 +432,8 @@ def main(argv=None):
         lock.phase("post_install_recovery_check")
         request_recovery(port, transport.log)
         new_profile = verify_park(transport, ASSETS / "profiles")
-        if new_profile["prefix_sha256"] != "b866589cf472cac9820d961f3243cb8280759614826083757fae374ccee7e242":
-            raise RuntimeError("Post-install recovery did not identify the r2 firmware.")
+        if new_profile["prefix_sha256"] != TARGET_PREFIX:
+            raise RuntimeError(f"Post-install recovery did not identify the {TAG} firmware.")
         save_json(out / "post-install-recovery.json", new_profile)
         lock.phase("normal_boot_release")
         normal_reset(port, transport.log)

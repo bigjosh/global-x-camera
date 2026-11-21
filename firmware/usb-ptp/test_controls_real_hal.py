@@ -65,8 +65,8 @@ class RealHALTests(unittest.TestCase):
         for e, g in [(0, 0), (120, 3720), (1920, 1920), (2177, 1781), (3840, 5), (4095, 2047)]:
             with self.subTest(exposure=e, gain=g):
                 self.assertIn('conversions=5 ', self.run_case(exposure=e, gain=g))
-        self.assertIn('us=1000 asa=100 ', self.run_case(exposure=3840, gain=0))
-        self.assertIn('us=500000 asa=800 ', self.run_case(exposure=0, gain=3840))
+        self.assertIn('us=167 asa=100 ', self.run_case(exposure=3840, gain=0))
+        self.assertIn('us=125000 asa=100 ', self.run_case(exposure=0, gain=3840))
 
     def test_timeouts_and_bad_inputs_fail_closed_and_clean_up(self):
         for fault, error in [('busy_adc', 1), ('wrong_voltage', 2), ('missing_security', 3),

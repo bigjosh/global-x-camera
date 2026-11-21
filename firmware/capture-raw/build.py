@@ -4,7 +4,7 @@ import copy
 import hashlib
 import importlib.util
 import json
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 import re
 import shutil
 import struct
@@ -36,6 +36,12 @@ BASE=ROOT/'firmware/capture-sd/evidence/2026-10-24-normal-profile/build/v66c-nor
 BASE_RECEIVER='20c5ddaef2e1bf6b78d272e3ee23f891ead2d41f88e922538962e218987f4e99'
 
 def sha(data): return hashlib.sha256(data).hexdigest()
+
+WIN_ROOT='-ID:\\Github\\global-x-camera\\'
+def local_flag(flag):
+    """Frozen manifests record the original build host's absolute include paths; point them at this checkout."""
+    if not flag.startswith(WIN_ROOT): return flag
+    return '-I'+str(ROOT.joinpath(*PureWindowsPath(flag[len(WIN_ROOT):]).parts))
 
 def relocate_prefix_crc(folder,prefix,compiled_crc,actual_crc,single_frame=False,gpio_hold=False):
     """Patch only two reviewed literal words, preserving compiler instruction layout.
@@ -93,7 +99,7 @@ def frozen_manifest(folder):
     m=json.loads((folder/'manifest.json').read_text())
     names=set()
     for path,digest in m['sources'].items():
-        name=Path(path).name
+        name=PureWindowsPath(path).name  # manifest keys are Windows paths; this splits both separators on any host
         if name in names: raise ValueError('Ambiguous archived source basename '+name)
         names.add(name)
         if sha((folder/name).read_bytes())!=digest:
@@ -412,7 +418,7 @@ def main():
     compiled=[]
     excluded={'sleep.c','save_loader.c','module-save.bin','module-manifest.json','save_module_config.h','late_config.h'}
     for rel in m['sources']:
-        src=rbase/Path(rel).name
+        src=rbase/PureWindowsPath(rel).name
         if src.name in excluded: continue
         dst=out/src.name
         data=src.read_bytes()
@@ -508,7 +514,7 @@ def main():
                 if a.gpio_hold: data=gpio_hold_transform.completion_source(data)
             (out/name).write_text(data,newline='\n')
             if name.endswith('.c'): compiled.append(out/name)
-    flags=[f for f in m['compile_flags'] if f!='-I'+str(rbase)]
+    flags=[local_flag(f) for f in m['compile_flags'] if f!='-I'+str(rbase)]
     flags.insert(0,'-I'+str(out))
     if a.error_blinks: flags.append(f'-DRAW_ERROR_PREFIX={int(a.flash)}')
     if a.cycle_trace: flags.append('-DRAW_CYCLE_TRACE=1')
@@ -720,7 +726,7 @@ def main():
     if a.flash:
         pd=out/'staged'; pd.mkdir(); sources=[]
         for rel in pm['sources']:
-            src=pbase/Path(rel).name; dst=pd/src.name
+            src=pbase/PureWindowsPath(rel).name; dst=pd/src.name
             if src.name=='stage1_sensor.c':
                 sensor=sensor_source(src.read_text())
                 if a.sensor_single_frame: sensor=sensor_autostop_transform.sensor_single(sensor)
@@ -732,7 +738,7 @@ def main():
             error_path=pd/'error_signal.c'
             error_path.write_text(gpio_hold_transform.error_source(error_path.read_text()),newline='\n')
             sources.extend(gpio_hold_prefix.prepare(pd))
-        pf=[f for f in pm['compile_flags'] if not f.startswith(('-DSTAGE2_BYTES=','-DSTAGE2_EXPECTED_CRC32='))]
+        pf=[local_flag(f) for f in pm['compile_flags'] if not f.startswith(('-DSTAGE2_BYTES=','-DSTAGE2_EXPECTED_CRC32='))]
         pf.insert(0,'-I'+str(pd))
         early_code=code[:late_meta['early_bytes']]
         if len(early_code)!=15804: raise ValueError('Prefix layout requires fixed v66c early load size')
