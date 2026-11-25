@@ -20,9 +20,9 @@ On November 25 the user redefined the first board as a beta: one small LiPo, an 
 | 2 | Open. The user asked what the local checkout and stash hold. The review environment cannot reach the user's PC; it needs `git status` and `git stash list` output, or the work pushed to a branch. |
 | 3 | Open. The user has the RV-3032 documents in the PC's downloads folder, which the review environment cannot reach. They need uploading, or fetching from the maker's site. |
 | 4 | **Resolved.** KiCad. |
-| 5 | **Resolved.** The beta runs only from a small LiPo stuck to the parts side; no charger, two pads for an external one. The reviewer is picking the cell. See [power notes](../power/NOTES.md). |
+| 5 | **Resolved**, cell pending. The beta runs only from a small LiPo stuck to the parts side; no charger, two pads for an external one. See [power notes](../power/NOTES.md). Thickness, not area, limits the cell: about 2.5 mm of cell on a 1.6 mm board, about 3 mm on a 1.0 mm board. The pick waits on the board thickness. |
 | 6 | **Resolved.** Unordered power-down is accepted. |
-| 7 | Delegated to the reviewer: pick an available NOR that will work. In progress. |
+| 7 | **Resolved by the reviewer, as delegated.** Winbond W25Q128JWPIQ; see [boot notes](../../firmware/boot-timing/NOTES.md). It needs a new blank-board loader and pads for BOOT0 and BOOT1. |
 | 8 | **Resolved.** No FRAM in this version. |
 | 9 | **Resolved.** An ST-LINK connector on the parts side is the only programming and debug path. |
 | 10 | **Resolved.** Two potentiometers; the ASA steps are made in software. |
