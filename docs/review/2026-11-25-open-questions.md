@@ -12,14 +12,26 @@ Not checked: live stock, vendor documents that are not stored in the repository,
 
 ## Status
 
+On November 25 the user redefined the first board as a beta: one small LiPo, an SD card, KiCad, ST-LINK only. That changes or closes many items below; the item text is kept as first written.
+
 | Item | Status |
 |---|---|
-| 1 | **Resolved November 25.** Pull request #1's firmware and installer are ignored for PCB planning. See [root notes](../../NOTES.md). |
-| 10 | **Partly resolved November 25.** Two dials, both potentiometers; no ASA switch. USB-C still to confirm. |
-| 22 | In discussion. The user described the control group; a [preview](../custom-pcb/control-cluster-preview.svg) awaits confirmation. |
-| 24 | **Partly resolved November 25.** One reverse-mount RGB LED, seen through a hole below the shutter button. Part and behaviour during exposure open. |
-| 30 | **Resolved November 25.** Alps RK10J11E0034 for both dials, mounted face-down behind windows. See [prototype notes](../prototype/NOTES.md). The footprint waits on the window size and on how the lugs are held. |
-| All others | Open, not yet discussed. |
+| 1 | **Resolved.** Pull request #1's firmware and installer are ignored for PCB planning. See [root notes](../../NOTES.md). |
+| 2 | Open. The user asked what the local checkout and stash hold. The review environment cannot reach the user's PC; it needs `git status` and `git stash list` output, or the work pushed to a branch. |
+| 3 | Open. The user has the RV-3032 documents in the PC's downloads folder, which the review environment cannot reach. They need uploading, or fetching from the maker's site. |
+| 4 | **Resolved.** KiCad. |
+| 5 | **Resolved.** The beta runs only from a small LiPo stuck to the parts side; no charger, two pads for an external one. The reviewer is picking the cell. See [power notes](../power/NOTES.md). |
+| 6 | **Resolved.** Unordered power-down is accepted. |
+| 7 | Delegated to the reviewer: pick an available NOR that will work. In progress. |
+| 8 | **Resolved.** No FRAM in this version. |
+| 9 | **Resolved.** An ST-LINK connector on the parts side is the only programming and debug path. |
+| 10 | **Resolved.** Two potentiometers; the ASA steps are made in software. |
+| 11–20 | Reframed. Storage is an SD card, so item 19 becomes the SD rail. The user proposes a 1.8 V buck plus an MCU-switched 3.3 V rail for the card; the reviewer's proposal for the whole tree is in progress. Item 14: the SPDT-and-capacitor start stays as built on the prototype. |
+| 22 | Partly resolved. The control group is confirmed: centred in the right half of the top edge, [preview](../custom-pcb/control-cluster-preview.svg). Quantity, enclosure and the rest of the placement are open. |
+| 24 | Partly resolved. One reverse-mount RGB LED, seen through a hole below the shutter button. Part and behaviour during exposure open. |
+| 26, 28 | Not on this beta: no NAND and no cell holders. A card socket and a LiPo replace them. |
+| 30 | **Resolved.** Alps RK10J11E0034 for both dials, mounted face-down; a small hole below each dial centre shows the selected label. See [prototype notes](../prototype/NOTES.md). The footprint waits on how the lugs are held. |
+| 12, 13, 15–18, 21, 23, 25, 27, 29, 31–35 | Open, not yet discussed. Items 12 and 13 are much simpler on a LiPo. |
 
 ## 1. Housekeeping first (owner)
 
