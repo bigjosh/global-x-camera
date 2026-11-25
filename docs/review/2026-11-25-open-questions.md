@@ -15,7 +15,10 @@ Not checked: live stock, vendor documents that are not stored in the repository,
 | Item | Status |
 |---|---|
 | 1 | **Resolved November 25.** Pull request #1's firmware and installer are ignored for PCB planning. See [root notes](../../NOTES.md). |
-| 30 | In discussion, pulled forward from item 1: which thumbwheel. |
+| 10 | **Partly resolved November 25.** Two dials, both potentiometers; no ASA switch. USB-C still to confirm. |
+| 22 | In discussion. The user described the control group; a [preview](../custom-pcb/control-cluster-preview.svg) awaits confirmation. |
+| 24 | **Partly resolved November 25.** One reverse-mount RGB LED, seen through a hole below the shutter button. Part and behaviour during exposure open. |
+| 30 | **Resolved November 25.** Alps RK10J11E0034 for both dials, mounted face-down behind windows. See [prototype notes](../prototype/NOTES.md). The footprint waits on the window size and on how the lugs are held. |
 | All others | Open, not yet discussed. |
 
 ## 1. Housekeeping first (owner)
