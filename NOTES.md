@@ -109,3 +109,9 @@ style checks; disabling whitespace checks for current source or the whole repo.
 
 **Evidence:** `.gitattributes` scopes exactly the two new archives. The staged
 blob audit validates every SHA256SUMS entry, independently of working files.
+
+## 2026-11-25  PCB planning ignores pull request #1's firmware and installer changes
+
+**Why:** in the open-questions review the user was shown pull request #1: a collaborator's Mac installer fixes, a 1/8 s exposure cap, a 1/6000 s floor and ASA fixed at 100, with the only hardware results so far for the r2 knob firmware. The user answered that the firmware and installer can be ignored for the board. The PCB requirements therefore stay as already settled: 0.5 s longest exposure and a manual gain control. The one point the user carried into PCB work is the control part: which thumbwheel replaces the hobby wheel, whose form the user likes.
+**Rejected:** treating the pull request's 1/8 s cap or fixed ASA as PCB requirements; making its review or merge a precondition for schematic capture. Not decided here: whether the pull request is merged. Its bench observations that could touch copper have no established cause and are carried as cautions, not as facts about the new board: an ASA knob that reads only its end values (open-questions item 30), exposures above about 220 ms failing after the settings verify (set aside as firmware), and the MCU apparently staying powered on battery with the ST-LINK attached (items 9 and 14).
+**Evidence:** direct user reply, November 25, in the open-questions review; pull request #1's description as read that day (head `fceb1456`); [open questions, item 1](docs/review/2026-11-25-open-questions.md). No hardware, firmware or CAD change.

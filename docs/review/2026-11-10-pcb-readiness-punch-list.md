@@ -2,6 +2,10 @@
 
 **Reviewed November 10, 2026**, before starting custom-PCB design. Hardware only; firmware items appear only where they change copper. Ordered by severity, most important first. Nothing here is decided: each item is for discussion, and the outcome of each discussion gets a dated entry in the owning `NOTES.md` when it is resolved.
 
+## Where the review stands (November 25)
+
+The review resumed on November 25 as a list of [open questions](2026-11-25-open-questions.md), which the user and the reviewer are resolving one at a time. A session picking this up should read that file first: its status table says what has been settled since. The November 11 block below is kept as the record of that date.
+
 ## Where the review stands (November 11)
 
 A session picking this up should read this block first, then the items it names.
