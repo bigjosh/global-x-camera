@@ -30,7 +30,7 @@ On November 25 the user redefined the first board as a beta: one small LiPo, an 
 | 22 | Partly resolved. The control group's geometry is locked: [preview](../custom-pcb/control-cluster-preview.svg), [positions](../custom-pcb/control-cluster.json). Quantity, enclosure and the rest of the placement are open. |
 | 24 | Partly resolved. One reverse-mount RGB LED, seen through a hole below the shutter button. Part and behaviour during exposure open. |
 | 26, 28 | Not on this beta: no NAND and no cell holders. A card socket and a LiPo replace them. |
-| 30 | **Resolved.** Alps RK10J11E0034 for both dials, mounted face-down; a small hole below each dial centre shows the selected label. See [prototype notes](../prototype/NOTES.md). The footprint waits on how the lugs are held. |
+| 30 | **Resolved.** Alps RK10J11E0034 for both dials, mounted face-down; a small hole below each dial centre shows the selected label. See [prototype notes](../prototype/NOTES.md). A draft [KiCad footprint](../../hardware/beta/README.md) exists; it is to be checked against a real part. |
 | 12, 13, 15–18, 21, 23, 25, 27, 29, 31–35 | Open, not yet discussed. Items 12 and 13 are much simpler on a LiPo. |
 
 ## 1. Housekeeping first (owner)

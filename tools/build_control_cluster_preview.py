@@ -15,6 +15,8 @@ import json
 import math
 from pathlib import Path
 
+import build_dial_footprint as dial_footprint       # the one definition of the dial's lands and label hole
+
 OUT = Path(__file__).resolve().parents[1] / 'docs/custom-pcb/control-cluster-preview.svg'
 
 # Board: ISO ID-1 card outline (spec.md), millimetres. Origin top-left, y down.
@@ -29,16 +31,14 @@ KNOB_R = 7.0
 BODY_HALF_W, BODY_TOP, BODY_BOTTOM = 5.15, 5.0, -7.6      # metal frame; terminals leave at y = -7.5
 SUBSTRATE_LEFT, SUBSTRATE_TOP = -6.0, -1.1                # substrate runs wider on one side
 TAB_RIGHT, TAB_TOP, TAB_BOTTOM = 7.0, -1.9, -4.0          # flat frame tab on the other side
-TERMINAL_X = (-4.0, -2.0, 0.0, 2.0, 4.0)
-PAD_W, PAD_TOP, PAD_BOTTOM = 1.2, -7.0, -9.8              # lands for the folded-back terminals
 
 # Drawn by the reviewer and confirmed with the rest of the drawing.
 DIAL_PITCH = 24.0           # centre to centre
-WINDOW_D = 2.8              # hole that shows one label
-WINDOW_R = 5.2              # its centre, measured from the knob centre; the flat face ends near 6.8
+WINDOW_D = dial_footprint.LABEL_HOLE_D      # hole that shows one label
+WINDOW_R = dial_footprint.LABEL_HOLE_R      # its centre, measured from the knob centre
 LABEL_SWEEP = 260           # degrees of the 270 degree travel used by the labels
 # These follow the parts still to be chosen.
-BUTTON_W, BUTTON_BODY_W, BUTTON_BODY_H = 4.0, 6.5, 3.6
+BUTTON_W, BUTTON_BODY_W, BUTTON_BODY_H = 4.0, 5.6, 3.6     # 6.2 mm is free between the dials' inner tab pads
 LED_HOLE_D, LED_BELOW_EDGE = 2.0, 7.5
 
 DIAL_Y = KNOB_R - PROTRUSION                     # centre depth below the top edge
@@ -94,8 +94,12 @@ def build():
         add(f'<rect x="{n(cx - BODY_HALF_W)}" y="{n(DIAL_Y - BODY_TOP)}" width="{n(2 * BODY_HALF_W)}" height="{n(BODY_TOP - BODY_BOTTOM)}" {hidden}/>')
         add(f'<rect x="{n(cx + SUBSTRATE_LEFT)}" y="{n(DIAL_Y - SUBSTRATE_TOP)}" width="{n(-BODY_HALF_W - SUBSTRATE_LEFT)}" height="{n(SUBSTRATE_TOP - BODY_BOTTOM)}" {hidden}/>')
         add(f'<rect x="{n(cx + BODY_HALF_W)}" y="{n(DIAL_Y - TAB_TOP)}" width="{n(TAB_RIGHT - BODY_HALF_W)}" height="{n(TAB_TOP - TAB_BOTTOM)}" {hidden}/>')
-        for tx in TERMINAL_X:
-            add(f'<rect x="{n(cx + tx - PAD_W / 2)}" y="{n(DIAL_Y - PAD_TOP)}" width="{n(PAD_W)}" height="{n(PAD_TOP - PAD_BOTTOM)}" '
+        for sign in (-1, 1):                                       # tabs folded outward, flat with the back of the pot
+            x1, x2 = sorted((sign * dial_footprint.TAB_FACE_X, sign * dial_footprint.TAB_TIP_X))
+            add(f'<rect x="{n(cx + x1)}" y="{n(DIAL_Y - dial_footprint.TAB_Y - dial_footprint.TAB_W / 2)}" width="{n(x2 - x1)}" '
+                f'height="{n(dial_footprint.TAB_W)}" {hidden}/>')
+        for _, px, py, pw, ph in dial_footprint.pads():
+            add(f'<rect x="{n(cx + px - pw / 2)}" y="{n(DIAL_Y - py - ph / 2)}" width="{n(pw)}" height="{n(ph)}" '
                 f'fill="#d9a441" fill-opacity="0.55" stroke="#bfe3d0" stroke-width="0.08" stroke-dasharray="0.4 0.3"/>')
     add(f'<rect x="{n(BUTTON_X - BUTTON_BODY_W / 2)}" y="0.3" width="{n(BUTTON_BODY_W)}" height="{n(BUTTON_BODY_H)}" {hidden}/>')
     add(f'<rect x="{n(BUTTON_X - 1.6)}" y="{n(LED_BELOW_EDGE - 1.4)}" width="3.2" height="2.8" {hidden}/>')
@@ -164,7 +168,8 @@ def record():
                             provisional='width and body size follow the switch chosen'),
         led_hole=dict(centre=[round(BUTTON_X, 2), LED_BELOW_EDGE], diameter=LED_HOLE_D,
                       provisional='diameter and depth follow the reverse-mount RGB LED chosen'),
-        dial_part='Alps RK10J11E0034, mounted face-down, terminals pointing away from the top edge')
+        dial_part='Alps RK10J11E0034, mounted face-down, terminals pointing away from the top edge',
+        dial_footprint='hardware/beta/GXB.pretty/' + dial_footprint.NAME + '.kicad_mod')
 
 
 def main():
