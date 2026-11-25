@@ -26,7 +26,7 @@ On November 25 the user redefined the first board as a beta: one small LiPo, an 
 | 8 | **Resolved.** No FRAM in this version. |
 | 9 | **Resolved.** An ST-LINK connector on the parts side is the only programming and debug path. |
 | 10 | **Resolved.** Two potentiometers; the ASA steps are made in software. |
-| 11–20 | Reframed. Storage is an SD card, so item 19 becomes the SD rail. The user proposes a 1.8 V buck plus an MCU-switched 3.3 V rail for the card; the reviewer's proposal for the whole tree is in progress. Item 14: the SPDT-and-capacitor start stays as built on the prototype. |
+| 11–20 | Reframed. Storage is an SD card, so item 19 becomes the SD rail. The user proposed a 1.8 V buck plus an MCU-switched 3.3 V rail for the card; the reviewer's [proposal for the whole tree](../power/beta-power-tree.md) awaits the user's approval. Item 14: the SPDT-and-capacitor start stays as built on the prototype. |
 | 22 | Partly resolved. The control group's geometry is locked: [preview](../custom-pcb/control-cluster-preview.svg), [positions](../custom-pcb/control-cluster.json). Quantity, enclosure and the rest of the placement are open. |
 | 24 | Partly resolved. One reverse-mount RGB LED, seen through a hole below the shutter button. Part and behaviour during exposure open. |
 | 26, 28 | Not on this beta: no NAND and no cell holders. A card socket and a LiPo replace them. |
