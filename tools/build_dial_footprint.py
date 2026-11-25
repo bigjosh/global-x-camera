@@ -23,24 +23,24 @@ NAME = 'ALPS_RK10J11E0034_FaceDown'
 # Alps geometry, knob-side view, millimetres.
 KNOB_R, KNOB_R_MAX = 7.0, 7.1                 # diameter 14 +/-0.2
 KNOB_THICKNESS, PART_HEIGHT = 0.9, 1.8        # knob face to back of pot is 1.8
-BODY_HALF_W, BODY_TOP, BODY_BOTTOM = 5.15, 5.0, -7.6
+BODY_HALF_W, BODY_TOP, BODY_BOTTOM = 5.3, 5.0, -7.6
 TERMINALS = (('1', -4.0), ('D1', -2.0), ('2', 0.0), ('D2', 2.0), ('3', 4.0))   # D = dummy, no connection
 TERMINAL_Y, TERMINAL_OUTER_FACE_Y, TERMINAL_FREE = -7.5, -7.65, 1.9
-TAB_FACE_X, TAB_Y, TAB_W, TAB_FREE = 5.15, 2.5, 1.0, 1.8
+TAB_FACE_X, TAB_Y, TAB_W = 5.15, 2.5, 1.0
+TAB_TIP_X = 6.97                              # tip once folded flat: 2.29 mm developed length from a bend line at 4.68
+BACK_PLATE = 0.3                              # the tab is part of the back plate, so it lies within the pot's 1.8 mm
 
 # Land pattern, chosen here.
 RIM_CLEARANCE = 0.3                           # copper stays this far outside the turning knob
 PIN_PAD_W = 1.2
-PIN_PAD_Y = (-(KNOB_R_MAX + RIM_CLEARANCE), -9.6)        # inner edge clears the rim at the centre terminal
+PIN_PAD_Y = (-7.7, -9.6)                      # starts just outside the terminal strip's edge at 7.6; a folded terminal cannot sit inboard of it
 TAB_PAD_H = 1.6
-TAB_PAD_X = (7.4, 8.9)                        # just outside the rim at the tab; ends short of the board edge
+TAB_PAD_X = (7.4, 8.6)                        # just outside the rim; short enough to keep 0.38 mm from the board's rounded corner
 LABEL_HOLE_D, LABEL_HOLE_R = 2.8, 5.2         # shows the selected label; confirmed with the control layout
 BOARD_EDGE_Y = 5.0                            # the top board edge; the knob stands 2 mm beyond it
 
 # Where the re-formed legs end up, for drawing and for the README.
-BEND_ALLOWANCE = 0.25
-TAB_TIP_X = TAB_FACE_X + TAB_FREE - BEND_ALLOWANCE       # folded outward, lying on the back of the pot
-TAB_HEIGHT_ABOVE_BOARD = PART_HEIGHT                     # so the tab is this far above its pad
+TAB_HEIGHT_ABOVE_BOARD = PART_HEIGHT - BACK_PLATE        # underside of a folded tab above its pad: 1.5 mm
 PIN_FOLD_Y = TERMINAL_OUTER_FACE_Y - 0.45                # centre of a terminal folded back over the strip edge
 
 
@@ -87,7 +87,7 @@ def footprint():
     # Board edge and notes.
     o.append(f'\t(fp_line (start -9.5 {ky(BOARD_EDGE_Y)}) (end 9.5 {ky(BOARD_EDGE_Y)}) {stroke.format(w=0.1)} (layer "Dwgs.User"))')
     o.append(f'\t(fp_text user "board edge; knob stands 2 mm beyond" (at 0 {ky(BOARD_EDGE_Y) - 2.9} 0) (layer "Dwgs.User") {font.format(s=0.6, t=0.09)})')
-    o.append(f'\t(fp_text user "knob face on the board; tabs sit {TAB_HEIGHT_ABOVE_BOARD} mm above the MP pads" (at 0 {round(ky(BODY_BOTTOM) + 6.3, 3)} 0) '
+    o.append(f'\t(fp_text user "knob face to the board; folded tabs are {TAB_HEIGHT_ABOVE_BOARD} mm above the MP pads" (at 0 {round(ky(BODY_BOTTOM) + 6.3, 3)} 0) '
              f'(layer "Cmts.User") {font.format(s=0.6, t=0.09)})')
     # Silk: terminal 1 marker, outside everything that moves or solders.
     one = kx(TERMINALS[0][1])
