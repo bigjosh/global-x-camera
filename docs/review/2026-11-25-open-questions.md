@@ -20,7 +20,7 @@ On November 25 the user redefined the first board as a beta: one small LiPo, an 
 | 2 | Open. The user asked what the local checkout and stash hold. The review environment cannot reach the user's PC; it needs `git status` and `git stash list` output, or the work pushed to a branch. |
 | 3 | Open. The user has the RV-3032 documents in the PC's downloads folder, which the review environment cannot reach. They need uploading, or fetching from the maker's site. |
 | 4 | **Resolved.** KiCad. |
-| 5 | **Resolved**, with one open point. Grepow GRP292434 (210 mAh) lying on the parts side; no cut-out; so the board is 1.0 mm thick. Its datasheet shows the protection-board end is 3.8 mm thick, 4.9 mm above the user face: see [power notes](../power/NOTES.md). |
+| 5 | **Resolved.** Grepow GRP292434 (210 mAh) lying on the parts side of a 1.6 mm board, its protection board unfolded flat beside it by hand; 4.6 mm overall. See [power notes](../power/NOTES.md). Measure the unfolded protection board on the first cell. |
 | 6 | **Resolved.** Unordered power-down is accepted. |
 | 7 | **Resolved by the reviewer, as delegated.** Winbond W25Q128JWPIQ; see [boot notes](../../firmware/boot-timing/NOTES.md). It needs a new blank-board loader and pads for BOOT0 and BOOT1. |
 | 8 | **Resolved.** No FRAM in this version. |

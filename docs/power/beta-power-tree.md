@@ -2,7 +2,7 @@
 
 **Status: proposed November 25, 2026; not yet approved by the user.** It answers the user's idea for the beta board: one buck for 1.8 V, and a 3.3 V rail the MCU switches on for the SD card. The idea holds, with four changes. A researcher built this from the stored ST, sensor and regulator documents and a second reader re-opened the citations and re-derived the numbers. Nothing here has been measured, and distributor figures are search snippets, not live pages.
 
-Inputs settled with the user: a single LiPo, the Grepow GRP292434 (210 mAh, about 2.9 mm, with protection), and no charger; USB powers the camera when plugged in and must never charge the cell; an SD card on SDMMC2; unordered power-down accepted; the SPDT-and-capacitor start stays; ST-LINK is the only programming path.
+Inputs settled with the user: a single LiPo, the Grepow GRP292434 (210 mAh, 2.9 mm cell, protection board unfolded flat beside it), and no charger; USB powers the camera when plugged in and must never charge the cell; an SD card on SDMMC2; unordered power-down accepted; the SPDT-and-capacitor start stays; ST-LINK is the only programming path.
 
 ## The tree
 
