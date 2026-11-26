@@ -29,6 +29,7 @@ On November 25 the user redefined the first board as a beta: one small LiPo, an 
 | 11–20 | **Resolved in outline.** The user agreed the [power tree](../power/beta-power-tree.md): one 1.8 V rail for the MCU, flash and sensor I/O, and a 3.3 V rail switched on for the SD card. Its open points remain: ST's answer on a 3.3 V SD bank beside a 1.8 V VDD, an internal-SMPS trial, source selection, the low-battery level, VBUS protection, the RTC supply. Item 14: the SPDT-and-capacitor start stays as built. |
 | 22 | Partly resolved. The control group's geometry is locked: [preview](../custom-pcb/control-cluster-preview.svg), [positions](../custom-pcb/control-cluster.json). Quantity, enclosure and the rest of the placement are open. |
 | 24 | Partly resolved. One reverse-mount RGB LED, seen through a hole below the shutter button. Part and behaviour during exposure open. |
+| 15 | Not on this beta: the user removed USB from this revision on November 26. Photos are read by removing the SD card. |
 | 26, 28 | Not on this beta: no NAND and no cell holders. A card socket and a LiPo replace them. |
 | 30 | **Resolved.** Alps RK10J11E0034 for both dials, mounted face-down; a small hole below each dial centre shows the selected label. See [prototype notes](../prototype/NOTES.md). A draft [KiCad footprint](../../hardware/beta/README.md) exists; it is to be checked against a real part. |
 | 12, 13, 15–18, 21, 23, 25, 27, 29, 31–35 | Open, not yet discussed. Items 12 and 13 are much simpler on a LiPo. |
