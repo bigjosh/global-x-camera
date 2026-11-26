@@ -15,6 +15,7 @@ from pathlib import Path
 
 import build_control_cluster_preview as cluster
 import build_dial_footprint as dial
+import build_shutter_fit_preview as shutter
 
 OUT = Path(__file__).resolve().parents[1] / 'docs/custom-pcb/beta-placement-draft.svg'
 W, H, R = cluster.BOARD_W, cluster.BOARD_H, cluster.CORNER_R
@@ -55,6 +56,11 @@ PARTS = [
 ]
 FETS = [(cluster.BUTTON_X - 6.4 + i * 3.3, 11.6, 2.9, 1.6) for i in range(4)]     # four SOT-23 in a row under the LED
 
+# Two drawings come from this file: the locked control positions, and the proposed spacing that makes
+# room for the D2MQ shutter switch (ASA dial 2 mm left, switch and LED 1 mm left).
+PROPOSED = False
+ASA_X = cluster.ASA_X
+
 STYLE = {
     'ic': ('#22262b', '#0d0f11', '#e6e6e6'), 'conn': ('#c9c2a8', '#6f6a55', '#2a2a2a'),
     'cell': ('#b9bec6', '#6d727a', '#22262b'), 'pcm': ('#3d7f4f', '#1f4a2b', '#ffffff'),
@@ -84,9 +90,10 @@ def view(front, ox, oy, title):
 
     add(f'<text x="{n(ox + W / 2)}" y="{n(oy - 3.4)}" font-size="2.2" text-anchor="middle" font-weight="bold" fill="#222">{title}</text>')
     # Dial rims and the button above the top edge.
-    for cx in (cluster.ASA_X, cluster.EXPOSURE_X):
+    for cx in (ASA_X, cluster.EXPOSURE_X):
         add(f'<circle cx="{n(X(cx))}" cy="{n(oy + cluster.DIAL_Y)}" r="{cluster.KNOB_R}" fill="#1c1c1c"/>')
-    rect(cluster.BUTTON_X - 2, -cluster.PROTRUSION, 4, cluster.PROTRUSION + 0.5, 'fill="#8c8f94" stroke="#44474b" stroke-width="0.1"', 'rx="0.6"')
+    if not PROPOSED:
+        rect(cluster.BUTTON_X - 2, -cluster.PROTRUSION, 4, cluster.PROTRUSION + 0.5, 'fill="#8c8f94" stroke="#44474b" stroke-width="0.1"', 'rx="0.6"')
     add(f'<rect x="{n(ox)}" y="{n(oy)}" width="{n(W)}" height="{n(H)}" rx="{n(R)}" fill="#2f6b4f" stroke="#17382a" stroke-width="0.2"/>')
 
     # Keep-outs.
@@ -101,7 +108,7 @@ def view(front, ox, oy, title):
 
     ghost = 'fill="none" stroke="#bfe3d0" stroke-width="0.12" stroke-dasharray="0.6 0.4"'
     # Dials.
-    for cx in (cluster.ASA_X, cluster.EXPOSURE_X):
+    for cx in (ASA_X, cluster.EXPOSURE_X):
         if front:
             add(f'<circle cx="{n(X(cx))}" cy="{n(oy + cluster.DIAL_Y)}" r="{cluster.KNOB_R}" fill="#1c1c1c" stroke="#555" stroke-width="0.1"/>')
             rect(cx - dial.BODY_HALF_W, cluster.DIAL_Y - dial.BODY_TOP, 2 * dial.BODY_HALF_W, dial.BODY_TOP - dial.BODY_BOTTOM,
@@ -111,10 +118,16 @@ def view(front, ox, oy, title):
         for _, px, py, pw, ph in dial.pads():
             rect(cx + px - pw / 2, cluster.DIAL_Y - py - ph / 2, pw, ph, 'fill="#d9a441"' if front else ghost)
         add(f'<circle cx="{n(X(cx))}" cy="{n(oy + cluster.DIAL_Y + cluster.WINDOW_R)}" r="{n(cluster.WINDOW_D / 2)}" fill="#e3cb9b" stroke="#0f2a1e" stroke-width="0.15"/>')
-    add(f'<circle cx="{n(X(cluster.BUTTON_X))}" cy="{n(oy + cluster.LED_BELOW_EDGE)}" r="{n(cluster.LED_HOLE_D / 2)}" fill="#fff6c9" stroke="#0f2a1e" stroke-width="0.15"/>')
-    rect(cluster.BUTTON_X - cluster.BUTTON_BODY_W / 2, 0.3, cluster.BUTTON_BODY_W, cluster.BUTTON_BODY_H,
-         'fill="#8c8f94" stroke="#44474b" stroke-width="0.1"' if front else ghost)
-    for fx, fy, fw, fh in FETS:
+    if PROPOSED:
+        shutter.switch_svg(add, front, lambda x: X(x), oy, ghost=not front)
+        add(f'<circle cx="{n(X(shutter.SW_X))}" cy="{n(oy + shutter.LED_Y)}" r="{n(cluster.LED_HOLE_D / 2)}" fill="#fff6c9" stroke="#0f2a1e" stroke-width="0.15"/>')
+        fet_list = shutter.fets()
+    else:
+        add(f'<circle cx="{n(X(cluster.BUTTON_X))}" cy="{n(oy + cluster.LED_BELOW_EDGE)}" r="{n(cluster.LED_HOLE_D / 2)}" fill="#fff6c9" stroke="#0f2a1e" stroke-width="0.15"/>')
+        rect(cluster.BUTTON_X - cluster.BUTTON_BODY_W / 2, 0.3, cluster.BUTTON_BODY_W, cluster.BUTTON_BODY_H,
+             'fill="#8c8f94" stroke="#44474b" stroke-width="0.1"' if front else ghost)
+        fet_list = FETS
+    for fx, fy, fw, fh in fet_list:
         rect(fx, fy, fw, fh, 'fill="#22262b" stroke="#0d0f11" stroke-width="0.08"' if front else ghost)
 
     # Parts.
@@ -133,7 +146,8 @@ def view(front, ox, oy, title):
         add(f'<circle cx="{n(X(LENS[0]))}" cy="{n(oy + LENS[1])}" r="1.0" fill="#0b0f18"/>')
         text(LENS[0], LENS[1] + c + 2.0, 'lens', 1.3, '#ffffff')
         text(LENS[0], 36.2 - 0.9, 'regulators', 1.1, '#cfe9dc')
-        text(cluster.BUTTON_X, 15.0, '4 x FET', 1.0, '#cfe9dc')
+        if not PROPOSED:
+            text(cluster.BUTTON_X, 15.0, '4 x FET', 1.0, '#cfe9dc')
     else:
         text(LENS[0], LENS[1] + c + 2.0, 'module back, flush', 1.2, '#ffffff')
         text(7.5, SD_EDGE_Y + 0.5, 'SD', 1.5, '#ffffff', weight='bold')
@@ -150,7 +164,9 @@ def build():
            view(False, PAD, PAD + 4, 'Back (user side)'),
            view(True, W + 2 * PAD, PAD + 4, 'Front (parts side, as seen through a clear case)')]
     y = H + PAD + 9.5
-    notes = ['Second draft for mark-up. Locked: the control group. From the user: lens, SD slot, right-edge keep-out, bare ST-LINK pads. Everything else is proposed.',
+    notes = ['Proposed spacing for the D2MQ shutter switch: ASA dial 2 mm left, switch and LED 1 mm left; everything else as the second draft.',
+             'Composition as before; the FETs now flank the LED hole, which sits below the switch\'s three pads.',
+             'Pending a module in hand: the camera cut-out and flex. Pending: the size of the cell\'s unfolded protection board.'] if PROPOSED else ['Second draft for mark-up. Locked: the control group. From the user: lens, SD slot, right-edge keep-out, bare ST-LINK pads. Everything else is proposed.',
              'Composition: SD slot, lens and cell share the horizontal centre line; MCU, lens and the regulator block share the lens axis; FETs centred under the LED; ST-LINK pads and charge pads centred under the cell.',
              'Pending a module in hand: the cut-out, the flex path and its direction. Pending: the shutter switch, and the size of the cell\'s unfolded protection board.']
     for i, s in enumerate(notes):
@@ -160,7 +176,11 @@ def build():
 
 
 def main():
+    global PROPOSED, ASA_X
     OUT.write_text(build())
+    PROPOSED, ASA_X = True, shutter.ASA_X
+    OUT.with_name('beta-placement-proposed-spacing.svg').write_text(build())
+    PROPOSED, ASA_X = False, cluster.ASA_X
     print(f'lens at ({LENS[0]:.2f}, {LENS[1]:.2f}); cell x {CELL_X:.1f}-{CELL_X + CELL_W:.1f}, y {CELL_Y:.1f}-{CELL_Y + CELL_H:.1f}; '
           f'exposure dial rim reaches x {cluster.EXPOSURE_X + cluster.KNOB_R:.1f}, keep-out starts {W - RIGHT_KEEPOUT:.1f}')
 
