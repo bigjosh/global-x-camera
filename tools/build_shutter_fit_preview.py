@@ -1,4 +1,4 @@
-"""Proposed fit of the Omron D2MQ hinge-lever switch between the two dials, back view.
+"""Fit of the Omron D2MQ hinge-lever switch between the two dials, back view.
 
 The switch (D2MQ-4L-105-1: hinge lever, straight terminals, gold contacts)
 lies flat on the parts side, lever toward the top edge, its three terminals
@@ -6,9 +6,11 @@ joggled down and soldered to pads. Geometry is from Omron's datasheet, stored
 in datasheets/controls. Omron measures lever positions from the mounting-hole
 centre line, 1.6 mm above the case bottom.
 
-To give the 8.2 mm body room between the dials' inner tab pads, the proposal
-moves the ASA dial 2 mm left and the switch and LED 1 mm left of the locked
-positions; the exposure dial does not move.
+To give the 8.2 mm body room between the dials' inner tab pads, the dials
+are 26 mm apart: the ASA dial sits 2 mm and the switch and LED 1 mm left of
+the first locked positions; the exposure dial did not move. The user confirmed
+this on November 26, 2026, and the positions now come from the control
+cluster script.
 
 Run:  python tools/build_shutter_fit_preview.py
 """
@@ -20,9 +22,8 @@ import build_dial_footprint as dial
 
 OUT = Path(__file__).resolve().parents[1] / 'docs/custom-pcb/shutter-switch-fit.svg'
 W = cluster.BOARD_W
-ASA_SHIFT, SWITCH_SHIFT = -2.0, -1.0
-ASA_X, EXP_X = cluster.ASA_X + ASA_SHIFT, cluster.EXPOSURE_X
-SW_X = cluster.BUTTON_X + SWITCH_SHIFT
+ASA_X, EXP_X = cluster.ASA_X, cluster.EXPOSURE_X
+SW_X = cluster.BUTTON_X
 DIAL_Y = cluster.DIAL_Y
 
 # Omron D2MQ-4L, heights above the case bottom (datasheet value + 1.6 where Omron measures from the hole line).
@@ -42,7 +43,8 @@ LEVER_PROUD = 2.0                          # lever at rest stands this far above
 BOTTOM_Y = FREE - LEVER_PROUD              # so the case bottom is this far below the edge
 TRIM = 2.2                                 # terminals trimmed to this length when they are re-formed
 PAD_W, PAD_Y = 1.4, (BOTTOM_Y + 0.1, BOTTOM_Y + TRIM + 0.5)
-LED_Y = PAD_Y[1] + 1.6                     # LED hole centre, clear of the terminal pads
+LED_Y = cluster.LED_BELOW_EDGE             # LED hole centre, clear of the terminal pads
+assert abs(LED_Y - (PAD_Y[1] + 1.6)) < 1e-6, 'the locked LED hole no longer sits 1.6 mm below the terminal pads'
 FET_W, FET_H, FET_GAP = 2.9, 1.6, 0.4      # four SOT-23, two each side of the LED
 LED_BODY = (3.2, 2.8)
 
@@ -128,7 +130,7 @@ def build():
     asa_pad, exp_pad = ASA_X + dial.TAB_PAD_X[1], EXP_X - dial.TAB_PAD_X[1]
     dim(asa_pad, bx, 5.4, '', up=False)
     dim(bx + BODY_W, exp_pad, 5.4, '', up=False)
-    dim(ASA_X, EXP_X, -6.6, f'{n(EXP_X - ASA_X)} mm between dial centres (was 24)')
+    dim(ASA_X, EXP_X, -6.6, f'{n(EXP_X - ASA_X)} mm between dial centres')
     dim(EXP_X + dial.KNOB_R, W, -3.6, n(W - EXP_X - dial.KNOB_R))
     x = ASA_X - dial.KNOB_R - 1.0
     add(f'<path d="M{n(x)} {n(DIAL_Y - dial.KNOB_R)} V0 M{n(x - 0.4)} {n(DIAL_Y - dial.KNOB_R)} H{n(x + 0.4)} M{n(x - 0.4)} 0 H{n(x + 0.4)}" stroke="#b3261e" stroke-width="0.08" fill="none"/>')
@@ -140,9 +142,9 @@ def build():
     text(x - 0.3, BOTTOM_Y + 1.0, n(BOTTOM_Y), 0.8, '#b3261e', 'end')
     text(X0 + 1, 18.8, 'BACK VIEW (user side); parts shown through the board', 0.85, '#9fd0b6', 'start')
     y = Y1 + 1.6
-    text((X0 + X1) / 2, y, 'Proposed: ASA dial 2 mm left and the switch and LED 1 mm left of the locked positions; exposure dial unchanged.', 0.9)
+    text((X0 + X1) / 2, y, 'Confirmed November 26: dials 26 mm apart, the switch midway between them; exposure dial where it was first locked.', 0.9)
     text((X0 + X1) / 2, y + 1.4, f'Switch case bottom {n(BOTTOM_Y)} mm below the edge; {n(bx - asa_pad)} mm between the case and each dial\'s inner tab pad; terminals trimmed to {n(TRIM)} mm.', 0.85, '#444')
-    text((X0 + X1) / 2, y + 2.8, 'The LED hole moves below the switch pads, with two FETs each side of it. Switch geometry from Omron\'s datasheet.', 0.85, '#444')
+    text((X0 + X1) / 2, y + 2.8, 'The LED hole sits below the switch pads, with two FETs each side of it. Switch geometry from Omron\'s datasheet.', 0.85, '#444')
     o.append('</svg>')
     return '\n'.join(o) + '\n'
 
