@@ -459,3 +459,10 @@ wiring change; target left in recovery with HIGH HOLD for the user's meter.
 **Removed:** `docs/custom-pcb/beta-placement-proposed-spacing.svg`, linked from the entry above. It showed the proposal; the placement draft now carries the same positions, and `tools/build_beta_placement_preview.py` no longer writes a second drawing.
 **Evidence:** direct user reply, November 26; [control-cluster.json](../custom-pcb/control-cluster.json) and its preview, the [fit drawing](../custom-pcb/shutter-switch-fit.svg) and the [placement draft](../custom-pcb/beta-placement-draft.svg), regenerated. No part in hand; DigiKey stock of the straight-terminal gold part has not been checked on a live page.
 
+## 2026-11-26  Dial wiring: outside terminals are the track ends, middle terminal is the wiper, dummies unconnected
+
+**Why:** the user settled it: "two outside pins as top and bottom and middle pin as tap is flippable." The wiring is mirror-symmetric, so the face-down footprint works whichever way the terminal numbering runs; only the direction of rotation changes, and firmware sets that. Each dummy terminal keeps its own pad with no net.
+**Rejected:** the earlier rule in the footprint notes, tying both dummy pads to the wiper until a part is metered. It assumed the dummies connect to nothing inside the part, which is not known. The user's first idea of the same day, shorting each outside pair of terminals and tapping the middle, which they withdrew: the opened part they photographed was not this one. That photo shows a two-gang element board (one shared end, two collectors, two far ends), the arrangement already recorded on November 7 for the uxcell duplex wheel; on such a part the shorted pairs would tie a live wiper to a track end.
+**Still to check:** Alps's hole drawing hints at 1, 2, dummy, dummy, 3 instead of 1, dummy, 2, dummy, 3. Meter the first RK10J11E0034 before boards are ordered; the pads are separate, so a solder bridge to the neighbouring pad corrects it.
+**Evidence:** direct user replies and photo, November 26; [footprint notes](../../hardware/beta/README.md). No Alps part has been metered or opened.
+
