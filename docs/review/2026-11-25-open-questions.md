@@ -24,10 +24,10 @@ On November 25 the user redefined the first board as a beta: one small LiPo, an 
 | 6 | **Resolved.** Unordered power-down is accepted. |
 | 7 | **Resolved by the reviewer, as delegated.** Winbond W25Q128JWPIQ; see [boot notes](../../firmware/boot-timing/NOTES.md). It needs a new blank-board loader and pads for BOOT0 and BOOT1. |
 | 8 | **Resolved.** No FRAM in this version. |
-| 9 | **Resolved.** An ST-LINK connector on the parts side is the only programming and debug path. |
+| 9 | **Resolved.** ST-LINK only, through bare STDC14 header pads on the parts side and a pogo fixture; BOOT0 and BOOT1 pads beside them. Probe: STLINK-V3MINIE. |
 | 10 | **Resolved.** Two potentiometers; the ASA steps are made in software. |
 | 11–20 | **Resolved in outline.** The user agreed the [power tree](../power/beta-power-tree.md): one 1.8 V rail for the MCU, flash and sensor I/O, and a 3.3 V rail switched on for the SD card. Its open points remain: ST's answer on a 3.3 V SD bank beside a 1.8 V VDD, an internal-SMPS trial, source selection, the low-battery level, VBUS protection, the RTC supply. Item 14: the SPDT-and-capacitor start stays as built. |
-| 22 | In discussion. The control group is locked. The user gave the lens, SD slot, keep-outs and the look wanted; a [first placement draft](../custom-pcb/beta-placement-draft.svg) awaits mark-up. Quantity and the enclosure are open. |
+| 22 | Mostly resolved. The control group is locked and the user accepted the [placement draft](../custom-pcb/beta-placement-draft.svg) as the direction. Pending: the shutter switch, and the camera cut-out and flex until a module is in hand (item 25). Quantity and assembler are open. |
 | 24 | Partly resolved. One reverse-mount RGB LED, seen through a hole below the shutter button. Part and behaviour during exposure open. |
 | 15 | Not on this beta: the user removed USB from this revision on November 26. Photos are read by removing the SD card. |
 | 26, 28 | Not on this beta: no NAND and no cell holders. A card socket and a LiPo replace them. |

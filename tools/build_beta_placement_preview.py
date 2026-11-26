@@ -23,8 +23,10 @@ MID_Y = H / 2
 # From the user, November 26, all "as seen from the back".
 LENS = (W / 3, MID_Y)                     # vertically centred, a third of the width from the left edge
 SD_EDGE_Y = MID_Y                         # card slot centred on the left edge
-RIGHT_KEEPOUT = 3.0                       # "a few mm" for the housing's radiused front edge
-TRIPOD_KEEPOUT = (12.0, 8.0)              # centred on the bottom edge; size waits on the socket
+RIGHT_KEEPOUT = W - (cluster.EXPOSURE_X + cluster.KNOB_R)   # for the housing's radiused front edge; shrunk on
+                                          # November 26 to stop at the exposure dial's rim. The dial's flat
+                                          # outer tab pad is the one thing allowed inside it.
+# The tripod socket is part of the housing (user, November 26), so the board keeps nothing clear for it.
 
 # Camera module (ST data brief): 6.5 mm square head, 7.45 mm from optical centre to connector centre.
 HEAD, CONNECTOR_OFFSET = 6.5, 7.45
@@ -47,9 +49,9 @@ PARTS = [
     ('ldo12', LENS[0] + 0.75, 41.6, 5.0, 4.0, 'pwr', ''),
     ('rtc', 5.0, 40.0, 4.0, 3.5, 'ic', 'RTC'),
     ('imu', 11.0, 40.0, 3.0, 3.5, 'ic', ''),
-    ('stlink', 54.0, 44.4, 9.5, 5.2, 'conn', 'ST-LINK'),
-    ('chg+', 70.0, 46.6, 3.0, 4.0, 'pad', '+'),
-    ('chg-', 75.0, 46.6, 3.0, 4.0, 'pad', '−'),
+    ('stlink', CELL_X + CELL_W / 2 - 4.75, 44.6, 9.5, 4.6, 'pads', 'ST-LINK pads'),
+    ('chg+', CELL_X + CELL_W / 2 - 15.5, 44.9, 3.0, 4.0, 'pad', '+'),
+    ('chg-', CELL_X + CELL_W / 2 + 12.5, 44.9, 3.0, 4.0, 'pad', '−'),
 ]
 FETS = [(cluster.BUTTON_X - 6.4 + i * 3.3, 11.6, 2.9, 1.6) for i in range(4)]     # four SOT-23 in a row under the LED
 
@@ -57,6 +59,7 @@ STYLE = {
     'ic': ('#22262b', '#0d0f11', '#e6e6e6'), 'conn': ('#c9c2a8', '#6f6a55', '#2a2a2a'),
     'cell': ('#b9bec6', '#6d727a', '#22262b'), 'pcm': ('#3d7f4f', '#1f4a2b', '#ffffff'),
     'pwr': ('#33383f', '#0d0f11', '#e6e6e6'), 'pad': ('#d9a441', '#7a5a14', '#2a2a2a'),
+    'pads': ('#2f6b4f', '#d9a441', '#f3deb0'),
 }
 SCALE = 9.0
 PAD = 7.0
@@ -89,10 +92,7 @@ def view(front, ox, oy, title):
     # Keep-outs.
     hatch = 'fill="#f2c14e" fill-opacity="0.28" stroke="#f2c14e" stroke-width="0.12" stroke-dasharray="0.7 0.5"'
     rect(W - RIGHT_KEEPOUT, 0, RIGHT_KEEPOUT, H, hatch)
-    tw, th = TRIPOD_KEEPOUT
-    rect(W / 2 - tw / 2, H - th, tw, th, hatch)
-    text(W / 2, H - th / 2 + 0.5, 'tripod', 1.3, '#fff3c4')
-    add(f'<text x="{n(X(W - RIGHT_KEEPOUT / 2))}" y="{n(oy + H * 0.72)}" font-size="1.2" text-anchor="middle" fill="#fff3c4" '
+    add(f'<text x="{n(X(W - RIGHT_KEEPOUT / 2))}" y="{n(oy + H * 0.72)}" font-size="1.0" text-anchor="middle" fill="#fff3c4" '
         f'transform="rotate(-90 {n(X(W - RIGHT_KEEPOUT / 2))} {n(oy + H * 0.72)})">housing radius keep-out</text>')
 
     # Axes the layout is composed on.
@@ -122,7 +122,7 @@ def view(front, ox, oy, title):
         fill, stroke, ink = STYLE[kind]
         rect(x, y, w, h, f'fill="{fill}" stroke="{stroke}" stroke-width="0.12"' if front else ghost, 'rx="0.4"')
         if label and front:
-            text(x + w / 2, y + h / 2 + 0.5, label, 1.5 if w > 8 else 1.1, ink, weight='bold')
+            text(x + w / 2, y + h / 2 + 0.5, label, 1.1 if kind == 'pads' or w <= 8 else 1.5, ink, weight='bold')
     # Camera: cut-out through the board, head in it, flex to the connector.
     c = HEAD / 2 + CUTOUT_CLEAR
     rect(LENS[0] - c, LENS[1] - c, 2 * c + 2.6, 2 * c, 'fill="#f6f5f1" stroke="#0f2a1e" stroke-width="0.2"')
@@ -150,9 +150,9 @@ def build():
            view(False, PAD, PAD + 4, 'Back (user side)'),
            view(True, W + 2 * PAD, PAD + 4, 'Front (parts side, as seen through a clear case)')]
     y = H + PAD + 9.5
-    notes = ['First draft for mark-up. Locked: the control group. From the user: lens, SD slot, tripod and right-edge keep-outs. Everything else is proposed.',
-             'Composition: SD slot, lens and cell share the horizontal centre line; MCU, lens and the regulator block share the lens axis; the four FETs sit centred under the LED.',
-             'Open: which way the camera flex leaves (it fixes portrait or landscape), the right-edge keep-out against the exposure dial, the tripod socket size, the unfolded protection board.']
+    notes = ['Second draft for mark-up. Locked: the control group. From the user: lens, SD slot, right-edge keep-out, bare ST-LINK pads. Everything else is proposed.',
+             'Composition: SD slot, lens and cell share the horizontal centre line; MCU, lens and the regulator block share the lens axis; FETs centred under the LED; ST-LINK pads and charge pads centred under the cell.',
+             'Pending a module in hand: the cut-out, the flex path and its direction. Pending: the shutter switch, and the size of the cell\'s unfolded protection board.']
     for i, s in enumerate(notes):
         out.append(f'<text x="{n(width / 2)}" y="{n(y + i * 2.6)}" font-size="1.45" text-anchor="middle" fill="#333">{s}</text>')
     out.append('</svg>')
