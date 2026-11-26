@@ -430,3 +430,10 @@ wiring change; target left in recovery with HIGH HOLD for the user's meter.
 **Rejected:** Tag-Connect, because its three holes would show on the back; a tripod keep-out on the board; moving the control group for the keep-out's sake.
 **Still proposed, not decided:** the card socket (Molex 503398-1892), the LED (SunLED XZMDKCBDDG45S-9), and every block position outside the control group.
 **Evidence:** direct user reply, November 26; [second draft](../custom-pcb/beta-placement-draft.svg) from `tools/build_beta_placement_preview.py`.
+
+## 2026-11-26  Beta pin table drafted; three prototype pins move
+
+**Why:** the pin table is the last input schematic capture needs. A researcher assigned every signal from ST's pin tables, the boot ROM manual and the prototype firmware, keeping the prototype's pin wherever it sits on a 1.8 V bank, and a second reader checked all rows. Three signals leave their prototype pins: the camera strobe goes from PA0 to PA5, because PA0 is a boot ROM UART pin that may be driven after any failed flash boot; XSHUTDOWN goes from PO5 to PF1, so the VDDIO2 bank stays unused as decided; the red LED goes from PG10, the ROM's boot-failed output, to PA7. The checker also found that 100 kilohm gate pull-downs are too weak against the datasheet's 5 microamp pin leakage: HOLD and the LED FETs get 10 to 22 kilohm and the 3.3 V enable 47 kilohm or less.
+**Rejected:** keeping PA0, PO5 and PG10 for firmware's sake; a shared bus for the camera and the RTC, in favour of a second bus so that only the sensor is on the camera bus during start-up.
+**Learned:** every reset returns HOLD to a floating input, so on the cell a reset drops power unless something else holds the latch; a force-on pad beside the debug pads is needed for programming.
+**Evidence:** [pin table](../custom-pcb/beta-pin-table.md); the researcher's and checker's reports of November 26, citing DS14791 Rev 10 Tables 17 to 20 and UM3234 Tables 27 to 34. Nothing run on hardware; the user has not reviewed the table.

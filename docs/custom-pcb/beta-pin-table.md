@@ -1,0 +1,112 @@
+# Beta board pin table
+
+**Status: draft, November 26, 2026.** Drafted from ST's datasheet (DS14791 Rev 10), the boot ROM manual (UM3234) and the prototype firmware's pin use, then checked row by row by a second reader, who confirmed every ball, alternate function and supply bank and asked for the changes already folded in below. Nothing here has been run on hardware. The same rows are in [beta-pin-table.json](beta-pin-table.json).
+
+Banks on this board: VDD and VDDIO3 at 1.8 V, always on; VDDIO5 at 3.3 V, switched, for the SD card only; VDDIO2 and VDDIO4 unused, tied to 1.8 V.
+
+## Changes from the prototype's pins
+
+- **Camera strobe moves from PA0 to PA5.** PA0 is a boot ROM UART pin and may be driven whenever a flash boot fails.
+- **Camera XSHUTDOWN moves from PO5 to PF1**, so the VDDIO2 bank stays unused.
+- **Red LED moves from PG10 to PA7.** PG10 is the ROM's boot-failed output; it becomes a test pad.
+- **The dials lose their excitation pins** (PF5, PF6, PC12): their top ends go to the ADC reference rail.
+- **New signals:** the 3.3 V regulator enable, SD card detect, cell voltage sense, the RTC bus.
+
+## Signals
+
+| Signal | Pin | Ball | Function | Bank | Reset and boot ROM | Same as prototype | Note |
+|---|---|---|---|---|---|---|---|
+| CSI clock lane | CSI_CKP / CSI_CKN | T3 / U3 | Dedicated MIPI D-PHY clock input (no alternate-function number) | VDDA18CSI, 1.8 V from 1V8_AUX | Dedicated analog receiver pins, no GPIO function. The boot ROM does not use them. | yes | 100 ohm differential pair straight to the camera connector. The Nucleo's common-mode filter is left out, as already adopted. |
+| CSI data lane 0 | CSI_D0P / CSI_D0N | T5 / U5 | Dedicated MIPI D-PHY data lane 0 | VDDA18CSI, 1.8 V from 1V8_AUX | Dedicated analog receiver pins. The boot ROM does not use them. | yes | Which module lane lands here depends on the connector pinout, which waits for a module in hand. |
+| CSI data lane 1 | CSI_D1P / CSI_D1N | T4 / U4 | Dedicated MIPI D-PHY data lane 1 | VDDA18CSI, 1.8 V from 1V8_AUX | Dedicated analog receiver pins. The boot ROM does not use them. | yes | Second of the two lanes the sensor uses. |
+| CSI reference resistor | CSI_REXT | P5 | 200 ohm 1% resistor to VSS | VDDA18CSI, 1.8 V from 1V8_AUX | Analog reference pin, no logic state. | yes (Nucleo R145, 200 ohm) | AN5967: "A 200 Ω 1% resistor must connect CSI_REXT and VSS." |
+| Boot flash clock | PN6 | P15 | XSPIM_P2_CLK, AF9 | VDDIO3, 1.8 V from 1V8_MAIN | Analog input in reset. In flash boot the ROM sets AF9 and clocks the flash; it is left configured at hand-off. | yes | W25Q128JW pad 6. Without fuses the bank runs in degraded mode: 45 MHz at 30 pF on the fastest setting. Keep the trace short. |
+| Boot flash chip select | PN1 | R17 | XSPIM_P2_NCS1, AF9 | VDDIO3, 1.8 V from 1V8_MAIN | Analog input in reset. The ROM drives it as AF9 in flash boot. | yes | W25Q128JW pad 1. Add a pull-up to 1.8 V so the flash stays deselected while the pin floats (my inference, not an ST instruction). |
+| Boot flash IO0 (DI) | PN2 | T17 | XSPIM_P2_IO0, AF9 | VDDIO3, 1.8 V from 1V8_MAIN | Analog input in reset. The ROM uses it as the single-line data output to the flash. | yes | W25Q128JW pad 5. |
+| Boot flash IO1 (DO) | PN3 | R15 | XSPIM_P2_IO1, AF9 | VDDIO3, 1.8 V from 1V8_MAIN | Analog input in reset. The ROM uses it as the single-line data input from the flash. | yes | W25Q128JW pad 2. |
+| Boot flash IO2 (/WP) | PN4 | N17 | XSPIM_P2_IO2, AF9 | VDDIO3, 1.8 V from 1V8_MAIN | Analog input in reset and through ROM boot: the ROM's serial-NOR set-up lists only CLK, NCS, IO0 and IO1. | yes | W25Q128JW pad 3. Needed only for four-line reads by firmware. Pull up to 1.8 V so it never floats (inferred). |
+| Boot flash IO3 (/HOLD) | PN5 | R16 | XSPIM_P2_IO3, AF9 | VDDIO3, 1.8 V from 1V8_MAIN | Analog input in reset and through ROM boot, as IO2. | yes | W25Q128JW pad 7. Pull up to 1.8 V (inferred). PN0 and PN7 to PN12 stay unconnected. |
+| SD clock | PC2 | D9 | SDMMC2_CK, AF11 | VDDIO5, 3.3 V switched (3V3_SW) | Analog input in reset; bank unpowered and isolated until firmware validates it. The ROM uses it only if SD boot is fused, which it is not. | yes | Whether a 3.3 V bank may sit beside a 1.8 V VDD is the open question to ST. Series resistor footprint near the ball. |
+| SD command | PC3 | E10 | SDMMC2_CMD, AF11 | VDDIO5, 3.3 V switched (3V3_SW) | Analog input in reset; bank isolated until firmware validates it. Not used by the ROM in the default boot. | yes | Pull-up, if external, goes to 3V3_SW and never to 1.8 V. Firmware drives it low or releases it before the rail goes off. |
+| SD data 0 | PC4 | A10 | SDMMC2_D0, AF11 | VDDIO5, 3.3 V switched (3V3_SW) | Analog input in reset; bank isolated until firmware validates it. Not used by the ROM in the default boot. | yes | Pull-up to 3V3_SW only. |
+| SD data 1 | PC5 | B10 | SDMMC2_D1, AF11 | VDDIO5, 3.3 V switched (3V3_SW) | Analog input in reset; bank isolated until firmware validates it. Never used by the ROM. | yes | Pull-up to 3V3_SW only. |
+| SD data 2 | PC0 | C10 | SDMMC2_D2, AF11 | VDDIO5, 3.3 V switched (3V3_SW) | Analog input in reset; bank isolated until firmware validates it. Never used by the ROM. | yes | Pull-up to 3V3_SW only. |
+| SD data 3 | PE4 | D10 | SDMMC2_D3, AF11 | VDDIO5, 3.3 V switched (3V3_SW) | Analog input in reset; bank isolated until firmware validates it. Never used by the ROM. | yes | Pull-up to 3V3_SW only. This is the sixth and last pin of the bank; nothing else may use it. |
+| SD card detect | PE11 | E11 | GPIO input with pull-up, interrupt line 11 | VDD, 1.8 V always on | Analog input in reset. The boot ROM does not use it. | no (the prototype has no card-detect input) | Socket switch to ground; pull-up to 1.8 V, internal or external. Ball sits beside the SD group for a common escape. |
+| 3.3 V SD regulator enable | PD7 | E12 | GPIO output, push-pull, high = on | VDD, 1.8 V always on | Analog input in reset and through every ROM boot mode; an external pull-down keeps the regulator off. | no (new signal) | Pull-down of 47 kilohm or less at the regulator's EN pin (off is guaranteed only below 0.4 V). Not a ROM pin, not a JTAG pin. |
+| SWDIO | PA13 | U6 | JTMS/SWDIO, AF0 | VDD, 1.8 V always on | Debug function from reset, with internal pull-up. On a blank flash, debug opens only in development boot (BOOT1 high). | yes | To the STDC14 pads. Probe must work at 1.8 V (STLINK-V3MINIE). |
+| SWCLK | PA14 | T6 | JTCK/SWCLK, AF0 | VDD, 1.8 V always on | Debug function from reset, with internal pull-down. | yes | To the STDC14 pads. |
+| SWO (optional) | PB5 | U12 | JTDO/TRACESWO, AF0 | VDD, 1.8 V always on | JTAG data-out function from reset. | yes | Optional trace pad on the STDC14 pattern. Do not reuse PB5, PB4 or PA15 for gates: they carry debug functions and pulls from reset. |
+| Reset | NRST | G3 | Dedicated reset input/output | VDD, 1.8 V always on | Reset pin with weak internal pull-up. | yes | To the STDC14 pads, 10 nF to ground as in ST's example. Erratum 2.2.18: a pin reset can need a firmware workaround or a power cycle. |
+| BOOT0 | BOOT0 | G4 | Dedicated boot strap: low = flash boot, high = serial boot | VDD, 1.8 V always on | Input latched at reset. Low with BOOT1 low selects the serial NOR on port N. | yes | 10 kilohm pull-down and a pad beside the debug pads. The Nucleo uses 10 kilohm and a jumper to VDD. |
+| BOOT1 | PA6 | P8 | BOOT1, AF0: high = development boot | VDD, 1.8 V always on | Level latched at reset and checked before BOOT0. High makes the ROM open debug and wait. | yes | 10 kilohm pull-down and a pad. Nothing else on this pin: a stray high stops the camera booting. |
+| Probe UART, MCU transmit | PE5 | C11 | USART1_TX, AF7 | VDD, 1.8 V always on | ROM USART1 pin: may be set to AF7 with a pull-up in any boot that reaches serial boot, including a failed flash boot. | yes (Nucleo VCP_TX) | To the probe's receive pad. A ROM UART pin, which is acceptable for a UART and gives a serial-boot route through the probe. |
+| Probe UART, MCU receive | PE6 | D11 | USART1_RX, AF7 | VDD, 1.8 V always on | ROM USART1 pin: may be set to AF7 with a pull-up in any boot that reaches serial boot, including a failed flash boot. | yes (Nucleo VCP_RX, the project's recovery input) | From the probe's transmit pad. The recovery code relies on a pull-up; fit 100 kilohm to 1.8 V so an absent probe reads idle. |
+| PWR_ON (auxiliary 1.8 V switch enable) | PWR_ON | E2 | Dedicated output, high in Run, low in Standby | VDD, 1.8 V always on | Hardware raises it once VDD and VDDA18AON pass power-on reset, before any code runs. | no (the Nucleo's own regulators use it; no project circuit does) | To the load switch EN with a pull-down. The internal SMPS input is behind this switch, so the core cannot start until it closes. |
+| HOLD (power latch hold) | PD12 | C13 | GPIO output, push-pull, high = hold | VDD, 1.8 V always on | Analog input in reset and through every ROM boot mode; the gate pull-down holds the FET off until firmware drives it. | yes | N-FET gate (SI2312CDS). Gate pull-down 10 to 22 kilohm, not 100: pin leakage of up to 5 microamps across 100 kilohm would reach the FET's 0.45 V minimum threshold. Any reset returns the pin to analog, so HOLD drops for the whole boot. |
+| LED red gate | PA7 | R12 | GPIO output, or TIM1_CH1N AF1 for dimming | VDD, 1.8 V always on | Analog input in reset and through every ROM boot mode; gate pull-down keeps the LED off. | no (prototype PG10) | Moved because PG10 is the ROM's boot-failed pin. PA7 gives the same timer channel PG10 had and sits next to green and blue. Gate pull-down as for HOLD. |
+| LED green gate | PG0 | R13 | GPIO output, or TIM1_CH4N AF1 | VDD, 1.8 V always on | Analog input in reset and through every ROM boot mode; gate pull-down keeps the LED off. | yes (pin); polarity inverts | The Nucleo LED is active-low; the FET gate is active-high. Firmware must change. Gate pull-down as for HOLD. |
+| LED blue gate | PG8 | T14 | GPIO output, or TIM1_CH3N AF1 | VDD, 1.8 V always on | Analog input in reset and through every ROM boot mode; gate pull-down keeps the LED off. | yes (pin); polarity inverts | Active-high gate, as green. Gate pull-down as for HOLD. |
+| Boot-failed test pad | PG10 | T10 | ROM boot-failed output, UART5_TX AF11 | VDD, 1.8 V always on | High-impedance in a good flash boot. Pulled low on boot failure and in development boot; toggles in serial boot; sends 9600-baud traces. | no (prototype red LED) | Pad with 10 kilohm pull-up to 1.8 V, nothing else. Useful when bringing up a blank board with a new flash part. |
+| Camera I2C clock | PB10 | U11 | I2C2_SCL, AF4, open-drain | VDD, 1.8 V always on | Analog input in reset. The boot ROM does not use it. | yes | Direct at 1.8 V; the adapter's level shifters go away. Pull-up to the sensor's I/O rail (1V8_AUX). |
+| Camera I2C data | PB11 | P10 | I2C2_SDA, AF4, open-drain | VDD, 1.8 V always on | Analog input in reset. The boot ROM does not use it. | yes | As the clock line. |
+| Camera XSHUTDOWN | PF1 | P4 | GPIO output, low = sensor held in reset | VDD, 1.8 V always on | Analog input in reset; the external pull-down holds the sensor in reset. In no boot ROM pin table. | no (prototype PO5) | Moved off PO5 so the VDDIO2 bank stays unused. Beside the CSI balls. External pull-down; an RC or power-good release may be added once the oscillator data is in hand. |
+| Camera strobe (sensor GPIO) | PA5 | R8 | GPIO input with interrupt line 5; TIM2_CH1 (AF1) for timestamping | VDD, 1.8 V always on | Analog input in reset. In no boot ROM pin table. | no (prototype PA0) | Moved off PA0, which is the ROM's UART4 transmit pin and may be driven whenever a flash boot fails. Series resistor at the sensor side. |
+| Exposure dial wiper | PA9 | P7 | ADC1_INP10 (analog) | VDD pin, 1.8 V; converted against VDDA18ADC and VREF+ (1V8_AUX) | Analog input in reset. The boot ROM does not use it. | yes (same channel; the Nucleo's buffer and divider go away) | Dial top to the VREF+ rail, bottom to analog ground, so no excitation pins. 100 nF at the pin (inferred) for the 10 kilohm source. |
+| ASA dial wiper | PG15 | R6 | ADC1_INP7 (analog) | VDD pin, 1.8 V; converted against VDDA18ADC and VREF+ (1V8_AUX) | Analog input in reset. The boot ROM does not use it. | yes (same channel) | As the exposure dial. Balls P7, R6 and U8 keep the three analog inputs together. |
+| Cell voltage sense | PA8 | U8 | ADC1_INP5 (analog) | VDD pin, 1.8 V; converted against VDDA18ADC and VREF+ (1V8_AUX) | Analog input in reset. The boot ROM does not use it. | no (new; the prototype sensed USB voltage on PA11) | Divider must keep the pin under 1.8 V at a 4.2 V cell. PA11 is avoided because the old selector code reads it as USB present. |
+| Cell divider enable (optional) | PA12 | U7 | GPIO output, high = divider connected | VDD, 1.8 V always on | Analog input in reset and through ROM boot; pull-down keeps the divider off. | no (new signal) | Not needed if the divider hangs from the latched input node, which I recommend. A low-side switch alone would let the ADC pin float to cell voltage. |
+| RTC and orientation I2C clock | PE13 | A11 | I2C4_SCL, AF4, open-drain | VDD, 1.8 V always on | Analog input in reset. The boot ROM does not use it. | no (prototype has neither part) | The only second I2C pair wholly on the VDD bank and clear of ROM pins. Pull-ups to 1V8_MAIN. |
+| RTC and orientation I2C data | PE14 | B11 | I2C4_SDA, AF4, open-drain | VDD, 1.8 V always on | Analog input in reset. The boot ROM does not use it. | no | As the clock line. |
+| RTC interrupt (optional) | PC13 | F3 | GPIO input, interrupt line 13; also RTC timestamp and wake-up 3 | VDD_VSW backup-domain switch, 1.8 V | Analog input in reset. The boot ROM does not use it. | no | Open-drain from the RV-3032 with a pull-up to 1.8 V, through a 0 ohm link. The RV-3032 documents are not stored, so its pin behaviour is unverified. |
+| 32.768 kHz input (not fitted) | PC14-OSC32_IN / PC15-OSC32_OUT | D1 / C1 | LSE oscillator pins; no crystal fitted | VDD_VSW backup-domain switch, 1.8 V | Inputs, unused by the boot ROM. | no (the Nucleo fits a crystal; project firmware never enables it) | I found no LSE or backup-domain clock code in the project's firmware. Optional unfitted link from the RTC's clock output to PC14. |
+| Orientation sensor interrupt (first to cut) | PE12 | B12 | GPIO input, interrupt line 12 | VDD, 1.8 V always on | Analog input in reset. The boot ROM does not use it. | no | LIS2DW12 INT1. Beside the I2C4 balls, so the whole group drops out together if the sensor is cut. |
+| 48 MHz crystal (footprint only) | PH0-OSC_IN / PH1-OSC_OUT | A7 / B7 | HSE oscillator pins | VDDA18AON, 1.8 V from 1V8_MAIN | Inputs. Flash boot and the capture firmware run without the crystal. | yes (pins); the Nucleo fits the crystal | Only the USB transport code turns the crystal on, and USB is off this board. Leave crystal and load capacitors unfitted. |
+| Exposure-mirror test pad (optional) | PD0 | D13 | GPIO output driven by existing firmware | VDD, 1.8 V always on | Analog input in reset. The boot ROM does not use it. | yes | The timing measurements so far use this output. Keep it as a pad; assign nothing else to it. |
+| Phase-marker test pad (optional) | PE0 | F16 | GPIO output driven by existing firmware | VDD, 1.8 V always on | Analog input in reset. The boot ROM does not use it. | yes | As PD0. |
+| USB data pins (unused) | OTG1_HSDP, OTG1_HSDM, OTG2_HSDP, OTG2_HSDM | B5, A5, B3, A3 | Tie to VSS | USB PHY, unpowered (supplies tied to VSS) | Unpowered PHY pins. | no (the Nucleo uses OTG1) | AN5967: "DP/DM pins must be connected to VSS." |
+| USB tuning and Type-C pins (unused) | OTG1_TXRTUNE, OTG2_TXRTUNE, UCPD1_CC1, UCPD1_CC2 | C6, D6, A6, B6 | Leave unconnected | USB PHY, unpowered | Unpowered PHY pins. | no | AN5967: "TXRTUNE pins must be left floating/open. UCPD_CC1/CC2 pins must be left floating/open." |
+| USB ID pins and no-connect balls | OTG1_ID, OTG2_ID, two unnamed balls | C3, E6, C4, B4 | Leave unconnected | USB PHY, unpowered | Unpowered PHY pins. | not found for the ID pins | C4 and B4 "must be kept floating" (datasheet note 4). AN5967 does not mention the ID pins; leaving them open is my inference. |
+| Latch force-on pad | (no MCU pin) | - | Pad on the latch FET's gate network, beside the debug pads | cell | - | no | Lets the pogo fixture hold power on: a blank flash never asserts HOLD and every reset drops it. |
+| Debug reference and ground pads | 1V8_MAIN, VSS | - | Target-voltage and ground pads in the STDC14 pattern | 1.8 V | - | yes (Nucleo connector pin 1) | STDC14 pad numbers to be taken from ST's probe manual, which is not stored. |
+| Reserved: ROM serial-boot pins | PA0, PA1, PA2, PF6 | U10, P9, T8, L5 | Leave unconnected | VDD, 1.8 V | The ROM may pull up or drive these in serial boot (UART4, USART2). | no | Do not reuse without reading UM3234 Tables 30 and 31. |
+| Sensor 12 MHz oscillator | (no MCU pin) | - | Free-running oscillator on the sensor I/O rail | 1V8_AUX | - | yes (on ST's adapter) | No enable pin: the sensor allows supplies and clock in any order while XSHUTDOWN is low. |
+| Cell thermistor (optional) | PA10 | R7 | ADC1_INP11 (analog) | VDD pin, 1.8 V | Analog input in reset. | no | Only if the pack's white NTC wire is used; undecided. |
+| 3.3 V rail sense (optional) | PA11 | T7 | ADC1_INP12 (analog), through a divider | VDD pin, 1.8 V | Analog input in reset. | no | The MCU's own monitor for this bank does not work (ES0620 2.2.29), so firmware otherwise has only a fixed delay. |
+
+## Supply pins
+
+1V8_MAIN (always on): VDD (G13, H12, H13, J12, J13, K13), VDDA18AON (F6), VDDA18PLL (M5), VBAT (E1), VDDIO3 (N13, P13), VDDIO2 (L13, L14, M14, M15), VDDIO4 (E8, F8), and PDR_ON (A1), which "must always be connected to VDDA18AON" (AN5967 Table 7 p.14).
+
+1V8_AUX (switched by PWR_ON): VDDSMPS (K1 to K6), VDDA18PMU (G1, through a ferrite), VDDA18ADC (N6), VREF+ (U2, also the dials' top end), VDDA18CSI (R5).
+
+Core: VLXSMPS (J1 to J6) through 1 µH to VDDCORE (L6, L12, M7, M9, M11, N8, N10, N12, P11); VFBSMPS (G2) senses VDDCORE; VDDCSI (R4) to VDDCORE; V08CAP (F1) gets 4.7 µF only.
+
+3V3_SW: VDDIO5 (E9, F9), with the card.
+
+USB unused: VDD33USB (A4) and VDDA18USB (C5) to VSS. AN5967 Table 5 p.7 says "Connected to VSS if not used", with note 2 p.8: "If USB/UCPD features are not used : DP/DM pins must be connected to VSS. TXRTUNE pins must be left floating/open. UCPD_CC1/CC2 pins must be left floating/open." Figure 6 p.12 draws both supplies grounded.
+
+Ground: VREF- (T2), VSSA (M6), VSSAON (G6), VSSAPMU (F2), VSSSMPS (H1 to H6), VSS.
+
+Decoupling follows AN5967 Table 6 p.12-13. Balls are from DS14791 Table 18 p.108-111 and match MB1940 sheet 4.
+
+## Rules the schematic must carry
+
+- Gate pull-downs on HOLD and the LED FETs are 10 to 22 kilohm; the 3.3 V enable's is 47 kilohm or less. At 100 kilohm the datasheet's worst-case pin leakage could turn them on.
+- Every reset returns HOLD to a floating input, so on the cell the board stays up only for the shutter's start pulse until firmware runs again. The force-on pad covers programming.
+- SD pull-ups go to the switched 3.3 V rail, never to 1.8 V.
+- Unused I/O is left unconnected and set by firmware to analog or a pull (AN5967 section 12.7).
+
+## Open points
+
+1. ST's answer on a 3.3 V VDDIO5 bank beside a 1.8 V VDD still decides the six SD rows (DS14791 Table 24 p.140 limits inputs to Min(VDD, VDDIOx) + 0.3 V). If the answer is no, the SD lines need a level translator or VDD goes to 3.3 V and most of this table changes bank voltage.
+2. RTC bus: I gave the RV-3032 and LIS2DW12 their own bus (I2C4 on PE13/PE14) so nothing but the sensor sits on the camera bus during the 50 ms start. Sharing the camera bus would save two pins. The RV-3032 documents are still not stored, so its supply, interrupt and clock-output levels are unverified.
+3. Cell-voltage divider: decide whether it hangs from the latched input node (no enable pin, a few microamps while on) or from the cell through a high-side switch (uses PA12).
+4. Serial boot through the probe's UART would be a second way onto a blank board, but the ROM's serial boot also starts the USB block (UM3234 Table 10 p.11) and this board grounds the USB supplies. Whether UART serial boot still works is not stated; try it on the Nucleo or ask ST. Development boot plus SWD stays the planned route.
+5. Erratum 2.2.16 (ES0620 p.10): the reference-buffer clamp can draw current through VDDA18AON when the ADC supply is absent. Here the ADC supply is on the switched auxiliary rail. Revision Z parts have no workaround; revision B has a software one. Check the revision you buy.
+6. Firmware changes this table forces: LED gates active-high with red on PA7; dials without excitation pins (PF5, PF6 and PC12 are freed); no USB-voltage sampling on PA11; no Ethernet pins (PF4, PG11); validate VDDIO2 and VDDIO5 at the right moments; every 1.8 V bank in degraded mode with its range bit left clear.
+7. STDC14 pad numbers are not assigned here: no ST-LINK or STDC14 document is stored in the repository. The table gives the MCU end only (SWDIO, SWCLK, SWO, NRST, UART transmit and receive, plus BOOT0, BOOT1 and the boot-failed pad beside them).
+8. Camera connector pin order, which sensor GPIO carries the strobe, and the card socket's detect-switch polarity wait on the module in hand and the socket choice.
+9. Every unassigned I/O is left unconnected and set by firmware to analog or a pull; AN5967 section 12.7 p.27 says unused I/Os must not be left free. PN0 and PN7 to PN12, the rest of port O and all of port P fall under this.
+10. Shutter-state input: none is assigned. It is needed only if firmware must read a held or repeated press while running; the user has not asked for it.
+11. The cell-voltage divider, if permanently connected, puts about 1.5 V on PA8 before the ADC supply rises; keep it high-impedance and add the case to the question for ST.

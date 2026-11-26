@@ -32,7 +32,8 @@ On November 25 the user redefined the first board as a beta: one small LiPo, an 
 | 15 | Not on this beta: the user removed USB from this revision on November 26. Photos are read by removing the SD card. |
 | 26, 28 | Not on this beta: no NAND and no cell holders. A card socket and a LiPo replace them. |
 | 30 | **Resolved.** Alps RK10J11E0034 for both dials, mounted face-down; a small hole below each dial centre shows the selected label. See [prototype notes](../prototype/NOTES.md). A draft [KiCad footprint](../../hardware/beta/README.md) exists; it is to be checked against a real part. |
-| 12, 13, 15–18, 21, 23, 25, 27, 29, 31–35 | Open, not yet discussed. Items 12 and 13 are much simpler on a LiPo. |
+| 21 | Drafted. The [pin table](../custom-pcb/beta-pin-table.md) assigns every signal and was checked once against ST's tables; its open points remain. |
+| 12, 13, 16–18, 23, 25, 27, 29, 31–35 | Open. Items 12 and 13 are covered by the agreed power tree; 25 waits for a camera module in hand. |
 
 ## 1. Housekeeping first (owner)
 
