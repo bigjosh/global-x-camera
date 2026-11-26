@@ -474,3 +474,10 @@ wiring change; target left in recovery with HIGH HOLD for the user's meter.
 **Rejected:** tying the second and middle pads together now as insurance. It would work for a single wiper on either, but it presumes the unused one is isolated, and the user's rule is simpler to correct with a solder bridge once a part is metered.
 **Evidence:** reports of the footprint builder, its checker and the Alps document reader, November 26 (stored catalogue pages 2 and 3; Alps product pages for RK10J11E0034, RK10J11R0A0L, RK10J12E0A0A and RK10J12R0A0B); three independent traces of the user's photo agreed on the two-gang layout of that other part. No Alps or Omron part has been metered; the footprint has not been loaded in KiCad.
 
+## 2026-11-26  Shutter switch moved 0.5 mm toward the board edge
+
+**Why:** the user chose it ("0.5 up please") after the footprint check showed that, 8.3 mm below the edge, a worst-case switch only finished its stroke 0.4 mm below the board edge. The case bottom is now 7.8 mm below the edge. The lever rests at most 2.5 mm above the edge, snaps 0.9 ±0.5 mm above it and, with Omron's 0.3 mm minimum overtravel, always finishes at least 0.1 mm above it. The pads run 7.9 to 10.5 mm below the edge and the LED hole centre is 12.1 mm below it.
+**Constraint this adds:** the lever's fixed pivot hub now stands 0.4 mm beyond the board edge, and the lever rests up to 0.5 mm higher than the dial rims; the housing has to allow for both.
+**Corrected in the drawings:** the four FETs beside the LED are now drawn standing on end at their real 2.4 x 2.9 mm outline, 0.5 mm below the LED centre. Drawn lying down at 2.9 x 1.6 mm they overlapped the corners of the dial bodies by 0.5 mm, in this and the earlier drawings. The fit script now checks the row against the switch pads and the dial bodies.
+**Evidence:** direct user reply, November 26; `tools/build_shutter_footprint.py` and its checks; regenerated [fit drawing](../custom-pcb/shutter-switch-fit.svg), [control-cluster.json](../custom-pcb/control-cluster.json) and [placement draft](../custom-pcb/beta-placement-draft.svg). No part in hand.
+

@@ -45,7 +45,8 @@ TRIM = switch.TRIM                         # terminals trimmed to this length wh
 PAD_W, PAD_Y = switch.PAD_W, (-switch.PAD_Y[0], -switch.PAD_Y[1])
 LED_Y = cluster.LED_BELOW_EDGE             # LED hole centre, clear of the terminal pads
 assert abs(LED_Y - (PAD_Y[1] + 1.6)) < 1e-6, 'the locked LED hole no longer sits 1.6 mm below the terminal pads'
-FET_W, FET_H, FET_GAP = 2.9, 1.6, 0.4      # four SOT-23, two each side of the LED
+FET_W, FET_H, FET_GAP = 2.4, 2.9, 0.4      # four SOT-23 standing on end (lead span x length), two each side of the LED
+FET_DROP = 0.5                             # the FET row sits this far below the LED centre, clear of the switch pads
 LED_BODY = (3.2, 2.8)
 
 X0, X1, Y0, Y1 = 36.0, 88.0, -9.0, 20.0
@@ -61,7 +62,7 @@ def fets():
     """(x, y, w, h) of the four FETs, a row centred on the LED."""
     half = LED_BODY[0] / 2 + FET_GAP
     xs = [SW_X - half - 2 * FET_W - FET_GAP, SW_X - half - FET_W, SW_X + half, SW_X + half + FET_W + FET_GAP]
-    return [(x, LED_Y - FET_H / 2, FET_W, FET_H) for x in xs]
+    return [(x, LED_Y + FET_DROP - FET_H / 2, FET_W, FET_H) for x in xs]
 
 
 def n(v):
@@ -155,7 +156,17 @@ def build():
     return '\n'.join(o) + '\n'
 
 
+def checks():
+    """The LED and FET row has to clear the switch pads above it and the dial bodies and pads beside it."""
+    row = fets()
+    assert min(y for _, y, _, _ in row) >= PAD_Y[1] + 0.5 - 1e-6, 'FETs too close to the switch pads'
+    assert row[0][0] >= ASA_X + dial.BODY_HALF_W + 0.4 - 1e-6, 'FET under the ASA dial body'
+    assert row[-1][0] + FET_W <= EXP_X - dial.BODY_HALF_W - 0.4 + 1e-6, 'FET under the exposure dial body'
+    assert LED_Y - LED_BODY[1] / 2 >= PAD_Y[1] + 0.2 - 1e-6, 'LED body too close to the switch pads'
+
+
 def main():
+    checks()
     OUT.write_text(build())
     bx = SW_X - BODY_W / 2
     print(f'ASA {ASA_X:.1f}, switch {SW_X:.1f}, exposure {EXP_X:.1f}; case bottom {BOTTOM_Y:.2f} below edge, case top {edge_y(CASE_TOP):.2f}, '

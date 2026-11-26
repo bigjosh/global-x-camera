@@ -39,7 +39,7 @@ DIAL_PITCH = 26.0           # centre to centre; 24 until the 8.2 mm switch body 
 WINDOW_D = dial_footprint.LABEL_HOLE_D      # hole that shows one label
 WINDOW_R = dial_footprint.LABEL_HOLE_R      # its centre, measured from the knob centre
 LABEL_SWEEP = 260           # degrees of the 270 degree travel used by the labels
-LED_BELOW_EDGE = 12.6       # hole centre; 1.6 mm below the end of the switch's terminal pads
+LED_BELOW_EDGE = 12.1       # hole centre; 1.6 mm below the end of the switch's terminal pads
 LED_HOLE_D = 2.0            # follows the reverse-mount RGB LED still to be confirmed
 
 DIAL_Y = KNOB_R - PROTRUSION                     # centre depth below the top edge
@@ -125,8 +125,8 @@ def build():
     add(f'<circle cx="{n(BUTTON_X)}" cy="{n(LED_BELOW_EDGE)}" r="{n(LED_HOLE_D / 2)}" fill="#fff6c9" stroke="#0f2a1e" stroke-width="0.2"/>')
 
     # Names.
-    text(ASA_X, DIAL_Y + 12.6 + 5.2, 'ASA dial', 1.7, fill='#ffffff', weight='bold')
-    text(EXPOSURE_X, DIAL_Y + 12.6 + 5.2, 'Exposure dial', 1.7, fill='#ffffff', weight='bold')
+    text(ASA_X, DIAL_Y + 12.1 + 5.2, 'ASA dial', 1.7, fill='#ffffff', weight='bold')
+    text(EXPOSURE_X, DIAL_Y + 12.1 + 5.2, 'Exposure dial', 1.7, fill='#ffffff', weight='bold')
     text(BUTTON_X, LED_BELOW_EDGE + 3.4, 'RGB LED', 1.25, fill='#ffffff')
     text(BUTTON_X, -PROTRUSION - 1.6, 'Shutter', 1.5, fill='#222222', weight='bold')
     text(BOARD_W / 2, BOARD_H - 16, 'USER SIDE (bare board)', 2.6, fill='#9fd0b6', weight='bold')
@@ -140,10 +140,10 @@ def build():
     x = ASA_X - KNOB_R - 2.2
     add(f'<path d="M{n(x)} {n(-PROTRUSION)} V0 M{n(x - 0.7)} {n(-PROTRUSION)} H{n(x + 4.2)} M{n(x - 0.7)} 0 H{n(x + 0.7)}" stroke="#b3261e" stroke-width="0.12" fill="none"/>')
     text(x - 1.0, -0.5, f'{n(PROTRUSION)} mm', 1.35, 'end', '#b3261e')
-    text(BUTTON_X, DIAL_Y + 12.6 + 8.2, f'a {n(WINDOW_D)} mm hole below each dial centre shows the selected label', 1.2, fill='#ffffff')
+    text(BUTTON_X, DIAL_Y + 12.1 + 8.2, f'a {n(WINDOW_D)} mm hole below each dial centre shows the selected label', 1.2, fill='#ffffff')
     text(BOARD_W / 2, BOARD_H + 4.2, 'Control cluster preview, seen from the user side. Dials are 14 mm Alps RK10J11E0034 wheels, mounted face-down.', 1.45)
     text(BOARD_W / 2, BOARD_H + 6.8, 'Faint numbers are the label ring on each dial face, hidden by the board.', 1.3, fill='#555555')
-    text(BOARD_W / 2, BOARD_H + 9.0, 'The shutter switch is an Omron D2MQ hinge-lever microswitch lying flat; its lever rests 2 mm above the edge.', 1.3, fill='#555555')
+    text(BOARD_W / 2, BOARD_H + 9.0, 'The shutter switch is an Omron D2MQ hinge-lever microswitch lying flat; its lever rests up to 2.5 mm above the edge.', 1.3, fill='#555555')
     add('</svg>')
     return '\n'.join(o) + '\n'
 
@@ -167,7 +167,7 @@ def record():
         exposure_dial=dial(EXPOSURE_X),
         label_hole=dict(diameter=WINDOW_D, radius_from_knob_centre=WINDOW_R, shows='the one selected label'),
         shutter_switch=dict(part='Omron D2MQ-4L-105-1, lying flat on the parts side, lever toward the top edge, terminals re-formed onto pads',
-                            centre_x=round(BUTTON_X, 2), lever_rest_above_top_edge=PROTRUSION,
+                            centre_x=round(BUTTON_X, 2), lever_rest_above_top_edge_max=shutter.LEVER_PROUD,
                             case_bottom_below_top_edge=round(shutter.BOTTOM_Y, 2),
                             terminal_pads_end_below_top_edge=round(shutter.PAD_Y[1], 2)),
         led_hole=dict(centre=[round(BUTTON_X, 2), LED_BELOW_EDGE], diameter=LED_HOLE_D,

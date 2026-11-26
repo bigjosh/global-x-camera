@@ -46,12 +46,14 @@ TERMINAL_W, TERMINAL_BARB_W, TERMINAL_T, TERMINAL_L = 0.8, 1.3, 0.6, 3.4   # two
 CONTACTS = ('COM', 'NO', 'NC')                # from the pivot end; to be confirmed with a meter
 
 # Placement and land pattern, chosen here (the same figures as tools/build_shutter_fit_preview.py).
-LEVER_PROUD = 2.0                             # the lever at its free position stands this far beyond the board edge
-CASE_BOTTOM_Y = LEVER_PROUD - FREE - HOLE_LINE    # so the case bottom is 8.3 mm below the edge
+LEVER_PROUD = 2.5                             # the lever at its free position stands at most this far beyond the board edge;
+                                              # 2.0 until November 26, when the user moved the switch 0.5 mm toward the edge
+                                              # so that a worst-case part still snaps, with its overtravel, above the edge
+CASE_BOTTOM_Y = LEVER_PROUD - FREE - HOLE_LINE    # so the case bottom is 7.8 mm below the edge
 HOLE_Y = CASE_BOTTOM_Y + HOLE_LINE
 TRIM = 2.2                                    # terminals are cut to this length when they are re-formed
 PAD_W = 1.6                                   # 0.15 mm a side over the 1.3 mm barbs, Omron's general tolerance; leaves 0.9 mm between pads
-PAD_Y = (-8.4, -11.0)                         # starts 0.1 mm outside the case; ends 0.5 mm past a trimmed terminal
+PAD_Y = (-7.9, -10.5)                         # starts 0.1 mm outside the case; ends 0.5 mm past a trimmed terminal
 
 # Where the terminals leave the case, for the note and the README. They are on the centre plane of the thickness.
 TERMINAL_CENTRE_ABOVE_BOARD = BODY_THICKNESS / 2                             # 1.35 mm
@@ -154,14 +156,15 @@ def checks():
     assert gap >= 0.9 - 1e-6, f'pad-to-pad gap {gap:.2f} mm'
     assert max(abs(x) for x in xs) + PAD_W / 2 <= BODY_W / 2 + 1e-6, 'pads run outside the case width'
     assert PAD_W >= TERMINAL_BARB_W, 'pad narrower than the terminal barbs'
-    assert abs(CASE_BOTTOM_Y + 8.3) < 1e-6, CASE_BOTTOM_Y
+    assert abs(CASE_BOTTOM_Y + 7.8) < 1e-6, CASE_BOTTOM_Y
+    assert above_holes(OPERATE - OPERATE_TOL) - 0.3 >= 0.1 - 1e-6, 'a worst-case part no longer finishes its stroke above the board edge'
     assert PAD_Y[0] <= CASE_BOTTOM_Y and PAD_Y[1] <= CASE_BOTTOM_Y - TRIM - 0.3, 'pad does not cover the trimmed terminal'
     assert TRIM <= TERMINAL_L
     assert abs(from_side(HOLE_FIRST) + from_side(HOLE_FIRST + HOLE_PITCH)) < 1e-6, 'mounting holes not centred'
     (px, py), (tx, ty) = lever()
     assert abs(ty + LEVER_TIP_R - LEVER_PROUD) < 1e-3, 'lever does not rest at the stated height'
     assert tx + LEVER_TIP_R <= BODY_W / 2 and px + LEVER_SWING_R + LEVER_TIP_R <= BODY_W / 2, 'lever swings outside the case width'
-    assert py + PIVOT_R <= 0, 'the lever hub stands beyond the board edge'
+    assert py + PIVOT_R <= 0.4 + 1e-6, 'the fixed lever hub stands more than 0.4 mm beyond the board edge'
     text = footprint()
     assert 'thru_hole' not in text and 'drill' not in text, 'this footprint puts no holes in the board'
     assert text.count('(') == text.count(')')
