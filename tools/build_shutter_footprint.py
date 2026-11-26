@@ -50,7 +50,7 @@ LEVER_PROUD = 2.0                             # the lever at its free position s
 CASE_BOTTOM_Y = LEVER_PROUD - FREE - HOLE_LINE    # so the case bottom is 8.3 mm below the edge
 HOLE_Y = CASE_BOTTOM_Y + HOLE_LINE
 TRIM = 2.2                                    # terminals are cut to this length when they are re-formed
-PAD_W = 1.4
+PAD_W = 1.6                                   # 0.15 mm a side over the 1.3 mm barbs, Omron's general tolerance; leaves 0.9 mm between pads
 PAD_Y = (-8.4, -11.0)                         # starts 0.1 mm outside the case; ends 0.5 mm past a trimmed terminal
 
 # Where the terminals leave the case, for the note and the README. They are on the centre plane of the thickness.
@@ -126,7 +126,7 @@ def footprint():
     o.append(f'\t(fp_text user "${{REFERENCE}}" (at 0 {ky(above_holes(1.9))} 0) (layer "F.Fab") {font.format(s=1, t=0.15)})')
     # Board edge and notes.
     o.append(f'\t(fp_line (start -6.5 0) (end 6.5 0) {stroke.format(w=0.1)} (layer "Dwgs.User"))')
-    o.append(f'\t(fp_text user "board edge; lever stands {LEVER_PROUD:g} mm beyond" (at 0 {round(-LEVER_PROUD - 1.1, 3)} 0) (layer "Dwgs.User") {font.format(s=0.6, t=0.09)})')
+    o.append(f'\t(fp_text user "board edge; lever stands up to {LEVER_PROUD:g} mm beyond" (at 0 {round(-LEVER_PROUD - 1.1, 3)} 0) (layer "Dwgs.User") {font.format(s=0.6, t=0.09)})')
     note_y = ky(PAD_Y[1]) + 4.3
     o.append(f'\t(fp_text user "terminals leave the case {TERMINAL_CENTRE_ABOVE_BOARD:.2f} mm above the board (centre; underside {TERMINAL_UNDERSIDE_ABOVE_BOARD:.2f} mm):" '
              f'(at 0 {round(note_y, 3)} 0) (layer "Cmts.User") {font.format(s=0.6, t=0.09)})')

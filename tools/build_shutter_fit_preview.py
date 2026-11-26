@@ -19,6 +19,7 @@ from pathlib import Path
 
 import build_control_cluster_preview as cluster
 import build_dial_footprint as dial
+import build_shutter_footprint as switch          # the one definition of the switch and its lands
 
 OUT = Path(__file__).resolve().parents[1] / 'docs/custom-pcb/shutter-switch-fit.svg'
 W = cluster.BOARD_W
@@ -26,23 +27,22 @@ ASA_X, EXP_X = cluster.ASA_X, cluster.EXPOSURE_X
 SW_X = cluster.BUTTON_X
 DIAL_Y = cluster.DIAL_Y
 
-# Omron D2MQ-4L, heights above the case bottom (datasheet value + 1.6 where Omron measures from the hole line).
-BODY_W = 8.2
-CASE_TOP = 4.45 + 1.6                      # top face of the case
-PIVOT = 5.9 + 1.6                          # lever pivot
-LEVER_TOP = 6.6 + 1.6                      # highest fixed point
-FREE = 8.7 + 1.6                           # lever at rest (maximum)
-OPERATE = 7.1 + 1.6                        # where it snaps (+/-0.5)
-HOLE_LINE, HOLE_PITCH = 1.6, 4.0
-LEVER_REACH = 5.35                         # pivot to the point where the lever is pressed
-TERMINALS = (-2.5, 0.0, 2.5)               # three at 2.5 mm pitch, centred on the body
-TERMINAL_W, TERMINAL_L = 0.8, 3.4
+# Omron D2MQ-4L, heights above the case bottom (the footprint script keeps Omron's own reference, the hole line).
+BODY_W = switch.BODY_W
+CASE_TOP = switch.CASE_TOP + switch.HOLE_LINE          # top face of the case, under the lever
+SHOULDER_TOP = switch.SHOULDER_TOP + switch.HOLE_LINE  # raised pivot end
+PIVOT = switch.PIVOT + switch.HOLE_LINE                # lever pivot
+FREE = switch.FREE + switch.HOLE_LINE                  # top of the lever end at rest (maximum)
+OPERATE = switch.OPERATE + switch.HOLE_LINE            # where it snaps (+/-0.5)
+HOLE_LINE, HOLE_PITCH = switch.HOLE_LINE, switch.HOLE_PITCH
+TERMINALS = tuple(x for _, _, x in switch.terminals())
+TERMINAL_W = switch.TERMINAL_W
 
-# Placement choices.
-LEVER_PROUD = 2.0                          # lever at rest stands this far above the board's top edge
-BOTTOM_Y = FREE - LEVER_PROUD              # so the case bottom is this far below the edge
-TRIM = 2.2                                 # terminals trimmed to this length when they are re-formed
-PAD_W, PAD_Y = 1.4, (BOTTOM_Y + 0.1, BOTTOM_Y + TRIM + 0.5)
+# Placement, from the footprint.
+LEVER_PROUD = switch.LEVER_PROUD           # the lever at rest stands at most this far above the board's top edge
+BOTTOM_Y = -switch.CASE_BOTTOM_Y           # case bottom, this far below the edge
+TRIM = switch.TRIM                         # terminals trimmed to this length when they are re-formed
+PAD_W, PAD_Y = switch.PAD_W, (-switch.PAD_Y[0], -switch.PAD_Y[1])
 LED_Y = cluster.LED_BELOW_EDGE             # LED hole centre, clear of the terminal pads
 assert abs(LED_Y - (PAD_Y[1] + 1.6)) < 1e-6, 'the locked LED hole no longer sits 1.6 mm below the terminal pads'
 FET_W, FET_H, FET_GAP = 2.9, 1.6, 0.4      # four SOT-23, two each side of the LED
@@ -74,14 +74,18 @@ def switch_svg(add, front=False, X=lambda x: x, oy=0.0, ghost=False):
     def rx(x, w):                      # left edge after optional mirroring
         return X(x + w) if front else X(x)
     dash = 'fill="none" stroke="#bfe3d0" stroke-width="0.12" stroke-dasharray="0.6 0.4"'
-    add(f'<rect x="{n(rx(bx, BODY_W))}" y="{n(oy + edge_y(CASE_TOP))}" width="{n(BODY_W)}" height="{n(CASE_TOP)}" '
+    sw = switch.SHOULDER_W                                   # the pivot end of the case is a raised shoulder
+    outline = [(bx, BOTTOM_Y), (bx, edge_y(SHOULDER_TOP)), (bx + sw, edge_y(SHOULDER_TOP)), (bx + sw, edge_y(CASE_TOP)),
+               (bx + BODY_W, edge_y(CASE_TOP)), (bx + BODY_W, BOTTOM_Y)]
+    add('<path d="M' + ' L'.join(f'{n(X(x))} {n(oy + y)}' for x, y in outline) + ' Z" '
         + (dash if ghost else 'fill="#22262b" stroke="#0d0f11" stroke-width="0.1"') + '/>')
     for hx in (-HOLE_PITCH / 2, HOLE_PITCH / 2):
         add(f'<circle cx="{n(X(SW_X + hx))}" cy="{n(oy + edge_y(HOLE_LINE))}" r="0.8" fill="#2f6b4f" stroke="#555" stroke-width="0.06"/>')
-    px, py = bx + 0.7, edge_y(PIVOT)
-    tx = px + LEVER_REACH + 0.9
-    add(f'<path d="M{n(X(px))} {n(oy + py)} L{n(X(tx))} {n(oy + edge_y(FREE))}" stroke="#d7dbe0" stroke-width="0.35" stroke-linecap="round"/>')
-    add(f'<circle cx="{n(X(px))}" cy="{n(oy + py)}" r="0.7" fill="#3a3f46" stroke="#0d0f11" stroke-width="0.06"/>')
+    (px, py), (tx, ty) = switch.lever()                      # back view about the switch centre, +y beyond the edge
+    px, py, tx, ty = SW_X + px, -py, SW_X + tx, -ty
+    add(f'<path d="M{n(X(px))} {n(oy + py)} L{n(X(tx))} {n(oy + ty)}" stroke="#d7dbe0" stroke-width="0.35" stroke-linecap="round"/>')
+    add(f'<circle cx="{n(X(tx))}" cy="{n(oy + ty)}" r="{switch.LEVER_TIP_R}" fill="#d7dbe0"/>')
+    add(f'<circle cx="{n(X(px))}" cy="{n(oy + py)}" r="{switch.PIVOT_R}" fill="#3a3f46" stroke="#0d0f11" stroke-width="0.06"/>')
     for t in TERMINALS:
         add(f'<rect x="{n(rx(SW_X + t - PAD_W / 2, PAD_W))}" y="{n(oy + PAD_Y[0])}" width="{n(PAD_W)}" height="{n(PAD_Y[1] - PAD_Y[0])}" '
             + (dash if ghost else 'fill="#d9a441" fill-opacity="0.8" stroke="#7a5a14" stroke-width="0.05"') + '/>')
@@ -117,8 +121,10 @@ def build():
         add(f'<circle cx="{n(cx)}" cy="{n(DIAL_Y + dial.LABEL_HOLE_R)}" r="{n(dial.LABEL_HOLE_D / 2)}" fill="#e3cb9b" stroke="#0f2a1e" stroke-width="0.12"/>')
         text(cx, DIAL_Y + 0.3, name, 1.0, '#ffffff', weight='bold')
 
-    px, tx = switch_svg(add)
-    add(f'<path d="M{n(px)} {n(edge_y(PIVOT))} L{n(tx)} {n(edge_y(OPERATE))}" stroke="#d7dbe0" stroke-width="0.2" stroke-dasharray="0.4 0.3" stroke-linecap="round"/>')
+    px, _ = switch_svg(add)
+    rise = OPERATE - switch.LEVER_TIP_R - PIVOT                # the lever end at the nominal operating position
+    tx = px + math.sqrt(switch.LEVER_SWING_R ** 2 - rise ** 2)
+    add(f'<path d="M{n(px)} {n(edge_y(PIVOT))} L{n(tx)} {n(edge_y(OPERATE - switch.LEVER_TIP_R))}" stroke="#d7dbe0" stroke-width="0.2" stroke-dasharray="0.4 0.3" stroke-linecap="round"/>')
     text(SW_X, edge_y(CASE_TOP) + 2.4, 'D2MQ', 0.95, '#e6e6e6', weight='bold')
     add(f'<circle cx="{n(SW_X)}" cy="{n(LED_Y)}" r="{n(cluster.LED_HOLE_D / 2)}" fill="#fff6c9" stroke="#0f2a1e" stroke-width="0.12"/>')
     add(f'<rect x="{n(SW_X - LED_BODY[0] / 2)}" y="{n(LED_Y - LED_BODY[1] / 2)}" width="{LED_BODY[0]}" height="{LED_BODY[1]}" {ghost}/>')
@@ -135,8 +141,8 @@ def build():
     x = ASA_X - dial.KNOB_R - 1.0
     add(f'<path d="M{n(x)} {n(DIAL_Y - dial.KNOB_R)} V0 M{n(x - 0.4)} {n(DIAL_Y - dial.KNOB_R)} H{n(x + 0.4)} M{n(x - 0.4)} 0 H{n(x + 0.4)}" stroke="#b3261e" stroke-width="0.08" fill="none"/>')
     text(x - 0.5, -0.7, '2', 0.8, '#b3261e', 'end')
-    text(SW_X, -4.4, f'lever: {n(LEVER_PROUD)} mm proud at rest,', 0.8, '#b3261e')
-    text(SW_X, -3.3, f'snaps {n(OPERATE - BOTTOM_Y)} mm above the edge', 0.8, '#b3261e')
+    text(SW_X, -4.4, f'lever: up to {n(LEVER_PROUD)} mm proud at rest,', 0.8, '#b3261e')
+    text(SW_X, -3.3, f'snaps {n(OPERATE - BOTTOM_Y)} ±{switch.OPERATE_TOL} mm above the edge', 0.8, '#b3261e')
     x = bx - 1.0
     add(f'<path d="M{n(x)} 0 V{n(BOTTOM_Y)} M{n(x - 0.4)} {n(BOTTOM_Y)} H{n(x + 0.4)}" stroke="#b3261e" stroke-width="0.08" fill="none"/>')
     text(x - 0.3, BOTTOM_Y + 1.0, n(BOTTOM_Y), 0.8, '#b3261e', 'end')
