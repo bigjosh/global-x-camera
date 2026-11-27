@@ -31,7 +31,7 @@ On November 25 the user redefined the first board as a beta: one small LiPo, an 
 | 24 | Partly resolved. One reverse-mount RGB LED, seen through a hole below the shutter switch's pads, 12.1 mm below the top edge. Part and behaviour during exposure open. |
 | 15 | Not on this beta: the user removed USB from this revision on November 26. Photos are read by removing the SD card. |
 | 26, 28 | Not on this beta: no NAND and no cell holders. A card socket and a LiPo replace them. |
-| 30 | **Resolved.** Alps RK10J11E0034 for both dials, mounted face-down; a small hole below each dial centre shows the selected label. See [prototype notes](../prototype/NOTES.md). A draft [KiCad footprint](../../hardware/beta/README.md) exists; it is to be checked against a real part. Wiring: outside terminals are the track ends, middle terminal the wiper; which terminal really carries the wiper must be metered on a part before boards are ordered. |
+| 30 | **Resolved.** Alps RK10J11E0034 for both dials, mounted face-down; a small hole below each dial centre shows the selected label. See [prototype notes](../prototype/NOTES.md). A draft [KiCad footprint](../../hardware/beta/README.md) exists; it is to be checked against a real part. Wiring: outside terminals are the track ends, middle terminal the wiper; the wiper position and the switch's pin order are best guesses the user chose on November 27 to build on; meter the first parts to arrive. |
 | 21 | Drafted. The [pin table](../custom-pcb/beta-pin-table.md) assigns every signal and was checked once against ST's tables; its open points remain. |
 | 12, 13, 16–18, 23, 25, 27, 29, 31–35 | Open. Items 12 and 13 are covered by the agreed power tree; 25 waits for a camera module in hand. |
 

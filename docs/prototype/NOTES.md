@@ -481,3 +481,11 @@ wiring change; target left in recovery with HIGH HOLD for the user's meter.
 **Corrected in the drawings:** the four FETs beside the LED are now drawn standing on end at their real 2.4 x 2.9 mm outline, 0.5 mm below the LED centre. Drawn lying down at 2.9 x 1.6 mm they overlapped the corners of the dial bodies by 0.5 mm, in this and the earlier drawings. The fit script now checks the row against the switch pads and the dial bodies.
 **Evidence:** direct user reply, November 26; `tools/build_shutter_footprint.py` and its checks; regenerated [fit drawing](../custom-pcb/shutter-switch-fit.svg), [control-cluster.json](../custom-pcb/control-cluster.json) and [placement draft](../custom-pcb/beta-placement-draft.svg). No part in hand.
 
+## 2026-11-27  Dial and switch pin orders: build on the best guess, rework if wrong
+
+**Why:** the user has neither part in hand and will not hold the board for meter checks ("go with best guess and we can always rework if issues"). The board is drawn with the dial wiper on the middle terminal and the switch as pad 1 COM (lever-pivot end), 2 NO, 3 NC.
+**Basis for each guess:** dial: the part's own terminal figure and the digits over its hole drawing both give the middle terminal, and Alps drew a different figure for the reflow twin, which suggests the difference is deliberate; the stray dummy leader on the hole drawing looks like a leftover from the twin's drawing. That is the reviewer's reading, not a fact. Switch: two independent readings of Omron's contact-form figure agree.
+**Rework if wrong:** dial: bridge the middle pad to the neighbouring dummy pad with solder (0.8 mm gap); the track ends are on the outside terminals in every Alps figure, so nothing else changes. Switch: a wrong order needs cuts and wires at the three pads, so keep the three nets as short, exposed surface traces near the pads.
+**Deferred, not dropped:** the meter checks and the trial fold of a dial move from "before ordering" to the first parts to arrive.
+**Evidence:** direct user reply, November 27; the entry of November 26 on the Alps documents.
+
