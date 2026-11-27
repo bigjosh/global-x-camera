@@ -512,3 +512,10 @@ wiring change; target left in recovery with HIGH HOLD for the user's meter.
 **Rejected:** capacitor-only backup (hours, not weeks); Molex 104031-0811 as first choice (push-pull, needs an exposed card end); lengthened receptacle pads and fluxed touch-up, against Hirose's instructions.
 **Corrected by the checker:** order RV-3032 -TA-QC or -TA-QA, whichever is in stock; EVI through 10 k and a 10 k INT pull-up; receptacle power pads are 0.53 x 0.33 mm; wait 20 ms or more before releasing XSHUTDOWN; the SD socket's footprint and detect polarity cannot be verified until Molex's drawing is read.
 **Evidence:** the pickers' and checkers' reports of November 27. RTC figures come from third-party mirror copies, stored in `datasheets/sensors_timing` and labelled as such. Nothing was measured; stock figures are undated search snippets.
+
+## 2026-11-27  Camera flex may leave the module upward or downward
+
+**Why:** the user reported that the module's flex can exit either up or down on the board ("the ffc on the sensor can exit either up or down"). The placement drafts so far draw it leaving sideways toward a connector beside the lens, which was a placeholder pending a module in hand. The next placement draft is to run the flex vertically and choose the direction that gives the shortest camera pairs to the MCU and leaves room for the MCU's capacitors, which now sit around the package edge. The two directions differ by a half turn of the module, so the image comes out upside down in one of them; that is a readout or software flip, to be confirmed against the sensor's settings.
+**Not yet known:** which direction the user prefers, if either; the module's exact flex length and connector position, which the stored module drawing gives and a module in hand will confirm.
+**Evidence:** direct user remark, November 27. The half-turn and flip statement is the reviewer's inference, not checked against the VD56G3 register list.
+
