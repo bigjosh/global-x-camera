@@ -215,7 +215,6 @@ From the study of November 27, after the checker's corrections. These are paper 
 4. **Picks the checker could not verify** (no pick was marked low confidence): Molex 503398-1892, until drawing SD-503398-003 is read; GRM188R61A106KE69J at the three LDOs (bias loss, height, fitted count); TPS7A2028PDBVR as the 2.8 V alternate.
 5. **Check part status:** DFE201612P-1R0M=P2 is marked no longer manufactured in one distributor snippet; TFM201610ALM-R47MTAA is called being discontinued at RS; order SI2333DDS-T1-GE3, not SI2333DS or the -T1-BE3 listing.
 6. **Decisions for the owner** (the study marked only the first for the user; the others are choices its picks leave open):
-   - Thin 1.8 V floor: add margin now, by a second TPS22918DBVR feeding only VDDA18CSI (the checker's suggestion), the bypass link if ST allows it, or the 1.83 V adjustable conversion, or wait for the bench?
    - SMPS output capacitors: 15 uF as ST's table says, or the 22 uF the Nucleo fits?
    - Orientation sensor: still the default "unless the owner objects".
 7. **Smaller choices left to the reviewer:** 1 uF part for the four unassigned positions; the 100 k for PE6 and the pull and series resistors not yet valued; cell divider 1 M over 560 k or 100 k over 56 k, when the low-battery level is set; whether to fit one or two 10 uF on each sensor rail, after the first scope.
