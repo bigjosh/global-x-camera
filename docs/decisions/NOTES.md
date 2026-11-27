@@ -122,3 +122,10 @@
 **Rejected:** JLCPCB assembly with globally sourced parts, on lead time; a paid sourcing order there also cannot be cancelled.
 **Evidence:** direct user replies, November 27; JLCPCB help pages read the same day through search results (global sourcing 9-20 business days; standard PCBA at least 4 days; August 2026 multilayer lead-time notices). No live quote was obtained. The reflow advice is general practice, not tested on this part.
 
+## 2026-11-27  Six layers, a provision for an external core regulator, and PCBWay preferred for bare boards
+
+**Why:** the user chose six layers for the look of the back ("Look matters so let go 6"): the back can then be one unbroken ground pour with no escape tracks under the MCU. The user agreed to provision the board for an external core regulator in case the MCU's internal SMPS, never yet run in this project, gives trouble, and to buy that regulator's parts with the first order so they are on hand; they are not fitted unless needed. With no assembly service wanted, the user has a small preference for PCBWay from good past experience, and is willing to go back to JLCPCB if something justifies it.
+**Rejected:** four layers. A study the same day found them workable electrically (see [prototype notes](../prototype/NOTES.md)), but they put up to 25 escape tracks and their vias on the visible back, and the price gap looked small.
+**Not decided here:** the quantity; the stackup and via treatment, which depend on the fabricator's six-layer offer; the regulator part and the links that select it. These are being worked out and will be recorded where they land (power tree, hardware notes).
+**Evidence:** direct user replies, November 27.
+
