@@ -520,14 +520,14 @@
    "source": "DS14791 Table 18 p.100, Table 19 p.117"
   },
   {
-   "signal": "48 MHz crystal (footprint only)",
+   "signal": "48 MHz crystal pins (no crystal, no footprint)",
    "pin": "PH0-OSC_IN / PH1-OSC_OUT",
    "ball": "A7 / B7",
-   "function": "HSE oscillator pins",
+   "function": "HSE oscillator pins, unused",
    "bank": "VDDA18AON, 1.8 V from 1V8_MAIN",
    "reset_and_rom_state": "Inputs. Flash boot and the capture firmware run without the crystal.",
-   "same_as_prototype": "yes (pins); the Nucleo fits the crystal",
-   "note": "Only the USB transport code turns the crystal on, and USB is off this board. Leave crystal and load capacitors unfitted.",
+   "same_as_prototype": "no (the Nucleo fits the crystal)",
+   "note": "Removed on November 27: USB is permanently out of this design, and only the USB transport code ever turned the crystal on. Leave both balls unconnected; firmware never enables HSE.",
    "source": "DS14791 Table 18 p.105, note 2 p.112; firmware/usb-ptp/transport/usb_ptp_transport.c"
   },
   {

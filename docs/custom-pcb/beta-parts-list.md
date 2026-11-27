@@ -53,7 +53,6 @@ Shared capacitor and resistor lines are listed once, with the count per board an
 | 200 ohm 1% (CSI_REXT) and 2 ohm 1% (SMPS snubber) | Yageo RC0402FR-07200RL; Yageo RC0402FR-072RL | 1 each | 0402, about 0.35 mm | CHOSEN BY THE REVIEWER, CHECKED | Reflow | PIN; PW 2026-11-27 | Stock not looked up; no snippet. Both are the Nucleo's parts |
 | Cell-voltage divider at PA8: 1 M over 560 k, 1% | Yageo RC0402FR-071ML; Yageo RC0402FR-07560KL | 1 each | 0402, about 0.35 mm | CHOSEN BY THE REVIEWER, CHECKED with caveat | Reflow | PIN; PW 2026-11-27 | Stock not looked up; no snippet. Caveat: no guaranteed accuracy against the MCU's 5 uA pin-leakage limit; 100 k over 56 k fits the same pads |
 | External core regulator kit (fallback) | See the fallback table below | 0 fitted; buy 10 sets | - | Provision and purchase DECIDED BY THE USER; parts CHOSEN BY THE REVIEWER | Not fitted unless needed; by hand, hot air | DN 2026-11-27; PT | See below |
-| 48 MHz crystal and load capacitors | NDK CS13734-48M, the current number for NX1612SA-48MHZ-EXS00A-CS13734 (DigiKey 644-CS13734-48MCT-ND; neither number verified by the checker); capacitors Yageo CC0402CRNPO9BN8R2, 8.2 pF C0G | 0 fitted: one crystal footprint, two capacitor footprints. Buy a few of each as spares | Crystal 1.6 x 1.2 mm, 0.30 mm typical; capacitors 0402 | PROPOSED: do not fit (the study's pick, CHECKED with caveat) | Unfitted | PIN; RN 2026-11-26; OQ defaults; PN 2026-11-27 | Snippet: 5,894 on one DigiKey page; 16-week lead time on another. Caveat: the boot ROM's serial boot without the crystal is untested |
 | 32.768 kHz crystal | None; not fitted | 0 | - | No part; optional unfitted link from the RTC clock output | - | PIN | - |
 | Sensor 12 MHz oscillator | ECS ECS-2520MVLC-120-CN-TR (DigiKey 50-ECS-2520MVLC-120-CN-TRCT-ND) | 1 | 4-pad, 2.5 x 2.0 mm, 0.90 mm (corrected by the checker; 0.8 mm reported) | CHOSEN BY THE REVIEWER, CHECKED with caveat | Reflow | PIN; PL-09; PN 2026-11-27 | Stock thin. Snippets conflict: 4,856 on one regional page, 0 on another; 9-week lead time; the checker saw no figure. Buy early. ECS datasheet not stored: start-up time, jitter and output levels unread. Alternate ECS-2520MVLC-120-BN-TR (+/-50 ppm) |
 | RTC | Micro Crystal RV-3032-C7-32.768KHZ-2.5PPM-TA-QC (DigiKey 2195-RV-3032-C7-32.768KHZ-2.5PPM-TA-QCCT-ND) or -TA-QA (DigiKey 2195-RV-3032-C7-32.768KHZ-2.5PPM-TA-QACT-ND), whichever the live page has in stock | 1 | C7 ceramic, 3.2 x 1.5 mm, 0.8 mm | Part DECIDED BY THE USER; ordering code corrected by the checker (the picker preferred QA on a stock reading that did not hold; the two differ only in qualification) | Reflow; hot-air rework at 270 C at most | PN 2026-11-11, 2026-11-27; PT open point 7 | Snippets: QC 19,348 on a regional page, about $3.18; QA about 10,000 to 12,700, about $3.33. Every RTC figure is from a third-party mirror of the application manual. It cannot run from the cell with a 1.8 V bus: see the next row |
@@ -106,6 +105,7 @@ For the provision described in the [power tree](../power/beta-power-tree.md). Te
 | Dual N-FETs | Si1922EDH, DMN2990UDJ | PW 2026-11-26 |
 | Hobby thumbwheels and dual-track dials | uxcell B503, RK10J12 parts | PN 2026-11-25 |
 | 40 MHz crystal | CX3225SA40000D0PTWCC | PL (recovered design); PIN |
+| 48 MHz crystal and its 8.2 pF load capacitors | NDK CS13734-48M (NX1612SA-48MHZ-EXS00A-CS13734); Yageo CC0402CRNPO9BN8R2 | RN 2026-11-27: USB is permanently out of the design; no footprint |
 | Adapter level shifters and LDOs | BSS138, 74LVC1T45, LD39050 | PIN (direct 1.8 V) |
 
 
@@ -192,8 +192,6 @@ From the study of November 27, after the checker's corrections. These are paper 
 | Cell-sense leakage error | about 50 mV at the cell per 50 nA of pin leakage; no guaranteed accuracy at the 5 uA limit | 100 k over 56 k fits the same pads with a tenth of the error |
 | PWR_ON pull-down | 47 k | 5 uA x 47 k = 0.235 V against the load switch's 0.5 V |
 | I2C pull-ups | camera bus: 2.2 k, 37 to 93 ns rise on 20 to 50 pF, limit 64 pF at 1 MHz. RTC bus: 4.7 k to 3V3_SW (about 200 ns on 50 pF); orientation-sensor bus 2.2 k | At 3.3 V the RTC allows 400 kHz |
-| Crystal load capacitors, unfitted | 2 x 8.2 pF C0G | 7 pF load, about 3 pF stray |
-| Crystal drive margin, if ever fitted | 1.64 to 2.10 mA/V needed against 1.95 mA/V available | Thin on paper; the crystal's shunt capacitance was not read |
 | Sensor clock levels and start wait | high at least 1.26 V, low at most 0.54 V; wait 20 ms or more before releasing XSHUTDOWN until the ECS datasheet is read (corrected by the checker; the 10 ms reported was unsourced) | DS12968 Table 15 p.33 |
 | **RTC, sensor, connectors** | | |
 | RTC drain on the cell, camera off | 170 nA typical, 270 nA maximum at 25 C: about 1.5 to 2.4 mAh a year, about 1% of the cell | RV-3032 manual p.128, backup current in level mode (third-party copy) |
@@ -212,12 +210,11 @@ From the study of November 27, after the checker's corrections. These are paper 
 ## Before ordering
 
 1. **Check stock on the live DigiKey page where snippets were doubtful or disagreed:** GRM188R61A106KE69J; TPS22918DBVR; SI2333DDS-T1-GE3; C1608X5R0J156M080AC; ECS-2520MVLC-120-CN-TR; DFE201612P-1R0M=P2; LIS2DW12TR; 503398-1892; RV-3032-C7 (QC against QA); RC0402FR-0710KL; RC0402FR-07510RL; RC0402JR-070RL; GRM155R71C224KA12D; GRM155R61E105KA12D; TFM201610ALM-R47MTAA (alternate); ERA-3AEB104V (first list).
-2. **Check lines for which no stock figure was seen:** RC0402FR-071KL, RC0402FR-072K2L, RC0402FR-07200RL, RC0402FR-072RL, RC0402FR-071ML, RC0402FR-07560KL, CC0402KRX7R9BB222, CC0402KRX7R9BB103, CC0402CRNPO9BN8R2, GRM188R60J226MEA0J, FTSH-107-01-L-DV-K, and the first list's Alps dials and Omron switch. The checkers saw no figure for GRM155R71C104KA88D or the SMPS coil.
-3. **Confirm DigiKey numbers that were inferred or not seen by the checker:** 490-18109-1-ND (buck coil), 490-14372-1-ND (10 uF), 490-10017-1-ND (1 uF), 311-0.0JRCT-ND (0 ohm), 490-3261-1-ND (100 nF), 445-8027-1-ND (15 uF), 644-CS13734-48MCT-ND (crystal), 846-PMR03EZPJ000CT-ND (jumper). No DigiKey number was seen for SI2333DDS-T1-GE3 or XZMDKCBDDG45S-9.
+2. **Check lines for which no stock figure was seen:** RC0402FR-071KL, RC0402FR-072K2L, RC0402FR-07200RL, RC0402FR-072RL, RC0402FR-071ML, RC0402FR-07560KL, CC0402KRX7R9BB222, CC0402KRX7R9BB103, GRM188R60J226MEA0J, FTSH-107-01-L-DV-K, and the first list's Alps dials and Omron switch. The checkers saw no figure for GRM155R71C104KA88D or the SMPS coil.
+3. **Confirm DigiKey numbers that were inferred or not seen by the checker:** 490-18109-1-ND (buck coil), 490-14372-1-ND (10 uF), 490-10017-1-ND (1 uF), 311-0.0JRCT-ND (0 ohm), 490-3261-1-ND (100 nF), 445-8027-1-ND (15 uF), 846-PMR03EZPJ000CT-ND (jumper). No DigiKey number was seen for SI2333DDS-T1-GE3 or XZMDKCBDDG45S-9.
 4. **Picks the checker could not verify** (no pick was marked low confidence): Molex 503398-1892, until drawing SD-503398-003 is read; GRM188R61A106KE69J at the three LDOs (bias loss, height, fitted count); TPS7A2028PDBVR as the 2.8 V alternate.
 5. **Check part status:** DFE201612P-1R0M=P2 is marked no longer manufactured in one distributor snippet; TFM201610ALM-R47MTAA is called being discontinued at RS; order SI2333DDS-T1-GE3, not SI2333DS or the -T1-BE3 listing.
 6. **Decisions for the owner** (the study marked only the first for the user; the others are choices its picks leave open):
-   - 48 MHz crystal: leave it unfitted (the study's recommendation) and buy a few with their 8.2 pF pairs in case UART serial boot stalls?
    - Thin 1.8 V floor: add margin now, by a second TPS22918DBVR feeding only VDDA18CSI (the checker's suggestion), the bypass link if ST allows it, or the 1.83 V adjustable conversion, or wait for the bench?
    - SMPS output capacitors: 15 uF as ST's table says, or the 22 uF the Nucleo fits?
    - Orientation sensor: still the default "unless the owner objects".
@@ -263,7 +260,7 @@ Carried from the pickers' open points and from every requirement the checkers fo
 - The sensor clock must be running before XSHUTDOWN is raised (checker).
 - RTC: write EEPROM C0h = 60h at first boot (see Design values); the RTC is on I2C1 (PH9, PC1) at 3.3 V; send a STOP or bus-clear before the first access and check the PORF and VLF flags; clear or ignore the EVF flag, which is set at every power-on with EVI held low (checker).
 - Cell readings: wait 30 ms after power-up, and space the samples of a burst, because each takes about one step of charge from the 10 nF (checker).
-- Without the crystal the timebase is the internal oscillator: +/-0.5% at 30 C and up to +/-5% over temperature, which affects the probe UART and the SD clock.
+- There is no crystal (removed November 27), so the timebase is the internal oscillator: +/-0.5% at 30 C and up to +/-5% over temperature, which affects the probe UART and the SD clock.
 - LED: green looks about 6.5 times brighter than red and blue at equal current, so dim it by PWM or fit a larger resistor after seeing it. Use red for the low-battery warning.
 - Low-battery level (tree open point 4): the 3.3 V rail leaves regulation below about a 3.40 to 3.44 V input but stays usable to about 2.8 V; the 2.8 V rail regulates to about 2.83 V and keeps the sensor in range to about 2.68 V, where the tree says 2.75 V.
 
