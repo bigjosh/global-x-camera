@@ -2,7 +2,42 @@
 
 KiCad files for the first custom board, the beta. The recovered September design is in [../kicad](../kicad) and is not the starting point.
 
-So far this holds one footprint library, `GXB.pretty`, with the dial and the shutter switch.
+So far this holds the board's stackup and layout rules, and one footprint library, `GXB.pretty`, with the dial and the shutter switch.
+
+## The board
+
+**Status: proposal, November 27. The fabricator is not chosen, and no fabricator page could be opened from the review environment: every fabricator figure below is from search summaries, third-party copies or recollection. Confirm each on the live quote page before layout.**
+
+Six layers, 1.6 mm, ENIG, every part on one side. The user chose six layers for the look of the back, which is the camera's user-facing face.
+
+| Layer | Use |
+|---|---|
+| L1 | parts; the camera's differential pairs; the boot-flash lines; SMPS coil and capacitors; ground fill |
+| L2 | unbroken ground |
+| L3 | supply islands: VDDCORE, `1V8_MAIN`, `1V8_AUX`, `3V3_SW`, sensor rails |
+| L4 | unbroken ground |
+| L5 | the 25 inner-ring BGA escapes and slow signals; ground fill |
+| L6 | the back: one ground pour, no tracks, no parts |
+
+Rules:
+
+- **BGA:** land 0.40 mm, mask opening 0.47 mm (DS14791 Table 138). Dog-bone through vias, no via in a pad. Planned via 0.45 mm land with 0.20 mm drill; a fabricator whose standard ring is larger gets a 0.50 mm land, which still fits.
+- **Vias on the back:** resin-filled and capped is the only treatment that leaves the back flat. Ground vias then vanish into the pour and each other via shows as a small flat disc in a hairline ring. Covered or plugged vias leave a dimple each. Keep every via at or under 0.5 mm drill so it can be filled.
+- **Impedance:** the camera pairs are 100 ohm differential on L1 over L2; SD and boot-flash lines 50 ohm. Widths come from the chosen fabricator's own calculator for its stackup. On a 0.10 mm outer dielectric they are about 0.12 mm track with 0.19 mm gap, and 0.15 mm single-ended (field-solved here, not the fabricator's figures).
+- **Back pour:** solid connection to ground vias, pulled back 0.3 mm from the edges, the camera cut-out and the three window holes; the window holes are drawn as unplated holes, not vias.
+- **Copper balance:** fill the unused areas of L1, L3 and L5 with stitched ground to limit bow.
+- **For hand assembly:** a silkscreen outline and corner marks for the MCU; a paste stencil ordered with the boards; the back rests on the hot plate, so try one board first to see whether the mask scuffs.
+- **Order remarks:** no order number, date code or fabricator mark on the back.
+
+Fabricator candidates (user's preference: PCBWay; JLCPCB if justified):
+
+| | PCBWay | JLCPCB |
+|---|---|---|
+| Stackup to name | its standard six-layer build with about 0.12 mm outer prepreg | JLC06161H-3313: 0.099 mm outer prepreg, 0.55 mm cores, about 0.11 mm between L3 and L4 |
+| Filled, capped vias | a paid option; one report of about $100 on a five-board order | reported free and standard on six layers |
+| ENIG | surcharge, amount not found | reported included on six layers |
+| Planned 0.45/0.20 mm via | under its standard ring; use 0.50 mm or ask | reported inside the no-surcharge rule |
+| Matte mask | offered at extra charge | believed not offered |
 
 ## ALPS_RK10J11E0034_FaceDown
 

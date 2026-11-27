@@ -93,6 +93,8 @@ Decoupling follows AN5967 Table 6 p.12-13. Balls are from DS14791 Table 18 p.108
 ## Rules the schematic must carry
 
 - Gate pull-downs on HOLD and the LED FETs are 10 to 22 kilohm; the 3.3 V enable's is 47 kilohm or less. At 100 kilohm the datasheet's worst-case pin leakage could turn them on.
+- The PWR_ON pull-down is 47 to 68 kilohm for the same reason: PWR_ON also enables the fallback core regulator when one is fitted (added November 27).
+- PB12 (ball R10) stays unassigned: it is the pin ST's Nucleo uses to switch an external core regulator to the higher core voltage.
 - Every reset returns HOLD to a floating input, so on the cell the board stays up only for the shutter's start pulse until firmware runs again. The force-on pad covers programming.
 - SD pull-ups go to the switched 3.3 V rail, never to 1.8 V.
 - Unused I/O is left unconnected and set by firmware to analog or a pull (AN5967 section 12.7).
