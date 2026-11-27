@@ -129,3 +129,9 @@
 **Not decided here:** the quantity; the stackup and via treatment, which depend on the fabricator's six-layer offer; the regulator part and the links that select it. These are being worked out and will be recorded where they land (power tree, hardware notes).
 **Evidence:** direct user replies, November 27.
 
+## 2026-11-27  First run: ten bare boards
+
+**Why:** the user wants slack for assembly mistakes ("10 boards forst run to give me some slack for mistakes"); the BGA is hand-placed and a bad joint cannot be seen.
+**Not decided here:** how many of the ten get a full set of parts. The MCU is the costly and thinly stocked part (about $21 each; DigiKey US showed 6 on November 26), so the kit quantity is a separate choice from the board quantity.
+**Evidence:** direct user reply, November 27.
+
