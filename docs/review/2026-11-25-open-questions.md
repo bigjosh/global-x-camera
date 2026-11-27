@@ -33,7 +33,8 @@ On November 25 the user redefined the first board as a beta: one small LiPo, an 
 | 26, 28 | Not on this beta: no NAND and no cell holders. A card socket and a LiPo replace them. |
 | 30 | **Resolved.** Alps RK10J11E0034 for both dials, mounted face-down; a small hole below each dial centre shows the selected label. See [prototype notes](../prototype/NOTES.md). A draft [KiCad footprint](../../hardware/beta/README.md) exists; it is to be checked against a real part. Wiring: outside terminals are the track ends, middle terminal the wiper; the wiper position and the switch's pin order are best guesses the user chose on November 27 to build on; meter the first parts to arrive. |
 | 21 | Drafted. The [pin table](../custom-pcb/beta-pin-table.md) assigns every signal and was checked once against ST's tables; its open points remain. |
-| 12, 13, 16–18, 23, 25, 27, 29, 31–35 | Open. Items 12 and 13 are covered by the agreed power tree; 25 waits for a camera module in hand. |
+| 23 | Partly resolved. The user assembles the boards, BGA included; see [decision notes](../decisions/NOTES.md). Open: the fabricator (JLCPCB assumed), the quantity, four or six layers. |
+| 12, 13, 16–18, 25, 27, 29, 31–35 | Open. Items 12 and 13 are covered by the agreed power tree; 25 waits for a camera module in hand. |
 
 ## 1. Housekeeping first (owner)
 
