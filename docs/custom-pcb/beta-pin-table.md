@@ -2,7 +2,7 @@
 
 **Status: draft, November 26, 2026.** Drafted from ST's datasheet (DS14791 Rev 10), the boot ROM manual (UM3234) and the prototype firmware's pin use, then checked row by row by a second reader, who confirmed every ball, alternate function and supply bank and asked for the changes already folded in below. Nothing here has been run on hardware. The same rows are in [beta-pin-table.json](beta-pin-table.json).
 
-Banks on this board: VDD and VDDIO3 at 1.8 V, always on; VDDIO5 at 3.3 V, switched, for the SD card only; VDDIO2 and VDDIO4 unused, tied to 1.8 V.
+Banks on this board: VDD and VDDIO3 at 1.8 V, always on; VDDIO5 at 3.3 V, switched, for the SD card; VDDIO4 at 3.3 V on the same switched rail, for the RTC bus only (changed November 27); VDDIO2 unused, tied to 1.8 V.
 
 ## Changes from the prototype's pins
 
@@ -56,10 +56,12 @@ Banks on this board: VDD and VDDIO3 at 1.8 V, always on; VDDIO5 at 3.3 V, switch
 | ASA dial wiper | PG15 | R6 | ADC1_INP7 (analog) | VDD pin, 1.8 V; converted against VDDA18ADC and VREF+ (1V8_AUX) | Analog input in reset. The boot ROM does not use it. | yes (same channel) | As the exposure dial. Balls P7, R6 and U8 keep the three analog inputs together. |
 | Cell voltage sense | PA8 | U8 | ADC1_INP5 (analog) | VDD pin, 1.8 V; converted against VDDA18ADC and VREF+ (1V8_AUX) | Analog input in reset. The boot ROM does not use it. | no (new; the prototype sensed USB voltage on PA11) | Divider must keep the pin under 1.8 V at a 4.2 V cell. PA11 is avoided because the old selector code reads it as USB present. |
 | Cell divider enable (optional) | PA12 | U7 | GPIO output, high = divider connected | VDD, 1.8 V always on | Analog input in reset and through ROM boot; pull-down keeps the divider off. | no (new signal) | Not needed if the divider hangs from the latched input node, which I recommend. A low-side switch alone would let the ADC pin float to cell voltage. |
-| RTC and orientation I2C clock | PE13 | A11 | I2C4_SCL, AF4, open-drain | VDD, 1.8 V always on | Analog input in reset. The boot ROM does not use it. | no (prototype has neither part) | The only second I2C pair wholly on the VDD bank and clear of ROM pins. Pull-ups to 1V8_MAIN. |
-| RTC and orientation I2C data | PE14 | B11 | I2C4_SDA, AF4, open-drain | VDD, 1.8 V always on | Analog input in reset. The boot ROM does not use it. | no | As the clock line. |
-| RTC interrupt (optional) | PC13 | F3 | GPIO input, interrupt line 13; also RTC timestamp and wake-up 3 | VDD_VSW backup-domain switch, 1.8 V | Analog input in reset. The boot ROM does not use it. | no | Open-drain from the RV-3032 with a pull-up to 1.8 V, through a 0 ohm link. The RV-3032 documents are not stored, so its pin behaviour is unverified. |
-| 32.768 kHz input (not fitted) | PC14-OSC32_IN / PC15-OSC32_OUT | D1 / C1 | LSE oscillator pins; no crystal fitted | VDD_VSW backup-domain switch, 1.8 V | Inputs, unused by the boot ROM. | no (the Nucleo fits a crystal; project firmware never enables it) | I found no LSE or backup-domain clock code in the project's firmware. Optional unfitted link from the RTC's clock output to PC14. |
+| Orientation sensor I2C clock | PE13 | A11 | I2C4_SCL, AF4, open-drain | VDD, 1.8 V always on | Analog input in reset. The boot ROM does not use it. | no (prototype has no such part) | Pull-ups to 1V8_MAIN. The RTC left this bus on November 27; with the sensor cut, these two pins are free. |
+| Orientation sensor I2C data | PE14 | B11 | I2C4_SDA, AF4, open-drain | VDD, 1.8 V always on | Analog input in reset. The boot ROM does not use it. | no | As the clock line. |
+| RTC I2C clock | PH9 | D8 | I2C1_SCL, AF4, open-drain | VDDIO4, 3.3 V switched (3V3_SW) | Analog input in reset; bank isolated until firmware validates it. Boot ROM use not checked. | no (prototype has no RTC) | RV-3032 alone on this bus. Pull-up 4.7 kilohm to 3V3_SW only. Ball in the fourth row: needs a via. |
+| RTC I2C data | PC1 | A9 | I2C1_SDA, AF4, open-drain | VDDIO4, 3.3 V switched (3V3_SW) | Analog input in reset; bank isolated until firmware validates it. Boot ROM use not checked. | no | As the clock line. Outer-row ball. |
+| RTC interrupt (not connected) | PC13 | F3 | GPIO input, interrupt line 13; also RTC timestamp and wake-up 3 | VDD_VSW backup-domain switch, 1.8 V | Analog input in reset. The boot ROM does not use it. | no | Left unconnected on the beta. The RV-3032 now has its supply pin on 3V3_SW, so a pull-up to 1.8 V would sit above its unpowered supply pin, and nothing uses the interrupt. Keep an unfitted 0 ohm link only if layout allows. |
+| 32.768 kHz input (not fitted) | PC14-OSC32_IN / PC15-OSC32_OUT | D1 / C1 | LSE oscillator pins; no crystal fitted | VDD_VSW backup-domain switch, 1.8 V | Inputs, unused by the boot ROM. | no (the Nucleo fits a crystal; project firmware never enables it) | I found no LSE or backup-domain clock code in the project's firmware. No link from the RTC's clock output: it now swings 3.3 V and PC14 is a 1.8 V pin. |
 | Orientation sensor interrupt (first to cut) | PE12 | B12 | GPIO input, interrupt line 12 | VDD, 1.8 V always on | Analog input in reset. The boot ROM does not use it. | no | LIS2DW12 INT1. Beside the I2C4 balls, so the whole group drops out together if the sensor is cut. |
 | 48 MHz crystal (footprint only) | PH0-OSC_IN / PH1-OSC_OUT | A7 / B7 | HSE oscillator pins | VDDA18AON, 1.8 V from 1V8_MAIN | Inputs. Flash boot and the capture firmware run without the crystal. | yes (pins); the Nucleo fits the crystal | Only the USB transport code turns the crystal on, and USB is off this board. Leave crystal and load capacitors unfitted. |
 | Exposure-mirror test pad (optional) | PD0 | D13 | GPIO output driven by existing firmware | VDD, 1.8 V always on | Analog input in reset. The boot ROM does not use it. | yes | The timing measurements so far use this output. Keep it as a pad; assign nothing else to it. |
@@ -76,13 +78,13 @@ Banks on this board: VDD and VDDIO3 at 1.8 V, always on; VDDIO5 at 3.3 V, switch
 
 ## Supply pins
 
-1V8_MAIN (always on): VDD (G13, H12, H13, J12, J13, K13), VDDA18AON (F6), VDDA18PLL (M5), VBAT (E1), VDDIO3 (N13, P13), VDDIO2 (L13, L14, M14, M15), VDDIO4 (E8, F8), and PDR_ON (A1), which "must always be connected to VDDA18AON" (AN5967 Table 7 p.14).
+1V8_MAIN (always on): VDD (G13, H12, H13, J12, J13, K13), VDDA18AON (F6), VDDA18PLL (M5), VBAT (E1), VDDIO3 (N13, P13), VDDIO2 (L13, L14, M14, M15), and PDR_ON (A1), which "must always be connected to VDDA18AON" (AN5967 Table 7 p.14).
 
 1V8_AUX (switched by PWR_ON): VDDSMPS (K1 to K6), VDDA18PMU (G1, through a ferrite), VDDA18ADC (N6), VREF+ (U2, also the dials' top end), VDDA18CSI (R5).
 
 Core: VLXSMPS (J1 to J6) through 1 µH to VDDCORE (L6, L12, M7, M9, M11, N8, N10, N12, P11); VFBSMPS (G2) senses VDDCORE; VDDCSI (R4) to VDDCORE; V08CAP (F1) gets 4.7 µF only.
 
-3V3_SW: VDDIO5 (E9, F9), with the card.
+3V3_SW: VDDIO5 (E9, F9), with the card; VDDIO4 (E8, F8), for the RTC bus, each ball with its own 100 nF.
 
 USB unused: VDD33USB (A4) and VDDA18USB (C5) to VSS. AN5967 Table 5 p.7 says "Connected to VSS if not used", with note 2 p.8: "If USB/UCPD features are not used : DP/DM pins must be connected to VSS. TXRTUNE pins must be left floating/open. UCPD_CC1/CC2 pins must be left floating/open." Figure 6 p.12 draws both supplies grounded.
 
@@ -94,6 +96,7 @@ Decoupling follows AN5967 Table 6 p.12-13. Balls are from DS14791 Table 18 p.108
 
 - Gate pull-downs on HOLD and the LED FETs are 10 to 22 kilohm; the 3.3 V enable's is 47 kilohm or less. At 100 kilohm the datasheet's worst-case pin leakage could turn them on.
 - The PWR_ON pull-down is 47 to 68 kilohm for the same reason: PWR_ON also enables the fallback core regulator when one is fitted (added November 27).
+- VDDIO4 is a 3.3 V bank from November 27: never set its 1.8 V range bit (RM0486: that damages the device), leave OTP124 bit 14 unprogrammed, and set its supply-valid bit only after 3V3_SW is up (fixed delay: the supply-ready flag does not work, ES0620 2.2.29). RTC pull-ups go to 3V3_SW, never to the cell or to 1.8 V.
 - PB12 (ball R10) stays unassigned: it is the pin ST's Nucleo uses to switch an external core regulator to the higher core voltage.
 - Every reset returns HOLD to a floating input, so on the cell the board stays up only for the shutter's start pulse until firmware runs again. The force-on pad covers programming.
 - SD pull-ups go to the switched 3.3 V rail, never to 1.8 V.
@@ -102,7 +105,7 @@ Decoupling follows AN5967 Table 6 p.12-13. Balls are from DS14791 Table 18 p.108
 ## Open points
 
 1. ST's answer on a 3.3 V VDDIO5 bank beside a 1.8 V VDD still decides the six SD rows (DS14791 Table 24 p.140 limits inputs to Min(VDD, VDDIOx) + 0.3 V). If the answer is no, the SD lines need a level translator or VDD goes to 3.3 V and most of this table changes bank voltage.
-2. RTC bus: I gave the RV-3032 and LIS2DW12 their own bus (I2C4 on PE13/PE14) so nothing but the sensor sits on the camera bus during the 50 ms start. Sharing the camera bus would save two pins. The RV-3032 documents are still not stored, so its supply, interrupt and clock-output levels are unverified.
+2. RTC bus: I gave the RV-3032 and LIS2DW12 their own bus (I2C4 on PE13/PE14) so nothing but the sensor sits on the camera bus during the 50 ms start. Sharing the camera bus would save two pins. The RV-3032 documents are still not stored, so its supply, interrupt and clock-output levels are unverified. **Changed November 27:** the RTC moved to its own 3.3 V bus, I2C1 on PH9 and PC1 (bank VDDIO4 on 3V3_SW), with its supply pin on 3V3_SW and the cell on its backup pin in level switchover mode; the LIS2DW12 stays on I2C4. Check UM3234 for any boot-ROM use of PH9 and PC1, and remove the stored dial firmware's use of bank VDDIO4 pins.
 3. Cell-voltage divider: decide whether it hangs from the latched input node (no enable pin, a few microamps while on) or from the cell through a high-side switch (uses PA12).
 4. Serial boot through the probe's UART would be a second way onto a blank board, but the ROM's serial boot also starts the USB block (UM3234 Table 10 p.11) and this board grounds the USB supplies. Whether UART serial boot still works is not stated; try it on the Nucleo or ask ST. Development boot plus SWD stays the planned route.
 5. Erratum 2.2.16 (ES0620 p.10): the reference-buffer clamp can draw current through VDDA18AON when the ADC supply is absent. Here the ADC supply is on the switched auxiliary rail. Revision Z parts have no workaround; revision B has a software one. Check the revision you buy.

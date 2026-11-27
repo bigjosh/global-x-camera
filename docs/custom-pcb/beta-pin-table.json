@@ -443,18 +443,18 @@
    "source": "DS14791 Table 18 p.92, Table 19 p.113"
   },
   {
-   "signal": "RTC and orientation I2C clock",
+   "signal": "Orientation sensor I2C clock",
    "pin": "PE13",
    "ball": "A11",
    "function": "I2C4_SCL, AF4, open-drain",
    "bank": "VDD, 1.8 V always on",
    "reset_and_rom_state": "Analog input in reset. The boot ROM does not use it.",
-   "same_as_prototype": "no (prototype has neither part)",
-   "note": "The only second I2C pair wholly on the VDD bank and clear of ROM pins. Pull-ups to 1V8_MAIN.",
+   "same_as_prototype": "no (prototype has no such part)",
+   "note": "Pull-ups to 1V8_MAIN. The RTC left this bus on November 27; with the sensor cut, these two pins are free.",
    "source": "DS14791 Table 18 p.100, Table 19 p.117"
   },
   {
-   "signal": "RTC and orientation I2C data",
+   "signal": "Orientation sensor I2C data",
    "pin": "PE14",
    "ball": "B11",
    "function": "I2C4_SDA, AF4, open-drain",
@@ -465,14 +465,36 @@
    "source": "DS14791 Table 18 p.100, Table 19 p.117"
   },
   {
-   "signal": "RTC interrupt (optional)",
+   "signal": "RTC I2C clock",
+   "pin": "PH9",
+   "ball": "D8",
+   "function": "I2C1_SCL, AF4, open-drain",
+   "bank": "VDDIO4, 3.3 V switched (3V3_SW)",
+   "reset_and_rom_state": "Analog input in reset; bank isolated until firmware validates it. Boot ROM use not checked.",
+   "same_as_prototype": "no (prototype has no RTC)",
+   "note": "RV-3032 alone on this bus. Pull-up 4.7 kilohm to 3V3_SW only. Ball in the fourth row: needs a via.",
+   "source": "DS14791 Table 18 p.106, Table 19 p.120; RM0486 p.351"
+  },
+  {
+   "signal": "RTC I2C data",
+   "pin": "PC1",
+   "ball": "A9",
+   "function": "I2C1_SDA, AF4, open-drain",
+   "bank": "VDDIO4, 3.3 V switched (3V3_SW)",
+   "reset_and_rom_state": "Analog input in reset; bank isolated until firmware validates it. Boot ROM use not checked.",
+   "same_as_prototype": "no",
+   "note": "As the clock line. Outer-row ball.",
+   "source": "DS14791 Table 18 p.95, Table 19 p.115"
+  },
+  {
+   "signal": "RTC interrupt (not connected)",
    "pin": "PC13",
    "ball": "F3",
    "function": "GPIO input, interrupt line 13; also RTC timestamp and wake-up 3",
    "bank": "VDD_VSW backup-domain switch, 1.8 V",
    "reset_and_rom_state": "Analog input in reset. The boot ROM does not use it.",
    "same_as_prototype": "no",
-   "note": "Open-drain from the RV-3032 with a pull-up to 1.8 V, through a 0 ohm link. The RV-3032 documents are not stored, so its pin behaviour is unverified.",
+   "note": "Left unconnected on the beta. The RV-3032 now has its supply pin on 3V3_SW, so a pull-up to 1.8 V would sit above its unpowered supply pin, and nothing uses the interrupt. Keep an unfitted 0 ohm link only if layout allows.",
    "source": "DS14791 Table 18 p.96, note 8 p.112; AN5967 Table 7 p.14"
   },
   {
@@ -483,7 +505,7 @@
    "bank": "VDD_VSW backup-domain switch, 1.8 V",
    "reset_and_rom_state": "Inputs, unused by the boot ROM.",
    "same_as_prototype": "no (the Nucleo fits a crystal; project firmware never enables it)",
-   "note": "I found no LSE or backup-domain clock code in the project's firmware. Optional unfitted link from the RTC's clock output to PC14.",
+   "note": "I found no LSE or backup-domain clock code in the project's firmware. No link from the RTC's clock output: it now swings 3.3 V and PC14 is a 1.8 V pin.",
    "source": "DS14791 Table 18 p.97; search of firmware/ for LSE and BDCR, 2026-11-26"
   },
   {
@@ -630,5 +652,5 @@
    "source": "DS14791 Table 18 p.91"
   }
  ],
- "supply_pins": "1V8_MAIN (always on): VDD (G13, H12, H13, J12, J13, K13), VDDA18AON (F6), VDDA18PLL (M5), VBAT (E1), VDDIO3 (N13, P13), VDDIO2 (L13, L14, M14, M15), VDDIO4 (E8, F8), and PDR_ON (A1), which \"must always be connected to VDDA18AON\" (AN5967 Table 7 p.14).\n1V8_AUX (switched by PWR_ON): VDDSMPS (K1 to K6), VDDA18PMU (G1, through a ferrite), VDDA18ADC (N6), VREF+ (U2, also the dials' top end), VDDA18CSI (R5).\nCore: VLXSMPS (J1 to J6) through 1 µH to VDDCORE (L6, L12, M7, M9, M11, N8, N10, N12, P11); VFBSMPS (G2) senses VDDCORE; VDDCSI (R4) to VDDCORE; V08CAP (F1) gets 4.7 µF only.\n3V3_SW: VDDIO5 (E9, F9), with the card.\nUSB unused: VDD33USB (A4) and VDDA18USB (C5) to VSS. AN5967 Table 5 p.7 says \"Connected to VSS if not used\", with note 2 p.8: \"If USB/UCPD features are not used : DP/DM pins must be connected to VSS. TXRTUNE pins must be left floating/open. UCPD_CC1/CC2 pins must be left floating/open.\" Figure 6 p.12 draws both supplies grounded.\nGround: VREF- (T2), VSSA (M6), VSSAON (G6), VSSAPMU (F2), VSSSMPS (H1 to H6), VSS.\nDecoupling follows AN5967 Table 6 p.12-13. Balls are from DS14791 Table 18 p.108-111 and match MB1940 sheet 4."
+ "supply_pins": "1V8_MAIN (always on): VDD (G13, H12, H13, J12, J13, K13), VDDA18AON (F6), VDDA18PLL (M5), VBAT (E1), VDDIO3 (N13, P13), VDDIO2 (L13, L14, M14, M15), and PDR_ON (A1), which \"must always be connected to VDDA18AON\" (AN5967 Table 7 p.14).\n1V8_AUX (switched by PWR_ON): VDDSMPS (K1 to K6), VDDA18PMU (G1, through a ferrite), VDDA18ADC (N6), VREF+ (U2, also the dials' top end), VDDA18CSI (R5).\nCore: VLXSMPS (J1 to J6) through 1 µH to VDDCORE (L6, L12, M7, M9, M11, N8, N10, N12, P11); VFBSMPS (G2) senses VDDCORE; VDDCSI (R4) to VDDCORE; V08CAP (F1) gets 4.7 µF only.\n3V3_SW: VDDIO5 (E9, F9), with the card; VDDIO4 (E8, F8), for the RTC bus, each ball with its own 100 nF.\nUSB unused: VDD33USB (A4) and VDDA18USB (C5) to VSS. AN5967 Table 5 p.7 says \"Connected to VSS if not used\", with note 2 p.8: \"If USB/UCPD features are not used : DP/DM pins must be connected to VSS. TXRTUNE pins must be left floating/open. UCPD_CC1/CC2 pins must be left floating/open.\" Figure 6 p.12 draws both supplies grounded.\nGround: VREF- (T2), VSSA (M6), VSSAON (G6), VSSAPMU (F2), VSSSMPS (H1 to H6), VSS.\nDecoupling follows AN5967 Table 6 p.12-13. Balls are from DS14791 Table 18 p.108-111 and match MB1940 sheet 4."
 }

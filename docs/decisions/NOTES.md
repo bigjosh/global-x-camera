@@ -146,3 +146,8 @@
 **Rejected:** parts for only five builds, the proposal accepted an hour earlier.
 **Evidence:** direct user reply, November 27.
 
+## 2026-11-27  The clock's battery must be field-replaceable in the product; the beta uses the LiPo
+
+**Why:** the user set the requirement while choosing the RTC's backup source ("Battery needs to be field replaceable"), and accepted the LiPo as the backup for this early revision because the LiPo is expected to go in a later one, which frees board area. On the beta the clock therefore loses the time if the LiPo goes flat or is unplugged.
+**Consequence for later revisions:** a soldered, tabbed coin cell does not meet the requirement; the cell goes in a holder or retainer. A CR2032 is 3.2 mm thick, over the height limit on a 1.6 mm board; a CR2016 in a low-profile retainer is about 2.2 mm and needs roughly a 20 mm circle of board, and a 12 mm cell would run the RTC for over ten years.
+**Evidence:** direct user reply, November 27; cell and retainer figures from the RTC study's search summaries, not from drawings.

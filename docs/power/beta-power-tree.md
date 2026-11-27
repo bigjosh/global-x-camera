@@ -6,6 +6,8 @@ Inputs settled with the user: a single LiPo, the Grepow GRP292434 (210 mAh, 2.9 
 
 **Changed November 26:** the user removed USB from this revision. The source-selection stage, the USB PHY supply and the VBUS protection are gone from the tree below. The MCU's USB supply pins are tied off as ST's hardware guide directs for an unused PHY.
 
+**Changed November 27:** the RTC is powered from `3V3_SW` with the cell on its backup pin, as the user proposed, in place of the always-on 1.8 V regulator first suggested for it. Its bus runs at 3.3 V on MCU bank VDDIO4, which moves to `3V3_SW`. This uses the LiPo for this revision only: the user requires the eventual clock battery to be field-replaceable.
+
 **Changed November 27:** the user asked for a fallback in case the internal SMPS gives trouble. The board carries unpopulated footprints for an external core regulator and two links that select it; see "Fallback: external core regulator" below. The default build is unchanged.
 
 ## The tree
@@ -16,7 +18,8 @@ Inputs settled with the user: a single LiPo, the Grepow GRP292434 (210 mAh, 2.9 
 | Main buck | TI TPS6282x, 1.8 V (stored datasheet; used in the recovered design) | `1V8_MAIN` | Soft start 1.25 ms, inside ST's ramp limits. Feeds VDD, VDDA18AON, VDDA18PLL, VBAT, the unused banks and the boot flash. |
 | Auxiliary switch | load switch enabled by `PWR_ON` (TI TPS22918, stored datasheet), with a bypass link | `1V8_AUX` | ST requires the main supplies up before the auxiliary ones. Feeds the internal SMPS, the ADC, CSI analog supplies, the sensor's I/O and the 1.2 V regulator. |
 | Core | the MCU's internal SMPS; an external regulator is provisioned as a fallback and not fitted | 0.81 V | No extra converter and no firmware needed to start. Never run in this project: the Nucleo ships on its external buck. |
-| SD rail | LDO with slow slew and active discharge (onsemi NCP115C 3.3 V, stored datasheet), enabled by an MCU pin with a pull-down | `3V3_SW` | Feeds the card and the MCU's SD pin bank (VDDIO5), nothing else. |
+| SD rail | LDO with slow slew and active discharge (onsemi NCP115C 3.3 V, stored datasheet), enabled by an MCU pin with a pull-down | `3V3_SW` | Feeds the card and the MCU's SD pin bank (VDDIO5). From November 27 it also feeds the RTC's supply pin, the RTC bus pull-ups and the MCU bank that bus is on (VDDIO4). |
+| RTC | Micro Crystal RV-3032-C7: supply pin on `3V3_SW`, backup pin on the cell through 1 kΩ with 1 µF at the pin | — | Level switchover mode: it runs from `3V3_SW` while the camera is on and from the cell while it is off. No regulator of its own. |
 | Sensor analog | 2.8 V LDO from the input node | 2.8 V | Holds until the cell is near 2.75 V. |
 | Sensor core | 1.2 V LDO from `1V8_AUX` | 1.2 V | Burns up to about 52 mW while streaming, which a LiPo can afford. |
 | LED | low-side FETs from the input node | — | Fault blinks then work with the 3.3 V rail off. |
@@ -83,6 +86,7 @@ The MCU pins need 1.746 to 1.89 V: the floor is the CSI analog supply, the ceili
 - Never set the bank's 1.8 V range bit while it is at 3.3 V: ST says that damages the device.
 - Never issue a backup-domain reset: a stored erratum says the internal SMPS output then drops and does not recover.
 - The SD start-up profile assumes an already valid rail and must change.
+- RTC: on first power-up write its EEPROM register C0h = 60h (clock output off, level switchover, trickle charger off). Until that is done the part ignores its backup pin and loses the time at every power-off. Read the RTC only after `3V3_SW` is up and bank VDDIO4's supply-valid bit is set; treat a set power-on flag as time lost.
 
 ## Open points
 
@@ -92,7 +96,7 @@ The MCU pins need 1.746 to 1.89 V: the floor is the CSI analog supply, the ceili
 4. **Low-battery lock-out** at about 3.3 to 3.4 V under load keeps both the 3.3 V rail and the 2.8 V regulator in regulation. It needs the chosen cell's resistance.
 5. *(Removed with USB.)*
 6. **Probe.** The board is 1.8 V: an STLINK-V3MINIE works from 1.65 V; a plain STLINK-V3SET needs its voltage adapter.
-7. **RTC supply** waits on the RV-3032 documents.
+7. **RTC supply:** settled on November 27 (above), from third-party copies of the RV-3032 manual; re-check against Micro Crystal's own documents. It rests on the same answer from ST as the SD bank (point 1). The `3V3_SW` ramp sits at the lower edge of the RTC's stated power-on window; it matters only until the switchover mode is programmed.
 8. The 2.8 V version of the LDO looked thinly stocked; buy it early or name an alternate.
 
 ## What would change this

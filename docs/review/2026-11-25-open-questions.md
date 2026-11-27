@@ -18,7 +18,7 @@ On November 25 the user redefined the first board as a beta: one small LiPo, an 
 |---|---|
 | 1 | **Resolved.** Pull request #1's firmware and installer are ignored for PCB planning. See [root notes](../../NOTES.md). |
 | 2 | Open. The user asked what the local checkout and stash hold. The review environment cannot reach the user's PC; it needs `git status` and `git stash list` output, or the work pushed to a branch. |
-| 3 | Open. The user has the RV-3032 documents in the PC's downloads folder, which the review environment cannot reach. They need uploading, or fetching from the maker's site. |
+| 3 | Partly resolved. Third-party copies of the RV-3032-C7 application manual and datasheet are stored, and the RTC's supply was settled from them on November 27: supply pin on the switched 3.3 V rail, the cell on its backup pin. Micro Crystal's own documents are still wanted to confirm. |
 | 4 | **Resolved.** KiCad. |
 | 5 | **Resolved.** Grepow GRP292434 (210 mAh) lying on the parts side of a 1.6 mm board, its protection board unfolded flat beside it by hand; 4.6 mm overall. See [power notes](../power/NOTES.md). Measure the unfolded protection board on the first cell. |
 | 6 | **Resolved.** Unordered power-down is accepted. |
