@@ -140,3 +140,9 @@
 **Why:** the user accepted the reviewer's proposal ("5 builds plus spare mcus is good"): parts for five complete boards and three spare MCUs, eight MCUs in all, with the other five bare boards kept for practice and as spares. A hand-placed BGA can fail without showing it, and the MCU is the thinly stocked part.
 **Evidence:** direct user reply, November 27. The count of three spares is the reviewer's figure, which the user accepted without restating it.
 
+## 2026-11-27  Parts quantity changed: ten of everything except the MCU
+
+**Why:** the user revised the entry above the same day ("Actually just order 10x everything except the mcu"): parts for all ten boards, so any board can be completed. The MCU count stays at eight, the earlier five plus three spares; that reading is the reviewer's, since the user did not restate the MCU number.
+**Rejected:** parts for only five builds, the proposal accepted an hour earlier.
+**Evidence:** direct user reply, November 27.
+
