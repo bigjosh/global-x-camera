@@ -529,3 +529,10 @@ wiring change; target left in recovery with HIGH HOLD for the user's meter.
 **Deferred:** the user's choice between the regulator and the LiPo-on-backup arrangement.
 **Evidence:** reports of November 27 reading the stored third-party copies of the RV-3032-C7 application manual Rev 1.3 (pp. 45, 58 to 61, 127 to 131, 137 to 141), DS14791 Rev 10 Tables 18, 19, 21 and 24, RM0486 Rev 4 and ES0620 Rev 5. Nothing was built or measured.
 
+## 2026-11-27  Proposed parts confirmed; 22 uF on the SMPS output; a one-board DigiKey kit file
+
+**Why:** the user confirmed the four parts still marked proposed: RGB LED SunLED XZMDKCBDDG45S-9, camera connector Hirose BM28B0.6-30DS/2-0.35V(51), card socket Molex 503398-1892 and orientation sensor LIS2DW12TR. The user accepted Murata GRM188R60J226MEA0J, 22 uF, for the four SMPS output capacitors, the part the Nucleo fits, in place of the 15 uF in ST's table. To check stock the user asked for a one-board kit to import into DigiKey, order ten of, and see what is backordered: [beta-digikey-kit.csv](../custom-pcb/beta-digikey-kit.csv), 49 lines.
+**Rejected for the stock check:** driving DigiKey's site from a browser in the review session (the site refuses automated traffic, and the session's own rules stopped the attempt); passing the user's login through chat.
+**Still unverified on the confirmed parts:** the card socket's drawing has not been read, so its detect switch and setback are not fixed; the 22 uF line and the reviewer's added 100 nF for the boot flash were not checked by a second reader.
+**Evidence:** direct user replies, November 27; the kit file was cross-checked once against the parts list by a second reader, who found no errors.
+
