@@ -135,3 +135,8 @@
 **Not decided here:** how many of the ten get a full set of parts. The MCU is the costly and thinly stocked part (about $21 each; DigiKey US showed 6 on November 26), so the kit quantity is a separate choice from the board quantity.
 **Evidence:** direct user reply, November 27.
 
+## 2026-11-27  Parts for five builds, plus spare MCUs
+
+**Why:** the user accepted the reviewer's proposal ("5 builds plus spare mcus is good"): parts for five complete boards and three spare MCUs, eight MCUs in all, with the other five bare boards kept for practice and as spares. A hand-placed BGA can fail without showing it, and the MCU is the thinly stocked part.
+**Evidence:** direct user reply, November 27. The count of three spares is the reviewer's figure, which the user accepted without restating it.
+
